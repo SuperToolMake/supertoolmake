@@ -1,0 +1,34 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "tasksRunnerOptions": {
+    "default": {
+      "options": {
+        "cacheableOperations": ["build", "test", "check:types"]
+      }
+    }
+  },
+  "targetDefaults": {
+    "build": {
+      "inputs": [
+        "default",
+        "{workspaceRoot}/scripts/*",
+        "{workspaceRoot}/lerna.json",
+        "{workspaceRoot}/.github/workflows/*",
+        "{workspaceRoot}/tsconfig.build.json"
+      ]
+    },
+    "test": {
+      "inputs": [
+        "default",
+        "{workspaceRoot}/scripts/*",
+        "{workspaceRoot}/lerna.json",
+        "{workspaceRoot}/.github/workflows/*"
+      ]
+    }
+  },
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "sharedGlobals": [],
+    "production": ["default"]
+  }
+}
