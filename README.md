@@ -1,4 +1,3 @@
-
 <h1>
   Babibudi
 </h1>
@@ -12,10 +11,9 @@
     <li>✖️ Excludes the pro module
     <li>✖️ Excludes the internal DB
     <li>✖️ Excludes automations
-    <li>✖️ Excludes plugins 
+    <li>✖️ Excludes plugins
+    <li>✖️ Excludes user groups
   </ul>
 </p>
 
 Forked from release [3.23.42](https://github.com/Budibase/budibase/releases/tag/3.23.42)
-
-
