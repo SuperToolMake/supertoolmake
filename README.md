@@ -4,7 +4,7 @@
 </h1>
 
 <h3>
-  A light weight non-commercial fork of [Budibase](https://github.com/Budibase/budibase). 
+  A light weight non-commercial fork of <a href="https://github.com/Budibase/budibase">Budibase</a>. 
 </h3>
 <p>
   <ul>
