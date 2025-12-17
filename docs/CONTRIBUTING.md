@@ -138,8 +138,6 @@ To develop the Budibase platform you'll need [Docker](https://www.docker.com/) a
 
 `yarn setup` will check that all necessary components are installed and setup the repo for usage.
 
-If you have access to the `@budibase/pro` submodule then please follow the Pro section of this guide before running the above command.
-
 ##### Manual method
 
 The following commands can be executed to manually get Budibase up and running (assuming Docker/Docker Compose has been installed).
@@ -147,8 +145,6 @@ The following commands can be executed to manually get Budibase up and running (
 `yarn` to install project dependencies
 
 `yarn build` will build all budibase packages.
-
-If you have access to the `@budibase/pro` submodule then please follow the Pro section of this guide before running the above commands.
 
 #### 4. Running
 
@@ -233,34 +229,6 @@ yarn mode:account
 
 An overview of the CI pipelines can be found [here](../.github/workflows/README.md)
 
-### Pro
-
-@budibase/pro is the closed source package that supports licensed features in budibase. By default the package will be pulled from NPM and will not normally need to be touched in local development. If you need to make an update to pro and have access to the repo, then you can update your submodule within the mono-repo by running `git submodule update --init` - from here you can use normal submodule flow to develop a change within pro.
-
-Once you have updated to use the pro submodule, it will be linked into all of your local dependencies by NX as with all other monorepo packages. If you have been using the NPM version of `@budibase/pro` then you may need to run a `git reset --hard` to fix all of the pro versions back to `0.0.0` to be monorepo aware.
-
-From here - to develop a change in pro, you can follow the below flow:
-
-```
-# enter the pro submodule
-cd packages/pro
-# get the base branch you are working from (same as monorepo)
-git fetch
-git checkout master
-# create a branch, named the same as the branch in your monorepo
-git checkout -b <some branch>
-... make changes
-# commit the changes you've made, with a message for pro
-git commit <something>
-# within the monorepo, add the pro reference to your branch, commit it with a message like "Update pro ref"
-cd ../..
-git add packages/pro
-git commit <add the new reference to main repo>
-```
-
-From here, you will have created a branch in the pro repository and commited the reference to your branch on the monorepo. When you eventually PR this work back into the mainline branch, you will need to first merge your pro PR to the pro mainline, then go into your PR in the monorepo and update the reference again to the new mainline.
-
-Note that only budibase maintainers will be able to access the pro repo.
 
 ### Troubleshooting
 

@@ -12,7 +12,10 @@
     <li>✖️ Excludes the pro module
     <li>✖️ Excludes the internal DB
     <li>✖️ Excludes automations
+    <li>✖️ Excludes plugins 
   </ul>
 </p>
+
+Forked from release [3.23.42](https://github.com/Budibase/budibase/releases/tag/3.23.42)
 
 
