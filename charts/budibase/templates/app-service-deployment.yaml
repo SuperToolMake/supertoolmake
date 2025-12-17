@@ -142,8 +142,6 @@ spec:
           {{ end }}
         - name: SELF_HOSTED
           value: {{ .Values.globals.selfHosted | quote }}
-        - name: POSTHOG_TOKEN
-          value: {{ .Values.globals.posthogToken | quote }}
         - name: WORKER_URL
           value: http://worker-service:{{ .Values.services.worker.port }}
         - name: LITELLM_URL

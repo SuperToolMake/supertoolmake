@@ -19,7 +19,6 @@ if [[ -z "${MINIO_URL}" && -z "${USE_S3}" ]]; then
 fi
 
 export NODE_ENV="${NODE_ENV:-production}"
-export POSTHOG_TOKEN="${POSTHOG_TOKEN:-phc_bIjZL7oh2GEUd2vqvTBH8WvrX0fWTFQMs6H5KQxiUxU}"
 export ACCOUNT_PORTAL_URL="${ACCOUNT_PORTAL_URL:-https://account.budibase.app}"
 export REDIS_URL="${REDIS_URL:-127.0.0.1:6379}"
 export SELF_HOSTED="${SELF_HOSTED:-1}"
