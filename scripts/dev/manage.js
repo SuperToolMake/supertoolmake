@@ -36,8 +36,6 @@ async function init() {
     PASSWORD_MIN_LENGTH: "1",
     PLUGINS_DIR: "",
     BUDICLOUD_URL: "https://budibaseqa.app",
-    BB_ADMIN_USER_EMAIL: "local@budibase.com",
-    BB_ADMIN_USER_PASSWORD: "cheekychuckles",
   }
 
   config = { ...config, ...existingConfig }

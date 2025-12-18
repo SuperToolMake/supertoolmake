@@ -17,3 +17,31 @@
 </p>
 
 Forked from release [3.23.42](https://github.com/Budibase/budibase/releases/tag/3.23.42)
+
+<h3>
+  Local development
+</h3>
+<p>
+  To run locally, you will need to have <b>docker</b> installed. 
+  
+  Also ensure your IDE has permissions for mounting the volumes defined in <a href="/hosting/docker-compose.dev.yaml">docker-compose.dev.yaml</a>. 
+  <br />For example, in macOS I had to do this via `Privacy & Security > Files & Folders` 
+</p>
+
+<h4>Starting</h4>
+
+`yarn` - installs the dependencies
+<br />`yarn dev` - runs Babibudi locally
+
+You will know yarn dev has worked correctly when there are no build errors of course, but also you will see the following containers running:
+
+- budi-nginx-dev
+- budi-couchdb3-dev
+- budi-redis-dev
+- budi-minio-dev (note to self: can I remove this?)
+
+Once running, visit [localhost:10000/builder](http://localhost:10000/builder)
+
+You should be prompted to create a super admin:
+
+<img src="docs/super_admin.png">
