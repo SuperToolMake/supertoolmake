@@ -3,16 +3,16 @@
 </h1>
 
 <h3>
-  A light weight non-commercial fork of <a href="https://github.com/Budibase/budibase">Budibase</a>. 
+  A light weight fork of <a href="https://github.com/Budibase/budibase">Budibase</a>. 
 </h3>
 <p>
   <ul>
-    <li>✔️ Includes the app builder for client apps
-    <li>✖️ Excludes the pro module
-    <li>✖️ Excludes the internal DB
-    <li>✖️ Excludes automations
-    <li>✖️ Excludes plugins
-    <li>✖️ Excludes user groups
+    ✔️ Includes the app builder for client apps
+    <br />✖️ Excludes the pro module
+    <br />✖️ Excludes the internal DB
+    <br />✖️ Excludes automations
+    <br />✖️ Excludes plugins
+    <br />✖️ Excludes user groups
   </ul>
 </p>
 
