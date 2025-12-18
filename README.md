@@ -44,4 +44,4 @@ Once running, visit [localhost:10000/builder](http://localhost:10000/builder)
 
 You should be prompted to create a super admin:
 
-<img src="docs/super_admin.png">
+<img src="docs/super_admin.png" width="640">
