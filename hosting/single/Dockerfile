@@ -46,14 +46,6 @@ ENV TARGETBUILD=$TARGETBUILD
 RUN apt-get update && \
     apt-get install -y --no-install-recommends software-properties-common nginx uuid-runtime redis-server libaio1 gettext-base python3-pip python3-venv
 
-# Install litellm
-RUN python3 -m venv /opt/venv/litellm
-RUN /opt/venv/litellm/bin/pip install 'litellm[proxy]'
-RUN mkdir -p /litellm
-
-# This is the default litellm config file, users can mount their own
-COPY hosting/litellm_config.yaml /litellm/config.yaml
-
 # Install postgres client for pg_dump utils
 RUN apt install -y software-properties-common apt-transport-https ca-certificates gnupg \
     && curl -fsSl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | tee /usr/share/keyrings/postgresql.gpg > /dev/null \
@@ -114,8 +106,6 @@ COPY --from=build /app/packages/worker /worker
 
 EXPOSE 80
 EXPOSE 443
-# Expose port 4000 for LiteLLM config dashboard
-EXPOSE 4000
 # Expose port 2222 for SSH on Azure App Service build
 EXPOSE 2222
 VOLUME /data

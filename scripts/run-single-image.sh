@@ -22,7 +22,6 @@ docker run -d \
   budibase:latest
 
 echo "Budibase single image is running. Access it at http://localhost:80"
-echo "LiteLLM dashboard available at http://localhost:4000"
 echo "To stop the container, run: docker stop budibase-single"
 echo "To remove the container, run: docker rm budibase-single"
 echo "To view logs, run: docker logs budibase-single -f"

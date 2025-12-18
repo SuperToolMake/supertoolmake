@@ -140,8 +140,6 @@ spec:
           value: {{ .Values.globals.selfHosted | quote }}
         - name: ENABLE_ANALYTICS
           value: {{ .Values.globals.enableAnalytics | quote }}
-        - name: LITELLM_URL
-          value: {{ .Values.globals.litellmUrl | quote }}
         - name: ACCOUNT_PORTAL_URL
           value: {{ .Values.globals.accountPortalUrl | quote }}
         - name: INTERNAL_ACCOUNT_PORTAL_URL

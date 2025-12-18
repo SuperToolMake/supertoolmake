@@ -89,7 +89,6 @@ ln -s ${DATA_DIR}/.env /worker/.env
 mkdir -p ${DATA_DIR}/minio
 mkdir -p ${DATA_DIR}/redis
 mkdir -p ${DATA_DIR}/couch
-mkdir -p ${DATA_DIR}/litellm
 chown -R couchdb:couchdb ${DATA_DIR}/couch
 
 echo "Starting Redis runner..."
@@ -128,18 +127,6 @@ fi
 
 # Wait for backend services to start
 sleep 10
-
-LITELLM_CONFIG_PATH="/litellm/config.yaml"
-if [ -f "${DATA_DIR}/litellm/config.yaml" ]; then
-    echo "Using user-mounted litellm config from ${DATA_DIR}/litellm/config.yaml"
-    LITELLM_CONFIG_PATH="${DATA_DIR}/litellm/config.yaml"
-fi
-
-pm2 start /opt/venv/litellm/bin/litellm \
-  --interpreter /opt/venv/litellm/bin/python \
-  --restart-delay 5000 \
-  --time \
-  -- -c "${LITELLM_CONFIG_PATH}"
 
 pushd app
 pm2 start --name app "yarn run:docker"
