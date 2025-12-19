@@ -5431,10 +5431,10 @@
   resolved "https://registry.yarnpkg.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.52.4.tgz#5b2dd648a960b8fa00d76f2cc4eea2f03daa80f4"
   integrity sha512-bf9PtUa0u8IXDVxzRToFQKsNCRz9qLYfR/MpECxl4mRoWYjAeFjgxj1XdZr2M/GNVpT05p+LgQOHopYDlUu6/w==
 
-"@roxi/routify@3.5.1":
-  version "3.5.1"
-  resolved "https://registry.yarnpkg.com/@roxi/routify/-/routify-3.5.1.tgz#c5ac1dc0fb66bc02cbe14bb9fb9e05439679af1c"
-  integrity sha512-V43rXXNOdRAl9IDprgJNAsOZocp6jrm9yidQIA+x6O1CC8ET7p1eC7brKYCUsMJlGlN7Lxpf3tsIojy3wqfIVg==
+"@roxi/routify@3.6.4":
+  version "3.6.4"
+  resolved "https://registry.yarnpkg.com/@roxi/routify/-/routify-3.6.4.tgz#bc324ad30c96ae2670067c76e3ca409c7c39d415"
+  integrity sha512-cLx0gyUjbdUfQnNCVRi8Itabze/SFQSn7mvF6w/OGZkJRC89sscwMop7CT0hEc+yTZsj5l6RMK6JD5xHS6E9pg==
   dependencies:
     cachewrap "^0.0.1"
     cheap-watch "^1.0.4"

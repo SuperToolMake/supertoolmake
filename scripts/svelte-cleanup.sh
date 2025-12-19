@@ -28,17 +28,17 @@ do
         continue
     fi
 
-    # skip page files in /pages directories unless they look like components
-    if [[ "$svelte_file" == *"/pages/"* ]]
+    # skip page files in /routes directories unless they look like components
+    if [[ "$svelte_file" == *"/routes/"* ]]
     then
         # Page route files - always skip these as they're used by the router
-        if [[ "$filename" == "index.svelte" || "$filename" == "_layout.svelte" || "$filename" == "_fallback.svelte" || "$filename" =~ ^\[.*\]\.svelte$ ]]
+        if [[ "$filename" == "index.svelte" || "$filename" == "_module.svelte" || "$filename" == "_fallback.svelte" || "$filename" =~ ^\[.*\]\.svelte$ ]]
         then
             echo -n -e "${GREEN}.${NC}"
             continue
         fi
         
-        # Component-like files in pages (typically in _components/ subdirs or PascalCase names)
+        # Component-like files in routes (typically in _components/ subdirs or PascalCase names)
         # Only check these if they look like reusable components
         if [[ "$svelte_file" == *"/_components/"* || "$filename" =~ ^[A-Z][A-Za-z]*\.svelte$ ]]
         then
