@@ -5,13 +5,14 @@ import {
   DeploymentStatus,
   FetchDeploymentResponse,
   PublishStatusResponse,
+  PublishTableRequest,
+  PublishTableResponse,
   PublishWorkspaceRequest,
   PublishWorkspaceResponse,
   Table,
   UserCtx,
 } from "@budibase/types"
 import { DocumentType } from "../../../db/utils"
-import env from "../../../environment"
 import sdk from "../../../sdk"
 import { builderSocket } from "../../../websockets"
 import Deployment from "./Deployment"
@@ -187,32 +188,16 @@ export async function publishStatus(ctx: UserCtx<void, PublishStatusResponse>) {
   }
 }
 
-export const publishWorkspace = async function (
-  ctx: UserCtx<PublishWorkspaceRequest, PublishWorkspaceResponse>
-) {
-  if (ctx.request.body?.automationIds || ctx.request.body?.workspaceAppIds) {
-    throw new errors.NotImplementedError(
-      "Publishing resources by ID not currently supported"
-    )
-  }
-  const seedProductionTables = ctx.request.body?.seedProductionTables
+type PublishContext = UserCtx<
+  PublishWorkspaceRequest | PublishTableRequest,
+  PublishWorkspaceResponse | PublishTableResponse
+>
+
+export const publishWorkspaceInternal = async (ctx: PublishContext) => {
   let deployment = new Deployment()
   deployment.setStatus(DeploymentStatus.PENDING)
   deployment = await storeDeploymentHistory(deployment)
   let tablesToSync: "all" | string[] | undefined
-  if (env.isTest()) {
-    // TODO: a lot of tests depend on old behaviour of data being published
-    // we could do with going through the tests and updating them all to write
-    // data to production instead of development - but doesn't improve test
-    // quality - so keep publishing data in dev for now
-    tablesToSync = "all"
-  } else if (seedProductionTables) {
-    try {
-      tablesToSync = await sdk.tables.listEmptyProductionTables()
-    } catch (e) {
-      tablesToSync = []
-    }
-  }
 
   const appId = context.getWorkspaceId()!
 
@@ -247,8 +232,7 @@ export const publishWorkspace = async function (
           replication.appReplicateOpts({
             isCreation: !isPublished,
             tablesToSync,
-            // don't use checkpoints, this can stop previously ignored data being replicated
-            checkpoint: !seedProductionTables,
+            checkpoint: false,
           })
         )
 
@@ -361,4 +345,17 @@ export const publishWorkspace = async function (
 
   ctx.body = deployment
   builderSocket?.emitAppPublish(ctx)
+  return deployment
+}
+
+export const publishWorkspace = async function (
+  ctx: UserCtx<PublishWorkspaceRequest, PublishWorkspaceResponse>
+) {
+  if (ctx.request.body?.automationIds || ctx.request.body?.workspaceAppIds) {
+    throw new errors.NotImplementedError(
+      "Publishing resources by ID not currently supported"
+    )
+  }
+
+  ctx.body = await publishWorkspaceInternal(ctx)
 }

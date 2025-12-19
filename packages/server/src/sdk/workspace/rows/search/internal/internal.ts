@@ -1,5 +1,5 @@
 import { context, HTTPError } from "@budibase/backend-core"
-import { Row, TableSchema } from "@budibase/types"
+import { Row, TableSchema, Table } from "@budibase/types"
 import sdk from "../../../.."
 import {
   csv,
@@ -110,9 +110,13 @@ export async function exportRows(
 }
 
 export async function fetch(tableId: string): Promise<Row[]> {
-  const table = await sdk.tables.getTable(tableId)
+  const table = await getTableForFetch(tableId)
   const rows = await fetchRaw(tableId)
   return await outputProcessing(table, rows)
+}
+
+async function getTableForFetch(tableId: string): Promise<Table> {
+  return await sdk.tables.getTable(tableId)
 }
 
 export async function fetchRaw(

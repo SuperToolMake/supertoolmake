@@ -2,11 +2,12 @@ import { context } from "@budibase/backend-core"
 import {
   Database,
   INTERNAL_TABLE_SOURCE_ID,
+  RowValue,
   Table,
   TableSourceType,
 } from "@budibase/types"
 import sdk from "../.."
-import { getTableParams, InternalTables } from "../../../db/utils"
+import { getRowParams, getTableParams, InternalTables } from "../../../db/utils"
 import {
   breakExternalTableId,
   isExternalTableID,
@@ -83,12 +84,42 @@ export async function listEmptyProductionTables(): Promise<string[]> {
   return context.doInWorkspaceContext(
     context.getProdWorkspaceId(),
     async () => {
+      const db = context.getWorkspaceDB()
+      const hasNonDeletedRows = async (tableId: string) => {
+        const batchSize = 25
+        let skip = 0
+
+        while (true) {
+          const { rows } = await db.allDocs<RowValue>(
+            getRowParams(tableId, null, {
+              include_docs: false,
+              limit: batchSize,
+              skip,
+            })
+          )
+          if (rows.length === 0) {
+            return false
+          }
+
+          const containsLiveRow = rows.some(row => !row.value?.deleted)
+          if (containsLiveRow) {
+            return true
+          }
+
+          if (rows.length < batchSize) {
+            return false
+          }
+
+          skip += batchSize
+        }
+      }
+
       for (let table of internalTables) {
         if (table._id === InternalTables.USER_METADATA || !table._id) {
           continue
         }
-        const aRow = await sdk.rows.fetchRaw(table._id, 1)
-        if (aRow.length === 0) {
+        const hasRows = await hasNonDeletedRows(table._id)
+        if (!hasRows) {
           emptyTableIds.push(table._id)
         }
       }
