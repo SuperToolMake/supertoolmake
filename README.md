@@ -22,10 +22,14 @@ Forked from release [3.23.42](https://github.com/Budibase/budibase/releases/tag/
   Local development
 </h3>
 <p>
-  To run locally, you will need to have <b>docker</b> installed. 
-  
-  Also ensure your IDE has permissions for mounting the volumes defined in <a href="/hosting/docker-compose.dev.yaml">docker-compose.dev.yaml</a>. 
-  <br />For example, in macOS I had to do this via `Privacy & Security > Files & Folders` 
+  To run locally, you will need to have <b>docker</b> installed.
+
+If you are not using _Docker Desktop_, you can use [Colima](https://github.com/abiosoft/colima).
+<br />Run `colima start` to spin up the docker runtime.
+
+Also ensure your IDE has permissions for mounting the volumes defined in <a href="/hosting/docker-compose.dev.yaml">docker-compose.dev.yaml</a>.
+<br />For example, in macOS I had to do this via `Privacy & Security > Files & Folders`
+
 </p>
 
 <h4>Starting</h4>
