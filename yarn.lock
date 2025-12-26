@@ -2829,18 +2829,6 @@
     to-gfm-code-block "^0.1.1"
     uuid "^9.0.1"
 
-"@budibase/nano@10.1.5":
-  version "10.1.5"
-  resolved "https://registry.yarnpkg.com/@budibase/nano/-/nano-10.1.5.tgz#eeaded7bfc707ecabf8fde604425b865a90c06ec"
-  integrity sha512-q1eKIsYKo+iK17zsJYd3VBl+5ufQMPpHYLec0wVsid8wnJVrTQk7RNpBlBUn/EDgXM7t8XNNHlERqHu+CxJu8Q==
-  dependencies:
-    "@types/tough-cookie" "^4.0.2"
-    axios "^1.1.3"
-    http-cookie-agent "^4.0.2"
-    node-abort-controller "^3.0.1"
-    qs "^6.11.0"
-    tough-cookie "^4.1.2"
-
 "@budibase/pouchdb-replication-stream@1.2.11":
   version "1.2.11"
   resolved "https://registry.yarnpkg.com/@budibase/pouchdb-replication-stream/-/pouchdb-replication-stream-1.2.11.tgz#b437584471f2cf6976fa690c338f432a3ecd24c9"
@@ -7948,7 +7936,7 @@
   resolved "https://registry.yarnpkg.com/@types/tmp/-/tmp-0.2.6.tgz#d785ee90c52d7cc020e249c948c36f7b32d1e217"
   integrity sha512-chhaNf2oKHlRkDGt+tiKE2Z5aJ6qalm7Z9rlLdBwmOiAAf09YQvvoLXjWK4HWPF1xU/fqvMgfNfpVoBscA/tKA==
 
-"@types/tough-cookie@*", "@types/tough-cookie@^4.0.2":
+"@types/tough-cookie@*":
   version "4.0.5"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-4.0.5.tgz#cb6e2a691b70cb177c6e3ae9c1d2e8b2ea8cd304"
   integrity sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==
@@ -9211,7 +9199,7 @@ aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.13.2.tgz#0aa167216965ac9474ccfa83892cfb6b3e1e52ef"
   integrity sha512-lHe62zvbTB5eEABUVi/AwVh0ZKY9rMMDhmm+eeyuuUQbQ3+J+fONVQOZyj+DdrvD4BY33uYniyRJ4UJIaSKAfw==
 
-axios@1.1.3, axios@1.7.7, axios@^0.21.1, axios@^1.0.0, axios@^1.1.3, axios@^1.4.0, axios@^1.6.2, axios@^1.6.8:
+axios@1.1.3, axios@1.7.7, axios@^0.21.1, axios@^1.0.0, axios@^1.4.0, axios@^1.6.2, axios@^1.6.8:
   version "1.7.7"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.7.7.tgz#2f554296f9892a72ac8d8e4c5b79c14a91d0a47f"
   integrity sha512-S4kL7XrjgBmvdGut0sN3yJxqYzrDOnivkBiN0OFs6hLiUam3UPvswUo0kqGyhqUZGEOytHyumEdXsAkgCOUf3Q==
@@ -14262,13 +14250,6 @@ http-cache-semantics@3.8.1, http-cache-semantics@4.1.1, http-cache-semantics@^4.
   resolved "https://registry.yarnpkg.com/http-cache-semantics/-/http-cache-semantics-4.1.1.tgz#abe02fcb2985460bf0323be664436ec3476a6d5a"
   integrity sha512-er295DKPVsV82j5kw1Gjt+ADA/XYHsajl82cGNQG2eyoPkvgUhX+nDIyelzhIWbbsXP39EHcI6l5tYs2FYqYXQ==
 
-http-cookie-agent@^4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/http-cookie-agent/-/http-cookie-agent-4.0.2.tgz#dcdaae18ed1f7452d81ae4d5cd80b227d6831b69"
-  integrity sha512-noTmxdH5CuytTnLj/Qv3Z84e/YFq8yLXAw3pqIYZ25Edhb9pQErIAC+ednw40Cic6Le/h9ryph5/TqsvkOaUCw==
-  dependencies:
-    agent-base "^6.0.2"
-
 http-errors@2.0.0, http-errors@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/http-errors/-/http-errors-2.0.0.tgz#b7774a1486ef73cf7667ac9ae0858c012c57b9d3"
@@ -17809,6 +17790,11 @@ nan@2.22.0, nan@^2.19.0, nan@^2.23.0:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.22.0.tgz#31bc433fc33213c97bad36404bb68063de604de3"
   integrity sha512-nbajikzWTMwsW+eSsNm3QwlOs7het9gGJU5dDZzRTQGk03vyBOauxgI4VakDzE0PtsGTmXPsXTbbjVhRwR5mpw==
 
+nano@11.0.3:
+  version "11.0.3"
+  resolved "https://registry.yarnpkg.com/nano/-/nano-11.0.3.tgz#61dffb1133d9f844030550008964835098ccc8d2"
+  integrity sha512-bOiBWTW5sA92Rp2Tuu5LmujUe0rre5AAKuiXuhjD4tBAVRZRrKWK0AJyEYWFm9PN8TRktsbUfUdDb//c5Cr3Dg==
+
 nanoclone@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/nanoclone/-/nanoclone-0.2.1.tgz#dd4090f8f1a110d26bb32c49ed2f5b9235209ed4"
@@ -17903,11 +17889,6 @@ node-abi@^3.3.0:
   integrity sha512-OhYaY5sDsIka7H7AtijtI9jwGYLyl29eQn/W623DiN/MIv5sUqc4g7BIDThX+gb7di9f6xK02nkp8sdfFWZLTg==
   dependencies:
     semver "^7.3.5"
-
-node-abort-controller@^3.0.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/node-abort-controller/-/node-abort-controller-3.1.1.tgz#a94377e964a9a37ac3976d848cb5c765833b8548"
-  integrity sha512-AGK2yQKIjRuqnc6VkX2Xj5d+QW8xZ87pa1UK6yA6ouUyuxfHuMP6umE5QK7UmTeOAymo+Zx1Fxiuw9rVx8taHQ==
 
 node-addon-api@^3.2.1:
   version "3.2.1"
