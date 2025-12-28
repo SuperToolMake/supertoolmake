@@ -163,7 +163,6 @@ jobs:
             mongodb,
             mariadb,
             oracle,
-            sqs,
             elasticsearch,
             dynamodb,
             none,

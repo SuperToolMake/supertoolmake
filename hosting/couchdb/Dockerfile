@@ -127,13 +127,3 @@ ADD clouseau/log4j.properties clouseau/clouseau.ini ./
 # setup CouchDB
 WORKDIR /opt/couchdb
 ADD couch/vm.args couch/local.ini ./etc/
-
-# setup SQS
-WORKDIR /opt/sqs
-ADD sqs ./
-RUN chmod +x ./install.sh && ./install.sh
-
-WORKDIR /
-ADD runner.sh ./bbcouch-runner.sh
-RUN chmod +x ./bbcouch-runner.sh /opt/clouseau/bin/clouseau /opt/sqs/sqs
-CMD ["./bbcouch-runner.sh"]
