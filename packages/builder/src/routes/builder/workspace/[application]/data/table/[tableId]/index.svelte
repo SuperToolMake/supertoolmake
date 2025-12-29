@@ -25,7 +25,6 @@
   import GridGenerateButton from "@/components/backend/DataTable/buttons/grid/GridGenerateButton.svelte"
   import GridScreensButton from "@/components/backend/DataTable/buttons/grid/GridScreensButton.svelte"
   import GridRowActionsButton from "@/components/backend/DataTable/buttons/grid/GridRowActionsButton.svelte"
-  import GridDevProdSwitcher from "@/components/backend/DataTable/buttons/grid/GridDevProdSwitcher.svelte"
   import { DB_TYPE_EXTERNAL } from "@/constants/backend"
   import { getContext } from "svelte"
   import {
@@ -198,9 +197,6 @@
           <GridImportButton />
           <GridExportButton />
         {/if}
-      </svelte:fragment>
-      <svelte:fragment slot="controls-right">
-        <GridDevProdSwitcher />
       </svelte:fragment>
 
       <!-- Content for editing columns -->
