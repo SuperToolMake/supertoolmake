@@ -125,12 +125,6 @@
 </ModalContent>
 
 <style>
-  .user-notification {
-    display: flex;
-    align-items: center;
-    flex-direction: row;
-    gap: var(--spacing-m);
-  }
   .icon {
     width: 10%;
     align-self: flex-start;

@@ -192,22 +192,21 @@
 >
   <div class="content">
     {#if sourceType}
-      <p class="warning">
-        {buildMessage(sourceType)}
-        {#if affectedScreens.length > 0}
-          <span class="screens">
-            <ul class="screens-list">
-              {#each affectedScreens as item}
-                <li>
-                  <Link overBackground target="_blank" href={item.url}
-                    >{item.text}</Link
-                  >
-                </li>
-              {/each}
-            </ul>
-          </span>
-        {/if}
-      </p>
+      <p class="warning"></p>
+      {buildMessage(sourceType)}
+      {#if affectedScreens.length > 0}
+        <span class="screens">
+          <ul class="screens-list">
+            {#each affectedScreens as item}
+              <li>
+                <Link overBackground target="_blank" href={item.url}
+                  >{item.text}</Link
+                >
+              </li>
+            {/each}
+          </ul>
+        </span>
+      {/if}
     {/if}
     <p class="warning">This action cannot be undone.</p>
   </div>

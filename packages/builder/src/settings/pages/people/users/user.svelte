@@ -10,7 +10,6 @@
     Icon,
     Input,
     MenuItem,
-    Popover,
     Select,
     Modal,
     notifications,
@@ -65,9 +64,6 @@
 
   let deleteModal
   let resetPasswordModal
-  let popoverAnchor
-  let searchTerm = ""
-  let popover
   let user, tenantOwner
   let loaded = false
   let userFieldsToUpdate = {}
@@ -342,11 +338,6 @@
     align-items: center;
     justify-content: flex-start;
     gap: var(--spacing-l);
-  }
-  .tableTitle {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
   }
   .subtitle {
     display: flex;

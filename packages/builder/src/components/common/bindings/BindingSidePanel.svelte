@@ -10,9 +10,7 @@
 
   export let addHelper: (_helper: Helper, _js?: boolean) => void = () => {}
   export let addBinding: (_binding: EnrichedBinding) => void = () => {}
-  export let addSnippet: (_snippet: Snippet) => void = () => {}
   export let bindings: EnrichedBinding[] | undefined
-  export let snippets: Snippet[] | null = null
   export let mode: BindingMode | undefined = BindingMode.Text
   export let allowHelpers: boolean = true
   export let allowSnippets: boolean = true
@@ -489,46 +487,5 @@
   .binding-popover.has-code :global(.cm-line),
   .binding-popover.has-code :global(.cm-content) {
     padding: 0;
-  }
-
-  /* Snippets */
-  .add-snippet-button {
-    margin-left: auto;
-  }
-  .snippet-list {
-    padding: 0 var(--spacing-l);
-    padding-bottom: var(--spacing-l);
-    display: flex;
-    flex-direction: column;
-  }
-  .snippet {
-    font-size: var(--font-size-s);
-    padding: var(--spacing-m);
-    border-radius: 4px;
-    background-color: var(--spectrum-global-color-gray-200);
-    transition:
-      background-color 130ms ease-out,
-      color 130ms ease-out,
-      border-color 130ms ease-out;
-    word-wrap: break-word;
-    display: flex;
-    justify-content: space-between;
-  }
-  .snippet:hover {
-    color: var(--spectrum-global-color-gray-900);
-    background-color: var(--spectrum-global-color-gray-50);
-    cursor: pointer;
-  }
-
-  /* Upgrade */
-  .upgrade {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-l);
-  }
-  .upgrade :global(p) {
-    text-align: center;
-    align-self: center;
   }
 </style>

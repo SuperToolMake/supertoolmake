@@ -427,9 +427,7 @@
           {context}
           addHelper={onSelectHelper}
           addBinding={onSelectBinding}
-          {addSnippet}
           {mode}
-          {snippets}
         />
       {:else if sidePanel === "Evaluation"}
         <EvaluationSidePanel

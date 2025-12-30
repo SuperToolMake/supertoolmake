@@ -98,13 +98,6 @@
 </ModalContent>
 
 <style>
-  .user-notification {
-    display: flex;
-    align-items: center;
-    flex-direction: row;
-    gap: var(--spacing-m);
-  }
-
   .dropzone {
     text-align: center;
     display: flex;
