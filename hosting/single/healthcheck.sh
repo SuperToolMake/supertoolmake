@@ -33,7 +33,7 @@ if [[ $(redis-cli -a $REDIS_PASSWORD --no-auth-warning  ping) != 'PONG' ]]; then
     echo 'ERROR: Redis is down';
     healthy=false
 fi
-# mino, clouseau, 
+# mino, 
 nginx -t -q
 NGINX_STATUS=$?
 

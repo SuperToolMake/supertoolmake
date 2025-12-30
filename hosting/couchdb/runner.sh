@@ -24,12 +24,10 @@ if [[ "${TARGETBUILD}" = "aas" ]]; then
         && (sleep 1;/tmp/ssh_setup.sh 2>&1 > /dev/null)
     cp /etc/sshd_config /etc/ssh/sshd_config
     /etc/init.d/ssh restart
-    sed -i "s#DATA_DIR#/home#g" /opt/clouseau/clouseau.ini
     sed -i "s#DATA_DIR#/home#g" /opt/couchdb/etc/local.ini
 elif [[ "${TARGETBUILD}" = "single" ]]; then
     # In the single image build, the Dockerfile specifies /data as a volume
     # mount, so we use that for all persistent data.
-    sed -i "s#DATA_DIR#/data#g" /opt/clouseau/clouseau.ini
     sed -i "s#DATA_DIR#/data#g" /opt/couchdb/etc/local.ini
 elif [[ "${TARGETBUILD}" = "docker-compose" ]]; then
     # We remove the database_dir and view_index_dir settings from the local.ini
@@ -38,11 +36,9 @@ elif [[ "${TARGETBUILD}" = "docker-compose" ]]; then
     # image.
     sed -i "s#^database_dir.*\$##g" /opt/couchdb/etc/local.ini
     sed -i "s#^view_index_dir.*\$##g" /opt/couchdb/etc/local.ini
-    sed -i "s#^dir=.*\$#dir=/opt/couchdb/data#g" /opt/clouseau/clouseau.ini
 elif [[ -n $KUBERNETES_SERVICE_HOST ]]; then
     # In Kubernetes the directory /opt/couchdb/data has a persistent volume
     # mount for storing database data.
-    sed -i "s#^dir=.*\$#dir=/opt/couchdb/data#g" /opt/clouseau/clouseau.ini
 
     # We remove the database_dir and view_index_dir settings from the local.ini
     # in Kubernetes because it will default to /opt/couchdb/data which is what
@@ -57,17 +53,10 @@ elif [[ -n $KUBERNETES_SERVICE_HOST ]]; then
     sed -i "s/^-name .*$//g" /opt/couchdb/etc/vm.args
 else
     # For all other builds, we use /data for persistent data.
-    sed -i "s#DATA_DIR#/data#g" /opt/clouseau/clouseau.ini
     sed -i "s#DATA_DIR#/data#g" /opt/couchdb/etc/local.ini
 fi
 
 sed -i "s#COUCHDB_ERLANG_COOKIE#${COUCHDB_ERLANG_COOKIE}#g" /opt/couchdb/etc/vm.args
-sed -i "s#COUCHDB_ERLANG_COOKIE#${COUCHDB_ERLANG_COOKIE}#g" /opt/clouseau/clouseau.ini
-
-# Start Clouseau. Budibase won't function correctly without Clouseau running, it
-# powers the search API endpoints which are used to do all sorts, including
-# populating app grids.
-/opt/clouseau/bin/clouseau > /dev/stdout 2>&1 &
 
 # Start CouchDB.
 /docker-entrypoint.sh /opt/couchdb/bin/couchdb > /dev/stdout 2>&1 &

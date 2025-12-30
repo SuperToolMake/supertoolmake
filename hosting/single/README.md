@@ -2,7 +2,7 @@
 
 ## Overview
 
-As an alternative to running several docker containers via docker-compose, the files under ./hosting/single can be used to build a docker image containing all of the Budibase components (minio, couch, clouseau etc).
+As an alternative to running several docker containers via docker-compose, the files under ./hosting/single can be used to build a docker image containing all of the Budibase components (minio, couch etc).
 We call this the 'single image' container as the Dockerfile adds all the components to a single docker image.
 
 ## Usage

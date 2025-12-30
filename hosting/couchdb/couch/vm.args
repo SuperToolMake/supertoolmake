@@ -10,10 +10,6 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-# erlang cookie for clouseau security
--name couchdb@127.0.0.1
--setcookie COUCHDB_ERLANG_COOKIE
-
 # Ensure that the Erlang VM listens on a known port
 -kernel inet_dist_listen_min 9100
 -kernel inet_dist_listen_max 9100

@@ -3,7 +3,7 @@
 # Everything in this `base` image is adapted from the official `couchdb` image's
 # Dockerfile. Only modifications related to upgrading from Debian bullseye to
 # bookworm have been included. The `runner` image contains Budibase's
-# customisations to the image, e.g. adding Clouseau.
+# customisations to the image
 FROM node:22-slim AS base
 
 # Add CouchDB user account to make sure the IDs are assigned consistently
@@ -111,18 +111,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends software-proper
     apt-add-repository 'deb https://packages.adoptium.net/artifactory/deb bookworm main' && \
     apt-get update && apt-get install -y --no-install-recommends temurin-8-jdk && \
     rm -rf /var/lib/apt/lists/
-
-# setup clouseau
-WORKDIR /
-RUN wget https://github.com/cloudant-labs/clouseau/releases/download/2.21.0/clouseau-2.21.0-dist.zip && \
-  unzip clouseau-2.21.0-dist.zip && \
-  mv clouseau-2.21.0 /opt/clouseau && \
-  rm clouseau-2.21.0-dist.zip
-
-WORKDIR /opt/clouseau
-RUN mkdir ./bin
-ADD clouseau/clouseau ./bin/
-ADD clouseau/log4j.properties clouseau/clouseau.ini ./
 
 # setup CouchDB
 WORKDIR /opt/couchdb
