@@ -1,0 +1,61 @@
+jest.mock("nodemailer")
+import { TestConfiguration } from "../../../../tests"
+
+describe("/api/global/self", () => {
+  const config = new TestConfiguration()
+
+  beforeAll(async () => {
+    await config.beforeAll()
+  })
+
+  afterAll(async () => {
+    await config.afterAll()
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  describe("update", () => {
+    it("should reject updates with forbidden keys", async () => {
+      const user = await config.createUser()
+      await config.createSession(user)
+      delete user.password
+
+      await config.api.self.updateSelf(user, user).expect(400)
+    })
+
+    it("should update password", async () => {
+      const user = await config.createUser()
+      await config.createSession(user)
+
+      const res = await config.api.self
+        .updateSelf(user, {
+          password: "newPassword1",
+        })
+        .expect(200)
+
+      const dbUser = (await config.getUser(user.email))!
+
+      user._rev = dbUser._rev
+      expect(res.body._id).toBe(user._id)
+    })
+  })
+
+  it("should update free trial confirmation date", async () => {
+    const user = await config.createUser()
+    await config.createSession(user)
+
+    const res = await config.api.self
+      .updateSelf(user, {
+        freeTrialConfirmedAt: "2024-03-17T14:10:54.869Z",
+      })
+      .expect(200)
+
+    const dbUser = (await config.getUser(user.email))!
+
+    user._rev = dbUser._rev
+    expect(dbUser.freeTrialConfirmedAt).toBe("2024-03-17T14:10:54.869Z")
+    expect(res.body._id).toBe(user._id)
+  })
+})

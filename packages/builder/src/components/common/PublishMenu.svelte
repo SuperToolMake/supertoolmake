@@ -1,0 +1,336 @@
+<script lang="ts">
+  import {
+    Body,
+    Icon,
+    Popover,
+    ActionMenu,
+    PopoverAlignment,
+    MenuItem,
+    Modal,
+    ModalContent,
+  } from "@budibase/bbui"
+  import {
+    deploymentStore,
+    workspaceAppStore,
+    workspaceDeploymentStore,
+    tables,
+    appStore,
+  } from "@/stores/builder"
+  import { type Plugin, TableSourceType } from "@budibase/types"
+  import type { PopoverAPI } from "@budibase/bbui"
+
+  let actionMenu: any
+  let publishPopoverAnchor: HTMLElement | undefined
+  let publishSuccessPopover: PopoverAPI | undefined
+  let seedProductionTables = false
+  let menuOpen = false
+  let pluginWarningModal: Modal | undefined
+  let pendingSeedProductionTables = false
+
+  const CURRENT_SVELTE_MAJOR = 5
+  const LEGACY_SVELTE_MAJOR = 4
+
+  const getPluginSvelteMajor = (plugin: Plugin): number | undefined => {
+    const major = plugin?.schema?.metadata?.svelteMajor
+    return typeof major === "number" ? major : undefined
+  }
+
+  const getEffectivePluginSvelteMajor = (plugin: Plugin): number => {
+    return getPluginSvelteMajor(plugin) ?? LEGACY_SVELTE_MAJOR
+  }
+
+  $: incompatiblePlugins = ($appStore.usedPlugins || []).filter(plugin => {
+    const major = getPluginSvelteMajor(plugin)
+    // `schema.metadata.svelteMajor` only exists on Svelte 5 plugins - treat
+    // absence as legacy (Svelte 4).
+    return major !== CURRENT_SVELTE_MAJOR
+  })
+
+  const hasAcknowledgedSvelte4PluginWarning = (appId?: string) => {
+    const key = `bb:publish:svelte4-plugin-warning-ack:${appId}`
+    if (!key || typeof window === "undefined") {
+      return false
+    }
+    try {
+      return window.localStorage.getItem(key) === "1"
+    } catch (err) {
+      return false
+    }
+  }
+
+  const acknowledgeSvelte4PluginWarning = (appId?: string) => {
+    const key = `bb:publish:svelte4-plugin-warning-ack:${appId}`
+    if (!key || typeof window === "undefined") {
+      return
+    }
+    try {
+      window.localStorage.setItem(key, "1")
+    } catch (err) {
+      // Ignore storage failures (e.g. privacy mode)
+    }
+  }
+
+  let hasAcknowledgedWarning = hasAcknowledgedSvelte4PluginWarning(
+    $appStore.appId
+  )
+
+  $: hasAcknowledgedWarning = hasAcknowledgedSvelte4PluginWarning(
+    $appStore.appId
+  )
+
+  // Get all internal tables and check if they're published
+  $: unpublishedInternalTableIds = $tables.list
+    .filter(table => table.sourceType === TableSourceType.INTERNAL)
+    .filter(table => {
+      const deploymentInfo = $workspaceDeploymentStore.tables[table._id!]
+      return !deploymentInfo || !deploymentInfo.published
+    })
+    .map(table => table._id!)
+
+  $: hasEmptyProdTables = unpublishedInternalTableIds.length > 0
+
+  const showPluginWarningModal = () => {
+    pendingSeedProductionTables = seedProductionTables
+    actionMenu?.hide?.()
+    menuOpen = false
+    pluginWarningModal?.show()
+  }
+
+  const publish = async () => {
+    if (incompatiblePlugins.length && !hasAcknowledgedWarning) {
+      showPluginWarningModal()
+      return
+    }
+    actionMenu?.hide?.()
+    menuOpen = false
+    await publishWithoutChecks(seedProductionTables)
+  }
+
+  const publishWithoutChecks = async (seedProdTables: boolean) => {
+    await deploymentStore.publishApp({ seedProductionTables: seedProdTables })
+    publishSuccessPopover?.show()
+    seedProductionTables = false
+  }
+
+  const publishAnyway = async () => {
+    acknowledgeSvelte4PluginWarning($appStore.appId)
+    hasAcknowledgedWarning = true
+    actionMenu?.hide?.()
+    menuOpen = false
+    pluginWarningModal?.hide()
+    await publishWithoutChecks(pendingSeedProductionTables)
+    pendingSeedProductionTables = false
+  }
+</script>
+
+<ActionMenu
+  bind:this={actionMenu}
+  disabled={$deploymentStore.isPublishing}
+  roundedPopover
+  on:open={() => (menuOpen = true)}
+  on:close={() => (menuOpen = false)}
+>
+  <svelte:fragment slot="control">
+    <div class="publish-menu" class:disabled={$deploymentStore.isPublishing}>
+      <div
+        role="button"
+        tabindex="0"
+        on:click={publish}
+        on:keydown={e => e.key === "Enter" && publish()}
+        class="publish-menu-text"
+      >
+        <Icon size="M" name="arrow-circle-up" />
+        <span>Publish</span>
+      </div>
+      <div class="separator"></div>
+      <div
+        bind:this={publishPopoverAnchor}
+        class="publish-dropdown"
+        class:active={menuOpen}
+      >
+        <Icon size="M" name="caret-down" />
+      </div>
+    </div>
+  </svelte:fragment>
+
+  <MenuItem
+    icon="check"
+    iconHidden={seedProductionTables}
+    iconAlign="start"
+    on:click={() => (seedProductionTables = false)}
+  >
+    <div>
+      <div class="menu-item-header">Publish workspace</div>
+      <div class="menu-item-text">Publish changes to the workspace</div>
+    </div>
+  </MenuItem>
+  <MenuItem
+    icon="check"
+    iconAlign="start"
+    disabled={!hasEmptyProdTables}
+    iconHidden={!seedProductionTables || !hasEmptyProdTables}
+    on:click={() => (seedProductionTables = true)}
+  >
+    <div class="seed-publish" class:disabled={!hasEmptyProdTables}>
+      <div class="menu-item-header">Seed and publish</div>
+      <div class="menu-item-text">
+        Seed internal prod tables with dev data and publish workspace
+      </div>
+    </div>
+  </MenuItem>
+</ActionMenu>
+
+<Popover
+  anchor={publishPopoverAnchor}
+  bind:this={publishSuccessPopover}
+  align={PopoverAlignment.Right}
+  offset={6}
+>
+  <div class="popover-content">
+    <Icon
+      name="CheckmarkCircle"
+      color="var(--spectrum-global-color-green-400)"
+      size="L"
+    />
+    <Body size="S">
+      {#if $workspaceAppStore.workspaceApps.length}
+        Apps published: {$workspaceAppStore.workspaceApps.length}
+      {/if}
+    </Body>
+  </div>
+</Popover>
+
+<Modal bind:this={pluginWarningModal}>
+  <ModalContent
+    title="Svelte 4 plugins detected"
+    confirmText="Publish anyway"
+    cancelText="Cancel"
+    warning
+    disabled={$deploymentStore.isPublishing}
+    onConfirm={publishAnyway}
+  >
+    <Body size="S">
+      Some plugins in this workspace were built for Svelte 4 and may not work
+      correctly until they are updated to Svelte 5.
+    </Body>
+
+    {#if incompatiblePlugins.length}
+      <div class="plugin-warning-list">
+        <ul>
+          {#each incompatiblePlugins as plugin (plugin._id || plugin.name)}
+            <li>
+              <span class="plugin-name">{plugin.name}</span>
+              {#if plugin.version}
+                <span class="plugin-version">v{plugin.version}</span>
+              {/if}
+              <span class="plugin-svelte-major">
+                Svelte {getEffectivePluginSvelteMajor(plugin)}
+              </span>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
+  </ModalContent>
+</Modal>
+
+<style>
+  .publish-menu {
+    font-size: var(--font-size-l);
+    display: flex;
+    align-items: center;
+    background: var(--spectrum-global-color-gray-800);
+    border-radius: 8px;
+    color: var(--spectrum-global-color-gray-50);
+    cursor: pointer;
+    transition: background-color 130ms ease-in-out;
+  }
+  .publish-menu.disabled {
+    background: var(--spectrum-global-color-gray-400);
+    color: var(--spectrum-global-color-gray-600);
+    cursor: default;
+    opacity: 0.8;
+  }
+  .publish-menu-text {
+    padding: var(--spacing-s) var(--spacing-l);
+    display: flex;
+    gap: var(--spacing-s);
+    align-items: center;
+    font-size: var(--font-size-m);
+  }
+  .publish-menu-text:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 8px 0 0 8px;
+  }
+  .publish-menu.disabled .publish-menu-text:hover {
+    background-color: transparent;
+    border-radius: 0;
+  }
+  .publish-dropdown {
+    padding: var(--spacing-s) var(--spacing-m);
+  }
+  .publish-dropdown:hover,
+  .publish-dropdown.active {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 0 8px 8px 0;
+  }
+  .publish-menu.disabled .publish-dropdown:hover,
+  .publish-menu.disabled .publish-dropdown.active {
+    background-color: transparent;
+    border-radius: 0;
+  }
+  .separator {
+    width: 1px;
+    background: rgba(0, 0, 0, 0.4);
+    align-self: stretch;
+  }
+  .popover-content {
+    display: flex;
+    gap: var(--spacing-s);
+    padding: var(--spacing-m);
+  }
+  .menu-item-header {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--spectrum-global-color-gray-900);
+  }
+  .menu-item-text {
+    font-size: 12px;
+    color: var(--spectrum-global-color-gray-700);
+    margin-top: 2px;
+  }
+  .seed-publish.disabled .menu-item-header,
+  .seed-publish.disabled .menu-item-text {
+    color: unset;
+  }
+
+  .plugin-warning-list {
+    margin-top: var(--spacing-m);
+    background: var(--spectrum-global-color-gray-100);
+    border: 1px solid var(--spectrum-global-color-gray-200);
+    border-radius: 8px;
+    padding: var(--spacing-m);
+  }
+  .plugin-warning-list ul {
+    margin: 0;
+    padding-left: var(--spacing-m);
+  }
+  .plugin-warning-list li {
+    display: flex;
+    gap: var(--spacing-s);
+    align-items: center;
+    margin: var(--spacing-s) 0;
+  }
+  .plugin-name {
+    font-weight: 600;
+    color: var(--spectrum-global-color-gray-900);
+  }
+  .plugin-version {
+    font-size: var(--font-size-s);
+    color: var(--spectrum-global-color-gray-700);
+  }
+  .plugin-svelte-major {
+    font-size: var(--font-size-s);
+    color: var(--spectrum-global-color-gray-700);
+  }
+</style>

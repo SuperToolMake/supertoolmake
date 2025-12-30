@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  # password: Passw0rd
+  # user: sa
+  # database: master
+  mssql:
+    # platform: linux/amd64
+    image: bb/mssql
+    build:
+      context: .
+      dockerfile: data/Dockerfile
+    ports:
+      - "1433:1433"
