@@ -1,34 +1,19 @@
-<script>
+<script lang="ts">
   import { queries, builderStore } from "@/stores/builder"
-  import { syncURLToState } from "@/helpers/urlStateSync"
-  import * as routify from "@roxi/routify"
-  import { onDestroy } from "svelte"
+  import { params } from "@roxi/routify"
 
-  // Extract stores from namespace for Svelte 5 compatibility
-  const { goto, params, url, isActive, page, layout } = routify
-
-  $goto
-  $params
-  $url
-  $goto
-  $isActive
-  $page
-  $layout
-
+  $: setQueryId($params.queryId)
   $: queryId = $queries.selectedQueryId
-  $: builderStore.selectResource(queryId)
+  $: builderStore.selectResource(queryId!)
 
-  const stopSyncing = syncURLToState({
-    urlParam: "queryId",
-    stateKey: "selectedQueryId",
-    validate: id => id === "new" || $queries.list?.some(q => q._id === id),
-    update: queries.select,
-    fallbackUrl: "../",
-    store: queries,
-    routify,
-  })
+  const validate = (id: string) =>
+    id === "new" || $queries.list?.some(q => q._id === id)
 
-  onDestroy(stopSyncing)
+  const setQueryId = (queryId: string) => {
+    if (validate(queryId)) {
+      queries.select(queryId)
+    }
+  }
 </script>
 
 {#key $queries.selectedQueryId}
