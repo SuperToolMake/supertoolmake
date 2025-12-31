@@ -75,30 +75,6 @@ write.push(
 
 /**
  * @openapi
- * /applications/{appId}:
- *   delete:
- *     deprecated: true
- *     operationId: appDestroy
- *     summary: Delete an application
- *     tags:
- *       - applications
- *     parameters:
- *       - $ref: '#/components/parameters/appIdUrl'
- *     responses:
- *       200:
- *         description: Returns the deleted application.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/applicationOutput'
- *             examples:
- *               application:
- *                 $ref: '#/components/examples/application'
- */
-write.push(new Endpoint("delete", "/applications/:appId", controller.destroy))
-
-/**
- * @openapi
  * /applications/{appId}/unpublish:
  *   post:
  *     deprecated: true
