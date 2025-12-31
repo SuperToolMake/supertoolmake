@@ -9,7 +9,6 @@ import {
   LinkDocument,
   RelationshipFieldMetadata,
   SourceName,
-  VirtualDocumentType,
 } from "@budibase/types"
 
 export { DocumentType, VirtualDocumentType } from "@budibase/types"
@@ -273,16 +272,6 @@ export function generateJunctionTableID(tableId1: string, tableId2: string) {
   const first = tableId1 > tableId2 ? tableId1 : tableId2
   const second = tableId1 > tableId2 ? tableId2 : tableId1
   return `${first}${SEPARATOR}${second}`
-}
-
-/**
- * Generates a new view ID.
- * @returns The new view ID which the view doc can be stored under.
- */
-export function generateViewID(tableId: string) {
-  return `${
-    VirtualDocumentType.VIEW
-  }${SEPARATOR}${tableId}${SEPARATOR}${newid()}`
 }
 
 export function isRelationshipColumn(

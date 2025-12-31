@@ -6,7 +6,6 @@ import {
   Query,
   Table,
   UserCtx,
-  ViewV2,
   WithoutDocMetadata,
   WorkspaceApp,
   WorkspaceFavourite,
@@ -16,7 +15,7 @@ import {
 import sdk from "../../sdk"
 import { db, HTTPError } from "@budibase/backend-core"
 
-type WorkspaceResourceDoc = Table | WorkspaceApp | Datasource | Query | ViewV2
+type WorkspaceResourceDoc = Table | WorkspaceApp | Datasource | Query
 
 export type ResourceGetter = (
   id: string
@@ -65,7 +64,6 @@ export async function create(
     [WorkspaceResource.WORKSPACE_APP]: sdk.workspaceApps.get,
     [WorkspaceResource.DATASOURCE]: sdk.datasources.get,
     [WorkspaceResource.QUERY]: sdk.queries.find,
-    [WorkspaceResource.VIEW]: sdk.views.get,
   }
   const verifyResource: ResourceGetter = check[body.resourceType]
 

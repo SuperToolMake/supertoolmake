@@ -55,7 +55,6 @@ export const USERS_TABLE_SCHEMA: Table = {
   type: "table",
   sourceId: INTERNAL_TABLE_SOURCE_ID,
   sourceType: TableSourceType.INTERNAL,
-  views: {},
   name: "Users",
   // TODO: ADMIN PANEL - when implemented this doesn't need to be carried out
   schema: {

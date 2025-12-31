@@ -2,54 +2,16 @@ import { auth, permissions } from "@budibase/backend-core"
 import {
   EmptyFilterOption,
   SearchFilters,
-  Table,
   WebhookActionType,
   BuiltinPermissionID,
-  ViewV2Type,
-  SortOrder,
-  SortType,
-  UILogicalOperator,
-  BasicOperator,
-  ArrayOperator,
-  RangeOperator,
 } from "@budibase/types"
-import Joi, { CustomValidator } from "joi"
-import { ValidSnippetNameRegex, helpers } from "@budibase/shared-core"
-import sdk from "../../../sdk"
-
-const { isRequired } = helpers.schema
+import Joi from "joi"
+import { ValidSnippetNameRegex } from "@budibase/shared-core"
 
 const OPTIONAL_STRING = Joi.string().optional().allow(null).allow("")
 const OPTIONAL_NUMBER = Joi.number().optional().allow(null)
 const OPTIONAL_BOOLEAN = Joi.boolean().optional().allow(null)
 const APP_NAME_REGEX = /^[\w\s]+$/
-
-const validateViewSchemas: CustomValidator<Table> = (table, joiHelpers) => {
-  if (!table.views || Object.keys(table.views).length === 0) {
-    return table
-  }
-  const required = Object.keys(table.schema).filter(key =>
-    isRequired(table.schema[key].constraints)
-  )
-  if (required.length === 0) {
-    return table
-  }
-  for (const view of Object.values(table.views)) {
-    if (!sdk.views.isV2(view) || helpers.views.isCalculationView(view)) {
-      continue
-    }
-    const editable = Object.entries(view.schema || {})
-      .filter(([_, f]) => f.visible && !f.readonly)
-      .map(([key]) => key)
-    const missingField = required.find(f => !editable.includes(f))
-    if (missingField) {
-      return joiHelpers.message({
-        custom: `To make field "${missingField}" required, this field must be present and writable in views: ${view.name}.`,
-      })
-    }
-  }
-  return table
-}
 
 export function tableValidator() {
   return auth.joiValidator.body(
@@ -62,70 +24,8 @@ export function tableValidator() {
       name: Joi.string().required(),
       views: Joi.object(),
       rows: Joi.array(),
-    })
-      .custom(validateViewSchemas)
-      .unknown(true),
+    }).unknown(true),
     { errorPrefix: "" }
-  )
-}
-
-function searchUIFilterValidator() {
-  const logicalOperator = Joi.string().valid(
-    ...Object.values(UILogicalOperator)
-  )
-  const operators = [
-    ...Object.values(BasicOperator),
-    ...Object.values(ArrayOperator),
-    ...Object.values(RangeOperator),
-  ]
-  const filters = Joi.array().items(
-    Joi.object({
-      operator: Joi.string()
-        .valid(...operators)
-        .required(),
-      field: Joi.string().required(),
-      // could do with better validation of value based on operator
-      value: Joi.any().required(),
-    })
-  )
-  return Joi.object({
-    logicalOperator,
-    onEmptyFilter: Joi.string().valid(...Object.values(EmptyFilterOption)),
-    groups: Joi.array().items(
-      Joi.object({
-        logicalOperator,
-        filters,
-        groups: Joi.array().items(
-          Joi.object({
-            filters,
-            logicalOperator,
-          })
-        ),
-      })
-    ),
-  })
-}
-
-export function viewValidator() {
-  return auth.joiValidator.body(
-    Joi.object({
-      id: OPTIONAL_STRING,
-      tableId: Joi.string().required(),
-      name: Joi.string().required(),
-      type: Joi.string().optional().valid(null, ViewV2Type.CALCULATION),
-      primaryDisplay: OPTIONAL_STRING,
-      schema: Joi.object().required(),
-      query: searchUIFilterValidator().optional(),
-      sort: Joi.object({
-        field: Joi.string().required(),
-        order: Joi.string()
-          .optional()
-          .valid(...Object.values(SortOrder)),
-        type: Joi.string()
-          .optional()
-          .valid(...Object.values(SortType)),
-      }).optional(),
-    })
   )
 }
 

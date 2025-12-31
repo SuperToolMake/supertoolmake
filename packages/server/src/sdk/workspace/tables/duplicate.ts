@@ -22,7 +22,6 @@ export async function duplicate(table: Table, userId?: string): Promise<Table> {
     sourceType: table.sourceType,
     sourceId: table.sourceId,
     schema: { ...table.schema },
-    views: {},
     indexes: table.indexes ? { ...table.indexes } : undefined,
     // Don't include any data/rows - this is intentionally empty
   }

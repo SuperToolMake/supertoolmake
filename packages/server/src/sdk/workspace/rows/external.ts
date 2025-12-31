@@ -1,12 +1,5 @@
 import { HTTPError } from "@budibase/backend-core"
-import { helpers, isViewId } from "@budibase/shared-core"
-import {
-  IncludeRelationship,
-  Operation,
-  Row,
-  Table,
-  ViewV2,
-} from "@budibase/types"
+import { IncludeRelationship, Operation, Row, Table } from "@budibase/types"
 import cloneDeep from "lodash/fp/cloneDeep"
 import sdk from "../.."
 import { handleRequest } from "../../../api/controllers/row/external"
@@ -15,20 +8,15 @@ import {
   inputProcessing,
   outputProcessing,
 } from "../../../utilities/rowProcessor"
-import { tryExtractingTableAndViewId } from "./utils"
 
 export async function getRow(
-  sourceId: string | Table | ViewV2,
+  sourceId: string | Table,
   rowId: string,
   opts?: { relationships?: boolean }
 ) {
-  let source: Table | ViewV2
+  let source: Table
   if (typeof sourceId === "string") {
-    if (isViewId(sourceId)) {
-      source = await sdk.views.get(sourceId)
-    } else {
-      source = await sdk.tables.getTable(sourceId)
-    }
+    source = await sdk.tables.getTable(sourceId)
   } else {
     source = sourceId
   }
@@ -47,17 +35,8 @@ export async function save(
   inputs: Row,
   userId: string | undefined
 ) {
-  const { tableId, viewId } = tryExtractingTableAndViewId(sourceId)
-  let source: Table | ViewV2
-  if (viewId) {
-    source = await sdk.views.get(viewId)
-  } else {
-    source = await sdk.tables.getTable(tableId)
-  }
-
-  if (sdk.views.isView(source) && helpers.views.isCalculationView(source)) {
-    throw new HTTPError("Cannot insert rows through a calculation view", 400)
-  }
+  const tableId = sourceId
+  let source: Table = await sdk.tables.getTable(tableId)
 
   const row = await inputProcessing(userId, cloneDeep(source), inputs)
 
@@ -90,16 +69,8 @@ export async function save(
   }
 }
 
-export async function find(tableOrViewId: string, rowId: string): Promise<Row> {
-  const { tableId, viewId } = tryExtractingTableAndViewId(tableOrViewId)
-
-  let source: Table | ViewV2
-  if (viewId) {
-    source = await sdk.views.get(viewId)
-  } else {
-    source = await sdk.tables.getTable(tableId)
-  }
-
+export async function find(tableId: string, rowId: string): Promise<Row> {
+  let source: Table = await sdk.tables.getTable(tableId)
   const row = await getRow(source, rowId, {
     relationships: true,
   })

@@ -6,7 +6,6 @@ enum Resource {
   APPLICATION = "applications",
   WORKSPACE = "workspaces",
   TABLES = "tables",
-  VIEWS = "views",
   ROWS = "rows",
   USERS = "users",
   QUERIES = "queries",
@@ -38,14 +37,6 @@ function processTables(ctx: Ctx) {
     return mapping.mapTables(ctx)
   } else {
     return mapping.mapTable(ctx)
-  }
-}
-
-function processViews(ctx: Ctx) {
-  if (isArrayResponse(ctx)) {
-    return mapping.mapViews(ctx)
-  } else {
-    return mapping.mapView(ctx)
   }
 }
 
@@ -91,13 +82,6 @@ export default async (ctx: Ctx, next: () => Promise<void>) => {
         body = processRows(ctx)
       } else {
         body = processTables(ctx)
-      }
-      break
-    case Resource.VIEWS:
-      if (urlParts[2] === Resource.ROWS) {
-        body = processRows(ctx)
-      } else {
-        body = processViews(ctx)
       }
       break
     case Resource.USERS:

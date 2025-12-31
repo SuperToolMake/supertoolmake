@@ -1,5 +1,4 @@
 import { context, db as dbCore } from "@budibase/backend-core"
-import { getTableIdFromViewId, isViewId } from "@budibase/shared-core"
 import { Database, Row } from "@budibase/types"
 import { getRowParams } from "../../../db/utils"
 import { isExternalTableID } from "../../../integrations/utils"
@@ -21,12 +20,7 @@ export async function getAllInternalRows(appId?: string) {
   return response.rows.map(row => row.doc) as Row[]
 }
 
-function pickApi(tableOrViewId: string) {
-  let tableId = tableOrViewId
-  if (isViewId(tableOrViewId)) {
-    tableId = getTableIdFromViewId(tableOrViewId)
-  }
-
+function pickApi(tableId: string) {
   if (isExternalTableID(tableId)) {
     return external
   }

@@ -1,18 +1,12 @@
-import { context, HTTPError } from "@budibase/backend-core"
-import { helpers } from "@budibase/shared-core"
+import { context } from "@budibase/backend-core"
 import {
-  FieldType,
-  LinkDocumentValue,
   PatchRowRequest,
   PatchRowResponse,
   Row,
   Table,
   UserCtx,
 } from "@budibase/types"
-import { flatten } from "lodash"
 import { cloneDeep } from "lodash/fp"
-import * as linkRows from "../../../db/linkedRows"
-import { getLinkedTableIDs } from "../../../db/linkedRows/linkUtils"
 import { InternalTables } from "../../../db/utils"
 import sdk from "../../../sdk"
 import { findRow } from "../../../sdk/workspace/rows/internal"
@@ -29,13 +23,7 @@ export async function patch(ctx: UserCtx<PatchRowRequest, PatchRowResponse>) {
   const { tableId } = utils.getSourceId(ctx)
   const source = await utils.getSource(ctx)
 
-  if (sdk.views.isView(source) && helpers.views.isCalculationView(source)) {
-    ctx.throw(400, "Cannot update rows through a calculation view")
-  }
-
-  const table = sdk.views.isView(source)
-    ? await sdk.views.getTable(source.id)
-    : source
+  const table = source
 
   const inputs = ctx.request.body
   const isUserTable = tableId === InternalTables.USER_METADATA
@@ -72,13 +60,6 @@ export async function patch(ctx: UserCtx<PatchRowRequest, PatchRowResponse>) {
     ctx.throw(400, { validation: validateResult.errors })
   }
 
-  // returned row is cleaned and prepared for writing to DB
-  row = (await linkRows.updateLinks({
-    eventType: linkRows.EventType.ROW_UPDATE,
-    row,
-    tableId: row.tableId,
-    table,
-  })) as Row
   // check if any attachments removed
   await AttachmentCleanup.rowUpdate(table, { row, oldRow })
 
@@ -101,16 +82,7 @@ export async function destroy(ctx: UserCtx) {
   const db = context.getWorkspaceDB()
   const source = await utils.getSource(ctx)
 
-  if (sdk.views.isView(source) && helpers.views.isCalculationView(source)) {
-    throw new HTTPError("Cannot delete rows through a calculation view", 400)
-  }
-
-  let table: Table
-  if (sdk.views.isView(source)) {
-    table = await sdk.views.getTable(source.id)
-  } else {
-    table = source
-  }
+  let table: Table = source
 
   const { _id } = ctx.request.body
   let row = await db.get<Row>(_id)
@@ -123,12 +95,6 @@ export async function destroy(ctx: UserCtx) {
   row = await outputProcessing(table, row, {
     squash: false,
     skipBBReferences: true,
-  })
-  // now remove the relationships
-  await linkRows.updateLinks({
-    eventType: linkRows.EventType.ROW_DELETE,
-    row,
-    tableId: table._id!,
   })
   // remove any attachments that were on the row from object storage
   await AttachmentCleanup.rowDelete(table, [row])
@@ -161,13 +127,7 @@ export async function bulkDestroy(ctx: UserCtx) {
   })) as Row[]
 
   // remove the relationships first
-  let updates: Promise<any>[] = processedRows.map(row =>
-    linkRows.updateLinks({
-      eventType: linkRows.EventType.ROW_DELETE,
-      row,
-      tableId: row.tableId,
-    })
-  )
+  let updates: Row[] = []
   if (tableId === InternalTables.USER_METADATA) {
     updates = updates.concat(
       processedRows.map(row => {
@@ -189,56 +149,11 @@ export async function bulkDestroy(ctx: UserCtx) {
 }
 
 export async function fetchEnrichedRow(ctx: UserCtx) {
-  const fieldName = ctx.request.query.field as string | undefined
-  const db = context.getWorkspaceDB()
   const { tableId } = utils.getSourceId(ctx)
   const rowId = ctx.params.rowId as string
-  // need table to work out where links go in row, as well as the link docs
-  const [table, links] = await Promise.all([
-    sdk.tables.getTable(tableId),
-    linkRows.getLinkDocuments({ tableId, rowId, fieldName }),
-  ])
+  const [table] = await Promise.all([sdk.tables.getTable(tableId)])
   let row = await findRow(tableId, rowId)
   row = await outputProcessing(table, row)
-  const linkVals = links as LinkDocumentValue[]
 
-  // look up the actual rows based on the ids
-  let linkedRows: Row[] = await db.getMultiple<Row>(
-    linkVals.map(linkVal => linkVal.id),
-    { allowMissing: true }
-  )
-
-  // get the linked tables
-  const linkTableIds = getLinkedTableIDs(table.schema)
-  const linkTables = await sdk.tables.getTables(linkTableIds)
-
-  // perform output processing
-  let final: Promise<Row[]>[] = []
-  for (let linkTable of linkTables) {
-    const relatedRows = linkedRows.filter(row => row.tableId === linkTable._id)
-    // include the row being enriched for performance reasons, don't need to fetch it to include
-    final = final.concat(
-      outputProcessing(linkTable, relatedRows, {
-        // have to clone to avoid JSON cycle
-        fromRow: cloneDeep(row),
-        squash: true,
-      })
-    )
-  }
-  // finalise the promises
-  linkedRows = flatten(await Promise.all(final))
-
-  // insert the link rows in the correct place throughout the main row
-  for (let fieldName of Object.keys(table.schema)) {
-    let field = table.schema[fieldName]
-    if (field.type === FieldType.LINK) {
-      // find the links that pertain to this field
-      const links = linkVals.filter(link => link.fieldName === fieldName)
-      // find the rows that the links state are linked to this field
-      row[fieldName] = linkedRows.filter(linkRow =>
-        links.find(link => link.id === linkRow._id)
-      )
-    }
-  }
   return row
 }

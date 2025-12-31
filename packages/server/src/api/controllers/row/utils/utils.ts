@@ -8,18 +8,16 @@ import {
   RelationshipsJson,
   Row,
   Table,
-  ViewV2,
 } from "@budibase/types"
 import {
   processDates,
   processFormulas,
 } from "../../../../utilities/rowProcessor"
 import { isKnexRows } from "./sqlUtils"
-import { basicProcessing, generateIdForRow, getInternalRowId } from "./basic"
+import { basicProcessing, generateIdForRow } from "./basic"
 import sdk from "../../../../sdk"
 import { processStringSync } from "@budibase/string-templates"
 import validateJs from "validate.js"
-import { getTableIdFromViewId, helpers, isViewId } from "@budibase/shared-core"
 
 validateJs.extend(validateJs.validators.datetime, {
   parse: function (value: string) {
@@ -62,13 +60,6 @@ export async function processRelationshipFields(
 export function getSourceId(ctx: Ctx): { tableId: string; viewId?: string } {
   // top priority, use the URL first
   if (ctx.params?.sourceId) {
-    const { sourceId } = ctx.params
-    if (isViewId(sourceId)) {
-      return {
-        tableId: getTableIdFromViewId(sourceId),
-        viewId: sql.utils.encodeViewId(sourceId),
-      }
-    }
     return { tableId: sql.utils.encodeTableId(ctx.params.sourceId) }
   }
   // now check for old way of specifying table ID
@@ -82,18 +73,12 @@ export function getSourceId(ctx: Ctx): { tableId: string; viewId?: string } {
   throw new Error("Unable to find table ID in request")
 }
 
-export async function getSource(ctx: Ctx): Promise<Table | ViewV2> {
-  const { tableId, viewId } = getSourceId(ctx)
-  if (viewId) {
-    return sdk.views.get(viewId)
-  }
+export async function getSource(ctx: Ctx): Promise<Table> {
+  const { tableId } = getSourceId(ctx)
   return sdk.tables.getTable(tableId)
 }
 
-export async function getTableFromSource(source: Table | ViewV2) {
-  if (sdk.views.isView(source)) {
-    return await sdk.views.getTable(source.id)
-  }
+export async function getTableFromSource(source: Table) {
   return source
 }
 
@@ -110,15 +95,7 @@ function fixBooleanFields(row: Row, table: Table) {
   return row
 }
 
-export function getSourceFields(source: Table | ViewV2): string[] {
-  const isView = sdk.views.isView(source)
-  if (isView) {
-    const fields = Object.keys(
-      helpers.views.basicFields(source, { visible: true })
-    )
-    return fields
-  }
-
+export function getSourceFields(source: Table): string[] {
   const fields = Object.entries(source.schema)
     .filter(([_, field]) => field.visible !== false)
     .map(([columnName]) => columnName)
@@ -127,7 +104,7 @@ export function getSourceFields(source: Table | ViewV2): string[] {
 
 export async function sqlOutputProcessing(
   rows: DatasourcePlusQueryResponse,
-  source: Table | ViewV2,
+  source: Table,
   tables: Record<string, Table>,
   relationships: RelationshipsJson[]
 ): Promise<Row[]> {
@@ -135,14 +112,8 @@ export async function sqlOutputProcessing(
     return []
   }
 
-  let table: Table
+  let table: Table = source
   let isCalculationView = false
-  if (sdk.views.isView(source)) {
-    table = await sdk.views.getTable(source.id)
-    isCalculationView = helpers.views.isCalculationView(source)
-  } else {
-    table = source
-  }
 
   let processedRows: Row[] = []
   for (let row of rows) {

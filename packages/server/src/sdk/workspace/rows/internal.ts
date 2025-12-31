@@ -1,42 +1,30 @@
-import { context, db, HTTPError } from "@budibase/backend-core"
-import { helpers } from "@budibase/shared-core"
-import { Row, Table, ViewV2 } from "@budibase/types"
+import { context, db } from "@budibase/backend-core"
+import { Row, Table } from "@budibase/types"
 import sdk from "../.."
 import { finaliseRow } from "../../../api/controllers/row/staticFormula"
-import * as linkRows from "../../../db/linkedRows"
 import { InternalTables } from "../../../db/utils"
 import {
   inputProcessing,
   outputProcessing,
 } from "../../../utilities/rowProcessor"
 import { getFullUser } from "../../../utilities/users"
-import { getSource, tryExtractingTableAndViewId } from "./utils"
+import { getSource } from "./utils"
 
 export async function save(
-  tableOrViewId: string,
+  tableId: string,
   inputs: Row,
   userId: string | undefined,
   opts?: { updateAIColumns: boolean }
 ) {
-  const { tableId, viewId } = tryExtractingTableAndViewId(tableOrViewId)
   inputs.tableId = tableId
 
-  let source: Table | ViewV2
+  let source: Table
   let table: Table
-  if (viewId) {
-    source = await sdk.views.get(viewId)
-    table = await sdk.views.getTable(viewId)
-  } else {
-    source = await sdk.tables.getTable(tableId)
-    table = source
-  }
-
-  if (sdk.views.isView(source) && helpers.views.isCalculationView(source)) {
-    throw new HTTPError("Cannot insert rows through a calculation view", 400)
-  }
+  source = await sdk.tables.getTable(tableId)
+  table = source
 
   if (!inputs._rev && !inputs._id) {
-    inputs._id = db.generateRowID(inputs.tableId)
+    inputs._id = db.generateRowID(inputs.tableId!)
   }
 
   let row = await inputProcessing(userId, source, inputs)
@@ -49,14 +37,6 @@ export async function save(
   if (!validateResult.valid) {
     throw { validation: validateResult.errors }
   }
-
-  // make sure link rows are up-to-date
-  row = (await linkRows.updateLinks({
-    eventType: linkRows.EventType.ROW_SAVE,
-    row,
-    tableId: row.tableId,
-    table,
-  })) as Row
 
   return finaliseRow(source, row, {
     updateFormula: true,
@@ -72,7 +52,7 @@ export async function find(sourceId: string, rowId: string): Promise<Row> {
 }
 
 export async function findRow(sourceId: string, rowId: string) {
-  const { tableId } = tryExtractingTableAndViewId(sourceId)
+  const tableId = sourceId
   const db = context.getWorkspaceDB()
   let row: Row
   // TODO remove special user case in future

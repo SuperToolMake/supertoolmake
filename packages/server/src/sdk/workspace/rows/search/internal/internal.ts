@@ -12,7 +12,7 @@ import {
   Format,
   json,
   jsonWithSchema,
-} from "../../../../../api/controllers/view/exporters"
+} from "../../../../../api/controllers/table/exporters"
 import {
   getFromDesignDoc,
   getFromMemoryDoc,

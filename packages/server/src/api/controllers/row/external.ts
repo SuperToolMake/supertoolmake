@@ -17,7 +17,6 @@ import {
   Row,
   Table,
   UserCtx,
-  ViewV2,
 } from "@budibase/types"
 import sdk from "../../../sdk"
 import * as utils from "./utils"
@@ -27,12 +26,10 @@ import {
 } from "../../../utilities/rowProcessor"
 import { cloneDeep } from "lodash"
 import { generateIdForRow } from "./utils"
-import { helpers } from "@budibase/shared-core"
-import { HTTPError } from "@budibase/backend-core"
 
 export async function handleRequest<T extends Operation>(
   operation: T,
-  source: Table | ViewV2,
+  source: Table,
   opts?: RunConfig
 ): Promise<ExternalRequestReturnType<T>> {
   return (
@@ -45,12 +42,8 @@ export async function handleRequest<T extends Operation>(
 export async function patch(ctx: UserCtx<PatchRowRequest, PatchRowResponse>) {
   const source = await utils.getSource(ctx)
 
-  const { viewId, tableId } = utils.getSourceId(ctx)
-  const sourceId = viewId || tableId
-
-  if (sdk.views.isView(source) && helpers.views.isCalculationView(source)) {
-    ctx.throw(400, "Cannot update rows through a calculation view")
-  }
+  const { tableId } = utils.getSourceId(ctx)
+  const sourceId = tableId
 
   const table = await utils.getTableFromSource(source)
   const { _id, ...rowData } = ctx.request.body
@@ -114,10 +107,6 @@ export async function patch(ctx: UserCtx<PatchRowRequest, PatchRowResponse>) {
 
 export async function destroy(ctx: UserCtx) {
   const source = await utils.getSource(ctx)
-
-  if (sdk.views.isView(source) && helpers.views.isCalculationView(source)) {
-    throw new HTTPError("Cannot delete rows through a calculation view", 400)
-  }
 
   const _id = ctx.request.body._id
   const { row } = await handleRequest(Operation.DELETE, source, {

@@ -15,10 +15,8 @@ import { checkBuilderEndpoint } from "./utilities/TestFunctions"
 const {
   basicScreen,
   createTableScreen,
-  createViewScreen,
   createQueryScreen,
   basicTable,
-  viewV2,
   basicQuery,
 } = setup.structures
 
@@ -271,18 +269,6 @@ describe("/screens", () => {
       )
       const usage = await config.api.screen.usage(table._id!)
       expect(usage.sourceType).toEqual(SourceType.TABLE)
-      confirmScreen(usage, screen)
-    })
-
-    it("should find view usage", async () => {
-      const table = await config.api.table.save(basicTable())
-      const view = await config.api.viewV2.create(
-        viewV2.createRequest(table._id!),
-        { status: 201 }
-      )
-      const screen = await config.api.screen.save(createViewScreen(view))
-      const usage = await config.api.screen.usage(view.id)
-      expect(usage.sourceType).toEqual(SourceType.VIEW)
       confirmScreen(usage, screen)
     })
 

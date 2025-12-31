@@ -5,7 +5,6 @@ import {
   Row,
   Table,
   JsonTypes,
-  ViewV2,
   EXTERNAL_ROW_REV,
 } from "@budibase/types"
 import {
@@ -14,7 +13,6 @@ import {
   PROTECTED_INTERNAL_COLUMNS,
 } from "@budibase/shared-core"
 import { generateRowIdField } from "../../../../integrations/utils"
-import sdk from "../../../../sdk"
 
 function extractFieldValue({
   row,
@@ -94,18 +92,12 @@ export async function basicProcessing({
   isLinked,
 }: {
   row: Row
-  source: Table | ViewV2
+  source: Table
   tables: Table[]
   isLinked: boolean
 }): Promise<Row> {
-  let table: Table
+  let table: Table = source
   let isCalculationView = false
-  if (sdk.views.isView(source)) {
-    table = await sdk.views.getTable(source.id)
-    isCalculationView = helpers.views.isCalculationView(source)
-  } else {
-    table = source
-  }
 
   const thisRow: Row = {}
 
@@ -123,12 +115,6 @@ export async function basicProcessing({
     // all responses include "select col as table.col" so that overlaps are handled
     else if (value != null) {
       thisRow[fieldName] = value
-    }
-  }
-
-  if (sdk.views.isView(source)) {
-    for (const key of Object.keys(helpers.views.calculationFields(source))) {
-      thisRow[key] = row[key]
     }
   }
 

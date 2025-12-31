@@ -65,18 +65,6 @@ export async function update(ctx: UserCtx, next: Next) {
   })
 }
 
-export async function destroy(ctx: UserCtx, next: Next) {
-  await context.doInWorkspaceContext(ctx.params.appId, async () => {
-    // get the app before deleting it
-    await setResponseApp(ctx)
-    const body = ctx.body
-    await controller.destroy(ctx)
-    // overwrite the body again
-    ctx.body = body
-    await next()
-  })
-}
-
 export async function unpublish(ctx: UserCtx, next: Next) {
   await context.doInWorkspaceContext(ctx.params.appId, async () => {
     await controller.unpublish(ctx)
@@ -97,7 +85,6 @@ export default {
   create,
   update,
   read,
-  destroy,
   search,
   unpublish,
   publish,

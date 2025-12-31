@@ -1,8 +1,7 @@
 import { context } from "@budibase/backend-core"
-import { FieldType, FormulaType, Row, Table, ViewV2 } from "@budibase/types"
+import { FieldType, FormulaType, Row, Table } from "@budibase/types"
 import { cloneDeep, merge } from "lodash/fp"
 import isEqual from "lodash/isEqual"
-import * as linkRows from "../../../db/linkedRows"
 import { getRowParams } from "../../../db/utils"
 import sdk from "../../../sdk"
 import {
@@ -134,15 +133,13 @@ export async function updateAllFormulasInTable(table: Table) {
  * expects the row to be totally enriched/contain all relationships.
  */
 export async function finaliseRow(
-  source: Table | ViewV2,
+  source: Table,
   row: Row,
   opts?: { updateFormula: boolean; updateAIColumns: boolean }
 ) {
   const db = context.getWorkspaceDB()
   const { updateFormula = true } = opts || {}
-  const table = sdk.views.isView(source)
-    ? await sdk.views.getTable(source.id)
-    : source
+  const table = source
 
   row.type = "row"
   // process the row before return, to include relationships
@@ -171,6 +168,5 @@ export async function finaliseRow(
   if (updateFormula) {
     await updateRelatedFormula(table, enrichedRow)
   }
-  const squashed = await linkRows.squashLinks(source, enrichedRow)
-  return { row: enrichedRow, squashed, table }
+  return { row: enrichedRow, table }
 }

@@ -1,8 +1,7 @@
 import { db as dbCore } from "@budibase/backend-core"
-import { dataFilters, helpers } from "@budibase/shared-core"
+import { dataFilters } from "@budibase/shared-core"
 import { processObjectSync } from "@budibase/string-templates"
 import {
-  Aggregation,
   AutoFieldSubType,
   AutoReason,
   Datasource,
@@ -25,7 +24,6 @@ import {
   SortJson,
   SortType,
   Table,
-  ViewV2,
 } from "@budibase/types"
 import dayjs from "dayjs"
 import { isEqual, omit } from "lodash"
@@ -160,21 +158,16 @@ function isEditableColumn(column: FieldSchema) {
 
 export class ExternalRequest<T extends Operation> {
   private readonly operation: T
-  private readonly source: Table | ViewV2
+  private readonly source: Table
   private datasource: Datasource
 
   public static async for<T extends Operation>(
     operation: T,
-    source: Table | ViewV2,
+    source: Table,
     opts: { datasource?: Datasource } = {}
   ) {
     if (!opts.datasource) {
-      if (sdk.views.isView(source)) {
-        const table = await sdk.views.getTable(source.id)
-        opts.datasource = await sdk.datasources.get(table.sourceId)
-      } else {
-        opts.datasource = await sdk.datasources.get(source.sourceId)
-      }
+      opts.datasource = await sdk.datasources.get(source.sourceId)
     }
 
     return new ExternalRequest(operation, source, opts.datasource)
@@ -187,11 +180,7 @@ export class ExternalRequest<T extends Operation> {
     return this.datasource.entities
   }
 
-  private constructor(
-    operation: T,
-    source: Table | ViewV2,
-    datasource: Datasource
-  ) {
+  private constructor(operation: T, source: Table, datasource: Datasource) {
     this.operation = operation
     this.source = source
     this.datasource = datasource
@@ -640,12 +629,7 @@ export class ExternalRequest<T extends Operation> {
 
   async run(config: RunConfig): Promise<ExternalRequestReturnType<T>> {
     const { operation } = this
-    let table: Table
-    if (sdk.views.isView(this.source)) {
-      table = await sdk.views.getTable(this.source.id)
-    } else {
-      table = this.source
-    }
+    let table: Table = this.source
 
     let isSql = isSQL(this.datasource)
 
@@ -673,19 +657,7 @@ export class ExternalRequest<T extends Operation> {
     filters = this.prepareFilters(id, filters || {}, table)
     const relationships = buildExternalRelationships(table, this.tables)
 
-    let aggregations: Aggregation[] = []
-    if (sdk.views.isView(this.source)) {
-      const calculationFields = helpers.views.calculationFields(this.source)
-      for (const [key, field] of Object.entries(calculationFields)) {
-        aggregations.push({
-          ...field,
-          name: key,
-        })
-      }
-    }
-
     const incRelationships =
-      aggregations.length === 0 &&
       config.includeSqlRelationships === IncludeRelationship.INCLUDE
 
     // clean up row on ingress using schema
@@ -725,7 +697,6 @@ export class ExternalRequest<T extends Operation> {
               relationships: incRelationships,
             })
           : [],
-        aggregations,
       },
       filters,
       sort,

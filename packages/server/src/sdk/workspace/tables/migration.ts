@@ -17,7 +17,6 @@ import {
 } from "@budibase/types"
 import { cloneDeep } from "lodash"
 import sdk from "../.."
-import { EventType, updateLinks } from "../../../db/linkedRows"
 import { isExternalTableID } from "../../../integrations/utils"
 
 export interface MigrationResult {
@@ -221,11 +220,6 @@ abstract class UserColumnMigrator<T> implements ColumnMigrator {
 
     delete this.table.schema[this.oldColumn.name]
     this.table = await sdk.tables.saveTable(this.table)
-    await updateLinks({
-      eventType: EventType.TABLE_UPDATED,
-      table: this.table,
-      oldTable,
-    })
 
     let otherTable = await sdk.tables.getTable(this.oldColumn.tableId)
     return {

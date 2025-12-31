@@ -3,16 +3,11 @@ import {
   Query,
   Table,
   User,
-  ViewV2,
   WorkspaceApp,
   WorkspaceResource,
 } from "@budibase/types"
 import TestConfiguration from "../../../tests/utilities/TestConfiguration"
-import {
-  basicQuery,
-  basicTable,
-  basicView,
-} from "../../../tests/utilities/structures"
+import { basicQuery, basicTable } from "../../../tests/utilities/structures"
 import * as setup from "./utilities"
 import { structures } from "@budibase/backend-core/tests"
 import { utils } from "@budibase/backend-core"
@@ -24,7 +19,6 @@ describe("/workspace", () => {
   let table: Table
   let datasource: Datasource
   let query: Query
-  let viewV2: ViewV2
   let workspaceApp: WorkspaceApp
 
   afterAll(setup.afterAll)
@@ -42,9 +36,6 @@ describe("/workspace", () => {
   > = {
     [WorkspaceResource.TABLE]: async () =>
       await config.api.table.save(basicTable()),
-
-    [WorkspaceResource.VIEW]: async (opts?: any) =>
-      await config.api.viewV2.create(basicView(opts?.tableId!)),
 
     [WorkspaceResource.QUERY]: async () =>
       await config.api.query.save(basicQuery(datasource?._id!)),
@@ -94,14 +85,6 @@ describe("/workspace", () => {
     await favouriteAndVerify(table._id!, WorkspaceResource.TABLE)
   })
 
-  it("should be able to favourite a valid view", async () => {
-    viewV2 = await createResource(WorkspaceResource.VIEW, {
-      tableId: table._id,
-    })
-
-    await favouriteAndVerify(viewV2.id!, WorkspaceResource.VIEW)
-  })
-
   it("should be able to favourite a valid query", async () => {
     query = await createResource(WorkspaceResource.QUERY)
     await favouriteAndVerify(query._id!, WorkspaceResource.QUERY)
@@ -117,13 +100,12 @@ describe("/workspace", () => {
   it("should not allow a duplicate favourite of any resource type", async () => {
     const resources = [
       { resource: table, type: WorkspaceResource.TABLE },
-      { resource: viewV2, type: WorkspaceResource.VIEW },
       { resource: query, type: WorkspaceResource.QUERY },
       { resource: workspaceApp, type: WorkspaceResource.WORKSPACE_APP },
     ]
 
     for (const { resource, type } of resources) {
-      const id = "version" in resource ? resource.id : resource._id
+      const id = resource._id
 
       // Duplicate save should fail with 409
       await config.api.workspaceFavourites.save(
@@ -149,12 +131,12 @@ describe("/workspace", () => {
   })
 
   it("should fetch all the users favourited resources", async () => {
-    const resources = [table, viewV2, query, workspaceApp]
+    const resources = [table, query, workspaceApp]
     const resp = await config.api.workspaceFavourites.fetchAll()
 
     expect(resp.favourites.length).toBe(5)
 
-    const resourceIds = resources.map(r => ("version" in r ? r.id : r._id))
+    const resourceIds = resources.map(r => r._id)
     const favouriteResourceIds = resp.favourites.map(r => r.resourceId)
 
     const mergedSet = new Set([...resourceIds, ...favouriteResourceIds])

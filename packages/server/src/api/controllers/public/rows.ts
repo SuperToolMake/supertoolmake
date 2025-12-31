@@ -45,15 +45,6 @@ export async function search(ctx: UserCtx, next: Next) {
   await next()
 }
 
-export async function viewSearch(ctx: UserCtx, next: Next) {
-  ctx.request.body = buildSearchRequestBody(ctx)
-  ctx.params = {
-    viewId: ctx.params.viewId,
-  }
-  await rowController.views.searchView(ctx)
-  await next()
-}
-
 export async function create(ctx: UserCtx, next: Next) {
   ctx.request.body = fixRow(ctx.request.body, ctx.params)
   await rowController.save(ctx)
@@ -92,5 +83,4 @@ export default {
   update,
   destroy,
   search,
-  viewSearch,
 }

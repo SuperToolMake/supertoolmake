@@ -7,7 +7,6 @@ import {
   RenameColumn,
   Table,
   TableRequest,
-  ViewV2,
   WithoutDocMetadata,
 } from "@budibase/types"
 import { cloneDeep } from "lodash/fp"
@@ -30,7 +29,6 @@ import {
 } from "./utils"
 
 import datasourceSdk from "../../datasources"
-import * as viewSdk from "../../views"
 import { getTable } from "../getters"
 import { populateExternalTableSchemas } from "../validation"
 
@@ -147,21 +145,6 @@ export async function save(
       autocolumn: true,
       name: DEFAULT_PRIMARY_COLUMN,
     }
-  }
-
-  for (let view in tableToSave.views) {
-    const tableView = tableToSave.views[view]
-    if (!tableView || !viewSdk.isV2(tableView)) continue
-
-    tableToSave.views[view] = viewSdk.syncSchema(
-      oldTable!.views![view] as ViewV2,
-      tableToSave.schema,
-      {
-        renameColumn: opts?.renaming,
-        primaryDisplay: tableToSave.primaryDisplay,
-        previousPrimaryDisplay: oldTable?.primaryDisplay,
-      }
-    )
   }
 
   const db = context.getWorkspaceDB()

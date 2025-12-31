@@ -255,8 +255,6 @@ function copyExistingPropsOver(
       table.constrained = entities[tableName]?.constrained
     }
 
-    table.views = entities[tableName].views
-
     const existingTableSchema = entities[tableName].schema
     for (let key in existingTableSchema) {
       if (!Object.prototype.hasOwnProperty.call(existingTableSchema, key)) {

@@ -1,11 +1,9 @@
 import { context } from "@budibase/backend-core"
 import {
   Database,
-  FindTableResponse,
   INTERNAL_TABLE_SOURCE_ID,
   Table,
   TableSourceType,
-  TableViewsResponse,
 } from "@budibase/types"
 import { tracer } from "dd-trace"
 import sdk from "../.."
@@ -16,8 +14,6 @@ import {
   isSQL,
 } from "../../../integrations/utils"
 import datasources from "../datasources"
-import { isV2 } from "../views"
-import { ensureQueryUISet } from "../views/utils"
 
 export async function processTable(table: Table): Promise<Table> {
   return await tracer.trace("processTable", async span => {
@@ -28,15 +24,6 @@ export async function processTable(table: Table): Promise<Table> {
     span.addTags({ tableId: table._id })
 
     table = { ...table }
-    if (table.views) {
-      span.addTags({ numViews: Object.keys(table.views).length })
-      for (const [key, view] of Object.entries(table.views)) {
-        if (!isV2(view)) {
-          continue
-        }
-        table.views[key] = ensureQueryUISet(view)
-      }
-    }
     if (table._id && isExternalTableID(table._id)) {
       span.addTags({ isExternal: true })
       // Old created external tables via Budibase might have a missing field name breaking some UI such as filters
@@ -259,27 +246,5 @@ export async function getTables(tableIds: string[]): Promise<Table[]> {
     }
     span.addTags({ numTables: tables.length })
     return await processTables(tables)
-  })
-}
-
-export async function enrichViewSchemas(
-  table: Table
-): Promise<FindTableResponse> {
-  return await tracer.trace("enrichViewSchemas", async span => {
-    span.addTags({ tableId: table._id })
-    const views = []
-    for (const view of Object.values(table.views ?? [])) {
-      if (sdk.views.isV2(view)) {
-        views.push(await sdk.views.enrichSchema(view, table.schema))
-      } else views.push(view)
-    }
-
-    return {
-      ...table,
-      views: views.reduce((p, v) => {
-        p[v.name!] = v
-        return p
-      }, {} as TableViewsResponse),
-    }
   })
 }

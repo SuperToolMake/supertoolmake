@@ -1,5 +1,4 @@
 import { USERS_TABLE_SCHEMA } from "../../../constants"
-import { setEnv, withEnv } from "../../../environment"
 
 import { Header, context, db, roles } from "@budibase/backend-core"
 import { structures } from "@budibase/backend-core/tests"
@@ -1155,39 +1154,6 @@ describe("/applications", () => {
         .reply(200, {})
 
       await config.withProdApp(() => config.api.workspace.delete(prodAppId))
-    })
-
-    it("should remove MIGRATING_APP header if present during deletion", async () => {
-      setEnv({ DISABLE_WORKSPACE_MIGRATIONS: false })
-
-      const migrationsModule = await import(
-        "../../../workspaceMigrations/migrations"
-      )
-
-      const migrationMock = jest.fn()
-      migrationsModule.MIGRATIONS.push({
-        id: "99999999999999_test_deletion",
-        func: migrationMock,
-      })
-
-      nock("http://localhost:10000")
-        .delete(`/api/global/roles/${workspace.appId}`)
-        .reply(200, {})
-
-      expect(migrationMock).not.toHaveBeenCalled()
-      await withEnv(
-        {
-          SYNC_MIGRATION_CHECKS_MS: 1000,
-        },
-        () =>
-          config.api.workspace.delete(workspace.appId, {
-            headersNotPresent: [Header.MIGRATING_APP],
-          })
-      )
-
-      expect(migrationMock).toHaveBeenCalledTimes(2)
-
-      migrationsModule.MIGRATIONS.pop()
     })
   })
 

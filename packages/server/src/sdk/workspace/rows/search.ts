@@ -1,15 +1,10 @@
 import {
   EmptyFilterOption,
-  LegacyFilter,
-  LogicalOperator,
   Row,
   RowSearchParams,
-  SearchFilters,
-  SearchFilterKey,
   SearchResponse,
   SortOrder,
   Table,
-  ViewV2,
 } from "@budibase/types"
 import { isExternalTableID } from "../../../integrations/utils"
 import * as internal from "./search/internal"
@@ -17,11 +12,10 @@ import * as external from "./search/external"
 import { ExportRowsParams, ExportRowsResult } from "./search/types"
 import { dataFilters } from "@budibase/shared-core"
 import sdk from "../../index"
-import { checkFilters, searchInputMapping } from "./search/utils"
+import { searchInputMapping } from "./search/utils"
 import tracer from "dd-trace"
 import { getQueryableFields, validateFilters } from "./queryUtils"
 import { enrichSearchContext } from "../../../api/controllers/row/utils"
-import { db } from "@budibase/backend-core"
 
 export { isValidFilter } from "../../../integrations/utils"
 
@@ -57,12 +51,9 @@ export async function search(
       countRows: options.countRows,
     })
 
-    let source: Table | ViewV2
+    let source: Table
     let table: Table
-    if (options.viewId) {
-      source = await sdk.views.get(options.viewId)
-      table = await sdk.views.getTable(source)
-    } else if (options.tableId) {
+    if (options.tableId) {
       source = await sdk.tables.getTable(options.tableId)
       table = source
     } else {
@@ -88,56 +79,6 @@ export async function search(
 
     // need to make sure filters in correct shape before checking for view
     options = searchInputMapping(table, options)
-
-    const view = source as ViewV2
-
-    // Enrich saved query with ephemeral query params.
-    // We prevent searching on any fields that are saved as part of the query, as
-    // that could let users find rows they should not be allowed to access.
-    let viewQuery = (await enrichSearchContext(view.query || {}, context)) as
-      | SearchFilters
-      | LegacyFilter[]
-    if (Array.isArray(viewQuery)) {
-      viewQuery = dataFilters.buildQuery(viewQuery)
-    }
-    viewQuery = checkFilters(table, viewQuery)
-
-    if (!isExternalTable) {
-      let queryFilters: LegacyFilter[] = Array.isArray(view.query)
-        ? view.query
-        : []
-
-      const { filters } = dataFilters.splitFiltersArray(queryFilters)
-
-      // Extract existing fields
-      const existingFields = filters.map(filter =>
-        db.removeKeyNumbering(filter.field)
-      )
-
-      // Carry over filters for unused fields
-      Object.keys(options.query).forEach(key => {
-        const operator = key as Exclude<SearchFilterKey, LogicalOperator>
-        Object.keys(options.query[operator] || {}).forEach(field => {
-          if (!existingFields.includes(db.removeKeyNumbering(field))) {
-            viewQuery[operator]![field] = options.query[operator]![field]
-          }
-        })
-      })
-      options.query = viewQuery
-    } else if (options.viewId) {
-      const conditions = viewQuery ? [viewQuery] : []
-      options.query = {
-        $and: {
-          conditions: [...conditions, options.query],
-        },
-      }
-      if (viewQuery.onEmptyFilter) {
-        options.query.onEmptyFilter = viewQuery.onEmptyFilter
-      }
-    }
-
-    options.query = dataFilters.cleanupQuery(options.query)
-    options.query = dataFilters.fixupFilterArrays(options.query)
 
     span.addTags({
       cleanedQuery: options.query,
@@ -193,11 +134,4 @@ export async function fetchRaw(
   limit?: number
 ): Promise<Row[]> {
   return pickApi(tableId).fetchRaw(tableId, limit)
-}
-
-export async function fetchLegacyView(
-  viewName: string,
-  params: ViewParams
-): Promise<Row[]> {
-  return internal.fetchLegacyView(viewName, params)
 }

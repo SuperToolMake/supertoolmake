@@ -9,12 +9,10 @@ import {
   RelationshipsJson,
   Row,
   Table,
-  ViewV2,
 } from "@budibase/types"
 import { breakExternalTableId } from "../../../../integrations/utils"
 import { generateJunctionTableID } from "../../../../db/utils"
-import sdk from "../../../../sdk"
-import { helpers, PROTECTED_INTERNAL_COLUMNS } from "@budibase/shared-core"
+import { PROTECTED_INTERNAL_COLUMNS } from "@budibase/shared-core"
 import { sql } from "@budibase/backend-core"
 
 type TableMap = Record<string, Table>
@@ -114,7 +112,7 @@ export function buildInternalRelationships(
  * is more performant and has the added benefit of protecting against this scenario.
  */
 export async function buildSqlFieldList(
-  source: Table | ViewV2,
+  source: Table,
   tables: TableMap,
   opts?: { relationships: boolean }
 ) {
@@ -155,23 +153,13 @@ export async function buildSqlFieldList(
 
   let fields: string[] = []
 
-  const isView = sdk.views.isView(source)
-
   let table: Table
-  if (isView) {
-    table = await sdk.views.getTable(source.id)
+  table = source
+  fields = extractRealFields(source).filter(
+    f => table.schema[f].visible !== false
+  )
 
-    fields = Object.keys(helpers.views.basicFields(source)).filter(
-      f => table.schema[f].type !== FieldType.LINK
-    )
-  } else {
-    table = source
-    fields = extractRealFields(source).filter(
-      f => table.schema[f].visible !== false
-    )
-  }
-
-  const containsFormula = (isView ? fields : Object.keys(table.schema)).some(
+  const containsFormula = Object.keys(table.schema).some(
     f => table.schema[f]?.type === FieldType.FORMULA
   )
   // If are requesting for a formula field, we need to retrieve all fields
@@ -179,31 +167,20 @@ export async function buildSqlFieldList(
     fields = extractRealFields(table)
   }
 
-  if (!isView || !helpers.views.isCalculationView(source)) {
-    fields.push(
-      ...getRequiredFields(
-        {
-          ...table,
-          primaryDisplay: source.primaryDisplay || table.primaryDisplay,
-        },
-        fields
-      )
+  fields.push(
+    ...getRequiredFields(
+      {
+        ...table,
+        primaryDisplay: source.primaryDisplay || table.primaryDisplay,
+      },
+      fields
     )
-  }
+  )
 
   fields = fields.map(c => `${table.name}.${c}`)
 
   for (const field of Object.values(table.schema)) {
     if (field.type !== FieldType.LINK || !relationships || !field.tableId) {
-      continue
-    }
-
-    if (
-      isView &&
-      (!source.schema?.[field.name] ||
-        !helpers.views.isVisible(source.schema[field.name])) &&
-      !containsFormula
-    ) {
       continue
     }
 
@@ -220,19 +197,6 @@ export async function buildSqlFieldList(
       relatedTable.primary?.forEach(f => viewFields.add(f))
       if (relatedTable.primaryDisplay) {
         viewFields.add(relatedTable.primaryDisplay)
-      }
-
-      if (isView) {
-        Object.entries(source.schema?.[field.name]?.columns || {})
-          .filter(
-            ([columnName, columnConfig]) =>
-              relatedTable.schema[columnName] &&
-              helpers.views.isVisible(columnConfig) &&
-              ![FieldType.LINK, FieldType.FORMULA].includes(
-                relatedTable.schema[columnName].type
-              )
-          )
-          .forEach(([field]) => viewFields.add(field))
       }
     }
 

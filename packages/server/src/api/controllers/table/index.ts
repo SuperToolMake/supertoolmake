@@ -27,11 +27,7 @@ import {
   ValidateTableImportResponse,
 } from "@budibase/types"
 import { cloneDeep } from "lodash"
-import {
-  isExternalTable,
-  isExternalTableID,
-  isSQL,
-} from "../../../integrations/utils"
+import { isExternalTable, isSQL } from "../../../integrations/utils"
 import sdk from "../../../sdk"
 import { processTable } from "../../../sdk/workspace/tables/getters"
 import {
@@ -41,17 +37,6 @@ import {
 } from "../../../utilities/schema"
 import { builderSocket } from "../../../websockets"
 import * as external from "./external"
-import * as internal from "./internal"
-
-function pickApi({ tableId, table }: { tableId?: string; table?: Table }) {
-  if (table && isExternalTable(table)) {
-    return external
-  }
-  if (tableId && isExternalTableID(tableId)) {
-    return external
-  }
-  return internal
-}
 
 function checkDefaultFields(table: Table) {
   for (const [key, field] of Object.entries(table.schema)) {
@@ -111,7 +96,7 @@ export async function fetch(ctx: UserCtx<void, FetchTablesResponse>) {
 
   const result: FetchTablesResponse = []
   for (const table of [...internal, ...external]) {
-    result.push(await sdk.tables.enrichViewSchemas(table))
+    result.push(table)
   }
   ctx.body = result
 }
@@ -120,14 +105,12 @@ export async function find(ctx: UserCtx<void, FindTableResponse>) {
   const tableId = ctx.params.tableId
   const table = await sdk.tables.getTable(tableId)
 
-  const result = await sdk.tables.enrichViewSchemas(table)
-  ctx.body = result
+  ctx.body = table
 }
 
 export async function save(ctx: UserCtx<SaveTableRequest, SaveTableResponse>) {
   const appId = ctx.appId
   const { rows, ...table } = ctx.request.body
-  const isImport = rows
   const renaming = ctx.request.body._rename
 
   const isCreate = !table._id
@@ -137,19 +120,12 @@ export async function save(ctx: UserCtx<SaveTableRequest, SaveTableResponse>) {
   let savedTable: Table
   if (isCreate) {
     savedTable = await sdk.tables.create(table, rows, ctx.user._id)
-    savedTable = await sdk.tables.enrichViewSchemas(savedTable)
     savedTable = await processTable(savedTable)
   } else {
-    const api = pickApi({ table })
-    const { table: updatedTable, oldTable } = await api.updateTable(
-      ctx,
-      renaming
-    )
+    const api = external
+    const { table: updatedTable } = await api.updateTable(ctx, renaming)
     savedTable = updatedTable
     savedTable = await processTable(savedTable)
-  }
-  if (renaming) {
-    await sdk.views.renameLinkedViews(savedTable, renaming)
   }
   ctx.message = `Table ${table.name} saved successfully.`
   ctx.eventEmitter?.emitTable(EventType.TABLE_SAVE, appId, { ...savedTable })
@@ -161,7 +137,7 @@ export async function save(ctx: UserCtx<SaveTableRequest, SaveTableResponse>) {
 export async function destroy(ctx: UserCtx<void, DeleteTableResponse>) {
   const appId = ctx.appId
   const tableId = ctx.params.tableId
-  const deletedTable = await pickApi({ tableId }).destroy(ctx)
+  const deletedTable = await external.destroy(ctx)
 
   ctx.eventEmitter?.emitTable(EventType.TABLE_DELETE, appId, deletedTable)
   ctx.table = deletedTable
@@ -172,8 +148,7 @@ export async function destroy(ctx: UserCtx<void, DeleteTableResponse>) {
 export async function bulkImport(
   ctx: UserCtx<BulkImportRequest, BulkImportResponse>
 ) {
-  const tableId = ctx.params.tableId
-  await pickApi({ tableId }).bulkImport(ctx)
+  await external.bulkImport(ctx)
 
   // right now we don't trigger anything for bulk import because it
   // can only be done in the builder, but in the future we may need to

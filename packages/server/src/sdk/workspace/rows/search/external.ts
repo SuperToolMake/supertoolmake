@@ -11,12 +11,11 @@ import {
   SortJson,
   SortOrder,
   Table,
-  ViewV2,
 } from "@budibase/types"
 import pick from "lodash/pick"
 import sdk from "../../.."
 import { handleRequest } from "../../../../api/controllers/row/external"
-import * as exporters from "../../../../api/controllers/view/exporters"
+import * as exporters from "../../../../api/controllers/table/exporters"
 import {
   breakExternalTableId,
   breakRowIdField,
@@ -61,7 +60,7 @@ function getPaginationAndLimitParameters(
 
 export async function search(
   options: RowSearchParams,
-  source: Table | ViewV2
+  source: Table
 ): Promise<SearchResponse<Row>> {
   const { countRows, paginate, query, ...params } = options
   const { limit } = params

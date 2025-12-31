@@ -14,7 +14,6 @@ import roleEndpoints from "./roles"
 import rowEndpoints from "./rows"
 import tableEndpoints from "./tables"
 import userEndpoints from "./users"
-import viewEndpoints from "./views"
 import workspaceEndpoints from "./workspaces"
 // below imports don't have declaration files
 const Router = require("@koa/router")
@@ -156,7 +155,6 @@ applyAdminRoutes(roleEndpoints)
 applyRoutes(workspaceEndpoints, PermissionType.WORKSPACE, "workspaceId")
 applyRoutes(appEndpoints_deprecated, PermissionType.WORKSPACE, "appId")
 applyRoutes(tableEndpoints, PermissionType.TABLE, "tableId")
-applyRoutes(viewEndpoints, PermissionType.VIEW, "viewId")
 applyRoutes(userEndpoints, PermissionType.USER, "userId")
 applyRoutes(queryEndpoints, PermissionType.QUERY, "queryId")
 // needs to be applied last for routing purposes, don't override other endpoints

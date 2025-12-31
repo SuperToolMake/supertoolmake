@@ -71,29 +71,6 @@ write.push(
 
 /**
  * @openapi
- * /workspaces/{workspaceId}:
- *   delete:
- *     operationId: workspaceDestroy
- *     summary: Delete a workspace
- *     tags:
- *       - workspaces
- *     parameters:
- *       - $ref: '#/components/parameters/workspaceId'
- *     responses:
- *       200:
- *         description: Returns the deleted workspace.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/workspaceOutput'
- *             examples:
- *               workspace:
- *                 $ref: '#/components/examples/workspace'
- */
-write.push(new Endpoint("delete", "/workspaces/:appId", controller.destroy))
-
-/**
- * @openapi
  * /workspaces/{workspaceId}/publish:
  *   post:
  *     operationId: workspacePublish
