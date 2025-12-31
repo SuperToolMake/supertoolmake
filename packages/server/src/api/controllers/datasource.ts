@@ -7,19 +7,15 @@ import {
   Datasource,
   DatasourcePlus,
   DeleteDatasourceResponse,
-  Document,
   DynamicVariable,
   FetchDatasourceInfoRequest,
   FetchDatasourceInfoResponse,
   FetchDatasourceViewInfoRequest,
   FetchDatasourceViewInfoResponse,
   FetchDatasourcesResponse,
-  FieldType,
   FindDatasourcesResponse,
-  RelationshipFieldMetadata,
   RowValue,
   SourceName,
-  Table,
   UpdateDatasourceRequest,
   UpdateDatasourceResponse,
   UserCtx,
@@ -27,7 +23,7 @@ import {
   VerifyDatasourceResponse,
 } from "@budibase/types"
 import { isEqual } from "lodash"
-import { getQueryParams, getTableParams } from "../../db/utils"
+import { getQueryParams } from "../../db/utils"
 import sdk from "../../sdk"
 import { processTable } from "../../sdk/workspace/tables/getters"
 import { invalidateCachedVariable } from "../../threads/utils"
@@ -241,50 +237,6 @@ export async function save(
   builderSocket?.emitDatasourceUpdate(ctx, datasource)
 }
 
-async function destroyInternalTablesBySourceId(datasourceId: string) {
-  const db = context.getWorkspaceDB()
-
-  // Get all internal tables
-  const internalTables = await db.allDocs<Table>(
-    getTableParams(null, {
-      include_docs: true,
-    })
-  )
-
-  // Filter by datasource and return the docs.
-  const datasourceTableDocs = internalTables.rows.reduce(
-    (acc: Table[], table) => {
-      if (table.doc?.sourceId == datasourceId) {
-        acc.push(table.doc)
-      }
-      return acc
-    },
-    []
-  )
-
-  function updateRevisions(deletedLinks: RelationshipFieldMetadata[]) {
-    for (const link of deletedLinks) {
-      datasourceTableDocs.forEach((doc: Document) => {
-        if (doc._id === link.tableId) {
-          doc._rev = link.tableRev
-        }
-      })
-    }
-  }
-
-  // Destroy the tables.
-  for (const table of datasourceTableDocs) {
-    const deleted = await sdk.tables.internal.destroy(table)
-    // Update the revisions of any tables that remain to be deleted
-    const deletedLinks: RelationshipFieldMetadata[] = Object.values(
-      deleted.table.schema
-    )
-      .filter(field => field.type === FieldType.LINK)
-      .map(field => field as RelationshipFieldMetadata)
-    updateRevisions(deletedLinks)
-  }
-}
-
 export async function destroy(ctx: UserCtx<void, DeleteDatasourceResponse>) {
   const db = context.getWorkspaceDB()
   const datasourceId = ctx.params.datasourceId
@@ -292,18 +244,14 @@ export async function destroy(ctx: UserCtx<void, DeleteDatasourceResponse>) {
   const datasource = await sdk.datasources.get(datasourceId)
   // Delete all queries for the datasource
 
-  if (datasource.type === dbCore.BUDIBASE_DATASOURCE_TYPE) {
-    await destroyInternalTablesBySourceId(datasourceId)
-  } else {
-    const queries = await db.allDocs<RowValue>(getQueryParams(datasourceId))
-    await db.bulkDocs(
-      queries.rows.map(row => ({
-        _id: row.id,
-        _rev: row.value.rev,
-        _deleted: true,
-      }))
-    )
-  }
+  const queries = await db.allDocs<RowValue>(getQueryParams(datasourceId))
+  await db.bulkDocs(
+    queries.rows.map(row => ({
+      _id: row.id,
+      _rev: row.value.rev,
+      _deleted: true,
+    }))
+  )
 
   // delete the datasource
   await db.remove(datasourceId, ctx.params.revId)

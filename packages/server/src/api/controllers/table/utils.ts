@@ -11,7 +11,6 @@ import {
   Row,
   SourceName,
   Table,
-  View,
 } from "@budibase/types"
 import { cloneDeep } from "lodash/fp"
 import isEqual from "lodash/isEqual"
@@ -27,8 +26,6 @@ import {
   inputProcessing,
 } from "../../../utilities/rowProcessor"
 import { isRows, isSchema, parse } from "../../../utilities/schema"
-import { getViews, saveView } from "../view/utils"
-import viewTemplate from "../view/viewBuilder"
 
 export async function clearColumns(table: Table, columnNames: string[]) {
   const db = context.getWorkspaceDB()
@@ -87,8 +84,6 @@ export async function checkForColumnUpdates(
       oldTable,
       rename: columnRename,
     })
-    // Update views
-    await checkForViewUpdates(updatedTable, deletedColumns, columnRename)
   }
 
   return { rows: updatedRows, table: updatedTable }
@@ -332,95 +327,6 @@ class TableSaveFunctions {
 
   getUpdatedRows() {
     return this.rows
-  }
-}
-
-export async function checkForViewUpdates(
-  table: Table,
-  deletedColumns: string[],
-  columnRename?: RenameColumn
-) {
-  const views = await getViews()
-  const tableViews = views.filter(view => view.meta?.tableId === table._id)
-
-  // Check each table view to see if impacted by this table action
-  for (let view of tableViews) {
-    let needsUpdated = false
-    const viewMetadata = view.meta as any
-    if (!viewMetadata) {
-      continue
-    }
-
-    // First check for renames, otherwise check for deletions
-    if (columnRename) {
-      // Update calculation field if required
-      if (viewMetadata.field === columnRename.old) {
-        viewMetadata.field = columnRename.updated
-        needsUpdated = true
-      }
-
-      // Update group by field if required
-      if (viewMetadata.groupBy === columnRename.old) {
-        viewMetadata.groupBy = columnRename.updated
-        needsUpdated = true
-      }
-
-      // Update filters if required
-      if (viewMetadata.filters) {
-        viewMetadata.filters.forEach((filter: any) => {
-          if (filter.key === columnRename.old) {
-            filter.key = columnRename.updated
-            needsUpdated = true
-          }
-        })
-      }
-    } else if (deletedColumns) {
-      deletedColumns.forEach((column: string) => {
-        // Remove calculation statement if required
-        if (viewMetadata.field === column) {
-          delete viewMetadata.field
-          delete viewMetadata.calculation
-          delete viewMetadata.groupBy
-          needsUpdated = true
-        }
-
-        // Remove group by field if required
-        if (viewMetadata.groupBy === column) {
-          delete viewMetadata.groupBy
-          needsUpdated = true
-        }
-
-        // Remove filters referencing deleted field if required
-        if (viewMetadata.filters && viewMetadata.filters.length) {
-          const initialLength = viewMetadata.filters.length
-          viewMetadata.filters = viewMetadata.filters.filter((filter: any) => {
-            return filter.key !== column
-          })
-          if (initialLength !== viewMetadata.filters.length) {
-            needsUpdated = true
-          }
-        }
-      })
-    }
-
-    // Update view if required
-    if (needsUpdated) {
-      const groupByField: any = Object.values(table.schema).find(
-        (field: any) => field.name == view.groupBy
-      )
-      const newViewTemplate = viewTemplate(
-        viewMetadata,
-        groupByField?.type === FieldType.ARRAY
-      )
-      const viewName = view.name!
-      await saveView(null, viewName, newViewTemplate)
-      if (!newViewTemplate.meta?.schema) {
-        newViewTemplate.meta!.schema = table.schema
-      }
-      if (table.views?.[viewName]) {
-        table.views[viewName] = newViewTemplate.meta as View
-      }
-    }
   }
 }
 

@@ -1,13 +1,4 @@
-import {
-  User,
-  Table,
-  SearchFilters,
-  Row,
-  ViewV2Schema,
-  ViewV2,
-  ViewV2Type,
-  PublicAPIView,
-} from "@budibase/types"
+import { User, Table, SearchFilters, Row } from "@budibase/types"
 import { HttpMethod, MakeRequestResponse, generateMakeRequest } from "./utils"
 import TestConfiguration from "../../../../tests/utilities/TestConfiguration"
 
@@ -26,7 +17,6 @@ export class PublicAPIRequest {
   private appId: string | undefined
 
   tables: PublicTableAPI
-  views: PublicViewAPI
   rows: PublicRowAPI
   apiKey: string
 
@@ -40,7 +30,6 @@ export class PublicAPIRequest {
     this.appId = appId
     this.tables = new PublicTableAPI(this)
     this.rows = new PublicRowAPI(this)
-    this.views = new PublicViewAPI(this)
   }
 
   static async init(config: TestConfiguration, user: User, opts?: RequestOpts) {
@@ -149,62 +138,6 @@ export class PublicRowAPI {
       `/views/${viewId}/rows/search`,
       {
         query,
-      },
-      expectations
-    )
-  }
-}
-
-export class PublicViewAPI {
-  request: PublicAPIRequest
-
-  constructor(request: PublicAPIRequest) {
-    this.request = request
-  }
-
-  async create(
-    view: Omit<PublicAPIView, "id" | "version">,
-    expectations?: PublicAPIExpectations
-  ): Promise<Response<PublicAPIView>> {
-    return this.request.send("post", "/views", view, expectations)
-  }
-
-  async update(
-    viewId: string,
-    view: Omit<PublicAPIView, "id" | "version">,
-    expectations?: PublicAPIExpectations
-  ): Promise<Response<PublicAPIView>> {
-    return this.request.send("put", `/views/${viewId}`, view, expectations)
-  }
-
-  async destroy(
-    viewId: string,
-    expectations?: PublicAPIExpectations
-  ): Promise<void> {
-    return this.request.send(
-      "delete",
-      `/views/${viewId}`,
-      undefined,
-      expectations
-    )
-  }
-
-  async find(
-    viewId: string,
-    expectations?: PublicAPIExpectations
-  ): Promise<Response<PublicAPIView>> {
-    return this.request.send("get", `/views/${viewId}`, undefined, expectations)
-  }
-
-  async search(
-    viewName: string,
-    expectations?: PublicAPIExpectations
-  ): Promise<Response<PublicAPIView[]>> {
-    return this.request.send(
-      "post",
-      "/views/search",
-      {
-        name: viewName,
       },
       expectations
     )
