@@ -1,6 +1,5 @@
 import { DocumentType, permissions, roles } from "@budibase/backend-core"
-import { VirtualDocumentType } from "../db/utils"
-import { getDocumentType, getVirtualDocumentType } from "@budibase/shared-core"
+import { getDocumentType } from "@budibase/shared-core"
 
 export const CURRENTLY_SUPPORTED_LEVELS: string[] = [
   permissions.PermissionLevel.WRITE,
@@ -9,12 +8,6 @@ export const CURRENTLY_SUPPORTED_LEVELS: string[] = [
 ]
 
 export function getPermissionType(resourceId: string) {
-  const virtualDocType = getVirtualDocumentType(resourceId)
-  switch (virtualDocType) {
-    case VirtualDocumentType.VIEW:
-      return permissions.PermissionType.TABLE
-  }
-
   const docType = getDocumentType(resourceId)
   switch (docType) {
     case DocumentType.TABLE:

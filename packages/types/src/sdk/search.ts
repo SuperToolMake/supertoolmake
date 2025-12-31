@@ -2,7 +2,6 @@ import { Operation } from "./datasources"
 import { Row, DocumentType, Table, Datasource } from "../documents"
 import { SortOrder, SortType } from "../api"
 import { Knex } from "knex"
-import { Aggregation } from "./row"
 import isPlainObject from "lodash/isPlainObject"
 
 export enum BasicOperator {
@@ -170,7 +169,6 @@ export interface QueryJson {
   }
   resource?: {
     fields: string[]
-    aggregations?: Aggregation[]
   }
   filters?: SearchFilters
   sort?: SortJson

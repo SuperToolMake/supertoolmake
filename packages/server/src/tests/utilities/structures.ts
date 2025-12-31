@@ -4,7 +4,6 @@ import { cloneDeep } from "lodash/fp"
 import {
   AutoFieldSubType,
   BBReferenceFieldSubType,
-  CreateViewRequest,
   Datasource,
   FieldSchema,
   FieldType,
@@ -18,16 +17,11 @@ import {
   Webhook,
   WebhookActionType,
   BuiltinPermissionID,
-  CreateEnvironmentVariableRequest,
   Screen,
 } from "@budibase/types"
 import { merge } from "lodash"
 import { generator } from "@budibase/backend-core/tests"
-export {
-  createTableScreen,
-  createQueryScreen,
-  createViewScreen,
-} from "./structures/screens"
+export { createTableScreen, createQueryScreen } from "./structures/screens"
 
 const { BUILTIN_ROLE_IDS } = roles
 
@@ -102,52 +96,6 @@ export function basicTableWithAttachmentField(
     },
     ...extra
   )
-}
-
-export function basicView(tableId: string) {
-  return {
-    tableId,
-    name: "ViewTest",
-  }
-}
-
-export function filterView(tableId: string) {
-  return {
-    ...basicView(tableId),
-    filters: [
-      {
-        value: 0,
-        condition: "MT",
-        key: "count",
-      },
-    ],
-  }
-}
-
-export function calculationView(tableId: string) {
-  return {
-    ...basicView(tableId),
-    field: "count",
-    calculation: "sum",
-  }
-}
-
-export function view(tableId: string) {
-  return {
-    ...filterView(tableId),
-    ...calculationView(tableId),
-  }
-}
-
-function viewV2CreateRequest(tableId: string): CreateViewRequest {
-  return {
-    tableId,
-    name: generator.guid(),
-  }
-}
-
-export const viewV2 = {
-  createRequest: viewV2CreateRequest,
 }
 
 export function basicRow(tableId: string) {
@@ -306,18 +254,6 @@ export function basicWebhook(automationId: string): Webhook {
       type: WebhookActionType.AUTOMATION,
       target: automationId,
     },
-  }
-}
-
-export function basicEnvironmentVariable(
-  name: string,
-  prod: string,
-  dev?: string
-): CreateEnvironmentVariableRequest {
-  return {
-    name,
-    production: prod,
-    development: dev || prod,
   }
 }
 

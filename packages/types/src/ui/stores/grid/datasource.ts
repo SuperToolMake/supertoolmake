@@ -1,6 +1,6 @@
-import { Datasource, Table, UITable, UIView } from "@budibase/types"
+import { Datasource, Table, UITable } from "@budibase/types"
 
-export type UIDatasource = UITable | (Omit<UIView, "type"> & { type: "viewV2" })
+export type UIDatasource = UITable
 
 export interface UIFieldMutation {
   visible?: boolean

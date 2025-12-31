@@ -1,4 +1,4 @@
-import { Component, Query, Screen, Table, ViewV2 } from "@budibase/types"
+import { Component, Query, Screen, Table } from "@budibase/types"
 
 function heading(text: string): Component {
   return {
@@ -65,58 +65,6 @@ export function createTableScreen(
       homeScreen: false,
     },
     name: "screen-id",
-    workspaceAppId: "workspaceAppId",
-  }
-}
-
-export function createViewScreen(view: ViewV2): Screen {
-  return {
-    props: {
-      _id: "cc359092bbd6c4e10b57827155edb7872",
-      _component: "@budibase/standard-components/container",
-      _styles: {
-        normal: {},
-        hover: {},
-        active: {},
-        selected: {},
-      },
-      _children: [
-        heading("view"),
-        {
-          _id: "ccb4a9e3734794864b5c65b012a0bdc5a",
-          _component: "@budibase/standard-components/gridblock",
-          _styles: {
-            normal: {},
-            hover: {},
-            active: {},
-            selected: {},
-          },
-          _instanceName: "view - Table",
-          _children: [],
-          table: {
-            ...view,
-            name: view.name,
-            tableId: view.tableId,
-            id: view.id,
-            label: view.name,
-            type: "viewV2",
-          },
-        },
-      ],
-      _instanceName: "view - List",
-      layout: "grid",
-      direction: "column",
-      hAlign: "stretch",
-      vAlign: "top",
-      size: "grow",
-      gap: "M",
-    },
-    routing: {
-      route: "/view",
-      roleId: "ADMIN",
-      homeScreen: false,
-    },
-    name: "view-id",
     workspaceAppId: "workspaceAppId",
   }
 }

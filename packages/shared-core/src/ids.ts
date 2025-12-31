@@ -53,22 +53,9 @@ export const isTableIdOrExternalTableId = (id: string): boolean => {
 }
 
 export const isTableId = idCheckFor(DocumentType.TABLE)
-export const isViewId = idCheckFor(VirtualDocumentType.VIEW)
 
 export const isDatasourceOrDatasourcePlusId = idCheckFor(
   DocumentType.DATASOURCE
 )
 
 export const isQueryId = idCheckFor(DocumentType.QUERY)
-
-export function getTableIdFromViewId(viewId: string) {
-  if (!isViewId(viewId)) {
-    throw new Error("Unable to extract table ID, is not a view ID")
-  }
-  const split = viewId.split(SEPARATOR)
-  split.shift()
-  viewId = split.join(SEPARATOR)
-  const regex = new RegExp(`^(?<tableId>.+)${SEPARATOR}([^${SEPARATOR}]+)$`)
-  const res = regex.exec(viewId)
-  return res!.groups!["tableId"]
-}

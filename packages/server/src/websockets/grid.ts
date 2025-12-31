@@ -1,11 +1,6 @@
-import { auth, context, permissions } from "@budibase/backend-core"
+import { auth, permissions } from "@budibase/backend-core"
 import { GridSocketEvent } from "@budibase/shared-core"
-import {
-  decodeJSBinding,
-  findHBSBlocks,
-  isJSBinding,
-} from "@budibase/string-templates"
-import { Ctx, Row, Table, View, ViewV2, WorkspaceApp } from "@budibase/types"
+import { Ctx, Row, Table, WorkspaceApp } from "@budibase/types"
 import http from "http"
 import Koa from "koa"
 import { userAgent } from "koa-useragent"
@@ -13,7 +8,6 @@ import { Socket } from "socket.io"
 import { getSourceId } from "../api/controllers/row/utils"
 import { authorizedMiddleware as authorized } from "../middleware/authorized"
 import { currentWorkspaceMiddleware as currentWorkspace } from "../middleware/currentWorkspace"
-import sdk from "../sdk"
 import { createContext, runMiddlewares } from "./middleware"
 import { BaseSocket } from "./websocket"
 
@@ -22,20 +16,6 @@ const { PermissionType, PermissionLevel } = permissions
 export default class GridSocket extends BaseSocket {
   constructor(app: Koa, server: http.Server) {
     super(app, server, "/socket/grid")
-  }
-
-  // Checks if a view's query contains any current user bindings
-  containsCurrentUserBinding(view: ViewV2): boolean {
-    return findHBSBlocks(JSON.stringify(view.query))
-      .map(binding => {
-        const sanitizedBinding = binding.replace(/\\"/g, '"')
-        if (isJSBinding(sanitizedBinding)) {
-          return decodeJSBinding(sanitizedBinding)
-        } else {
-          return sanitizedBinding
-        }
-      })
-      .some(binding => binding?.includes("[user]"))
   }
 
   async onConnect(socket: Socket) {
@@ -50,18 +30,6 @@ export default class GridSocket extends BaseSocket {
       if (!resourceId || !appId) {
         // Ignore if no table or app specified
         valid = false
-      } else if (ds.type === "viewV2") {
-        // If this is a view filtered by current user, don't sync changes
-        try {
-          await context.doInWorkspaceContext(appId, async () => {
-            const view = await sdk.views.get(ds.id)
-            if (this.containsCurrentUserBinding(view)) {
-              valid = false
-            }
-          })
-        } catch (err) {
-          valid = false
-        }
       }
       if (!valid) {
         socket.disconnect(true)
@@ -156,30 +124,6 @@ export default class GridSocket extends BaseSocket {
     const room = `${ctx.appId}-${table._id}`
     this.emitToRoom(ctx, room, GridSocketEvent.DatasourceChange, {
       id: table._id,
-      datasource: null,
-    })
-
-    // When the table is deleted we need to notify all views that they have
-    // also been deleted
-    Object.values(table.views || {})
-      .filter((view: View | ViewV2) => (view as ViewV2).version === 2)
-      .forEach((view: View | ViewV2) => {
-        this.emitViewDeletion(ctx, view as ViewV2)
-      })
-  }
-
-  emitViewUpdate(ctx: Ctx, view: ViewV2) {
-    const room = `${ctx.appId}-${view.id}`
-    this.emitToRoom(ctx, room, GridSocketEvent.DatasourceChange, {
-      id: view.id,
-      datasource: view,
-    })
-  }
-
-  emitViewDeletion(ctx: Ctx, view: ViewV2) {
-    const room = `${ctx.appId}-${view.id}`
-    this.emitToRoom(ctx, room, GridSocketEvent.DatasourceChange, {
-      id: view.id,
       datasource: null,
     })
   }

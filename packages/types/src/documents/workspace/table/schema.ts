@@ -260,6 +260,11 @@ export interface TableSchema {
   [key: string]: FieldSchema
 }
 
+export interface RelationSchemaField extends UIFieldMetadata {
+  readonly?: boolean
+  displayName?: string
+}
+
 export function isRelationshipField(
   field: FieldSchema
 ): field is RelationshipFieldMetadata {

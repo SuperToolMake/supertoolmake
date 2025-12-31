@@ -1,11 +1,6 @@
-import { Row, Table, TableRequest, TableSchema, View } from "../../../documents"
-import { ViewV2Enriched } from "../../../sdk"
+import { Row, Table, TableRequest, TableSchema } from "../../../documents"
 
-export type TableViewsResponse = { [key: string]: View | ViewV2Enriched }
-
-export interface FindTableResponse extends Table {
-  views?: TableViewsResponse
-}
+export interface FindTableResponse extends Table {}
 
 export type FetchTablesResponse = FindTableResponse[]
 

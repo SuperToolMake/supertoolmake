@@ -4,7 +4,6 @@ import { AttachmentAPI } from "./attachment"
 import { BackupAPI } from "./backup"
 import { DatasourceAPI } from "./datasource"
 import { DeployAPI } from "./deploy"
-import { LegacyViewAPI } from "./legacyView"
 import { MiscAPI } from "./misc"
 import { NavigationAPI } from "./navigation"
 import { OAuth2API } from "./oauth2"
@@ -22,7 +21,6 @@ import { ScreenAPI } from "./screen"
 import { TableAPI } from "./table"
 import { TemplateAPI } from "./template"
 import { UserAPI } from "./user"
-import { ViewV2API } from "./viewV2"
 import { WebhookAPI } from "./webhook"
 import { WorkspaceAPI } from "./workspace"
 import { WorkspaceAppAPI } from "./workspaceApp"
@@ -34,7 +32,6 @@ export default class API {
   backup: BackupAPI
   datasource: DatasourceAPI
   deploy: DeployAPI
-  legacyView: LegacyViewAPI
   misc: MiscAPI
   oauth2: OAuth2API
   permission: PermissionAPI
@@ -47,7 +44,6 @@ export default class API {
   table: TableAPI
   templates: TemplateAPI
   user: UserAPI
-  viewV2: ViewV2API
   webhook: WebhookAPI
   assets: AssetsAPI
   workspaceApp: WorkspaceAppAPI
@@ -67,7 +63,6 @@ export default class API {
     this.backup = new BackupAPI(config)
     this.datasource = new DatasourceAPI(config)
     this.deploy = new DeployAPI(config)
-    this.legacyView = new LegacyViewAPI(config)
     this.misc = new MiscAPI(config)
     this.oauth2 = new OAuth2API(config)
     this.permission = new PermissionAPI(config)
@@ -80,7 +75,6 @@ export default class API {
     this.table = new TableAPI(config)
     this.templates = new TemplateAPI(config)
     this.user = new UserAPI(config)
-    this.viewV2 = new ViewV2API(config)
     this.webhook = new WebhookAPI(config)
     this.assets = new AssetsAPI(config)
     this.workspaceApp = new WorkspaceAppAPI(config)

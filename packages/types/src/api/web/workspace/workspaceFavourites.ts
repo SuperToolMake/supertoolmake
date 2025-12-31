@@ -6,7 +6,6 @@ export enum WorkspaceResource {
   QUERY = "query",
   TABLE = "table",
   WORKSPACE_APP = "workspace_app",
-  VIEW = "view",
 }
 
 export interface AddWorkspaceFavouriteRequest {

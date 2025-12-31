@@ -1,10 +1,4 @@
-import {
-  CalculationType,
-  FieldSchema,
-  FieldType,
-  UICondition,
-  UIRow,
-} from "@budibase/types"
+import { FieldSchema, FieldType, UICondition, UIRow } from "@budibase/types"
 
 export type UIColumn = FieldSchema & {
   label: string
@@ -23,7 +17,6 @@ export type UIColumn = FieldSchema & {
     autocolumn: boolean
     cellRenderType?: FieldType | "role"
   }
-  calculationType: CalculationType
   __idx: number
   __left: number
   width: number

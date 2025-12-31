@@ -5,7 +5,6 @@ export * from "./retry"
 import { getNextExecutionDates, validate } from "./cron"
 export const cron = { getNextExecutionDates, validate }
 export * as schema from "./schema"
-export * as views from "./views"
 export * as roles from "./roles"
 export * as lists from "./lists"
 export * from "./duplicate"

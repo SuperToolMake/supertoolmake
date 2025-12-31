@@ -2,8 +2,6 @@ import { Row, TableSchema } from "../../documents"
 
 export type DataFetchDatasource =
   | TableDatasource
-  | ViewV1Datasource
-  | ViewDatasource
   | QueryDatasource
   | RelationshipDatasource
   | UserDatasource
@@ -16,20 +14,6 @@ export type DataFetchDatasource =
 export interface TableDatasource {
   type: "table"
   tableId: string
-}
-
-export type ViewV1Datasource = {
-  type: "view"
-  name: string
-  tableId: string
-  calculation: string
-  field: string
-  groupBy: string
-}
-
-export interface ViewDatasource {
-  type: "viewV2"
-  id: string
 }
 
 export interface QueryDatasource {

@@ -11,14 +11,6 @@ export interface UITableResource {
   resourceId: string
 }
 
-export interface UIViewResource {
-  type: "viewV2"
-  id: string
-  label: string
-  tableId: string
-  resourceId: string
-}
-
 export interface UIFile {
   size: number
   name: string

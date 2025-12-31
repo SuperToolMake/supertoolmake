@@ -1,5 +1,4 @@
 import { Document } from "../../document"
-import { View, ViewV2 } from "../view"
 import { RenameColumn } from "../../../sdk"
 import { TableSchema } from "./schema"
 
@@ -13,7 +12,6 @@ export enum TableSourceType {
 export interface Table extends Document {
   type: "table"
   sourceType: TableSourceType
-  views?: { [key: string]: View | ViewV2 }
   name: string
   originalName?: string
   sourceId: string

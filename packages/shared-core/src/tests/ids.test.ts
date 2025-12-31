@@ -1,11 +1,9 @@
-import { DocumentType, VirtualDocumentType } from "@budibase/types"
+import { DocumentType } from "@budibase/types"
 import {
-  getTableIdFromViewId,
   isDatasourceOrDatasourcePlusId,
   isQueryId,
   isTableId,
   isTableIdOrExternalTableId,
-  isViewId,
 } from "../ids"
 
 function makeId(prefix: string): string {
@@ -20,14 +18,6 @@ describe("ids", () => {
       const found = oneOfEachId.filter(isTableId)
       expect(found.length).toBe(1)
       expect(found[0].startsWith(`${DocumentType.TABLE}_`)).toBe(true)
-    })
-  })
-
-  describe("isViewId", () => {
-    it("should return true for view IDs", () => {
-      const found = oneOfEachId.filter(isViewId)
-      expect(found.length).toBe(1)
-      expect(found[0].startsWith(`${VirtualDocumentType.VIEW}_`)).toBe(true)
     })
   })
 
@@ -62,20 +52,6 @@ describe("ids", () => {
       const found = oneOfEachId.filter(isQueryId)
       expect(found.length).toBe(1)
       expect(found[0].startsWith(`${DocumentType.QUERY}_`)).toBe(true)
-    })
-  })
-
-  describe("getTableIdFromViewId", () => {
-    it("should return the correct table ID for a given view ID", () => {
-      const tableId = makeId(DocumentType.TABLE)
-      const viewId = makeId(`${VirtualDocumentType.VIEW}_${tableId}`)
-      expect(getTableIdFromViewId(viewId)).toBe(tableId)
-    })
-
-    it("should handle the weird sample data IDs", () => {
-      const tableId = "ta_bb_employee"
-      const viewId = makeId(`${VirtualDocumentType.VIEW}_${tableId}`)
-      expect(getTableIdFromViewId(viewId)).toBe(tableId)
     })
   })
 })

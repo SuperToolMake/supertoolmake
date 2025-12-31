@@ -1,6 +1,4 @@
 import {
-  BasicViewFieldMetadata,
-  CalculationType,
   FieldSchema,
   FieldType,
   RelationSchemaField,
@@ -23,15 +21,13 @@ export interface UITable extends Table {
   schema: Record<string, UIFieldSchema>
 }
 
-export type UIFieldSchema = FieldSchema &
-  BasicViewFieldMetadata & {
-    calculationType?: CalculationType
-    cellRenderType?: string
-    columns?: Record<string, UIRelationSchemaField>
-    disabled?: boolean
-    related?: { field: string; subField: string }
-    format?: (row: UIRow) => any
-  }
+export type UIFieldSchema = FieldSchema & {
+  cellRenderType?: string
+  columns?: Record<string, UIRelationSchemaField>
+  disabled?: boolean
+  related?: { field: string; subField: string }
+  format?: (row: UIRow) => any
+}
 
 interface UIRelationSchemaField extends RelationSchemaField {
   type: FieldType

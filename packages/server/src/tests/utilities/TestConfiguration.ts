@@ -20,7 +20,6 @@ import {
   layout as layoutController,
   query as queryController,
   role as roleController,
-  view as viewController,
   workspace as workspaceController,
 } from "./controllers"
 import {
@@ -31,13 +30,11 @@ import {
   basicRow,
   basicScreen,
   basicTable,
-  basicWebhook,
   TEST_WORKSPACEAPPID_PLACEHOLDER,
 } from "./structures"
 
 import {
   AuthToken,
-  CreateViewRequest,
   Datasource,
   DevInfo,
   FieldType,
@@ -54,7 +51,6 @@ import {
   TableSourceType,
   User,
   UserCtx,
-  View,
   Webhook,
   WithRequired,
   Workspace,
@@ -802,38 +798,6 @@ export default class TestConfiguration {
 
   async createRole(config?: any) {
     return this._req(roleController.save, config || basicRole())
-  }
-
-  // VIEW
-
-  async createLegacyView(config?: View) {
-    if (!this.table && !config) {
-      throw "Test requires table to be configured."
-    }
-    const view = config || {
-      tableId: this.table!._id,
-      name: generator.guid(),
-    }
-    return this._req(viewController.v1.save, view)
-  }
-
-  async createView(
-    config?: Omit<CreateViewRequest, "tableId" | "name"> & {
-      name?: string
-      tableId?: string
-    }
-  ) {
-    if (!this.table && !config?.tableId) {
-      throw "Test requires table to be configured."
-    }
-
-    const view: CreateViewRequest = {
-      ...config,
-      tableId: config?.tableId || this.table!._id!,
-      name: config?.name || generator.word(),
-    }
-
-    return await this.api.viewV2.create(view)
   }
 
   // DATASOURCE
