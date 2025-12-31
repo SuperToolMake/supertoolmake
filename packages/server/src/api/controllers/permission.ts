@@ -5,7 +5,6 @@ import {
   FetchBuiltinPermissionsResponse,
   FetchPermissionLevelsRequest,
   FetchResourcePermissionInfoResponse,
-  GetDependantResourcesResponse,
   GetResourcePermsResponse,
   RemovePermissionRequest,
   RemovePermissionResponse,
@@ -68,8 +67,6 @@ export async function getResourcePerms(
 ) {
   const resourceId = ctx.params.resourceId
   const resourcePermissions = await sdk.permissions.getResourcePerms(resourceId)
-  const inheritablePermissions =
-    await sdk.permissions.getInheritablePermissions(resourceId)
 
   ctx.body = {
     permissions: Object.entries(resourcePermissions).reduce(
@@ -77,22 +74,11 @@ export async function getResourcePerms(
         p[level] = {
           role: role.role,
           permissionType: role.type,
-          inheritablePermission:
-            inheritablePermissions && inheritablePermissions[level].role,
         }
         return p
       },
       {} as Record<string, ResourcePermissionInfo>
     ),
-  }
-}
-
-export async function getDependantResources(
-  ctx: UserCtx<void, GetDependantResourcesResponse>
-) {
-  const resourceId = ctx.params.resourceId
-  ctx.body = {
-    resourceByType: await sdk.permissions.getDependantResources(resourceId),
   }
 }
 

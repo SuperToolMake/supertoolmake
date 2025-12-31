@@ -44,7 +44,6 @@ import fs from "fs"
 import { ObjectStoreBuckets } from "../../../constants"
 import env from "../../../environment"
 import {
-  backupClientLibrary,
   revertClientLibrary,
   shouldServeLocally,
   updateClientLibrary,
@@ -63,88 +62,6 @@ describe("clientLibrary", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-  })
-
-  describe("backupClientLibrary", () => {
-    it("should backup entire app folder to /.bak folder", async () => {
-      const mockFiles: ObjectStoreFile[] = [
-        { Key: "app_123/manifest.json" },
-        { Key: "app_123/budibase-client.js" },
-        { Key: "app_123/_dependencies/some-lib.js" },
-        { Key: "app_123/custom-file.json" },
-      ]
-
-      mockedObjectStore.listAllObjects.mockReturnValue(mockFiles as any)
-
-      await backupClientLibrary(testAppId)
-
-      expect(mockedObjectStore.deleteFolder).toHaveBeenCalledWith(
-        ObjectStoreBuckets.APPS,
-        "app_123/.bak"
-      )
-
-      expect(mockedObjectStore.upload).toHaveBeenCalledTimes(4)
-      expect(mockedObjectStore.upload).toHaveBeenCalledWith({
-        bucket: ObjectStoreBuckets.APPS,
-        filename: "app_123/.bak/manifest.json",
-        path: "/tmp/file",
-      })
-      expect(mockedObjectStore.upload).toHaveBeenCalledWith({
-        bucket: ObjectStoreBuckets.APPS,
-        filename: "app_123/.bak/budibase-client.js",
-        path: "/tmp/file",
-      })
-      expect(mockedObjectStore.upload).toHaveBeenCalledWith({
-        bucket: ObjectStoreBuckets.APPS,
-        filename: "app_123/.bak/_dependencies/some-lib.js",
-        path: "/tmp/file",
-      })
-      expect(mockedObjectStore.upload).toHaveBeenCalledWith({
-        bucket: ObjectStoreBuckets.APPS,
-        filename: "app_123/.bak/custom-file.json",
-        path: "/tmp/file",
-      })
-    })
-
-    it("should skip .bak files during backup", async () => {
-      const mockFiles: ObjectStoreFile[] = [
-        { Key: "app_123/manifest.json" },
-        { Key: "app_123/.bak/old-file.js" },
-        { Key: "app_123/file.js.bak" },
-      ]
-
-      mockedObjectStore.listAllObjects.mockReturnValue(mockFiles as any)
-
-      await backupClientLibrary(testAppId)
-
-      expect(mockedObjectStore.upload).toHaveBeenCalledTimes(1)
-      expect(mockedObjectStore.upload).toHaveBeenCalledWith({
-        bucket: ObjectStoreBuckets.APPS,
-        filename: "app_123/.bak/manifest.json",
-        path: "/tmp/file",
-      })
-    })
-
-    it("should handle dev app IDs correctly", async () => {
-      const mockFiles: ObjectStoreFile[] = [{ Key: "app_123/manifest.json" }]
-      mockedObjectStore.listAllObjects.mockReturnValue(mockFiles as any)
-
-      await backupClientLibrary(testAppIdDev)
-
-      expect(mockedObjectStore.listAllObjects).toHaveBeenCalledWith(
-        ObjectStoreBuckets.APPS,
-        testAppId // should be converted to prod ID
-      )
-    })
-
-    it("should continue if backup folder delete fails", async () => {
-      const mockFiles: ObjectStoreFile[] = [{ Key: "app_123/manifest.json" }]
-      mockedObjectStore.listAllObjects.mockReturnValue(mockFiles as any)
-      mockedObjectStore.deleteFolder.mockRejectedValue(new Error("Not found"))
-
-      await expect(backupClientLibrary(testAppId)).resolves.not.toThrow()
-      expect(mockedObjectStore.upload).toHaveBeenCalledTimes(1)
-    })
   })
 
   describe("updateClientLibrary", () => {

@@ -1,6 +1,5 @@
 import {
   AddPermissionResponse,
-  GetDependantResourcesResponse,
   GetResourcePermsResponse,
   PermissionLevel,
   RemovePermissionResponse,
@@ -21,7 +20,6 @@ export interface PermissionEndpoints {
     roleId: string,
     level: PermissionLevel
   ) => Promise<RemovePermissionResponse>
-  getDependants: (resourceId: string) => Promise<GetDependantResourcesResponse>
 }
 
 export const buildPermissionsEndpoints = (
@@ -58,16 +56,6 @@ export const buildPermissionsEndpoints = (
   removePermissionFromResource: async (resourceId, roleId, level) => {
     return await API.delete({
       url: `/api/permission/${roleId}/${resourceId}/${level}`,
-    })
-  },
-
-  /**
-   * Gets info about the resources that depend on this resource permissions
-   * @param resourceId the resource ID to check
-   */
-  getDependants: async resourceId => {
-    return await API.get({
-      url: `/api/permission/${resourceId}/dependants`,
     })
   },
 })

@@ -62,7 +62,6 @@ import {
 import env from "../../environment"
 import sdk from "../../sdk"
 import {
-  backupClientLibrary,
   revertClientLibrary,
   updateClientLibrary,
   uploadAppFiles,
@@ -629,7 +628,6 @@ export async function updateClient(
   let manifest
   // Update client library and manifest
   if (!env.isTest()) {
-    await backupClientLibrary(ctx.params.appId)
     manifest = await updateClientLibrary(ctx.params.appId)
   }
 

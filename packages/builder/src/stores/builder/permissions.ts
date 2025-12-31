@@ -3,7 +3,6 @@ import { API } from "@/api"
 import {
   PermissionLevel,
   GetResourcePermsResponse,
-  GetDependantResourcesResponse,
   ResourcePermissionInfo,
 } from "@budibase/types"
 
@@ -38,12 +37,6 @@ export class PermissionStore extends BudiStore<Permission[]> {
     resourceId: string
   ): Promise<GetResourcePermsResponse> => {
     return await API.getPermissionForResource(resourceId)
-  }
-
-  getDependantsInfo = async (
-    resourceId: string
-  ): Promise<GetDependantResourcesResponse> => {
-    return await API.getDependants(resourceId)
   }
 }
 

@@ -18,10 +18,6 @@ export interface GetResourcePermsResponse {
   permissions: Record<string, ResourcePermissionInfo>
 }
 
-export interface GetDependantResourcesResponse {
-  resourceByType?: Record<string, number>
-}
-
 export interface AddedPermission {
   _id?: string
   rev?: string

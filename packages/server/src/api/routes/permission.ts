@@ -7,10 +7,6 @@ builderRoutes
   .get("/api/permission/levels", controller.fetchLevels)
   .get("/api/permission", controller.fetch)
   .get("/api/permission/:resourceId", controller.getResourcePerms)
-  .get(
-    "/api/permission/:resourceId/dependants",
-    controller.getDependantResources
-  )
   // adding a specific role/level for the resource overrides the underlying access control
   .post(
     "/api/permission/:roleId/:resourceId/:level",
