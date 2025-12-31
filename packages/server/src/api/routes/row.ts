@@ -1,15 +1,11 @@
 import * as rowController from "../controllers/row"
-import {
-  authorizedMiddleware as authorized,
-  authorizedResource,
-} from "../../middleware/authorized"
+import { authorizedMiddleware as authorized } from "../../middleware/authorized"
 import { paramResource, paramSubResource } from "../../middleware/resourceId"
 import { permissions } from "@budibase/backend-core"
 import { internalSearchValidator } from "./utils/validators"
-import { trimViewRowInfoMiddleware } from "../../middleware/trimViewRowInfo"
 import { validateBody } from "../../middleware/zod-validator"
 import { searchRowRequestValidator } from "@budibase/types"
-import { endpointGroupList, publicRoutes } from "./endpointGroups"
+import { endpointGroupList } from "./endpointGroups"
 
 const { PermissionType, PermissionLevel } = permissions
 
@@ -55,18 +51,8 @@ readRoutes
   )
 
 writeRoutes
-  .post(
-    "/api/:sourceId/rows",
-    paramResource("sourceId"),
-    trimViewRowInfoMiddleware,
-    rowController.save
-  )
-  .patch(
-    "/api/:sourceId/rows",
-    paramResource("sourceId"),
-    trimViewRowInfoMiddleware,
-    rowController.patch
-  )
+  .post("/api/:sourceId/rows", paramResource("sourceId"), rowController.save)
+  .patch("/api/:sourceId/rows", paramResource("sourceId"), rowController.patch)
   .post(
     "/api/:sourceId/rows/validate",
     paramResource("sourceId"),
@@ -75,7 +61,6 @@ writeRoutes
   .delete(
     "/api/:sourceId/rows",
     paramResource("sourceId"),
-    trimViewRowInfoMiddleware,
     rowController.destroy
   )
   .post(
@@ -83,11 +68,3 @@ writeRoutes
     paramResource("sourceId"),
     rowController.exportRows
   )
-
-publicRoutes.post(
-  "/api/v2/views/:viewId/search",
-  internalSearchValidator(),
-  validateBody(searchRowRequestValidator),
-  authorizedResource(PermissionType.VIEW, PermissionLevel.READ, "viewId"),
-  rowController.views.searchView
-)
