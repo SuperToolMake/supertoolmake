@@ -3,7 +3,7 @@
   import { convertToJS } from "@budibase/string-templates"
   import { Input, Layout, Icon, Popover } from "@budibase/bbui"
   import { handlebarsCompletions } from "@/constants/completions"
-  import type { EnrichedBinding, Helper, Snippet } from "@budibase/types"
+  import type { EnrichedBinding, Helper } from "@budibase/types"
   import { BindingMode } from "@budibase/types"
   import { EditorModes } from "../CodeEditor"
   import CodeEditor from "../CodeEditor/CodeEditor.svelte"

@@ -1,10 +1,11 @@
-<script>
+<script lang="ts">
   import { Select, Label, Checkbox } from "@budibase/bbui"
-  import { tables, datasources, viewsV2, rowActions } from "@/stores/builder"
+  import { tables, datasources, rowActions } from "@/stores/builder"
   import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+  import type { EnrichedBinding } from "@budibase/types"
 
   export let parameters
-  export let bindings = []
+  export let bindings: EnrichedBinding[] = []
 
   $: datasourceMap = Object.fromEntries(
     ($datasources.list || []).map(ds => [ds._id, ds.name])
@@ -16,15 +17,7 @@
       resourceId: table._id,
     }
   })
-  $: viewOptions = $viewsV2.list.map(view => {
-    const table = $tables.list.find(t => t._id === view.tableId)
-    const datasourceName = datasourceMap[table.sourceId] || "Unknown"
-    return {
-      label: `${datasourceName} - ${view.name}`,
-      resourceId: view.id,
-    }
-  })
-  $: datasourceOptions = [...(tableOptions || []), ...(viewOptions || [])]
+  $: datasourceOptions = [...(tableOptions || [])]
   $: resourceId = parameters.resourceId
   $: rowActions.refreshRowActions(resourceId)
   $: enabledRowActions = $rowActions[resourceId] || []
@@ -44,7 +37,7 @@
       getOptionValue={x => x.resourceId}
     />
 
-    <Label small>Row ID</Label>
+    <Label size="S">Row ID</Label>
     <DrawerBindableInput
       {bindings}
       title="Row ID"
@@ -52,35 +45,35 @@
       on:change={value => (parameters.rowId = value.detail)}
     />
 
-    <Label small>Row action</Label>
+    <Label size="S">Row action</Label>
     <Select bind:value={parameters.rowActionId} options={rowActionOptions} />
 
     <br />
     <Checkbox text="Require confirmation" bind:value={parameters.confirm} />
 
     {#if parameters.confirm}
-      <Label small>Title</Label>
+      <Label size="S">Title</Label>
       <DrawerBindableInput
         placeholder="Prompt User"
         value={parameters.customTitleText}
         on:change={e => (parameters.customTitleText = e.detail)}
         {bindings}
       />
-      <Label small>Text</Label>
+      <Label size="S">Text</Label>
       <DrawerBindableInput
         placeholder="Are you sure you want to continue?"
         value={parameters.confirmText}
         on:change={e => (parameters.confirmText = e.detail)}
         {bindings}
       />
-      <Label small>Confirm Text</Label>
+      <Label size="S">Confirm Text</Label>
       <DrawerBindableInput
         placeholder="Confirm"
         value={parameters.confirmButtonText}
         on:change={e => (parameters.confirmButtonText = e.detail)}
         {bindings}
       />
-      <Label small>Cancel Text</Label>
+      <Label size="S">Cancel Text</Label>
       <DrawerBindableInput
         placeholder="Cancel"
         value={parameters.cancelButtonText}

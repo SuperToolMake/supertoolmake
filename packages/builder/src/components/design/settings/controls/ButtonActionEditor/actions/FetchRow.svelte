@@ -1,10 +1,11 @@
-<script>
+<script lang="ts">
   import { Select, Label } from "@budibase/bbui"
-  import { tables, datasources, viewsV2 } from "@/stores/builder"
+  import { tables, datasources } from "@/stores/builder"
   import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+  import type { EnrichedBinding } from "@budibase/types"
 
   export let parameters
-  export let bindings = []
+  export let bindings: EnrichedBinding[] = []
 
   $: datasourceMap = Object.fromEntries(
     ($datasources.list || []).map(ds => [ds._id, ds.name])
@@ -16,15 +17,7 @@
       resourceId: table._id,
     }
   })
-  $: viewOptions = $viewsV2.list.map(view => {
-    const table = $tables.list.find(t => t._id === view.tableId)
-    const datasourceName = datasourceMap[table.sourceId] || "Unknown"
-    return {
-      label: `${datasourceName} - ${view.name}`,
-      resourceId: view.id,
-    }
-  })
-  $: options = [...(tableOptions || []), ...(viewOptions || [])]
+  $: options = [...(tableOptions || [])]
 </script>
 
 <div class="root">
@@ -36,7 +29,7 @@
     getOptionValue={table => table.resourceId}
   />
 
-  <Label small>Row ID</Label>
+  <Label size="S">Row ID</Label>
   <DrawerBindableInput
     {bindings}
     title="Row ID"

@@ -6,21 +6,19 @@
     queries,
     screenStore,
     tables,
-    views,
-    viewsV2,
   } from "@/stores/builder"
   import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
-  import { helpers, utils } from "@budibase/shared-core"
+  import { utils } from "@budibase/shared-core"
   import { SourceType } from "@budibase/types"
   import { goto, params } from "@roxi/routify"
   import { DB_TYPE_EXTERNAL } from "@/constants/backend"
   import { get } from "svelte/store"
-  import type { Table, ViewV2, View, Datasource, Query } from "@budibase/types"
+  import type { Table, Datasource, Query } from "@budibase/types"
 
   $goto
   $params
 
-  export let source: Table | ViewV2 | Datasource | Query | undefined
+  export let source: Table | Datasource | Query | undefined
 
   let confirmDeleteDialog: any
   let affectedScreens: { text: string; url: string }[] = []
@@ -40,9 +38,6 @@
   function getSourceID(): string {
     if (!source) {
       throw new Error("No data source provided.")
-    }
-    if ("id" in source) {
-      return source.id
     }
     return source._id!
   }
@@ -80,23 +75,12 @@
       }
       notifications.success("Table deleted")
       if (isSelected) {
-        $goto(`./datasource/${table.datasourceId}`)
+        $goto(`./datasource/[datasourceId]`, {
+          datasourceId: table.datasourceId!,
+        })
       }
     } catch (error: any) {
       notifications.error(`Error deleting table - ${error.message}`)
-    }
-  }
-
-  async function deleteView(view: ViewV2 | View) {
-    try {
-      if (helpers.views.isV2(view)) {
-        await viewsV2.delete(view as ViewV2)
-      } else {
-        await views.delete(view as View)
-      }
-      notifications.success("View deleted")
-    } catch (error) {
-      notifications.error("Error deleting view")
     }
   }
 
@@ -138,8 +122,6 @@
     switch (sourceType) {
       case SourceType.TABLE:
         return await deleteTable(source as Table)
-      case SourceType.VIEW:
-        return await deleteView(source as ViewV2)
       case SourceType.QUERY:
         return await deleteQuery(source as Query)
       case SourceType.DATASOURCE:

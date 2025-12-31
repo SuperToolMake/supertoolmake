@@ -30,9 +30,7 @@ const containsActiveEntity = (
   params,
   isActive,
   tables,
-  queries,
-  views,
-  viewsV2
+  queries
 ) => {
   // Check for being on a datasource page
   if (params.datasourceId === datasource._id) {
@@ -69,19 +67,6 @@ const containsActiveEntity = (
     const selectedTable = tables.selected?._id
     return options.find(x => x._id === selectedTable) != null
   }
-
-  // Check for a matching view
-  const selectedView = views.selected?.name
-  const viewTable = options.find(table => {
-    return table.views?.[selectedView] != null
-  })
-  if (viewTable) {
-    return true
-  }
-
-  // Check for a matching viewV2
-  const viewV2Table = options.find(x => x._id === viewsV2.selected?.tableId)
-  return viewV2Table != null
 }
 
 export const enrichDatasources = (
@@ -90,8 +75,6 @@ export const enrichDatasources = (
   isActive,
   tables,
   queries,
-  views,
-  viewsV2,
   toggledDatasources,
   searchTerm,
   datasourceFilter = _ => true
@@ -115,9 +98,7 @@ export const enrichDatasources = (
       params,
       isActive,
       tables,
-      queries,
-      views,
-      viewsV2
+      queries
     )
 
     const dsTables = tables.list.filter(
@@ -145,23 +126,11 @@ export const enrichDatasources = (
     const visibleDsTables = dsTables
       .map(t => ({
         ...t,
-        views: !searchTerm
-          ? t.views
-          : Object.keys(t.views || {})
-              .filter(
-                viewName =>
-                  viewName.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1
-              )
-              .reduce(
-                (acc, viewName) => ({ ...acc, [viewName]: t.views[viewName] }),
-                {}
-              ),
       }))
       .filter(
         table =>
           !searchTerm ||
-          table.name?.toLowerCase()?.indexOf(searchTerm.toLowerCase()) > -1 ||
-          Object.keys(table.views).length
+          table.name?.toLowerCase()?.indexOf(searchTerm.toLowerCase()) > -1
       )
 
     const show = !!(

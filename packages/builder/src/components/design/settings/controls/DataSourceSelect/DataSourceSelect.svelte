@@ -20,8 +20,6 @@
   import {
     tables as tablesStore,
     queries as queriesStore,
-    viewsV2 as viewsV2Store,
-    views as viewsStore,
     selectedScreen,
     componentStore,
     datasources,
@@ -57,13 +55,6 @@
 
   $: text = value?.label ?? "Choose an option"
   $: tables = sortAndFormat.tables($tablesStore.list, $datasources.list)
-  $: viewsV1 = $viewsStore.list.map(view => ({
-    ...view,
-    label: view.name,
-    type: "view",
-  }))
-  $: viewsV2 = sortAndFormat.viewsV2($viewsV2Store.list, $datasources.list)
-  $: views = [...(viewsV1 || []), ...(viewsV2 || [])]
   $: queries = $queriesStore.list
     .filter(q => showAllQueries || q.queryVerb === "read" || q.readable)
     .map(query => ({
@@ -231,16 +222,6 @@
       {value}
       onSelect={handleSelected}
     />
-    {#if views?.length}
-      <DataSourceCategory
-        dividerState={true}
-        heading="Views"
-        dataSet={views}
-        {value}
-        onSelect={handleSelected}
-        identifiers={["tableId", "name"]}
-      />
-    {/if}
     {#if queries?.length}
       <DataSourceCategory
         dividerState={true}

@@ -4,7 +4,6 @@
   import {
     tables as tableStore,
     datasources as datasourceStore,
-    viewsV2 as viewsV2Store,
   } from "@/stores/builder"
   import DataSourceCategory from "./DataSourceSelect/DataSourceCategory.svelte"
   import { sortAndFormat } from "@/helpers/data/format"
@@ -16,8 +15,7 @@
   const dispatch = createEventDispatcher()
 
   $: tables = sortAndFormat.tables($tableStore.list, $datasourceStore.list)
-  $: views = sortAndFormat.viewsV2($viewsV2Store.list, $datasourceStore.list)
-  $: options = [...(tables || []), ...(views || [])]
+  $: options = [...(tables || [])]
 
   $: text = value?.label ?? "Choose an option"
 
@@ -32,9 +30,8 @@
   onMount(() => {
     // Migrate old values before "resourceId" existed
     if (value && !value.resourceId) {
-      const view = views.find(x => x.resourceId === value.id)
       const table = tables.find(x => x.resourceId === value.tableId)
-      dispatch("change", view || table)
+      dispatch("change", table)
     }
   })
 </script>
@@ -55,15 +52,6 @@
       {value}
       onSelect={onChange}
     />
-    {#if views?.length}
-      <DataSourceCategory
-        dividerState={true}
-        heading="Views"
-        dataSet={views}
-        {value}
-        onSelect={onChange}
-      />
-    {/if}
   </div>
 </Popover>
 

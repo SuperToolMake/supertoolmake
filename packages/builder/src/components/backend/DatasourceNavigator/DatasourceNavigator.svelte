@@ -5,8 +5,6 @@
     datasources,
     queries,
     tables,
-    views,
-    viewsV2,
     userSelectedResourceMap,
     dataEnvironmentStore,
     workspaceDeploymentStore,
@@ -37,8 +35,6 @@
     $isActive,
     $tables,
     $queries,
-    $views,
-    $viewsV2,
     toggledDatasources,
     searchTerm,
     datasourceFilter

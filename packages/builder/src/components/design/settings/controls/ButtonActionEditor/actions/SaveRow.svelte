@@ -1,19 +1,19 @@
-<script>
+<script lang="ts">
   import { Select, Label, Body, Checkbox } from "@budibase/bbui"
   import {
     selectedScreen,
     componentStore,
     tables,
     datasources,
-    viewsV2,
   } from "@/stores/builder"
   import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
   import { getSchemaForDatasourcePlus } from "@/dataBinding"
   import SaveFields from "./SaveFields.svelte"
   import { getDatasourceLikeProviders } from "@/components/design/settings/controls/ButtonActionEditor/actions/utils"
+  import type { EnrichedBinding } from "@budibase/types"
 
   export let parameters
-  export let bindings = []
+  export let bindings: EnrichedBinding[] = []
   export let nested
 
   $: providerOptions = getDatasourceLikeProviders({
@@ -32,22 +32,14 @@
       resourceId: table._id,
     }
   })
-  $: viewOptions = $viewsV2.list.map(view => {
-    const table = $tables.list.find(t => t._id === view.tableId)
-    const datasourceName = datasourceMap[table.sourceId] || "Unknown"
-    return {
-      label: `${datasourceName} - ${view.name}`,
-      resourceId: view.id,
-    }
-  })
-  $: options = [...(tableOptions || []), ...(viewOptions || [])]
+  $: options = [...(tableOptions || [])]
 
-  const getSchemaFields = resourceId => {
-    const { schema } = getSchemaForDatasourcePlus(resourceId)
+  const getSchemaFields = (resourceId: string) => {
+    const { schema } = getSchemaForDatasourcePlus(resourceId, {})
     return Object.values(schema || {}).filter(field => !field.readonly)
   }
 
-  const onFieldsChanged = e => {
+  const onFieldsChanged = (e: CustomEvent) => {
     parameters.fields = e.detail
   }
 </script>
@@ -60,14 +52,14 @@
   </Body>
 
   <div class="params">
-    <Label small>Datasource</Label>
+    <Label size="S">Datasource</Label>
     <Select
       bind:value={parameters.providerId}
       options={providerOptions}
       placeholder="None"
     />
 
-    <Label small>Table</Label>
+    <Label size="S">Table</Label>
     <Select
       bind:value={parameters.tableId}
       {options}
@@ -75,7 +67,7 @@
       getOptionValue={option => option.resourceId}
     />
 
-    <Label small />
+    <Label size="S" />
     <Checkbox
       text="Do not display default notification"
       bind:value={parameters.notificationOverride}
@@ -84,7 +76,7 @@
     <Checkbox text="Require confirmation" bind:value={parameters.confirm} />
 
     {#if parameters.confirm}
-      <Label small>Title</Label>
+      <Label size="S">Title</Label>
       <DrawerBindableInput
         placeholder="Prompt User"
         value={parameters.customTitleText}
@@ -92,7 +84,7 @@
         {bindings}
       />
 
-      <Label small>Text</Label>
+      <Label size="S">Text</Label>
       <DrawerBindableInput
         placeholder="Are you sure you want to continue?"
         value={parameters.confirmText}
@@ -100,14 +92,14 @@
         {bindings}
       />
 
-      <Label small>Confirm Text</Label>
+      <Label size="S">Confirm Text</Label>
       <DrawerBindableInput
         placeholder="Confirm"
         value={parameters.confirmButtonText}
         on:change={e => (parameters.confirmButtonText = e.detail)}
         {bindings}
       />
-      <Label small>Cancel Text</Label>
+      <Label size="S">Cancel Text</Label>
       <DrawerBindableInput
         placeholder="Cancel"
         value={parameters.cancelButtonText}

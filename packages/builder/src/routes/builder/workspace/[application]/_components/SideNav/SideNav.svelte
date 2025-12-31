@@ -21,7 +21,6 @@
     datasources,
     tables,
     queries,
-    viewsV2,
   } from "@/stores/builder"
   import FavouriteResourceButton from "@/routes/builder/_components/FavouriteResourceButton.svelte"
   import { enrichedApps } from "@/stores/portal"
@@ -34,7 +33,6 @@
     type Table,
     type UIInternalDatasource,
     type UIWorkspaceApp,
-    type ViewV2,
     type WorkspaceFavourite,
     PublishResourceState,
     WorkspaceResource,
@@ -72,7 +70,6 @@
     datasources: (Datasource | UIInternalDatasource)[]
     tables: Table[]
     queries: Query[]
-    views: ViewV2[]
   }
 
   setContext(Context.PopoverRoot, ".nav .popover-container")
@@ -83,7 +80,6 @@
     [WorkspaceResource.TABLE]: "table",
     [WorkspaceResource.WORKSPACE_APP]: "browser",
     [WorkspaceResource.QUERY]: "database", // regular db queries
-    [WorkspaceResource.VIEW]: "table",
   }
 
   const datasourceLookup = datasources.lookup
@@ -118,15 +114,13 @@
         datasources,
         tables,
         queries,
-        viewsV2,
         workspaceFavouriteStore,
       ],
-      ([$apps, $datasources, $tables, $queries, $views]) => ({
+      ([$apps, $datasources, $tables, $queries]) => ({
         apps: $apps.workspaceApps,
         datasources: $datasources.list,
         tables: $tables.list,
         queries: $queries.list,
-        views: $views.list,
       })
     )
 
@@ -236,10 +230,6 @@
         const basePath =
           datasource?.source === IntegrationTypes.REST ? "apis" : "data"
         return `${appPrefix}/${basePath}/query/${id}`
-      },
-      [WorkspaceResource.VIEW]: (id: string) => {
-        const view = $viewsV2.list.find(v => v.id === id)
-        return `${appPrefix}/data/table/${view?.tableId}/${id}`
       },
     }
     if (!link[favourite.resourceType]) return null

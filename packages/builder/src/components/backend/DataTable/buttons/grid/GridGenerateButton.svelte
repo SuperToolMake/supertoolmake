@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ActionButton, ListItem } from "@budibase/bbui"
   import { getContext } from "svelte"
-  import { tables, viewsV2 } from "@/stores/builder"
+  import { tables } from "@/stores/builder"
   import { goto } from "@roxi/routify"
   import DetailPopover from "@/components/common/DetailPopover.svelte"
   import MagicWand from "./magic-wand.svg"
@@ -25,8 +25,6 @@
     let preSelected
     if ($datasource.type === "table") {
       preSelected = $tables.list.find(x => x._id === $datasource.tableId)
-    } else {
-      preSelected = $viewsV2.list.find(x => x.id === $datasource.id)
     }
     createScreenModal.show(autoScreenType, undefined, preSelected)
   }

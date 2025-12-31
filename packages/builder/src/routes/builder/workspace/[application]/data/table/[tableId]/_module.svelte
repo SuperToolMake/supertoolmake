@@ -1,6 +1,6 @@
 <script lang="ts">
   import { tables, builderStore } from "@/stores/builder"
-  import ViewNavBar from "./_components/ViewNavBar.svelte"
+  import NavBar from "./_components/NavBar.svelte"
   import { params } from "@roxi/routify"
   import { onMount } from "svelte"
 
@@ -18,7 +18,7 @@
 </script>
 
 <div class="wrapper">
-  <ViewNavBar />
+  <NavBar />
   <slot />
 </div>
 

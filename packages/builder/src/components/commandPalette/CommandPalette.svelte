@@ -17,8 +17,6 @@
     datasources,
     queries,
     tables,
-    views,
-    viewsV2,
   } from "@/stores/builder"
   import { themeStore } from "@/stores/portal"
   import { getContext } from "svelte"
@@ -88,8 +86,6 @@
     },
     ...datasourceCommands($datasources?.list || []),
     ...tableCommands($tables?.list || []),
-    ...viewCommands($views?.list || []),
-    ...viewV2Commands($viewsV2?.list || []),
     ...queryCommands($queries?.list || []),
     ...screenCommands($sortedScreens),
     ...themeCommands(),
@@ -166,37 +162,6 @@
           application: $params.application,
           id: table._id,
         }),
-      requiresApp: true,
-    }))
-  }
-
-  const viewCommands = views => {
-    return views.map(view => ({
-      type: "View",
-      name: view.name,
-      icon: "minus",
-      action: () => {
-        $goto(`/builder/workspace/:application/data/view/:name`, {
-          application: $params.application,
-          name: view.name,
-        })
-      },
-      requiresApp: true,
-    }))
-  }
-
-  const viewV2Commands = views => {
-    return views.map(view => ({
-      type: "View",
-      name: view.name,
-      icon: "minus",
-      action: () => {
-        $goto(`/builder/workspace/:application/data/table/:tableId/:viewId`, {
-          application: $params.application,
-          x: view.tableId,
-          viewId: view.id,
-        })
-      },
       requiresApp: true,
     }))
   }

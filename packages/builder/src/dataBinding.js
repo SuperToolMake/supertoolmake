@@ -31,7 +31,6 @@ import ActionDefinitions from "@/components/design/settings/controls/ButtonActio
 import { convertOldFieldFormat } from "@/components/design/settings/controls/FieldConfiguration/utils"
 import { FIELDS } from "@/constants/backend"
 import { FieldType } from "@budibase/types"
-import { getTableIdFromViewId } from "@budibase/shared-core"
 
 const { ContextScopes } = Constants
 
@@ -869,14 +868,7 @@ const getEmbedBindings = () => {
  * @return {{schema: Object, table: Object}}
  */
 export const getSchemaForDatasourcePlus = (resourceId, options) => {
-  const isViewV2 = resourceId?.startsWith("view_")
-  const datasource = isViewV2
-    ? {
-        type: "viewV2",
-        id: resourceId,
-        tableId: getTableIdFromViewId(resourceId),
-      }
-    : { type: "table", tableId: resourceId }
+  const datasource = { type: "table", tableId: resourceId }
   return getSchemaForDatasource(null, datasource, options)
 }
 

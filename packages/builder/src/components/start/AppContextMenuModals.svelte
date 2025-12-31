@@ -1,6 +1,5 @@
 <script lang="ts">
   import { Modal } from "@budibase/bbui"
-  import DeleteModal from "@/components/deploy/DeleteModal.svelte"
   import DuplicateAppModal from "./DuplicateAppModal.svelte"
   import ExportAppModal from "./ExportAppModal.svelte"
   import type { EnrichedApp } from "@/types"
@@ -9,7 +8,6 @@
 
   let exportPublishedVersion = false
 
-  let deleteModal: DeleteModal
   let exportModal: Modal
   let duplicateModal: Modal
 
@@ -26,13 +24,7 @@
     exportPublishedVersion = true
     exportModal.show()
   }
-
-  export const showDeleteModal = () => {
-    deleteModal.show()
-  }
 </script>
-
-<DeleteModal bind:this={deleteModal} appId={app?.devId} appName={app?.name} />
 
 <Modal bind:this={exportModal}>
   <ExportAppModal appId={app.devId || ""} published={exportPublishedVersion} />

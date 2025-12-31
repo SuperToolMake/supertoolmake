@@ -13,13 +13,11 @@ import {
 } from "./utils"
 import SqlTableQueryBuilder from "./sqlTable"
 import {
-  Aggregation,
   AnySearchFilter,
   ArrayFilter,
   ArrayOperator,
   BasicOperator,
   BBReferenceFieldMetadata,
-  CalculationType,
   EnrichedQueryJson,
   FieldSchema,
   FieldType,
@@ -1076,86 +1074,6 @@ class InternalBuilder {
     )
   }
 
-  addAggregations(
-    query: Knex.QueryBuilder,
-    aggregations: Aggregation[]
-  ): Knex.QueryBuilder {
-    const fields = this.query.resource?.fields || []
-    const tableName = this.getTableName()
-    if (fields.length > 0) {
-      const qualifiedFields = fields.map(field => this.qualifyIdentifier(field))
-      if (this.client === SqlClient.ORACLE) {
-        const groupByFields = qualifiedFields.map(field =>
-          this.convertClobs(field)
-        )
-        const selectFields = qualifiedFields.map(field =>
-          this.convertClobs(field, { forSelect: true })
-        )
-        query = query.groupBy(groupByFields).select(selectFields)
-      } else {
-        query = query.groupBy(qualifiedFields).select(qualifiedFields)
-      }
-    }
-    for (const aggregation of aggregations) {
-      const op = aggregation.calculationType
-      if (op === CalculationType.COUNT) {
-        if ("distinct" in aggregation && aggregation.distinct) {
-          if (this.client === SqlClient.ORACLE) {
-            const field = this.convertClobs(`${tableName}.${aggregation.field}`)
-            query = query.select(
-              this.knex.raw(`COUNT(DISTINCT ??) as ??`, [
-                field,
-                aggregation.name,
-              ])
-            )
-          } else {
-            query = query.countDistinct(
-              `${tableName}.${aggregation.field} as ${aggregation.name}`
-            )
-          }
-        } else {
-          if (this.client === SqlClient.ORACLE) {
-            const field = this.convertClobs(`${tableName}.${aggregation.field}`)
-            query = query.select(
-              this.knex.raw(`COUNT(??) as ??`, [field, aggregation.name])
-            )
-          } else {
-            query = query.count(`${aggregation.field} as ${aggregation.name}`)
-          }
-        }
-      } else {
-        const fieldSchema = this.getFieldSchema(aggregation.field)
-        if (!fieldSchema) {
-          // This should not happen in practice.
-          throw new Error(
-            `field schema missing for aggregation target: ${aggregation.field}`
-          )
-        }
-
-        let aggregate = this.knex.raw("??(??)", [
-          this.knex.raw(op),
-          this.rawQuotedIdentifier(`${tableName}.${aggregation.field}`),
-        ])
-
-        if (fieldSchema.type === FieldType.BIGINT) {
-          aggregate = this.castIntToString(aggregate)
-        }
-
-        query = query.select(
-          this.knex.raw("?? as ??", [aggregate, aggregation.name])
-        )
-      }
-    }
-    return query
-  }
-
-  isAggregateField(field: string): boolean {
-    const found = this.query.resource?.aggregations?.find(
-      aggregation => aggregation.name === field
-    )
-    return !!found
-  }
-
   addSorting(query: Knex.QueryBuilder): Knex.QueryBuilder {
     let { sort, resource } = this.query
     const primaryKey = this.table.primary
@@ -1185,9 +1103,7 @@ class InternalBuilder {
         const composite = `${aliased}.${key}`
         let identifier
 
-        if (this.isAggregateField(key)) {
-          identifier = this.rawQuotedIdentifier(key)
-        } else if (this.client === SqlClient.ORACLE) {
+        if (this.client === SqlClient.ORACLE) {
           identifier = this.convertClobs(composite)
         } else {
           identifier = this.rawQuotedIdentifier(composite)
@@ -1201,16 +1117,11 @@ class InternalBuilder {
       }
     }
 
-    // add sorting by the primary key if the result isn't already sorted by it,
-    // to make sure result is deterministic
-    const hasAggregations = (resource?.aggregations?.length ?? 0) > 0
-    if (!hasAggregations) {
-      const primarySortKey = this.findSortablePrimaryKey(primaryKey)
-      if (primarySortKey && (!sort || sort[primarySortKey] === undefined)) {
-        query = query.orderBy(`${aliased}.${primarySortKey}`)
-      } else if (!primarySortKey && (!sort || Object.keys(sort).length === 0)) {
-        throw new Error(`Primary key not found for table ${this.table.name}`)
-      }
+    const primarySortKey = this.findSortablePrimaryKey(primaryKey)
+    if (primarySortKey && (!sort || sort[primarySortKey] === undefined)) {
+      query = query.orderBy(`${aliased}.${primarySortKey}`)
+    } else if (!primarySortKey && (!sort || Object.keys(sort).length === 0)) {
+      throw new Error(`Primary key not found for table ${this.table.name}`)
     }
     return query
   }
@@ -1640,11 +1551,8 @@ class InternalBuilder {
       }
     }
 
-    const aggregations = this.query.resource?.aggregations || []
     if (operation === Operation.COUNT) {
       query = this.addDistinctCount(query)
-    } else if (aggregations.length > 0) {
-      query = this.addAggregations(query, aggregations)
     } else {
       query = query.select(this.generateSelectStatement())
     }
@@ -1657,7 +1565,7 @@ class InternalBuilder {
     query = this.addFilters(query, filters, { relationship: true })
 
     // handle relationships with a CTE for all others
-    if (relationships?.length && aggregations.length === 0) {
+    if (relationships?.length) {
       const mainTable = this.query.tableAliases?.[table.name] || table.name
       const cte = this.addSorting(
         this.knex

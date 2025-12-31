@@ -18,13 +18,8 @@
   import { Roles } from "@/constants/backend"
   import { AutoScreenTypes } from "@/constants"
   import type { SourceOption } from "./utils"
-  import { makeTableOption, makeViewOption } from "./utils"
-  import type {
-    SaveScreenRequest,
-    Screen,
-    Table,
-    ViewV2,
-  } from "@budibase/types"
+  import { makeTableOption } from "./utils"
+  import type { SaveScreenRequest, Screen, Table } from "@budibase/types"
 
   $goto
 
@@ -36,7 +31,7 @@
   let datasourceModal: Modal
   let formTypeModal: Modal
   let tableTypeModal: Modal
-  let selectedTablesAndViews: SourceOption[] = []
+  let selectedTables: SourceOption[] = []
   let permissions: Record<
     string,
     {
@@ -59,10 +54,10 @@
   export const show = (
     newMode: AutoScreenTypes,
     preselectedWorkspaceAppId: string | undefined,
-    preselectedDatasource: Table | ViewV2 | null = null
+    preselectedDatasource: Table | null = null
   ) => {
     mode = newMode
-    selectedTablesAndViews = []
+    selectedTables = []
     permissions = {}
     workspaceAppId = preselectedWorkspaceAppId
     if (!workspaceAppId && $workspaceAppStore.workspaceApps.length === 1) {
@@ -77,13 +72,9 @@
 
     if (mode === AutoScreenTypes.TABLE || mode === AutoScreenTypes.FORM) {
       if (preselectedDatasource) {
-        // If preselecting a datasource, skip a step
-        const isTable = preselectedDatasource.type === "table"
-        const tableOrView = isTable
-          ? makeTableOption(preselectedDatasource, $datasources.list)
-          : makeViewOption(preselectedDatasource)
-        fetchPermission(tableOrView.id)
-        selectedTablesAndViews.push(tableOrView)
+        const table = makeTableOption(preselectedDatasource, $datasources.list)
+        fetchPermission(table.id)
+        selectedTables.push(table)
       }
 
       if (!preselectedDatasource) {
@@ -163,7 +154,7 @@
 
     const screenTemplates = (
       await Promise.all(
-        selectedTablesAndViews.map(tableOrView =>
+        selectedTables.map(tableOrView =>
           screenTemplating.table({
             screens,
             tableOrView,
@@ -184,7 +175,7 @@
     const safeWorkspaceAppId = workspaceAppId
     const screenTemplates = (
       await Promise.all(
-        selectedTablesAndViews.map(tableOrView =>
+        selectedTables.map(tableOrView =>
           screenTemplating.form({
             screens,
             tableOrView,
@@ -256,16 +247,16 @@
   }: {
     detail: SourceOption
   }) => {
-    const alreadySelected = selectedTablesAndViews.some(
+    const alreadySelected = selectedTables.some(
       selected => selected.id === tableOrView.id
     )
 
     if (!alreadySelected) {
       fetchPermission(tableOrView.id)
-      selectedTablesAndViews = [...selectedTablesAndViews, tableOrView]
+      selectedTables = [...selectedTables, tableOrView]
     } else {
       deletePermission(tableOrView.id)
-      selectedTablesAndViews = selectedTablesAndViews.filter(
+      selectedTables = selectedTables.filter(
         selected => selected.id !== tableOrView.id
       )
     }
@@ -292,7 +283,7 @@
 
 <Modal bind:this={datasourceModal} autoFocus={false} on:cancel={onCancel}>
   <DatasourceModal
-    {selectedTablesAndViews}
+    selectedTablesAndViews={selectedTables}
     onConfirm={() => {
       stepIndex++
     }}

@@ -6,20 +6,13 @@
   import { createEventDispatcher } from "svelte"
   import TableOrViewOption from "./TableOrViewOption.svelte"
   import type { SourceOption } from "./utils"
-  import { makeTableOption, makeViewOption } from "./utils"
-  import type { Datasource, Table, UIInternalDatasource } from "@budibase/types"
-  import { helpers } from "@budibase/shared-core"
+  import { makeTableOption } from "./utils"
+  import type { Datasource, UIInternalDatasource } from "@budibase/types"
 
   export let onConfirm: () => Promise<void> | void
   export let selectedTablesAndViews: SourceOption[]
 
   const dispatch = createEventDispatcher()
-
-  const getViews = (table: Table) => {
-    const views = Object.values(table.views || {}).filter(helpers.views.isV2)
-    return views.map(makeViewOption)
-  }
-
   const getTablesAndViews = (
     datasource: Datasource | UIInternalDatasource,
     datasources: (Datasource | UIInternalDatasource)[]
@@ -36,10 +29,7 @@
 
       const formattedTable = makeTableOption(table, datasources)
 
-      tablesAndViews = tablesAndViews.concat([
-        formattedTable,
-        ...getViews(table),
-      ])
+      tablesAndViews = tablesAndViews.concat([formattedTable])
     }
 
     return tablesAndViews

@@ -22,8 +22,6 @@ import {
 
 // Backend
 import { tables } from "./tables"
-import { views } from "./views"
-import { viewsV2 } from "./viewsV2"
 import { permissions } from "./permissions"
 import { roles } from "./roles"
 import { datasources } from "./datasources"
@@ -58,8 +56,6 @@ export {
   contextMenuStore,
   selectedComponent,
   tables,
-  views,
-  viewsV2,
   permissions,
   roles,
   datasources,

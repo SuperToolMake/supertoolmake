@@ -1,10 +1,11 @@
-<script>
+<script lang="ts">
   import { Select, Label, Checkbox, Body } from "@budibase/bbui"
-  import { tables, datasources, viewsV2 } from "@/stores/builder"
+  import { tables, datasources } from "@/stores/builder"
   import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+  import type { EnrichedBinding } from "@budibase/types"
 
   export let parameters
-  export let bindings = []
+  export let bindings: EnrichedBinding[] = []
 
   $: datasourceMap = Object.fromEntries(
     ($datasources.list || []).map(ds => [ds._id, ds.name])
@@ -16,19 +17,11 @@
       resourceId: table._id,
     }
   })
-  $: viewOptions = $viewsV2.list.map(view => {
-    const table = $tables.list.find(t => t._id === view.tableId)
-    const datasourceName = datasourceMap[table.sourceId] || "Unknown"
-    return {
-      label: `${datasourceName} - ${view.name}`,
-      resourceId: view.id,
-    }
-  })
-  $: options = [...(tableOptions || []), ...(viewOptions || [])]
+  $: options = [...(tableOptions || [])]
 </script>
 
 <div class="root">
-  <Body size="small">Please specify one or more rows to delete.</Body>
+  <Body size="S">Please specify one or more rows to delete.</Body>
   <div class="params">
     <Label>Table</Label>
     <Select
@@ -38,7 +31,7 @@
       getOptionValue={x => x.resourceId}
     />
 
-    <Label small>Row IDs</Label>
+    <Label size="S">Row IDs</Label>
     <DrawerBindableInput
       {bindings}
       title="Row IDs to delete"
@@ -46,7 +39,7 @@
       on:change={value => (parameters.rowId = value.detail)}
     />
 
-    <Label small />
+    <Label size="S" />
     <Checkbox
       text="Do not display default notification"
       bind:value={parameters.notificationOverride}
@@ -55,7 +48,7 @@
     <Checkbox text="Require confirmation" bind:value={parameters.confirm} />
 
     {#if parameters.confirm}
-      <Label small>Title</Label>
+      <Label size="S">Title</Label>
       <DrawerBindableInput
         placeholder="Prompt User"
         value={parameters.customTitleText}
@@ -63,7 +56,7 @@
         {bindings}
       />
 
-      <Label small>Text</Label>
+      <Label size="S">Text</Label>
       <DrawerBindableInput
         placeholder="Are you sure you want to continue?"
         value={parameters.confirmText}
@@ -71,14 +64,14 @@
         {bindings}
       />
 
-      <Label small>Confirm Text</Label>
+      <Label size="S">Confirm Text</Label>
       <DrawerBindableInput
         placeholder="Confirm"
         value={parameters.confirmButtonText}
         on:change={e => (parameters.confirmButtonText = e.detail)}
         {bindings}
       />
-      <Label small>Cancel Text</Label>
+      <Label size="S">Cancel Text</Label>
       <DrawerBindableInput
         placeholder="Cancel"
         value={parameters.cancelButtonText}
