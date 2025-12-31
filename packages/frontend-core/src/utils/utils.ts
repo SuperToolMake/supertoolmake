@@ -5,7 +5,6 @@ import {
   SearchFilterGroup,
   UISearchFilter,
   UITableResource,
-  UIViewResource,
 } from "@budibase/types"
 
 export const sleep = (ms: number) =>
@@ -140,7 +139,7 @@ export const domDebounce = (callback: Function) => {
 export const buildFormBlockButtonConfig = (props?: {
   _id?: string
   actionType?: string
-  dataSource?: UITableResource | UIViewResource
+  dataSource?: UITableResource
   notificationOverride?: boolean
   actionUrl?: string
   showDeleteButton?: boolean

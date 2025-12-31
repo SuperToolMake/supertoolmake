@@ -1,6 +1,5 @@
 import { derivedMemo } from "../../../utils"
 import { derived, Readable } from "svelte/store"
-import { ViewV2Type } from "@budibase/types"
 import { BaseStoreProps, Store as StoreContext } from "."
 
 type ConfigStore = {
@@ -45,27 +44,14 @@ export const createStores = (context: StoreContext): ConfigStore => {
 }
 
 export const deriveStores = (context: StoreContext): ConfigDerivedStore => {
-  const { props, definition, hasNonAutoColumn } = context
+  const { props, hasNonAutoColumn } = context
 
   // Derive features
   const config = derived(
-    [props, definition, hasNonAutoColumn],
-    ([$props, $definition, $hasNonAutoColumn]) => {
+    [props, hasNonAutoColumn],
+    ([$props, $hasNonAutoColumn]) => {
       let config: ConfigState = { ...$props, canSelectRows: false }
       const type = $props.datasource?.type
-
-      // Disable some features if we're editing a view
-      if (type === "viewV2") {
-        config.canEditColumns = false
-
-        // Disable features for calculation views
-        if ($definition?.type === ViewV2Type.CALCULATION) {
-          config.canAddRows = false
-          config.canEditRows = false
-          config.canDeleteRows = false
-          config.canExpandRows = false
-        }
-      }
 
       // Disable adding rows if we don't have any valid columns
       if (!$hasNonAutoColumn) {
@@ -73,7 +59,7 @@ export const deriveStores = (context: StoreContext): ConfigDerivedStore => {
       }
 
       // Disable features for non DS+
-      if (type && !["table", "viewV2"].includes(type)) {
+      if (type && !["table"].includes(type)) {
         config.canAddRows = false
         config.canEditRows = false
         config.canDeleteRows = false

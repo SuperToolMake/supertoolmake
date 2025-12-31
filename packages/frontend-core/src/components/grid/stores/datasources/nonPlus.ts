@@ -12,7 +12,7 @@ interface NonPlusActions {
 export type Store = NonPlusActions
 
 export const createActions = (context: StoreContext): NonPlusActions => {
-  const { columns, table, viewV2 } = context
+  const { columns, table } = context
 
   const saveDefinition = async () => {
     throw "This datasource does not support updating the definition"
@@ -34,9 +34,7 @@ export const createActions = (context: StoreContext): NonPlusActions => {
     // There are many different types and shapes of datasource, so we only
     // check that we aren't null
     return (
-      !table.actions.isDatasourceValid(datasource) &&
-      !viewV2.actions.isDatasourceValid(datasource) &&
-      datasource?.type != null
+      !table.actions.isDatasourceValid(datasource) && datasource?.type != null
     )
   }
 

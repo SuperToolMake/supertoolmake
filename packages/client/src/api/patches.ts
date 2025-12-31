@@ -92,12 +92,6 @@ export const patchAPI = (API: APIClient) => {
       rows: await enrichRows(output.rows, sourceId),
     }
   }
-  const fetchViewData = API.fetchViewData
-  API.fetchViewData = async (viewName, params) => {
-    const tableId = params?.tableId
-    const rows = await fetchViewData(viewName, params)
-    return await enrichRows(rows, tableId)
-  }
 
   // Wipe any HBS formulas from table definitions, as these interfere with
   // handlebars enrichment

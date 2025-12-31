@@ -1,8 +1,8 @@
 <script lang="ts">
   import { getContext } from "svelte"
-  import type { Row, TableDatasource, ViewDatasource } from "@budibase/types"
+  import type { Row, TableDatasource } from "@budibase/types"
 
-  export let datasource: TableDatasource | ViewDatasource
+  export let datasource: TableDatasource
   export let rowId: string
 
   const component = getContext("component")
@@ -11,8 +11,7 @@
   let row: Row | null | undefined
   let loading = true
 
-  $: datasourceId =
-    datasource.type === "table" ? datasource.tableId : datasource.id
+  $: datasourceId = datasource.tableId
   $: fetchRow(datasourceId, rowId)
   $: actions = [
     {

@@ -48,9 +48,6 @@ function getCellRendererByType(type: FieldType | "role" | undefined) {
 }
 
 export const getCellRenderer = (column: UIColumn) => {
-  if (column.calculationType) {
-    return NumberCell
-  }
   return (
     getCellRendererByType(column.schema?.cellRenderType) ||
     getCellRendererByType(column.schema?.type) ||

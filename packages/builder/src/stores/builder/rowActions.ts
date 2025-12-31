@@ -3,7 +3,6 @@ import { getSequentialName } from "@/helpers/duplicate"
 import { BudiStore } from "@/stores/BudiStore"
 import { derived, get } from "svelte/store"
 import { tables } from "./tables"
-import { viewsV2 } from "./viewsV2"
 
 interface RowAction {
   id: string
@@ -34,10 +33,6 @@ export class RowActionStore extends BudiStore<RowActionState> {
 
     // Get the underlying table ID for this source ID
     let tableId = get(tables).list.find(table => table._id === sourceId)?._id
-    if (!tableId) {
-      const view = get(viewsV2).list.find(view => view.id === sourceId)
-      tableId = view?.tableId
-    }
     if (!tableId) {
       return
     }

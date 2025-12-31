@@ -20,7 +20,6 @@ import * as Filter from "./filter"
 import * as Notifications from "./notifications"
 import * as Datasource from "./datasource"
 import * as Table from "./datasources/table"
-import * as ViewV2 from "./datasources/viewV2"
 import * as NonPlus from "./datasources/nonPlus"
 import * as Cache from "./cache"
 import * as Conditions from "./conditions"
@@ -39,7 +38,6 @@ const DependencyOrderedStores = [
   Filter,
   Bounds,
   Table,
-  ViewV2,
   NonPlus,
   Datasource,
   Columns,
@@ -106,7 +104,6 @@ export interface BaseStore {
 export type Store = BaseStore &
   Columns.Store &
   Table.Store &
-  ViewV2.Store &
   NonPlus.Store &
   Datasource.Store &
   Validation.Store &

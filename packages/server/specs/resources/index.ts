@@ -5,7 +5,6 @@ import query from "./query"
 import user from "./user"
 import misc from "./misc"
 import roles from "./roles"
-import view from "./view"
 
 export const examples = {
   ...workspace.getExamples(),
@@ -15,7 +14,6 @@ export const examples = {
   ...user.getExamples(),
   ...misc.getExamples(),
   ...roles.getExamples(),
-  ...view.getExamples(),
 }
 
 export const schemas = {
@@ -26,5 +24,4 @@ export const schemas = {
   ...user.getSchemas(),
   ...misc.getSchemas(),
   ...roles.getSchemas(),
-  ...view.getSchemas(),
 }

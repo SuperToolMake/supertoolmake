@@ -13,10 +13,6 @@ export function canBeDisplayColumn(column: UIFieldSchema) {
 }
 
 export function canBeSortColumn(columnSchema: UIFieldSchema) {
-  // Allow sorting by calculation columns
-  if (columnSchema.calculationType) {
-    return true
-  }
   // Allow static-only formula columns to be sorted
   if (isStaticFormula(columnSchema)) {
     return true

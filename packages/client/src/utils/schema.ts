@@ -56,15 +56,6 @@ export const fetchDatasourceSchema = async <
     return null
   }
 
-  // Strip hidden fields from views
-  if (datasource.type === "viewV2") {
-    for (const field of Object.keys(schema)) {
-      if (!schema[field].visible) {
-        delete schema[field]
-      }
-    }
-  }
-
   // Enrich schema with relationships if required
   if (
     definition &&

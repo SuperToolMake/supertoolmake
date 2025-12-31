@@ -1,4 +1,4 @@
-import { DataFetchDatasource, Table, ViewV2Enriched } from "@budibase/types"
+import { DataFetchDatasource, Table } from "@budibase/types"
 import { APIClient } from "../api/types"
 import CustomFetch from "./CustomFetch"
 import FieldFetch from "./FieldFetch"
@@ -9,15 +9,11 @@ import QueryFetch from "./QueryFetch"
 import RelationshipFetch from "./RelationshipFetch"
 import TableFetch from "./TableFetch"
 import UserFetch from "./UserFetch"
-import ViewFetch from "./ViewFetch"
-import ViewV2Fetch from "./ViewV2Fetch"
 
 export type DataFetchType = keyof typeof DataFetchMap
 
 export const DataFetchMap = {
   table: TableFetch,
-  view: ViewFetch,
-  viewV2: ViewV2Fetch,
   query: QueryFetch,
   link: RelationshipFetch,
   user: UserFetch,
@@ -32,8 +28,6 @@ export const DataFetchMap = {
 
 export interface DataFetchClassMap {
   table: TableFetch
-  view: ViewFetch
-  viewV2: ViewV2Fetch
   query: QueryFetch
   link: RelationshipFetch
   user: UserFetch
@@ -48,8 +42,6 @@ export interface DataFetchClassMap {
 
 export type DataFetch =
   | TableFetch
-  | ViewFetch
-  | ViewV2Fetch
   | QueryFetch
   | RelationshipFetch
   | UserFetch
@@ -61,7 +53,6 @@ export type DataFetch =
 
 export type DataFetchDefinition =
   | Table
-  | ViewV2Enriched
   | {
       // These fields are added to allow checking these fields on definition usages without requiring constant castings
       schema?: Record<string, any> | null

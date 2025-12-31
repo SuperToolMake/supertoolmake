@@ -12,7 +12,6 @@ import {
   UIFieldMutation,
   UIFieldSchema,
   UIRow,
-  ViewV2Type,
 } from "@budibase/types"
 import { Store as StoreContext, BaseStoreProps } from "."
 import { DatasourceActions } from "./datasources"
@@ -127,26 +126,10 @@ export const deriveStores = (context: StoreContext): DerivedDatasourceStore => {
     }
   )
 
-  const hasBudibaseIdentifiers = derived(
-    [datasource, definition],
-    ([$datasource, $definition]) => {
-      let type = $datasource?.type
-      // @ts-expect-error
-      if (type === "provider") {
-        type = ($datasource as any).value?.datasource?.type
-      }
-      // Handle calculation views
-      if (
-        type === "viewV2" &&
-        $definition &&
-        "type" in $definition &&
-        $definition.type === ViewV2Type.CALCULATION
-      ) {
-        return false
-      }
-      return !!type && ["table", "viewV2", "link"].includes(type)
-    }
-  )
+  const hasBudibaseIdentifiers = derived([datasource], ([$datasource]) => {
+    let type = $datasource?.type
+    return !!type && ["table", "link"].includes(type)
+  })
 
   return {
     schema,
@@ -163,7 +146,6 @@ export const createActions = (context: StoreContext): ActionDatasourceStore => {
     config,
     dispatch,
     table,
-    viewV2,
     nonPlus,
     schemaMutations,
     subSchemaMutations,
@@ -181,8 +163,6 @@ export const createActions = (context: StoreContext): ActionDatasourceStore => {
     switch (type) {
       case "table":
         return table
-      case "viewV2":
-        return viewV2
       default:
         return nonPlus
     }

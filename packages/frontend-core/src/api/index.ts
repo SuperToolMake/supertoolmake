@@ -30,8 +30,6 @@ import { buildTableEndpoints } from "./tables"
 import { buildTemplateEndpoints } from "./templates"
 import { buildUserEndpoints } from "./user"
 import { buildSelfEndpoints } from "./self"
-import { buildViewEndpoints } from "./views"
-import { buildViewV2Endpoints } from "./viewsV2"
 import { buildPluginEndpoints } from "./plugins"
 import { buildBackupEndpoints } from "./backups"
 import { buildLogsEndpoints } from "./logs"
@@ -286,14 +284,12 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
     ...buildTableEndpoints(API),
     ...buildTemplateEndpoints(API),
     ...buildUserEndpoints(API),
-    ...buildViewEndpoints(API),
     ...buildSelfEndpoints(API),
     ...buildPluginEndpoints(API),
     ...buildBackupEndpoints(API),
     ...buildLogsEndpoints(API),
     ...buildMigrationEndpoints(API),
     deployment: buildDeploymentEndpoints(API),
-    viewV2: buildViewV2Endpoints(API),
     rowActions: buildRowActionEndpoints(API),
     oauth2: buildOAuth2Endpoints(API),
     navigation: buildNavigationEndpoints(API),

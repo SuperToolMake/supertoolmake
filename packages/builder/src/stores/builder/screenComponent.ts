@@ -1,7 +1,6 @@
 import { derived } from "svelte/store"
 import { tables } from "./tables"
 import { selectedScreen } from "./screens"
-import { viewsV2 } from "./viewsV2"
 import {
   UIDatasourceType,
   Component,
@@ -11,7 +10,6 @@ import {
   Screen,
 } from "@budibase/types"
 import { queries } from "./queries"
-import { views } from "./views"
 import { findAllComponents } from "@/helpers/components"
 import { bindings } from "@/helpers"
 import { getBindableProperties } from "@/dataBinding"
@@ -48,12 +46,10 @@ export const screenComponentsList = derived(
 )
 
 export const screenComponentErrorList = derived(
-  [selectedScreen, tables, views, viewsV2, queries, componentStore],
+  [selectedScreen, tables, queries, componentStore],
   ([
     $selectedScreen,
     $tables,
-    $views,
-    $viewsV2,
     $queries,
     $componentStore,
   ]): UIComponentError[] => {
@@ -64,8 +60,6 @@ export const screenComponentErrorList = derived(
 
     const datasources = {
       ...reduceBy("_id", $tables.list),
-      ...reduceBy("name", $views.list),
-      ...reduceBy("id", $viewsV2.list),
       ...reduceBy("_id", $queries.list),
     }
 

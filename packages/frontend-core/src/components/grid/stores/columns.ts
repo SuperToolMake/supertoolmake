@@ -186,7 +186,6 @@ export const initialise = (context: StoreContext) => {
             order: fieldSchema.order,
             conditions: fieldSchema.conditions,
             related: fieldSchema.related,
-            calculationType: fieldSchema.calculationType,
             format: fieldSchema.format,
             __left: undefined as any, // TODO
             __idx: undefined as any, // TODO

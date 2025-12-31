@@ -1,10 +1,6 @@
 <script lang="ts">
   import { Utils } from "@budibase/frontend-core"
-  import type {
-    TableSchema,
-    UITableResource,
-    UIViewResource,
-  } from "@budibase/types"
+  import type { TableSchema, UITableResource } from "@budibase/types"
   import { getContext } from "svelte"
   import { get } from "svelte/store"
   import FormBlockWrapper from "./FormBlockWrapper.svelte"
@@ -13,7 +9,7 @@
   type Field = { name: string; active: boolean }
 
   export let actionType: string
-  export let dataSource: UITableResource | UIViewResource
+  export let dataSource: UITableResource
   export let size: string
   export let disabled: boolean
   export let fields: (Field | string)[]
