@@ -39,13 +39,11 @@ import { apiFileReturn } from "../../../utilities/fileSystem"
 import { gridSocket } from "../../../websockets"
 import { fixRow } from "../public/rows"
 import { addRev } from "../public/utils"
-import * as exporters from "../view/exporters"
-import { Format } from "../view/exporters"
+import * as exporters from "../table/exporters"
+import { Format } from "../table/exporters"
 import * as external from "./external"
 import * as internal from "./internal"
 import * as utils from "./utils"
-
-export * as views from "./views"
 
 function pickApi(tableId: string) {
   if (isExternalTableID(tableId)) {
@@ -132,18 +130,6 @@ export const save = async (ctx: UserCtx<SaveRowRequest, SaveRowResponse>) => {
   ctx.message = `${table.name} saved successfully`
   ctx.body = row
   gridSocket?.emitRowUpdate(ctx, row)
-}
-
-export async function fetchLegacyView(ctx: any) {
-  const viewName = decodeURIComponent(ctx.params.viewName)
-
-  const { calculation, group, field } = ctx.query
-
-  ctx.body = await sdk.rows.fetchLegacyView(viewName, {
-    calculation,
-    group: calculation ? group : null,
-    field,
-  })
 }
 
 export async function fetch(ctx: UserCtx<void, FetchRowsResponse>) {

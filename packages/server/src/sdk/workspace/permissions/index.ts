@@ -1,24 +1,16 @@
 import { context, roles } from "@budibase/backend-core"
 import {
-  getTableIdFromViewId,
-  isTableIdOrExternalTableId,
-  isViewId,
-} from "@budibase/shared-core"
-import {
   Database,
   PermissionLevel,
   PermissionSource,
   Role,
-  VirtualDocumentType,
 } from "@budibase/types"
-import sdk from "../.."
 import { getRoleParams } from "../../../db/utils"
 import { removeFromArray } from "../../../utilities"
 import {
   CURRENTLY_SUPPORTED_LEVELS,
   getBasePermissions,
 } from "../../../utilities/security"
-import { isV2 } from "../views"
 
 type ResourcePermissions = Record<
   string,
@@ -30,22 +22,12 @@ export const enum PermissionUpdateType {
   ADD = "add",
 }
 
-export async function getInheritablePermissions(
-  resourceId: string
-): Promise<ResourcePermissions | undefined> {
-  if (isViewId(resourceId)) {
-    return await getResourcePerms(getTableIdFromViewId(resourceId))
-  }
-}
-
 export async function getResourcePerms(
   resourceId: string
 ): Promise<ResourcePermissions> {
   const rolesList = await roles.getAllRoles()
 
   let permissions: ResourcePermissions = {}
-
-  const permsToInherit = await getInheritablePermissions(resourceId)
 
   for (let level of CURRENTLY_SUPPORTED_LEVELS) {
     // update the various roleIds in the resource permissions
@@ -59,15 +41,6 @@ export async function getResourcePerms(
           role: roles.getExternalRoleID(role._id!, role.version),
           type: PermissionSource.EXPLICIT,
         }
-      } else if (
-        !permissions[level] &&
-        permsToInherit &&
-        permsToInherit[level]
-      ) {
-        permissions[level] = {
-          role: permsToInherit[level].role,
-          type: PermissionSource.INHERITED,
-        }
       }
     }
   }
@@ -79,39 +52,6 @@ export async function getResourcePerms(
     return p
   }, {})
   return Object.assign(basePermissions, permissions)
-}
-
-export async function getDependantResources(
-  resourceId: string
-): Promise<Record<string, number> | undefined> {
-  if (isTableIdOrExternalTableId(resourceId)) {
-    const dependants: Record<string, Set<string>> = {}
-
-    const table = await sdk.tables.getTable(resourceId)
-    const views = Object.values(table.views || {})
-
-    for (const view of views) {
-      if (!isV2(view)) {
-        continue
-      }
-
-      const permissions = await getResourcePerms(view.id)
-      for (const [, roleInfo] of Object.entries(permissions)) {
-        if (roleInfo.type === PermissionSource.INHERITED) {
-          dependants[VirtualDocumentType.VIEW] ??= new Set()
-          dependants[VirtualDocumentType.VIEW].add(view.id)
-        }
-      }
-    }
-
-    return Object.entries(dependants).reduce(
-      (p, [type, resources]) => {
-        p[type] = resources.size
-        return p
-      },
-      {} as Record<string, number>
-    )
-  }
 }
 
 export async function updatePermissionOnRole(

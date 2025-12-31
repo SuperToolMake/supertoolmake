@@ -21,17 +21,14 @@ import {
   RowAttachment,
   Table,
   User,
-  ViewV2,
 } from "@budibase/types"
 import { cloneDeep } from "lodash/fp"
 import {
   getTableFromSource,
   isUserMetadataTable,
 } from "../../api/controllers/row/utils"
-import * as linkRows from "../../db/linkedRows"
 import { InternalTables } from "../../db/utils"
 import { isExternalTableID } from "../../integrations/utils"
-import sdk from "../../sdk"
 import {
   processInputBBReference,
   processInputBBReferences,
@@ -211,7 +208,7 @@ export function coerce(value: string | Date | string[], type: FieldType) {
  */
 export async function inputProcessing(
   userId: string | null | undefined,
-  source: Table | ViewV2,
+  source: Table,
   row: Row,
   opts?: AutoColumnProcessingOpts
 ) {
@@ -287,7 +284,7 @@ export async function inputProcessing(
  * @returns the enriched rows will be returned.
  */
 export async function outputProcessing<T extends Row[] | Row>(
-  source: Table | ViewV2,
+  source: Table,
   rows: T,
   opts: {
     squash?: boolean
@@ -308,30 +305,13 @@ export async function outputProcessing<T extends Row[] | Row>(
   } else {
     safeRows = rows
   }
-
-  let table: Table
-  if (sdk.views.isView(source)) {
-    table = await sdk.views.getTable(source.id)
-  } else {
-    table = source
-  }
-
-  // attach any linked row information
-  let enriched = !opts.preserveLinks
-    ? await linkRows.attachFullLinkedDocs(table.schema, safeRows, {
-        fromRow: opts?.fromRow,
-      })
-    : safeRows
+  let enriched = safeRows
 
   if (!opts.squash && utils.hasCircularStructure(rows)) {
     opts.squash = true
   }
 
   enriched = await coreOutputProcessing(source, enriched, opts)
-
-  if (opts.squash) {
-    enriched = await linkRows.squashLinks(source, enriched)
-  }
 
   return (wasArray ? enriched : enriched[0]) as T
 }
@@ -345,7 +325,7 @@ export async function outputProcessing<T extends Row[] | Row>(
  * view operations).
  */
 export async function coreOutputProcessing(
-  source: Table | ViewV2,
+  source: Table,
   rows: Row[],
   opts: {
     preserveLinks?: boolean
@@ -356,12 +336,7 @@ export async function coreOutputProcessing(
     skipBBReferences: false,
   }
 ): Promise<Row[]> {
-  let table: Table
-  if (sdk.views.isView(source)) {
-    table = await sdk.views.getTable(source.id)
-  } else {
-    table = source
-  }
+  let table: Table = source
 
   // process complex types: attachments, bb references...
   for (const [property, column] of Object.entries(table.schema)) {
@@ -494,32 +469,6 @@ export async function coreOutputProcessing(
     }
   }
 
-  if (sdk.views.isView(source)) {
-    // We ensure calculation fields are returned as numbers.  During the
-    // testing of this feature it was discovered that the COUNT operation
-    // returns a string for MySQL, MariaDB, and Postgres. But given that all
-    // calculation fields (except ones operating on BIGINTs) should be
-    // numbers, we blanket make sure of that here.
-    for (const [name, field] of Object.entries(
-      helpers.views.calculationFields(source)
-    )) {
-      if ("field" in field) {
-        const targetSchema = table.schema[field.field]
-        // We don't convert BIGINT fields to floats because we could lose
-        // precision.
-        if (targetSchema.type === FieldType.BIGINT) {
-          continue
-        }
-      }
-
-      for (const row of rows) {
-        if (typeof row[name] === "string") {
-          row[name] = parseFloat(row[name])
-        }
-      }
-    }
-  }
-
   if (!isUserMetadataTable(table._id!)) {
     const protectedColumns = isExternal
       ? PROTECTED_EXTERNAL_COLUMNS
@@ -532,13 +481,6 @@ export async function coreOutputProcessing(
     const fields = [...tableFields, ...protectedColumns].map(f =>
       f.toLowerCase()
     )
-
-    if (sdk.views.isView(source)) {
-      const aggregations = helpers.views.calculationFields(source)
-      for (const key of Object.keys(aggregations)) {
-        fields.push(key.toLowerCase())
-      }
-    }
 
     for (const row of rows) {
       for (const key of Object.keys(row)) {
