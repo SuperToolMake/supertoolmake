@@ -2,7 +2,6 @@ import { dataFilters } from "@budibase/shared-core"
 import {
   BulkDocsResponse,
   ContextUser,
-  DatabaseQueryOpts,
   SearchUsersRequest,
   User,
 } from "@budibase/types"
@@ -23,6 +22,7 @@ import {
 } from "../db"
 import { UserDB } from "./db"
 import { creatorsInList } from "./utils"
+import { DocumentListParams } from "nano"
 
 type GetOpts = { cleanup?: boolean }
 
@@ -137,7 +137,7 @@ export async function doesUserExist(email: string) {
 
 export async function searchGlobalUsersByApp(
   workspaceId: any,
-  opts: DatabaseQueryOpts,
+  opts: DocumentListParams,
   getOpts?: GetOpts
 ) {
   if (typeof workspaceId !== "string") {
@@ -247,7 +247,7 @@ export async function paginatedUsers({
   const pageSize = limit ?? PAGE_LIMIT
   const pageLimit = pageSize + 1
   // get one extra document, to have the next page
-  const opts: DatabaseQueryOpts = {
+  const opts: DocumentListParams = {
     include_docs: true,
     limit: pageLimit,
   }

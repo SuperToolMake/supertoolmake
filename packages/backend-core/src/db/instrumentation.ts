@@ -1,5 +1,6 @@
 import Nano, {
   DocumentDestroyResponse,
+  DocumentListParams,
   DocumentInsertResponse,
   DocumentBulkResponse,
   OkResponse,
@@ -143,7 +144,7 @@ export class DDInstrumentedDatabase implements Database {
   }
 
   allDocs<T extends Document | RowValue>(
-    params: DatabaseQueryOpts
+    params: DocumentListParams
   ): Promise<AllDocsResponse<T>> {
     return tracer.trace("db.allDocs", async span => {
       span.addTags({ db_name: this.name, ...params })

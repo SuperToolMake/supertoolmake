@@ -7,6 +7,7 @@ import {
   ViewName,
 } from "../constants"
 import { getProdWorkspaceID } from "./conversions"
+import { DocumentListParams } from "nano"
 
 /**
  * If creating DB allDocs/query params with only a single top level ID this can be used, this
@@ -23,8 +24,8 @@ import { getProdWorkspaceID } from "./conversions"
 export function getDocParams(
   docType: string,
   docId?: string | null,
-  otherProps: Partial<DatabaseQueryOpts> = {}
-): DatabaseQueryOpts {
+  otherProps: Partial<DocumentListParams> = {}
+): DocumentListParams {
   if (docId == null) {
     docId = ""
   }
@@ -48,8 +49,8 @@ export function getDocParams(
 export function getRowParams(
   tableId?: string | null,
   rowId?: string | null,
-  otherProps: Partial<DatabaseQueryOpts> = {}
-): DatabaseQueryOpts {
+  otherProps: Partial<DocumentListParams> = {}
+): DocumentListParams {
   if (tableId == null) {
     return getDocParams(DocumentType.ROW, null, otherProps)
   }
@@ -71,8 +72,8 @@ export function getQueryIndex(viewName: ViewName) {
  */
 export function getGlobalUserParams(
   globalId: any,
-  otherProps: Partial<DatabaseQueryOpts> = {}
-): DatabaseQueryOpts {
+  otherProps: Partial<DocumentListParams> = {}
+): DocumentListParams {
   if (!globalId) {
     globalId = ""
   }
@@ -92,8 +93,8 @@ export function getGlobalUserParams(
  */
 export function getUserMetadataParams(
   userId?: string | null,
-  otherProps: Partial<DatabaseQueryOpts> = {}
-): DatabaseQueryOpts {
+  otherProps: Partial<DocumentListParams> = {}
+): DocumentListParams {
   return getRowParams(InternalTable.USER_METADATA, userId, otherProps)
 }
 
@@ -157,7 +158,7 @@ export const getPluginParams = (pluginId?: string | null, otherProps = {}) => {
  */
 export const getOAuth2ConfigParams = (
   configId?: string | null,
-  otherProps: Partial<DatabaseQueryOpts> = {}
+  otherProps: Partial<DocumentListParams> = {}
 ) => {
   return getDocParams(DocumentType.OAUTH2_CONFIG, configId, otherProps)
 }
@@ -167,7 +168,7 @@ export const getOAuth2ConfigParams = (
  */
 export const getWorkspaceAppParams = (
   workspaceAppId?: string | null,
-  otherProps: Partial<DatabaseQueryOpts> = {}
+  otherProps: Partial<DocumentListParams> = {}
 ) => {
   return getDocParams(DocumentType.WORKSPACE_APP, workspaceAppId, otherProps)
 }
@@ -177,7 +178,7 @@ export const getWorkspaceAppParams = (
  */
 export const getWorkspaceFavouriteParams = (
   workspaceFavouriteId?: string | null,
-  otherProps: Partial<DatabaseQueryOpts> = {}
+  otherProps: Partial<DocumentListParams> = {}
 ) => {
   return getDocParams(
     DocumentType.WORKSPACE_FAVOURITE,

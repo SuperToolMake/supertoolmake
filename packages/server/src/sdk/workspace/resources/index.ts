@@ -12,7 +12,6 @@ import {
   DocumentType,
   INTERNAL_TABLE_SOURCE_ID,
   FieldType,
-  DatabaseQueryOpts,
   Row,
   RowAttachment,
   WithDocMetadata,
@@ -27,6 +26,7 @@ import {
 import sdk from "../.."
 import { ObjectStoreBuckets } from "../../../constants"
 import { getRowParams } from "../../../db/utils"
+import { DocumentListParams } from "nano"
 
 export async function getResourcesInfo(): Promise<
   Record<string, { dependencies: UsedResource[] }>
@@ -386,7 +386,7 @@ async function fetchTableRowsPage(
   nextStartAfter?: string
 }> {
   const sourceDb = context.getWorkspaceDB()
-  const params: Partial<DatabaseQueryOpts> = {
+  const params: Partial<DocumentListParams> = {
     include_docs: true,
     limit: ROW_PAGE_SIZE + (startAfter ? 1 : 0),
   }

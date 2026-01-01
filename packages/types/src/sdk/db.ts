@@ -10,6 +10,7 @@ import {
   ViewTemplateOpts,
   WithDocMetadata,
 } from "../"
+import { DocumentListParams } from "nano"
 
 export enum SearchIndex {
   ROWS = "rows",
@@ -84,10 +85,13 @@ export type DatabaseDeleteIndexOpts = {
   type?: string | undefined
 }
 
+type DBPrimitiveKey = string | number | {}
+export type DatabaseKey = DBPrimitiveKey | DBPrimitiveKey[]
+
 export type DatabaseQueryOpts = {
   include_docs?: boolean
-  startkey?: string
-  endkey?: string
+  startkey?: DatabaseKey
+  endkey?: DatabaseKey
   limit?: number
   skip?: number
   descending?: boolean
@@ -147,7 +151,7 @@ export interface Database {
     params: Nano.MangoQuery
   ): Promise<Nano.MangoResponse<T>>
   allDocs<T extends Document | RowValue>(
-    params: DatabaseQueryOpts
+    params: DocumentListParams
   ): Promise<AllDocsResponse<T>>
   query<T extends Document>(
     viewName: string,

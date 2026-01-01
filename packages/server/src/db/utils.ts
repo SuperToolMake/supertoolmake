@@ -1,6 +1,5 @@
 import { context, db as dbCore, utils } from "@budibase/backend-core"
 import {
-  DatabaseQueryOpts,
   Datasource,
   DocumentType,
   FieldSchema,
@@ -10,6 +9,7 @@ import {
   RelationshipFieldMetadata,
   SourceName,
 } from "@budibase/types"
+import { DocumentListParams } from "nano"
 
 export { DocumentType, VirtualDocumentType } from "@budibase/types"
 
@@ -100,7 +100,7 @@ export function generateLinkID(
 /**
  * Gets parameters for retrieving link docs, this is a utility function for the getDocParams function.
  */
-function getLinkParams(otherProps: Partial<DatabaseQueryOpts> = {}) {
+function getLinkParams(otherProps: Partial<DocumentListParams> = {}) {
   return getDocParams(DocumentType.LINK, null, otherProps)
 }
 
@@ -217,7 +217,7 @@ export function getAutomationMetadataParams(otherProps = {}) {
  */
 export function getQueryParams(
   datasourceId?: Optional,
-  otherProps: Partial<DatabaseQueryOpts> = {}
+  otherProps: Partial<DocumentListParams> = {}
 ) {
   if (datasourceId == null) {
     return getDocParams(DocumentType.QUERY, null, otherProps)
@@ -245,7 +245,7 @@ export function generateMetadataID(type: string, entityId: string) {
 export function getMetadataParams(
   type: string,
   entityId?: Optional,
-  otherProps: Partial<DatabaseQueryOpts> = {}
+  otherProps: Partial<DocumentListParams> = {}
 ) {
   let docId = `${type}${SEPARATOR}`
   if (entityId != null) {
@@ -259,7 +259,7 @@ export function generateMemoryViewID(viewName: string) {
 }
 
 export function getMemoryViewParams(
-  otherProps: Partial<DatabaseQueryOpts> = {}
+  otherProps: Partial<DocumentListParams> = {}
 ) {
   return getDocParams(DocumentType.MEM_VIEW, null, otherProps)
 }

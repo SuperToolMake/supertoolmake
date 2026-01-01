@@ -1,4 +1,4 @@
-import Nano from "nano"
+import Nano, { DocumentListParams } from "nano"
 import {
   AllDocsResponse,
   AnyDocument,
@@ -360,7 +360,7 @@ export class CouchDatabase implements Database {
   }
 
   async allDocs<T extends Document | RowValue>(
-    params: DatabaseQueryOpts
+    params: DocumentListParams
   ): Promise<AllDocsResponse<T>> {
     return this.performCall(db => {
       return async () => {
