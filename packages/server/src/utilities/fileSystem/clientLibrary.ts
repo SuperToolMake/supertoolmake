@@ -12,65 +12,6 @@ export function devClientLibPath() {
 }
 
 /**
- * Client library paths in the object store:
- * Previously, the entire client library package was downloaded from NPM
- * as a tarball and extracted to the object store, even though only the manifest
- * was ever needed. Therefore we need to support old apps which may still have
- * the manifest at this location for the first update.
- *
- * The paths for the in-use version are:
- * {appId}/manifest.json
- * {appId}/budibase-client.js
- * {appId}/_chunks/...
- * {appId}/... (and any other app files)
- *
- * The paths for the backups are:
- * {appId}/.bak/manifest.json
- * {appId}/.bak/budibase-client.js
- * {appId}/.bak/_chunks/...
- * {appId}/.bak/... (complete folder backup)
- *
- * We don't rely on NPM at all any more, as when updating to the latest version
- * we pull both the manifest and client bundle from the server's dependencies
- * in the local file system.
- */
-
-/**
- * Backs up the current client library version by copying the entire app folder
- * to a backup location in the object store. Only the one previous version is
- * stored as a backup, which can be reverted to.
- * @param appId The app ID to backup
- * @returns {Promise<void>}
- */
-export async function backupClientLibrary(appId: string) {
-  appId = sdk.applications.getProdAppID(appId)
-  // First, remove any existing backup folder
-  try {
-    await objectStore.deleteFolder(ObjectStoreBuckets.APPS, `${appId}/.bak`)
-  } catch (error) {
-    // Ignore errors if backup doesn't exist
-  }
-
-  await forEachObject(appId, async fileKey => {
-    if (fileKey.includes("/.bak/") || fileKey.endsWith(".bak")) {
-      return
-    }
-
-    const tmpPath = await objectStore.retrieveToTmp(
-      ObjectStoreBuckets.APPS,
-      fileKey
-    )
-
-    const backupKey = fileKey.replace(appId, `${appId}/.bak`)
-    await objectStore.upload({
-      bucket: ObjectStoreBuckets.APPS,
-      filename: backupKey,
-      path: tmpPath,
-    })
-  })
-}
-
-/**
  * Uploads the latest version of the component manifest and the client library
  * to the object store, overwriting the existing version.
  * @param appId The app ID to update
