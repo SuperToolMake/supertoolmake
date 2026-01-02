@@ -6,7 +6,6 @@ import { stop } from "./stop"
 import { status } from "./status"
 import { update } from "./update"
 import { generateUser } from "./genUser"
-import { watchPlugins } from "./watch"
 
 export default new Command(`${CommandWord.HOSTING}`)
   .addHelp("Controls self hosting on the Budibase platform.")
@@ -34,11 +33,6 @@ export default new Command(`${CommandWord.HOSTING}`)
     "--update",
     "Update the Budibase images to the latest version.",
     update
-  )
-  .addSubOption(
-    "--watch-plugin-dir [directory]",
-    "Add plugin directory watching to a Budibase install.",
-    watchPlugins
   )
   .addSubOption(
     "--gen-user",

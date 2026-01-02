@@ -5,7 +5,6 @@ import ProfilePage from "@/settings/pages/profile.svelte"
 import UsersPage from "@/settings/pages/people/users/index.svelte"
 import UserPage from "@/settings/pages/people/users/user.svelte"
 import UserInvitesPage from "@/settings/pages/people/users/invites.svelte"
-import PluginsPage from "@/settings/pages/plugins/index.svelte"
 import EmailPage from "@/settings/pages/email.svelte"
 import EmailTemplatesPage from "@/settings/pages/email/EmailTemplates.svelte"
 import EmailTemplatePage from "@/settings/pages/email/Template.svelte"
@@ -25,7 +24,6 @@ const componentMap = {
   users: UsersPage,
   user: UserPage,
   user_invites: UserInvitesPage,
-  plugins: PluginsPage,
   email: EmailPage,
   email_templates: EmailTemplatesPage,
   email_template: EmailTemplatePage,

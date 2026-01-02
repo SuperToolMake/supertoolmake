@@ -88,13 +88,6 @@ export const orgRoutes = (
       ],
     },
     {
-      section: "Plugins",
-      access: () => isGlobalBuilder,
-      path: "plugins",
-      icon: "plug",
-      comp: Pages.get("plugins"),
-    },
-    {
       section: "Email",
       path: "email",
       icon: "envelope",
