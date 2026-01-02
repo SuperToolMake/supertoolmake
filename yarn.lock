@@ -16199,11 +16199,6 @@ leac@^0.6.0:
   resolved "https://registry.yarnpkg.com/leac/-/leac-0.6.0.tgz#dcf136e382e666bd2475f44a1096061b70dc0912"
   integrity sha512-y+SqErxb8h7nE/fiEX07jsbuhrpO9lL8eca7/Y1nuWV2moNlXhyd59iDGcRf6moVyDMbmTNzL40SUyrFU/yDpg==
 
-leaflet@^1.9.4:
-  version "1.9.4"
-  resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.9.4.tgz#23fae724e282fa25745aff82ca4d394748db7d8d"
-  integrity sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==
-
 lerna@7.4.2:
   version "7.4.2"
   resolved "https://registry.yarnpkg.com/lerna/-/lerna-7.4.2.tgz#03497125d7b7c8d463eebfe17a701b16bde2ad09"
@@ -20693,11 +20688,6 @@ scim2-parse-filter@0.2.10:
   version "0.2.10"
   resolved "https://registry.yarnpkg.com/scim2-parse-filter/-/scim2-parse-filter-0.2.10.tgz#856e5be35f06162a9ae1995bf769e8d9bcdd87ea"
   integrity sha512-k5TgGSuQEbR4jXRgw/GPAYVL9fMp1pWA2abLF5z3q9IGWSuZTqbrZBOSUezvc+rtViXr+czSZjg3eAN4QSTvxQ==
-
-screenfull@^6.0.1:
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/screenfull/-/screenfull-6.0.2.tgz#3dbe4b8c4f8f49fb8e33caa8f69d0bca730ab238"
-  integrity sha512-AQdy8s4WhNvUZ6P8F6PB21tSPIYKniic+Ogx0AacBMjKP1GUHN2E9URxQHtCusiwxudnCKkdy4GrHXPPJSkCCw==
 
 scroll-into-view-if-needed@^3.1.0:
   version "3.1.0"

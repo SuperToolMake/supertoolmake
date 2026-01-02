@@ -83,20 +83,6 @@ export default defineConfig(({ mode }) => {
           replacement: path.resolve(__dirname, "src"),
         },
         {
-          find: "leaflet/dist/leaflet.css",
-          replacement: path.resolve(
-            __dirname,
-            "../../node_modules/leaflet/dist/leaflet.css"
-          ),
-        },
-        {
-          find: "leaflet",
-          replacement: path.resolve(
-            __dirname,
-            "../../node_modules/leaflet/dist/leaflet.js"
-          ),
-        },
-        {
           find: "html2canvas",
           replacement: path.resolve(
             __dirname,

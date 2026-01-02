@@ -48,7 +48,6 @@ export function getComponentStructure({ chatbox } = { chatbox: false }) {
         "iconphosphor",
         "embed",
         "backgroundimage",
-        "embeddedmap",
         "codegenerator",
       ],
     },
