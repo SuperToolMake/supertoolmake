@@ -20,7 +20,7 @@
     "husky": "^8.0.3",
     "jest": "^30.0.5",
     "kill-port": "^1.6.1",
-    "lerna": "7.4.2",
+    "lerna": "9.0.3",
     "load-tsconfig": "^0.2.5",
     "madge": "^6.0.0",
     "prettier": "3.5.3",
@@ -123,8 +123,7 @@
     "**/nan": "2.22.0",
     "globals": "15.13.0",
     "esm": "npm:esm-wallaby@3.2.35",
-    "@types/koa": "2.13.4",
-    "node-gyp": "11"
+    "@types/koa": "2.13.4"
   },
   "engines": {
     "node": ">=22.0.0 <23.0.0"
