@@ -11,7 +11,7 @@ Initial major changes:
 - removed automations,
 - removed pro module,
 - removed SQS,
-- ensured the criteria for the open source GPLv3 license were met
+- ensured the criteria for the open source AGPLv3 license were met
 
 -----------------------------------------------------------------------
 
