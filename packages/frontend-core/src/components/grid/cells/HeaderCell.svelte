@@ -6,12 +6,7 @@
   import { getColumnIcon } from "../../../utils/schema"
   import MigrationModal from "../controls/MigrationModal.svelte"
   import { debounce } from "../../../utils/utils"
-  import {
-    FieldType,
-    FormulaType,
-    SortOrder,
-    isStaticFormula,
-  } from "@budibase/types"
+  import { FieldType, SortOrder } from "@budibase/types"
   import { TableNames } from "../../../constants"
   import GridPopover from "../overlays/GridPopover.svelte"
 
@@ -79,9 +74,6 @@
       }
     }
     let schemaType = column.schema?.type
-    if (isStaticFormula(column.schema)) {
-      schemaType = column.schema.responseType
-    }
     switch (schemaType) {
       case FieldType.NUMBER:
       case FieldType.BIGINT:
@@ -107,11 +99,8 @@
   }
 
   const isColumnSearchable = col => {
-    const { type, formulaType } = col.schema
-    return (
-      searchableTypes.includes(type) ||
-      (type === FieldType.FORMULA && formulaType === FormulaType.STATIC)
-    )
+    const { type } = col.schema
+    return searchableTypes.includes(type)
   }
 
   const editColumn = async () => {

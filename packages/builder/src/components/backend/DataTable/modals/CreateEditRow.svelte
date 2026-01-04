@@ -3,9 +3,6 @@
   import { tables, dataAPI } from "@/stores/builder"
   import { ModalContent, keepOpen, notifications } from "@budibase/bbui"
   import RowFieldControl from "../RowFieldControl.svelte"
-  import { FIELDS } from "@/constants/backend"
-
-  const FORMULA_TYPE = FIELDS.FORMULA.type
 
   export let row = {}
 
@@ -58,7 +55,7 @@
     }}
   >
     {#each tableSchema as [key, meta]}
-      {#if !meta.autocolumn && meta.type !== FORMULA_TYPE && meta.type !== AI_TYPE}
+      {#if !meta.autocolumn}
         <div>
           <RowFieldControl error={errors[key]} {meta} bind:value={row[key]} />
         </div>

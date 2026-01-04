@@ -2,8 +2,6 @@ import pino, { LoggerOptions } from "pino"
 import pinoPretty from "pino-pretty"
 
 import { IdentityType } from "@budibase/types"
-import tracer from "dd-trace"
-import { formats } from "dd-trace/ext"
 import * as context from "../../context"
 import env from "../../environment"
 import * as correlation from "../correlation"
@@ -115,11 +113,6 @@ if (!env.DISABLE_PINO_LOGGER) {
       identityId: identity?._id,
       identityType: identity?.type,
       correlationId: correlation.getId(),
-    }
-
-    const span = tracer.scope().active()
-    if (span) {
-      tracer.inject(span.context(), formats.LOG, contextObject)
     }
 
     const mergingObject: any = {

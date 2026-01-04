@@ -1,5 +1,5 @@
 import { Document } from "../document"
-import { FieldSchema, FormulaFieldMetadata, FormulaType } from "./table"
+import { FieldSchema } from "./table"
 
 export const EXTERNAL_ROW_REV = "rev"
 
@@ -45,18 +45,6 @@ export enum FieldType {
    */
   DATETIME = "datetime",
   /**
-   * a JSON type, an array of metadata about files held in object storage, called Attachment List within
-   * Budibase. To utilise this type there is an API for uploading files to Budibase, which returns metadata
-   * that can be stored against columns of this type. Currently this is not supported on external databases.
-   */
-  ATTACHMENTS = "attachment",
-  /**
-   * a JSON type, similar to the attachments type, called Attachment within Budibase. This type functions
-   * much the same as the attachment list, but only holds a single attachment metadata as an object.
-   * This simplifies the binding experience of using this column type.
-   */
-  ATTACHMENT_SINGLE = "attachment_single",
-  /**
    * a complex type, called Relationships within Budibase. This is the most complex type of Budibase,
    * nothing should be stored against rows under link columns; this type simply represents the
    * relationship between tables as part of the table schema. When rows are input to the Budibase API
@@ -64,13 +52,6 @@ export enum FieldType {
    * from the Budibase API it will contain a list of row IDs and display column values of the related rows.
    */
   LINK = "link",
-  /**
-   * a complex type, called Formulas within Budibase. This type has two variants, static and dynamic, with
-   * static only being supported against internal tables. Dynamic formulas calculate a provided HBS/JS binding
-   * based on the row context and enrich it when rows are being returned from the API. Static bindings calculate
-   * this when rows are being stored, so that the formula output can be searched upon within the DB.
-   */
-  FORMULA = "formula",
   /**
    * a complex type, called Auto Column within Budibase. This type has a few variants, with options such as a
    * date for created at/updated at, an auto ID column with auto-increments as rows are saved and a user
@@ -86,21 +67,11 @@ export enum FieldType {
    */
   JSON = "json",
   /**
-   * @deprecated an internal type, this is an old deprecated type which is no longer used - still represented to note it
-   * could appear in very old tables.
-   */
-  INTERNAL = "internal",
-  /**
    * a string type, called Barcode/QR within Budibase. This type is used to denote to forms to that this column
    * should be filled in using a camera to read a barcode, there is a form component which will be used when this
    * type is found. The column will contain the contents of any barcode scanned.
    */
   BARCODEQR = "barcodeqr",
-  /**
-   * a JSON type, called Signature within Budibase. This type functions much the same as ATTACHMENTS but restricted
-   * only to signatures.
-   */
-  SIGNATURE_SINGLE = "signature_single",
   /**
    * a string type, this allows representing very large integers, but they are held/managed within Budibase as
    * strings. When stored in external databases Budibase will attempt to use a real big integer type and depend
@@ -122,34 +93,16 @@ export enum FieldType {
 }
 
 export const JsonTypes = [
-  FieldType.ATTACHMENT_SINGLE,
-  FieldType.ATTACHMENTS,
-  FieldType.SIGNATURE_SINGLE,
   // only BB_REFERENCE is JSON, it's an array, BB_REFERENCE_SINGLE is a string type
   FieldType.BB_REFERENCE,
   FieldType.JSON,
   FieldType.ARRAY,
 ]
 
-export type FormulaResponseType =
-  | FieldType.STRING
-  | FieldType.NUMBER
-  | FieldType.BOOLEAN
-  | FieldType.DATETIME
-
 export const NumericTypes = [FieldType.NUMBER, FieldType.BIGINT]
 
 export function isNumeric(type: FieldType) {
   return NumericTypes.includes(type)
-}
-
-export function isNumericStaticFormula(schema: FieldSchema) {
-  return (
-    schema.type === FieldType.FORMULA &&
-    schema.formulaType === FormulaType.STATIC &&
-    schema.responseType &&
-    isNumeric(schema.responseType)
-  )
 }
 
 export const GroupByTypes = [
@@ -166,26 +119,8 @@ export function canGroupBy(type: FieldType) {
   return GroupByTypes.includes(type)
 }
 
-export function isStaticFormula(
-  schema: FieldSchema
-): schema is FormulaFieldMetadata {
-  return (
-    schema.type === FieldType.FORMULA &&
-    schema.formulaType === FormulaType.STATIC
-  )
-}
-
 export function canGroupBySchema(schema: FieldSchema) {
-  return canGroupBy(schema.type) || isStaticFormula(schema)
-}
-
-export interface RowAttachment {
-  size: number
-  name: string
-  extension: string
-  key?: string
-  // Populated on read
-  url?: string
+  return canGroupBy(schema.type)
 }
 
 export interface Row extends Document {

@@ -1,14 +1,6 @@
-import { constants, context, db as dbCore } from "@budibase/backend-core"
+import { context, db as dbCore } from "@budibase/backend-core"
 import { structures } from "@budibase/backend-core/tests"
-import {
-  FieldType,
-  FormulaType,
-  PublishResourceState,
-  Row,
-  Table,
-  WorkspaceApp,
-} from "@budibase/types"
-import { cloneDeep } from "lodash/fp"
+import { PublishResourceState, Row, Table, WorkspaceApp } from "@budibase/types"
 import { getRowParams } from "../../../db/utils"
 import { basicTable } from "../../../tests/utilities/structures"
 import * as setup from "./utilities"
@@ -189,59 +181,6 @@ describe("/api/deploy", () => {
       )
       await expectApp(secondApp).disabled(true, PublishResourceState.DISABLED)
     })
-  })
-
-  it("updates production rows with new static formulas when published", async () => {
-    const amountFieldName = "amount"
-    const tableDefinition = basicTable(undefined, {
-      schema: {
-        [amountFieldName]: {
-          name: amountFieldName,
-          type: FieldType.NUMBER,
-          constraints: {},
-        },
-      },
-    })
-
-    const table = await config.api.table.save(tableDefinition)
-
-    // Initial publish so a production workspace exists
-    await config.api.workspace.publish(config.devWorkspace!.appId)
-
-    // Create a row directly in production to simulate live data
-    const productionRow = await config.withHeaders(
-      { [constants.Header.APP_ID]: config.getProdWorkspaceId() },
-      async () =>
-        await config.api.row.save(table._id!, {
-          tableId: table._id!,
-          name: "Prod row",
-          description: "Prod description",
-          [amountFieldName]: 5,
-        })
-    )
-
-    const formulaFieldName = "amountPlusOne"
-    const formula = "{{ add amount 1 }}"
-
-    const updatedTable = cloneDeep(table)
-    updatedTable.schema[formulaFieldName] = {
-      name: formulaFieldName,
-      type: FieldType.FORMULA,
-      formula,
-      formulaType: FormulaType.STATIC,
-      responseType: FieldType.NUMBER,
-    }
-
-    await config.api.table.save(updatedTable)
-
-    await config.api.workspace.publish(config.devWorkspace!.appId)
-
-    const prodRowAfterPublish = await config.withHeaders(
-      { [constants.Header.APP_ID]: config.getProdWorkspaceId() },
-      async () => await config.api.row.get(table._id!, productionRow._id!)
-    )
-
-    expect(prodRowAfterPublish[formulaFieldName]).toBe(6)
   })
 
   it("migrates production row data when a column is renamed in development", async () => {

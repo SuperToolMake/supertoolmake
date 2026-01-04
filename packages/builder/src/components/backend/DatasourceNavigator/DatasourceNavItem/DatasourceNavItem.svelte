@@ -1,10 +1,9 @@
-<script>
+<script lang="ts">
   import { isActive, goto, params } from "@roxi/routify"
   import { BUDIBASE_INTERNAL_DB_ID } from "@/constants/backend"
   import { contextMenuStore, userSelectedResourceMap } from "@/stores/builder"
   import { restTemplates } from "@/stores/builder/restTemplates"
   import NavItem from "@/components/common/NavItem.svelte"
-  import { SourceName } from "@budibase/types"
 
   import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
   import { Icon } from "@budibase/bbui"
@@ -22,8 +21,8 @@
       ? restTemplates.getByName(datasource.restTemplate)?.icon
       : undefined
 
-  let editModal
-  let deleteConfirmationModal
+  let editModal: UpdateDatasourceModal
+  let deleteConfirmationModal: DeleteDataConfirmModal
 
   let addQueryItem = {
     icon: "plus",
@@ -45,10 +44,7 @@
 
   const getContextMenuItems = () => {
     return [
-      ...(datasource._id !== BUDIBASE_INTERNAL_DB_ID &&
-      datasource.source !== SourceName.GOOGLE_SHEETS
-        ? [addQueryItem]
-        : []),
+      ...(datasource._id !== BUDIBASE_INTERNAL_DB_ID ? [addQueryItem] : []),
       {
         icon: "pencil",
         name: "Edit",
@@ -68,6 +64,7 @@
     ]
   }
 
+  // @ts-expect-error TODO(mel): Add type
   const openContextMenu = e => {
     if (datasource._id === BUDIBASE_INTERNAL_DB_ID) {
       return

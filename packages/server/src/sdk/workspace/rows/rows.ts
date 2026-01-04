@@ -1,9 +1,7 @@
 import { context, db as dbCore } from "@budibase/backend-core"
 import { Database, Row } from "@budibase/types"
 import { getRowParams } from "../../../db/utils"
-import { isExternalTableID } from "../../../integrations/utils"
 import * as external from "./external"
-import * as internal from "./internal"
 
 export async function getAllInternalRows(appId?: string) {
   let db: Database
@@ -20,22 +18,18 @@ export async function getAllInternalRows(appId?: string) {
   return response.rows.map(row => row.doc) as Row[]
 }
 
-function pickApi(tableId: string) {
-  if (isExternalTableID(tableId)) {
-    return external
-  }
-  return internal
+function pickApi() {
+  return external
 }
 
 export async function save(
   sourceId: string,
   row: Row,
-  userId: string | undefined,
-  opts?: { updateAIColumns: boolean }
+  userId: string | undefined
 ) {
-  return pickApi(sourceId).save(sourceId, row, userId, opts)
+  return pickApi().save(sourceId, row, userId)
 }
 
 export async function find(sourceId: string, rowId: string) {
-  return pickApi(sourceId).find(sourceId, rowId)
+  return pickApi().find(sourceId, rowId)
 }

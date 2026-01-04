@@ -29,8 +29,5 @@ export function getFields(
       filteredFields = filteredFields.concat(getTableFields(tables, linkField))
     }
   }
-  const staticFormulaFields = fields.filter(
-    field => field.type === "formula" && field.formulaType === "static"
-  )
-  return filteredFields.concat(staticFormulaFields)
+  return filteredFields
 }

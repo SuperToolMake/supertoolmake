@@ -117,31 +117,6 @@ export const FIELDS: Record<string, UIField> = {
       },
     },
   },
-  ATTACHMENT_SINGLE: {
-    name: "Single attachment",
-    type: FieldType.ATTACHMENT_SINGLE,
-    icon: TypeIconMap[FieldType.ATTACHMENT_SINGLE],
-    constraints: {
-      presence: false,
-    },
-  },
-  ATTACHMENTS: {
-    name: "Multi attachment",
-    type: FieldType.ATTACHMENTS,
-    icon: TypeIconMap[FieldType.ATTACHMENTS],
-    constraints: {
-      type: "array",
-      presence: false,
-    },
-  },
-  SIGNATURE_SINGLE: {
-    name: "Signature",
-    type: FieldType.SIGNATURE_SINGLE,
-    icon: "pen-nib",
-    constraints: {
-      presence: false,
-    },
-  },
   LINK: {
     name: "Relationship",
     type: FieldType.LINK,
@@ -155,12 +130,6 @@ export const FIELDS: Record<string, UIField> = {
     name: "Auto column",
     type: FieldType.AUTO,
     icon: TypeIconMap[FieldType.AUTO],
-    constraints: {},
-  },
-  FORMULA: {
-    name: "Formula",
-    type: FieldType.FORMULA,
-    icon: TypeIconMap[FieldType.FORMULA],
     constraints: {},
   },
   JSON: {

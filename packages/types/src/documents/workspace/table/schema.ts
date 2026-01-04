@@ -1,12 +1,10 @@
 // all added by grid/table when defining the
 // column size, position and whether it can be viewed
-import { FieldType, FormulaResponseType } from "../row"
+import { FieldType } from "../row"
 import {
-  AttachmentSubType,
   AutoFieldSubType,
   AutoReason,
   BBReferenceFieldSubType,
-  FormulaType,
   JsonFieldSubType,
   RelationshipType,
   StringFieldSubType,
@@ -113,13 +111,6 @@ export interface StringFieldMetadata extends Omit<BaseFieldSchema, "subtype"> {
   default?: string
 }
 
-export interface FormulaFieldMetadata extends BaseFieldSchema {
-  type: FieldType.FORMULA
-  formula: string
-  formulaType?: FormulaType
-  responseType?: FormulaResponseType
-}
-
 export interface BBReferenceFieldMetadata
   extends Omit<BaseFieldSchema, "subtype"> {
   type: FieldType.BB_REFERENCE
@@ -132,17 +123,6 @@ export interface BBReferenceSingleFieldMetadata
   type: FieldType.BB_REFERENCE_SINGLE
   subtype: Exclude<BBReferenceFieldSubType, BBReferenceFieldSubType.USERS>
   default?: string
-}
-
-export interface AttachmentFieldMetadata
-  extends Omit<BaseFieldSchema, "subtype"> {
-  type: FieldType.ATTACHMENTS
-  subtype?: AttachmentSubType
-}
-export interface SingleAttachmentFieldMetadata
-  extends Omit<BaseFieldSchema, "subtype"> {
-  type: FieldType.ATTACHMENT_SINGLE
-  subtype?: AttachmentSubType
 }
 
 export interface FieldConstraints {
@@ -222,12 +202,10 @@ interface OtherFieldMetadata extends BaseFieldSchema {
     | FieldType.DATETIME
     | FieldType.LINK
     | FieldType.AUTO
-    | FieldType.FORMULA
     | FieldType.NUMBER
     | FieldType.LONGFORM
     | FieldType.BB_REFERENCE
     | FieldType.BB_REFERENCE_SINGLE
-    | FieldType.ATTACHMENTS
     | FieldType.STRING
     | FieldType.ARRAY
     | FieldType.OPTIONS
@@ -242,14 +220,11 @@ export type FieldSchema =
   | DateFieldMetadata
   | RelationshipFieldMetadata
   | AutoColumnFieldMetadata
-  | FormulaFieldMetadata
   | NumberFieldMetadata
   | LongFormFieldMetadata
   | StringFieldMetadata
   | BBReferenceFieldMetadata
   | JsonFieldMetadata
-  | AttachmentFieldMetadata
-  | SingleAttachmentFieldMetadata
   | BBReferenceSingleFieldMetadata
   | ArrayFieldMetadata
   | OptionsFieldMetadata

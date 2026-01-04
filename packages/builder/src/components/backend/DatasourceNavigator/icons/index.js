@@ -11,7 +11,6 @@ import ArangoDB from "./ArangoDB.svelte"
 import Rest from "./Rest.svelte"
 import Budibase from "./Budibase.svelte"
 import Oracle from "./Oracle.svelte"
-import GoogleSheets from "./GoogleSheets.svelte"
 import Firebase from "./Firebase.svelte"
 import Redis from "./Redis.svelte"
 import Snowflake from "./Snowflake.svelte"
@@ -31,7 +30,6 @@ const ICONS = {
   ARANGODB: ArangoDB,
   REST: Rest,
   ORACLE: Oracle,
-  GOOGLE_SHEETS: GoogleSheets,
   FIRESTORE: Firebase,
   REDIS: Redis,
   SNOWFLAKE: Snowflake,

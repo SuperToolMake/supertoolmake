@@ -1446,7 +1446,6 @@ class InternalBuilder {
       for (const [column, schema] of Object.entries(this.query.table.schema)) {
         if (
           schema.constraints?.presence === true ||
-          schema.type === FieldType.FORMULA ||
           schema.type === FieldType.AUTO ||
           schema.type === FieldType.LINK
         ) {

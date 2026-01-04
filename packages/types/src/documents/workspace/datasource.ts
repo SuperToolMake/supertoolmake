@@ -7,9 +7,6 @@ export interface Datasource extends Document {
   type: string
   name?: string
   source: SourceName
-  // this is a googlesheets specific property which
-  // can be found in the GSheets schema - pertains to SSO creds
-  auth?: { type: string }
   // the config is defined by the schema
   config?: Record<string, any>
   plus?: boolean

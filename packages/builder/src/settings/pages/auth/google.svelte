@@ -36,7 +36,6 @@
     : googleCallbackReadonly
       ? "Visit the organisation page to update the platform URL"
       : "Leave blank to use the default callback URL"
-  $: googleSheetsCallbackUrl = `${$organisation.platformUrl}/api/global/auth/datasource/google/callback`
 
   $: GoogleConfigFields = {
     Google: [
@@ -48,14 +47,6 @@
         readonly: googleCallbackReadonly,
         tooltip: googleCallbackTooltip,
         placeholder: $organisation.googleCallbackUrl,
-        copyButton: true,
-      },
-      {
-        name: "sheetsURL",
-        label: "Sheets URL",
-        readonly: googleCallbackReadonly,
-        tooltip: googleCallbackTooltip,
-        placeholder: googleSheetsCallbackUrl,
         copyButton: true,
       },
     ],

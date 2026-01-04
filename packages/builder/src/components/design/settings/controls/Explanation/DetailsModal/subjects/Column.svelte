@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { tables } from "@/stores/builder"
   import {
     BindingValue,
@@ -12,7 +12,7 @@
   export let schema
   export let columnName
 
-  const parseDate = isoString => {
+  const parseDate = (isoString: string) => {
     if ([null, undefined, ""].includes(isoString)) {
       return "None"
     }
@@ -90,14 +90,6 @@
       <Property name="Schema">
         <JSONValue value={JSON.stringify(schema?.schema ?? {}, null, 2)} />
       </Property>
-    {:else if schema.type === "formula"}
-      <Property name="Formula">
-        <BindingValue value={schema?.formula} />
-      </Property>
-      <Property
-        name="Formula type"
-        value={schema?.formulaType === "dynamic" ? "Dynamic" : "Static"}
-      />
     {:else if schema.type === "link"}
       <Property name="Type" value={schema?.relationshipType} />
       <Property

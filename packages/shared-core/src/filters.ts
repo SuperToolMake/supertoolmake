@@ -6,7 +6,6 @@ import {
   FieldConstraints,
   FieldType,
   FieldSubType,
-  FormulaType,
   isArraySearchOperator,
   isBasicSearchOperator,
   isLogicalSearchOperator,
@@ -50,7 +49,6 @@ export const getValidOperatorsForType = (
   fieldType: {
     type: FieldType
     subtype?: FieldSubType
-    formulaType?: FormulaType
     constraints?: FieldConstraints
   },
   field?: string,
@@ -86,7 +84,7 @@ export const getValidOperatorsForType = (
     value: string
     label: string
   }[] = []
-  const { type, formulaType, subtype } = fieldType
+  const { type, subtype } = fieldType
   if (type === FieldType.STRING) {
     if (subtype === StringFieldSubType.ARRAY) {
       ops = arrayOps
@@ -105,8 +103,6 @@ export const getValidOperatorsForType = (
     ops = stringOps
   } else if (type === FieldType.DATETIME) {
     ops = numOps
-  } else if (type === FieldType.FORMULA && formulaType === FormulaType.STATIC) {
-    ops = stringOps.concat([Op.MoreThan, Op.LessThan])
   } else if (
     type === FieldType.BB_REFERENCE_SINGLE ||
     schema.isDeprecatedSingleUserColumn(fieldType)

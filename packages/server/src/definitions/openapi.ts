@@ -372,13 +372,6 @@ export interface components {
               autocolumn?: boolean;
               /** @description Defines the width of the column in the data UI. */
               width?: number;
-              /** @description Defines a Handlebars or JavaScript formula to use, note that Javascript formulas are expected to be provided in the base64 format. */
-              formula?: string;
-              /**
-               * @description Defines whether this is a static or dynamic formula.
-               * @enum {string}
-               */
-              formulaType?: "static" | "dynamic";
             }
           | {
               /**
@@ -503,13 +496,6 @@ export interface components {
                 autocolumn?: boolean;
                 /** @description Defines the width of the column in the data UI. */
                 width?: number;
-                /** @description Defines a Handlebars or JavaScript formula to use, note that Javascript formulas are expected to be provided in the base64 format. */
-                formula?: string;
-                /**
-                 * @description Defines whether this is a static or dynamic formula.
-                 * @enum {string}
-                 */
-                formulaType?: "static" | "dynamic";
               }
             | {
                 /**
@@ -636,13 +622,6 @@ export interface components {
                 autocolumn?: boolean;
                 /** @description Defines the width of the column in the data UI. */
                 width?: number;
-                /** @description Defines a Handlebars or JavaScript formula to use, note that Javascript formulas are expected to be provided in the base64 format. */
-                formula?: string;
-                /**
-                 * @description Defines whether this is a static or dynamic formula.
-                 * @enum {string}
-                 */
-                formulaType?: "static" | "dynamic";
               }
             | {
                 /**

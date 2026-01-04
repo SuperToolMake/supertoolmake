@@ -8,7 +8,6 @@ import {
   utils,
 } from "@budibase/backend-core"
 import { ContextUser, UserCtx } from "@budibase/types"
-import tracer from "dd-trace"
 import type { Middleware, Next } from "koa"
 import { generateUserMetadataID, isDevWorkspaceID } from "../db/utils"
 import env from "../environment"
@@ -20,11 +19,6 @@ export const currentWorkspaceMiddleware = (async (ctx: UserCtx, next: Next) => {
   let requestWorkspaceId = await utils.getWorkspaceIdFromCtx(ctx)
   if (!requestWorkspaceId) {
     return next()
-  }
-
-  if (requestWorkspaceId) {
-    const span = tracer.scope().active()
-    span?.setTag("appId", requestWorkspaceId)
   }
 
   // deny access to application preview
@@ -66,14 +60,6 @@ export const currentWorkspaceMiddleware = (async (ctx: UserCtx, next: Next) => {
   // nothing more to do
   if (!workspaceId) {
     return next()
-  }
-
-  if (ctx.user) {
-    const span = tracer.scope().active()
-    if (ctx.user._id) {
-      span?.setTag("userId", ctx.user._id)
-    }
-    span?.setTag("tenantId", ctx.user.tenantId)
   }
 
   const userId = ctx.user ? generateUserMetadataID(ctx.user._id!) : undefined

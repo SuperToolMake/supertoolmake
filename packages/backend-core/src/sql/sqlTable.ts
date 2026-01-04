@@ -17,7 +17,7 @@ import SchemaBuilder = Knex.SchemaBuilder
 import CreateTableBuilder = Knex.CreateTableBuilder
 
 function isIgnoredType(type: FieldType) {
-  const ignored = [FieldType.LINK, FieldType.FORMULA]
+  const ignored = [FieldType.LINK]
   return ignored.indexOf(type) !== -1
 }
 
@@ -140,16 +140,6 @@ function generateSchema(
             .foreign(column.foreignKey)
             .references(`${tableName}.${relatedPrimary}`)
         }
-        break
-      case FieldType.SIGNATURE_SINGLE:
-      case FieldType.ATTACHMENTS:
-      case FieldType.ATTACHMENT_SINGLE:
-        // single attachments are stored as an object, multi attachments
-        // are stored as an array
-        schema.json(key)
-        break
-      case FieldType.FORMULA:
-        // This is allowed, but nothing to do on the external datasource
         break
       case FieldType.AUTO:
       case FieldType.JSON:

@@ -31,7 +31,6 @@ export type SearchFilter = {
   externalType?: string
   noValue?: boolean
   valueType?: string
-  formulaType?: string
 }
 
 // Prior to v2, this is the type the frontend sent us when filters were

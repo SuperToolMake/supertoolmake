@@ -28,7 +28,6 @@ import {
   getDefinitions,
   getIntegration,
 } from "../../../integrations"
-import { setupCreationAuth as googleSetupCreationAuth } from "../../../integrations/googlesheets"
 import sdk from "../../index"
 import { getEnvironmentVariables } from "../../utils"
 
@@ -341,22 +340,12 @@ export async function save(
     errors = schema.errors
   }
 
-  if (preSaveAction[datasource.source]) {
-    await preSaveAction[datasource.source](datasource)
-  }
-
   const dbResp = await db.put(
     sdk.tables.populateExternalTableSchemas(datasource)
   )
   datasource._rev = dbResp.rev
 
   return { datasource, errors }
-}
-
-const preSaveAction: Partial<Record<SourceName, any>> = {
-  [SourceName.GOOGLE_SHEETS]: async (datasource: Datasource) => {
-    await googleSetupCreationAuth(datasource.config as any)
-  },
 }
 
 /**

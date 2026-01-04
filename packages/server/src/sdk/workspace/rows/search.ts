@@ -13,7 +13,6 @@ import { ExportRowsParams, ExportRowsResult } from "./search/types"
 import { dataFilters } from "@budibase/shared-core"
 import sdk from "../../index"
 import { searchInputMapping } from "./search/utils"
-import tracer from "dd-trace"
 import { getQueryableFields, validateFilters } from "./queryUtils"
 import { enrichSearchContext } from "../../../api/controllers/row/utils"
 
@@ -36,87 +35,58 @@ export async function search(
   options: RowSearchParams,
   context?: Record<string, any>
 ): Promise<SearchResponse<Row>> {
-  return await tracer.trace("search", async span => {
-    span?.addTags({
-      tableId: options.tableId,
-      viewId: options.viewId,
-      query: options.query,
-      sort: options.sort,
-      sortOrder: options.sortOrder,
-      sortType: options.sortType,
-      limit: options.limit,
-      bookmark: options.bookmark,
-      paginate: options.paginate,
-      fields: options.fields,
-      countRows: options.countRows,
-    })
+  let source: Table
+  let table: Table
+  if (options.tableId) {
+    source = await sdk.tables.getTable(options.tableId)
+    table = source
+  } else {
+    throw new Error(`Must supply either a view ID or a table ID`)
+  }
 
-    let source: Table
-    let table: Table
-    if (options.tableId) {
-      source = await sdk.tables.getTable(options.tableId)
-      table = source
-    } else {
-      throw new Error(`Must supply either a view ID or a table ID`)
+  const isExternalTable = isExternalTableID(table._id!)
+
+  if (options.query) {
+    const visibleFields = (options.fields || Object.keys(table.schema)).filter(
+      field => table.schema[field]?.visible !== false
+    )
+
+    const queryableFields = await getQueryableFields(table, visibleFields)
+    validateFilters(options.query, queryableFields)
+  } else {
+    options.query = {}
+  }
+
+  if (context) {
+    options.query = await enrichSearchContext(options.query, context)
+  }
+
+  // need to make sure filters in correct shape before checking for view
+  options = searchInputMapping(table, options)
+
+  if (
+    !dataFilters.hasFilters(options.query) &&
+    options.query.onEmptyFilter === EmptyFilterOption.RETURN_NONE
+  ) {
+    return {
+      rows: [],
     }
+  }
 
-    const isExternalTable = isExternalTableID(table._id!)
+  if (options.sortOrder) {
+    options.sortOrder = options.sortOrder.toLowerCase() as SortOrder
+  }
 
-    if (options.query) {
-      const visibleFields = (
-        options.fields || Object.keys(table.schema)
-      ).filter(field => table.schema[field]?.visible !== false)
-
-      const queryableFields = await getQueryableFields(table, visibleFields)
-      validateFilters(options.query, queryableFields)
-    } else {
-      options.query = {}
+  let result: SearchResponse<Row>
+  if (isExternalTable) {
+    result = await external.search(options, source)
+  } else {
+    const rows = await internal.fetch(options.tableId)
+    result = {
+      rows,
     }
-
-    if (context) {
-      options.query = await enrichSearchContext(options.query, context)
-    }
-
-    // need to make sure filters in correct shape before checking for view
-    options = searchInputMapping(table, options)
-
-    span.addTags({
-      cleanedQuery: options.query,
-    })
-
-    if (
-      !dataFilters.hasFilters(options.query) &&
-      options.query.onEmptyFilter === EmptyFilterOption.RETURN_NONE
-    ) {
-      span.addTags({ emptyQuery: true })
-      return {
-        rows: [],
-      }
-    }
-
-    if (options.sortOrder) {
-      options.sortOrder = options.sortOrder.toLowerCase() as SortOrder
-    }
-
-    let result: SearchResponse<Row>
-    if (isExternalTable) {
-      span?.addTags({ searchType: "external" })
-      result = await external.search(options, source)
-    } else {
-      span?.addTags({ searchType: "lucene" })
-      const rows = await internal.fetch(options.tableId)
-      result = {
-        rows,
-      }
-    }
-
-    span.addTags({
-      foundRows: result.rows.length,
-      totalRows: result.totalRows,
-    })
-
-    return result
-  })
+  }
+  return result
 }
 
 export async function exportRows(

@@ -1,4 +1,4 @@
-import { FieldType, FormulaType, RelationshipType } from "@budibase/types"
+import { FieldType, RelationshipType } from "@budibase/types"
 import { object } from "./utils"
 import Resource from "./utils/Resource"
 
@@ -28,7 +28,7 @@ const baseColumnDef = {
   type: {
     type: "string",
     enum: Object.values(FieldType).filter(
-      type => ![FieldType.LINK, FieldType.FORMULA].includes(type)
+      type => ![FieldType.LINK].includes(type)
     ),
     description:
       "Defines the type of the column, most explain themselves, a link column is a relationship.",
@@ -150,22 +150,6 @@ const tableSchema = {
             type: "object",
             properties: {
               ...baseColumnDef,
-              type: {
-                type: "string",
-                enum: [FieldType.FORMULA],
-                description: "A formula column.",
-              },
-              formula: {
-                type: "string",
-                description:
-                  "Defines a Handlebars or JavaScript formula to use, note that Javascript formulas are expected to be provided in the base64 format.",
-              },
-              formulaType: {
-                type: "string",
-                enum: [FormulaType.STATIC, FormulaType.DYNAMIC],
-                description:
-                  "Defines whether this is a static or dynamic formula.",
-              },
             },
           },
           {

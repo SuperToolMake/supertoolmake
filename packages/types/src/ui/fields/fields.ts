@@ -1,9 +1,4 @@
-import {
-  FieldType,
-  FieldConstraints,
-  type FieldSchema,
-  type FormulaResponseType,
-} from "../../"
+import { FieldType, FieldConstraints, type FieldSchema } from "../../"
 
 export interface UIField {
   name: string
@@ -34,7 +29,6 @@ export interface UIField {
 export type FieldSchemaConfig = FieldSchema & {
   constraints: FieldConstraints
   fieldName?: string
-  responseType?: FormulaResponseType
   default?: any
   fieldId?: string
   optionColors?: string[]

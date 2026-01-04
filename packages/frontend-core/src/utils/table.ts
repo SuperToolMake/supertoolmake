@@ -1,5 +1,5 @@
 import * as sharedCore from "@budibase/shared-core"
-import { UIFieldSchema, isStaticFormula } from "@budibase/types"
+import { UIFieldSchema } from "@budibase/types"
 
 export function canBeDisplayColumn(column: UIFieldSchema) {
   if (!sharedCore.canBeDisplayColumn(column.type)) {
@@ -13,10 +13,6 @@ export function canBeDisplayColumn(column: UIFieldSchema) {
 }
 
 export function canBeSortColumn(columnSchema: UIFieldSchema) {
-  // Allow static-only formula columns to be sorted
-  if (isStaticFormula(columnSchema)) {
-    return true
-  }
   if (!sharedCore.canBeSortColumn(columnSchema.type)) {
     return false
   }

@@ -1,27 +1,21 @@
-import archiver from "archiver"
-import stream from "stream"
-
-import { context, objectStore } from "@budibase/backend-core"
+import { context } from "@budibase/backend-core"
 import { dataFilters } from "@budibase/shared-core"
 import {
   Ctx,
   DeleteRow,
   DeleteRowRequest,
   DeleteRows,
-  DownloadAttachmentResponse,
   EventType,
   ExportRowsRequest,
   ExportRowsResponse,
   FetchEnrichedRowResponse,
   FetchRowsResponse,
-  FieldType,
   FindRowResponse,
   isRelationshipField,
   PatchRowRequest,
   PatchRowResponse,
   RequiredKeys,
   Row,
-  RowAttachment,
   RowSearchParams,
   SaveRowRequest,
   SaveRowResponse,
@@ -42,14 +36,10 @@ import { addRev } from "../public/utils"
 import * as exporters from "../table/exporters"
 import { Format } from "../table/exporters"
 import * as external from "./external"
-import * as internal from "./internal"
 import * as utils from "./utils"
 
-function pickApi(tableId: string) {
-  if (isExternalTableID(tableId)) {
-    return external
-  }
-  return internal
+function pickApi() {
+  return external
 }
 
 export async function patch(
@@ -64,7 +54,7 @@ export async function patch(
     return save(ctx)
   }
   try {
-    const api = pickApi(tableId)
+    const api = pickApi()
     const runQuery = async () => {
       const response = await api.patch(ctx)
       return response
@@ -174,14 +164,13 @@ async function processDeleteRowsRequest(ctx: UserCtx<DeleteRowRequest>) {
 }
 
 async function deleteRows(ctx: UserCtx<DeleteRowRequest>) {
-  const { tableId } = utils.getSourceId(ctx)
   const appId = ctx.appId
 
   let deleteRequest = ctx.request.body as DeleteRows
 
   deleteRequest.rows = await processDeleteRowsRequest(ctx)
 
-  const { rows } = await pickApi(tableId).bulkDestroy(ctx)
+  const { rows } = await pickApi().bulkDestroy(ctx)
 
   for (let row of rows) {
     ctx.eventEmitter?.emitRow({
@@ -197,8 +186,7 @@ async function deleteRows(ctx: UserCtx<DeleteRowRequest>) {
 
 async function deleteRow(ctx: UserCtx<DeleteRowRequest>) {
   const appId = ctx.appId
-  const { tableId } = utils.getSourceId(ctx)
-  const api = pickApi(tableId)
+  const api = pickApi()
   const resp = await api.destroy(ctx)
 
   ctx.eventEmitter?.emitRow({
@@ -330,8 +318,7 @@ export async function validate(
 export async function fetchEnrichedRow(
   ctx: UserCtx<void, FetchEnrichedRowResponse>
 ) {
-  const { tableId } = utils.getSourceId(ctx)
-  ctx.body = await pickApi(tableId).fetchEnrichedRow(ctx)
+  ctx.body = await pickApi().fetchEnrichedRow(ctx)
 }
 
 export const exportRows = async (
@@ -365,69 +352,4 @@ export const exportRows = async (
   })
   ctx.attachment(fileName)
   ctx.body = apiFileReturn(content)
-}
-
-export async function downloadAttachment(
-  ctx: UserCtx<void, DownloadAttachmentResponse>
-) {
-  const { columnName } = ctx.params
-
-  const { tableId } = utils.getSourceId(ctx)
-  const rowId = ctx.params.rowId
-  const row = await sdk.rows.find(tableId, rowId)
-
-  const table = await sdk.tables.getTable(tableId)
-  const columnSchema = table.schema[columnName]
-  if (!columnSchema) {
-    ctx.throw(400, `'${columnName}' is not valid`)
-  }
-
-  const columnType = columnSchema.type
-
-  if (
-    columnType !== FieldType.ATTACHMENTS &&
-    columnType !== FieldType.ATTACHMENT_SINGLE
-  ) {
-    ctx.throw(404, `'${columnName}' is not valid attachment column`)
-  }
-
-  const attachments: RowAttachment[] =
-    columnType === FieldType.ATTACHMENTS ? row[columnName] : [row[columnName]]
-
-  if (!attachments?.length) {
-    ctx.throw(404)
-  }
-
-  if (attachments.length === 1) {
-    const attachment = attachments[0]
-    ctx.attachment(attachment.name)
-    if (attachment.key) {
-      const { stream } = await objectStore.getReadStream(
-        objectStore.ObjectStoreBuckets.APPS,
-        attachment.key
-      )
-      ctx.body = stream
-    }
-  } else {
-    const passThrough = new stream.PassThrough()
-    const archive = archiver.create("zip")
-    archive.pipe(passThrough)
-
-    for (const attachment of attachments) {
-      if (!attachment.key) {
-        continue
-      }
-      const { stream: attachmentStream } = await objectStore.getReadStream(
-        objectStore.ObjectStoreBuckets.APPS,
-        attachment.key
-      )
-      archive.append(attachmentStream, { name: attachment.name })
-    }
-
-    const displayName = row[table.primaryDisplay || "_id"]
-    ctx.attachment(`${displayName}_${columnName}.zip`)
-    archive.finalize()
-    ctx.body = passThrough
-    ctx.type = "zip"
-  }
 }

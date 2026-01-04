@@ -21,7 +21,6 @@ const FILTER_ALLOWED_KEYS: (keyof SearchFilter)[] = [
   "externalType",
   "valueType",
   "noValue",
-  "formulaType",
 ]
 
 export function unreachable(

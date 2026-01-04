@@ -22,7 +22,6 @@ import {
   User,
 } from "@budibase/types"
 import { InvalidAPIKeyWarning } from "../warnings"
-import tracer from "dd-trace"
 import type { Middleware, Next } from "koa"
 
 const ONE_MINUTE = env.SESSION_UPDATE_PERIOD
@@ -211,15 +210,6 @@ export function authenticated(
         user: any
       ): user is User & { budibaseAccess?: string } => {
         return user && user.email
-      }
-
-      if (isUser(user)) {
-        tracer.setUser({
-          id: user._id!,
-          tenantId: user.tenantId,
-          budibaseAccess: user.budibaseAccess,
-          status: user.status,
-        })
       }
 
       // isAuthenticated is a function, so use a variable to be able to check authed state

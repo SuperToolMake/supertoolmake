@@ -1,5 +1,4 @@
 import { db as dbCore, encryption, objectStore } from "@budibase/backend-core"
-import { tracer } from "dd-trace"
 import fs from "fs"
 import fsp from "fs/promises"
 import { join } from "path"
@@ -102,90 +101,76 @@ function defineFilter(excludeRows?: boolean) {
  * @returns either a string or a stream of the backup
  */
 export async function exportApp(appId: string, config?: ExportOpts) {
-  return await tracer.trace("exportApp", async span => {
-    span.addTags({
-      "config.excludeRows": config?.excludeRows,
-      "config.tar": config?.tar,
-      "config.encryptPassword": !!config?.encryptPassword,
-      "config.exportPath": config?.exportPath,
-      "config.filter": !!config?.filter,
-    })
+  const prodAppId = dbCore.getProdWorkspaceID(appId)
+  const appPath = `${prodAppId}/`
 
-    const prodAppId = dbCore.getProdWorkspaceID(appId)
-    const appPath = `${prodAppId}/`
+  const toExclude = [/\/\..+/]
+  if (config?.excludeRows) {
+    toExclude.push(/\/attachments\/.*/)
+  }
 
-    const toExclude = [/\/\..+/]
-    if (config?.excludeRows) {
-      toExclude.push(/\/attachments\/.*/)
+  const tmpPath = await objectStore.retrieveDirectory(
+    ObjectStoreBuckets.APPS,
+    appPath,
+    toExclude
+  )
+
+  const downloadedPath = join(tmpPath, appPath)
+  if (fs.existsSync(downloadedPath)) {
+    const allFiles = await fsp.readdir(downloadedPath)
+    for (let file of allFiles) {
+      const path = join(downloadedPath, file)
+      // move out of app directory, simplify structure
+      await fsp.rename(path, join(downloadedPath, "..", file))
     }
+    // remove the old app directory created by object export
+    await fsp.rmdir(downloadedPath)
+  }
+  // enforce an export of app DB to the tmp path
+  const dbPath = join(tmpPath, DB_EXPORT_FILE)
+  await exportDB(appId, {
+    filter: defineFilter(config?.excludeRows),
+    exportPath: dbPath,
+  })
 
-    const tmpPath = await objectStore.retrieveDirectory(
-      ObjectStoreBuckets.APPS,
-      appPath,
-      toExclude
-    )
+  if (config?.encryptPassword) {
+    const processDirectory = async (dirPath: string, relativePath = "") => {
+      for (let file of await fsp.readdir(dirPath)) {
+        const fullPath = join(dirPath, file)
+        const relativeFilePath = relativePath ? join(relativePath, file) : file
 
-    span.addTags({ prodAppId, tmpPath })
-
-    const downloadedPath = join(tmpPath, appPath)
-    if (fs.existsSync(downloadedPath)) {
-      const allFiles = await fsp.readdir(downloadedPath)
-      for (let file of allFiles) {
-        const path = join(downloadedPath, file)
-        // move out of app directory, simplify structure
-        await fsp.rename(path, join(downloadedPath, "..", file))
-      }
-      // remove the old app directory created by object export
-      await fsp.rmdir(downloadedPath)
-    }
-    // enforce an export of app DB to the tmp path
-    const dbPath = join(tmpPath, DB_EXPORT_FILE)
-    await exportDB(appId, {
-      filter: defineFilter(config?.excludeRows),
-      exportPath: dbPath,
-    })
-
-    if (config?.encryptPassword) {
-      const processDirectory = async (dirPath: string, relativePath = "") => {
-        for (let file of await fsp.readdir(dirPath)) {
-          const fullPath = join(dirPath, file)
-          const relativeFilePath = relativePath
-            ? join(relativePath, file)
-            : file
-
-          // skip the attachments - too big to encrypt
-          if (file !== ATTACHMENT_DIRECTORY) {
-            const stats = await fsp.lstat(fullPath)
-            if (stats.isFile()) {
-              await encryption.encryptFile(
-                { dir: dirPath, filename: file },
-                config.encryptPassword!
-              )
-              await fsp.rm(fullPath)
-            } else if (stats.isDirectory()) {
-              await processDirectory(fullPath, relativeFilePath)
-            }
+        // skip the attachments - too big to encrypt
+        if (file !== ATTACHMENT_DIRECTORY) {
+          const stats = await fsp.lstat(fullPath)
+          if (stats.isFile()) {
+            await encryption.encryptFile(
+              { dir: dirPath, filename: file },
+              config.encryptPassword!
+            )
+            await fsp.rm(fullPath)
+          } else if (stats.isDirectory()) {
+            await processDirectory(fullPath, relativeFilePath)
           }
         }
       }
-
-      await processDirectory(tmpPath)
     }
 
-    // if tar requested, return where the tarball is
-    if (config?.tar) {
-      // now the tmpPath contains both the DB export and attachments, tar this
-      const tarPath = await tarFilesToTmp(tmpPath, await fsp.readdir(tmpPath))
-      // cleanup the tmp export files as tarball returned
-      await fsp.rm(tmpPath, { recursive: true, force: true })
+    await processDirectory(tmpPath)
+  }
 
-      return tarPath
-    }
-    // tar not requested, turn the directory where export is
-    else {
-      return tmpPath
-    }
-  })
+  // if tar requested, return where the tarball is
+  if (config?.tar) {
+    // now the tmpPath contains both the DB export and attachments, tar this
+    const tarPath = await tarFilesToTmp(tmpPath, await fsp.readdir(tmpPath))
+    // cleanup the tmp export files as tarball returned
+    await fsp.rm(tmpPath, { recursive: true, force: true })
+
+    return tarPath
+  }
+  // tar not requested, turn the directory where export is
+  else {
+    return tmpPath
+  }
 }
 
 /**

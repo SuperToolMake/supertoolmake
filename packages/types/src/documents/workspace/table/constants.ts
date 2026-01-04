@@ -12,7 +12,6 @@ export enum AutoReason {
 
 export type FieldSubType =
   | AutoFieldSubType
-  | AttachmentSubType
   | BBReferenceFieldSubType
   | JsonFieldSubType
   | StringFieldSubType
@@ -29,20 +28,10 @@ export enum JsonFieldSubType {
   ARRAY = "array",
 }
 
-export enum FormulaType {
-  STATIC = "static",
-  DYNAMIC = "dynamic",
-  AI = "ai",
-}
-
 export enum BBReferenceFieldSubType {
   USER = "user",
   /** @deprecated this should not be used anymore, left here in order to support the existing usages */
   USERS = "users",
-}
-
-export enum AttachmentSubType {
-  IMAGE = "image",
 }
 
 export enum StringFieldSubType {

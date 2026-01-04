@@ -1,10 +1,4 @@
-import {
-  cache,
-  context,
-  HTTPError,
-  objectStore,
-  utils,
-} from "@budibase/backend-core"
+import { cache, context, HTTPError, utils } from "@budibase/backend-core"
 import {
   helpers,
   isExternalColumnName,
@@ -18,7 +12,6 @@ import {
   FieldType,
   IdentityType,
   Row,
-  RowAttachment,
   Table,
   User,
 } from "@budibase/types"
@@ -37,7 +30,7 @@ import {
 } from "./bbReferenceProcessor"
 import { allocateAutoColumnValues } from "./autoColumnState"
 import { TYPE_TRANSFORM_MAP } from "./map"
-import { fixAutoColumnSubType, processFormulas } from "./utils"
+import { fixAutoColumnSubType } from "./utils"
 
 export * from "./attachments"
 export * from "./utils"
@@ -228,32 +221,9 @@ export async function inputProcessing(
     if (!field) {
       continue
     }
-    // remove any formula values, they are to be generated
-    if (field.type === FieldType.FORMULA) {
-      delete clonedRow[key]
-    }
-    // otherwise coerce what is there to correct types
-    else {
-      clonedRow[key] = coerce(value, field.type)
-    }
+    clonedRow[key] = coerce(value, field.type)
 
-    // remove any attachment urls, they are generated on read
-    if (field.type === FieldType.ATTACHMENTS) {
-      const attachments = clonedRow[key]
-      if (attachments?.length) {
-        attachments.forEach((attachment: RowAttachment) => {
-          delete attachment.url
-        })
-      }
-    } else if (
-      field.type === FieldType.ATTACHMENT_SINGLE ||
-      field.type === FieldType.SIGNATURE_SINGLE
-    ) {
-      const attachment = clonedRow[key]
-      if (attachment?.url) {
-        delete clonedRow[key].url
-      }
-    } else if (
+    if (
       value &&
       (field.type === FieldType.BB_REFERENCE_SINGLE ||
         helpers.schema.isDeprecatedSingleUserColumn(field))
@@ -340,38 +310,7 @@ export async function coreOutputProcessing(
 
   // process complex types: attachments, bb references...
   for (const [property, column] of Object.entries(table.schema)) {
-    if (
-      column.type === FieldType.ATTACHMENTS ||
-      column.type === FieldType.ATTACHMENT_SINGLE ||
-      column.type === FieldType.SIGNATURE_SINGLE
-    ) {
-      for (const row of rows) {
-        if (row[property] == null) {
-          continue
-        }
-        const process = async (attachment: RowAttachment) => {
-          if (attachment.key) {
-            attachment.url = await objectStore.getAppFileUrl(attachment.key)
-          }
-          return attachment
-        }
-        if (typeof row[property] === "string" && row[property].length) {
-          row[property] = JSON.parse(row[property])
-        }
-        if (Array.isArray(row[property])) {
-          await Promise.all(
-            row[property].map((attachment: RowAttachment) =>
-              process(attachment)
-            )
-          )
-        } else {
-          await process(row[property])
-        }
-      }
-    } else if (
-      !opts.skipBBReferences &&
-      column.type == FieldType.BB_REFERENCE
-    ) {
+    if (!opts.skipBBReferences && column.type == FieldType.BB_REFERENCE) {
       for (const row of rows) {
         row[property] = await processOutputBBReferences(
           row[property],
@@ -447,9 +386,6 @@ export async function coreOutputProcessing(
       }
     }
   }
-
-  // process formulas after the complex types had been processed
-  rows = await processFormulas(table, rows, { dynamic: true })
 
   // remove null properties to match internal API
   const isExternal = isExternalTableID(table._id!)

@@ -12,7 +12,6 @@ import BullQueue, {
 import { addListeners, StalledFn } from "./listeners"
 import { Duration } from "../utils"
 import * as timers from "../timers"
-import tracer from "dd-trace"
 import sizeof from "object-sizeof"
 
 export type { QueueOptions, Queue, JobOptions } from "bull"
@@ -30,26 +29,6 @@ async function cleanup() {
   for (let queue of QUEUES) {
     await queue.clean(CLEANUP_PERIOD_MS, "completed")
     await queue.clean(CLEANUP_PERIOD_MS, "failed")
-  }
-}
-
-async function withMetrics<T>(
-  name: string,
-  cb: () => Promise<T>,
-  tags?: Record<string, string | number>
-): Promise<T> {
-  const start = performance.now()
-  try {
-    const result = await cb()
-    tracer.dogstatsd.increment(`${name}.success`, 1, tags)
-    return result
-  } catch (err) {
-    tracer.dogstatsd.increment(`${name}.error`, 1, tags)
-    throw err
-  } finally {
-    const durationMs = performance.now() - start
-    tracer.dogstatsd.distribution(`${name}.duration.ms`, durationMs, tags)
-    tracer.dogstatsd.increment(name, 1, tags)
   }
 }
 
@@ -166,37 +145,10 @@ export class BudibaseQueue<T> {
     }
 
     const processCallback = async (job: Job<T>, done?: DoneCallback) => {
-      await tracer.trace("queue.process", async span => {
-        // @ts-expect-error monkey patching the parent span id
-        if (job.data._parentSpanContext) {
-          // @ts-expect-error monkey patching the parent span id
-          const parentContext = job.data._parentSpanContext
-          const parent = {
-            traceId: parentContext.traceId,
-            spanId: parentContext.spanId,
-            toTraceId: () => parentContext.traceId,
-            toSpanId: () => parentContext.spanId,
-            toTraceparent: () => "",
-          }
-          span.addLink(parent)
-        }
-        span.addTags({ "queue.name": this.jobQueue, ...jobTags(job) })
-        if (this.opts.jobTags) {
-          span.addTags(this.opts.jobTags(job.data))
-        }
-
-        tracer.dogstatsd.distribution(
-          "queue.process.sizeBytes",
-          sizeof(job.data),
-          this.metricTags()
-        )
-        await this.withMetrics("queue.process", () => {
-          if (done) {
-            return cb(job, done)
-          }
-          return cb(job)
-        })
-      })
+      if (done) {
+        return cb(job, done)
+      }
+      return cb(job)
     }
 
     let wrappedCb
@@ -215,38 +167,7 @@ export class BudibaseQueue<T> {
   }
 
   async add(data: T, opts?: JobOptions): Promise<Job<T>> {
-    return await tracer.trace("queue.add", async span => {
-      span.addTags({
-        "queue.name": this.jobQueue,
-        "job.data.sizeBytes": sizeof(data),
-        ...jobOptsTags(opts || {}),
-      })
-      if (this.opts.jobTags) {
-        span.addTags(this.opts.jobTags(data))
-      }
-      // @ts-expect-error monkey patching the parent span id
-      data._parentSpanContext = {
-        traceId: span.context().toTraceId(),
-        spanId: span.context().toSpanId(),
-      }
-
-      tracer.dogstatsd.distribution(
-        "queue.add.sizeBytes",
-        sizeof(data),
-        this.metricTags()
-      )
-      return await this.withMetrics("queue.add", () =>
-        this.queue.add(data, opts)
-      )
-    })
-  }
-
-  private withMetrics<T>(name: string, cb: () => Promise<T>) {
-    return withMetrics(name, cb, this.metricTags())
-  }
-
-  private metricTags() {
-    return { queueName: this.jobQueue }
+    return this.queue.add(data, opts)
   }
 
   close(doNotWaitJobs?: boolean) {

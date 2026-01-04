@@ -38,10 +38,7 @@ export interface Query extends Document {
   datasourceId: string
   name: string
   parameters: QueryParameter[]
-  fields: RestQueryFields &
-    SQLQueryFields &
-    MongoQueryFields &
-    GoogleSheetsQueryFields
+  fields: RestQueryFields & SQLQueryFields & MongoQueryFields
   transformer: string | null
   schema: Record<string, QuerySchema | string>
   nestedSchemaFields?: Record<string, Record<string, QuerySchema | string>>
@@ -111,12 +108,6 @@ export interface MongoQueryFields {
       | "deleteMany"
   }
   json?: object | string
-}
-
-export interface GoogleSheetsQueryFields {
-  sheet?: string
-  rowIndex?: string
-  row?: Row
 }
 
 export interface PaginationConfig {

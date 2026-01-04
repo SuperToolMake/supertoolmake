@@ -44,11 +44,6 @@ readRoutes
     paramResource("sourceId"),
     rowController.search
   )
-  .get(
-    "/api/:sourceId/rows/:rowId/attachment/:columnName",
-    paramSubResource("sourceId", "rowId"),
-    rowController.downloadAttachment
-  )
 
 writeRoutes
   .post("/api/:sourceId/rows", paramResource("sourceId"), rowController.save)

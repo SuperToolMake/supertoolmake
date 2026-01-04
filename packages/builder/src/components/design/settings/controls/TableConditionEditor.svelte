@@ -17,7 +17,7 @@
   import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
   import { QueryUtils, Constants, FilterUsers } from "@budibase/frontend-core"
   import { generate } from "shortid"
-  import { FieldType, FormulaType } from "@budibase/types"
+  import { FieldType } from "@budibase/types"
   import { dndzone } from "svelte-dnd-action"
   import { flip } from "svelte/animate"
 
@@ -59,10 +59,6 @@
   $: hasValueOption = type !== FieldType.STRING
   $: operatorOptions = QueryUtils.getValidOperatorsForType({
     type,
-
-    // We can filter on any formula columns here since we already have the data
-    // on the page, so adding this ensures formula columns get operators
-    formulaType: FormulaType.STATIC,
   })
 
   const getValueTypeOptions = type => {

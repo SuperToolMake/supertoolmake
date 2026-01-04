@@ -8,7 +8,6 @@
     roles,
     dataEnvironmentStore,
     dataAPI,
-    deploymentStore,
   } from "@/stores/builder"
   import { themeStore, admin } from "@/stores/portal"
   import { TableNames } from "@/constants"
@@ -36,14 +35,11 @@
     type Datasource,
     type UIDatasource,
     type UIInternalDatasource,
-    FieldType,
-    FormulaType,
   } from "@budibase/types"
 
   let generateButton: GridGenerateButton
   let grid: Grid
   let gridContext: GridStore | undefined
-  let lastPublishCount = 0
 
   const dataLayoutContext = getContext("data-layout") as {
     registerGridDispatch?: Function
@@ -98,11 +94,7 @@
     isInternal || tableDatasource?.usesEnvironmentVariables
   $: isProductionMode =
     $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION
-  $: hasStaticFormulas = Object.values($tables.selected?.schema || {}).some(
-    field =>
-      field.type === FieldType.FORMULA &&
-      field.formulaType === FormulaType.STATIC
-  )
+
   $: externalClipboardData = {
     clipboard: gridClipboard,
     tableId: id,
@@ -114,20 +106,6 @@
         data.viewId
       )
     },
-  }
-
-  $: {
-    const publishCount = $deploymentStore.publishCount
-    if (publishCount > lastPublishCount) {
-      lastPublishCount = publishCount
-      if (
-        $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION &&
-        hasStaticFormulas &&
-        gridContext?.rows?.actions?.refreshData
-      ) {
-        gridContext.rows.actions.refreshData().catch(() => {})
-      }
-    }
   }
 
   const relationshipSupport = (

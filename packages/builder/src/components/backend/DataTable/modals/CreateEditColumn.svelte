@@ -39,12 +39,10 @@
   import { buildAutoColumn, getAutoColumnInformation } from "@/helpers/utils"
   import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
   import ModalBindableInput from "@/components/common/bindings/ModalBindableInput.svelte"
-  import { getBindings } from "@/components/backend/DataTable/formula"
   import JSONSchemaModal from "./JSONSchemaModal.svelte"
   import {
     BBReferenceFieldSubType,
     FieldType,
-    FormulaType,
     SourceName,
   } from "@budibase/types"
   import RelationshipSelector from "@/components/common/RelationshipSelector.svelte"
@@ -58,7 +56,6 @@
     FieldSchema,
     UIField,
     AutoFieldSubType,
-    FormulaResponseType,
     FieldSchemaConfig,
     UIFieldSchema,
   } from "@budibase/types"
@@ -125,9 +122,6 @@
     FIELDS.LONGFORM,
     FIELDS.USER,
     FIELDS.USERS,
-    FIELDS.ATTACHMENT_SINGLE,
-    FIELDS.ATTACHMENTS,
-    FIELDS.FORMULA,
     FIELDS.JSON,
     FIELDS.BARCODEQR,
     FIELDS.SIGNATURE_SINGLE,
@@ -135,7 +129,6 @@
     FIELDS.AUTO,
   ]
 
-  $: rowGoldenSample = RowUtils.generateGoldenSample($rows)
   $: if (hasPrimaryDisplay && editableColumn.constraints) {
     editableColumn.constraints.presence = { allowEmpty: false }
   }
@@ -230,7 +223,7 @@
     (originalName &&
       SWITCHABLE_TYPES[field.type] &&
       !editableColumn?.autocolumn)
-  $: allowedTypes = getAllowedTypes(datasource, table)
+  $: allowedTypes = getAllowedTypes(table)
   $: orderedAllowedTypes = fixedTypeOrder
     .filter(ordered =>
       allowedTypes.find(allowed => allowed.type === ordered.type)
@@ -267,7 +260,6 @@
     FIELDS.DATETIME,
     FIELDS.LINK,
     FIELDS.LONGFORM,
-    FIELDS.FORMULA,
     FIELDS.BARCODEQR,
     FIELDS.BIGINT,
   ]
@@ -449,8 +441,6 @@
       "subtype",
       "tableId",
       "relationshipType",
-      "formulaType",
-      "responseType",
     ]
     for (let column of columnsToClear) {
       if (column in editableColumn) {
@@ -475,12 +465,6 @@
     // Default relationships many to many
     if (editableColumn.type === FieldType.LINK) {
       editableColumn.relationshipType = RelationshipType.MANY_TO_MANY
-    } else if (editableColumn.type === FieldType.FORMULA) {
-      editableColumn.formulaType = FormulaType.DYNAMIC
-      editableColumn.responseType =
-        field && "responseType" in field
-          ? field.responseType
-          : (FIELDS.STRING.type as FormulaResponseType)
     }
   }
 
@@ -505,14 +489,8 @@
     deleteColName = ""
   }
 
-  function getAllowedTypes(
-    datasource: Datasource | undefined,
-    table: Table | undefined
-  ): UIField[] {
+  function getAllowedTypes(table: Table | undefined): UIField[] {
     const isSqlTable = table?.sql
-    const isGoogleSheet =
-      table?.sourceType === DB_TYPE_EXTERNAL &&
-      datasource?.source === SourceName.GOOGLE_SHEETS
     if (originalName) {
       let possibleTypes = SWITCHABLE_TYPES[field.type] || [editableColumn.type]
       if (
@@ -551,27 +529,15 @@
         ...allTableFields,
         FIELDS.USER,
         FIELDS.USERS,
-        FIELDS.ATTACHMENT_SINGLE,
-        FIELDS.ATTACHMENTS,
-        FIELDS.SIGNATURE_SINGLE,
         FIELDS.JSON,
         FIELDS.AUTO,
       ]
       return fields
     }
     if (isExternalTable && isSqlTable) {
-      return [
-        ...allTableFields,
-        FIELDS.USER,
-        FIELDS.USERS,
-        FIELDS.ATTACHMENT_SINGLE,
-        FIELDS.ATTACHMENTS,
-        FIELDS.SIGNATURE_SINGLE,
-      ]
-    } else if (isExternalTable && isGoogleSheet) {
-      // google-sheets supports minimum set (no attachments or user references)
-      return allTableFields
-    } else if (isExternalTable && !isSqlTable) {
+      return [...allTableFields, FIELDS.USER, FIELDS.USERS]
+    }
+    if (isExternalTable && !isSqlTable) {
       // filter out SQL-specific types for non-SQL datasources
       return allTableFields.filter(x => x !== FIELDS.LINK && x !== FIELDS.ARRAY)
     }
@@ -867,70 +833,6 @@
       {tableOptions}
       {errors}
     />
-  {:else if editableColumn.type === FieldType.FORMULA}
-    {#if !isExternalTable}
-      <div class="split-label">
-        <div class="label-length">
-          <Label size="M">Formula Type</Label>
-        </div>
-        <div class="input-length">
-          <Select
-            bind:value={editableColumn.formulaType}
-            options={[
-              { label: "Dynamic", value: "dynamic" },
-              { label: "Static", value: "static" },
-            ]}
-            disabled={!isCreating}
-            getOptionLabel={option => option.label}
-            getOptionValue={option => option.value}
-            tooltip="Dynamic formula are calculated when retrieved, but cannot be filtered or sorted by,
-         while static formula are calculated when the row is saved."
-          />
-        </div>
-      </div>
-    {/if}
-    <div class="split-label">
-      <div class="label-length">
-        <Label size="M">Response Type</Label>
-      </div>
-      <div class="input-length">
-        <Select
-          bind:value={editableColumn.responseType}
-          options={[
-            FIELDS.STRING,
-            FIELDS.NUMBER,
-            FIELDS.BOOLEAN,
-            FIELDS.DATETIME,
-          ]}
-          getOptionLabel={option => option.name}
-          getOptionValue={option => option.type}
-          tooltip="Formulas by default will return a string - however if you need another type the response can be coerced."
-        />
-      </div>
-    </div>
-    <div class="split-label">
-      <div class="label-length">
-        <Label size="M">Formula</Label>
-      </div>
-      <div class="input-length">
-        <ModalBindableInput
-          panel={ServerBindingPanel}
-          title="Formula"
-          value={editableColumn.formula}
-          on:change={e => {
-            if (editableColumn.type === FieldType.FORMULA) {
-              editableColumn = {
-                ...editableColumn,
-                formula: e.detail,
-              }
-            }
-          }}
-          bindings={getBindings({ table })}
-          allowJS
-          context={rowGoldenSample}
-        />
-      </div>
-    </div>
   {:else if editableColumn.type === FieldType.JSON}
     <Button primary on:click={openJsonSchemaEditor}>Open schema editor</Button>
   {/if}

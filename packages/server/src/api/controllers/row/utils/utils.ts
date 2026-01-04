@@ -9,10 +9,7 @@ import {
   Row,
   Table,
 } from "@budibase/types"
-import {
-  processDates,
-  processFormulas,
-} from "../../../../utilities/rowProcessor"
+import { processDates } from "../../../../utilities/rowProcessor"
 import { isKnexRows } from "./sqlUtils"
 import { basicProcessing, generateIdForRow } from "./basic"
 import sdk from "../../../../sdk"
@@ -50,7 +47,6 @@ export async function processRelationshipFields(
       }
       // process additional types
       relatedRow = processDates(table, relatedRow)
-      relatedRow = await processFormulas(linkedTable, relatedRow)
       row[relationship.column][key] = relatedRow
     }
   }

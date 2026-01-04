@@ -1,7 +1,3 @@
-if (process.env.DD_APM_ENABLED) {
-  require("./ddApm")
-}
-
 // need to load environment first
 import {
   auth,

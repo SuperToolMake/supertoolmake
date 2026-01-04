@@ -39,8 +39,6 @@ export interface ExportRowsRequest {
 
 export type ExportRowsResponse = ReadStream
 
-export type DownloadAttachmentResponse = stream.PassThrough | stream.Readable
-
 export interface FindRowResponse extends Row {}
 
 export interface DeleteRows {

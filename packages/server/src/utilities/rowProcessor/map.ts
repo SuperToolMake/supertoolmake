@@ -85,13 +85,6 @@ export const TYPE_TRANSFORM_MAP: Record<
     //@ts-ignore
     [undefined]: undefined,
   },
-  [FieldType.FORMULA]: {
-    "": null,
-    //@ts-ignore
-    [null]: null,
-    //@ts-ignore
-    [undefined]: undefined,
-  },
   [FieldType.LONGFORM]: {
     "": null,
     //@ts-ignore
@@ -146,16 +139,6 @@ export const TYPE_TRANSFORM_MAP: Record<
       }
     },
   },
-  [FieldType.ATTACHMENTS]: {
-    //@ts-ignore
-    [null]: [],
-    //@ts-ignore
-    [undefined]: undefined,
-    parse: parseArrayString,
-  },
-  [FieldType.ATTACHMENT_SINGLE]: {
-    "": null,
-  },
   [FieldType.BOOLEAN]: {
     "": null,
     //@ts-ignore
@@ -184,6 +167,5 @@ export const TYPE_TRANSFORM_MAP: Record<
     },
   },
   [FieldType.BB_REFERENCE_SINGLE]: {},
-  [FieldType.SIGNATURE_SINGLE]: {},
   [FieldType.INTERNAL]: {},
 }
