@@ -28,17 +28,6 @@ export const getComponentFixture = type => {
 // All currently defined component definitions in the client.
 export const COMPONENT_DEFINITIONS = manifest
 
-// Sample plugin definitions
-export const PLUGIN_DEFINITIONS = {
-  "budi-video": {
-    component: "plugin/budi-video",
-    description: "Embedded video component.",
-    friendlyName: "Budi Video",
-    icon: "film-slate",
-    name: "budi-video",
-  },
-}
-
 // Take a component array and turn it into a deeply nested tree
 export const componentsToNested = components => {
   let nested
@@ -73,25 +62,6 @@ export const componentDefinitionMap = () => {
   }, {})
 }
 
-export const pluginDefinitionMap = () => {
-  return Object.keys(PLUGIN_DEFINITIONS).reduce((acc, key) => {
-    const def = PLUGIN_DEFINITIONS[key]
-    acc[`plugin/${key}`] = def
-    return acc
-  }, {})
-}
-
-export const getPluginFixture = pluginName => {
-  const fakeName = pluginName || v4().replace(/-/g, "")
-  return {
-    _id: `plg_${fakeName}`,
-    name: fakeName,
-    version: "1.0.0",
-    hash: v4().replace(/-/g, ""),
-    jsUrl: `/files/signed/plugins/${fakeName}/plugin.min.js`,
-  }
-}
-
 export const generateFakeRoutes = screens => {
   return {
     routes: screens.reduce((acc, screen, idx) => {
@@ -112,7 +82,6 @@ export const generateFakeRoutes = screens => {
 }
 
 export const generateAppPackage = ({
-  plugins = 0,
   version = "1.0.0",
   upgradableVersion,
   revertableVersion,
@@ -122,10 +91,6 @@ export const generateAppPackage = ({
   url = "/test-app",
 }) => {
   const appId = "app_dev_" + getDocId()
-
-  const fakePlugins = Array(plugins)
-    .fill()
-    .map(() => getPluginFixture())
 
   const features = {}
   features["componentValidation"] = appValidation
@@ -141,7 +106,6 @@ export const generateAppPackage = ({
       upgradableVersion,
       revertableVersion,
       componentLibraries: ["@budibase/standard-components"],
-      usedPlugins: [...fakePlugins],
       name,
       url,
       instance: {

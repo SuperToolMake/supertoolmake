@@ -1,5 +1,5 @@
 export * from "./bindings"
-export * from "./BudibaseApp"
+export * from "./App"
 export * from "./common"
 export * from "./components"
 export * from "./dataFetch"

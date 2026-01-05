@@ -23,10 +23,8 @@ import {
   AppCustomTheme,
   PreviewDevice,
   AppNavigation,
-  Plugin,
   Snippet,
   UIComponentError,
-  CustomComponent,
   Table,
   DataFetchDatasource,
 } from "@budibase/types"
@@ -45,8 +43,6 @@ if (typeof window !== "undefined") {
 
 import * as svelte from "svelte"
 import * as svelteStore from "svelte/store"
-// Legacy Svelte 4 runtime for plugin compatibility
-import * as svelteLegacy from "svelte-legacy"
 // @ts-ignore
 import * as svelteLegacyStore from "svelte-legacy/store"
 // @ts-ignore
@@ -55,11 +51,6 @@ import * as svelteInternal from "svelte/internal/client"
 import * as svelteLegacyInternal from "svelte-legacy/internal"
 
 window.svelte = svelte
-// Expose legacy runtime under dedicated globals so Svelte 5 consumers stay untouched
-// @ts-ignore - augmenting the window at runtime
-window.svelteLegacy = svelteLegacy
-// @ts-ignore - augmenting the window at runtime
-window.svelteLegacyStore = svelteLegacyStore
 // @ts-ignore - augmenting the window at runtime
 window.svelteLegacyInternal = svelteLegacyInternal
 // Provide the legacy global names that Svelte 4 bundles hardcode
@@ -67,7 +58,6 @@ window.svelteLegacyInternal = svelteLegacyInternal
 window.svelte_internal = svelteLegacyInternal
 // @ts-ignore - augmenting the window at runtime
 window.svelte_store = svelteLegacyStore
-// Maintain existing camelCase aliases expected by some plugins
 // @ts-ignore - augmenting the window at runtime
 window.svelteStore = svelteStore
 // @ts-ignore - augmenting the window at runtime
@@ -88,10 +78,8 @@ declare global {
     "##BUDIBASE_APP_EMBEDDED##"?: string // This is a bool wrapped in a string
     "##BUDIBASE_PREVIEW_NAVIGATION##"?: AppNavigation
     "##BUDIBASE_HIDDEN_COMPONENT_IDS##"?: string[]
-    "##BUDIBASE_USED_PLUGINS##"?: Plugin[]
     "##BUDIBASE_SNIPPETS##"?: Snippet[]
     "##BUDIBASE_COMPONENT_ERRORS##"?: Record<string, UIComponentError[]>
-    "##BUDIBASE_CUSTOM_COMPONENTS##"?: CustomComponent[]
 
     // Other flags
     MIGRATING_APP: boolean
@@ -101,7 +89,6 @@ declare global {
 
     // Client additions
     handleBuilderRuntimeEvent: (type: string, data: any) => void
-    registerCustomComponent: typeof componentStore.actions.registerCustomComponent
     loadBudibase: typeof loadBudibase
     svelte: typeof svelte
     svelteStore: typeof svelteStore
@@ -145,7 +132,6 @@ const loadBudibase = async () => {
     previewDevice: window["##BUDIBASE_PREVIEW_DEVICE##"],
     navigation: window["##BUDIBASE_PREVIEW_NAVIGATION##"],
     hiddenComponentIds: window["##BUDIBASE_HIDDEN_COMPONENT_IDS##"],
-    usedPlugins: window["##BUDIBASE_USED_PLUGINS##"],
     snippets: window["##BUDIBASE_SNIPPETS##"],
     componentErrors: window["##BUDIBASE_COMPONENT_ERRORS##"],
   })
@@ -216,19 +202,6 @@ const loadBudibase = async () => {
       routeStore.actions.setTestUrlParams(route, testValue)
     }
   }
-
-  // Register any custom components
-  if (window["##BUDIBASE_CUSTOM_COMPONENTS##"]) {
-    window["##BUDIBASE_CUSTOM_COMPONENTS##"].forEach(component => {
-      componentStore.actions.registerCustomComponent(component)
-    })
-  }
-
-  // Make a callback available for custom component bundles to register
-  // themselves at runtime
-  window.registerCustomComponent =
-    componentStore.actions.registerCustomComponent
-
   // Initialise websocket
   initWebsocket()
 

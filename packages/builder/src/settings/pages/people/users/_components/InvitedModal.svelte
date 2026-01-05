@@ -55,7 +55,7 @@
   {#if hasSuccess}
     <Body size="XS">
       Your users should now receive an email invite to get access to their
-      Budibase account
+      SuperToolMake account
     </Body>
   {/if}
   {#if hasFailure}

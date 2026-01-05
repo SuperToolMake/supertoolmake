@@ -1,25 +1,22 @@
 <script>
   import {
     ActionButton,
-    Body,
     Button,
     Divider,
     Heading,
     Layout,
     notifications,
-    Link,
     FancyForm,
     FancyInput,
   } from "@budibase/bbui"
   import { goto } from "@roxi/routify"
-  import { auth, organisation, oidc, admin } from "@/stores/portal"
+  import { auth, organisation, oidc } from "@/stores/portal"
   import GoogleButton from "./_components/GoogleButton.svelte"
   import OIDCButton from "./_components/OIDCButton.svelte"
   import { handleError } from "./_components/utils"
   import Logo from "assets/bb-emblem.svg"
   import { onMount } from "svelte"
   import { pushNumSessionsInvalidated } from "../../../../../frontend-core/src"
-  import { CookieUtils, Constants } from "@budibase/frontend-core"
 
   $goto
 
@@ -28,8 +25,7 @@
   let errors = {}
   let formData = {}
 
-  $: company = $organisation.company || "Budibase"
-  $: cloud = $admin.cloud
+  $: company = $organisation.company || "SuperToolMake"
 
   async function login() {
     form.validate()
@@ -77,7 +73,7 @@
             <img alt="logo" src={$organisation.logoUrl || Logo} />
           {/if}
           <Heading size="M" textAlign="center">
-            {$organisation.loginHeading || "Log in to Budibase"}
+            {$organisation.loginHeading || "Log in to SuperToolMake"}
           </Heading>
         </Layout>
         <Layout gap="S" noPadding>
@@ -154,21 +150,6 @@
               </ActionButton>
             </div>
           </Layout>
-        {/if}
-
-        {#if cloud}
-          <Body size="xs" textAlign="center">
-            By using Budibase Cloud
-            <br />
-            you are agreeing to our
-            <Link
-              href="https://budibase.com/eula"
-              target="_blank"
-              secondary={true}
-            >
-              License Agreement
-            </Link>
-          </Body>
         {/if}
       </Layout>
     </div>

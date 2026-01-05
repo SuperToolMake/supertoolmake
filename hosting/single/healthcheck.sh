@@ -11,17 +11,17 @@ else
 fi
 
 if [[ $(curl -Lfk -s -w "%{http_code}\n" http://localhost/ -o /dev/null) -ne 200 ]]; then
-  echo 'ERROR: Budibase is not running';
+  echo 'ERROR: SuperToolMake is not running';
   healthy=false
 fi
 
 if [[ $(curl -s -w "%{http_code}\n" http://localhost:4001/health -o /dev/null) -ne 200 ]]; then
-    echo 'ERROR: Budibase backend is not running';
+    echo 'ERROR: SuperToolMake backend is not running';
     healthy=false
 fi
 
 if [[ $(curl -s -w "%{http_code}\n" http://localhost:4002/health -o /dev/null) -ne 200 ]]; then
-    echo 'ERROR: Budibase worker is not running';
+    echo 'ERROR: SuperToolMake worker is not running';
     healthy=false
 fi
 

@@ -284,10 +284,10 @@
       }
     } else {
       // the relateFrom.fieldName should remain the same, as it is the foreignKey in the other
-      // table, this is due to the way that budibase represents relationships, the fieldName in a
+      // table, this is due to the way that supertoolmake represents relationships, the fieldName in a
       // link column schema is the column linked to (FK in this case). The foreignKey column is
       // essentially what is linked to in the from table, this is unique to SQL as this isn't a feature
-      // of Budibase internal tables.
+      // of SuperToolMake internal tables.
       // Essentially this means the fieldName is what we are linking to in the other table, and the
       // foreignKey is what is linking out of the current table.
       relateFrom = {
@@ -468,7 +468,7 @@
     <Detail>Column names</Detail>
   </div>
   <Body>
-    Budibase manages SQL relationships as a new column in the table, please
+    SuperToolMake manages SQL relationships as a new column in the table, please
     provide a name for these columns.
   </Body>
   <Input

@@ -35,7 +35,7 @@
     <div class="loading placeholder">
       <ProgressCircle />
     </div>
-    <iframe title="Budibase App Preview" {src}></iframe>
+    <iframe title="App Preview" {src}></iframe>
   </div>
 </div>
 

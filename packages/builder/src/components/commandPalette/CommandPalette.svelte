@@ -71,7 +71,9 @@
       name: "Raise Github Discussion",
       icon: "question",
       action: () =>
-        window.open(`https://github.com/Budibase/budibase/discussions/new`),
+        window.open(
+          `https://github.com/SuperToolMake/supertoolmake/discussions/new`
+        ),
       requiresApp: true,
     },
     {
@@ -80,7 +82,7 @@
       icon: "bug",
       action: () =>
         window.open(
-          `https://github.com/Budibase/budibase/issues/new?assignees=&labels=bug&template=bug_report.md&title=`
+          `https://github.com/SuperToolMake/supertoolmake/issues/new?assignees=&labels=bug&template=bug_report.md&title=`
         ),
       requiresApp: true,
     },
@@ -110,10 +112,6 @@
       {
         name: "Design",
         url: "/builder/workspace/:application/design",
-      },
-      {
-        name: "Automations",
-        url: "/builder/workspace/:application/automation",
       },
     ]
     return routes.map(route => ({

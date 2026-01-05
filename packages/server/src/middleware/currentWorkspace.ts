@@ -12,7 +12,7 @@ import type { Middleware, Next } from "koa"
 import { generateUserMetadataID, isDevWorkspaceID } from "../db/utils"
 import env from "../environment"
 import { getCachedSelf } from "../utilities/global"
-import { isApiKey, isBrowser, isWebhookEndpoint } from "./utils"
+import { isApiKey, isBrowser } from "./utils"
 
 export const currentWorkspaceMiddleware = (async (ctx: UserCtx, next: Next) => {
   // try to get the workspaceID from the request
@@ -25,7 +25,6 @@ export const currentWorkspaceMiddleware = (async (ctx: UserCtx, next: Next) => {
   if (isBrowser(ctx) && !isApiKey(ctx)) {
     if (
       isDevWorkspaceID(requestWorkspaceId) &&
-      !isWebhookEndpoint(ctx) &&
       !users.isBuilder(ctx.user, requestWorkspaceId)
     ) {
       return ctx.redirect("/")

@@ -2,11 +2,11 @@
   "name": "@budibase/worker",
   "email": "hi@budibase.com",
   "version": "0.0.0",
-  "description": "Budibase background service",
+  "description": "Background service",
   "main": "src/index.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Budibase/budibase.git"
+    "url": "https://github.com/SuperToolMake/supertoolmake.git"
   },
   "keywords": [
     "budibase"

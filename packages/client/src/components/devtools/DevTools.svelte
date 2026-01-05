@@ -16,7 +16,7 @@
   {#if $devToolsStore.visible}
     <Layout noPadding gap="XS">
       <div class="header">
-        <Heading size="XS">Budibase DevTools</Heading>
+        <Heading size="XS">DevTools</Heading>
         <Icon
           hoverable
           name="x"

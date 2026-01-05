@@ -29,7 +29,7 @@ const read = [],
  *     responses:
  *       200:
  *         description: Returns the created row, including the ID which has been generated for it.
- *           This can be found in the Budibase portal, viewed under the developer information.
+ *           This can be found in the portal, viewed under the developer information.
  *         content:
  *           application/json:
  *             schema:

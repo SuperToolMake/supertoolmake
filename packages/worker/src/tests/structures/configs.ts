@@ -81,7 +81,7 @@ export function settings(conf?: Partial<SettingsInnerConfig>): SettingsConfig {
     config: {
       platformUrl: "http://localhost:10000",
       logoUrl: "",
-      company: "Budibase",
+      company: "SuperToolMake",
       ...conf,
     },
   }

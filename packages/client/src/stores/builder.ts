@@ -9,7 +9,6 @@ import {
   Theme,
   AppCustomTheme,
   AppNavigation,
-  Plugin,
   Snippet,
   UIComponentError,
 } from "@budibase/types"
@@ -25,7 +24,6 @@ interface BuilderStore {
   previewDevice?: PreviewDevice
   navigation?: AppNavigation | null
   hiddenComponentIds?: string[]
-  usedPlugins?: Plugin[] | null
   metadata: { componentId: string; step: number } | null
   snippets?: Snippet[] | null
   componentErrors?: Record<string, UIComponentError[]>
@@ -43,7 +41,6 @@ const createBuilderStore = () => {
     previewDevice: "desktop",
     navigation: null,
     hiddenComponentIds: [],
-    usedPlugins: null,
     metadata: null,
     snippets: null,
     componentErrors: {},
@@ -129,23 +126,6 @@ const createBuilderStore = () => {
     },
     ejectBlock: (id: string, definition: ComponentDefinition) => {
       eventStore.actions.dispatchEvent("eject-block", { id, definition })
-    },
-    updateUsedPlugin: (name: string, hash: string) => {
-      // Check if we used this plugin
-      const used = get(store)?.usedPlugins?.find(x => x.name === name)
-      if (used) {
-        store.update(state => {
-          state.usedPlugins = state.usedPlugins!.filter(x => x.name !== name)
-          state.usedPlugins.push({
-            ...used,
-            hash,
-          })
-          return state
-        })
-      }
-
-      // Notify the builder so we can reload component definitions
-      eventStore.actions.dispatchEvent("reload-plugin")
     },
     addParentComponent: (componentId: string, parentType: string) => {
       eventStore.actions.dispatchEvent("add-parent-component", {

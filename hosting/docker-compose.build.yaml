@@ -28,7 +28,6 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       BB_ADMIN_USER_EMAIL: ${BB_ADMIN_USER_EMAIL}
       BB_ADMIN_USER_PASSWORD: ${BB_ADMIN_USER_PASSWORD}
-      PLUGINS_DIR: ${PLUGINS_DIR}
       TENANT_FEATURE_FLAGS: ""
     depends_on:
       - worker-service

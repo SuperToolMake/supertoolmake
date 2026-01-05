@@ -3,7 +3,7 @@ import { EmailTemplatePurpose } from "@budibase/types"
 import { InternalTemplateBinding, LOGO_URL } from "../constants"
 import { checkSlashesInUrl } from "./index"
 
-const BASE_COMPANY = "Budibase"
+const BASE_COMPANY = "SuperToolMake"
 
 export async function getSettingsTemplateContext(
   purpose: EmailTemplatePurpose,

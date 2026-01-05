@@ -154,9 +154,6 @@ export function recurseLogicalOperators(
 /**
  * Removes any fields that contain empty strings that would cause inconsistent
  * behaviour with how backend tables are filtered (no value means no filter).
- *
- * don't do a pure falsy check, as 0 is included
- * https://github.com/Budibase/budibase/issues/10118
  */
 export const cleanupQuery = (query: SearchFilters) => {
   for (let filterField of NoEmptyFilterStrings) {

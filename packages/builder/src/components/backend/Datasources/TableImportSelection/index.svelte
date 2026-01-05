@@ -28,7 +28,7 @@
 
   $: description = isSheets
     ? "Select which spreadsheets you want to connect."
-    : "Choose what tables you want to sync with Budibase"
+    : "Choose what tables you want to sync with SuperToolMake"
 
   $: selectAllText = isSheets ? "Select all sheets" : "Select all"
 </script>

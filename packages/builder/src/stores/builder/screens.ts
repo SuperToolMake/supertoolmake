@@ -276,10 +276,6 @@ export class ScreenStore extends BudiStore<ScreenState> {
       return state
     })
 
-    if (savedScreen.pluginAdded) {
-      await appStore.refresh()
-    }
-
     await appStore.refreshAppNav()
 
     return savedScreen

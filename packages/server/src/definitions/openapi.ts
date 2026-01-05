@@ -35,7 +35,7 @@ export interface paths {
     get: operations["metricsGet"];
   };
   "/queries/{queryId}": {
-    /** Queries which have been created within a Budibase app can be executed using this, */
+    /** Queries which have been created within an app can be executed using this, */
     post: operations["queryExecute"];
   };
   "/queries/search": {
@@ -171,7 +171,7 @@ export interface components {
         createdAt: string;
         /** @description States the last time the app was updated - stored in ISO format. */
         updatedAt: string;
-        /** @description States the version of the Budibase client this app is currently based on. */
+        /** @description States the version of the client this app is currently based on. */
         version: string;
         /** @description In a multi-tenant environment this will state the tenant this app is within. */
         tenantId?: string;
@@ -196,7 +196,7 @@ export interface components {
         createdAt: string;
         /** @description States the last time the app was updated - stored in ISO format. */
         updatedAt: string;
-        /** @description States the version of the Budibase client this app is currently based on. */
+        /** @description States the version of the client this app is currently based on. */
         version: string;
         /** @description In a multi-tenant environment this will state the tenant this app is within. */
         tenantId?: string;
@@ -221,7 +221,7 @@ export interface components {
         createdAt: string;
         /** @description States the last time the app was updated - stored in ISO format. */
         updatedAt: string;
-        /** @description States the version of the Budibase client this app is currently based on. */
+        /** @description States the version of the client this app is currently based on. */
         version: string;
         /** @description In a multi-tenant environment this will state the tenant this app is within. */
         tenantId?: string;
@@ -246,7 +246,7 @@ export interface components {
         createdAt: string;
         /** @description States the last time the app was updated - stored in ISO format. */
         updatedAt: string;
-        /** @description States the version of the Budibase client this app is currently based on. */
+        /** @description States the version of the client this app is currently based on. */
         version: string;
         /** @description In a multi-tenant environment this will state the tenant this app is within. */
         tenantId?: string;
@@ -848,7 +848,7 @@ export interface components {
          * @example [object Object]
          */
         string?: { [key: string]: string };
-        /** @description Searches for a sub-string within a string column, e.g. searching for 'dib' will match 'Budibase'. */
+        /** @description Searches for a sub-string within a string column, e.g. searching for 'dib' will match 'udibase'. */
         fuzzy?: { [key: string]: unknown };
         /**
          * @description Searches within a range, the format of this must be in the format of an object with a "low" and "high" property.
@@ -1585,7 +1585,7 @@ export interface operations {
       };
     };
   };
-  /** Queries which have been created within a Budibase app can be executed using this, */
+  /** Queries which have been created within an app can be executed using this, */
   queryExecute: {
     parameters: {
       path: {
@@ -1678,7 +1678,7 @@ export interface operations {
       };
     };
     responses: {
-      /** Returns the created row, including the ID which has been generated for it. This can be found in the Budibase portal, viewed under the developer information. */
+      /** Returns the created row, including the ID which has been generated for it. This can be found in the portal, viewed under the developer information. */
       200: {
         content: {
           "application/json": components["schemas"]["rowOutput"];

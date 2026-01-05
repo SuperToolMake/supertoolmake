@@ -17,7 +17,6 @@ import Agplv3Page from "./agplv3.svelte"
 
 // App pages
 import GeneralInfoPage from "@/settings/pages/general.svelte"
-import AutomationsPage from "@/settings/pages/automations/automations.svelte"
 import EmbedPage from "@/settings/pages/embed.svelte"
 
 const componentMap = {
@@ -34,7 +33,6 @@ const componentMap = {
   diagnostics: DiagnosticsPage,
   system_logs: SystemLogsPage,
   general_info: GeneralInfoPage,
-  automations: AutomationsPage,
   embed: EmbedPage,
   agplv3: Agplv3Page,
 } satisfies Record<string, Component<any>>

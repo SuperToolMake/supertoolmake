@@ -22,7 +22,6 @@ export enum PermissionType {
   TABLE = "table",
   USER = "user",
   AUTOMATION = "automation",
-  WEBHOOK = "webhook",
   BUILDER = "builder",
   CREATOR = "creator",
   GLOBAL_BUILDER = "globalBuilder",

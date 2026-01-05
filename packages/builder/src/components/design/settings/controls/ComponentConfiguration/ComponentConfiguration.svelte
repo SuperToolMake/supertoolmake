@@ -79,7 +79,7 @@
     if (!componentType) return null
 
     // If it's already a full component reference, use it
-    if (componentType.startsWith("@") || componentType.startsWith("plugin/")) {
+    if (componentType.startsWith("@")) {
       return componentType
     }
 
@@ -111,18 +111,6 @@
     const componentType = resolvedComponentType
     if (!componentType) {
       return null
-    }
-
-    const definition = componentStore.getDefinition(componentType)
-    if (!definition) {
-      // Create a basic instance for plugin components that might not be loaded yet
-      return {
-        _id: Helpers.uuid(),
-        _component: componentType,
-        _instanceName: cfg._instanceName || Helpers.uuid(),
-        _styles: {},
-        ...cfg,
-      }
     }
 
     try {

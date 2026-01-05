@@ -18,7 +18,7 @@ describe("selectors", () => {
   })
 
   describe("hasData", () => {
-    describe("when the user has created a datasource in addition to the premade Budibase DB source", () => {
+    describe("when the user has created a datasource in addition to the premade DB source", () => {
       it("returns true", () => {
         expect(hasData({ list: [1, 1] }, { list: [] })).toBe(true)
       })

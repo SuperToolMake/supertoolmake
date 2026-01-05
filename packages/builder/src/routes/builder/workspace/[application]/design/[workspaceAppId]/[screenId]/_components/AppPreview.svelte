@@ -34,7 +34,6 @@
   let error
 
   // Messages that can be sent from the iframe preview to the builder
-  // Budibase events are and initialisation events
   const MessageTypes = {
     READY: "ready",
     ERROR: "error",
@@ -65,7 +64,6 @@
         ? [$componentStore.componentToPaste?._id]
         : [],
     isBudibaseEvent: true,
-    usedPlugins: $appStore.usedPlugins,
     location: {
       protocol: window.location.protocol,
       hostname: window.location.hostname,
@@ -191,8 +189,6 @@
     } else if (type === "eject-block") {
       const { id, definition } = data
       await componentStore.handleEjectBlock(id, definition)
-    } else if (type === "reload-plugin") {
-      await componentStore.refreshDefinitions()
     } else if (type === "drop-new-component") {
       const { component, parent, index, props } = data
       await componentStore.create(component, props, parent, index)

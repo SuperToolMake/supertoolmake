@@ -49,13 +49,6 @@ export const DefaultAppTheme = {
   navTextColor: "var(--spectrum-global-color-gray-800)",
 }
 
-export const PluginSource = {
-  URL: "URL",
-  NPM: "NPM",
-  GITHUB: "Github",
-  FILE: "File Upload",
-}
-
 export const OnboardingType = {
   EMAIL: "email",
   PASSWORD: "password",
@@ -65,14 +58,10 @@ export const PlanModel = {
   PER_USER: "perUser",
 }
 
-export const CHANGELOG_URL = "https://docs.budibase.com/changelog"
-export const DISCORD_URL = "https://discord.com/invite/ZepTmGbtfF"
+export const CHANGELOG_URL = "https://github.com/SuperToolMake/supertoolmake"
 export const DOCUMENTATION_URL = "https://docs.budibase.com/docs"
 export const GITHUB_DISCUSSIONS_URL =
-  "https://github.com/Budibase/budibase/discussions"
-export const BUDIBASE_UNIVERSITY_URL =
-  "https://vimeo.com/showcase/budibase-university"
-export const SUPPORT_EMAIL = "mailto:support@budibase.com"
+  "https://github.com/SuperToolMake/supertoolmake/discussions"
 
 export const enum AutoScreenTypes {
   BLANK = "blank",

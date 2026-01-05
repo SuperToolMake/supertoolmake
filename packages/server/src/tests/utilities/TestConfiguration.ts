@@ -51,7 +51,6 @@ import {
   TableSourceType,
   User,
   UserCtx,
-  Webhook,
   WithRequired,
   Workspace,
 } from "@budibase/types"

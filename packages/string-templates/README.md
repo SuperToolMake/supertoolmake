@@ -1,6 +1,6 @@
 # String templating
 
-This package provides a common system for string templating across the Budibase Builder, client and server.
+This package provides a common system for string templating across the Builder, client and server.
 The templating is provided through the use of [Handlebars](https://handlebarsjs.com/) an extension of Mustache
 which is capable of carrying out logic. We have also extended the base Handlebars functionality through the use
 of a set of helpers provided through the [handlebars-helpers](https://github.com/budibase/handlebars-helpers) package.
@@ -93,7 +93,7 @@ as follows:
 
 ## Development
 
-This library is built with [Rollup](https://rollupjs.org/guide/en/) as many of the packages built by Budibase are. We have
+This library is built with [Rollup](https://rollupjs.org/guide/en/) as many of the packages built are. We have
 built the string templating package as a UMD so that it can be used by Node and Browser based applications. This package also
 builds Typescript stubs which when making use of the library will be used by your IDE to provide code completion. The following
 commands are provided for development purposes:

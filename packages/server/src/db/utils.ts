@@ -148,25 +148,6 @@ export function getScreenParams(screenId?: Optional, otherProps = {}) {
   return getDocParams(DocumentType.SCREEN, screenId, otherProps)
 }
 
-/**
- * Generates a new webhook ID.
- * @returns The new webhook ID which the webhook doc can be stored under.
- */
-export function generateWebhookID() {
-  return `${DocumentType.WEBHOOK}${SEPARATOR}${newid()}`
-}
-
-/**
- * Gets parameters for retrieving a webhook, this is a utility function for the getDocParams function.
- */
-export function getWebhookParams(webhookId?: Optional, otherProps = {}) {
-  return getDocParams(DocumentType.WEBHOOK, webhookId, otherProps)
-}
-
-/**
- * Generates a new datasource ID.
- * @returns The new datasource ID which the webhook doc can be stored under.
- */
 export function generateDatasourceID({ plus = false } = {}) {
   return `${
     plus ? DocumentType.DATASOURCE_PLUS : DocumentType.DATASOURCE
@@ -262,10 +243,6 @@ export function getMemoryViewParams(
   otherProps: Partial<DocumentListParams> = {}
 ) {
   return getDocParams(DocumentType.MEM_VIEW, null, otherProps)
-}
-
-export function generatePluginID(name: string) {
-  return `${DocumentType.PLUGIN}${SEPARATOR}${name}`
 }
 
 export function generateJunctionTableID(tableId1: string, tableId2: string) {

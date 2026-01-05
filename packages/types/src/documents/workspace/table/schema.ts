@@ -75,7 +75,7 @@ export interface NumberFieldMetadata extends Omit<BaseFieldSchema, "subtype"> {
   subtype?: AutoFieldSubType.AUTO_ID
   lastID?: number
   autoReason?: AutoReason.FOREIGN_KEY
-  // used specifically when Budibase generates external tables, this denotes if a number field
+  // used specifically when external tables are generated, this denotes if a number field
   // is a foreign key used for a many-to-many relationship
   meta?: {
     toTable: string

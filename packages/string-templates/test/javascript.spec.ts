@@ -197,7 +197,7 @@ describe("Javascript", () => {
     })
   })
 
-  // the test cases here were extracted from templates/real world examples of JS in Budibase
+  // the test cases here were extracted from templates/real world examples of JS
   describe("real test cases from Budicloud", () => {
     const context = {
       "Unit Value": 2,

@@ -10,10 +10,6 @@ import { screenStore } from "./screens"
 
 import * as AppComponents from "../components/app/index.ts"
 import { ScreenslotID, ScreenslotType } from "../constants"
-import {
-  isLegacySvelteComponent,
-  wrapLegacyComponent,
-} from "@/utils/wrapLegacyComponent"
 
 export const BudibasePrefix = "@budibase/standard-components/"
 
@@ -22,8 +18,6 @@ const builtInComponentPromises = new Map()
 
 const createComponentStore = () => {
   const store = writable({
-    customComponentManifest: {},
-    customComponentMap: {},
     mountedComponents: {},
   })
 
@@ -46,7 +40,6 @@ const createComponentStore = () => {
         findComponentPathById(root, selectedComponentId) || []
 
       return {
-        customComponentManifest: $store.customComponentManifest,
         selectedComponentInstance:
           $store.mountedComponents[selectedComponentId],
         selectedComponent: component,
@@ -63,17 +56,6 @@ const createComponentStore = () => {
       return
     }
     store.update(state => {
-      // If this is a custom component, flag it so we can reload this component
-      // later if required
-      const component = instance.component
-      if (component?.startsWith("plugin")) {
-        if (!state.customComponentMap[component]) {
-          state.customComponentMap[component] = [id]
-        } else {
-          state.customComponentMap[component].push(id)
-        }
-      }
-
       // Register to mounted components
       state.mountedComponents[id] = instance
       return state
@@ -85,17 +67,6 @@ const createComponentStore = () => {
       return
     }
     store.update(state => {
-      // Remove from custom component map if required
-      const component = state.mountedComponents[id]?.instance?.component
-      let customComponentMap = state.customComponentMap
-      if (component?.startsWith("plugin")) {
-        customComponentMap[component] = customComponentMap[component].filter(
-          x => {
-            return x !== id
-          }
-        )
-      }
-
       // Remove from mounted components
       delete state.mountedComponents[id]
       return state
@@ -122,14 +93,8 @@ const createComponentStore = () => {
     }
 
     // Handle built-in components
-    if (type.startsWith(BudibasePrefix)) {
-      type = type.replace(BudibasePrefix, "")
-      return type ? Manifest[type] : null
-    }
-
-    // Handle custom components
-    const { customComponentManifest } = get(store)
-    return customComponentManifest?.[type]?.schema?.schema
+    type = type.replace(BudibasePrefix, "")
+    return type ? Manifest[type] : null
   }
 
   const getComponentConstructor = type => {
@@ -140,77 +105,44 @@ const createComponentStore = () => {
       return Router
     }
 
-    // Handle budibase components
-    if (type.startsWith(BudibasePrefix)) {
-      const split = type.split("/")
-      const name = split[split.length - 1]
+    const split = type.split("/")
+    const name = split[split.length - 1]
 
-      if (builtInComponentCache.has(name)) {
-        return builtInComponentCache.get(name)
-      }
-
-      if (builtInComponentPromises.has(name)) {
-        return builtInComponentPromises.get(name)
-      }
-
-      const loader = AppComponents[name]
-      if (!loader) {
-        console.warn(`Component loader missing for ${name}`)
-        return null
-      }
-
-      const promise = loader()
-        .then(module => {
-          const Component = module?.default ?? null
-          if (Component) {
-            builtInComponentCache.set(name, Component)
-          }
-          builtInComponentPromises.delete(name)
-          return Component
-        })
-        .catch(error => {
-          builtInComponentPromises.delete(name)
-          console.error(`Failed to load component ${name}`, error)
-          return null
-        })
-
-      builtInComponentPromises.set(name, promise)
-      return promise
+    if (builtInComponentCache.has(name)) {
+      return builtInComponentCache.get(name)
     }
 
-    // Handle custom components
-    const { customComponentManifest } = get(store)
-    return customComponentManifest?.[type]?.Component
+    if (builtInComponentPromises.has(name)) {
+      return builtInComponentPromises.get(name)
+    }
+
+    const loader = AppComponents[name]
+    if (!loader) {
+      console.warn(`Component loader missing for ${name}`)
+      return null
+    }
+
+    const promise = loader()
+      .then(module => {
+        const Component = module?.default ?? null
+        if (Component) {
+          builtInComponentCache.set(name, Component)
+        }
+        builtInComponentPromises.delete(name)
+        return Component
+      })
+      .catch(error => {
+        builtInComponentPromises.delete(name)
+        console.error(`Failed to load component ${name}`, error)
+        return null
+      })
+
+    builtInComponentPromises.set(name, promise)
+    return promise
   }
 
   const getComponentInstance = id => {
     return derived(store, $store => $store.mountedComponents[id])
-  }
-
-  const registerCustomComponent = ({ Component, schema, version }) => {
-    if (!Component || !schema?.schema?.name || !version) return
-
-    let RegisteredComponent = Component
-    if (isLegacySvelteComponent(Component)) {
-      RegisteredComponent = wrapLegacyComponent(Component)
-    }
-
-    const componentKey = `plugin/${schema.schema.name}`
-    store.update(state => {
-      state.customComponentManifest[componentKey] = {
-        Component: RegisteredComponent,
-        schema,
-      }
-      return state
-    })
-
-    // Reload any mounted instances of this custom component
-    const state = get(store)
-    if (state.customComponentMap[componentKey]?.length) {
-      state.customComponentMap[componentKey].forEach(id => {
-        state.mountedComponents[id]?.reload()
-      })
-    }
   }
 
   return {
@@ -223,7 +155,6 @@ const createComponentStore = () => {
       getComponentDefinition,
       getComponentConstructor,
       getComponentInstance,
-      registerCustomComponent,
     },
   }
 }

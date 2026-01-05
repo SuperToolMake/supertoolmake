@@ -93,13 +93,13 @@
     }
   }
 
-  const ensureWorkspaceApp = async () => {
+  const ensureWorkspaceApp = async (): Promise<string> => {
     if (!workspaceAppId) {
       const workspaceApp = await workspaceAppStore.add({
         name: $appStore.name,
         url: "/",
       })
-      workspaceAppId = workspaceApp._id
+      return workspaceApp._id
     }
     return workspaceAppId
   }
@@ -195,11 +195,22 @@
       // Focus on the main component for the screen type
       const mainComponent = screen.props?._children?.[0]._id
       $goto(
-        `/builder/workspace/${$appStore.appId}/design/${workspaceAppId}/${screen._id}/${mainComponent}`
+        `/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]`,
+        {
+          application: $appStore.appId,
+          workspaceAppId: workspaceAppId!,
+          screenId: screen._id!,
+          componentId: mainComponent!,
+        }
       )
     } else {
       $goto(
-        `/builder/workspace/${$appStore.appId}/design/${workspaceAppId}/${screen._id}`
+        `/builder/workspace/[application]/design/[workspaceAppId]/[screenId]`,
+        {
+          application: $appStore.appId,
+          workspaceAppId: workspaceAppId!,
+          screenId: screen._id!,
+        }
       )
     }
 

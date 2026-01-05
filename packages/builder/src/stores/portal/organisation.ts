@@ -19,7 +19,7 @@ type OrganisationState = SavedOrganisationState &
 
 const DEFAULT_STATE: OrganisationState = {
   platformUrl: "",
-  company: "Budibase",
+  company: "SuperToolMake",
   google: false,
   googleDatasourceConfigured: false,
   oidc: false,

@@ -53,7 +53,7 @@
           icon="warning"
         />
       {/if}
-      <p>Connect your database to Budibase using the config below.</p>
+      <p>Connect your database to SuperToolMake using the config below.</p>
     </Body>
   </Layout>
 

@@ -53,7 +53,7 @@
     <Layout>
       <Layout noPadding justifyItems="center">
         <img alt="logo" src={Logo} />
-        <Heading>Set Budibase organisation</Heading>
+        <Heading>Set SuperToolMake organisation</Heading>
       </Layout>
       <Divider noGrid />
       <Layout gap="XS" noPadding>

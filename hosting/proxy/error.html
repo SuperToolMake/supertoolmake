@@ -2,21 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>Budibase</title>
+    <title>SuperToolMake</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">  
   </head>
 
   <script>
-    function checkStatusButton() {
-      if (window.location.href.includes("budibase.app")) {
-        var button = document.getElementById("statusButton")
-        button.removeAttribute("hidden")
-      }
-    }
-
-    function goToStatus() {
-      window.location.href = "https://status.budibase.com";
-    }
     function goHome() {
       window.location.href = window.location.origin;
     }
@@ -45,7 +35,6 @@
     }
 
     window.onload = function() {
-      checkStatusButton()
       getStatus()
     };
    
@@ -168,7 +157,6 @@
           </div>
           <div class="buttons">
             <button class="homeButton" onclick=goHome()>Return home</button> 
-            <button id="statusButton" class="statusButton" hidden="true" onclick=goToStatus()>Check out status</button> 
           </div>
         </div>
       </div>

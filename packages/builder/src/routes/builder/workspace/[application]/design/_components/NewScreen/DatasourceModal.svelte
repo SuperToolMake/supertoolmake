@@ -115,7 +115,7 @@
       <p class="no-tables">
         Go to the
         <Link size="L" href={dataUrl || null}>Data section</Link>
-        to connect your database or create a new internal Budibase table.
+        to connect your database.
       </p></Body
     >
   {/if}

@@ -166,17 +166,6 @@ export const appRoutes = (
       ],
     },
     {
-      section: "Automations",
-      icon: "lightning-a",
-      path: "automations",
-      routes: [
-        {
-          path: "logs",
-          comp: Pages.get("automations"),
-        },
-      ],
-    },
-    {
       section: "Apps",
       icon: "layout",
       path: "app",

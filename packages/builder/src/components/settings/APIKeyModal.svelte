@@ -39,6 +39,6 @@
   showCancelButton={false}
   confirmText="Close"
 >
-  <Body size="S">Your API key for accessing the Budibase public API:</Body>
+  <Body size="S">Your API key for accessing the SuperToolMake public API:</Body>
   <CopyInput bind:value={apiKey} />
 </ModalContent>

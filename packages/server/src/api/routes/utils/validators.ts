@@ -2,7 +2,6 @@ import { auth, permissions } from "@budibase/backend-core"
 import {
   EmptyFilterOption,
   SearchFilters,
-  WebhookActionType,
   BuiltinPermissionID,
 } from "@budibase/types"
 import Joi from "joi"
@@ -124,22 +123,6 @@ export function externalSearchValidator() {
         type: OPTIONAL_STRING.valid("string", "number"),
       }).optional(),
     })
-  )
-}
-
-export function webhookValidator() {
-  return auth.joiValidator.body(
-    Joi.object({
-      live: Joi.bool(),
-      _id: OPTIONAL_STRING,
-      _rev: OPTIONAL_STRING,
-      name: Joi.string().required(),
-      bodySchema: Joi.object().optional(),
-      action: Joi.object({
-        type: Joi.string().required().valid(WebhookActionType.AUTOMATION),
-        target: Joi.string().required(),
-      }).required(),
-    }).unknown(true)
   )
 }
 

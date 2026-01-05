@@ -10,7 +10,7 @@ import {
 import { InvalidFileExtensions } from "@budibase/shared-core"
 import { processString } from "@budibase/string-templates"
 import {
-  BudibaseAppProps,
+  AppProps,
   Ctx,
   DocumentType,
   GetSignedUploadUrlRequest,
@@ -40,7 +40,7 @@ import {
   NODE_MODULES_PATH,
   shouldServeLocally,
 } from "../../../utilities/fileSystem"
-import AppComponent from "./templates/BudibaseApp.svelte"
+import AppComponent from "./templates/App.svelte"
 import { render } from "svelte/server"
 
 export const uploadFile = async function (
@@ -221,7 +221,6 @@ export const serveApp = async function (ctx: UserCtx<void, ServeAppResponse>) {
     const themeVariables = getThemeVariables(appInfo.theme)
 
     if (!env.isJest()) {
-      const plugins = await objectStore.enrichPluginURLs(appInfo.usedPlugins)
       /*
        * Server rendering in svelte sadly does not support type checking, the .render function
        * always will just expect "any" when typing - so it is pointless for us to type the
@@ -230,7 +229,7 @@ export const serveApp = async function (ctx: UserCtx<void, ServeAppResponse>) {
        */
       const appName = workspaceApp?.name || `${appInfo.name}`
       const nonce = ctx.state.nonce || ""
-      let props: BudibaseAppProps = {
+      let props: AppProps = {
         title: appName,
         showSkeletonLoader: appInfo.features?.skeletonLoader ?? false,
         hideDevTools,
@@ -239,9 +238,8 @@ export const serveApp = async function (ctx: UserCtx<void, ServeAppResponse>) {
         metaImage:
           "https://res.cloudinary.com/daog6scxm/image/upload/v1698759482/meta-images/plain-branded-meta-image-coral_ocxmgu.png",
         metaDescription: "",
-        metaTitle: `${appName} - built with Budibase`,
+        metaTitle: `${appName} - built with SuperToolMake`,
         clientCacheKey: await objectStore.getClientCacheKey(appInfo.version),
-        usedPlugins: plugins,
         favicon: "",
         nonce,
         workspaceId,

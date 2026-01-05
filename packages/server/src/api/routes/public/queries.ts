@@ -11,7 +11,7 @@ const read = [],
  *   post:
  *     operationId: queryExecute
  *     summary: Execute a query
- *     description: Queries which have been created within a Budibase app can be executed using this,
+ *     description: Queries which have been created within an app can be executed using this,
  *     tags:
  *       - queries
  *     parameters:

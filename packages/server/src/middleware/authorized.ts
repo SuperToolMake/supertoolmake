@@ -9,7 +9,6 @@ import { PermissionLevel, PermissionType, UserCtx } from "@budibase/types"
 import sdk from "../sdk"
 import { builderMiddleware } from "./builder"
 import { paramResource } from "./resourceId"
-import { isWebhookEndpoint } from "./utils"
 
 function hasResource(ctx: any) {
   return ctx.resourceId != null
@@ -89,12 +88,6 @@ const authorized =
     resourcePath?: string
   ) =>
   async (ctx: UserCtx, next: any) => {
-    // webhooks don't need authentication, each webhook unique
-    // also internal requests (between services) don't need authorized
-    if (isWebhookEndpoint(ctx) || ctx.internal) {
-      return next()
-    }
-
     if (!ctx.user) {
       return ctx.throw(401, "No user info found")
     }

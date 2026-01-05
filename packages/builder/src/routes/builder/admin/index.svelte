@@ -60,7 +60,7 @@
       <Layout justifyItems="center" noPadding>
         <img alt="logo" src={Logo} />
         <Heading size="M">Create an admin user</Heading>
-        <Body>The admin user has access to everything in Budibase.</Body>
+        <Body>The admin user has access to everything in SuperToolMake.</Body>
       </Layout>
       <Layout gap="S" noPadding>
         <FancyForm bind:this={form}>

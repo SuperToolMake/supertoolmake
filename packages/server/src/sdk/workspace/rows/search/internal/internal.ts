@@ -1,11 +1,5 @@
 import { context, HTTPError } from "@budibase/backend-core"
-import {
-  Database,
-  DocumentType,
-  Row,
-  Table,
-  TableSchema,
-} from "@budibase/types"
+import { Row, TableSchema } from "@budibase/types"
 import sdk from "../../../.."
 import {
   csv,
@@ -13,15 +7,7 @@ import {
   json,
   jsonWithSchema,
 } from "../../../../../api/controllers/table/exporters"
-import {
-  getFromDesignDoc,
-  getFromMemoryDoc,
-  migrateToDesignView,
-  migrateToInMemoryView,
-} from "../../../../../api/controllers/view/utils"
-import * as inMemoryViews from "../../../../../db/inMemoryView"
 import { getRowParams, InternalTables } from "../../../../../db/utils"
-import env from "../../../../../environment"
 import { breakRowIdField } from "../../../../../integrations/utils"
 import { outputProcessing } from "../../../../../utilities/rowProcessor"
 import { ExportRowsParams, ExportRowsResult } from "../types"
@@ -147,102 +133,6 @@ export async function fetchRaw(
     rows = response.rows.map(row => row.doc)
   }
   return rows as Row[]
-}
-
-export async function fetchLegacyView(
-  viewName: string,
-  options: { calculation: string; group: string; field: string }
-): Promise<Row[]> {
-  // if this is a table view being looked for just transfer to that
-  if (viewName.startsWith(DocumentType.TABLE)) {
-    return fetch(viewName)
-  }
-
-  const db = context.getWorkspaceDB()
-  const { calculation, group, field } = options
-  const viewInfo = await getView(db, viewName)
-  let response
-  if (env.SELF_HOSTED) {
-    response = await db.query(`database/${viewName}`, {
-      include_docs: !calculation,
-      group: !!group,
-    })
-  } else {
-    const tableId = viewInfo.meta!.tableId
-    const data = await fetchRaw(tableId!)
-    response = await inMemoryViews.runView(
-      viewInfo,
-      calculation as string,
-      !!group,
-      data
-    )
-  }
-
-  let rows: Row[] = []
-  if (!calculation) {
-    response.rows = response.rows.map(row => row.doc)
-    let table: Table
-    try {
-      table = await sdk.tables.getTable(viewInfo.meta!.tableId)
-    } catch (err) {
-      throw new Error("Unable to retrieve view table.")
-    }
-    rows = await outputProcessing(table, response.rows)
-  }
-
-  if (calculation === CALCULATION_TYPES.STATS) {
-    response.rows = response.rows.map(row => ({
-      group: row.key,
-      field,
-      ...row.value,
-      avg: row.value.sum / row.value.count,
-    }))
-    rows = response.rows
-  }
-
-  if (
-    calculation === CALCULATION_TYPES.COUNT ||
-    calculation === CALCULATION_TYPES.SUM
-  ) {
-    rows = response.rows.map(row => ({
-      group: row.key,
-      field,
-      value: row.value,
-    }))
-  }
-  return rows
-}
-
-const CALCULATION_TYPES = {
-  SUM: "sum",
-  COUNT: "count",
-  STATS: "stats",
-}
-
-async function getView(db: Database, viewName: string) {
-  let mainGetter = env.SELF_HOSTED ? getFromDesignDoc : getFromMemoryDoc
-  let secondaryGetter = env.SELF_HOSTED ? getFromMemoryDoc : getFromDesignDoc
-  let migration = env.SELF_HOSTED ? migrateToDesignView : migrateToInMemoryView
-  let viewInfo,
-    migrate = false
-  try {
-    viewInfo = await mainGetter(db, viewName)
-  } catch (err: any) {
-    // check if it can be retrieved from design doc (needs migrated)
-    if (err.status !== 404) {
-      viewInfo = null
-    } else {
-      viewInfo = await secondaryGetter(db, viewName)
-      migrate = !!viewInfo
-    }
-  }
-  if (migrate) {
-    await migration(db, viewName)
-  }
-  if (!viewInfo) {
-    throw "View does not exist."
-  }
-  return viewInfo
 }
 
 function trimFields(rows: Row[], schema: TableSchema) {

@@ -95,7 +95,7 @@ export async function bulkImport(
   ) {
     // This is becuse we make use of the ON CONFLICT functionality in SQL
     // databases, which only triggers when there's a conflict against a unique
-    // index. The only unique index we can count on atm in Budibase is the
+    // index. The only unique index we can count on atm is the
     // primary key, so this functionality always uses the primary key.
     ctx.throw(
       400,

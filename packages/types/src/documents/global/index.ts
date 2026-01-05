@@ -1,6 +1,5 @@
 export * from "./config"
 export * from "./user"
-export * from "./plugin"
 export * from "./schedule"
 export * from "./templates"
 export * from "./environmentVariables"

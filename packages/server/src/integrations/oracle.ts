@@ -466,8 +466,8 @@ class OracleIntegration extends Sql implements DatasourcePlus {
           if (metaData.dbType === oracledb.CLOB) {
             return { type: oracledb.STRING }
           } else if (
-            // When we create a new table in OracleDB from Budibase, bigints get
-            // created as NUMBER(20,0). Budibase expects bigints to be returned
+            // When we create a new table in OracleDB, bigints get
+            // created as NUMBER(20,0). SuperToolMake expects bigints to be returned
             // as strings, which is what we're doing here. However, this is
             // likely to be brittle if we connect to externally created
             // databases that have used different precisions and scales.
@@ -508,7 +508,7 @@ class OracleIntegration extends Sql implements DatasourcePlus {
     }
 
     // We set the timezone of the connection to match the timezone of the
-    // Budibase server, this is because several column types (e.g. time-only
+    // server, this is because several column types (e.g. time-only
     // timestamps) do not store timezone information, so to avoid storing one
     // time and getting a different one back we need to make sure the timezone
     // of the server matches the timezone of the database. There's an assumption

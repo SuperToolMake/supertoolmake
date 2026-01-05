@@ -161,14 +161,6 @@
   }
 </script>
 
-<svelte:head>
-  {#if $builderStore.usedPlugins?.length}
-    {#each $builderStore.usedPlugins as plugin (plugin.hash)}
-      <script src={`${plugin.jsUrl}`}></script>
-    {/each}
-  {/if}
-</svelte:head>
-
 {#if dataLoaded}
   <div
     id="spectrum-root"
@@ -243,7 +235,7 @@
                                 <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                                 {@html ErrorSVG}
                                 <Heading size="L">
-                                  This Budibase app is not publicly accessible
+                                  This app is not publicly accessible
                                 </Heading>
                               </Layout>
                             </div>

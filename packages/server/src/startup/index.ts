@@ -7,7 +7,6 @@ import {
   users,
 } from "@budibase/backend-core"
 import bson from "bson"
-import fs from "fs"
 import { Server } from "http"
 import Koa from "koa"
 import { AddressInfo } from "net"
@@ -42,7 +41,7 @@ export async function startup(
 ) {
   const { app, server } = opts
   if (STATE !== "uninitialised" && !opts.force) {
-    console.log("Budibase already started")
+    console.log("SuperToolMake already started")
     return
   }
   STATE = "starting"
@@ -50,7 +49,7 @@ export async function startup(
     console.log(`service running environment: "${env.BUDIBASE_ENVIRONMENT}"`)
   }
   if (app && server && !env.CLUSTER_MODE) {
-    console.log(`Budibase running on ${JSON.stringify(server.address())}`)
+    console.log(`SuperToolMake running on ${JSON.stringify(server.address())}`)
     const address = server.address() as AddressInfo
     env._set("PORT", address.port)
   }
@@ -73,16 +72,6 @@ export async function startup(
   if (app && server) {
     console.log("Initialising websockets")
     initialiseWebsockets(app, server)
-  }
-
-  // monitor plugin directory if required
-  if (
-    env.SELF_HOSTED &&
-    !env.MULTI_TENANCY &&
-    env.PLUGINS_DIR &&
-    fs.existsSync(env.PLUGINS_DIR)
-  ) {
-    console.log("Monitoring plugin directory")
   }
 
   // check for version updates

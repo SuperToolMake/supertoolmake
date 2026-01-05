@@ -20,7 +20,7 @@
     $store.loading || $store.hasSelected
       ? "Fetch views"
       : "Continue without fetching"
-  $: description = "Choose what views you want to sync with Budibase"
+  $: description = "Choose what views you want to sync with SuperToolMake"
   $: selectAllText = "Select all"
 </script>
 

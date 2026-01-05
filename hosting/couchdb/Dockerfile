@@ -2,8 +2,7 @@
 #
 # Everything in this `base` image is adapted from the official `couchdb` image's
 # Dockerfile. Only modifications related to upgrading from Debian bullseye to
-# bookworm have been included. The `runner` image contains Budibase's
-# customisations to the image
+# bookworm have been included.
 FROM node:22-slim AS base
 
 # Add CouchDB user account to make sure the IDs are assigned consistently

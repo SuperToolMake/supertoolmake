@@ -38,8 +38,7 @@ getDistro
 
 if [[ $OS == "Darwin" ]];
 then
-    echo "This script is not setup for your machine type:" $OS
-    echo "Please use the manual steps described in https://github.com/Budibase/budibase/blob/master/docs/CONTRIBUTING.md#getting-started-for-contributors"
+    echo "This script is not setup for your machine type"
     exit 1
 fi
 

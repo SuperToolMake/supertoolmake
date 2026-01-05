@@ -21,7 +21,6 @@ import { ScreenAPI } from "./screen"
 import { TableAPI } from "./table"
 import { TemplateAPI } from "./template"
 import { UserAPI } from "./user"
-import { WebhookAPI } from "./webhook"
 import { WorkspaceAPI } from "./workspace"
 import { WorkspaceAppAPI } from "./workspaceApp"
 import { WorkspaceFavouriteAPI } from "./workspaceFavourite"
@@ -44,7 +43,6 @@ export default class API {
   table: TableAPI
   templates: TemplateAPI
   user: UserAPI
-  webhook: WebhookAPI
   assets: AssetsAPI
   workspaceApp: WorkspaceAppAPI
   resource: ResourceAPI
@@ -75,7 +73,6 @@ export default class API {
     this.table = new TableAPI(config)
     this.templates = new TemplateAPI(config)
     this.user = new UserAPI(config)
-    this.webhook = new WebhookAPI(config)
     this.assets = new AssetsAPI(config)
     this.workspaceApp = new WorkspaceAppAPI(config)
     this.resource = new ResourceAPI(config)

@@ -7897,7 +7897,7 @@
     "name": "Accordion",
     "icon": "caret-down",
     "friendlyName": "Accordion",
-    "description": "A collapsible Budibase container component",
+    "description": "A collapsible container component",
     "hasChildren": true,
     "illegalChildren": ["modal", "sidepanel"],
     "showSettingsBar": true,
@@ -8606,7 +8606,7 @@
       "width": 800,
       "height": 1200
     },
-    "description": "A component to render PDFs from other Budibase components",
+    "description": "A component to render PDFs from other components",
     "settings": [
       {
         "type": "text",
@@ -8822,41 +8822,5 @@
         }
       ]
     }
-  },
-  "chatbox": {
-    "name": "Chatbox",
-    "description": "Embed the Budibase chat experience inside your app.",
-    "icon": "chat",
-    "new": true,
-    "showSettingsBar": true,
-    "size": {
-      "width": 640,
-      "height": 420
-    },
-    "grid": {
-      "hAlign": "stretch",
-      "vAlign": "stretch"
-    },
-    "styles": ["padding", "background", "border"],
-    "settings": [
-      {
-        "type": "text",
-        "label": "Intro text",
-        "key": "intro",
-        "defaultValue": "Ask our assistant anything about this app."
-      },
-      {
-        "type": "text",
-        "label": "Input placeholder",
-        "key": "placeholder",
-        "defaultValue": "Ask Budibase..."
-      },
-      {
-        "type": "text",
-        "label": "Send button label",
-        "key": "sendButtonLabel",
-        "defaultValue": "Send"
-      }
-    ]
   }
 }

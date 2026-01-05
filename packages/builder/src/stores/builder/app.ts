@@ -2,7 +2,6 @@ import { API } from "@/api"
 import {
   AppScript,
   AutomationSettings,
-  Plugin,
   PWAManifest,
   TranslationOverrides,
   UpdateWorkspaceRequest,
@@ -46,7 +45,6 @@ export interface AppMetaState {
   appInstance: { _id: string } | null
   initialised: boolean
   hasAppPackage: boolean
-  usedPlugins: Plugin[]
   automations: AutomationSettings
   routes: { [key: string]: any }
   version?: string
@@ -86,7 +84,6 @@ export const INITIAL_APP_META_STATE: AppMetaState = {
   appInstance: null,
   initialised: false,
   hasAppPackage: false,
-  usedPlugins: [],
   automations: {},
   routes: {},
   pwa: {
@@ -128,7 +125,6 @@ export class AppMetaStore extends BudiStore<AppMetaState> {
       appInstance: workspace.instance,
       revertableVersion: workspace.revertableVersion,
       upgradableVersion: workspace.upgradableVersion,
-      usedPlugins: workspace.usedPlugins || [],
       icon: workspace.icon,
       features: {
         ...INITIAL_APP_META_STATE.features,

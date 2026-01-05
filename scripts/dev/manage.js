@@ -34,7 +34,6 @@ async function init() {
     HTTP_LOGGING: "0",
     VERSION: "0.0.0+local",
     PASSWORD_MIN_LENGTH: "1",
-    PLUGINS_DIR: "",
     BUDICLOUD_URL: "https://budibaseqa.app",
   }
 

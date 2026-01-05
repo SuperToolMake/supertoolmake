@@ -58,8 +58,8 @@
   {#if smtpConfig}
     <Layout gap="XS" noPadding>
       <Body size="S">
-        Budibase comes out of the box with ready-made email templates to help
-        with user onboarding.
+        SuperToolMake comes out of the box with ready-made email templates to
+        help with user onboarding.
       </Body>
     </Layout>
     <div>

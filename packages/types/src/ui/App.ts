@@ -1,6 +1,4 @@
-import { Plugin } from "../"
-
-export interface BudibaseAppProps {
+export interface AppProps {
   title: string
   favicon: string
   metaImage: string
@@ -8,7 +6,6 @@ export interface BudibaseAppProps {
   metaDescription: string
   clientCacheKey?: string
   workspaceId: string
-  usedPlugins: Plugin[]
   appMigrating?: boolean
   showSkeletonLoader?: boolean
   hideDevTools?: boolean

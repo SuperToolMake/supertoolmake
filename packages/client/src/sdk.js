@@ -76,7 +76,6 @@ export default {
   fetchData,
   QueryUtils,
   ContextScopes: Constants.ContextScopes,
-  // This is not used internally but exposed to users to be used in plugins
   getAPIKey,
   enrichButtonActions,
   processStringSync,

@@ -67,9 +67,7 @@ export const BUILTIN_PERMISSIONS: BuiltinPermissions = {
   PUBLIC: {
     _id: BuiltinPermissionID.PUBLIC,
     name: "Public",
-    permissions: [
-      new PermissionImpl(PermissionType.WEBHOOK, PermissionLevel.EXECUTE),
-    ],
+    permissions: [],
   },
   READ_ONLY: {
     _id: BuiltinPermissionID.READ_ONLY,
@@ -98,7 +96,6 @@ export const BUILTIN_PERMISSIONS: BuiltinPermissions = {
       new PermissionImpl(PermissionType.TABLE, PermissionLevel.WRITE),
       new PermissionImpl(PermissionType.USER, PermissionLevel.READ),
       new PermissionImpl(PermissionType.AUTOMATION, PermissionLevel.EXECUTE),
-      new PermissionImpl(PermissionType.WEBHOOK, PermissionLevel.READ),
       new PermissionImpl(PermissionType.LEGACY_VIEW, PermissionLevel.READ),
       new PermissionImpl(PermissionType.WORKSPACE, PermissionLevel.READ),
     ],
@@ -110,7 +107,6 @@ export const BUILTIN_PERMISSIONS: BuiltinPermissions = {
       new PermissionImpl(PermissionType.TABLE, PermissionLevel.ADMIN),
       new PermissionImpl(PermissionType.USER, PermissionLevel.ADMIN),
       new PermissionImpl(PermissionType.AUTOMATION, PermissionLevel.ADMIN),
-      new PermissionImpl(PermissionType.WEBHOOK, PermissionLevel.READ),
       new PermissionImpl(PermissionType.QUERY, PermissionLevel.ADMIN),
       new PermissionImpl(PermissionType.LEGACY_VIEW, PermissionLevel.READ),
       new PermissionImpl(PermissionType.WORKSPACE, PermissionLevel.READ),

@@ -25,7 +25,7 @@
   let errors = {}
   let loaded = false
 
-  $: company = $organisation.company || "Budibase"
+  $: company = $organisation.company || "SuperToolMake"
   $: passwordMinLength = $admin.passwordMinLength ?? 12
 
   async function acceptInvite() {

@@ -113,22 +113,6 @@
   const enrichStructure = (structure, definitions, customComponents) => {
     let enrichedStructure = []
 
-    // Add custom components category
-    if (customComponents?.length) {
-      enrichedStructure.push({
-        name: "Plugins",
-        isCategory: true,
-        children: customComponents
-          .map(x => ({
-            ...definitions[x],
-            name: definitions[x].friendlyName || definitions[x].name,
-          }))
-          .sort((a, b) => {
-            return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
-          }),
-      })
-    }
-
     structure.forEach(item => {
       if (typeof item === "string") {
         const def = definitions[`@budibase/standard-components/${item}`]

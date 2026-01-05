@@ -35,7 +35,7 @@ export function createRequest<TBody>(request: Request<TBody>): RequestInit {
   if (!ctx && coreEnv.INTERNAL_API_KEY) {
     headers[constants.Header.API_KEY] = coreEnv.INTERNAL_API_KEY
   } else if (ctx && ctx.headers) {
-    // copy all Budibase utilised headers over - copying everything can have
+    // copy all utilised headers over - copying everything can have
     // side effects like requests being rejected due to odd content types etc
     for (let header of Object.values(constants.Header)) {
       const value = ctx.headers[header]

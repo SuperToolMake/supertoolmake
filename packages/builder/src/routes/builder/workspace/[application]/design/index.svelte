@@ -230,8 +230,7 @@
     color="#732B00"
   >
     Transform internal workflows with modern apps and forms. Connect SQL, REST
-    APIs, or your Budibase automations, and create beautiful interfaces with
-    pre-built components in minutes.
+    APIs and create beautiful interfaces with pre-built components in minutes.
   </HeroBanner>
 
   <TopBar icon="browser" breadcrumbs={[{ text: "Apps" }]} showPublish={false}>

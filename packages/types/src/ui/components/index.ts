@@ -3,16 +3,6 @@ import { FieldType } from "@budibase/types"
 export * from "./codeEditor"
 export * from "./errors"
 
-export interface CustomComponent {
-  Component: any
-  schema: {
-    type: "component"
-    metadata: Record<string, any>
-    schema: ComponentDefinition
-  }
-  version: string
-}
-
 export interface ComponentDefinition {
   component: string
   name: string

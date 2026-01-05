@@ -9,7 +9,7 @@ import { BaseAPIClient } from "./types"
 
 export interface OtherEndpoints {
   getSystemStatus: () => Promise<SystemStatusResponse>
-  getBudibaseVersion: () => Promise<string>
+  getInstallVersion: () => Promise<string>
   getIntegrations: () => Promise<FetchIntegrationsResponse>
   getBasePermissions: () => Promise<FetchBuiltinPermissionsResponse>
   getEnvironment: () => Promise<GetEnvironmentResponse>
@@ -44,9 +44,9 @@ export const buildOtherEndpoints = (API: BaseAPIClient): OtherEndpoints => ({
   },
 
   /**
-   * Gets the version of the installed Budibase environment.
+   * Gets the version of the installed environment.
    */
-  getBudibaseVersion: async () => {
+  getInstallVersion: async () => {
     return (
       await API.get<GetVersionResponse>({
         url: "/api/dev/version",

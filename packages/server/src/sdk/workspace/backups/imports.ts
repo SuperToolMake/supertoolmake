@@ -1,12 +1,11 @@
 import { db as dbCore, encryption, objectStore } from "@budibase/backend-core"
 import { utils } from "@budibase/shared-core"
-import { Database, FieldType, Row, RowAttachment } from "@budibase/types"
+import { Database } from "@budibase/types"
 import fs from "fs"
 import fsp from "fs/promises"
 import { join } from "path"
 import tar from "tar"
 import { v4 as uuid } from "uuid"
-import sdk from "../.."
 import { ObjectStoreBuckets } from "../../../constants"
 import { budibaseTempDir } from "../../../utilities/budibaseDir"
 import { downloadTemplate } from "../../../utilities/fileSystem"
@@ -23,57 +22,6 @@ type TemplateType = {
     password?: string
   }
   key?: string
-}
-
-function rewriteAttachmentUrl(appId: string, attachment: RowAttachment) {
-  // URL looks like: /prod-budi-app-assets/appId/attachments/file.csv
-  const urlParts = attachment.key?.split("/") || []
-  // remove the app ID
-  urlParts.shift()
-  // add new app ID
-  urlParts.unshift(appId)
-  const key = urlParts.join("/")
-  return {
-    ...attachment,
-    key,
-    url: "", // calculated on retrieval using key
-  }
-}
-
-export async function updateAttachmentColumns(prodAppId: string, db: Database) {
-  // iterate through attachment documents and update them
-  const tables = await sdk.tables.getAllInternalTables(db)
-  let updatedRows: Row[] = []
-  for (let table of tables) {
-    const { rows, columns } = await sdk.rows.getRowsWithAttachments(
-      db.name,
-      table
-    )
-    updatedRows = updatedRows.concat(
-      rows.map(row => {
-        for (let column of columns) {
-          const columnType = table.schema[column].type
-          if (
-            columnType === FieldType.ATTACHMENTS &&
-            Array.isArray(row[column])
-          ) {
-            row[column] = row[column].map((attachment: RowAttachment) =>
-              rewriteAttachmentUrl(prodAppId, attachment)
-            )
-          } else if (
-            (columnType === FieldType.ATTACHMENT_SINGLE ||
-              columnType === FieldType.SIGNATURE_SINGLE) &&
-            row[column]
-          ) {
-            row[column] = rewriteAttachmentUrl(prodAppId, row[column])
-          }
-        }
-        return row
-      })
-    )
-  }
-  // write back the updated attachments
-  await db.bulkDocs(updatedRows)
 }
 
 /**
@@ -145,10 +93,7 @@ export function getListOfAppsInMulti(tmpPath: string) {
 export async function importApp(
   appId: string,
   db: Database,
-  template: TemplateType,
-  opts: {
-    updateAttachmentColumns: boolean
-  } = { updateAttachmentColumns: true }
+  template: TemplateType
 ) {
   let prodAppId = dbCore.getProdWorkspaceID(appId)
   let dbStream: fs.ReadStream
@@ -165,10 +110,6 @@ export async function importApp(
     const stillEncrypted = !!contents.find(name => name.endsWith(".enc"))
     if (stillEncrypted) {
       throw new Error("Files are encrypted but no password has been supplied.")
-    }
-    const isPlugin = !!contents.find(name => name === "plugin.min.js")
-    if (isPlugin) {
-      throw new Error("Supplied file is a plugin - cannot import as app.")
     }
     const isInvalid = !contents.find(name => name === DB_EXPORT_FILE)
     if (isInvalid) {
@@ -238,9 +179,6 @@ export async function importApp(
   const { ok } = await db.load(dbStream)
   if (!ok) {
     throw "Error loading database dump from template."
-  }
-  if (opts.updateAttachmentColumns) {
-    await updateAttachmentColumns(prodAppId, db)
   }
   // clear up afterward
   if (tmpPath) {

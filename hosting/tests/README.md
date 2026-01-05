@@ -1,4 +1,4 @@
-# Docker Image for Running Budibase Tests
+# Docker Image for Running SuperToolMake Tests
 
 ## Overview
 
@@ -11,11 +11,11 @@ This image contains the basic setup for running
 
 ### Build the Image
 
-The guidance below is based on building the Budibase single image on Debian 11 and AlmaLinux 8. If you use another distro or OS you will need to amend the commands to suit.
+The guidance below is based on building the SuperToolMake single image on Debian 11 and AlmaLinux 8. If you use another distro or OS you will need to amend the commands to suit.
 
 #### Install Node
 
-Budibase requires a more recent version of node (14+) than is available in the base Debian repos so:
+SuperToolMake requires a more recent version of node (14+) than is available in the base Debian repos so:
 
 ```
 curl -sL https://deb.nodesource.com/setup_16.x | sudo bash -
@@ -44,11 +44,11 @@ Check the versions of each installed version. This process was tested with the v
 
 #### Get the Code
 
-Clone the Budibase repo
+Clone the SuperToolMake repo
 
 ```
-git clone https://github.com/Budibase/budibase.git
-cd budibase
+git clone https://github.com/SuperToolMake/SuperToolMake.git
+cd SuperToolMake
 ```
 
 #### Setup Node

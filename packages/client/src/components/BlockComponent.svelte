@@ -49,11 +49,7 @@
     if (!type) {
       return null
     }
-    if (type.startsWith("plugin/")) {
-      return type
-    } else {
-      return `@budibase/standard-components/${type}`
-    }
+    return `@budibase/standard-components/${type}`
   }
 
   const getInstanceName = (name, type) => {
@@ -62,9 +58,6 @@
     }
     if (!type) {
       return "New component"
-    }
-    if (type.startsWith("plugin/")) {
-      type = type.split("plugin/")[1]
     }
     return type[0].toUpperCase() + type.slice(1)
   }

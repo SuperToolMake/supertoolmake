@@ -1,4 +1,4 @@
-import { builderStore, environmentStore, notificationStore } from "@/stores"
+import { builderStore, environmentStore } from "@/stores"
 import { get } from "svelte/store"
 import { createWebsocket } from "@budibase/frontend-core"
 
@@ -16,11 +16,5 @@ export const initWebsocket = () => {
   // Initialise connection
   socket = createWebsocket("/socket/client", {
     heartbeat: false,
-  })
-
-  // Event handlers
-  socket.on("plugin-update", data => {
-    builderStore.actions.updateUsedPlugin(data.name, data.hash)
-    notificationStore.actions.info(`"${data.name}" plugin reloaded`)
   })
 }

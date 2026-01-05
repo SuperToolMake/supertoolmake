@@ -43,7 +43,6 @@ const DefaultBucketName = {
   APPS: "prod-budi-app-assets",
   TEMPLATES: "templates",
   GLOBAL: "global",
-  PLUGINS: "plugins",
   TEMP: "tmp-file-attachments",
 }
 
@@ -206,8 +205,6 @@ const environment = {
     process.env.TEMPLATES_BUCKET_NAME || DefaultBucketName.TEMPLATES,
   GLOBAL_BUCKET_NAME:
     process.env.GLOBAL_BUCKET_NAME || DefaultBucketName.GLOBAL,
-  PLUGIN_BUCKET_NAME:
-    process.env.PLUGIN_BUCKET_NAME || DefaultBucketName.PLUGINS,
   TEMP_BUCKET_NAME: process.env.TEMP_BUCKET_NAME || DefaultBucketName.TEMP,
   USE_COUCH: process.env.USE_COUCH || true,
   MOCK_REDIS: process.env.MOCK_REDIS,

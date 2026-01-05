@@ -19,9 +19,9 @@
 
   async function getVersion() {
     try {
-      version = await API.getBudibaseVersion()
+      version = await API.getInstallVersion()
     } catch (error) {
-      notifications.error("Error getting Budibase version")
+      notifications.error("Error getting version")
       version = null
     }
   }
@@ -30,7 +30,7 @@
     try {
       //Check github API for the latest release
       const githubCheck = await fetch(
-        "https://api.github.com/repos/Budibase/budibase/releases/latest"
+        "https://api.github.com/repos/SuperToolMake/supertoolmake/releases/latest"
       )
       const githubResponse = await githubCheck.json()
 
@@ -41,7 +41,7 @@
       githubPublishedTime = githubPublishedDate.toLocaleTimeString()
       githubPublishedDate = githubPublishedDate.toLocaleDateString()
     } catch (error) {
-      notifications.error("Error getting the latest Budibase version")
+      notifications.error("Error getting the latest version")
       githubVersion = null
     }
   }
@@ -71,7 +71,7 @@
     </Layout>
     <Divider noMargin />
     <Layout noPadding gap="XS">
-      <Heading size="XS">Updating Budibase</Heading>
+      <Heading size="XS">Updating SuperToolMake</Heading>
       <Body size="S"
         >To update your self-host installation, follow the docs found <Link
           size="L"

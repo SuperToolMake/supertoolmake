@@ -157,9 +157,7 @@ export async function updateWithExport(
       },
     }
 
-    await backups.importApp(devId, tempDb, template, {
-      updateAttachmentColumns: true,
-    })
+    await backups.importApp(devId, tempDb, template)
     const newMetadata = await getNewWorkspaceMetadata(tempDb, workspaceDb)
     // get the documents to copy
     const toUpdate = await getImportableDocuments(tempDb)

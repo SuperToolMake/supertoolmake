@@ -99,7 +99,7 @@ export async function revert(ctx: Ctx<void, RevertWorkspaceResponse>) {
   }
 }
 
-export async function getBudibaseVersion(ctx: Ctx<void, GetVersionResponse>) {
+export async function getInstallVersion(ctx: Ctx<void, GetVersionResponse>) {
   const version = envCore.VERSION
   ctx.body = {
     version,

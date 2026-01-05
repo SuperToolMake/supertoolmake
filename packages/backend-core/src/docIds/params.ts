@@ -147,13 +147,6 @@ export function getStartEndKeyURL(baseKey: any, tenantId?: string) {
 }
 
 /**
- * Gets parameters for retrieving automations, this is a utility function for the getDocParams function.
- */
-export const getPluginParams = (pluginId?: string | null, otherProps = {}) => {
-  return getDocParams(DocumentType.PLUGIN, pluginId, otherProps)
-}
-
-/**
  * Gets parameters for retrieving OAuth2 configs, this is a utility function for the getDocParams function.
  */
 export const getOAuth2ConfigParams = (

@@ -21,7 +21,7 @@ export async function processTable(table: Table): Promise<Table> {
 
   table = { ...table }
   if (table._id && isExternalTableID(table._id)) {
-    // Old created external tables via Budibase might have a missing field name breaking some UI such as filters
+    // Old created external tables might have a missing field name breaking some UI such as filters
     if (table.schema["id"] && !table.schema["id"].name) {
       table.schema["id"].name = "id"
     }

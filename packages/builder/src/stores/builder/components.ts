@@ -107,19 +107,12 @@ export class ComponentStore extends BudiStore<ComponentState> {
     if (!appId) {
       return
     }
-
-    // Fetch definitions and filter out custom component definitions so we
-    // can flag them
     const components: any = await API.fetchComponentLibDefinitions(appId)
-    const customComponents = Object.keys(components).filter(key =>
-      key.startsWith("plugin/")
-    )
 
     // Update store
     this.update(state => ({
       ...state,
       components,
-      customComponents,
     }))
 
     // Sync client features to app store
@@ -381,19 +374,6 @@ export class ComponentStore extends BudiStore<ComponentState> {
           // Fill description with a long field if possible
           const longField = longFields[0] ?? shortFields[2]
           addBinding("cardDescription", "Description", longField)
-
-          // Attempt to fill the image setting.
-          // Check single attachment fields first.
-          let imgField = findFieldTypes(FieldType.ATTACHMENT_SINGLE)[0]
-          if (imgField) {
-            addBinding("cardImageURL", null, imgField, "url")
-          } else {
-            // Then try multi-attachment fields if no single ones exist
-            imgField = findFieldTypes(FieldType.ATTACHMENTS)[0]
-            if (imgField) {
-              addBinding("cardImageURL", null, imgField, 0, "url")
-            }
-          }
         }
       }
     }
@@ -1286,10 +1266,7 @@ export class ComponentStore extends BudiStore<ComponentState> {
     }
 
     // Ensure whole component name is used
-    if (
-      !componentType.startsWith("plugin/") &&
-      !componentType.startsWith("@budibase")
-    ) {
+    if (!componentType.startsWith("@budibase")) {
       componentType = `@budibase/standard-components/${componentType}`
     }
 

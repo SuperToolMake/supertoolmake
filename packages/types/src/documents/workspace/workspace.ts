@@ -1,4 +1,4 @@
-import { Document, Plugin, Snippet, Theme, User } from ".."
+import { Document, Snippet, Theme, User } from ".."
 import { SocketSession } from "../../sdk"
 
 export type WorkspaceMetadataErrors = { [key: string]: string[] }
@@ -27,7 +27,6 @@ export interface Workspace extends Document {
   icon?: WorkspaceIcon
   features?: WorkspaceFeatures
   automations?: AutomationSettings
-  usedPlugins?: Plugin[]
   upgradableVersion?: string
   snippets?: Snippet[]
   creationVersion?: string

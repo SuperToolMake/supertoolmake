@@ -1,8 +1,6 @@
 <script>
   import ClientAppSkeleton from "@budibase/frontend-core/src/components/ClientAppSkeleton.svelte"
 
-  /** @type {BudibaseAppProps} this receives all the props in one structure, following
-   * the type from @budibase/types */
   export let props
 </script>
 
@@ -18,7 +16,7 @@
   <meta name="description" content={props.metaDescription} />
 
   <!-- Opengraph Meta Tags -->
-  <meta property="og:site_name" content="Budibase" />
+  <meta property="og:site_name" content="SuperToolMake" />
   <meta property="og:title" content={props.metaTitle} />
   <meta property="og:description" content={props.metaDescription} />
   <meta property="og:type" content="website" />
@@ -125,8 +123,7 @@
     {#if props.clientLibPath}
       <h1>There was an error loading your app</h1>
       <h2>
-        The Budibase client library could not be loaded. Try republishing your
-        app.
+        The client library could not be loaded. Try republishing your app.
       </h2>
     {:else}
       <h2>We couldn't find that application</h2>
@@ -145,54 +142,21 @@
     id="budibase-client-script"
     type="module"
     src={`/api/assets/${props.workspaceId}/client?${props.clientCacheKey}`}
-    data-plugin-scripts={JSON.stringify(
-      props.usedPlugins?.map(plugin => plugin.jsUrl) ?? []
-    )}
   ></script>
-  <!-- Custom components need inserted after the core client library -->
-  <!-- But before loadBudibase is called -->
 
   <script type="application/javascript" nonce={props.nonce}>
     const clientScript = document.getElementById("budibase-client-script")
-    const pluginsUrls = (() => {
-      if (!clientScript) {
-        return []
-      }
-      const raw = clientScript.getAttribute("data-plugin-scripts")
-      if (!raw) {
-        return []
-      }
-      try {
-        return JSON.parse(raw)
-      } catch (error) {
-        console.error("Failed to parse plugin script list", error)
-        return []
-      }
-    })()
 
     function showLoadError() {
-      console.error("Failed to load the Budibase client")
+      console.error("Failed to load the client")
       const errorPanel = document.getElementById("error")
       if (errorPanel) {
         errorPanel.style.display = "flex"
       }
     }
 
-    async function loadPluginScripts() {
-      for (const pluginUrl of pluginsUrls) {
-        const script = document.createElement("script")
-        script.type = "application/javascript"
-        script.src = pluginUrl
-        script.onerror = () => {
-          console.error(`Failed to load plugin script: ${pluginUrl}`)
-        }
-        document.head.appendChild(script)
-      }
-    }
-
     async function bootBudibase() {
       if (window.loadBudibase) {
-        await loadPluginScripts()
         window.loadBudibase()
       } else {
         showLoadError()

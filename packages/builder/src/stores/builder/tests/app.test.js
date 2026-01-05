@@ -63,7 +63,6 @@ describe("Application Meta Store", () => {
       version: "2.5.0",
       revertableVersion: "2.5.6",
       upgradableVersion: "2.5.7",
-      plugins: 4,
     })
     const { application: app, clientLibPath, hasLock } = pkg
 
@@ -72,7 +71,6 @@ describe("Application Meta Store", () => {
       instance,
       revertableVersion,
       upgradableVersion,
-      usedPlugins,
       icon,
       name,
       appId,
@@ -95,7 +93,6 @@ describe("Application Meta Store", () => {
       appInstance: instance,
       revertableVersion,
       upgradableVersion,
-      usedPlugins,
       icon,
       features,
       hasLock,

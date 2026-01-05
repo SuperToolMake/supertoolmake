@@ -1,7 +1,6 @@
-import { context, db as dbCore, tenancy } from "@budibase/backend-core"
+import { context } from "@budibase/backend-core"
 import {
   FetchComponentDefinitionResponse,
-  Plugin,
   UserCtx,
   Workspace,
 } from "@budibase/types"
@@ -39,24 +38,6 @@ export async function fetchAppComponentDefinitions(
         }
       }
     }
-
-    // Add custom components
-    const globalDB = tenancy.getGlobalDB()
-    const response = await globalDB.allDocs(
-      dbCore.getPluginParams(null, {
-        include_docs: true,
-      })
-    )
-    response.rows
-      .map((row: any) => row.doc)
-      .filter((plugin: Plugin) => plugin.schema.type === "component")
-      .forEach((plugin: Plugin) => {
-        const fullComponentName = `plugin/${plugin.name}`
-        definitions[fullComponentName] = {
-          component: fullComponentName,
-          ...plugin.schema.schema,
-        }
-      })
 
     ctx.body = definitions
   } catch (err) {

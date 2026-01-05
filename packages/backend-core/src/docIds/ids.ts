@@ -109,14 +109,6 @@ export const generateDevInfoID = (userId: string) => {
   return `${DocumentType.DEV_INFO}${SEPARATOR}${userId}`
 }
 
-/**
- * Generates a new plugin ID - to be used in the global DB.
- * @returns The new plugin ID which a plugin metadata document can be stored under.
- */
-export const generatePluginID = (name: string) => {
-  return `${DocumentType.PLUGIN}${SEPARATOR}${name}`
-}
-
 export const generateOAuth2LogID = (id: string) => {
   return `${DocumentType.OAUTH2_CONFIG_LOG}${SEPARATOR}${id}`
 }
