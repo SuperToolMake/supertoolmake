@@ -42,7 +42,7 @@ You will know yarn dev has worked correctly when there are no build errors of co
 - budi-nginx-dev
 - budi-couchdb3-dev
 - budi-redis-dev
-- budi-minio-dev (note to self: can I remove this?)
+- budi-minio-dev
 
 Once running, visit [localhost:10000/builder](http://localhost:10000/builder)
 
