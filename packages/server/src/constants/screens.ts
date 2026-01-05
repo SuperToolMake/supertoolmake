@@ -79,7 +79,7 @@ export function createOnboardingWelcomeScreen(workspaceAppId: string): Screen {
               },
               size: "24px",
               _instanceName: "Welcome Title",
-              text: "# Welcome to Babibudi",
+              text: "# Welcome to SuperToolMake",
             },
             {
               _id: "c09edf7de69be44ce8f0215c3f62e43a8",

@@ -23,9 +23,6 @@ export const globalRoutes = (user: GetGlobalSelfResponse) => {
   ]
 }
 
-// Route definitions
-const { accountPortalUpgradeUrl, accountPortalBillingUrl } = helpers
-
 export const orgRoutes = (
   user: GetGlobalSelfResponse,
   admin: AdminState
@@ -125,24 +122,17 @@ export const orgRoutes = (
       ],
     },
     {
-      section: "Upgrade plan",
-      access: () => cloud && user?.accountPortalAccess,
-      icon: "arrow-circle-up",
-      href: {
-        url: accountPortalUpgradeUrl(admin?.accountPortalUrl),
-        target: Target.Blank,
-      },
-    },
-    {
-      section: "Billing",
-      access: () =>
-        !!(user?.accountPortalAccess && user?.account?.stripeCustomerId),
-      path: "billing",
-      icon: "credit-card",
-      href: {
-        url: accountPortalBillingUrl(admin?.accountPortalUrl),
-        target: Target.Blank,
-      },
+      section: "Open source license",
+      access: () => !cloud && isAdmin,
+      path: "legal",
+      icon: "gavel",
+      routes: [
+        {
+          path: "agplv3",
+          comp: Pages.get("agplv3"),
+          title: "AGPLv3",
+        },
+      ],
     },
   ].map((entry: Route) => ({
     ...entry,

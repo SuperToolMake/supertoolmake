@@ -5,9 +5,3 @@ export const BUILDER_URLS = {
   SETTINGS_PEOPLE_USERS: "/builder/settings/people/users",
   APPS: "/builder/apps",
 } as const
-
-export const ACCOUNT_PORTAL_PATHS = {
-  ACCOUNT: "/portal/account",
-  BILLING: "/portal/billing",
-  UPGRADE: "/portal/upgrade",
-} as const

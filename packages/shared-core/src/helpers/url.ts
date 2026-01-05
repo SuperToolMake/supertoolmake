@@ -1,4 +1,4 @@
-import { ACCOUNT_PORTAL_PATHS, BUILDER_URLS } from "../constants/urls"
+import { BUILDER_URLS } from "../constants/urls"
 
 const normalizePath = (path?: string) => {
   if (!path) {
@@ -25,14 +25,6 @@ const joinBaseAndPath = (base?: string | null, path?: string) => {
   }
   return `${sanitizedBase}${sanitizedPath}`
 }
-export const accountPortalAccountUrl = (accountPortalUrl?: string | null) =>
-  joinBaseAndPath(accountPortalUrl, ACCOUNT_PORTAL_PATHS.ACCOUNT)
-
-export const accountPortalBillingUrl = (accountPortalUrl?: string | null) =>
-  joinBaseAndPath(accountPortalUrl, ACCOUNT_PORTAL_PATHS.BILLING)
-
-export const accountPortalUpgradeUrl = (accountPortalUrl?: string | null) =>
-  joinBaseAndPath(accountPortalUrl, ACCOUNT_PORTAL_PATHS.UPGRADE)
 
 export const builderWorkspacesUrl = (builderBaseUrl?: string | null) =>
   joinBaseAndPath(builderBaseUrl, BUILDER_URLS.WORKSPACES)
@@ -50,9 +42,6 @@ export const builderAppsUrl = (builderBaseUrl?: string | null) =>
   joinBaseAndPath(builderBaseUrl, BUILDER_URLS.APPS)
 
 export const urlHelpers = {
-  accountPortalAccountUrl,
-  accountPortalBillingUrl,
-  accountPortalUpgradeUrl,
   builderWorkspacesUrl,
   builderSettingsEmailUrl,
   builderSettingsAuthUrl,

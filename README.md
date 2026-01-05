@@ -35,7 +35,7 @@ Also ensure your IDE has permissions for mounting the volumes defined in <a href
 <h4>Starting</h4>
 
 `yarn` - installs the dependencies
-<br />`yarn dev` - runs Babibudi locally
+<br />`yarn dev` - runs SuperToolMake locally
 
 You will know yarn dev has worked correctly when there are no build errors of course, but also you will see the following containers running:
 
