@@ -46,10 +46,6 @@
       > on app migrations.
     {:else}
       An error occurred, please try again later.
-      <br />
-      Contact
-      <a href="https://budibase.com/support/" target="_blank">support</a> if the
-      issue persists.
     {/if}</span
   >
 </div>

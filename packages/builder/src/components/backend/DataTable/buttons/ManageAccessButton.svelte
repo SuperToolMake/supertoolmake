@@ -25,7 +25,6 @@
   let dependantsInfoMessage
 
   $: fetchPermissions(resourceId)
-  $: loadDependantInfo(resourceId)
   $: roleMismatch = checkRoleMismatch(permissions)
   $: selectedRoleID = roleMismatch ? null : permissions?.[0]?.value
   $: selectedRole = $roles.find(x => x._id === selectedRoleID)
@@ -84,28 +83,6 @@
       permissions[0].value !== permissions[1].value ||
       permissions[0].value === inheritedRoleId
     )
-  }
-
-  const loadDependantInfo = async resourceId => {
-    const dependantsInfo = await permissionsStore.getDependantsInfo(resourceId)
-    const resourceByType = dependantsInfo?.resourceByType
-    if (resourceByType) {
-      const total = Object.values(resourceByType).reduce((p, c) => p + c, 0)
-      let resourceDisplay =
-        Object.keys(resourceByType).length === 1 && resourceByType.view
-          ? "view"
-          : "resource"
-
-      if (total === 1) {
-        dependantsInfoMessage = `1 ${resourceDisplay} is inheriting this access`
-      } else if (total > 1) {
-        dependantsInfoMessage = `${total} ${resourceDisplay}s are inheriting this access`
-      } else {
-        dependantsInfoMessage = null
-      }
-    } else {
-      dependantsInfoMessage = null
-    }
   }
 
   const changePermission = async role => {

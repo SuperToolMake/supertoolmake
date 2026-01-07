@@ -2,7 +2,7 @@ import { constants } from "@budibase/backend-core"
 import { EmailTemplatePurpose } from "@budibase/types"
 
 export const LOGO_URL =
-  "https://d33wubrfki0l68.cloudfront.net/aac32159d7207b5085e74a7ef67afbb7027786c5/2b1fd/img/logo/bb-emblem.svg"
+  "https://avatars.githubusercontent.com/u/252235214?s=400&u=7ebfd7c321d8e7d9b2752a83a9ffb828a89e9e45&v=4"
 
 export enum UserStatus {
   ACTIVE = "active",

@@ -85,7 +85,7 @@
   const datasourceLookup = datasources.lookup
   const favouriteLookup = workspaceFavouriteStore.lookup
   const pinned = createLocalStorageStore("builder-nav-pinned", true)
-  const navLogoSize = 20
+  const navLogoSize = 24
 
   let ignoreFocus = false
   let focused = false
@@ -299,7 +299,7 @@
 </script>
 
 <div class="nav_wrapper" style={`--nav-logo-width: ${navLogoSize}px;`}>
-  <div class="nav_spacer" class:pinned={$pinned} />
+  <div class="nav_spacer" class:pinned={$pinned}></div>
   <div
     class="nav"
     class:pinned={$pinned}
@@ -310,10 +310,7 @@
   >
     <div class="nav_header">
       <div>
-        <BBLogo
-          color={"var(--spectrum-global-color-gray-900)"}
-          size={navLogoSize}
-        />
+        <BBLogo size={navLogoSize} />
       </div>
 
       <div class="nav-title">

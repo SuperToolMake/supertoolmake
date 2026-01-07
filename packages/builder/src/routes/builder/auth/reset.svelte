@@ -9,7 +9,7 @@
   } from "@budibase/bbui"
   import { goto, params } from "@roxi/routify"
   import { auth, organisation, admin } from "@/stores/portal"
-  import Logo from "assets/bb-emblem.svg"
+  import Logo from "assets/supertoolmake-emblem.svg"
   import { PasswordRepeatInput } from "@budibase/frontend-core"
   import { onMount } from "svelte"
 

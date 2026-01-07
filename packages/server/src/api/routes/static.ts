@@ -14,7 +14,7 @@ addFileManagement(router)
 
 router
   .get("/apple-touch-icon.png", async ctx => {
-    ctx.redirect("/builder/bblogo.png")
+    ctx.redirect("/builder/logo_supertoolmake.png")
   })
   .get("/api/assets/:appId/client", controller.serveClientLibrary)
   .get("/api/assets/:appId/:file(.*)", controller.serve3rdPartyFile)

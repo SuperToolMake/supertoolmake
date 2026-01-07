@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="150 140 460 460" width="360" height="280">
+  <defs>
+    <linearGradient id="grad-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A6CD3"/>
+      <stop offset="45%" stop-color="#2C8EF2"/>
+      <stop offset="100%" stop-color="#5FB4FF"/>
+    </linearGradient>
+    <linearGradient id="grad-orange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#86F7C0"/>
+      <stop offset="45%" stop-color="#3BD98C"/>
+      <stop offset="100%" stop-color="#0E6E43"/>
+    </linearGradient>
+    <linearGradient id="grad-red" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#86F7C0"/>
+      <stop offset="45%" stop-color="#3BD98C"/>
+      <stop offset="100%" stop-color="#0E6E43"/>
+    </linearGradient>
+    <linearGradient id="grad-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#74E9FF"/>
+      <stop offset="45%" stop-color="#2AD7FF"/>
+      <stop offset="100%" stop-color="#0A8FB8"/>
+    </linearGradient>
+  </defs>
+  <g transform="rotate(90 361 375.5)">
+    <path d="M 166 360 A 46 42 0 0 1 134 315 L 340 74 A 46 42 0 0 0 357 87 L 357 360 Z" fill="url(#grad-blue)"/>
+    <path d="M 357 173 L 540 173 A 42 36 0 0 1 582 209 A 18 18 0 0 1 582 224 L 466 359 L 357 359 Z" fill="url(#grad-cyan)"/>
+    <path d="M 357 359 L 300 359 L 134 521 A 46 42 0 0 0 180 563 L 357 563 Z" fill="url(#grad-red)"/>
+    <path d="M 357 359 L 540 359 A 42 35 0 0 1 582 394 A 18 18 0 0 1 582 415 L 378 644 L 357 624 Z" fill="url(#grad-orange)"/>
+  </g>
+</svg>

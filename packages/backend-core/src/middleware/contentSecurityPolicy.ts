@@ -7,7 +7,6 @@ const CSP_DIRECTIVES = {
   "script-src": [
     "'self'",
     "'unsafe-eval'",
-    "https://*.budibase.net",
     "https://cdn.budi.live",
     "https://js.intercomcdn.com",
     "https://widget.intercom.io",
@@ -26,9 +25,6 @@ const CSP_DIRECTIVES = {
   "base-uri": ["'self'"],
   "connect-src": [
     "'self'",
-    "https://*.budibase.app",
-    "https://*.budibaseqa.app",
-    "https://*.budibase.net",
     "https://*.amazonaws.com",
     "https://*.s3.amazonaws.com",
     "https://*.s3.us-east-2.amazonaws.com",

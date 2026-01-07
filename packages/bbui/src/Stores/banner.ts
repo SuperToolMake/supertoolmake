@@ -35,17 +35,6 @@ export function createBannerStore() {
     })
   }
 
-  const showStatus = async () => {
-    const config: BannerConfig = {
-      message: "Some systems are experiencing issues",
-      type: BANNER_TYPES.NEGATIVE,
-      extraButtonText: "View Status",
-      extraButtonAction: () => window.open("https://status.budibase.com/"),
-    }
-
-    await queue([config])
-  }
-
   const queue = async (entries: Array<BannerConfig>) => {
     const priority: Record<string, number> = {
       [BANNER_TYPES.NEGATIVE]: 0,
@@ -74,7 +63,6 @@ export function createBannerStore() {
 
   return {
     subscribe: banner.subscribe,
-    showStatus,
     show,
     queue,
   }

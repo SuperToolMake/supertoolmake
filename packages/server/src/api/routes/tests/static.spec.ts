@@ -160,7 +160,7 @@ describe("/static", () => {
       const res = await request.get(`/apple-touch-icon.png`)
       expect(res.status).toEqual(302)
       expect(res.text).toEqual(
-        `Redirecting to <a href="/builder/bblogo.png">/builder/bblogo.png</a>.`
+        `Redirecting to <a href="/builder/logo_supertoolmake.png">/builder/logo_supertoolmake.png</a>.`
       )
     })
   })

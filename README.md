@@ -1,10 +1,16 @@
-<h1>
+<div align="center">
+    <img alt="SuperToolMake" src="logo.svg" width="60" />
+</div>
+<h1 align="center">
   SuperToolMake
 </h1>
 
-<h3>
-  A light weight fork of <a href="https://github.com/Budibase/budibase">Budibase</a>. 
+<h3 align="center">
+  A light weight fork of <a href="https://github.com/Budibase/budibase">Budibase</a>
 </h3>
+<p align="center">
+  SuperToolMake is an open-source low-code platform that saves you time building forms, portals, and approval apps, securely.
+</p>
 <p>
   <ul>
     ✔️ Includes the app builder for client apps
@@ -15,8 +21,6 @@
     <br />✖️ Excludes user groups
   </ul>
 </p>
-
-Forked from release [3.23.42](https://github.com/Budibase/budibase/releases/tag/3.23.42)
 
 <h3>
   Local development

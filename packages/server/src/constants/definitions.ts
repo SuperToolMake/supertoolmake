@@ -48,7 +48,7 @@ export function defaultAppNavigator(name: string): AppNavigation {
     navigation: "Top",
     title: name,
     navWidth: "Large",
-    navBackground: "var(--spectrum-global-color-static-blue-1200)",
+    navBackground: "var(--spectrum-global-color-static-indigo-1200)",
     navTextColor: "var(--spectrum-global-color-static-white)",
     links: [],
   }

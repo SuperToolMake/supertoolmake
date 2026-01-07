@@ -1,5 +1,5 @@
 <script>
-  import Logo from "assets/bb-emblem.svg"
+  import Logo from "assets/supertoolmake-emblem.svg"
   import { goto } from "@roxi/routify"
   import { organisation } from "@/stores/portal"
 
@@ -10,7 +10,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <img
   src={$organisation.logoUrl || Logo}
-  alt="Budibase Logo"
+  alt="SuperToolMake Logo"
   on:click={() => $goto("./workspaces")}
 />
 

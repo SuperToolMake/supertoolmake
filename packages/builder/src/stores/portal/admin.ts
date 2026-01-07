@@ -1,5 +1,4 @@
 import { API } from "@/api"
-import { banner } from "@budibase/bbui"
 import {
   ConfigChecklistResponse,
   GetEnvironmentResponse,
@@ -35,7 +34,6 @@ export class AdminStore extends BudiStore<AdminState> {
     if (get(this.store).cloud) {
       // in cloud allow this
       await this.getSystemStatus()
-      this.checkStatus()
     }
     this.update(store => {
       store.loaded = true
@@ -58,13 +56,6 @@ export class AdminStore extends BudiStore<AdminState> {
 
       return store
     })
-  }
-
-  async checkStatus() {
-    const health = get(this.store).status?.health
-    if (!health?.passing) {
-      await banner.showStatus()
-    }
   }
 
   async getSystemStatus() {

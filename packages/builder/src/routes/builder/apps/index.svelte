@@ -24,7 +24,7 @@
   import { processStringSync } from "@budibase/string-templates"
   import type { PublishedWorkspaceData } from "@budibase/types"
   import { goto } from "@roxi/routify"
-  import Logo from "assets/bb-emblem.svg"
+  import Logo from "assets/supertoolmake-emblem.svg"
   import { onMount } from "svelte"
 
   $goto

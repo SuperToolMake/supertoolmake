@@ -129,11 +129,6 @@ describe("admin store", () => {
         it("getSystemStatus", () => {
           expect(API.getSystemStatus).toHaveBeenCalledTimes(0)
         })
-
-        it("checkStatus", () => {
-          expect(get).toHaveBeenCalledTimes(2)
-          expect(banner.showStatus).toHaveBeenCalledTimes(0)
-        })
       })
 
       describe("cloud with healthy admin status", () => {
@@ -151,12 +146,6 @@ describe("admin store", () => {
             ctx.writableReturn.update.mock.calls[2][0]({ foo: "foo" })
           ).toEqual({ foo: "foo", status: "status" })
         })
-
-        it("checkStatus", ctx => {
-          expect(get).toHaveBeenCalledTimes(3)
-          expect(get).toHaveBeenNthCalledWith(3, ctx.writableReturn)
-          expect(banner.showStatus).toHaveBeenCalledTimes(0)
-        })
       })
 
       describe("cloud with unhealthy admin status", () => {
@@ -173,13 +162,6 @@ describe("admin store", () => {
           expect(
             ctx.writableReturn.update.mock.calls[2][0]({ foo: "foo" })
           ).toEqual({ foo: "foo", status: "status" })
-        })
-
-        it("checkStatus", ctx => {
-          expect(get).toHaveBeenCalledTimes(3)
-          expect(get).toHaveBeenNthCalledWith(3, ctx.writableReturn)
-          expect(banner.showStatus).toHaveBeenCalledTimes(1)
-          expect(banner.showStatus).toHaveBeenCalledWith()
         })
       })
     })

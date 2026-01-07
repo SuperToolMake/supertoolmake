@@ -14,7 +14,7 @@
   import GoogleButton from "./_components/GoogleButton.svelte"
   import OIDCButton from "./_components/OIDCButton.svelte"
   import { handleError } from "./_components/utils"
-  import Logo from "assets/bb-emblem.svg"
+  import Logo from "assets/supertoolmake-emblem.svg"
   import { onMount } from "svelte"
   import { pushNumSessionsInvalidated } from "../../../../../frontend-core/src"
 

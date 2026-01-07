@@ -11,7 +11,7 @@
   import { BUILDER_URLS } from "@budibase/shared-core"
   import { goto, params } from "@roxi/routify"
   import { users, organisation, auth, admin } from "@/stores/portal"
-  import Logo from "assets/bb-emblem.svg"
+  import Logo from "assets/supertoolmake-emblem.svg"
   import { onMount } from "svelte"
   import { handleError, passwordsMatch } from "../auth/_components/utils"
 
@@ -102,8 +102,7 @@
         <img alt="logo" src={$organisation.logoUrl || Logo} />
         <Layout gap="XS" noPadding>
           <Heading size="M">Join {company}</Heading>
-          <Body size="M">Create your account to access your budibase apps!</Body
-          >
+          <Body size="M">Create your account to access your apps!</Body>
         </Layout>
 
         <Layout gap="S" noPadding>

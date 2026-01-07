@@ -44,7 +44,6 @@ ENV NODE_ENV=production
 ENV NODE_OPTIONS="--no-node-snapshot"
 ENV CLUSTER_MODE=${CLUSTER_MODE}
 ENV SERVICE=worker-service
-ENV ACCOUNT_PORTAL_URL=https://account.budibase.app
 
 ARG BUDIBASE_VERSION
 ARG GIT_COMMIT_SHA

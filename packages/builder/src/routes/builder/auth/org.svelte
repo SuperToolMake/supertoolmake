@@ -10,7 +10,7 @@
   } from "@budibase/bbui"
   import { goto } from "@roxi/routify"
   import { auth, admin } from "@/stores/portal"
-  import Logo from "assets/bb-emblem.svg"
+  import Logo from "assets/supertoolmake-emblem.svg"
   import { get } from "svelte/store"
   import { onMount } from "svelte"
 

@@ -1,48 +1,51 @@
 <script lang="ts">
-  export let color: string | undefined = undefined
-  export let topRightColor = "#FF4E4E"
-  export let bottomRightColor = "#6E56FF"
-  export let topLeftColor = "#F97777"
-  export let bottomLeftColor = "#9F8FFF"
   export let size = 265
-
-  // If single color is provided, use it for all
-  $: finalTopRight = color || topRightColor
-  $: finalBottomRight = color || bottomRightColor
-  $: finalTopLeft = color || topLeftColor
-  $: finalBottomLeft = color || bottomLeftColor
 </script>
 
 <svg
-  role="img"
-  aria-label="Budibase logo"
-  width={size}
-  height={size}
-  viewBox="0 0 265 265"
-  fill="none"
   xmlns="http://www.w3.org/2000/svg"
+  viewBox="150 140 460 460"
+  width={size * 1.2}
+  height={size}
 >
-  <g clip-path="url(#clip0_1_1799)">
+  <defs>
+    <linearGradient id="grad-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A6CD3" />
+      <stop offset="45%" stop-color="#2C8EF2" />
+      <stop offset="100%" stop-color="#5FB4FF" />
+    </linearGradient>
+    <linearGradient id="grad-orange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#86F7C0" />
+      <stop offset="45%" stop-color="#3BD98C" />
+      <stop offset="100%" stop-color="#0E6E43" />
+    </linearGradient>
+    <linearGradient id="grad-red" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#86F7C0" />
+      <stop offset="45%" stop-color="#3BD98C" />
+      <stop offset="100%" stop-color="#0E6E43" />
+    </linearGradient>
+    <linearGradient id="grad-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#74E9FF" />
+      <stop offset="45%" stop-color="#2AD7FF" />
+      <stop offset="100%" stop-color="#0A8FB8" />
+    </linearGradient>
+  </defs>
+  <g transform="rotate(90 361 375.5)">
     <path
-      d="M158.2 8.6V116.6C158.2 121.3 162 125.2 166.8 125.2H213.8C218 125.2 222 123.2 224.6 119.8L262.9 68.9C265.7 65.2 265.7 60.1 262.9 56.4L224.6 5.4C222 2 218 0 213.8 0H166.8C162 0 158.2 3.8 158.2 8.6Z"
-      fill={finalTopRight}
+      d="M 166 360 A 46 42 0 0 1 134 315 L 340 74 A 46 42 0 0 0 357 87 L 357 360 Z"
+      fill="url(#grad-blue)"
     />
     <path
-      d="M158.2 148.4V256.4C158.2 261.1 162 265 166.8 265H213.8C218 265 222 263 224.6 259.6L262.9 208.7C265.7 205 265.7 199.9 262.9 196.2L224.6 145.3C222.1 141.9 218.1 139.9 213.8 139.9H166.8C162 139.8 158.2 143.7 158.2 148.4Z"
-      fill={finalBottomRight}
+      d="M 357 173 L 540 173 A 42 36 0 0 1 582 209 A 18 18 0 0 1 582 224 L 466 359 L 357 359 Z"
+      fill="url(#grad-cyan)"
     />
     <path
-      d="M0 8.6V116.6C0 121.3 3.8 125.2 8.6 125.2H109.6C113.8 125.2 117.8 123.2 120.4 119.8L155.9 72.5C160.3 66.6 160.3 58.5 155.9 52.6L120.3 5.4C117.8 2 113.8 0 109.5 0H8.6C3.8 0 0 3.8 0 8.6Z"
-      fill={finalTopLeft}
+      d="M 357 359 L 300 359 L 134 521 A 46 42 0 0 0 180 563 L 357 563 Z"
+      fill="url(#grad-red)"
     />
     <path
-      d="M0 148.4V256.4C0 261.1 3.8 265 8.6 265H109.6C113.8 265 117.8 263 120.4 259.6L155.9 212.3C160.3 206.4 160.3 198.3 155.9 192.4L120.4 145.1C117.9 141.7 113.9 139.7 109.6 139.7H8.6C3.8 139.8 0 143.7 0 148.4Z"
-      fill={finalBottomLeft}
+      d="M 357 359 L 540 359 A 42 35 0 0 1 582 394 A 18 18 0 0 1 582 415 L 378 644 L 357 624 Z"
+      fill="url(#grad-orange)"
     />
   </g>
-  <defs>
-    <clipPath id="clip0_1_1799">
-      <rect width="265" height="265" fill="white" />
-    </clipPath>
-  </defs>
 </svg>

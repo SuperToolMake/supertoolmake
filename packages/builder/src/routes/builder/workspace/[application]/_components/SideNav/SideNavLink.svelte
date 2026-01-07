@@ -26,7 +26,7 @@
     {#if icon}
       <Icon
         name={icon}
-        size="M"
+        size="L"
         weight="regular"
         color={iconColor || "var(--spectrum-global-color-gray-800)"}
       />
@@ -91,7 +91,7 @@
   }
 
   .link_icon {
-    flex: 0 0 20px;
+    flex: 0 0 28px;
     display: grid;
     place-items: center;
   }

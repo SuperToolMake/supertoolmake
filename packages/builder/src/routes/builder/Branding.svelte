@@ -8,7 +8,7 @@
   $: platformTitle =
     !$auth.user && platformTitleText ? platformTitleText : "SuperToolMake"
 
-  $: faviconUrl = $organisation.faviconUrl || "/builder/bblogo.png"
+  $: faviconUrl = $organisation.faviconUrl || "/builder/logo_supertoolmake.png"
 
   onMount(async () => {
     await organisation.init()
@@ -27,6 +27,6 @@
     <link rel="icon" href={faviconUrl} />
   {:else}
     <!-- A default must be set or the browser defaults to favicon.ico behaviour -->
-    <link rel="icon" href={"/builder/bblogo.png"} />
+    <link rel="icon" href={"/builder/logo_supertoolmake.png"} />
   {/if}
 </svelte:head>

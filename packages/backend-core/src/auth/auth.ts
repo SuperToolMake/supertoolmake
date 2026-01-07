@@ -181,7 +181,7 @@ export async function updateUserOAuth(userId: string, oAuthConfig: any) {
 }
 
 /**
- * Logs a user out from budibase. Re-used across account portal and builder.
+ * Logs a user out. Re-used across account portal and builder.
  */
 export async function platformLogout(opts: PlatformLogoutOpts) {
   const ctx = opts.ctx

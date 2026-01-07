@@ -9,7 +9,6 @@ import SqlServer from "./SQLServer.svelte"
 import MySQL from "./MySQL.svelte"
 import ArangoDB from "./ArangoDB.svelte"
 import Rest from "./Rest.svelte"
-import Budibase from "./Budibase.svelte"
 import Oracle from "./Oracle.svelte"
 import Firebase from "./Firebase.svelte"
 import Redis from "./Redis.svelte"
@@ -17,7 +16,6 @@ import Snowflake from "./Snowflake.svelte"
 import Custom from "./Custom.svelte"
 
 const ICONS = {
-  BUDIBASE: Budibase,
   POSTGRES: Postgres,
   DYNAMODB: DynamoDB,
   MONGODB: MongoDB,

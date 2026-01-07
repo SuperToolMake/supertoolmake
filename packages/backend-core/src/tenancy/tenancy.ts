@@ -92,7 +92,7 @@ export const getTenantIDFromCtx = (
 
   // subdomain
   if (isAllowed(TenantResolutionStrategy.SUBDOMAIN)) {
-    // e.g. budibase.app or local.com:10000
+    // e.g. local.com:10000
     let platformHost
     try {
       platformHost = new URL(getPlatformURL()).host.split(":")[0]
@@ -102,7 +102,7 @@ export const getTenantIDFromCtx = (
         throw err
       }
     }
-    // e.g. tenant.budibase.app or tenant.local.com
+    // e.g. tenant.tenant.local.com
     const requestHost = ctx.host
     // parse the tenant id from the difference
     if (platformHost && requestHost.includes(platformHost)) {
