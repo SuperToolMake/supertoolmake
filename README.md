@@ -1,5 +1,5 @@
 <div align="center">
-    <img alt="SuperToolMake" src="logo.svg" width="60" />
+    <img alt="SuperToolMake" src="docs/logo.svg" width="60" />
 </div>
 <h1 align="center">
   SuperToolMake
