@@ -14,7 +14,6 @@ export enum FieldType {
   LINK = "link",
   AUTO = "auto",
   JSON = "json",
-  BARCODEQR = "barcodeqr",
   BIGINT = "bigint",
   BB_REFERENCE = "bb_reference",
   BB_REFERENCE_SINGLE = "bb_reference_single",

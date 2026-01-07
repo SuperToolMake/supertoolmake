@@ -109,8 +109,6 @@ describe("/applications/:appId/import", () => {
       "chunks/CardsBlock-3bf33a86.js": "15c4f90da5021530d2f3bcfcd16184dd",
       "chunks/ChartBlock-9712464a.js": "e42adb87fc2d53b4c88f3831e32d437b",
       "chunks/CheckboxGroup-995bb449.js": "d234f50e0ef9fcbeb212a82cdf1b8222",
-      "chunks/CodeGenerator-491374a6.js": "5ab08a313fd009d5c3ccfae4294a01d2",
-      "chunks/CodeScannerField-878f0124.js": "880ab344a303f85d245d0188936cbaa8",
       "chunks/CollapsedButtonGroup-2dfcf354.js":
         "8a8ab48ee3e3cb65c7ada31d7f6fe2b5",
       "chunks/Container-7ddcd183.js": "d1983447bf76acd38d89fa131ae77b11",

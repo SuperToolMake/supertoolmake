@@ -27,7 +27,6 @@ export const textv2 = () => import("./Text.svelte")
 export const filter = () => import("./filter/Filter.svelte")
 export const accordion = () => import("./Accordion.svelte")
 export const singlerowprovider = () => import("./SingleRowProvider.svelte")
-export const codegenerator = () => import("./CodeGenerator.svelte")
 export * from "./blocks"
 export * from "./charts"
 export * from "./dynamic-filter"

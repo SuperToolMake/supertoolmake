@@ -16,7 +16,6 @@ export const passwordfield = () => import("./PasswordField.svelte")
 export const formstep = () => import("./FormStep.svelte")
 export const jsonfield = () => import("./JSONField.svelte")
 export const s3upload = () => import("./S3Upload.svelte")
-export const codescanner = () => import("./CodeScannerField.svelte")
 export const signaturesinglefield = () => import("./SignatureField.svelte")
 export const bbreferencefield = () => import("./BBReferenceField.svelte")
 export const bbreferencesinglefield = () =>
