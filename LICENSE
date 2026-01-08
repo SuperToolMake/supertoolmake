@@ -10,7 +10,7 @@ Copyright (C) 2019 Budibase Ltd
 
 ---
 
-                                 2025-12-16
+                            Modifications 2025-12-16
 
 Forked from Budibase: <https://github.com/Budibase/budibase>
 
@@ -22,6 +22,18 @@ Initial major changes:
 - removed pro module,
 - removed SQS,
 - ensured the criteria for the open source AGPLv3 license were met
+
+---
+
+                                Object storage
+
+Published client apps, created with the SuperToolMake platform, are stored on MinIO.
+
+Copyright (C) 2014 MinIO, Inc.
+
+While no modifications have been made to the MinIO source code, you may view the source code here: <https://github.com/minio/minio>
+
+Any client apps created using SuperToolMake and/or stored on MinIO belong to the user.
 
 ---
 
