@@ -32,6 +32,7 @@
   let templatesValue: RestTemplate[] = []
   let templateGroupsValue: RestTemplateGroup<RestTemplateGroupName>[] = []
 
+  $goto
   $beforeUrlChange(() => {
     return true
   })
