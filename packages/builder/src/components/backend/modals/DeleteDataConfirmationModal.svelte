@@ -9,14 +9,16 @@
   } from "@/stores/builder"
   import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
   import { utils } from "@budibase/shared-core"
-  import { SourceType } from "@budibase/types"
+  import { SourceType, Theme } from "@budibase/types"
   import { goto as gotoStore, params as paramsStore } from "@roxi/routify"
   import { DB_TYPE_EXTERNAL } from "@/constants/backend"
   import { get } from "svelte/store"
   import type { Table, Datasource, Query } from "@budibase/types"
+  import { themeStore } from "@/stores/portal"
 
   $: goto = $gotoStore
   $: params = $paramsStore
+  $: isDarkTheme = ![Theme.LIGHTEST, Theme.LIGHT].includes($themeStore.theme)
 
   export let source: Table | Datasource | Query | undefined
 
@@ -174,21 +176,24 @@
 >
   <div class="content">
     {#if sourceType}
-      <p class="warning"></p>
-      {buildMessage(sourceType)}
-      {#if affectedScreens.length > 0}
-        <span class="screens">
-          <ul class="screens-list">
-            {#each affectedScreens as item}
-              <li>
-                <Link overBackground target="_blank" href={item.url}
-                  >{item.text}</Link
-                >
-              </li>
-            {/each}
-          </ul>
-        </span>
-      {/if}
+      <div class="warning">
+        {buildMessage(sourceType)}
+        {#if affectedScreens.length > 0}
+          <span class="screens">
+            <ul class="screens-list">
+              {#each affectedScreens as item}
+                <li>
+                  <Link
+                    overBackground={isDarkTheme}
+                    target="_blank"
+                    href={item.url}>{item.text}</Link
+                  >
+                </li>
+              {/each}
+            </ul>
+          </span>
+        {/if}
+      </div>
     {/if}
     <p class="warning">This action cannot be undone.</p>
   </div>
