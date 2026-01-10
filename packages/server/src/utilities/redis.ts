@@ -1,4 +1,4 @@
-import { redis, RedisClient, utils } from "@budibase/backend-core"
+import { redis, RedisClient } from "@budibase/backend-core"
 import { getGlobalIDFromUserMetadataID } from "../db/utils"
 import { ContextUser } from "@budibase/types"
 import env from "../environment"

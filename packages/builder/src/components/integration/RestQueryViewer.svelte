@@ -3,7 +3,6 @@
   import { datasources, integrations, queries } from "@/stores/builder"
 
   import {
-    Banner,
     Body,
     Button,
     Divider,
@@ -60,7 +59,6 @@
   $params
 
   export let queryId
-  let lastViewedQueryId = null
 
   let query, datasource
   let breakQs = {},
@@ -79,9 +77,6 @@
   let isTemplateDatasource = false
 
   $: staticVariables = datasource?.config?.staticVariables || {}
-  $: if (queryId) {
-    lastViewedQueryId = queryId
-  }
 
   $: customRequestBindings = toBindingsArray(
     requestBindings,
@@ -379,14 +374,6 @@
       // show when editable or when read only and not empty
       (!variablesReadOnly || Object.keys(dynamicVariables).length > 0)
     )
-  }
-
-  const updateFlag = async (flag, value) => {
-    try {
-      await flags.updateFlag(flag, value)
-    } catch (error) {
-      notifications.error("Error updating flag")
-    }
   }
 
   const urlChanged = evt => {

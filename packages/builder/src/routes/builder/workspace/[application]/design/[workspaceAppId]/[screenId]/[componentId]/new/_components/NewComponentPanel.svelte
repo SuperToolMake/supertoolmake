@@ -110,7 +110,7 @@
 
   // Parses the structure in the manifest and returns an enriched structure with
   // explicit categories
-  const enrichStructure = (structure, definitions, customComponents) => {
+  const enrichStructure = (structure, definitions) => {
     let enrichedStructure = []
 
     structure.forEach(item => {

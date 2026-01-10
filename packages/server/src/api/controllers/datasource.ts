@@ -232,7 +232,6 @@ export async function destroy(ctx: UserCtx<void, DeleteDatasourceResponse>) {
   const db = context.getWorkspaceDB()
   const datasourceId = ctx.params.datasourceId
 
-  const datasource = await sdk.datasources.get(datasourceId)
   // Delete all queries for the datasource
 
   const queries = await db.allDocs<RowValue>(getQueryParams(datasourceId))

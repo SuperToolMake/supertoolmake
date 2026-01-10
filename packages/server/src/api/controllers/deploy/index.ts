@@ -3,14 +3,12 @@ import {
   DeploymentDoc,
   DeploymentProgressResponse,
   DeploymentStatus,
-  FieldType,
   FetchDeploymentResponse,
   PublishStatusResponse,
   PublishWorkspaceRequest,
   PublishWorkspaceResponse,
   Table,
   UserCtx,
-  Workspace,
 } from "@budibase/types"
 import { DocumentType } from "../../../db/utils"
 import env from "../../../environment"
@@ -218,7 +216,6 @@ export const publishWorkspace = async function (
 
   const appId = context.getWorkspaceId()!
 
-  let migrationResult: { app: Workspace; prodWorkspaceId: string }
   try {
     const publish = async () => {
       let replication
@@ -346,7 +343,7 @@ export const publishWorkspace = async function (
         }
       }
     }
-    migrationResult = await publish()
+    await publish()
   } catch (error: unknown) {
     const message =
       error instanceof Error

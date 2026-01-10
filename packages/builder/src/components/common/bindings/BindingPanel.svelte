@@ -310,9 +310,6 @@
     }
   }
 
-  const addSnippet = (snippet: Snippet) =>
-    bindingHelpers.onSelectSnippet(snippet)
-
   onMount(() => {
     // Set the initial mode appropriately
     const initialValueMode = initialValueJS

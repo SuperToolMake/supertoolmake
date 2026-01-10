@@ -134,7 +134,7 @@ interface AppTemplate {
   key?: string
 }
 
-async function createInstance(appId: string, template: AppTemplate) {
+async function createInstance(appId: string) {
   const db = context.getWorkspaceDB()
   await db.put({
     _id: "_design/database",
@@ -664,7 +664,6 @@ export async function revertClient(
   }
 
   // Update versions in app package
-  const currentVersion = workspace.version
   const revertedToVersion = workspace.revertableVersion
   const workspacePackageUpdates = {
     version: revertedToVersion,

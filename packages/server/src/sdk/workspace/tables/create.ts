@@ -1,15 +1,11 @@
-import { Row, Table, WithoutDocMetadata } from "@budibase/types"
+import { Table, WithoutDocMetadata } from "@budibase/types"
 
 import * as external from "./external"
 import { isExternal } from "./utils"
 import { setPermissions } from "../permissions"
 import { roles } from "@budibase/backend-core"
 
-export async function create(
-  table: WithoutDocMetadata<Table>,
-  rows?: Row[],
-  userId?: string
-): Promise<Table> {
+export async function create(table: WithoutDocMetadata<Table>): Promise<Table> {
   let createdTable: Table
   if (isExternal({ table })) {
     createdTable = await external.create(table)

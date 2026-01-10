@@ -2,7 +2,6 @@ import * as redis from "../redis/init"
 import * as tenancy from "../tenancy"
 import * as context from "../context"
 import * as platform from "../platform"
-import env from "../environment"
 import { UserDB } from "../users"
 import { User, SSOUser, UserMetadata } from "@budibase/types"
 

@@ -7,11 +7,7 @@ import {
   JsonTypes,
   EXTERNAL_ROW_REV,
 } from "@budibase/types"
-import {
-  helpers,
-  PROTECTED_EXTERNAL_COLUMNS,
-  PROTECTED_INTERNAL_COLUMNS,
-} from "@budibase/shared-core"
+import { helpers, PROTECTED_EXTERNAL_COLUMNS } from "@budibase/shared-core"
 import { generateRowIdField } from "../../../../integrations/utils"
 
 function extractFieldValue({
@@ -97,7 +93,6 @@ export async function basicProcessing({
   isLinked: boolean
 }): Promise<Row> {
   let table: Table = source
-  let isCalculationView = false
 
   const thisRow: Row = {}
 
@@ -119,22 +114,10 @@ export async function basicProcessing({
   }
 
   let columns: string[] = Object.keys(table.schema)
-  if (!isCalculationView) {
-    thisRow._id = generateIdForRow(row, table, isLinked)
-    thisRow.tableId = table._id
-    thisRow._rev = EXTERNAL_ROW_REV
-    columns = columns.concat(PROTECTED_EXTERNAL_COLUMNS)
-  } else if (!isCalculationView) {
-    columns = columns.concat(PROTECTED_EXTERNAL_COLUMNS)
-    for (let internalColumn of [...PROTECTED_INTERNAL_COLUMNS, ...columns]) {
-      thisRow[internalColumn] = extractFieldValue({
-        row,
-        tableName: table._id!,
-        fieldName: internalColumn,
-        isLinked,
-      })
-    }
-  }
+  thisRow._id = generateIdForRow(row, table, isLinked)
+  thisRow.tableId = table._id
+  thisRow._rev = EXTERNAL_ROW_REV
+  columns = columns.concat(PROTECTED_EXTERNAL_COLUMNS)
   for (let col of columns) {
     const schema: FieldSchema | undefined = table.schema[col]
     if (schema?.type !== FieldType.LINK) {

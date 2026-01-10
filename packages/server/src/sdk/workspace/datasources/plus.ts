@@ -6,7 +6,7 @@ import {
   Schema,
   Table,
 } from "@budibase/types"
-import sdk from "../.."
+
 import { getIntegration } from "../../../integrations"
 import tableSdk from "../tables"
 import * as datasources from "./datasources"

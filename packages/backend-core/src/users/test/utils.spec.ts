@@ -1,9 +1,6 @@
 import { User } from "@budibase/types"
 import { structures } from "../../../tests"
-import { DBTestConfiguration } from "../../../tests/extra"
 import { isCreatorSync } from "../utils"
-
-const config = new DBTestConfiguration()
 
 describe("Users", () => {
   it("User is a creator if it is configured as a global builder", () => {

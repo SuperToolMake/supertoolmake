@@ -74,22 +74,6 @@ function prioritisedArraySort(toSort: string[], priorities: string[]) {
   })
 }
 
-function convertBooleans(query: SqlQuery | SqlQuery[]): SqlQuery | SqlQuery[] {
-  if (Array.isArray(query)) {
-    return query.map((q: SqlQuery) => convertBooleans(q) as SqlQuery)
-  } else {
-    if (query.bindings) {
-      query.bindings = query.bindings.map(binding => {
-        if (typeof binding === "boolean") {
-          return binding ? 1 : 0
-        }
-        return binding
-      })
-    }
-  }
-  return query
-}
-
 function escapeQuotes(value: string, quoteChar = '"'): string {
   return value.replace(new RegExp(quoteChar, "g"), `${quoteChar}${quoteChar}`)
 }
@@ -865,7 +849,6 @@ class InternalBuilder {
         filters.oneOf,
         ArrayOperator.ONE_OF,
         (q, key: string, array) => {
-          const schema = this.getFieldSchema(key)
           const values = Array.isArray(array) ? array : [array]
           if (shouldOr) {
             q = q.or
@@ -932,8 +915,6 @@ class InternalBuilder {
         const lowValid = isValidFilter(value.low),
           highValid = isValidFilter(value.high)
 
-        const schema = this.getFieldSchema(key)
-
         let rawKey: string | Knex.Raw = key
         let high = value.high
         let low = value.low
@@ -961,7 +942,6 @@ class InternalBuilder {
     }
     if (filters.equal) {
       iterate(filters.equal, BasicOperator.EQUAL, (q, key, value) => {
-        const schema = this.getFieldSchema(key)
         if (shouldOr) {
           q = q.or
         }
@@ -986,7 +966,6 @@ class InternalBuilder {
     }
     if (filters.notEqual) {
       iterate(filters.notEqual, BasicOperator.NOT_EQUAL, (q, key, value) => {
-        const schema = this.getFieldSchema(key)
         if (shouldOr) {
           q = q.or
         }
@@ -1074,7 +1053,7 @@ class InternalBuilder {
   }
 
   addSorting(query: Knex.QueryBuilder): Knex.QueryBuilder {
-    let { sort, resource } = this.query
+    let { sort } = this.query
     const primaryKey = this.table.primary
     const aliased = this.getTableName()
     if (!Array.isArray(primaryKey)) {

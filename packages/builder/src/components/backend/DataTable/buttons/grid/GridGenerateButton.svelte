@@ -15,8 +15,6 @@
   let popover: DetailPopover
   let createScreenModal: CreateScreenModal
 
-  $: table = $tables.list.find(table => table._id === $datasource.tableId)
-
   export const show = () => popover?.show()
   export const hide = () => popover?.hide()
 

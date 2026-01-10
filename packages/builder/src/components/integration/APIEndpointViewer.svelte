@@ -18,7 +18,6 @@
     ActionButton,
     RadioGroup,
     notifications,
-    Banner,
     Icon,
     Divider,
   } from "@budibase/bbui"

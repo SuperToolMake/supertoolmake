@@ -1,13 +1,12 @@
-import { sdk, helpers } from "@budibase/shared-core"
+import { sdk } from "@budibase/shared-core"
 import { GetGlobalSelfResponse } from "@budibase/types"
 import { UserAvatar } from "@budibase/frontend-core"
 
-import { Target, type Route } from "@/types/routing"
+import { type Route } from "@/types/routing"
 import { Pages } from "./pages"
 import { AdminState } from "@/stores/portal/admin"
 import { AppMetaState } from "@/stores/builder/app"
 import { PortalAppsStore } from "@/stores/portal/apps"
-import { StoreApp } from "@/types"
 
 export const globalRoutes = (user: GetGlobalSelfResponse) => {
   return [
@@ -142,19 +141,11 @@ export const orgRoutes = (
 
 export const appRoutes = (
   appStore: AppMetaState,
-  appsStore: PortalAppsStore
+  _appsStore: PortalAppsStore
 ): Route[] => {
   if (!appStore?.appId) {
     return []
   }
-
-  const getBackupErrors = (apps: StoreApp[], appId: string) => {
-    const target = apps.find(app => app.devId === appId)
-    return target?.backupErrors || {}
-  }
-
-  const backupErrors = getBackupErrors(appsStore.apps || [], appStore?.appId)
-  const backupErrorCount = Object.keys(backupErrors).length
 
   return [
     {

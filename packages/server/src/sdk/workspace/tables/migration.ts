@@ -15,7 +15,7 @@ import {
   Row,
   Table,
 } from "@budibase/types"
-import { cloneDeep } from "lodash"
+
 import sdk from "../.."
 import { isExternalTableID } from "../../../integrations/utils"
 
@@ -182,7 +182,6 @@ abstract class UserColumnMigrator<T> implements ColumnMigrator {
   }
 
   async doMigration(): Promise<MigrationResult> {
-    let oldTable = cloneDeep(this.table)
     let rows = await sdk.rows.fetchRaw(this.table._id!)
     let rowsById = rows.reduce(
       (acc, row) => {

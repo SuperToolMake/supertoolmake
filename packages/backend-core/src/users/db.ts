@@ -217,19 +217,8 @@ export class UserDB {
       }
     }
 
-    let change = 1
-    let creatorsChange = 0
-    if (opts.isAccountHolder || dbUser) {
-      change = 0
-      creatorsChange = 1
-    }
-
     if (dbUser) {
-      const [isDbUserCreator, isUserCreator] = await creatorsInList([
-        dbUser,
-        user,
-      ])
-      creatorsChange = isDbUserCreator !== isUserCreator ? 1 : 0
+      await creatorsInList([dbUser, user])
     }
 
     const addUsers = async () => {
@@ -277,10 +266,7 @@ export class UserDB {
     return (await addUsers()) as User
   }
 
-  static async bulkCreate(
-    newUsersRequested: User[],
-    groups?: string[]
-  ): Promise<BulkUserCreated> {
+  static async bulkCreate(newUsersRequested: User[]): Promise<BulkUserCreated> {
     const tenantId = getTenantId()
 
     let usersToSave: Promise<User>[] = []
@@ -363,9 +349,6 @@ export class UserDB {
       _deleted: true,
     }))
     const dbResponse = await usersCore.bulkUpdateGlobalUsers(toDelete)
-
-    const creatorsEval = await creatorsInList(usersToDelete)
-    const creatorsToDeleteCount = creatorsEval.filter(creator => creator).length
 
     const ssoUsersToDelete: AnyDocument[] = []
     for (let user of usersToDelete) {

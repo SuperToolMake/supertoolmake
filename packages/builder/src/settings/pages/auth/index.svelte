@@ -118,15 +118,6 @@
     iconDropdownOptions.unshift({ label: fileName, value: fileName })
   }
 
-  async function toggleIsSSOEnforced() {
-    const value = $organisation.isSSOEnforced
-    try {
-      await organisation.save({ isSSOEnforced: !value })
-    } catch (e) {
-      notifications.error(e.message)
-    }
-  }
-
   async function saveConfig(config) {
     // Delete unsupported fields
     delete config.createdAt

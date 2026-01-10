@@ -154,8 +154,7 @@ export async function syncUsersAcrossWorkspaces(userIds: string[]) {
 }
 
 export async function syncWorkspace(
-  workspaceId: string,
-  opts?: { automationOnly?: boolean }
+  workspaceId: string
 ): Promise<{ message: string }> {
   if (env.DISABLE_AUTO_PROD_APP_SYNC) {
     return {

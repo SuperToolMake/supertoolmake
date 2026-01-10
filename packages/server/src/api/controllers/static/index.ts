@@ -177,21 +177,6 @@ export async function processPWAZip(ctx: UserCtx) {
   }
 }
 
-const getAppScriptHTML = (
-  workspace: Workspace,
-  location: "Head" | "Body",
-  nonce: string
-) => {
-  if (!workspace.scripts?.length) {
-    return ""
-  }
-  return workspace.scripts
-    .filter(script => script.location === location && script.html?.length)
-    .map(script => script.html)
-    .join("\n")
-    .replaceAll("<script", `<script nonce="${nonce}"`)
-}
-
 export const serveApp = async function (ctx: UserCtx<void, ServeAppResponse>) {
   // No app ID found, cannot serve - return message instead
   const workspaceId = context.getWorkspaceId()
@@ -202,7 +187,7 @@ export const serveApp = async function (ctx: UserCtx<void, ServeAppResponse>) {
 
   const bbHeaderEmbed =
     ctx.request.get("x-budibase-embed")?.toLowerCase() === "true"
-  const [settingsConfig] = await Promise.all([configs.getSettingsConfigDoc()])
+  await Promise.all([configs.getSettingsConfigDoc()])
   // incase running direct from TS
   let appHbsPath = join(__dirname, "app.hbs")
   if (!fs.existsSync(appHbsPath)) {

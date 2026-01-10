@@ -29,7 +29,6 @@ export async function fetch(ctx: UserCtx<void, FetchScreenResponse>) {
 export async function save(
   ctx: UserCtx<SaveScreenRequest, SaveScreenResponse>
 ) {
-  const db = context.getWorkspaceDB()
   const { navigationLinkLabel, ...screen } = ctx.request.body
 
   if (!(await sdk.workspaceApps.get(screen.workspaceAppId))) {

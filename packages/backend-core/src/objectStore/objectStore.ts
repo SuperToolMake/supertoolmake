@@ -520,7 +520,6 @@ export async function retrieveDirectory(
   let writePath = join(budibaseTempDir(), v4())
   await fsp.mkdir(writePath, { recursive: true })
 
-  let numObjects = 0
   await utils.parallelForeach(
     listAllObjects(bucketName, path),
     async object => {
@@ -529,7 +528,6 @@ export async function retrieveDirectory(
         return
       }
 
-      numObjects++
       const filename = object.Key!
       const { stream } = await getReadStream(bucketName, filename)
       const possiblePath = filename.split("/")

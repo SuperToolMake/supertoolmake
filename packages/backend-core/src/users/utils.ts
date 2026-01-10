@@ -1,6 +1,5 @@
 import { sdk } from "@budibase/shared-core"
 import { ContextUser, User } from "@budibase/types"
-import * as context from "../context"
 import env from "../environment"
 import { EmailUnavailableError } from "../errors"
 import { getFirstPlatformUser } from "./lookup"
@@ -16,7 +15,6 @@ export const hasAppBuilderPermissions = sdk.users.hasAppBuilderPermissions
 export const isAdminOrWorkspaceBuilder = sdk.users.isAdminOrWorkspaceBuilder
 
 export async function creatorsInList(users: (User | ContextUser)[]) {
-  const db = context.getGlobalDB()
   return users.map(user => isCreatorSync(user))
 }
 

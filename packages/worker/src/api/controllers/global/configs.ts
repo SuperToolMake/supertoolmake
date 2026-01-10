@@ -20,7 +20,6 @@ import {
   GoogleInnerConfig,
   isGoogleConfig,
   isOIDCConfig,
-  isSettingsConfig,
   isSMTPConfig,
   OIDCLogosConfig,
   PASSWORD_REPLACEMENT,

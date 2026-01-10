@@ -63,9 +63,6 @@
         Settings
       </ActionButton>
     </div>
-    <div>
-      <UpgradeButton on:click={close} />
-    </div>
   </Layout>
 </div>
 

@@ -194,9 +194,6 @@ export async function save(ctx: UserCtx<SaveQueryRequest, SaveQueryResponse>) {
     ctx.throw(400, "Invalid query name")
   }
 
-  const datasource = await sdk.datasources.get(query.datasourceId)
-
-  let eventFn
   if (!query._id && !query._rev) {
     query._id = generateQueryID(query.datasourceId)
     // flag to state whether the default bindings are empty strings (old behaviour) or null

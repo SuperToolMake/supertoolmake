@@ -1,5 +1,4 @@
 import { ReadStream } from "fs"
-import stream from "node:stream"
 import { Row } from "../../../../documents"
 import { SearchFilters } from "../../../../sdk"
 import { SortOrder } from "../../pagination"

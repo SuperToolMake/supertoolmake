@@ -46,7 +46,7 @@
     SourceName,
   } from "@budibase/types"
   import RelationshipSelector from "@/components/common/RelationshipSelector.svelte"
-  import { canBeDisplayColumn, RowUtils } from "@budibase/frontend-core"
+  import { canBeDisplayColumn } from "@budibase/frontend-core"
   import ServerBindingPanel from "@/components/common/bindings/ServerBindingPanel.svelte"
   import OptionsEditor from "./OptionsEditor.svelte"
   import { getUserBindings } from "@/dataBinding"
@@ -63,7 +63,7 @@
   export let field: FieldSchema
 
   const dispatch = createEventDispatcher()
-  const { dispatch: gridDispatch, rows } = getContext("grid") as any
+  const { dispatch: gridDispatch } = getContext("grid") as any
   const SafeID = `${makePropSafe("user")}.${makePropSafe("_id")}`
   const SingleUserDefault = `{{ ${SafeID} }}`
   const MultiUserDefault = `{{ js "${btoa(`return [$("${SafeID}")]`)}" }}`

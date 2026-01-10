@@ -2,7 +2,6 @@ import { context, HTTPError } from "@budibase/backend-core"
 import {
   AutoFieldSubType,
   Database,
-  Datasource,
   FieldSchema,
   FieldType,
   NumberFieldMetadata,
@@ -179,8 +178,6 @@ export async function handleDataImport(
     keepCouchId: identifierFields.includes("_id"),
   })
 
-  let newRowCount = finalData.length
-
   //Set IDs of finalData to match existing row if an update is expected
   if (identifierFields.length > 0) {
     const allDocs = await db.allDocs(
@@ -202,8 +199,6 @@ export async function handleDataImport(
           if (match) {
             finalItem._id = doc._id
             finalItem._rev = doc._rev
-
-            newRowCount--
           }
         })
       })

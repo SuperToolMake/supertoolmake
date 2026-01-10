@@ -22,7 +22,6 @@ const sortQueries = (queryList: Query[]) => {
 }
 
 const skipUnsavedPromptIds = new Set<string>()
-let skipNextUnsavedPrompt = false
 
 interface BuilderQueryStore {
   list: Query[]

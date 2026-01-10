@@ -454,8 +454,6 @@ describe("/api/global/users", () => {
       }
 
       await config.api.users.saveUser(user)
-
-      const savedUser = await config.getUser(user.email)
     })
 
     it("should not be able to create user that exists in same tenant", async () => {
@@ -588,8 +586,6 @@ describe("/api/global/users", () => {
       }
 
       await config.api.users.saveUser(user)
-
-      const savedUser = await config.getUser(user.email)
     })
 
     it("should be able to unassign app roles", async () => {
@@ -603,8 +599,6 @@ describe("/api/global/users", () => {
       user.roles = {}
 
       await config.api.users.saveUser(user)
-
-      const savedUser = await config.getUser(user.email)
     })
 
     it("should be able to update existing app roles", async () => {
@@ -621,8 +615,6 @@ describe("/api/global/users", () => {
       }
 
       await config.api.users.saveUser(user)
-
-      const savedUser = await config.getUser(user.email)
     })
 
     it("should not be able to update email address", async () => {

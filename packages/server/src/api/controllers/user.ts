@@ -11,7 +11,7 @@ import {
   UpdateUserMetadataResponse,
   UserCtx,
 } from "@budibase/types"
-import { generateUserFlagID, InternalTables } from "../../db/utils"
+import { InternalTables } from "../../db/utils"
 import sdk from "../../sdk"
 import { getFullUser } from "../../utilities/users"
 

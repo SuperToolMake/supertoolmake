@@ -1,13 +1,6 @@
 <script lang="ts">
   import { tables } from "@/stores/builder"
-  import {
-    BindingValue,
-    Block,
-    Subject,
-    JSONValue,
-    Property,
-    Section,
-  } from "./components"
+  import { Block, Subject, JSONValue, Property, Section } from "./components"
 
   export let schema
   export let columnName

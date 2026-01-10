@@ -138,7 +138,7 @@
     getOptionLabel={role => role.name}
     getOptionValue={role => role._id}
     getOptionColour={getColor}
-    isOptionEnabled={option => {
+    isOptionEnabled={() => {
       return true
     }}
     {error}
