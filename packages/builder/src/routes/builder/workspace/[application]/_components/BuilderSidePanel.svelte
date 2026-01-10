@@ -1,7 +1,12 @@
 <script lang="ts">
   import { API } from "@/api"
   import RoleSelect from "@/components/common/RoleSelect.svelte"
-  import { appStore, builderStore, deploymentStore } from "@/stores/builder"
+  import {
+    appStore,
+    builderStore,
+    deploymentStore,
+    roles,
+  } from "@/stores/builder"
   import { appsStore, auth, users } from "@/stores/portal"
   import {
     Button,
@@ -41,6 +46,7 @@
     role?: string
     isAdminOrGlobalBuilder?: boolean
     isAppBuilder?: boolean
+    group?: string
   }
 
   let query: string | null = null
@@ -283,7 +289,6 @@
     if (!email) {
       email = query
     }
-    invitingFlow = true
   }
 
   const onInviteUser = async () => {
@@ -337,11 +342,11 @@
     }
   }
 
-  const initSidePanel = async (sidePaneOpen: boolean) => {
+  const initSidePanel = () => {
     loaded = true
   }
 
-  $: initSidePanel($builderStore.builderSidePanel)
+  $: initSidePanel()
 
   function handleKeyDown(evt: { key: string }) {
     if (evt.key === "Enter" && validEmail && !inviting) {
@@ -361,8 +366,13 @@
 
   const getRoleFooter = (user: {
     isAdminOrGlobalBuilder?: boolean
+    group?: string
     role?: string
   }): string | undefined => {
+    if (user.group) {
+      const role = $roles.find(role => role._id === user.role)
+      return `This user has been given ${role?.name} access from the ${user.group} group`
+    }
     if (user.isAdminOrGlobalBuilder) {
       return "Tenant admins can edit all workspaces"
     }
@@ -386,10 +396,6 @@
     } else if (e.detail === Constants.BudibaseRoles.Admin) {
       creationAccessType = Constants.Roles.CREATOR
     }
-  }
-
-  const itemCountText = (word: string, count: number = 0) => {
-    return `${count} ${word}${count !== 1 ? "s" : ""}`
   }
 </script>
 
@@ -432,7 +438,7 @@
     <div class="search" class:focused={searchFocus}>
       <span class="search-input">
         <Input
-          placeholder={"Add users to your app"}
+          placeholder={"Add users and groups to your app"}
           autocomplete="off"
           disabled={inviting}
           bind:value={query}
@@ -538,7 +544,37 @@
               </div>
               {#each filteredUsers as user}
                 <div class="auth-entity">
-                  <div class="details"></div>
+                  <div class="details">
+                    <div class="user-groups">
+                      <div class="user-email" title={user.email}>
+                        {user.email}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="auth-entity-access" class:muted={user.group}>
+                    <RoleSelect
+                      footer={getRoleFooter(user)}
+                      placeholder={false}
+                      value={parseRole(user)}
+                      allowRemove={!!user.role && !user.group}
+                      allowPublic={false}
+                      allowCreator={true}
+                      quiet={true}
+                      on:addcreator={() => {}}
+                      on:change={e => {
+                        onUpdateUser(user, e.detail)
+                      }}
+                      on:remove={() => {
+                        onUpdateUser(user)
+                      }}
+                      autoWidth
+                      align={PopoverAlignment.Right}
+                      allowedRoles={user.isAdminOrGlobalBuilder
+                        ? [Constants.Roles.CREATOR]
+                        : null}
+                      labelPrefix="Can use as"
+                    />
+                  </div>
                 </div>
               {/each}
             </div>
@@ -712,7 +748,8 @@
     width: 100%;
   }
 
-  .auth-entity .user-email {
+  .auth-entity .user-email,
+  .group-name {
     flex: 1 1 0;
     min-width: 0;
     overflow: hidden;
