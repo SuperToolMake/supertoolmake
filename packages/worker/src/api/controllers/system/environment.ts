@@ -7,8 +7,6 @@ export const fetch = async (ctx: Ctx<void, GetEnvironmentResponse>) => {
     multiTenancy: !!env.MULTI_TENANCY,
     offlineMode: !!coreEnv.OFFLINE_MODE,
     cloud: !env.SELF_HOSTED,
-    accountPortalUrl: env.ACCOUNT_PORTAL_URL,
-    disableAccountPortal: !!env.DISABLE_ACCOUNT_PORTAL,
     baseUrl: env.PLATFORM_URL,
     isDev: env.isDev() && !env.isTest(),
     maintenance: [],

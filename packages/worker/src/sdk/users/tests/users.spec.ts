@@ -1,7 +1,6 @@
 import { structures, mocks } from "../../../tests"
 import { env, context } from "@budibase/backend-core"
 import { db as userDb } from "../"
-import { CloudAccount } from "@budibase/types"
 
 describe("users", () => {
   beforeEach(() => {
@@ -12,27 +11,6 @@ describe("users", () => {
     it("returns false for non sso user", async () => {
       await context.doInTenant(structures.tenant.id(), async () => {
         const user = structures.users.user()
-        const result = await userDb.isPreventPasswordActions(user)
-        expect(result).toBe(false)
-      })
-    })
-
-    it("returns true for sso account user", async () => {
-      await context.doInTenant(structures.tenant.id(), async () => {
-        const user = structures.users.user()
-        const account = structures.accounts.ssoAccount() as CloudAccount
-        account.email = user.email
-        mocks.accounts.getAccountByTenantId.mockResolvedValueOnce(account)
-        const result = await userDb.isPreventPasswordActions(user)
-        expect(result).toBe(true)
-      })
-    })
-
-    it("returns false when account doesn't match user email", async () => {
-      await context.doInTenant(structures.tenant.id(), async () => {
-        const user = structures.users.user()
-        const account = structures.accounts.ssoAccount() as CloudAccount
-        mocks.accounts.getAccountByTenantId.mockResolvedValueOnce(account)
         const result = await userDb.isPreventPasswordActions(user)
         expect(result).toBe(false)
       })

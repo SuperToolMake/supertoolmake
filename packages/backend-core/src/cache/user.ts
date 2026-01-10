@@ -3,7 +3,6 @@ import * as tenancy from "../tenancy"
 import * as context from "../context"
 import * as platform from "../platform"
 import env from "../environment"
-import * as accounts from "../accounts"
 import { UserDB } from "../users"
 import { User, SSOUser, UserMetadata } from "@budibase/types"
 
@@ -16,14 +15,6 @@ async function populateFromDB(userId: string, tenantId: string) {
   const db = tenancy.getTenantDB(tenantId)
   const user = await db.get<UserMetadata>(userId)
   user.budibaseAccess = true
-  if (!env.SELF_HOSTED && !env.DISABLE_ACCOUNT_PORTAL) {
-    const account = await accounts.getAccount(user.email)
-    if (account) {
-      user.account = account
-      user.accountPortalAccess = true
-    }
-  }
-
   return user
 }
 
@@ -40,13 +31,6 @@ async function populateUsersFromDB(
   await Promise.all(
     users.map(async (user: any) => {
       user.budibaseAccess = true
-      if (!env.SELF_HOSTED && !env.DISABLE_ACCOUNT_PORTAL) {
-        const account = await accounts.getAccount(user.email)
-        if (account) {
-          user.account = account
-          user.accountPortalAccess = true
-        }
-      }
     })
   )
 

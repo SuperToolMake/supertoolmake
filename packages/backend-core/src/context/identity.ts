@@ -2,9 +2,6 @@ import {
   IdentityContext,
   IdentityType,
   User,
-  isCloudAccount,
-  Account,
-  AccountUserContext,
   UserContext,
   Ctx,
 } from "@budibase/types"
@@ -31,28 +28,4 @@ export function doInUserContext(user: User, ctx: Ctx, task: any) {
     },
   }
   return doInIdentityContext(userContext, task)
-}
-
-// used in account portal
-export function doInAccountContext(account: Account, task: any) {
-  const _id = getAccountUserId(account)
-  const tenantId = account.tenantId
-  const accountContext: AccountUserContext = {
-    _id,
-    type: IdentityType.USER,
-    tenantId,
-    account,
-  }
-  return doInIdentityContext(accountContext, task)
-}
-
-export function getAccountUserId(account: Account) {
-  let userId: string
-  if (isCloudAccount(account)) {
-    userId = account.budibaseUserId
-  } else {
-    // use account id as user id for self-hosting
-    userId = account.accountId
-  }
-  return userId
 }

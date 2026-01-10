@@ -1,5 +1,4 @@
 export * from "./common"
-export * as accounts from "./accounts"
 export * as apps from "./apps"
 export * as db from "./db"
 export * as docs from "./documents"

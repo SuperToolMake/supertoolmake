@@ -1,8 +1,5 @@
 <script>
-  import { Body, ProgressBar, Heading, Icon, Link } from "@budibase/bbui"
-  import { helpers } from "@budibase/shared-core"
-  import { admin } from "@/stores/portal/admin"
-  import { auth } from "@/stores/portal/auth"
+  import { Body, ProgressBar, Heading, Icon } from "@budibase/bbui"
   import { onMount } from "svelte"
 
   export let usage
@@ -11,9 +8,6 @@
   let percentage
   let unlimited = false
   let showWarning = false
-
-  $: accountPortalAccess = $auth?.user?.accountPortalAccess
-  const { accountPortalUpgradeUrl } = helpers
 
   const isUnlimited = () => {
     if (usage.total === -1) {
@@ -25,8 +19,6 @@
   const getPercentage = () => {
     return (usage.used / usage.total) * 100
   }
-
-  $: upgradeUrl = accountPortalUpgradeUrl($admin.accountPortalUrl)
 
   onMount(() => {
     unlimited = isUnlimited()
@@ -75,16 +67,6 @@
         duration={1}
         value={percentage}
       />
-    {/if}
-    {#if showWarning}
-      <Body size="S">
-        To get more {usage.name.toLowerCase()}
-        {#if accountPortalAccess}
-          <Link href={upgradeUrl}>upgrade your plan</Link>
-        {:else}
-          contact your account holder
-        {/if}
-      </Body>
     {/if}
   </div>
 </div>

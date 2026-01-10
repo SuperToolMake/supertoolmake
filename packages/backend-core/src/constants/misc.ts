@@ -6,7 +6,6 @@ export enum UserStatus {
 export enum Cookie {
   Auth = "budibase:auth",
   Init = "budibase:init",
-  ACCOUNT_RETURN_URL = "budibase:account:returnurl",
   DatasourceAuth = "budibase:datasourceauth",
   OIDC_CONFIG = "budibase:oidc:config",
 }

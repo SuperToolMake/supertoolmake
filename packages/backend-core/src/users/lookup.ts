@@ -1,9 +1,4 @@
-import {
-  AccountMetadata,
-  PlatformUser,
-  PlatformUserByEmail,
-  User,
-} from "@budibase/types"
+import { PlatformUser, PlatformUserByEmail, User } from "@budibase/types"
 import * as dbUtils from "../db"
 import { ViewName } from "../constants"
 import { getExistingInvites } from "../cache/invite"
@@ -12,7 +7,6 @@ import { getExistingInvites } from "../cache/invite"
  * Apply a system-wide search on emails:
  * - in tenant
  * - cross tenant
- * - accounts
  * return an array of emails that match the supplied emails.
  */
 export async function searchExistingEmails(emails: string[]) {
@@ -23,9 +17,6 @@ export async function searchExistingEmails(emails: string[]) {
 
   const existingPlatformUsers = await getExistingPlatformUsers(emails)
   matchedEmails.push(...existingPlatformUsers.map(user => user._id!))
-
-  const existingAccounts = await getExistingAccounts(emails)
-  matchedEmails.push(...existingAccounts.map(account => account.email))
 
   const invitedEmails = await getExistingInvites(emails)
   matchedEmails.push(...invitedEmails.map(invite => invite.email))
@@ -85,15 +76,4 @@ export async function getExistingPlatformUsers(
     ViewName.PLATFORM_USERS_LOWERCASE,
     params
   )
-}
-
-export async function getExistingAccounts(
-  emails: string[]
-): Promise<AccountMetadata[]> {
-  const lcEmails = emails.map(email => email.toLowerCase())
-  const params = {
-    keys: lcEmails,
-    include_docs: true,
-  }
-  return await dbUtils.queryPlatformView(ViewName.ACCOUNT_BY_EMAIL, params)
 }

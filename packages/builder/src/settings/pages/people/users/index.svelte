@@ -84,7 +84,6 @@
   ]
   let userData: UserData = { users: [] }
 
-  $: isOwner = $auth.accountPortalAccess && $admin.cloud
   $: readonly = !sdk.users.isAdmin($auth.user)
   $: debouncedUpdateFetch(searchEmail)
   $: schema = {

@@ -37,7 +37,6 @@ import {
   InviteUsersResponse,
   LockName,
   LockType,
-  LookupAccountHolderResponse,
   LookupTenantUserResponse,
   OIDCUser,
   SaveUserResponse,
@@ -81,20 +80,6 @@ export const save = async (ctx: UserCtx<UnsavedUser, SaveUserResponse>) => {
     const currentUserId = ctx.user?._id
     const tenantId = context.getTenantId()
     const requestUser: User = { ...ctx.request.body, tenantId }
-
-    // Do not allow the account holder role to be changed
-    if (
-      requestUser.admin?.global !== true ||
-      requestUser.builder?.global !== true
-    ) {
-      const accountMetadata = await users.getExistingAccounts([
-        requestUser.email,
-      ])
-      if (accountMetadata?.length > 0) {
-        throw Error("Cannot set role of account holder")
-      }
-    }
-
     const user = await userSdk.db.save(requestUser, { currentUserId })
 
     ctx.body = {
@@ -224,9 +209,7 @@ export const adminUser = async (
     ctx.request.body
 
   await tenancy.doInTenant(tenantId, async () => {
-    // account portal sends a pre-hashed password - honour param to prevent double hashing
     const hashPassword = parseBooleanParam(ctx.request.query.hashPassword)
-    // account portal sends no password for SSO users
     const requirePassword = parseBooleanParam(ctx.request.query.requirePassword)
 
     const userExists = await checkAnyUserExists()
@@ -367,30 +350,6 @@ export const tenantUserLookup = async (
     ctx.body = user
   } else {
     ctx.throw(400, "No tenant user found.")
-  }
-}
-
-/**
- * This will be paginated to a default of the first 50 users,
- * So the account holder may not be found until further pagination has occurred
- */
-export const accountHolderLookup = async (
-  ctx: Ctx<void, LookupAccountHolderResponse>
-) => {
-  try {
-    const users = await userSdk.core.getAllUsers()
-    const response = await userSdk.core.getExistingAccounts(
-      users.map(u => u.email)
-    )
-    const holder = response[0]
-    if (!holder) {
-      ctx.body = null
-      return
-    }
-    holder._id = users.find(u => u.email === holder.email)?._id
-    ctx.body = holder
-  } catch (e) {
-    ctx.body = null
   }
 }
 

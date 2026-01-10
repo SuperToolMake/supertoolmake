@@ -214,11 +214,6 @@ export enum Event {
   LICENSE_CHECKOUT_SUCCESS = "license:checkout:success",
   LICENSE_PORTAL_OPENED = "license:portal:opened",
 
-  // ACCOUNT
-  ACCOUNT_CREATED = "account:created",
-  ACCOUNT_DELETED = "account:deleted",
-  ACCOUNT_VERIFIED = "account:verified",
-
   // BACKFILL
   APP_BACKFILL_SUCCEEDED = "app:backfill:succeeded",
   APP_BACKFILL_FAILED = "app:backfill:failed",
@@ -442,11 +437,6 @@ export const AuditedEventFriendlyName: Record<Event, string | undefined> = {
   [Event.LICENSE_CHECKOUT_OPENED]: undefined,
   [Event.LICENSE_CHECKOUT_SUCCESS]: undefined,
   [Event.LICENSE_PORTAL_OPENED]: undefined,
-
-  // ACCOUNT - NOT AUDITED
-  [Event.ACCOUNT_CREATED]: undefined,
-  [Event.ACCOUNT_DELETED]: undefined,
-  [Event.ACCOUNT_VERIFIED]: undefined,
 
   // BACKFILL - NOT AUDITED
   [Event.APP_BACKFILL_SUCCEEDED]: undefined,

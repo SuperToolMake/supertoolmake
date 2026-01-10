@@ -139,5 +139,4 @@ loggedInRoutes
     buildInviteAcceptValidation(),
     controller.inviteAccept
   )
-  .get("/api/global/users/accountholder", controller.accountHolderLookup)
   .get("/api/global/users/tenant/:id", controller.tenantUserLookup)

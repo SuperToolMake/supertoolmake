@@ -68,7 +68,6 @@ function generateSchema(
       case FieldType.STRING:
       case FieldType.OPTIONS:
       case FieldType.LONGFORM:
-      case FieldType.BARCODEQR:
       case FieldType.BB_REFERENCE_SINGLE:
         // primary key strings have to have a length in some DBs
         if (primaryKeys.includes(key)) {
@@ -143,7 +142,6 @@ function generateSchema(
         break
       case FieldType.AUTO:
       case FieldType.JSON:
-      case FieldType.INTERNAL:
         throw new Error(`${column.type} is not a valid SQL type`)
 
       default:

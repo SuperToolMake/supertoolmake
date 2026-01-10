@@ -1,9 +1,4 @@
-import {
-  AccountMetadata,
-  PlatformUser,
-  StrippedUser,
-  User,
-} from "../../documents"
+import { PlatformUser, StrippedUser, User } from "../../documents"
 import { SearchFilters } from "../../sdk"
 
 interface InviteInfo {
@@ -174,8 +169,6 @@ export interface CheckInviteResponse {
 export type GetUserInvitesResponse = InviteWithCode[]
 
 export interface UpdateInviteResponse extends Invite {}
-
-export type LookupAccountHolderResponse = AccountMetadata | null
 
 export interface ChangeTenantOwnerEmailRequest {
   newAccountEmail: string

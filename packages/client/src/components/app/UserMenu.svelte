@@ -27,7 +27,6 @@
   $: text = getText($authStore)
   $: isBuilder = sdk.users.hasBuilderPermissions($authStore)
   $: isSSO = $authStore != null && isSSOUser($authStore)
-  $: isOwner = $authStore?.accountPortalAccess && $environmentStore.cloud
   $: embedded = $appStore.embedded || $appStore.inIframe
   $: translationOverrides = resolveWorkspaceTranslations(
     $appStore.application?.translationOverrides
@@ -42,8 +41,7 @@
     translationOverrides
   )
 
-  const { accountPortalAccountUrl, builderWorkspacesUrl, builderAppsUrl } =
-    helpers
+  const { builderWorkspacesUrl, builderAppsUrl } = helpers
 
   const getText = (user?: User | ContextUser): string => {
     if (!user) {
@@ -61,7 +59,7 @@
   }
 
   const goToPortal = () => {
-    const builderBaseUrl = $environmentStore.accountPortalUrl
+    const builderBaseUrl = $environmentStore.baseUrl
     const targetUrl = isBuilder
       ? builderWorkspacesUrl(builderBaseUrl)
       : builderAppsUrl(builderBaseUrl)
@@ -96,13 +94,7 @@
       <MenuItem
         icon="lock"
         on:click={() => {
-          if (isOwner) {
-            window.location.href = accountPortalAccountUrl(
-              $environmentStore.accountPortalUrl
-            )
-          } else {
-            changePasswordModal?.show()
-          }
+          changePasswordModal?.show()
         }}
       >
         {userMenuLabels.password}

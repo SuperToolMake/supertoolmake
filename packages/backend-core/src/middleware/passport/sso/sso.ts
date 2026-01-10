@@ -62,7 +62,7 @@ export async function authenticate(
   if (!dbUser && requireLocalAccount) {
     return authError(
       done,
-      "Email does not yet exist. You must set up your local budibase account first."
+      "Email does not yet exist. You must set up your local account first."
     )
   }
 

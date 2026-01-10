@@ -14,7 +14,6 @@ import {
 interface PortalAuthStore {
   user?: GetGlobalSelfResponse
   initInfo?: Record<string, any>
-  accountPortalAccess: boolean
   loaded: boolean
   isSSO: boolean
   tenantId: string
@@ -25,7 +24,6 @@ interface PortalAuthStore {
 class AuthStore extends BudiStore<PortalAuthStore> {
   constructor() {
     super({
-      accountPortalAccess: false,
       tenantId: "default",
       tenantSet: false,
       loaded: false,
@@ -38,7 +36,6 @@ class AuthStore extends BudiStore<PortalAuthStore> {
     this.set({
       loaded: true,
       user: user,
-      accountPortalAccess: !!user?.accountPortalAccess,
       tenantId: user?.tenantId || "default",
       tenantSet: !!user,
       isSSO: user != null && isSSOUser(user),

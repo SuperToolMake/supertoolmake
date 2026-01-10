@@ -5,10 +5,6 @@ import {
   DeleteUserMetadataResponse,
   FetchUserMetadataResponse,
   FindUserMetadataResponse,
-  Flags,
-  GetUserFlagsResponse,
-  SetUserFlagRequest,
-  SetUserFlagResponse,
   UpdateSelfMetadataRequest,
   UpdateSelfMetadataResponse,
   UpdateUserMetadataRequest,
@@ -68,38 +64,4 @@ export async function findMetadata(
   ctx: UserCtx<void, FindUserMetadataResponse>
 ) {
   ctx.body = await getFullUser(ctx.params.id)
-}
-
-export async function setFlag(
-  ctx: UserCtx<SetUserFlagRequest, SetUserFlagResponse>
-) {
-  const userId = ctx.user?._id
-  const { flag, value } = ctx.request.body
-  if (!flag) {
-    ctx.throw(400, "Must supply a 'flag' field in request body.")
-  }
-  const flagDocId = generateUserFlagID(userId!)
-  const db = context.getWorkspaceDB()
-  let doc: Flags
-  try {
-    doc = await db.get<Flags>(flagDocId)
-  } catch (err) {
-    doc = { _id: flagDocId }
-  }
-  doc[flag] = value || true
-  await db.put(doc)
-  ctx.body = { message: "Flag set successfully" }
-}
-
-export async function getFlags(ctx: UserCtx<void, GetUserFlagsResponse>) {
-  const userId = ctx.user?._id
-  const docId = generateUserFlagID(userId!)
-  const db = context.getWorkspaceDB()
-  let doc: Flags
-  try {
-    doc = await db.get<Flags>(docId)
-  } catch (err) {
-    doc = { _id: docId }
-  }
-  ctx.body = doc
 }

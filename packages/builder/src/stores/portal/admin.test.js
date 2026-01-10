@@ -1,5 +1,4 @@
 import { API } from "@/api"
-import { banner } from "@budibase/bbui"
 import { get, writable } from "svelte/store"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { AdminStore } from "./admin"
@@ -71,8 +70,6 @@ describe("admin store", () => {
       API.getEnvironment.mockReturnValue({
         multiTenancy: true,
         cloud: true,
-        disableAccountPortal: true,
-        accountPortalUrl: "url",
         isDev: true,
         serveDevClientFromStorage: false,
       })
@@ -112,8 +109,6 @@ describe("admin store", () => {
           foo: "foo",
           multiTenancy: true,
           cloud: true,
-          disableAccountPortal: true,
-          accountPortalUrl: "url",
           isDev: true,
         })
       })

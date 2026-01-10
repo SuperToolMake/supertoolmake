@@ -2,7 +2,7 @@
   import { API } from "@/api"
   import RoleSelect from "@/components/common/RoleSelect.svelte"
   import { appStore, builderStore, deploymentStore } from "@/stores/builder"
-  import { admin, appsStore, auth, users } from "@/stores/portal"
+  import { appsStore, auth, users } from "@/stores/portal"
   import {
     Button,
     CopyInput,
@@ -64,7 +64,6 @@
   $: validEmail = emailValidator(email) === true
   $: prodAppId = appsStore.getProdAppID($appStore.appId)
   $: promptInvite = showInvite(filteredInvites, filteredUsers, query)
-  $: isOwner = $auth.accountPortalAccess && $admin.cloud
 
   const showInvite = (
     invites: InviteWithCode[],

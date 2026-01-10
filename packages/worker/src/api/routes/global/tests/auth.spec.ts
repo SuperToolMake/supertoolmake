@@ -1,4 +1,4 @@
-import { CloudAccount, SSOUser, User } from "@budibase/types"
+import { SSOUser, User } from "@budibase/types"
 
 jest.mock("nodemailer")
 import {
@@ -127,17 +127,6 @@ describe("/api/global/auth", () => {
             await testSSOUser()
           })
         })
-
-        describe("root account sso user", () => {
-          it("should prevent user from logging in", async () => {
-            user = await config.createUser()
-            const account = structures.accounts.ssoAccount() as CloudAccount
-            account.email = user.email
-            mocks.accounts.getAccountByTenantId.mockResolvedValueOnce(account)
-
-            await testSSOUser()
-          })
-        })
       })
 
       describe("lockout", () => {
@@ -233,17 +222,6 @@ describe("/api/global/auth", () => {
             await testSSOUser()
           })
         })
-
-        describe("root account sso user", () => {
-          it("should prevent user from generating password reset email", async () => {
-            user = await config.createUser(structures.users.user())
-            const account = structures.accounts.ssoAccount() as CloudAccount
-            account.email = user.email
-            mocks.accounts.getAccountByTenantId.mockResolvedValueOnce(account)
-
-            await testSSOUser()
-          })
-        })
       })
     })
 
@@ -308,16 +286,6 @@ describe("/api/global/auth", () => {
             const { code } = await config.api.auth.requestPasswordReset(
               sendMailMock,
               user.email
-            )
-
-            // convert to account owner now that password has been requested
-            const account: CloudAccount = {
-              ...structures.accounts.ssoAccount(),
-              budibaseUserId: "budibaseUserId",
-              email: user.email,
-            }
-            mocks.accounts.getAccountByTenantId.mockReturnValueOnce(
-              Promise.resolve(account)
             )
 
             await testSSOUser(code!)

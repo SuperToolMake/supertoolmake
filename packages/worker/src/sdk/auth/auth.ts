@@ -40,8 +40,6 @@ export async function loginUser(user: User) {
 }
 
 export async function logout(opts: PlatformLogoutOpts) {
-  // TODO: This should be moved out of core and into worker only
-  // account-portal can call worker endpoint
   return authCore.platformLogout(opts)
 }
 

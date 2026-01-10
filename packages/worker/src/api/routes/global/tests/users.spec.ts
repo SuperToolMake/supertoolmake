@@ -1,13 +1,11 @@
 import { InviteUsersResponse, OIDCUser, User } from "@budibase/types"
 
-import { accounts as _accounts, tenancy } from "@budibase/backend-core"
+import { tenancy } from "@budibase/backend-core"
 import * as userSdk from "../../../../sdk/users"
 import { TestConfiguration, mocks, structures } from "../../../../tests"
 
 jest.mock("nodemailer")
 const sendMailMock = mocks.email.mock()
-
-const accounts = jest.mocked(_accounts)
 
 describe("/api/global/users", () => {
   const config = new TestConfiguration()
@@ -410,19 +408,6 @@ describe("/api/global/users", () => {
       })
     })
 
-    it("should ignore accounts using the same email", async () => {
-      const account = structures.accounts.account()
-      const resp = await config.api.accounts.saveMetadata(account)
-      const user = structures.users.user({ email: resp.email })
-      jest.clearAllMocks()
-
-      const response = await config.api.users.bulkCreateUsers([user])
-
-      expect(response.created?.successful.length).toBe(0)
-      expect(response.created?.unsuccessful.length).toBe(1)
-      expect(response.created?.unsuccessful[0].email).toBe(user.email)
-    })
-
     it("should be able to bulk create users", async () => {
       const builder = structures.users.builderUser()
       const admin = structures.users.adminUser()
@@ -498,18 +483,6 @@ describe("/api/global/users", () => {
           `Email already in use: '${user.email}'`
         )
       })
-    })
-
-    it("should not be able to create user with the same email as an account", async () => {
-      const user = structures.users.user()
-      const account = structures.accounts.cloudAccount()
-      accounts.getAccount.mockReturnValueOnce(Promise.resolve(account))
-
-      const response = await config.api.users.saveUser(user, 400)
-
-      expect(response.body.message).toBe(
-        `Email already in use: '${user.email}'`
-      )
     })
 
     it("should not be able to create a user with the same email and different casing", async () => {
@@ -1068,27 +1041,6 @@ describe("/api/global/users", () => {
       jest.clearAllMocks()
 
       await config.api.users.deleteUser(user._id!)
-    })
-
-    it("should not be able to destroy account owner", async () => {
-      const user = await config.createUser()
-      const account = structures.accounts.cloudAccount()
-      accounts.getAccount.mockReturnValueOnce(Promise.resolve(account))
-
-      const response = await config.api.users.deleteUser(user._id!, 400)
-
-      expect(response.body.message).toBe("Account holder cannot be deleted")
-    })
-
-    it("should not be able to destroy account owner as account owner", async () => {
-      const user = await config.user!
-      const account = structures.accounts.cloudAccount()
-      account.email = user.email
-      accounts.getAccount.mockReturnValueOnce(Promise.resolve(account))
-
-      const response = await config.api.users.deleteUser(user._id!, 400)
-
-      expect(response.body.message).toBe("Unable to delete self.")
     })
   })
 

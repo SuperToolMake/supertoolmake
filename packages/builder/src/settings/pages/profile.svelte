@@ -28,7 +28,6 @@
   let apiKey: string | undefined = undefined
   let updatePasswordModal: Modal
 
-  $: isOwner = $auth.accountPortalAccess && $admin.cloud
   $: user = $auth.user
   $: first = user?.firstName
   $: last = user?.lastName

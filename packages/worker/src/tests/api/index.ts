@@ -1,5 +1,4 @@
 import TestConfiguration from "../TestConfiguration"
-import { AccountAPI } from "./accounts"
 import { AuthAPI } from "./auth"
 import { ConfigAPI } from "./configs"
 import { EmailAPI } from "./email"
@@ -12,7 +11,6 @@ import { RolesAPI } from "./roles"
 import { TemplatesAPI } from "./templates"
 
 export default class API {
-  accounts: AccountAPI
   auth: AuthAPI
   configs: ConfigAPI
   emails: EmailAPI
@@ -25,7 +23,6 @@ export default class API {
   templates: TemplatesAPI
 
   constructor(config: TestConfiguration) {
-    this.accounts = new AccountAPI(config)
     this.auth = new AuthAPI(config)
     this.configs = new ConfigAPI(config)
     this.emails = new EmailAPI(config)

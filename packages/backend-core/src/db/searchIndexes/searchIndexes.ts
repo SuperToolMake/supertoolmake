@@ -23,7 +23,6 @@ export async function createUserIndex() {
       "account",
       "license",
       "budibaseAccess",
-      "accountPortalAccess",
       "csrfToken",
     ]
 

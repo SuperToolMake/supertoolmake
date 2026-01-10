@@ -2,7 +2,6 @@ import { Context, Request } from "koa"
 import {
   Role,
   UserRoles,
-  Account,
   Row,
   Table,
   UserBindings,
@@ -25,8 +24,6 @@ export interface ContextUser extends Omit<User & Partial<UserSSO>, "roles"> {
   role?: Role
   roles?: UserRoles
   csrfToken?: string
-  accountPortalAccess?: boolean
-  account?: Account
 }
 
 /**

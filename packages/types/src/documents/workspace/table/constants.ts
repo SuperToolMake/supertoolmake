@@ -40,13 +40,11 @@ export enum StringFieldSubType {
 
 export type SupportedSqlTypes =
   | FieldType.STRING
-  | FieldType.BARCODEQR
   | FieldType.LONGFORM
   | FieldType.OPTIONS
   | FieldType.DATETIME
   | FieldType.NUMBER
   | FieldType.BOOLEAN
-  | FieldType.FORMULA
   | FieldType.BIGINT
   | FieldType.BB_REFERENCE
   | FieldType.BB_REFERENCE_SINGLE

@@ -86,9 +86,7 @@ export async function fetchAPIKey(ctx: UserCtx<void, FetchAPIKeyResponse>) {
  *
  */
 const getUserSessionAttributes = (ctx: UserCtx) => ({
-  account: ctx.user.account,
   budibaseAccess: !!ctx.user.budibaseAccess,
-  accountPortalAccess: !!ctx.user.accountPortalAccess,
   csrfToken: ctx.user.csrfToken!,
 })
 

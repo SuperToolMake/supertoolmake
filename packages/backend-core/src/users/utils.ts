@@ -1,10 +1,9 @@
 import { sdk } from "@budibase/shared-core"
-import { ContextUser, User, UserIdentifier } from "@budibase/types"
-import * as accountSdk from "../accounts"
+import { ContextUser, User } from "@budibase/types"
 import * as context from "../context"
 import env from "../environment"
 import { EmailUnavailableError } from "../errors"
-import { getExistingAccounts, getFirstPlatformUser } from "./lookup"
+import { getFirstPlatformUser } from "./lookup"
 
 // extract from shared-core to make easily accessible from backend-core
 export const isBuilder = sdk.users.isBuilder
@@ -38,29 +37,5 @@ export async function validateUniqueUser(email: string, tenantId: string) {
     if (tenantUser != null && tenantUser.tenantId !== tenantId) {
       throw new EmailUnavailableError(email)
     }
-  }
-
-  // check root account users in account portal
-  if (!env.SELF_HOSTED && !env.DISABLE_ACCOUNT_PORTAL) {
-    const account = await accountSdk.getAccount(email)
-    if (account && account.verified && account.tenantId !== tenantId) {
-      throw new EmailUnavailableError(email)
-    }
-  }
-}
-
-/**
- * For a list of users, return the account holder if there is an email match.
- */
-export async function getAccountHolderFromUsers(
-  users: Array<UserIdentifier>
-): Promise<UserIdentifier | undefined> {
-  if (!env.SELF_HOSTED && !env.DISABLE_ACCOUNT_PORTAL) {
-    const accountMetadata = await getExistingAccounts(
-      users.map(user => user.email)
-    )
-    return users.find(user =>
-      accountMetadata.map(metadata => metadata.email).includes(user.email)
-    )
   }
 }

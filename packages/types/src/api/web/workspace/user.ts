@@ -1,18 +1,8 @@
 import { DocumentInsertResponse } from "nano"
-import { ContextUserMetadata, Flags, UserMetadata } from "../../.."
+import { ContextUserMetadata, UserMetadata } from "../../.."
 
 export type FetchUserMetadataResponse = ContextUserMetadata[]
 export type FindUserMetadataResponse = ContextUserMetadata
-
-export interface SetUserFlagRequest {
-  flag: string
-  value: any
-}
-export interface SetUserFlagResponse {
-  message: string
-}
-
-export interface GetUserFlagsResponse extends Flags {}
 
 export type SelfResponse = ContextUserMetadata | {}
 

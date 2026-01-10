@@ -99,7 +99,6 @@ export interface User
   ssoId?: string
   appSort?: string
   budibaseAccess?: boolean
-  accountPortalAccess?: boolean
   onboardedAt?: string // deprecated and no longer saved
   tours?: Record<string, Date> // deprecated and no longer saved
 }

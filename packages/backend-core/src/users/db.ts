@@ -1,9 +1,7 @@
 import {
-  Account,
   AnyDocument,
   BulkUserCreated,
   BulkUserDeleted,
-  isSSOAccount,
   isSSOUser,
   PlatformUserById,
   PlatformUserBySsoId,
@@ -12,9 +10,8 @@ import {
   UserIdentifier,
   UserStatus,
 } from "@budibase/types"
-import * as accountSdk from "../accounts"
 import * as cache from "../cache"
-import { getGlobalDB, getIdentity, getTenantId } from "../context"
+import { getGlobalDB, getTenantId } from "../context"
 import * as dbUtils from "../db"
 import env from "../environment"
 import { EmailUnavailableError, HTTPError } from "../errors"
@@ -30,7 +27,6 @@ import {
 import * as usersCore from "./users"
 import {
   creatorsInList,
-  getAccountHolderFromUsers,
   isAdmin,
   isCreatorAsync,
   validateUniqueUser,
@@ -54,7 +50,7 @@ const bulkDeleteProcessing = async (dbUser: User) => {
 }
 
 export class UserDB {
-  static async isPreventPasswordActions(user: User, account?: Account) {
+  static async isPreventPasswordActions(user: User) {
     // when in maintenance mode we allow sso users with the admin role
     // to perform any password action - this prevents lockout
     if (env.ENABLE_SSO_MAINTENANCE_MODE && isAdmin(user)) {
@@ -66,11 +62,7 @@ export class UserDB {
       return true
     }
 
-    // Check account sso
-    if (!account) {
-      account = await accountSdk.getAccountByTenantId(getTenantId())
-    }
-    return !!(account && account.email === user.email && isSSOAccount(account))
+    return false
   }
 
   static async buildUser(
@@ -80,8 +72,7 @@ export class UserDB {
       requirePassword: true,
     },
     tenantId: string,
-    dbUser?: any,
-    account?: Account
+    dbUser?: any
   ): Promise<User> {
     let { password, _id } = user
 
@@ -92,7 +83,7 @@ export class UserDB {
 
     let hashedPassword
     if (password && password !== dbUser?.password) {
-      if (await UserDB.isPreventPasswordActions(user, account)) {
+      if (await UserDB.isPreventPasswordActions(user)) {
         throw new HTTPError("Password change is disabled for this user", 400)
       }
 
@@ -315,17 +306,10 @@ export class UserDB {
       }
     }
 
-    const account = await accountSdk.getAccountByTenantId(tenantId)
     const addUsers = async () => {
       for (const user of newUsers) {
         usersToSave.push(
-          UserDB.buildUser(
-            user,
-            { hashPassword: true },
-            tenantId,
-            undefined,
-            account
-          )
+          UserDB.buildUser(user, { hashPassword: true }, tenantId, undefined)
         )
       }
 
@@ -362,18 +346,6 @@ export class UserDB {
     const response: BulkUserDeleted = {
       successful: [],
       unsuccessful: [],
-    }
-
-    // remove the account holder from the delete request if present
-    const accountHolder = await getAccountHolderFromUsers(users)
-    if (accountHolder) {
-      users = users.filter(u => u.userId !== accountHolder.userId)
-      // mark user as unsuccessful
-      response.unsuccessful.push({
-        _id: accountHolder.userId,
-        email: accountHolder.email,
-        reason: "Account holder cannot be deleted",
-      })
     }
 
     // Get users and delete
@@ -450,19 +422,6 @@ export class UserDB {
     const db = getGlobalDB()
     const dbUser = (await db.get(id)) as User
     const userId = dbUser._id as string
-
-    if (!env.SELF_HOSTED && !env.DISABLE_ACCOUNT_PORTAL) {
-      // root account holder can't be deleted from inside budibase
-      const email = dbUser.email
-      const account = await accountSdk.getAccount(email)
-      if (account) {
-        if (dbUser.userId === getIdentity()!._id) {
-          throw new HTTPError('Please visit "Account" to delete this user', 400)
-        } else {
-          throw new HTTPError("Account holder cannot be deleted", 400)
-        }
-      }
-    }
 
     await platform.users.removeUser(dbUser)
 
