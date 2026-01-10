@@ -32,7 +32,6 @@ import { allocateAutoColumnValues } from "./autoColumnState"
 import { TYPE_TRANSFORM_MAP } from "./map"
 import { fixAutoColumnSubType } from "./utils"
 
-export * from "./attachments"
 export * from "./utils"
 
 type AutoColumnProcessingOpts = {

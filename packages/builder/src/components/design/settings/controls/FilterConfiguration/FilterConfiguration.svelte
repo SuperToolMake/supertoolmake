@@ -12,7 +12,6 @@
   import FilterSetting from "./FilterSetting.svelte"
   import { removeInvalidAddMissing } from "../GridColumnConfiguration/getColumns.js"
   import {
-    FieldType,
     type UIFieldSchema,
     type Component,
     type FilterConfig,
@@ -105,17 +104,7 @@
     delete schema._id
     delete schema._rev
 
-    const excludedTypes = [
-      FieldType.ATTACHMENT_SINGLE,
-      FieldType.ATTACHMENTS,
-      FieldType.SIGNATURE_SINGLE,
-    ]
-
-    const filteredSchema = Object.entries(schema || {}).filter(
-      ([_, field]: [string, UIFieldSchema]) => {
-        return !excludedTypes.includes(field.type)
-      }
-    )
+    const filteredSchema = Object.entries(schema || {})
 
     return Object.fromEntries(filteredSchema)
   }

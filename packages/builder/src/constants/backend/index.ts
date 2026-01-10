@@ -39,16 +39,6 @@ export const FIELDS: Record<string, UIField> = {
       presence: false,
     },
   },
-  BARCODEQR: {
-    name: "Barcode / QR",
-    type: FieldType.BARCODEQR,
-    icon: TypeIconMap[FieldType.BARCODEQR],
-    constraints: {
-      type: "string",
-      length: {},
-      presence: false,
-    },
-  },
   LONGFORM: {
     name: "Long form text",
     type: FieldType.LONGFORM,

@@ -73,10 +73,7 @@
   })
   $: registerField($fieldInfo)
 
-  $: schemaType =
-    fieldSchema?.type !== "formula" && fieldSchema?.type !== "bigint"
-      ? fieldSchema?.type
-      : "string"
+  $: schemaType = fieldSchema?.type !== "bigint" ? fieldSchema?.type : "string"
 
   // Focus label when editing
   $: $component.editing && labelNode?.focus()

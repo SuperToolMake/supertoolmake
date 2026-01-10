@@ -1,6 +1,5 @@
 <script lang="ts">
   import { goto } from "@roxi/routify"
-  import { flags } from "@/stores/builder"
   import { datasources } from "@/stores/builder/datasources"
   import { queries } from "@/stores/builder/queries"
   import { integrations } from "@/stores/builder/integrations"
@@ -611,14 +610,6 @@
     }
   }
 
-  const updateFlag = async (flag: string, value: any) => {
-    try {
-      await flags.updateFlag(flag, value)
-    } catch (error) {
-      notifications.error("Error updating flag")
-    }
-  }
-
   // This behaviour needs to be turned into a component!
   // Maybe add a slot behaviour to allow any component to expand to a modal?
   const moveToExpanded = (node: HTMLElement) => {
@@ -881,19 +872,6 @@
                 </Tab>
                 <Tab title="Transformer">
                   <Layout noPadding>
-                    {#if !$flags.queryTransformerBanner}
-                      <Banner
-                        extraButtonText="Learn more"
-                        extraButtonAction={() =>
-                          window.open(
-                            "https://docs.budibase.com/docs/transformers"
-                          )}
-                        on:change={() =>
-                          updateFlag("queryTransformerBanner", true)}
-                      >
-                        Add a JavaScript function to transform the query result.
-                      </Banner>
-                    {/if}
                     <div class="embed">
                       <CodeEditor
                         value={query?.transformer}

@@ -50,7 +50,6 @@ export enum DatasourceFieldType {
 export enum SourceName {
   AIRTABLE = "AIRTABLE",
   ARANGODB = "ARANGODB",
-  BUDIBASE = "BUDIBASE",
   COUCHDB = "COUCHDB",
   DYNAMODB = "DYNAMODB",
   ELASTICSEARCH = "ELASTICSEARCH",

@@ -67,10 +67,6 @@ describe("BannerStore", () => {
       const state = get(bannerStore.store)
       expect(state.closedBanners.size).toBe(1)
       expect(state.closedBanners.has(BannerType.APPS)).toBe(true)
-
-      bannerStore.closeBanner(BannerType.AUTOMATIONS)
-      expect(state.closedBanners.size).toBe(2)
-      expect(state.closedBanners.has(BannerType.AUTOMATIONS)).toBe(true)
     })
 
     it("does not duplicate closed banners", () => {
@@ -113,7 +109,7 @@ describe("BannerStore", () => {
       const appsDisplay = bannerStore.shouldDisplayBanner(BannerType.APPS)
 
       // Close one banner type
-      bannerStore.closeBanner(BannerType.AUTOMATIONS)
+      bannerStore.closeBanner(BannerType.AGENTS)
 
       expect(get(appsDisplay)).toBe(true)
     })

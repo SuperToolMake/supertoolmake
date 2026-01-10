@@ -57,7 +57,7 @@ if (descriptions.length) {
 
         withField(
           name: string,
-          type: FieldType.STRING | FieldType.NUMBER | FieldType.FORMULA,
+          type: FieldType.STRING | FieldType.NUMBER,
           options?: { visible: boolean }
         ) {
           switch (type) {
@@ -66,14 +66,6 @@ if (descriptions.length) {
               this._table.schema[name] = {
                 name,
                 type,
-                ...options,
-              }
-              break
-            case FieldType.FORMULA:
-              this._table.schema[name] = {
-                name,
-                type,
-                formula: "any",
                 ...options,
               }
               break
@@ -142,21 +134,6 @@ if (descriptions.length) {
           expect(result).toEqual(["table.name", "table.amount", "table.id"])
         })
 
-        it("includes hidden fields if there is a formula column", async () => {
-          const table = await new TableConfig("table")
-            .withHiddenField("description")
-            .withField("formula", FieldType.FORMULA)
-            .create()
-
-          const result = await buildSqlFieldListInApp(table, {})
-          expect(result).toEqual([
-            "table.name",
-            "table.description",
-            "table.amount",
-            "table.id",
-          ])
-        })
-
         it("includes relationships fields when flagged", async () => {
           const otherTable = await new TableConfig("linkedTable")
             .withField("id", FieldType.NUMBER)
@@ -178,59 +155,6 @@ if (descriptions.length) {
             "table.id",
             "linkedTable.id",
             "linkedTable.name",
-          ])
-        })
-
-        it("includes all relationship fields if there is a formula column", async () => {
-          const otherTable = await new TableConfig("linkedTable")
-            .withField("hidden", FieldType.STRING, { visible: false })
-            .create()
-
-          const table = await new TableConfig("table")
-            .withRelation("link", otherTable._id!)
-            .withField("formula", FieldType.FORMULA)
-            .create()
-
-          const result = await buildSqlFieldListInApp(table, allTables, {
-            relationships: true,
-          })
-          expect(result).toEqual([
-            "table.name",
-            "table.description",
-            "table.amount",
-            "table.id",
-            "linkedTable.name",
-            "linkedTable.description",
-            "linkedTable.amount",
-            "linkedTable.hidden",
-            "linkedTable.id",
-          ])
-        })
-
-        it("never includes non-sql columns from relationships", async () => {
-          const otherTable = await new TableConfig("linkedTable")
-            .withField("hidden", FieldType.STRING, { visible: false })
-            .withField("formula", FieldType.FORMULA)
-            .create()
-
-          const table = await new TableConfig("table")
-            .withRelation("link", otherTable._id!)
-            .withField("formula", FieldType.FORMULA)
-            .create()
-
-          const result = await buildSqlFieldListInApp(table, allTables, {
-            relationships: true,
-          })
-          expect(result).toEqual([
-            "table.name",
-            "table.description",
-            "table.amount",
-            "table.id",
-            "linkedTable.name",
-            "linkedTable.description",
-            "linkedTable.amount",
-            "linkedTable.hidden",
-            "linkedTable.id",
           ])
         })
       })

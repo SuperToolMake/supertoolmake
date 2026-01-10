@@ -276,9 +276,7 @@ function copyExistingPropsOver(
 
       let shouldKeepSchema = false
       switch (existingColumnType) {
-        case FieldType.FORMULA:
         case FieldType.AUTO:
-        case FieldType.INTERNAL:
           shouldKeepSchema = true
           break
 
@@ -291,7 +289,6 @@ function copyExistingPropsOver(
         case FieldType.STRING:
         case FieldType.OPTIONS:
         case FieldType.LONGFORM:
-        case FieldType.BARCODEQR:
           shouldKeepSchema = keepIfType(FieldType.STRING)
           break
 
@@ -301,9 +298,6 @@ function copyExistingPropsOver(
           break
 
         case FieldType.ARRAY:
-        case FieldType.ATTACHMENTS:
-        case FieldType.ATTACHMENT_SINGLE:
-        case FieldType.SIGNATURE_SINGLE:
         case FieldType.JSON:
         case FieldType.BB_REFERENCE:
         case FieldType.BB_REFERENCE_SINGLE:

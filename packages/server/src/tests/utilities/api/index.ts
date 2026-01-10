@@ -1,6 +1,5 @@
 import TestConfiguration from "../TestConfiguration"
 import { AssetsAPI } from "./assets"
-import { AttachmentAPI } from "./attachment"
 import { BackupAPI } from "./backup"
 import { DatasourceAPI } from "./datasource"
 import { DeployAPI } from "./deploy"
@@ -8,7 +7,6 @@ import { MiscAPI } from "./misc"
 import { NavigationAPI } from "./navigation"
 import { OAuth2API } from "./oauth2"
 import { PermissionAPI } from "./permission"
-import { PluginAPI } from "./plugin"
 import { RowPublicAPI } from "./public/row"
 import { UserPublicAPI } from "./public/user"
 import { QueryAPI } from "./query"
@@ -27,14 +25,12 @@ import { WorkspaceFavouriteAPI } from "./workspaceFavourite"
 
 export default class API {
   workspace: WorkspaceAPI
-  attachment: AttachmentAPI
   backup: BackupAPI
   datasource: DatasourceAPI
   deploy: DeployAPI
   misc: MiscAPI
   oauth2: OAuth2API
   permission: PermissionAPI
-  plugin: PluginAPI
   query: QueryAPI
   roles: RoleAPI
   row: RowAPI
@@ -57,14 +53,12 @@ export default class API {
 
   constructor(config: TestConfiguration) {
     this.workspace = new WorkspaceAPI(config)
-    this.attachment = new AttachmentAPI(config)
     this.backup = new BackupAPI(config)
     this.datasource = new DatasourceAPI(config)
     this.deploy = new DeployAPI(config)
     this.misc = new MiscAPI(config)
     this.oauth2 = new OAuth2API(config)
     this.permission = new PermissionAPI(config)
-    this.plugin = new PluginAPI(config)
     this.query = new QueryAPI(config)
     this.roles = new RoleAPI(config)
     this.row = new RowAPI(config)

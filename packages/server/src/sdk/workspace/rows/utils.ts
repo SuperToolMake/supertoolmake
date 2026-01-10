@@ -38,10 +38,8 @@ const SQL_CLIENT_SOURCE_MAP: Record<SourceName, SqlClient | undefined> = {
   [SourceName.ARANGODB]: undefined,
   [SourceName.REST]: undefined,
   [SourceName.FIRESTORE]: undefined,
-  [SourceName.GOOGLE_SHEETS]: undefined,
   [SourceName.REDIS]: undefined,
   [SourceName.SNOWFLAKE]: undefined,
-  [SourceName.BUDIBASE]: undefined,
 }
 
 const XSS_INPUT_REGEX =
@@ -200,10 +198,7 @@ export async function validate({
 }> {
   const table = await getTableFromSource(source)
   const errors: Record<string, any> = {}
-  const disallowArrayTypes = [
-    FieldType.ATTACHMENT_SINGLE,
-    FieldType.BB_REFERENCE_SINGLE,
-  ]
+  const disallowArrayTypes = [FieldType.BB_REFERENCE_SINGLE]
   for (let fieldName of Object.keys(table.schema)) {
     const column = table.schema[fieldName]
     const type = column.type
@@ -218,8 +213,7 @@ export async function validate({
     if (isForeignKey(fieldName, table)) {
       continue
     }
-    // formulas shouldn't validated, data will be deleted anyway
-    if (type === FieldType.FORMULA || column.autocolumn) {
+    if (column.autocolumn) {
       continue
     }
     // special case for options, need to always allow unselected (empty)
@@ -249,23 +243,6 @@ export async function validate({
       } else if (constraints?.presence && row[fieldName].length === 0) {
         // non required MultiSelect creates an empty array, which should not throw errors
         errors[fieldName] = [`${fieldName} is required`]
-      }
-    } else if (
-      (type === FieldType.ATTACHMENTS || type === FieldType.JSON) &&
-      typeof row[fieldName] === "string"
-    ) {
-      // this should only happen if there is an error
-      try {
-        const json = JSON.parse(row[fieldName])
-        if (type === FieldType.ATTACHMENTS) {
-          if (Array.isArray(json)) {
-            row[fieldName] = json
-          } else {
-            errors[fieldName] = [`Must be an array`]
-          }
-        }
-      } catch (err) {
-        errors[fieldName] = [`Contains invalid JSON`]
       }
     } else if (type === FieldType.DATETIME && column.timeOnly) {
       res = validateTimeOnlyField(fieldName, row[fieldName], constraints)

@@ -36,13 +36,6 @@ export const patchAPI = (API: APIClient) => {
                   ?.map(option => option?.primaryDisplay)
                   .filter(option => !!option)
                   .join(", ") || ""
-            } else if (type === "attachment") {
-              // Enrich row with the first image URL for any attachment fields
-              let url = null
-              if (Array.isArray(row[key]) && row[key][0] != null) {
-                url = row[key][0].url
-              }
-              row[`${key}_first`] = url
             }
           }
         }
@@ -75,17 +68,21 @@ export const patchAPI = (API: APIClient) => {
     return null
   }
   const fetchRelationshipData = API.fetchRelationshipData
-  API.fetchRelationshipData = async (sourceId, rowId, fieldName) => {
+  API.fetchRelationshipData = async (
+    sourceId: string,
+    rowId: string,
+    fieldName?: string
+  ) => {
     const rows = await fetchRelationshipData(sourceId, rowId, fieldName)
     return await enrichRows(rows, sourceId)
   }
   const fetchTableData = API.fetchTableData
-  API.fetchTableData = async tableId => {
+  API.fetchTableData = async (tableId: string) => {
     const rows = await fetchTableData(tableId)
     return await enrichRows(rows, tableId)
   }
   const searchTable = API.searchTable
-  API.searchTable = async (sourceId, opts) => {
+  API.searchTable = async (sourceId: string, opts: object) => {
     const output = await searchTable(sourceId, opts)
     return {
       ...output,
@@ -96,14 +93,8 @@ export const patchAPI = (API: APIClient) => {
   // Wipe any HBS formulas from table definitions, as these interfere with
   // handlebars enrichment
   const fetchTableDefinition = API.fetchTableDefinition
-  API.fetchTableDefinition = async tableId => {
+  API.fetchTableDefinition = async (tableId: string) => {
     const definition = await fetchTableDefinition(tableId)
-    Object.keys(definition?.schema || {}).forEach(field => {
-      if (definition.schema[field]?.type === "formula") {
-        // @ts-expect-error TODO check what use case removing that would break
-        delete definition.schema[field].formula
-      }
-    })
     return definition
   }
 }

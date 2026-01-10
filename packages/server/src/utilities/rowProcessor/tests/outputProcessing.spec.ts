@@ -3,7 +3,6 @@ import {
   BBReferenceFieldSubType,
   FieldType,
   INTERNAL_TABLE_SOURCE_ID,
-  RowAttachment,
   Table,
   TableSourceType,
 } from "@budibase/types"
@@ -136,96 +135,6 @@ describe("rowProcessor - outputProcessing", () => {
       expect(
         bbReferenceProcessor.processOutputBBReferences
       ).toHaveBeenCalledWith("123", BBReferenceFieldSubType.USER)
-    })
-  })
-
-  it("should handle attachment list correctly", async () => {
-    await config.doInContext(config.getDevWorkspaceId(), async () => {
-      const table: Table = {
-        _id: generator.guid(),
-        name: "TestTable",
-        type: "table",
-        sourceId: INTERNAL_TABLE_SOURCE_ID,
-        sourceType: TableSourceType.INTERNAL,
-        schema: {
-          attach: {
-            type: FieldType.ATTACHMENTS,
-            name: "attach",
-            constraints: {},
-          },
-        },
-      }
-
-      const row: { attach: RowAttachment[] } = {
-        attach: [
-          {
-            size: 10,
-            name: "test",
-            extension: "jpg",
-            key: "test.jpg",
-          },
-        ],
-      }
-
-      const output = await outputProcessing(table, row, { squash: false })
-      expect(output.attach[0].url?.split("?")[0]).toBe(
-        "/files/signed/prod-budi-app-assets/test.jpg"
-      )
-
-      row.attach[0].url = ""
-      const output2 = await outputProcessing(table, row, { squash: false })
-      expect(output2.attach[0].url?.split("?")[0]).toBe(
-        "/files/signed/prod-budi-app-assets/test.jpg"
-      )
-
-      delete row.attach[0].key
-      row.attach[0].url = "aaaa"
-      const output3 = await outputProcessing(table, row, { squash: false })
-      expect(output3.attach[0].url).toBe("aaaa")
-    })
-  })
-
-  it("should handle single attachment correctly", async () => {
-    await config.doInContext(config.getDevWorkspaceId(), async () => {
-      const table: Table = {
-        _id: generator.guid(),
-        name: "TestTable",
-        type: "table",
-        sourceId: INTERNAL_TABLE_SOURCE_ID,
-        sourceType: TableSourceType.INTERNAL,
-        schema: {
-          attach: {
-            type: FieldType.ATTACHMENT_SINGLE,
-            name: "attach",
-            constraints: {},
-          },
-        },
-      }
-
-      const row: { attach: RowAttachment } = {
-        attach: {
-          size: 10,
-          name: "test",
-          extension: "jpg",
-          key: "test.jpg",
-        },
-      }
-
-      const output = await outputProcessing(table, row, { squash: false })
-      expect(output.attach.url?.split("?")[0]).toBe(
-        "/files/signed/prod-budi-app-assets/test.jpg"
-      )
-
-      row.attach.url = ""
-      const output2 = await outputProcessing(table, row, { squash: false })
-      expect(output2.attach?.url?.split("?")[0]).toBe(
-        "/files/signed/prod-budi-app-assets/test.jpg"
-      )
-
-      delete row.attach.key
-      row.attach.url = "aaaa"
-      const output3 = await outputProcessing(table, row, { squash: false })
-      expect(output3.attach?.url).toBe("aaaa")
     })
   })
 

@@ -17,7 +17,6 @@ import {
 import { cloneDeep } from "lodash/fp"
 import merge from "lodash/merge"
 import {
-  BudibaseInternalDB,
   DocumentType,
   generateDatasourceID,
   getDatasourceParams,
@@ -58,10 +57,6 @@ export async function fetch(opts?: {
     return acc
   }, {})
 
-  const bbInternalDb = {
-    ...BudibaseInternalDB,
-  } as Datasource
-
   // Get external datasources
   let datasources = (
     await db.allDocs<Datasource>(
@@ -72,7 +67,6 @@ export async function fetch(opts?: {
   ).rows.map(row => row.doc!)
 
   const allDatasources: Datasource[] = await sdk.datasources.removeSecrets([
-    bbInternalDb,
     ...datasources,
   ])
 
@@ -90,9 +84,9 @@ export async function fetch(opts?: {
     const enriched = (await Promise.all(promises)).map(
       result => result.datasource
     )
-    return [bbInternalDb, ...enriched]
+    return [...enriched]
   } else {
-    return [bbInternalDb, ...datasources]
+    return [...datasources]
   }
 }
 

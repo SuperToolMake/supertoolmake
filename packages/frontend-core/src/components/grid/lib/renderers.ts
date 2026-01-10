@@ -17,7 +17,6 @@ const TypeComponentMap = {
   [FieldType.STRING]: TextCell,
   [FieldType.OPTIONS]: OptionsCell,
   [FieldType.DATETIME]: DateCell,
-  [FieldType.BARCODEQR]: TextCell,
   [FieldType.LONGFORM]: LongFormCell,
   [FieldType.ARRAY]: MultiSelectCell,
   [FieldType.NUMBER]: NumberCell,

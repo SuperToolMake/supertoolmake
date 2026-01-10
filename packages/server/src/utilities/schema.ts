@@ -224,13 +224,6 @@ export function parse(rows: Rows, table: Table): Rows {
           parsedValue = parseJsonExport<{ _id: string }>(columnData)
         }
         parsedRow[columnName] = parsedValue?._id
-      } else if (
-        (columnType === FieldType.ATTACHMENTS ||
-          columnType === FieldType.ATTACHMENT_SINGLE ||
-          columnType === FieldType.SIGNATURE_SINGLE) &&
-        typeof columnData === "string"
-      ) {
-        parsedRow[columnName] = parseJsonExport(columnData)
       } else {
         parsedRow[columnName] = columnData
       }

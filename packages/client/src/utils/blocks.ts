@@ -88,7 +88,7 @@ export const enrichFilter = (
   const newFilters: LegacyFilter[] = []
   columns?.forEach(column => {
     const safePath = column.name.split(".").map(safe).join(".")
-    const stringType = column.type === "string" || column.type === "formula"
+    const stringType = column.type === "string"
     const dateType = column.type === "datetime"
     const binding = `${safe(formId)}.${safePath}`
 

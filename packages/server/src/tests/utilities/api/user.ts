@@ -1,7 +1,6 @@
 import {
   FetchUserMetadataResponse,
   FindUserMetadataResponse,
-  Flags,
   UserMetadata,
 } from "@budibase/types"
 import { Expectations, TestAPI } from "./base"
@@ -61,22 +60,5 @@ export class UserAPI extends TestAPI {
         expectations,
       }
     )
-  }
-
-  setFlag = async (
-    flag: string,
-    value: any,
-    expectations?: Expectations
-  ): Promise<{ message: string }> => {
-    return await this._post<{ message: string }>(`/api/users/flags`, {
-      body: { flag, value },
-      expectations,
-    })
-  }
-
-  getFlags = async (expectations?: Expectations): Promise<Flags> => {
-    return await this._get<Flags>(`/api/users/flags`, {
-      expectations,
-    })
   }
 }

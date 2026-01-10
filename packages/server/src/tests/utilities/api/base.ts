@@ -1,11 +1,7 @@
 import { ReadStream } from "fs"
-import jestOpenAPI from "jest-openapi"
 import request, { Response, SuperTest, Test } from "supertest"
-import { spec } from "../../../../specs/generate"
 import { getServer } from "../../../app"
 import TestConfiguration from "../TestConfiguration"
-
-jestOpenAPI(spec() as any)
 
 type Headers = Record<string, string | string[] | undefined>
 type Method = "get" | "post" | "put" | "patch" | "delete"
@@ -261,15 +257,5 @@ export abstract class PublicAPI extends TestAPI {
     }
 
     return headers
-  }
-
-  protected _checkResponse(response: Response, expectations?: Expectations) {
-    const checked = super._checkResponse(response, expectations)
-    if (checked.status >= 200 && checked.status < 300) {
-      // We don't seem to have documented our errors yet, so for the time being
-      // we'll only do the schema check for successful responses.
-      expect(checked).toSatisfyApiSpec()
-    }
-    return checked
   }
 }

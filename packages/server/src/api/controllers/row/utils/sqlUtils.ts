@@ -118,7 +118,7 @@ export async function buildSqlFieldList(
 ) {
   const { relationships } = opts || {}
 
-  const nonMappedColumns = [FieldType.LINK, FieldType.FORMULA]
+  const nonMappedColumns = [FieldType.LINK]
 
   function extractRealFields(table: Table, existing: string[] = []) {
     return Object.entries(table.schema)
@@ -159,14 +159,6 @@ export async function buildSqlFieldList(
     f => table.schema[f].visible !== false
   )
 
-  const containsFormula = Object.keys(table.schema).some(
-    f => table.schema[f]?.type === FieldType.FORMULA
-  )
-  // If are requesting for a formula field, we need to retrieve all fields
-  if (containsFormula) {
-    fields = extractRealFields(table)
-  }
-
   fields.push(
     ...getRequiredFields(
       {
@@ -191,13 +183,9 @@ export async function buildSqlFieldList(
     }
 
     const viewFields = new Set<string>()
-    if (containsFormula) {
-      extractRealFields(relatedTable).forEach(f => viewFields.add(f))
-    } else {
-      relatedTable.primary?.forEach(f => viewFields.add(f))
-      if (relatedTable.primaryDisplay) {
-        viewFields.add(relatedTable.primaryDisplay)
-      }
+    relatedTable.primary?.forEach(f => viewFields.add(f))
+    if (relatedTable.primaryDisplay) {
+      viewFields.add(relatedTable.primaryDisplay)
     }
 
     const fieldsToAdd = Array.from(viewFields)

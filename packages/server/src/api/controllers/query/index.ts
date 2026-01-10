@@ -48,7 +48,6 @@ const Runner = new Thread(ThreadType.QUERY, {
 function sanitiseUserStructure(user: ContextUser) {
   const copiedUser = cloneDeep(user)
   delete copiedUser.roles
-  delete copiedUser.account
   return copiedUser
 }
 

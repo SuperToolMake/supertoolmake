@@ -1,19 +1,11 @@
-import {
-  context,
-  db,
-  HTTPError,
-  logging,
-  objectStore,
-} from "@budibase/backend-core"
+import { context, db, HTTPError, logging } from "@budibase/backend-core"
 import chunk from "lodash/chunk"
 import {
   AnyDocument,
   Datasource,
   DocumentType,
   INTERNAL_TABLE_SOURCE_ID,
-  FieldType,
   Row,
-  RowAttachment,
   WithDocMetadata,
   prefixed,
   Query,
@@ -24,7 +16,6 @@ import {
   WorkspaceApp,
 } from "@budibase/types"
 import sdk from "../.."
-import { ObjectStoreBuckets } from "../../../constants"
 import { getRowParams } from "../../../db/utils"
 import { DocumentListParams } from "nano"
 
@@ -181,196 +172,12 @@ function getResourceType(id: string): ResourceType | undefined {
   return type
 }
 
-function isWorkspaceApp(doc: AnyDocument): doc is WorkspaceApp {
-  if (!doc._id) {
-    return false
-  }
-  const type = getResourceType(doc._id)
-  return type === ResourceType.WORKSPACE_APP
-}
-
 function isTable(doc: AnyDocument): doc is WithDocMetadata<Table> {
   if (!doc._id) {
     return false
   }
   const type = getResourceType(doc._id)
   return type === ResourceType.TABLE
-}
-
-const ATTACHMENT_FIELD_TYPES = new Set<FieldType>([
-  FieldType.ATTACHMENTS,
-  FieldType.ATTACHMENT_SINGLE,
-  FieldType.SIGNATURE_SINGLE,
-])
-
-type AttachmentColumn = { field: string; type: FieldType }
-
-const isAttachmentColumn = (column: { type?: FieldType } | undefined) =>
-  !!column?.type && ATTACHMENT_FIELD_TYPES.has(column.type)
-
-const getAttachmentColumns = (table: Table): AttachmentColumn[] => {
-  if (!table.schema) {
-    return []
-  }
-  return Object.entries(table.schema)
-    .filter(([, column]) => isAttachmentColumn(column))
-    .map(([field, column]) => ({ field, type: column.type as FieldType }))
-}
-
-interface AttachmentCopyContext {
-  sourceProdWorkspaceId: string
-  destinationProdWorkspaceId: string
-  cache: Map<string, Promise<string | undefined>>
-}
-
-const buildDestinationAttachmentKey = (
-  key: string,
-  sourceProdWorkspaceId: string,
-  destinationProdWorkspaceId: string
-) => {
-  if (!key?.startsWith(`${sourceProdWorkspaceId}/`)) {
-    return key
-  }
-  if (sourceProdWorkspaceId === destinationProdWorkspaceId) {
-    return key
-  }
-  const suffix = key.slice(sourceProdWorkspaceId.length)
-  return `${destinationProdWorkspaceId}${suffix}`
-}
-
-async function copyAttachmentToWorkspace(
-  key: string,
-  destinationKey: string,
-  cache: Map<string, Promise<string | undefined>>
-): Promise<string | undefined> {
-  if (!key || key === destinationKey) {
-    return key
-  }
-  if (!cache.has(key)) {
-    cache.set(
-      key,
-      (async () => {
-        try {
-          const alreadyExists = await objectStore.objectExists(
-            ObjectStoreBuckets.APPS,
-            destinationKey
-          )
-          if (alreadyExists) {
-            return destinationKey
-          }
-        } catch (err) {
-          logging.logWarn(
-            "Resource duplication: failed to check attachment existence",
-            {
-              err,
-              key,
-              destinationKey,
-            }
-          )
-        }
-        try {
-          const { stream, contentType } = await objectStore.getReadStream(
-            ObjectStoreBuckets.APPS,
-            key
-          )
-          await objectStore.streamUpload({
-            bucket: ObjectStoreBuckets.APPS,
-            stream,
-            filename: destinationKey,
-            type: contentType,
-          })
-          return destinationKey
-        } catch (err) {
-          logging.logWarn("Resource duplication: failed to copy attachment", {
-            err,
-            key,
-            destinationKey,
-          })
-          return undefined
-        }
-      })()
-    )
-  }
-  const copiedKey = await cache.get(key)!
-  if (copiedKey === undefined) {
-    cache.delete(key)
-  }
-  return copiedKey
-}
-
-async function remapAttachmentValue(
-  attachment: RowAttachment,
-  context: AttachmentCopyContext
-): Promise<RowAttachment> {
-  if (
-    !attachment?.key ||
-    !context.sourceProdWorkspaceId ||
-    !context.destinationProdWorkspaceId ||
-    context.sourceProdWorkspaceId === context.destinationProdWorkspaceId
-  ) {
-    return attachment
-  }
-
-  const destinationKey = buildDestinationAttachmentKey(
-    attachment.key,
-    context.sourceProdWorkspaceId,
-    context.destinationProdWorkspaceId
-  )
-  if (!destinationKey || destinationKey === attachment.key) {
-    return attachment
-  }
-
-  const copiedKey = await copyAttachmentToWorkspace(
-    attachment.key,
-    destinationKey,
-    context.cache
-  )
-
-  if (!copiedKey) {
-    return attachment
-  }
-
-  return {
-    ...attachment,
-    key: copiedKey,
-    url: "",
-  }
-}
-
-async function remapRowAttachments(
-  row: Row,
-  columns: AttachmentColumn[],
-  context: AttachmentCopyContext
-) {
-  if (!columns.length) {
-    return
-  }
-
-  const rowData: Record<string, unknown> = row
-
-  for (const column of columns) {
-    const value = rowData[column.field]
-    if (!value) {
-      continue
-    }
-    if (column.type === FieldType.ATTACHMENTS && Array.isArray(value)) {
-      const updated: RowAttachment[] = []
-      for (const attachment of value as RowAttachment[]) {
-        const remapped = await remapAttachmentValue(attachment, context)
-        updated.push(remapped)
-      }
-      rowData[column.field] = updated
-    } else if (
-      (column.type === FieldType.ATTACHMENT_SINGLE ||
-        column.type === FieldType.SIGNATURE_SINGLE) &&
-      value
-    ) {
-      rowData[column.field] = await remapAttachmentValue(
-        value as RowAttachment,
-        context
-      )
-    }
-  }
 }
 
 const ROW_PAGE_SIZE = 1000
@@ -477,8 +284,6 @@ async function duplicateInternalTableRows(
       )
       continue
     }
-
-    const attachmentColumns = getAttachmentColumns(table)
     let startAfter: string | undefined = undefined
 
     do {
@@ -494,11 +299,6 @@ async function duplicateInternalTableRows(
 
       const sanitizedRows: AnyDocument[] = []
       for (const row of rows) {
-        await remapRowAttachments(row, attachmentColumns, {
-          sourceProdWorkspaceId,
-          destinationProdWorkspaceId,
-          cache: attachmentCopyCache,
-        })
         const sanitizedRow: AnyDocument = {
           ...row,
           fromWorkspace,

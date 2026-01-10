@@ -50,23 +50,6 @@ const stringifyField = (value: any, schema: FieldSchema): string => {
     case FieldType.AUTO:
       return ""
 
-    // Just state whether signatures exist or not
-    case FieldType.SIGNATURE_SINGLE:
-      return value ? "Yes" : "No"
-
-    // Extract attachment names
-    case FieldType.ATTACHMENT_SINGLE:
-    case FieldType.ATTACHMENTS: {
-      if (!value) {
-        return ""
-      }
-      const arrayValue = Array.isArray(value) ? value : [value]
-      return arrayValue
-        .map(x => x.name)
-        .filter(x => !!x)
-        .join(", ")
-    }
-
     // Extract primary displays from relationships
     case FieldType.LINK: {
       if (!value) {
@@ -124,11 +107,8 @@ const stringifyField = (value: any, schema: FieldSchema): string => {
     case FieldType.LONGFORM:
     case FieldType.BIGINT:
     case FieldType.OPTIONS:
-    case FieldType.BARCODEQR:
       return value || ""
 
-    // Fallback for unknown types or future column types that we forget to add
-    case FieldType.FORMULA:
     default:
       return stringifyValue(value)
   }

@@ -142,15 +142,6 @@ export const createValidatedConfigStore = (
       const validatedConfig: ValidatedConfigItem[] = []
 
       const config: Record<string, any> = {}
-
-      // During the auth flow, we get a continueSetupId from Google's OAuth flow
-      // that gets saved in the config store but is not something we expect the
-      // user to configure. It needs preserving in the validated config or no
-      // one is able to create a Google Sheets datasource.
-      if (integration.name === SourceName.GOOGLE_SHEETS) {
-        config.continueSetupId = $configStore.continueSetupId
-      }
-
       const allowedRestKeys = ["rejectUnauthorized", "downloadImages"]
       Object.entries(integration.datasource || {}).forEach(
         ([key, properties]) => {

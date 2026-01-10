@@ -134,7 +134,6 @@ export const createActions = (context: StoreContext): ColumnActions => {
     return (
       column.schema.autocolumn ||
       column.schema.disabled ||
-      column.schema.type === "formula" ||
       column.schema.readonly
     )
   }

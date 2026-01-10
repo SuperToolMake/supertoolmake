@@ -62,8 +62,8 @@
 
 <div class="content">
   <Layout alignContent="center" justifyItems="center">
-    <div class="budibaseLogo">
-      <BBLogo size={48} color={"var(--spectrum-global-color-gray-900)"} />
+    <div>
+      <BBLogo size={48} />
     </div>
     {#if loading}
       <Body size="M">Setting up your workspace...</Body>

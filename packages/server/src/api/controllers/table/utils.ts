@@ -9,22 +9,17 @@ import {
   RelationshipFieldMetadata,
   RenameColumn,
   Row,
-  SourceName,
   Table,
 } from "@budibase/types"
 import { cloneDeep } from "lodash/fp"
 import isEqual from "lodash/isEqual"
 import {
   CanSwitchTypes,
-  GOOGLE_SHEETS_PRIMARY_KEY,
   SwitchableTypes,
   USERS_TABLE_SCHEMA,
 } from "../../../constants"
 import { generateRowID, getRowParams, InternalTables } from "../../../db/utils"
-import {
-  AttachmentCleanup,
-  inputProcessing,
-} from "../../../utilities/rowProcessor"
+import { inputProcessing } from "../../../utilities/rowProcessor"
 import { isRows, isSchema, parse } from "../../../utilities/schema"
 
 export async function clearColumns(table: Table, columnNames: string[]) {
@@ -77,12 +72,6 @@ export async function checkForColumnUpdates(
         deletedColumns.forEach((colName: any) => delete row[colName])
       }
       return row
-    })
-
-    // cleanup any attachments from object storage for deleted attachment columns
-    await AttachmentCleanup.tableUpdate(updatedTable, rawRows, {
-      oldTable,
-      rename: columnRename,
     })
   }
 
@@ -398,18 +387,6 @@ export function hasTypeChanged(table: Table, oldTable: Table | undefined) {
     }
   }
   return false
-}
-
-// used for external tables, some of them will have static schemas that need
-// to be hard set
-export function setStaticSchemas(datasource: Datasource, table: Table) {
-  // GSheets is a specific case - only ever has a static primary key
-  if (table && datasource.source === SourceName.GOOGLE_SHEETS) {
-    table.primary = [GOOGLE_SHEETS_PRIMARY_KEY]
-    // if there is an id column, remove it, should never exist in GSheets
-    delete table.schema?.id
-  }
-  return table
 }
 
 const _TableSaveFunctions = TableSaveFunctions

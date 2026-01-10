@@ -134,7 +134,7 @@ describe("getBuiltinPermissionByID", () => {
       name: "Public",
       permissions: [
         new permissions.PermissionImpl(
-          permissions.PermissionType.WEBHOOK,
+          permissions.PermissionType.BUILDER,
           permissions.PermissionLevel.EXECUTE
         ),
       ],

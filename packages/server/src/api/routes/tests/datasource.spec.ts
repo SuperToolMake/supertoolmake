@@ -19,10 +19,7 @@ import {
 } from "@budibase/types"
 import { Knex } from "knex"
 import nock from "nock"
-import {
-  DatabaseName,
-  datasourceDescribe,
-} from "../../../integrations/tests/utils"
+import { datasourceDescribe } from "../../../integrations/tests/utils"
 import { tableForDatasource } from "../../../tests/utilities/structures"
 
 describe("/datasources", () => {
@@ -343,15 +340,6 @@ if (descriptions.length) {
               tableId: simpleTable._id!,
               relationshipType: RelationshipType.ONE_TO_MANY,
               fieldName: "link",
-            },
-            [FieldType.FORMULA]: {
-              name: "formula",
-              type: FieldType.FORMULA,
-              formula: "any formula",
-            },
-            [FieldType.BARCODEQR]: {
-              name: "barcodeqr",
-              type: FieldType.BARCODEQR,
             },
             [FieldType.BIGINT]: {
               name: "bigint",

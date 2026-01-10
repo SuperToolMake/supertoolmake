@@ -174,10 +174,6 @@ class UserStore extends BudiStore<UserState> {
     return res
   }
 
-  async getAccountHolder() {
-    return await API.getAccountHolder()
-  }
-
   getUserRole(user?: User & { tenantOwnerEmail?: string }) {
     if (!user) {
       return Constants.BudibaseRoles.AppUser

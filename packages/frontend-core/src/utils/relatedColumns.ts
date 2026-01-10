@@ -10,7 +10,6 @@ import {
 const columnTypeManyTypeOverrides: Partial<Record<FieldType, FieldType>> = {
   [FieldType.DATETIME]: FieldType.STRING,
   [FieldType.BOOLEAN]: FieldType.STRING,
-  [FieldType.SIGNATURE_SINGLE]: FieldType.ATTACHMENTS,
 }
 
 const columnTypeManyParser = {
@@ -115,7 +114,6 @@ export function getRelatedTableValues(
         FieldType.BOOLEAN,
         FieldType.DATETIME,
         FieldType.LONGFORM,
-        FieldType.BARCODEQR,
       ].includes(field.type)
     ) {
       result = parsed?.join(", ")

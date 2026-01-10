@@ -1,13 +1,10 @@
 import { context, db as dbCore, utils } from "@budibase/backend-core"
 import {
-  Datasource,
   DocumentType,
   FieldSchema,
   FieldType,
-  INTERNAL_TABLE_SOURCE_ID,
   LinkDocument,
   RelationshipFieldMetadata,
-  SourceName,
 } from "@budibase/types"
 import { DocumentListParams } from "nano"
 
@@ -21,14 +18,6 @@ export const enum WorkspaceStatus {
   DEV = "development",
   ALL = "all",
   DEPLOYED = "published",
-}
-
-export const BudibaseInternalDB: Datasource = {
-  _id: INTERNAL_TABLE_SOURCE_ID,
-  type: dbCore.BUDIBASE_DATASOURCE_TYPE,
-  name: "Budibase DB",
-  source: SourceName.BUDIBASE,
-  config: {},
 }
 
 export const SEPARATOR = dbCore.SEPARATOR

@@ -8,7 +8,6 @@ import {
 
 const DISABLED_EXTERNAL_INTEGRATIONS = [
   SourceName.AIRTABLE,
-  SourceName.BUDIBASE,
   SourceName.ARANGODB,
 ]
 

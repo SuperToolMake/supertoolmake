@@ -28,7 +28,6 @@ import { datasources } from "./datasources"
 import { integrations } from "./integrations"
 import { sortedIntegrations } from "./sortedIntegrations"
 import { queries } from "./queries"
-import { flags } from "./flags"
 import { rowActions } from "./rowActions"
 import componentTreeNodesStore from "./componentTreeNodes"
 import { oauth2 } from "./oauth2"
@@ -62,7 +61,6 @@ export {
   integrations,
   sortedIntegrations,
   queries,
-  flags,
   hoverStore,
   snippets,
   rowActions,
@@ -97,7 +95,6 @@ const refreshBuilderData = async () => {
     queries.init(),
     tables.init(),
     roles.fetch(),
-    flags.fetch(),
     workspaceAppStore.fetch(),
     workspaceDeploymentStore.fetch(),
   ])

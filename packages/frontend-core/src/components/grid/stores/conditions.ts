@@ -239,15 +239,6 @@ const evaluateConditions = (
 
       // Coerce values into correct types for primitives
       let coercedType = type
-      if (type === FieldType.FORMULA) {
-        // For formulas we want to ensure that the reference type matches the
-        // real type
-        if (value === true || value === false) {
-          coercedType = FieldType.BOOLEAN
-        } else if (typeof value === "number") {
-          coercedType = FieldType.NUMBER
-        }
-      }
       const coerce = TypeCoercionMap[coercedType]
       if (coerce) {
         value = coerce(value as string)

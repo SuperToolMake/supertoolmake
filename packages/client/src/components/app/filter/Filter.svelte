@@ -2,7 +2,6 @@
   import { Button, Helpers } from "@budibase/bbui"
   import {
     type FilterConfig,
-    type FieldSchema,
     type SearchFilter,
     type SearchFilterGroup,
     type TableSchema,
@@ -233,8 +232,6 @@
     })
   }
 
-  const excludedTypes = [FieldType.ATTACHMENT_SINGLE, FieldType.ATTACHMENTS]
-
   async function fetchSchema(datasource: any) {
     if (datasource) {
       const fetchedSchema: TableSchema | null = await fetchDatasourceSchema(
@@ -245,11 +242,7 @@
         }
       )
 
-      const filteredSchemaEntries = Object.entries(fetchedSchema || {}).filter(
-        ([_, field]: [string, FieldSchema]) => {
-          return !excludedTypes.includes(field.type)
-        }
-      )
+      const filteredSchemaEntries = Object.entries(fetchedSchema || {})
 
       const filteredSchema = Object.fromEntries(filteredSchemaEntries)
 

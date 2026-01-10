@@ -78,13 +78,6 @@ export const TYPE_TRANSFORM_MAP: Record<
     //@ts-ignore
     [undefined]: undefined,
   },
-  [FieldType.BARCODEQR]: {
-    "": null,
-    //@ts-ignore
-    [null]: null,
-    //@ts-ignore
-    [undefined]: undefined,
-  },
   [FieldType.LONGFORM]: {
     "": null,
     //@ts-ignore
@@ -167,5 +160,4 @@ export const TYPE_TRANSFORM_MAP: Record<
     },
   },
   [FieldType.BB_REFERENCE_SINGLE]: {},
-  [FieldType.INTERNAL]: {},
 }

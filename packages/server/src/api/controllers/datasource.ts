@@ -1,4 +1,4 @@
-import { context, db as dbCore } from "@budibase/backend-core"
+import { context } from "@budibase/backend-core"
 import {
   BuildSchemaFromSourceRequest,
   BuildSchemaFromSourceResponse,
@@ -160,16 +160,7 @@ export async function update(
   const baseDatasource = await sdk.datasources.get(datasourceId)
   await invalidateVariables(baseDatasource, ctx.request.body)
 
-  const isBudibaseSource =
-    baseDatasource.type === dbCore.BUDIBASE_DATASOURCE_TYPE
-
-  const dataSourceBody: Datasource = isBudibaseSource
-    ? {
-        name: ctx.request.body?.name,
-        type: dbCore.BUDIBASE_DATASOURCE_TYPE,
-        source: SourceName.BUDIBASE,
-      }
-    : ctx.request.body
+  const dataSourceBody: Datasource = ctx.request.body
 
   let datasource: Datasource = {
     ...baseDatasource,
@@ -178,7 +169,7 @@ export async function update(
 
   // this block is specific to GSheets, if no auth set, set it back
   const auth = baseDatasource.config?.auth
-  if (auth && !ctx.request.body.auth) {
+  if (auth) {
     // don't strip auth config from DB
     datasource.config!.auth = auth
   }

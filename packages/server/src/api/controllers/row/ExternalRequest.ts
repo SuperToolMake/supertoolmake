@@ -152,8 +152,7 @@ function isEditableColumn(column: FieldSchema) {
     column.autocolumn &&
     column.autoReason !== AutoReason.FOREIGN_KEY &&
     column.subtype !== AutoFieldSubType.AUTO_ID
-  const isFormula = column.type === FieldType.FORMULA
-  return !(isExternalAutoColumn || isFormula)
+  return !isExternalAutoColumn
 }
 
 export class ExternalRequest<T extends Operation> {
@@ -644,9 +643,6 @@ export class ExternalRequest<T extends Operation> {
         continue
       }
       switch (table.schema[sortColumn]?.type) {
-        case FieldType.FORMULA:
-          delete sort?.[sortColumn]
-          break
         case FieldType.NUMBER:
           if (sort && sort[sortColumn]) {
             sort[sortColumn].type = SortType.NUMBER

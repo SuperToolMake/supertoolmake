@@ -227,7 +227,7 @@
           />
         </div>
 
-        {#if editableFilter?.type && [FieldType.STRING, FieldType.LONGFORM, FieldType.NUMBER, FieldType.BIGINT, FieldType.FORMULA].includes(editableFilter.type)}
+        {#if editableFilter?.type && [FieldType.STRING, FieldType.LONGFORM, FieldType.NUMBER, FieldType.BIGINT].includes(editableFilter.type)}
           <Input
             disabled={editableFilter.noValue}
             value={editableFilter.value}

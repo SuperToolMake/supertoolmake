@@ -14,7 +14,6 @@ import { makeTableRequest } from "../../../../api/controllers/table/ExternalRequ
 import {
   foreignKeyStructure,
   hasTypeChanged,
-  setStaticSchemas,
 } from "../../../../api/controllers/table/utils"
 import {
   breakExternalTableId,
@@ -152,9 +151,6 @@ export async function save(
   if (!datasource.entities) {
     datasource.entities = {}
   }
-
-  // GSheets is a specific case - only ever has a static primary key
-  tableToSave = setStaticSchemas(datasource, tableToSave)
 
   const oldTables = cloneDeep(datasource.entities)
   const tables: Record<string, Table> = datasource.entities

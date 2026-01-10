@@ -14,8 +14,6 @@
   import { users } from "@/stores/portal/users"
   import { auth } from "@/stores/portal/auth"
   import { organisation } from "@/stores/portal/organisation"
-  import { admin } from "@/stores/portal/admin"
-  import { onMount } from "svelte"
   import DeleteRowsButton from "@/components/backend/DataTable/buttons/DeleteRowsButton.svelte"
   import AppsTableRenderer from "./_components/AppsTableRenderer.svelte"
   import RoleTableRenderer from "./_components/RoleTableRenderer.svelte"
@@ -31,7 +29,6 @@
   import { sdk } from "@budibase/shared-core"
   import { bb } from "@/stores/bb"
   import type {
-    AccountMetadata,
     BulkUserCreated,
     InviteUsersResponse,
     User as UserDoc,
@@ -67,7 +64,6 @@
   }
 
   let enrichedUsers: EnrichedUser[] = []
-  let tenantOwner: AccountMetadata | null
   let createUserModal: Modal,
     inviteConfirmationModal: Modal,
     onboardingTypeModal: Modal,
@@ -106,16 +102,10 @@
     successful: [],
     unsuccessful: [],
   }
-  $: setEnrichedUsers($fetch.rows as User[], tenantOwner)
+  $: setEnrichedUsers($fetch.rows as User[])
 
-  const setEnrichedUsers = async (
-    rows: User[],
-    owner: AccountMetadata | null
-  ) => {
+  const setEnrichedUsers = async (rows: User[]) => {
     enrichedUsers = rows?.map<EnrichedUser>(user => {
-      if (owner) {
-        user.tenantOwnerEmail = owner.email
-      }
       const role = Constants.ExtendedBudibaseRoleOptions.find(
         x => x.value === users.getUserRole(user)
       )!
@@ -286,16 +276,6 @@
       .join("")
       .slice(0, length)
   }
-
-  onMount(async () => {
-    try {
-      tenantOwner = await users.getAccountHolder()
-    } catch (err: any) {
-      if (err.status !== 404) {
-        notifications.error("Error fetching account holder")
-      }
-    }
-  })
 </script>
 
 <Layout noPadding gap="L">

@@ -18,7 +18,6 @@ import {
   GetUserInvitesResponse,
   InviteUsersRequest,
   InviteUsersResponse,
-  LookupAccountHolderResponse,
   SaveUserResponse,
   SearchUsersRequest,
   SearchUsersResponse,
@@ -53,7 +52,6 @@ export interface UserEndpoints {
     data: AcceptUserInviteRequest
   ) => Promise<AcceptUserInviteResponse>
   getUserCountByApp: (appId: string) => Promise<number>
-  getAccountHolder: () => Promise<LookupAccountHolderResponse>
   searchUsers: (data: SearchUsersRequest) => Promise<SearchUsersResponse>
   createUsers: (users: UnsavedUser[]) => Promise<BulkUserCreated | undefined>
   addWorkspaceIdToInvite: (
@@ -272,14 +270,5 @@ export const buildUserEndpoints = (API: BaseAPIClient): UserEndpoints => ({
       url: `/api/global/users/count/${appId}`,
     })
     return res.userCount
-  },
-
-  /**
-   * Gets the account holder of the current tenant
-   */
-  getAccountHolder: async () => {
-    return await API.get({
-      url: `/api/global/users/accountholder`,
-    })
   },
 })

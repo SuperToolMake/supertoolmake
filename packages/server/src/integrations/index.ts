@@ -38,8 +38,6 @@ const DEFINITIONS: Record<SourceName, Integration | undefined> = {
   /* deprecated - not available through UI */
   [SourceName.ARANGODB]: arangodb.schema,
   [SourceName.AIRTABLE]: airtable.schema,
-  /* un-used */
-  [SourceName.BUDIBASE]: undefined,
 }
 
 type IntegrationBaseConstructor = new (...args: any[]) => IntegrationBase
@@ -69,8 +67,6 @@ const INTEGRATIONS: Record<SourceName, IntegrationBaseConstructor | undefined> =
     /* deprecated - not available through UI */
     [SourceName.ARANGODB]: arangodb.integration,
     [SourceName.AIRTABLE]: airtable.integration,
-    /* un-used */
-    [SourceName.BUDIBASE]: undefined,
   }
 
 export async function getDefinition(

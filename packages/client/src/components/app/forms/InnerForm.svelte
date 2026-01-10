@@ -122,18 +122,8 @@
   // special data types like attachments. Relationships are currently not
   // handled as we don't have the primaryDisplay field that is required.
   const deriveBindingEnrichments = (fieldStores: Readable<FieldInfo>[]) => {
-    return derived(fieldStores, fieldValues => {
+    return derived(fieldStores, () => {
       const enrichments: Record<string, string> = {}
-      fieldValues.forEach(field => {
-        if (field.type === "attachment") {
-          const value = field.fieldState.value
-          let url = null
-          if (Array.isArray(value) && value[0] != null) {
-            url = value[0].url
-          }
-          enrichments[`${field.name}_first`] = url
-        }
-      })
       return enrichments
     })
   }

@@ -110,35 +110,4 @@ describe("/users", () => {
       expect(res.tableId).toBeDefined()
     })
   })
-
-  describe("setFlag", () => {
-    it("should throw an error if a flag is not provided", async () => {
-      await config.createUser()
-      const res = await request
-        .post(`/api/users/flags`)
-        .set(config.defaultHeaders())
-        .send({ value: "test" })
-        .expect(400)
-        .expect("Content-Type", /json/)
-      expect(res.body.message).toEqual(
-        "Must supply a 'flag' field in request body."
-      )
-    })
-
-    it("should be able to set a flag on the user", async () => {
-      await config.createUser()
-      const res = await config.api.user.setFlag("test", true)
-      expect(res.message).toEqual("Flag set successfully")
-    })
-  })
-
-  describe("getFlags", () => {
-    it("should get flags for a specific user", async () => {
-      await config.createUser()
-      await config.api.user.setFlag("test", "test")
-
-      const res = await config.api.user.getFlags()
-      expect(res.test).toEqual("test")
-    })
-  })
 })

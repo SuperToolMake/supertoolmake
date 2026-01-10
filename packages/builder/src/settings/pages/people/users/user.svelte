@@ -64,7 +64,7 @@
 
   let deleteModal
   let resetPasswordModal
-  let user, tenantOwner
+  let user
   let loaded = false
   let userFieldsToUpdate = {}
 
@@ -78,7 +78,6 @@
     ? getApps(user, sdk.users.userAppAccessList(user))
     : []
   $: globalRole = users.getUserRole(user)
-  $: isTenantOwner = tenantOwner?.email && tenantOwner.email === user?.email
 
   const getApps = (user, appIds) => {
     let availableApps = $appsStore.apps
@@ -179,7 +178,6 @@
     if (!user?._id) {
       bb.settings("/people/users")
     }
-    tenantOwner = await users.getAccountHolder()
   }
 
   onMount(async () => {
@@ -218,11 +216,8 @@
                 Force password reset
               </MenuItem>
             {/if}
-            {#if !isTenantOwner}
-              <MenuItem on:click={deleteModal.show} icon="trash">
-                Delete
-              </MenuItem>
-            {/if}
+
+            <MenuItem on:click={deleteModal.show} icon="trash">Delete</MenuItem>
           </ActionMenu>
         </div>
       {/if}
@@ -262,11 +257,9 @@
             <Label size="L">Role</Label>
             <Select
               placeholder={null}
-              disabled={!sdk.users.isAdmin($auth.user) || isTenantOwner}
-              value={isTenantOwner ? "owner" : globalRole}
-              options={isTenantOwner
-                ? Constants.ExtendedBudibaseRoleOptions
-                : Constants.BudibaseRoleOptions}
+              disabled={!sdk.users.isAdmin($auth.user)}
+              value={globalRole}
+              options={Constants.BudibaseRoleOptions}
               on:change={updateUserRole}
             />
           </div>

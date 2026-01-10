@@ -1,6 +1,6 @@
 <script>
   import { goto, params } from "@roxi/routify"
-  import { datasources, flags, integrations, queries } from "@/stores/builder"
+  import { datasources, integrations, queries } from "@/stores/builder"
 
   import {
     Banner,
@@ -649,16 +649,6 @@
           </Tab>
           <Tab title="Transformer">
             <Layout noPadding>
-              {#if !$flags.queryTransformerBanner}
-                <Banner
-                  extraButtonText="Learn more"
-                  extraButtonAction={() =>
-                    window.open("https://docs.budibase.com/docs/transformers")}
-                  on:change={() => updateFlag("queryTransformerBanner", true)}
-                >
-                  Add a JavaScript function to transform the query result.
-                </Banner>
-              {/if}
               <CodeMirrorEditor
                 height={200}
                 mode={EditorModes.JSON}

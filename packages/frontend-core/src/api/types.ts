@@ -1,10 +1,8 @@
 import { AppEndpoints } from "./app"
-import { AttachmentEndpoints } from "./attachments"
 import { AuthEndpoints } from "./auth"
 import { BackupEndpoints } from "./backups"
 import { ConfigEndpoints } from "./configs"
 import { DatasourceEndpoints } from "./datasources"
-import { FlagEndpoints } from "./flags"
 import { LayoutEndpoints } from "./layouts"
 import { LogEndpoints } from "./logs"
 import { MigrationEndpoints } from "./migrations"
@@ -97,18 +95,15 @@ export type APIError = {
 
 export type APIClient = BaseAPIClient &
   AppEndpoints &
-  AttachmentEndpoints &
   AuthEndpoints &
   BackupEndpoints &
   ConfigEndpoints &
   DatasourceEndpoints &
-  FlagEndpoints &
   LayoutEndpoints &
   LogEndpoints &
   MigrationEndpoints &
   OtherEndpoints &
   PermissionEndpoints &
-  PluginEndpoins &
   QueryEndpoints &
   RelationshipEndpoints &
   RoleEndpoints &
