@@ -274,13 +274,13 @@ jobs:
           
           SIZE_BYTES=$(stat -c%s "$CLIENT_FILE")
           SIZE_MB=$(awk "BEGIN {printf \"%.2f\", $SIZE_BYTES / 1024 / 1024}")
-          MAX_SIZE_BYTES=$((8 * 1024 * 1024))
+          MAX_SIZE_BYTES=$((1 * 1024 * 1024))
           
           echo "Client build size: ${SIZE_MB}MB"
-          echo "Maximum allowed size: 8MB"
+          echo "Maximum allowed size: 1MB"
           
           if [ $SIZE_BYTES -gt $MAX_SIZE_BYTES ]; then
-            echo "Client build size (${SIZE_MB}MB) exceeds maximum allowed size (8MB)"
+            echo "Client build size (${SIZE_MB}MB) exceeds maximum allowed size (1MB)"
             exit 1
           else
             echo "Client build size (${SIZE_MB}MB) is within acceptable limits"
