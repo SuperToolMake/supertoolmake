@@ -12,7 +12,6 @@ import BullQueue, {
 import { addListeners, StalledFn } from "./listeners"
 import { Duration } from "../utils"
 import * as timers from "../timers"
-import sizeof from "object-sizeof"
 
 export type { QueueOptions, Queue, JobOptions } from "bull"
 
@@ -29,33 +28,6 @@ async function cleanup() {
   for (let queue of QUEUES) {
     await queue.clean(CLEANUP_PERIOD_MS, "completed")
     await queue.clean(CLEANUP_PERIOD_MS, "failed")
-  }
-}
-
-function jobOptsTags(opts: JobOptions) {
-  return {
-    "job.opts.attempts": opts.attempts,
-    "job.opts.backoff": opts.backoff,
-    "job.opts.delay": opts.delay,
-    "job.opts.jobId": opts.jobId,
-    "job.opts.lifo": opts.lifo,
-    "job.opts.preventParsingData": opts.preventParsingData,
-    "job.opts.priority": opts.priority,
-    "job.opts.removeOnComplete": opts.removeOnComplete,
-    "job.opts.removeOnFail": opts.removeOnFail,
-    "job.opts.repeat": opts.repeat,
-    "job.opts.stackTraceLimit": opts.stackTraceLimit,
-    "job.opts.timeout": opts.timeout,
-  }
-}
-
-function jobTags(job: Job) {
-  return {
-    "job.id": job.id,
-    "job.attemptsMade": job.attemptsMade,
-    "job.timestamp": job.timestamp,
-    "job.data.sizeBytes": sizeof(job.data),
-    ...jobOptsTags(job.opts || {}),
   }
 }
 

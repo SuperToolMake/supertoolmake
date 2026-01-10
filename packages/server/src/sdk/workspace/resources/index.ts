@@ -2,18 +2,15 @@ import { context, db, HTTPError, logging } from "@budibase/backend-core"
 import chunk from "lodash/chunk"
 import {
   AnyDocument,
-  Datasource,
   DocumentType,
   INTERNAL_TABLE_SOURCE_ID,
   Row,
   WithDocMetadata,
   prefixed,
-  Query,
   ResourceType,
   Screen,
   Table,
   UsedResource,
-  WorkspaceApp,
 } from "@budibase/types"
 import sdk from "../.."
 import { getRowParams } from "../../../db/utils"
@@ -253,16 +250,11 @@ async function bulkInsertRows(
 async function duplicateInternalTableRows(
   tables: WithDocMetadata<Table>[],
   destinationDb: ReturnType<typeof db.getDB>,
-  fromWorkspace: string,
-  toWorkspace: string
+  fromWorkspace: string
 ) {
   if (!tables.length) {
     return
   }
-
-  const sourceProdWorkspaceId = db.getProdWorkspaceID(fromWorkspace)
-  const destinationProdWorkspaceId = db.getProdWorkspaceID(toWorkspace)
-  const attachmentCopyCache = new Map<string, Promise<string | undefined>>()
 
   for (const table of tables) {
     if (table.sourceId !== INTERNAL_TABLE_SOURCE_ID) {
@@ -363,61 +355,7 @@ export async function duplicateResourcesToWorkspace(
     await duplicateInternalTableRows(
       documentToCopy.filter(isTable),
       destinationDb,
-      fromWorkspace,
-      toWorkspace
+      fromWorkspace
     )
-  }
-
-  if (!docsToInsert.length) {
-    return
-  }
-
-  const fromWorkspaceName =
-    (await sdk.workspaces.metadata.tryGet())?.name || fromWorkspace
-  const toWorkspaceName = await context.doInContext(
-    toWorkspace,
-    async () => (await sdk.workspaces.metadata.tryGet())?.name || toWorkspace
-  )
-
-  for (const doc of docsToInsert) {
-    let name: string, displayType: string
-    const type = getResourceType(doc._id)
-
-    switch (type) {
-      case ResourceType.DATASOURCE:
-        name = (doc as Datasource).name || "Unknown"
-        displayType = "Datasource"
-        break
-      case ResourceType.QUERY:
-        name = (doc as Query).name
-        displayType = "Query"
-        break
-      case ResourceType.ROW_ACTION:
-        name = doc._id // We don't really have a row action name
-        displayType = "Row action"
-        break
-      case ResourceType.TABLE:
-        name = (doc as Table).name
-        displayType = "Table"
-        break
-      case ResourceType.SCREEN:
-        name = (doc as Screen).name || "Unkown"
-        displayType = "Screen"
-        break
-      case ResourceType.WORKSPACE_APP:
-        name = (doc as WorkspaceApp).name
-        displayType = "App"
-        break
-      case undefined:
-        throw new Error("Resource type could not be infered")
-      default:
-        throw new Error("Unreachable")
-    }
-
-    const resource = {
-      id: doc._id,
-      name,
-      type: displayType,
-    }
   }
 }
