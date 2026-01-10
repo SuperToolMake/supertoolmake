@@ -37,9 +37,11 @@
   $: authConfig = allConfigs.find(c => c.value === authConfigId)
 
   function addBasicConfiguration() {
-    $goto(
-      `/builder/workspace/${$appStore.appId}/apis/datasource/${datasourceId}?&tab=Authentication`
-    )
+    $goto(`/builder/workspace/[application]/apis/datasource/[datasourceId]`, {
+      application: $appStore.appId,
+      datasourceId,
+      tab: "Authentication",
+    })
   }
 
   function addOAuth2Configuration() {

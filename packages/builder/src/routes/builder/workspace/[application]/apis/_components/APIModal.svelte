@@ -22,6 +22,8 @@
   export const show = () => modal.show()
   export const hide = () => modal.hide()
 
+  $goto
+
   let modal: Modal
   let loading = false
 
@@ -52,8 +54,9 @@
         })
         await datasources.fetch()
 
-        // Go to the new query page.
-        $goto(`./query/new/${ds._id}`)
+        $goto(`./query/new/[datasourceId]`, {
+          datasourceId: ds._id!,
+        })
       }
     } catch {
       notifications.error("There was a problem creating your new api")
@@ -166,8 +169,9 @@
 
       await datasources.fetch()
 
-      // Go to the newly created datasource page.
-      $goto(`./datasource/${ds._id}`)
+      $goto(`./datasource/[datasourceId]`, {
+        datasourceId: ds._id!,
+      })
 
       notifications.success(`${selectedTemplate.name} API created`)
     } catch (error: any) {

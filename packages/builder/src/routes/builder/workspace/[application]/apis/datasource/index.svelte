@@ -10,9 +10,13 @@
     )
 
     if ($datasources.selected?.source === IntegrationTypes.REST) {
-      $goto(`./${$datasources.selected?._id}`)
+      $goto(`./[datasourceId]`, {
+        datasourceId: $datasources.selected?._id,
+      })
     } else if (restDatasources.length) {
-      $goto(`./${restDatasources[0]._id}`)
+      $goto(`./[datasourceId]`, {
+        datasourceId: restDatasources[0]._id,
+      })
     } else {
       $goto("../new")
     }
