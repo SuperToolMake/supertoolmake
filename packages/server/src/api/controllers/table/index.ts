@@ -119,7 +119,7 @@ export async function save(ctx: UserCtx<SaveTableRequest, SaveTableResponse>) {
 
   let savedTable: Table
   if (isCreate) {
-    savedTable = await sdk.tables.create(table, rows, ctx.user._id)
+    savedTable = await sdk.tables.create(table)
     savedTable = await processTable(savedTable)
   } else {
     const api = external

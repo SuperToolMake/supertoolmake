@@ -26,7 +26,7 @@ export async function duplicate(table: Table, userId?: string): Promise<Table> {
     // Don't include any data/rows - this is intentionally empty
   }
 
-  const duplicatedTable = await create(tableToCreate, undefined, userId)
+  const duplicatedTable = await create(tableToCreate)
 
   return duplicatedTable
 }

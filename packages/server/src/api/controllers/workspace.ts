@@ -384,7 +384,7 @@ async function performWorkspaceCreate(
   const workspaceId = getDevWorkspaceID(generateWorkspaceID(tenantId))
 
   return await context.doInWorkspaceContext(workspaceId, async () => {
-    const instance = await createInstance(workspaceId, instanceConfig)
+    const instance = await createInstance(workspaceId)
     const db = context.getWorkspaceDB()
     const isImport = !!instanceConfig.file
 
