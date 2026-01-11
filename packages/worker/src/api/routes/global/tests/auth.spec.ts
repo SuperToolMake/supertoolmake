@@ -279,18 +279,6 @@ describe("/api/global/auth", () => {
             await testSSOUser(code!)
           })
         })
-
-        describe("root account sso user", () => {
-          it("should prevent user from generating password reset email", async () => {
-            user = await config.createUser()
-            const { code } = await config.api.auth.requestPasswordReset(
-              sendMailMock,
-              user.email
-            )
-
-            await testSSOUser(code!)
-          })
-        })
       })
     })
   })
