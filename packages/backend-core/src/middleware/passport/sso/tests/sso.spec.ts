@@ -82,7 +82,7 @@ describe("sso", () => {
 
           expect(mockDone.mock.calls.length).toBe(1)
           expect(getErrorMessage()).toContain(
-            "Email does not yet exist. You must set up your local budibase account first."
+            "Email does not yet exist. You must set up your local account first."
           )
         })
       })
