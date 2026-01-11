@@ -128,19 +128,9 @@ describe("getBuiltinPermissions", () => {
 })
 
 describe("getBuiltinPermissionByID", () => {
-  it("returns correct permission object for valid ID", () => {
-    const expectedPermission = {
-      _id: BuiltinPermissionID.PUBLIC,
-      name: "Public",
-      permissions: [
-        new permissions.PermissionImpl(
-          permissions.PermissionType.BUILDER,
-          permissions.PermissionLevel.EXECUTE
-        ),
-      ],
-    }
-    expect(permissions.getBuiltinPermissionByID("public")).toEqual(
-      expectedPermission
-    )
+  test.each(
+    Object.values(permissions.BUILTIN_PERMISSIONS).map(p => [p.name, p])
+  )("returns correct permission object for %s", (name, expected) => {
+    expect(permissions.getBuiltinPermissionByID(expected._id)).toEqual(expected)
   })
 })
