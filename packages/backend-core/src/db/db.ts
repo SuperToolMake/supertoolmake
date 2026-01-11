@@ -1,6 +1,9 @@
 import { directCouchQuery, CouchDatabase } from "./couch"
 import { Database, DatabaseOpts } from "@budibase/types"
 import { DDInstrumentedDatabase } from "./instrumentation"
+import { dataFilters } from "@budibase/shared-core"
+
+export const removeKeyNumbering = dataFilters.removeKeyNumbering
 
 export function getDB(dbName: string, opts?: DatabaseOpts): Database {
   return new DDInstrumentedDatabase(new CouchDatabase(dbName, opts))

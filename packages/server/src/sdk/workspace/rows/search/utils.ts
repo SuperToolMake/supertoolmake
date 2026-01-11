@@ -1,33 +1,14 @@
-import { context, db as dbCore } from "@budibase/backend-core"
+import { db as dbCore } from "@budibase/backend-core"
 import { dataFilters, utils } from "@budibase/shared-core"
 import {
   BBReferenceFieldSubType,
   DocumentType,
   FieldType,
-  Row,
   RowSearchParams,
   SearchFilters,
-  SearchIndex,
-  SearchResponse,
   SEPARATOR,
   Table,
 } from "@budibase/types"
-
-export async function paginatedSearch(
-  query: SearchFilters,
-  params: RowSearchParams
-): Promise<SearchResponse<Row>> {
-  const appId = context.getWorkspaceId()
-  return dbCore.paginatedSearch(appId!, SearchIndex.ROWS, query, params)
-}
-
-export async function fullSearch(
-  query: SearchFilters,
-  params: RowSearchParams
-): Promise<{ rows: Row[] }> {
-  const appId = context.getWorkspaceId()
-  return dbCore.fullSearch(appId!, SearchIndex.ROWS, query, params)
-}
 
 function findColumnInQueries(
   column: string,
