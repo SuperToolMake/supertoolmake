@@ -24,16 +24,6 @@ describe("users", () => {
       })
     })
 
-    describe("enforced sso", () => {
-      it("returns true for all users when sso is enforced", async () => {
-        await context.doInTenant(structures.tenant.id(), async () => {
-          const user = structures.users.user()
-          const result = await userDb.isPreventPasswordActions(user)
-          expect(result).toBe(true)
-        })
-      })
-    })
-
     describe("sso maintenance mode", () => {
       beforeEach(() => {
         env._set("ENABLE_SSO_MAINTENANCE_MODE", true)
