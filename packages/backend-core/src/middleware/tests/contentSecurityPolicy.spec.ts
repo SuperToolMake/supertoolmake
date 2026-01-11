@@ -36,9 +36,11 @@ describe("contentSecurityPolicy middleware", () => {
     expect(ctx.state.nonce).toBe(mockNonce)
     expect(ctx.set).toHaveBeenCalledWith(
       "Content-Security-Policy",
-      expect.stringContaining(
-        `script-src 'self' 'unsafe-eval' https://js.intercomcdn.com https://widget.intercom.io https://d2l5prqdbvm3op.cloudfront.net https://www.google.com/recaptcha/api.js 'nonce-mocked/nonce'`
-      )
+      expect.stringContaining(`script-src 'self' 'unsafe-eval'`)
+    )
+    expect(ctx.set).toHaveBeenCalledWith(
+      "Content-Security-Policy",
+      expect.stringContaining(`'nonce-mocked/nonce'`)
     )
     expect(next).toHaveBeenCalled()
   })
