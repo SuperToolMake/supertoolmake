@@ -130,7 +130,7 @@ describe("getBuiltinPermissions", () => {
 describe("getBuiltinPermissionByID", () => {
   test.each(
     Object.values(permissions.BUILTIN_PERMISSIONS).map(p => [p.name, p])
-  )("returns correct permission object for %s", (name, expected) => {
+  )("returns correct permission object for %s", (_name, expected) => {
     expect(permissions.getBuiltinPermissionByID(expected._id)).toEqual(expected)
   })
 })
