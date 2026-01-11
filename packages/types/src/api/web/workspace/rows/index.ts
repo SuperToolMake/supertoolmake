@@ -1,4 +1,5 @@
 import { ReadStream } from "fs"
+import stream from "node:stream"
 import { Row } from "../../../../documents"
 import { SearchFilters } from "../../../../sdk"
 import { SortOrder } from "../../pagination"
@@ -37,6 +38,8 @@ export interface ExportRowsRequest {
 }
 
 export type ExportRowsResponse = ReadStream
+
+export type DownloadAttachmentResponse = stream.PassThrough | stream.Readable
 
 export interface FindRowResponse extends Row {}
 
