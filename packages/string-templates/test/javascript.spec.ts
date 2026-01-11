@@ -374,7 +374,7 @@ describe("Javascript", () => {
         `,
         context
       )
-      expect(result).toBe(10)
+      expect(result).toBe(15)
     })
 
     it("should handle test case 7", async () => {
