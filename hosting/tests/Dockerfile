@@ -1,4 +1,4 @@
-FROM budibase/couchdb
+FROM couchdb
 
 ENV DATA_DIR /data
 RUN mkdir /data
