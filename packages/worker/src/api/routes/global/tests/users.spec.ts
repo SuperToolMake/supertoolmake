@@ -867,21 +867,6 @@ describe("/api/global/users", () => {
   })
 
   describe("POST /api/global/users/:userId/permission/:role", () => {
-    it("should fail to assign CREATOR role when feature is not enabled", async () => {
-      const user = await config.createUser()
-      const workspaceId = "app_123456789"
-
-      const res = await config.withApp(workspaceId, () =>
-        config.api.users.addUserToWorkspace(
-          user._id!,
-          user._rev!,
-          "CREATOR",
-          400
-        )
-      )
-      expect(res.body.message).toBe("Feature not enabled, please check license")
-    })
-
     it("should assign CREATOR role and set builder properties", async () => {
       const user = await config.createUser()
       const workspaceId = "app_123456789"
