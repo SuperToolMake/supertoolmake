@@ -150,7 +150,6 @@ jobs:
             postgres_legacy,
             mongodb,
             mariadb,
-            oracle,
             elasticsearch,
             dynamodb,
             none,
@@ -187,8 +186,6 @@ jobs:
             docker pull mongo@${{ steps.dotenv.outputs.MONGODB_SHA }}
           elif [ "${{ matrix.datasource }}" == "mariadb" ]; then
             docker pull mariadb@${{ steps.dotenv.outputs.MARIADB_SHA }}
-          elif [ "${{ matrix.datasource }}" == "oracle" ]; then
-            docker pull budibase/oracle-database:23.2-slim-faststart
           elif [ "${{ matrix.datasource }}" == "postgres_legacy" ]; then
             docker pull postgres:9.5.25
           elif [ "${{ matrix.datasource }}" == "elasticsearch" ]; then
