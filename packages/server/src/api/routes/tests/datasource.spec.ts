@@ -172,12 +172,14 @@ if (descriptions.length) {
       let rawDatasource: Datasource
       let client: Knex
 
-      beforeEach(async () => {
+      beforeAll(async () => {
         const ds = await dsProvider()
         rawDatasource = ds.rawDatasource!
         datasource = ds.datasource!
         client = ds.client!
+      })
 
+      beforeEach(async () => {
         jest.clearAllMocks()
         nock.cleanAll()
       })
@@ -254,9 +256,23 @@ if (descriptions.length) {
       })
 
       describe("destroy", () => {
+        let datasource2: Datasource
+
+        beforeAll(async () => {
+          const ds = await dsProvider()
+          datasource2 = ds.datasource!
+        })
+
+        afterAll(async () => {
+          const ds = await dsProvider()
+          rawDatasource = ds.rawDatasource!
+          datasource = ds.datasource!
+          client = ds.client!
+        })
+
         it("deletes queries for the datasource after deletion and returns a success message", async () => {
           await config.api.query.save({
-            datasourceId: datasource._id!,
+            datasourceId: datasource2._id!,
             name: "Test Query",
             parameters: [],
             fields: {},
@@ -266,10 +282,10 @@ if (descriptions.length) {
             readable: true,
           })
 
-          await config.api.datasource.delete(datasource)
+          await config.api.datasource.delete(datasource2)
           const datasources = await config.api.datasource.fetch()
           expect(datasources).not.toContainEqual(
-            expect.objectContaining(datasource)
+            expect.objectContaining(datasource2)
           )
         })
       })
@@ -427,6 +443,8 @@ if (descriptions.length) {
             expect(
               table.schema.enum.constraints!.inclusion!.toSorted()
             ).toEqual(enumOptions)
+
+            await client.schema.dropTable("options")
           })
 
         !isOracle &&
@@ -455,6 +473,8 @@ if (descriptions.length) {
             expect(
               table.schema.enum.constraints!.inclusion!.toSorted()
             ).toEqual(enumOptions)
+
+            await client.schema.dropTable("options")
           })
 
         !isOracle &&
@@ -487,6 +507,8 @@ if (descriptions.length) {
             expect(
               table.schema.enum.constraints!.inclusion!.toSorted()
             ).toEqual(enumOptions)
+
+            await client.schema.dropTable("options")
           })
       })
 
