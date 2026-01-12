@@ -1,10 +1,10 @@
 <script>
-  import { goto } from "@roxi/routify"
+  import { goto as gotoStore } from "@roxi/routify"
   import { auth } from "@/stores/portal"
   import { onMount } from "svelte"
   import { notifications } from "@budibase/bbui"
 
-  $goto
+  $: goto = $gotoStore
 
   onMount(async () => {
     try {
@@ -12,6 +12,6 @@
     } catch (error) {
       notifications.error("Error setting org")
     }
-    $goto(`./builder`)
+    goto(`./builder`)
   })
 </script>

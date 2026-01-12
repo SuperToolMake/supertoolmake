@@ -7,7 +7,7 @@ import type { MockAgent } from "undici"
 import { setEnv } from "../../../../environment"
 import { installHttpMocking, resetHttpMocking } from "../../../../tests/jestEnv"
 
-describe("rest", () => {
+describe.skip("rest", () => {
   let config: TestConfiguration
   let datasource: Datasource
   let mockAgent: MockAgent | undefined

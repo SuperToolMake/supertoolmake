@@ -122,22 +122,4 @@ export class DDInstrumentedDatabase implements Database {
   load(...args: Parameters<Database["load"]>): ReturnType<Database["load"]> {
     return this.db.load(...args)
   }
-
-  createIndex(
-    ...args: Parameters<Database["createIndex"]>
-  ): ReturnType<Database["createIndex"]> {
-    return this.db.createIndex(...args)
-  }
-
-  deleteIndex(
-    ...args: Parameters<Database["deleteIndex"]>
-  ): ReturnType<Database["deleteIndex"]> {
-    return this.db.deleteIndex(...args)
-  }
-
-  getIndexes(
-    ...args: Parameters<Database["getIndexes"]>
-  ): ReturnType<Database["getIndexes"]> {
-    return this.db.getIndexes(...args)
-  }
 }

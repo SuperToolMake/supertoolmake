@@ -1,5 +1,5 @@
 <script>
-  import { isActive, goto } from "@roxi/routify"
+  import { isActive, goto as gotoStore } from "@roxi/routify"
   import {
     admin,
     auth,
@@ -32,7 +32,7 @@
   import { writable } from "svelte/store"
 
   $isActive
-  $goto
+  $: goto = $gotoStore
 
   let initPromise
   let loaded = writable(false)
@@ -79,25 +79,25 @@
 
       // if tenant is not set go to it
       if (multiTenancyEnabled && !$auth.tenantSet) {
-        $goto("./auth/org")
+        goto("./auth/org")
         return
       }
 
       // Force creation of an admin user if one doesn't exist
       if (!hasAdminUser) {
-        $goto("./admin")
+        goto("./admin")
         return
       }
 
       // Redirect to log in at any time if the user isn't authenticated
       if (!$auth.user && !isOnPreLoginPage()) {
-        $goto(`./auth`)
+        goto(`./auth`)
         return
       }
 
       // Check if password reset required for user
       if ($auth.user?.forceResetPassword) {
-        $goto(`./auth/reset`)
+        goto(`./auth/reset`)
         return
       }
 
@@ -123,19 +123,19 @@
         ) {
           // Tenant owners without apps should be redirected to onboarding
           if (isOwner) {
-            $goto("./onboarding")
+            goto("./onboarding")
             return
           }
           // Regular builders without apps should be redirected to "get started"
           if (isBuilder && !isOwner) {
-            $goto("./get-started")
+            goto("./get-started")
             return
           }
         }
 
         // Redirect non-builders to apps unless they're already there
         if (!isBuilder && !$isActive("./apps")) {
-          $goto(`./apps`)
+          goto(`./apps`)
           return
         }
 
@@ -153,7 +153,7 @@
           const defaultApp = $enrichedApps.find(app => app.editable)
           // Only redirect if enriched apps are loaded and app is editable
           if (defaultApp?.devId) {
-            $goto(`./workspace/[application]`, {
+            goto(`./workspace/[application]`, {
               application: defaultApp.devId,
             })
           }

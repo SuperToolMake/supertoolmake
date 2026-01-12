@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto } from "@roxi/routify"
+  import { goto as gotoStore } from "@roxi/routify"
   import { Body, notifications, Layout, Button } from "@budibase/bbui"
   import { API } from "@/api"
   import { onMount } from "svelte"
@@ -7,7 +7,7 @@
   import BBLogo from "assets/BBLogo.svelte"
   import { appsStore } from "@/stores/portal"
 
-  $goto
+  $: goto = $gotoStore
 
   let loading = false
   let onboardingFailed = false
@@ -33,7 +33,7 @@
       notifications.success(`Workspace created successfully`)
       if (homeScreen?.workspaceAppId && homeScreen?._id) {
         const screenId = homeScreen._id
-        $goto(
+        goto(
           `/builder/workspace/[application]/design/[workspaceAppId]/[screenId]`,
           {
             application: createdWorkspace.instance._id,
@@ -42,7 +42,7 @@
           }
         )
       } else {
-        $goto(`/builder/workspace/[application]`, {
+        goto(`/builder/workspace/[application]`, {
           application: createdWorkspace.instance._id,
         })
       }

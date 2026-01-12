@@ -163,9 +163,6 @@ export interface Database {
   // should be replaced by better typed/non-pouch implemented methods
   dump(stream: Writable, opts?: DatabaseDumpOpts): Promise<any>
   load(stream: ReadStream): Promise<any>
-  createIndex(opts: DatabaseCreateIndexOpts): Promise<any>
-  deleteIndex(opts: DatabaseDeleteIndexOpts): Promise<any>
-  getIndexes(): Promise<any>
 }
 
 export interface SqlDatabase extends Database {

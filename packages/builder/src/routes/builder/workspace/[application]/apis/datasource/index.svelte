@@ -1,8 +1,10 @@
 <script>
   import { datasources } from "@/stores/builder"
-  import { goto } from "@roxi/routify"
+  import { goto as gotoStore } from "@roxi/routify"
   import { onMount } from "svelte"
   import { IntegrationTypes } from "@/constants/backend"
+
+  $: goto = $gotoStore
 
   onMount(async () => {
     const restDatasources = ($datasources.list || []).filter(
@@ -10,15 +12,15 @@
     )
 
     if ($datasources.selected?.source === IntegrationTypes.REST) {
-      $goto(`./[datasourceId]`, {
+      goto(`./[datasourceId]`, {
         datasourceId: $datasources.selected?._id,
       })
     } else if (restDatasources.length) {
-      $goto(`./[datasourceId]`, {
+      goto(`./[datasourceId]`, {
         datasourceId: restDatasources[0]._id,
       })
     } else {
-      $goto("../new")
+      goto("../new")
     }
   })
 </script>

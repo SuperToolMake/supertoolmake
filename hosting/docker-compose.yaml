@@ -93,7 +93,7 @@ services:
 
   couchdb-service:
     restart: unless-stopped
-    image: couchdb:3.5.1
+    image: apache/couchdb:3.5.1
     environment:
       - COUCHDB_PASSWORD=${COUCH_DB_PASSWORD}
       - COUCHDB_USER=${COUCH_DB_USER}

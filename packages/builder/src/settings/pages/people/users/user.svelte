@@ -1,5 +1,5 @@
 <script>
-  import { goto } from "@roxi/routify"
+  import { goto as gotoStore } from "@roxi/routify"
   import {
     ActionMenu,
     Button,
@@ -30,7 +30,7 @@
   import ActiveDirectoryInfo from "../_components/ActiveDirectoryInfo.svelte"
   import { bb } from "@/stores/bb"
 
-  $goto
+  $: goto = $gotoStore
 
   export let userId
 
@@ -289,7 +289,7 @@
           allowEditColumns={false}
           customRenderers={customAppTableRenderers}
           on:click={e =>
-            $goto(`/builder/workspace/[application]`, {
+            goto(`/builder/workspace/[application]`, {
               application: e.detail.devId,
             })}
         >

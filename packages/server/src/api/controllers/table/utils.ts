@@ -11,7 +11,6 @@ import {
   Table,
 } from "@budibase/types"
 import { cloneDeep } from "lodash/fp"
-import isEqual from "lodash/isEqual"
 import {
   CanSwitchTypes,
   SwitchableTypes,
@@ -205,50 +204,6 @@ export async function handleDataImport(
   }
 
   await db.bulkDocs(finalData)
-  return table
-}
-
-export async function handleSearchIndexes(table: Table) {
-  const db = context.getWorkspaceDB()
-  // create relevant search indexes
-  if (table.indexes && table.indexes.length > 0) {
-    const currentIndexes = await db.getIndexes()
-    const indexName = `search:${table._id}`
-
-    const existingIndex = currentIndexes.indexes.find(
-      (existing: any) => existing.name === indexName
-    )
-
-    if (existingIndex) {
-      const currentFields = existingIndex.def.fields.map(
-        (field: any) => Object.keys(field)[0]
-      )
-
-      // if index fields have changed, delete the original index
-      if (!isEqual(currentFields, table.indexes)) {
-        await db.deleteIndex(existingIndex)
-        // create/recreate the index with fields
-        await db.createIndex({
-          index: {
-            fields: table.indexes,
-            name: indexName,
-            ddoc: "search_ddoc",
-            type: "json",
-          },
-        })
-      }
-    } else {
-      // create/recreate the index with fields
-      await db.createIndex({
-        index: {
-          fields: table.indexes,
-          name: indexName,
-          ddoc: "search_ddoc",
-          type: "json",
-        },
-      })
-    }
-  }
   return table
 }
 

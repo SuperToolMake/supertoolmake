@@ -54,11 +54,7 @@ import {
   isDevWorkspaceID,
   WorkspaceStatus,
 } from "../../db/utils"
-import {
-  createAllSearchIndex,
-  createLinkView,
-  createRoutingView,
-} from "../../db/views/staticViews"
+import { createLinkView, createRoutingView } from "../../db/views/staticViews"
 import env from "../../environment"
 import sdk from "../../sdk"
 import {
@@ -147,7 +143,6 @@ async function createInstance(appId: string) {
   // add view for linked rows
   await createLinkView()
   await createRoutingView()
-  await createAllSearchIndex()
 
   await db.put(USERS_TABLE_SCHEMA)
 

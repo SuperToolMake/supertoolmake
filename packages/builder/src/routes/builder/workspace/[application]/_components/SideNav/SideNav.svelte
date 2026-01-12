@@ -11,7 +11,7 @@
     StatusLight,
   } from "@budibase/bbui"
   import { createLocalStorageStore, derivedMemo } from "@budibase/frontend-core"
-  import { url, goto, isActive } from "@roxi/routify"
+  import { url, goto as gotoStore, isActive } from "@roxi/routify"
   import BBLogo from "assets/BBLogo.svelte"
   import {
     appStore,
@@ -54,9 +54,7 @@
     return target?.backupErrors || {}
   }
 
-  $goto
-  $url
-  $isActive
+  $: goto = $gotoStore
 
   type ResourceLinkFn = (_id: string) => string
 
@@ -199,14 +197,14 @@
   }
 
   const resourceLink = (favourite: WorkspaceFavourite) => {
-    const appPrefix = `/builder/workspace/${appId}`
+    const appPrefix = `/builder/workspace/[application]`
     const link: Record<WorkspaceResource, ResourceLinkFn> = {
       [WorkspaceResource.DATASOURCE]: (id: string) => {
         const datasourceMap = get(datasourceLookup) || {}
         const datasource = datasourceMap[id]
-        const basePath =
-          datasource?.source === IntegrationTypes.REST ? "apis" : "data"
-        return `${appPrefix}/${basePath}/datasource/${id}`
+        return datasource?.source === IntegrationTypes.REST
+          ? `${appPrefix}/apis/datasource/[datasourceId]`
+          : `${appPrefix}/data/datasource/[datasourceId]`
       },
       [WorkspaceResource.TABLE]: (id: string) =>
         `${appPrefix}/data/table/${id}`,
@@ -403,10 +401,13 @@
                       icon={lookup?.icon}
                       text={lookup?.name}
                       {collapsed}
-                      isActive={$isActive(resourceLink(favourite) ?? "")}
+                      isActive={$isActive(resourceLink(favourite) ?? "", {
+                        application: appId,
+                        datasourceId: favourite.resourceId,
+                      })}
                       on:click={() => {
                         const targetLink = resourceLink(favourite)
-                        if (targetLink) $goto(targetLink)
+                        if (targetLink) goto(targetLink)
                         keepCollapsed()
                       }}
                     >

@@ -496,9 +496,4 @@ export class CouchDatabase implements Database {
     const pouch = getPouchDB(this.name)
     return pouch.deleteIndex(opts)
   }
-
-  async getIndexes() {
-    const pouch = getPouchDB(this.name)
-    return pouch.getIndexes()
-  }
 }

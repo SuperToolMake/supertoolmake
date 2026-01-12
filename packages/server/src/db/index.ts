@@ -4,7 +4,6 @@ import env from "../environment"
 export function init() {
   const dbConfig: any = {
     replication: true,
-    find: true,
   }
 
   if (env.isTest() && !env.COUCH_DB_URL) {

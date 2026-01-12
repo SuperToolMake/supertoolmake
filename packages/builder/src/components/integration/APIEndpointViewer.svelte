@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto } from "@roxi/routify"
+  import { goto as gotoStore, params } from "@roxi/routify"
   import { datasources } from "@/stores/builder/datasources"
   import { queries } from "@/stores/builder/queries"
   import { integrations } from "@/stores/builder/integrations"
@@ -58,6 +58,9 @@
   import { readableToRuntimeMap, runtimeToReadableMap } from "@/dataBinding"
   import ResponsePanel from "./ResponsePanel.svelte"
   import AuthPicker from "./rest/AuthPicker.svelte"
+
+  $: goto = $gotoStore
+  $params
 
   export let queryId
   export let datasourceId
@@ -521,7 +524,10 @@
       notifications.success(`Request saved successfully`)
 
       if (isNew && redirectIfNew) {
-        $goto(`../../${_id}`)
+        goto(`/builder/workspace/[application]/apis/query/[queryId]`, {
+          queryId: _id!,
+          application: $params.application,
+        })
       }
 
       const updatedQuery = getSelectedQuery(_id!, builtQuery.datasourceId)

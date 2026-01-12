@@ -76,7 +76,7 @@ export default async function setup() {
   await killContainers(containers)
 
   try {
-    const couchdb = new GenericContainer("couchdb:3.5.1")
+    const couchdb = new GenericContainer("apache/couchdb:3.5.1")
       .withName("couchdb_testcontainer")
       .withExposedPorts(5984, 4984)
       .withEnvironment({
@@ -98,6 +98,9 @@ export default async function setup() {
           [cluster]
           n = 1
           q = 1
+
+          [nouveau] 
+          enable = false
         `,
           target: "/opt/couchdb/etc/local.d/test-couchdb.ini",
         },

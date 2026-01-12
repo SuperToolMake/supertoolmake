@@ -232,7 +232,10 @@
       notifications.success(`Request saved successfully`)
       if (isNew && redirectIfNew) {
         isModified = false
-        $goto(`../../${_id}`)
+        goto(`/builder/workspace/[application]/apis/query/[queryId]`, {
+          queryId: _id,
+          application: $params.application,
+        })
       }
 
       query = getSelectedQuery()

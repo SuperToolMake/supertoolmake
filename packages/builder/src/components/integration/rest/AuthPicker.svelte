@@ -8,14 +8,14 @@
     ListItem,
     PopoverAlignment,
   } from "@budibase/bbui"
-  import { goto } from "@roxi/routify"
+  import { goto as gotoStore } from "@roxi/routify"
   import { appStore, oauth2 } from "@/stores/builder"
   import DetailPopover from "@/components/common/DetailPopover.svelte"
   import { RestAuthType } from "@budibase/types"
   import { onMount } from "svelte"
   import { bb } from "@/stores/bb"
 
-  $goto
+  $: goto = $gotoStore
 
   type Config = { label: string; value: string }
 
@@ -37,7 +37,7 @@
   $: authConfig = allConfigs.find(c => c.value === authConfigId)
 
   function addBasicConfiguration() {
-    $goto(`/builder/workspace/[application]/apis/datasource/[datasourceId]`, {
+    goto(`/builder/workspace/[application]/apis/datasource/[datasourceId]`, {
       application: $appStore.appId,
       datasourceId,
       tab: "Authentication",

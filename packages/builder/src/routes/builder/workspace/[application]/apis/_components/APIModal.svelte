@@ -16,13 +16,13 @@
     type TemplateSelectionEventDetail,
     type UIIntegration,
   } from "@budibase/types"
-  import { goto } from "@roxi/routify"
+  import { goto as gotoStore } from "@roxi/routify"
   import SelectCategoryAPIModal from "./SelectCategoryAPIModal.svelte"
+
+  $: goto = $gotoStore
 
   export const show = () => modal.show()
   export const hide = () => modal.hide()
-
-  $goto
 
   let modal: Modal
   let loading = false
@@ -54,7 +54,7 @@
         })
         await datasources.fetch()
 
-        $goto(`./query/new/[datasourceId]`, {
+        goto(`./query/new/[datasourceId]`, {
           datasourceId: ds._id!,
         })
       }
@@ -169,7 +169,7 @@
 
       await datasources.fetch()
 
-      $goto(`./datasource/[datasourceId]`, {
+      goto(`./datasource/[datasourceId]`, {
         datasourceId: ds._id!,
       })
 

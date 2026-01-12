@@ -8,13 +8,13 @@
     FancyForm,
     FancyInput,
   } from "@budibase/bbui"
-  import { goto } from "@roxi/routify"
+  import { goto as gotoStore } from "@roxi/routify"
   import { API } from "@/api"
   import { admin, auth } from "@/stores/portal"
   import Logo from "assets/supertoolmake-emblem.svg"
   import { passwordsMatch, handleError } from "../auth/_components/utils"
 
-  $goto
+  $: goto = $gotoStore
 
   let form
   let errors = {}
@@ -38,7 +38,7 @@
       notifications.success("Admin user created")
       await admin.init()
       await auth.login(formData?.email.trim(), formData?.password)
-      $goto("/builder")
+      goto("/builder")
     } catch (error) {
       submitted = false
       notifications.error(error.message || "Failed to create admin user")

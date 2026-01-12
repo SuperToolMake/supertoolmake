@@ -1,6 +1,6 @@
 <script>
   import Panel from "@/components/design/Panel.svelte"
-  import { goto } from "@roxi/routify"
+  import { goto as gotoStore } from "@roxi/routify"
   import { Layout, Search, Icon, Body, notifications } from "@budibase/bbui"
   import { getComponentStructure } from "./componentStructure"
   import {
@@ -13,7 +13,7 @@
   import { findComponentPath } from "@/helpers/components"
   import NewPill from "@/components/common/NewPill.svelte"
 
-  $goto
+  $: goto = $gotoStore
 
   // Smallest possible 1x1 transparent GIF
   const ghost = new Image(1, 1)
@@ -229,7 +229,7 @@
 <Panel
   title="Add component"
   showCloseButton
-  onClickCloseButton={() => $goto("../")}
+  onClickCloseButton={() => goto("../")}
   borderLeft
   wide
 >
