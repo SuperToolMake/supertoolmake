@@ -11,6 +11,7 @@ import { basicQuery, basicTable } from "../../../tests/utilities/structures"
 import * as setup from "./utilities"
 import { structures } from "@budibase/backend-core/tests"
 import { utils } from "@budibase/backend-core"
+import { getDatasource, DatabaseName } from "../../../integrations/tests/utils"
 
 describe("/workspace", () => {
   const config = new TestConfiguration()
@@ -34,8 +35,13 @@ describe("/workspace", () => {
   const resourceCreators: Partial<
     Record<WorkspaceResource, (opts?: any) => Promise<any>>
   > = {
-    [WorkspaceResource.TABLE]: async () =>
-      await config.api.table.save(basicTable()),
+    [WorkspaceResource.TABLE]: async () => {
+      const rawDatasource = await getDatasource(
+        process.env.DATASOURCE as DatabaseName
+      )
+      const datasource = await config.api.datasource.create(rawDatasource!)
+      return await config.api.table.save(basicTable(datasource))
+    },
 
     [WorkspaceResource.QUERY]: async () =>
       await config.api.query.save(basicQuery(datasource?._id!)),
@@ -134,7 +140,7 @@ describe("/workspace", () => {
     const resources = [table, query, workspaceApp]
     const resp = await config.api.workspaceFavourites.fetchAll()
 
-    expect(resp.favourites.length).toBe(5)
+    expect(resp.favourites.length).toBe(3)
 
     const resourceIds = resources.map(r => r._id)
     const favouriteResourceIds = resp.favourites.map(r => r.resourceId)
@@ -142,13 +148,12 @@ describe("/workspace", () => {
     const mergedSet = new Set([...resourceIds, ...favouriteResourceIds])
 
     // Should have no dupe ids
-    expect(mergedSet.size).toBe(5)
+    expect(mergedSet.size).toBe(3)
   })
 
   it("should fetch a different users favourites based on the current users context", async () => {
     await config.withUser(altUser, async () => {
       const resp = await config.api.workspaceFavourites.fetchAll()
-      // This user shouldn't have any, even though the default user has 5
       expect(resp.favourites.length).toBe(0)
     })
   })
@@ -163,7 +168,7 @@ describe("/workspace", () => {
 
     // Confirm its missing
     const updated = await config.api.workspaceFavourites.fetchAll()
-    expect(updated.favourites.length).toBe(4)
+    expect(updated.favourites.length).toBe(2)
 
     const found = updated.favourites.find(f => f._id === target._id)
     expect(found).toBeUndefined()
@@ -171,6 +176,16 @@ describe("/workspace", () => {
 
   it("should allow the alt user to delete their favourites", async () => {
     await config.withUser(altUser, async () => {
+      // Create some favourites for altUser
+      await config.api.workspaceFavourites.save({
+        resourceType: WorkspaceResource.TABLE,
+        resourceId: table._id!,
+      })
+      await config.api.workspaceFavourites.save({
+        resourceType: WorkspaceResource.QUERY,
+        resourceId: query._id!,
+      })
+
       const resp = await config.api.workspaceFavourites.fetchAll()
       const target = resp.favourites[0]
 

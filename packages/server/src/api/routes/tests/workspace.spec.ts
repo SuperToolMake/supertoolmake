@@ -917,7 +917,6 @@ describe("/applications", () => {
         process.env.DATASOURCE as DatabaseName
       )
       const datasource = await config.api.datasource.create(rawDatasource!)
-      // Create a table for testing permissions
       const table = await config.api.table.save(basicTable(datasource))
       expect(table._id).toBeDefined()
 

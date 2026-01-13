@@ -11,6 +11,7 @@ import { ONBOARDING_WELCOME_SCREEN_NAME } from "../../../constants/screens"
 import { basicDatasourcePlus } from "../../../tests/utilities/structures"
 import * as setup from "./utilities"
 import { checkBuilderEndpoint } from "./utilities/TestFunctions"
+import { getDatasource, DatabaseName } from "../../../integrations/tests/utils"
 
 const {
   basicScreen,
@@ -263,7 +264,11 @@ describe("/screens", () => {
     }
 
     it("should find table usage", async () => {
-      const table = await config.api.table.save(basicTable())
+      const rawDatasource = await getDatasource(
+        process.env.DATASOURCE as DatabaseName
+      )
+      const datasource = await config.api.datasource.create(rawDatasource!)
+      const table = await config.api.table.save(basicTable(datasource))
       const screen = await config.api.screen.save(
         createTableScreen("BudibaseDB", table)
       )
