@@ -25,6 +25,8 @@ describe("/api/applications/:appId/sync", () => {
 
   it("make sure that user metadata is correctly sync'd", async () => {
     const rows = await getUserMetadata()
-    expect(rows.length).toBe(1)
+    // A default user is created with the newTenant call via `await config.init()`
+    // therefore two users are expected in this case
+    expect(rows.length).toBe(2)
   })
 })

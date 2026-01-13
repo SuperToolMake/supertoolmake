@@ -184,7 +184,7 @@ export function datasourceDescribe(opts: DatasourceDescribeOpts) {
   }))
 }
 
-function getDatasource(
+export function getDatasource(
   sourceName: DatabaseName
 ): Promise<Datasource | undefined> {
   return providers[sourceName]()
