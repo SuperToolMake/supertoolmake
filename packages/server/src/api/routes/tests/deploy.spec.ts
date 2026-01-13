@@ -1,8 +1,6 @@
-import { context, db as dbCore } from "@budibase/backend-core"
+import { db as dbCore } from "@budibase/backend-core"
 import { structures } from "@budibase/backend-core/tests"
-import { PublishResourceState, Row, Table, WorkspaceApp } from "@budibase/types"
-import { getRowParams } from "../../../db/utils"
-import { basicTable } from "../../../tests/utilities/structures"
+import { PublishResourceState, WorkspaceApp } from "@budibase/types"
 import * as setup from "./utilities"
 
 describe("/api/deploy", () => {
