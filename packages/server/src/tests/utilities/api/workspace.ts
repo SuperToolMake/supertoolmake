@@ -113,6 +113,21 @@ export class WorkspaceAPI extends TestAPI {
     })
   }
 
+  importToWorkspace = async (
+    appId: string,
+    opts: { fileToImport: string; encryptionPassword?: string },
+    expectations?: Expectations
+  ): Promise<{ message: string }> => {
+    const res = this.request
+      .post(`/api/applications/${appId}/import`)
+      .attach("appExport", opts.fileToImport)
+      .set(await this.getHeaders())
+    if (opts.encryptionPassword) {
+      res.field("encryptionPassword", opts.encryptionPassword)
+    }
+    return this._checkResponse(await res, expectations).body
+  }
+
   duplicateWorkspace = async (
     workspaceId: string,
     fields: object,

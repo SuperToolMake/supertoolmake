@@ -13,14 +13,12 @@ import {
   isDocument,
   RowResponse,
   RowValue,
-  SQLiteDefinition,
 } from "@budibase/types"
 import { getCouchInfo } from "./connections"
 import { directCouchUrlCall } from "./utils"
 import { getPouchDB } from "./pouchDB"
 import { ReadStream, WriteStream } from "fs"
 import { newid } from "../../docIds/newid"
-import { SQLITE_DESIGN_DOC_ID } from "../../constants"
 import { DDInstrumentedDatabase } from "../instrumentation"
 import { checkSlashesInUrl } from "../../helpers"
 
@@ -417,15 +415,6 @@ export class CouchDatabase implements Database {
     })
   }
 
-  // checks design document is accurate (cleans up tables)
-  // this will check the design document and remove anything from
-  // disk which is not supposed to be there
-  async sqlDiskCleanup(): Promise<void> {
-    const dbName = this.name
-    const url = `/${dbName}/_cleanup`
-    await this._query<void>(url, "POST")
-  }
-
   // removes a document from sqlite
   async sqlPurgeDocument(docIds: string[] | string): Promise<void> {
     if (!Array.isArray(docIds)) {
@@ -447,14 +436,6 @@ export class CouchDatabase implements Database {
   }
 
   async destroy() {
-    if (await this.exists(SQLITE_DESIGN_DOC_ID)) {
-      // delete the design document, then run the cleanup operation
-      const definition = await this.get<SQLiteDefinition>(SQLITE_DESIGN_DOC_ID)
-      // remove all tables - save the definition then trigger a cleanup
-      definition.sql.tables = {}
-      await this.put(definition)
-      await this.sqlDiskCleanup()
-    }
     try {
       return await this.nano().db.destroy(this.name)
     } catch (err: any) {

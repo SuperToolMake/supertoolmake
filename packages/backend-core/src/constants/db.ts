@@ -70,10 +70,8 @@ export const WORKSPACE_PREFIX = prefixed(DocumentType.WORKSPACE)
 export const WORKSPACE_DEV = prefixed(DocumentType.WORKSPACE_DEV)
 export const WORKSPACE_DEV_PREFIX = WORKSPACE_DEV
 export const BUDIBASE_DATASOURCE_TYPE = "budibase"
-export const SQLITE_DESIGN_DOC_ID = "_design/sqlite"
 export const USER_METADATA_PREFIX = `${DocumentType.ROW}${SEPARATOR}${InternalTable.USER_METADATA}${SEPARATOR}`
 
 export const enum DesignDocuments {
-  SQLITE = SQLITE_DESIGN_DOC_ID,
   MIGRATIONS = "_design/migrations",
 }

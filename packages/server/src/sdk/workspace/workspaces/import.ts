@@ -18,10 +18,7 @@ export type FileAttributes = {
   path: string
 }
 
-const DESIGN_DOCUMENTS_TO_IMPORT = [
-  DesignDocuments.SQLITE,
-  DesignDocuments.MIGRATIONS,
-]
+const DESIGN_DOCUMENTS_TO_IMPORT = [DesignDocuments.MIGRATIONS]
 
 async function getNewWorkspaceMetadata(
   tempDb: Database,

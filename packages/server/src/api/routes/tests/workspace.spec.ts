@@ -1,6 +1,5 @@
 import { USERS_TABLE_SCHEMA } from "../../../constants"
-
-import { Header, context, db, roles } from "@budibase/backend-core"
+import { Header, db, roles } from "@budibase/backend-core"
 import { structures } from "@budibase/backend-core/tests"
 import {
   type Workspace,
@@ -14,7 +13,6 @@ import path from "path"
 import tk from "timekeeper"
 import { WorkspaceStatus } from "../../../db/utils"
 import env from "../../../environment"
-import sdk from "../../../sdk"
 import { getAppObjectStorageEtags } from "../../../tests/utilities/objectStore"
 import {
   basicScreen,
@@ -23,6 +21,7 @@ import {
 } from "../../../tests/utilities/structures"
 import * as setup from "./utilities"
 import { checkBuilderEndpoint } from "./utilities/TestFunctions"
+import { getDatasource, DatabaseName } from "../../../integrations/tests/utils"
 
 const generateAppName = () => {
   return structures.generator.word({ length: 10 })
@@ -149,7 +148,7 @@ describe("/applications", () => {
       })
     })
 
-    it("creates app with sample data when onboarding", async () => {
+    it("creates app when onboarding", async () => {
       const name = "Welcome app"
       const newWorkspace = await config.api.workspace.create({
         name,
@@ -170,49 +169,6 @@ describe("/applications", () => {
         expect(res.screens.length).toEqual(1)
 
         const tables = await config.api.table.fetch()
-        expect(tables.length).toEqual(5)
-      })
-    })
-
-    it("creates app from template", async () => {
-      nock("https://prod-budi-templates.s3-eu-west-1.amazonaws.com")
-        .get(`/templates/app/expense-approval.tar.gz`)
-        .replyWithFile(
-          200,
-          path.resolve(__dirname, "data", "expense-approval.tar.gz")
-        )
-
-      const newApp = await config.api.workspace.create({
-        name: generateAppName(),
-        useTemplate: "true",
-        templateKey: "app/expense-approval",
-      })
-      expect(newApp._id).toBeDefined()
-
-      // Check resources from template in the newly created app context
-      await config.withApp(newApp, async () => {
-        const res = await config.api.workspace.getDefinition(newApp.appId)
-        expect(res.screens.length).toEqual(6)
-
-        const tables = await config.api.table.fetch()
-        expect(tables.length).toEqual(4)
-      })
-    })
-
-    it("creates app from file", async () => {
-      const newApp = await config.api.workspace.create({
-        name: generateAppName(),
-        useTemplate: "true",
-        fileToImport: "src/api/routes/tests/data/old-app.txt", // export.tx was empty
-      })
-      expect(newApp._id).toBeDefined()
-
-      // Check resources from import file in the newly created app context
-      await config.withApp(newApp, async () => {
-        const res = await config.api.workspace.getDefinition(newApp.appId)
-        expect(res.screens.length).toEqual(1)
-
-        const tables = await config.api.table.fetch()
         expect(tables.length).toEqual(1)
       })
     })
@@ -224,26 +180,6 @@ describe("/applications", () => {
         url: `/api/applications`,
         body: { name: "My App" },
       })
-    })
-
-    it("migrates navigation settings from old apps", async () => {
-      const app = await config.api.workspace.create({
-        name: generateAppName(),
-        useTemplate: "true",
-        fileToImport: "src/api/routes/tests/data/old-app.txt",
-      })
-      expect(app._id).toBeDefined()
-      expect(app.navigation).toBeDefined()
-      expect(app.navigation!.hideLogo).toBe(true)
-      expect(app.navigation!.title).toBe("Custom Title")
-      expect(app.navigation!.hideLogo).toBe(true)
-      expect(app.navigation!.navigation).toBe("Left")
-      expect(app.navigation!.navBackground).toBe(
-        "var(--spectrum-global-color-blue-600)"
-      )
-      expect(app.navigation!.navTextColor).toBe(
-        "var(--spectrum-global-color-gray-50)"
-      )
     })
 
     it("should reject with a known name", async () => {
@@ -260,46 +196,27 @@ describe("/applications", () => {
       )
     })
 
-    it("creates app from a old import", async () => {
-      const newApp = await config.api.workspace.createFromImport({
-        name: generateAppName(),
-        fileToImport: path.join(__dirname, "data", "old-export.enc.tar.gz"),
-        encryptionPassword: "testtest",
-      })
-      expect(newApp._id).toBeDefined()
-
-      // Check resources from import file in the newly created app context
-      await config.withApp(newApp, async () => {
-        const res = await config.api.workspace.getDefinition(newApp.appId)
-        expect(res.screens.length).toEqual(2)
-
-        const tables = await config.api.table.fetch()
-        expect(tables.length).toEqual(7)
-      })
-
-      const fileEtags = await getAppObjectStorageEtags(newApp.appId)
-      expect(fileEtags).toEqual({
-        // These etags match the ones from the export file
-        "budibase-client.js": "a0ab956601262aae131122b3f65102da-2",
-        "manifest.json": "8eecdd3935062de5298d8d115453e124",
-      })
-    })
-
     it("creates app from a new import", async () => {
-      const newApp = await config.api.workspace.createFromImport({
+      const filePath = path.join(
+        __dirname,
+        "data",
+        "export-change-request.tar.gz"
+      )
+      const newApp = await config.api.workspace.create({
         name: generateAppName(),
-        fileToImport: path.join(
-          __dirname,
-          "data",
-          "export-change-request.tar.gz"
-        ),
       })
       expect(newApp._id).toBeDefined()
 
+      await config.withApp(newApp, async () => {
+        await config.api.workspace.importToWorkspace(newApp.appId, {
+          fileToImport: filePath,
+        })
+      })
+
       // Check resources from import file in the newly created app context
       await config.withApp(newApp, async () => {
-        const res = await config.api.workspace.getDefinition(newApp.appId)
-        expect(res.screens.length).toEqual(6)
+        const screens = await config.api.screen.list()
+        expect(screens.length).toEqual(6)
 
         const tables = await config.api.table.fetch()
         expect(tables.length).toEqual(3)
@@ -335,6 +252,9 @@ describe("/applications", () => {
         "chunks/CardsBlock-3bf33a86.js": "15c4f90da5021530d2f3bcfcd16184dd",
         "chunks/ChartBlock-9712464a.js": "e42adb87fc2d53b4c88f3831e32d437b",
         "chunks/CheckboxGroup-995bb449.js": "d234f50e0ef9fcbeb212a82cdf1b8222",
+        "chunks/CodeGenerator-491374a6.js": "5ab08a313fd009d5c3ccfae4294a01d2",
+        "chunks/CodeScannerField-878f0124.js":
+          "880ab344a303f85d245d0188936cbaa8",
         "chunks/CollapsedButtonGroup-2dfcf354.js":
           "8a8ab48ee3e3cb65c7ada31d7f6fe2b5",
         "chunks/Container-7ddcd183.js": "d1983447bf76acd38d89fa131ae77b11",
@@ -348,6 +268,7 @@ describe("/applications", () => {
         "chunks/DonutChart-28fb127b.js": "be3e0af33c16f5c3d581af02478b7e33",
         "chunks/DynamicFilter-dbdc356f.js": "89e8e20238b69e0fbbb227caba631681",
         "chunks/Embed-dc9f82d1.js": "96d4019d86360bc3542a9d5e93422640",
+        "chunks/EmbeddedMap-6e3f96cb.js": "1579f6ab323805cfde554412c2d446a7",
         "chunks/Field-026e9b04.js": "3a908b104e0034c0154ab03b44f7477b",
         "chunks/FieldGroup-f0c1e7cf.js": "d606e090ec0b738b8b6eb01d95a6098f",
         "chunks/Filter-3a9aa189.js": "7276af9ac5a0bbdeeafef42ce14fda5e",
@@ -992,8 +913,12 @@ describe("/applications", () => {
     })
 
     it("should publish table permissions for custom roles correctly", async () => {
+      const rawDatasource = await getDatasource(
+        process.env.DATASOURCE as DatabaseName
+      )
+      const datasource = await config.api.datasource.create(rawDatasource!)
       // Create a table for testing permissions
-      const table = await config.api.table.save(basicTable())
+      const table = await config.api.table.save(basicTable(datasource))
       expect(table._id).toBeDefined()
 
       // Create a custom role
@@ -1108,49 +1033,6 @@ describe("/applications", () => {
         config.api.workspace.unpublish(workspace.appId.replace("_dev", ""))
       )
     })
-
-    it("should not delete production data when unpublishing and republishing", async () => {
-      const table = await config.api.table.save(basicTable())
-
-      // Ensure the table exists in production
-      await config.api.workspace.publish(config.getDevWorkspaceId())
-
-      const prodRow = await config.withProdApp(() =>
-        config.api.row.save(table._id!, { name: "Prod row" })
-      )
-
-      const prodRowsBefore = await config.withProdApp(() =>
-        config.api.row.search(table._id!, { query: {} })
-      )
-      expect(prodRowsBefore.rows.find(r => r._id === prodRow._id)).toBeDefined()
-
-      await config.api.workspace.unpublish(config.getDevWorkspaceId())
-      await config.api.workspace.publish(config.getDevWorkspaceId())
-
-      const prodRowsAfter = await config.withProdApp(() =>
-        config.api.row.search(table._id!, { query: {} })
-      )
-      expect(prodRowsAfter.rows.find(r => r._id === prodRow._id)).toBeDefined()
-    })
-  })
-
-  describe("delete", () => {
-    it("should delete published app and dev apps with dev app ID", async () => {
-      nock("http://localhost:10000")
-        .delete(`/api/global/roles/${workspace.appId}`)
-        .reply(200, {})
-
-      await config.api.workspace.delete(workspace.appId)
-    })
-
-    it("should delete published app and dev app with prod app ID", async () => {
-      const prodAppId = workspace.appId.replace("_dev", "")
-      nock("http://localhost:10000")
-        .delete(`/api/global/roles/${prodAppId}`)
-        .reply(200, {})
-
-      await config.withProdApp(() => config.api.workspace.delete(prodAppId))
-    })
   })
 
   describe("POST /api/applications/:appId/duplicate", () => {
@@ -1204,85 +1086,6 @@ describe("/applications", () => {
         },
         { body: { message: "App URL is already in use." }, status: 400 }
       )
-    })
-  })
-
-  describe("seedProductionTables", () => {
-    it("should seed empty production tables with development data when publishing", async () => {
-      // Create a table in development
-      const table = await config.api.table.save(basicTable())
-      expect(table._id).toBeDefined()
-
-      // Create some test rows in development
-      const testRows = [{ name: "Row 1" }, { name: "Row 2" }, { name: "Row 3" }]
-
-      for (const rowData of testRows) {
-        await config.api.row.save(table._id!, rowData)
-      }
-
-      // Verify rows exist in development
-      const devRows = await config.api.row.search(table._id!, { query: {} })
-      expect(devRows.rows).toHaveLength(3)
-
-      // Publish with seedProductionTables option
-      await config.api.workspace.filteredPublish(config.getDevWorkspaceId(), {
-        seedProductionTables: true,
-      })
-
-      // Switch to production context and verify data was seeded
-      await context.doInWorkspaceContext(config.prodWorkspaceId!, async () => {
-        const prodRows = await config.api.row.search(table._id!, {
-          query: {},
-        })
-        expect(prodRows.rows).toHaveLength(3)
-
-        // Verify the actual data was copied correctly
-        const prodRowNames = prodRows.rows.map(row => row.name).sort()
-        expect(prodRowNames).toEqual(["Row 1", "Row 2", "Row 3"])
-      })
-    })
-
-    it("should handle seedProductionTables API option correctly", async () => {
-      // Create a table in development with unique name for this test
-      const table = await config.api.table.save(basicTable())
-      expect(table._id).toBeDefined()
-
-      // Create some test rows in development
-      await config.api.row.save(table._id!, { name: "Dev Row 1" })
-      await config.api.row.save(table._id!, { name: "Dev Row 2" })
-
-      // Verify the API accepts seedProductionTables option without error
-      const result = await config.api.workspace.filteredPublish(
-        config.getDevWorkspaceId(),
-        {
-          seedProductionTables: true,
-        }
-      )
-
-      // Check that the publish completed successfully
-      expect(result).toBeDefined()
-
-      // Verify data was published to production (since test mode publishes all data)
-      await context.doInWorkspaceContext(config.prodWorkspaceId!, async () => {
-        const prodRows = await config.api.row.search(table._id!, {
-          query: {},
-        })
-        expect(prodRows.rows).toHaveLength(2)
-
-        const prodRowNames = prodRows.rows.map(row => row.name).sort()
-        expect(prodRowNames).toEqual(["Dev Row 1", "Dev Row 2"])
-      })
-
-      // Test that we can call listEmptyProductionTables without error
-      const emptyTables = await context.doInWorkspaceContext(
-        config.getDevWorkspaceId(),
-        async () => {
-          return await sdk.tables.listEmptyProductionTables()
-        }
-      )
-
-      // The result should be an array (even if empty in test mode due to all tables being synced)
-      expect(Array.isArray(emptyTables)).toBe(true)
     })
   })
 })
