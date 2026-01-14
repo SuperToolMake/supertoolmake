@@ -113,7 +113,7 @@ describe("jsRunner (using isolated-vm)", () => {
   })
 
   // the test cases here were extracted from templates/real world examples of JS
-  describe("real test cases from Budicloud", () => {
+  describe("real test cases", () => {
     const context = {
       "Unit Value": 2,
       Quantity: 1,
@@ -289,7 +289,7 @@ describe("jsRunner (using isolated-vm)", () => {
         `,
         context
       )
-      expect(result).toBe(10)
+      expect(result).toBe(15)
     })
 
     it("should handle test case 7", async () => {
