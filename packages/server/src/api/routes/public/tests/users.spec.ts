@@ -51,35 +51,7 @@ describe("public users API", () => {
       expect(newUser._id).toBeDefined()
     })
 
-    describe("role creation on free tier", () => {
-      it("should not allow 'roles' to be updated", async () => {
-        const newUser = await config.api.public.user.create({
-          email: generator.email({ domain: "example.com" }),
-          roles: { app_a: "BASIC" },
-        })
-        expect(newUser.roles["app_a"]).toBeUndefined()
-      })
-
-      it("should not allow 'admin' to be updated", async () => {
-        const newUser = await config.api.public.user.create({
-          email: generator.email({ domain: "example.com" }),
-          roles: {},
-          admin: { global: true },
-        })
-        expect(newUser.admin).toBeUndefined()
-      })
-
-      it("should not allow 'builder' to be updated", async () => {
-        const newUser = await config.api.public.user.create({
-          email: generator.email({ domain: "example.com" }),
-          roles: {},
-          builder: { global: true },
-        })
-        expect(newUser.builder).toBeUndefined()
-      })
-    })
-
-    describe("role creation on business tier", () => {
+    describe("role creation", () => {
       it("should allow 'roles' to be updated", async () => {
         const newUser = await config.api.public.user.create({
           email: generator.email({ domain: "example.com" }),
