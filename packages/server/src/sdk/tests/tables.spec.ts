@@ -2,6 +2,7 @@ import { Table } from "@budibase/types"
 import sdk from "../"
 import TestConfig from "../../tests/utilities/TestConfiguration"
 import { basicTable } from "../../tests/utilities/structures"
+import { getDatasource, DatabaseName } from "../../integrations/tests/utils"
 
 describe("tables", () => {
   const config = new TestConfig()
@@ -9,7 +10,13 @@ describe("tables", () => {
 
   beforeAll(async () => {
     await config.init()
-    table = await config.api.table.save(basicTable())
+    const ds =
+      process.env.DATASOURCE === "none" ? "postgres" : process.env.DATASOURCE
+    const rawDatasource = await getDatasource(
+      (ds as DatabaseName) || "postgres"
+    )
+    const datasource = await config.api.datasource.create(rawDatasource!)
+    table = await config.api.table.save(basicTable(datasource))
   })
 
   describe("getTables", () => {
