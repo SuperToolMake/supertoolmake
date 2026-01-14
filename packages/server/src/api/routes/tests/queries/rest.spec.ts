@@ -7,7 +7,7 @@ import type { MockAgent } from "undici"
 import { setEnv } from "../../../../environment"
 import { installHttpMocking, resetHttpMocking } from "../../../../tests/jestEnv"
 
-describe.skip("rest", () => {
+describe("rest", () => {
   let config: TestConfiguration
   let datasource: Datasource
   let mockAgent: MockAgent | undefined
@@ -133,7 +133,7 @@ describe.skip("rest", () => {
 
   beforeEach(() => {
     mockAgent = installHttpMocking()
-    mockAgent.disableNetConnect()
+    mockAgent.enableNetConnect()
   })
 
   afterEach(async () => {
