@@ -89,6 +89,7 @@ describe("clientLibrary", () => {
       ] as any)
 
       mockedEnv.isDev.mockReturnValue(isDev)
+      mockedObjectStore.listAllObjects.mockReturnValue([] as any)
 
       const result = await updateClientLibrary(testAppId)
 
