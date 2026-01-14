@@ -36,8 +36,10 @@ describe("/workspace", () => {
     Record<WorkspaceResource, (opts?: any) => Promise<any>>
   > = {
     [WorkspaceResource.TABLE]: async () => {
+      const ds =
+        process.env.DATASOURCE === "none" ? "postgres" : process.env.DATASOURCE
       const rawDatasource = await getDatasource(
-        process.env.DATASOURCE as DatabaseName
+        (ds as DatabaseName) || "postgres"
       )
       const datasource = await config.api.datasource.create(rawDatasource!)
       return await config.api.table.save(basicTable(datasource))

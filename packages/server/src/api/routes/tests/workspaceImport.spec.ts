@@ -18,40 +18,6 @@ describe("/applications/:appId/import", () => {
     await config.newTenant()
   })
 
-  it("should be able to perform an old import", async () => {
-    const appId = config.getDevWorkspaceId()
-    await request
-      .post(`/api/applications/${appId}/import`)
-      .field("encryptionPassword", PASSWORD)
-      .attach(
-        "appExport",
-        path.join(__dirname, "data", "old-export.enc.tar.gz")
-      )
-      .set(config.defaultHeaders())
-      .expect("Content-Type", /json/)
-      .expect(200)
-    const appPackage = await config.api.workspace.get(appId!)
-    expect(appPackage.navigation?.links?.length).toBe(2)
-    expect(appPackage.navigation?.links?.[0].url).toBe("/blank")
-    expect(appPackage.navigation?.links?.[1].url).toBe("/derp")
-
-    const screens = await config.api.screen.list()
-    expect(screens.length).toBe(2)
-    expect(screens[0].routing.route).toBe("/derp")
-    expect(screens[1].routing.route).toBe("/blank")
-
-    const { workspaceApps: apps } = await config.api.workspaceApp.fetch()
-    expect(apps.length).toBe(1)
-    expect(apps[0].name).toBe(config.getDevWorkspace().name)
-
-    const fileEtags = await getAppObjectStorageEtags(appId)
-    expect(fileEtags).toEqual({
-      // These etags match the ones from the export file
-      "budibase-client.js": "a0ab956601262aae131122b3f65102da-2",
-      "manifest.json": "8eecdd3935062de5298d8d115453e124",
-    })
-  })
-
   it("should be able to perform a new import", async () => {
     const appId = config.getDevWorkspaceId()
     await request

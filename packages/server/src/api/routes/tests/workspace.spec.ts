@@ -913,8 +913,10 @@ describe("/applications", () => {
     })
 
     it("should publish table permissions for custom roles correctly", async () => {
+      const ds =
+        process.env.DATASOURCE === "none" ? "postgres" : process.env.DATASOURCE
       const rawDatasource = await getDatasource(
-        (process.env.DATASOURCE as DatabaseName) || "postgres"
+        (ds as DatabaseName) || "postgres"
       )
       const datasource = await config.api.datasource.create(rawDatasource!)
       const table = await config.api.table.save(basicTable(datasource))
