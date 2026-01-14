@@ -5,6 +5,7 @@ import { endpointGroupList } from "./endpointGroups"
 // various groups they need to be included in
 import "./apikeys"
 import "./auth"
+import "./backup"
 import "./component"
 import "./datasource"
 import "./debug"

@@ -270,14 +270,10 @@ export interface components {
     appExport: {
       /** @description An optional password used to encrypt the export. */
       encryptPassword: string;
-      /** @description Set whether the internal table rows should be excluded from the export. */
-      excludeRows: boolean;
     };
     workspaceExport: {
       /** @description An optional password used to encrypt the export. */
       encryptPassword: string;
-      /** @description Set whether the internal table rows should be excluded from the export. */
-      excludeRows: boolean;
     };
     /** @description The row to be created/updated, based on the table schema. */
     row: { [key: string]: unknown };

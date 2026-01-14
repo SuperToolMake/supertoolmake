@@ -15,8 +15,10 @@ import * as screens from "./workspace/screens"
 import { default as tables } from "./workspace/tables"
 import * as workspaceApps from "./workspace/workspaceApps"
 import { default as workspaces } from "./workspace/workspaces"
+import { default as backups } from "./workspace/backups"
 
 const sdk = {
+  backups,
   tables,
   workspaces,
   rows,

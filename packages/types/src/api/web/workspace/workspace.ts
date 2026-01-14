@@ -77,7 +77,6 @@ export interface ImportToUpdateWorkspaceResponse {
 }
 
 export interface ExportWorkspaceDumpRequest {
-  excludeRows: boolean
   encryptPassword?: string
 }
 

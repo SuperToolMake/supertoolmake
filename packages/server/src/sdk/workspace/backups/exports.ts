@@ -24,7 +24,6 @@ export interface DBDumpOpts {
 
 export interface ExportOpts extends DBDumpOpts {
   tar?: boolean
-  excludeRows?: boolean
   encryptPassword?: string
 }
 
@@ -80,15 +79,14 @@ export async function exportDB(
   })
 }
 
-function defineFilter(excludeRows?: boolean) {
+function defineFilter() {
   const ids = [
     USER_METDATA_PREFIX,
     LINK_USER_METADATA_PREFIX,
     AUTOMATION_LOG_PREFIX,
   ]
-  if (excludeRows) {
-    ids.push(TABLE_ROW_PREFIX)
-  }
+  ids.push(TABLE_ROW_PREFIX)
+
   return (doc: any) =>
     !ids.map(key => doc._id.includes(key)).reduce((prev, curr) => prev || curr)
 }
@@ -105,9 +103,8 @@ export async function exportApp(appId: string, config?: ExportOpts) {
   const appPath = `${prodAppId}/`
 
   const toExclude = [/\/\..+/]
-  if (config?.excludeRows) {
-    toExclude.push(/\/attachments\/.*/)
-  }
+
+  toExclude.push(/\/attachments\/.*/)
 
   const tmpPath = await objectStore.retrieveDirectory(
     ObjectStoreBuckets.APPS,
@@ -129,7 +126,7 @@ export async function exportApp(appId: string, config?: ExportOpts) {
   // enforce an export of app DB to the tmp path
   const dbPath = join(tmpPath, DB_EXPORT_FILE)
   await exportDB(appId, {
-    filter: defineFilter(config?.excludeRows),
+    filter: defineFilter(),
     exportPath: dbPath,
   })
 
@@ -176,21 +173,17 @@ export async function exportApp(appId: string, config?: ExportOpts) {
 /**
  * Streams a backup of the database state for an app
  * @param appId The ID of the app which is to be backed up.
- * @param excludeRows Flag to state whether the export should include data.
  * @param encryptPassword password for encrypting the export.
  * @returns a readable stream of the backup which is written in real time
  */
 export async function streamExportApp({
   appId,
-  excludeRows,
   encryptPassword,
 }: {
   appId: string
-  excludeRows: boolean
   encryptPassword?: string
 }) {
   const tmpPath = await exportApp(appId, {
-    excludeRows,
     tar: true,
     encryptPassword,
   })
