@@ -265,7 +265,7 @@ describe("/screens", () => {
 
     it("should find table usage", async () => {
       const rawDatasource = await getDatasource(
-        process.env.DATASOURCE as DatabaseName
+        (process.env.DATASOURCE as DatabaseName) || "postgres"
       )
       const datasource = await config.api.datasource.create(rawDatasource!)
       const table = await config.api.table.save(basicTable(datasource))

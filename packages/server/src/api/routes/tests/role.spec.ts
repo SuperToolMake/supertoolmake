@@ -221,7 +221,7 @@ describe("/roles", () => {
 
     it("should be able to get the role with a permission added", async () => {
       const rawDatasource = await getDatasource(
-        process.env.DATASOURCE as DatabaseName
+        (process.env.DATASOURCE as DatabaseName) || "postgres"
       )
       const datasource = await config.api.datasource.create(rawDatasource!)
       const table = await config.api.table.save(basicTable(datasource))
