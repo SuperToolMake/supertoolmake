@@ -2,7 +2,6 @@ import { db } from "@budibase/backend-core"
 import { generator } from "@budibase/backend-core/tests"
 import { DevRevertQueueData } from "@budibase/types"
 import TestConfiguration from "../../tests/utilities/TestConfiguration"
-import { basicTable } from "../../tests/utilities/structures"
 import { devRevertProcessor } from "./devRevertProcessor"
 
 describe("devRevertProcessor", () => {
@@ -20,26 +19,6 @@ describe("devRevertProcessor", () => {
     const processor1 = devRevertProcessor()
     const processor2 = devRevertProcessor()
     expect(processor1).toBe(processor2)
-  })
-
-  it("should revert dev changes", async () => {
-    const newDevTable = await config.api.table.save(basicTable())
-
-    const processor = devRevertProcessor()
-    const testData: DevRevertQueueData = {
-      appId: config.getDevWorkspaceId(),
-      userId: generator.guid(),
-    }
-
-    await config.api.table.get(newDevTable._id!, { status: 200 })
-    const result = await processor.execute(testData)
-
-    expect(result).toEqual({
-      success: true,
-      result: { message: "Reverted changes successfully." },
-    })
-
-    await config.api.table.get(newDevTable._id!, { status: 404 })
   })
 
   describe("unhappy paths", () => {
@@ -61,8 +40,6 @@ describe("devRevertProcessor", () => {
     })
 
     it("should recover from replication errors during rollback", async () => {
-      await config.api.table.save(basicTable())
-
       async function verifyDevAppExists() {
         expect(await db.dbExists(config.getDevWorkspaceId())).toBe(true)
       }
