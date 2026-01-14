@@ -1,8 +1,9 @@
 import { db as dbCore, roles } from "@budibase/backend-core"
 import { BuiltinPermissionID, PermissionLevel } from "@budibase/types"
 import * as setup from "./utilities"
+import { getDatasource, DatabaseName } from "../../../integrations/tests/utils"
 
-const { basicRole } = setup.structures
+const { basicRole, basicTable } = setup.structures
 const { BUILTIN_ROLE_IDS } = roles
 
 const LOOP_ERROR = "Role inheritance contains a loop, this is not supported"
@@ -219,7 +220,11 @@ describe("/roles", () => {
     })
 
     it("should be able to get the role with a permission added", async () => {
-      const table = await config.createTable()
+      const rawDatasource = await getDatasource(
+        process.env.DATASOURCE as DatabaseName
+      )
+      const datasource = await config.api.datasource.create(rawDatasource!)
+      const table = await config.api.table.save(basicTable(datasource))
       await config.api.permission.add({
         roleId: BUILTIN_ROLE_IDS.POWER,
         resourceId: table._id!,
