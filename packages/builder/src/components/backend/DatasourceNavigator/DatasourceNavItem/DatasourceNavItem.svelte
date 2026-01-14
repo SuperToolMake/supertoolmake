@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { isActive, goto, params } from "@roxi/routify"
+  import { isActive, goto as gotoStore, params } from "@roxi/routify"
   import { BUDIBASE_INTERNAL_DB_ID } from "@/constants/backend"
   import { contextMenuStore, userSelectedResourceMap } from "@/stores/builder"
   import { restTemplates } from "@/stores/builder/restTemplates"
@@ -10,10 +10,8 @@
   import UpdateDatasourceModal from "@/components/backend/DatasourceNavigator/modals/UpdateDatasourceModal.svelte"
   import DeleteDataConfirmModal from "@/components/backend/modals/DeleteDataConfirmationModal.svelte"
 
-  $goto
+  $: goto = $gotoStore
   $params
-
-  $isActive
 
   export let datasource
 
@@ -33,7 +31,7 @@
     disabled: false,
     callback: () => {
       const section = datasource?.source === "REST" ? "apis" : "data"
-      $goto(
+      goto(
         `/builder/workspace/[application]/${section}/query/new/[datasourceId]`,
         {
           application: $params.application,

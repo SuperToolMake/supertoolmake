@@ -7,31 +7,37 @@
 
   export let datasource
 
-  $: integration = integrationForDatasource($integrations, datasource)
+  $: integration = datasource
+    ? integrationForDatasource($integrations, datasource)
+    : null
 
   let createExternalTableModal
   let tableSelectionModal
 </script>
 
-<Modal bind:this={createExternalTableModal}>
-  <CreateExternalTableModal {datasource} />
-</Modal>
+{#if datasource}
+  <Modal bind:this={createExternalTableModal}>
+    <CreateExternalTableModal {datasource} />
+  </Modal>
 
-<Modal bind:this={tableSelectionModal}>
-  <TableImportSelection
-    {datasource}
-    {integration}
-    onComplete={() => {
-      tableSelectionModal.hide()
-      tables.fetch()
-    }}
-  />
-</Modal>
+  <Modal bind:this={tableSelectionModal}>
+    <TableImportSelection
+      {datasource}
+      {integration}
+      onComplete={() => {
+        tableSelectionModal.hide()
+        tables.fetch()
+      }}
+    />
+  </Modal>
 
-<div class="buttons">
-  <Button cta on:click={createExternalTableModal.show}>Create new table</Button>
-  <Button secondary on:click={tableSelectionModal.show}>Fetch tables</Button>
-</div>
+  <div class="buttons">
+    <Button cta on:click={createExternalTableModal.show}
+      >Create new table</Button
+    >
+    <Button secondary on:click={tableSelectionModal.show}>Fetch tables</Button>
+  </div>
+{/if}
 
 <style>
   .buttons {

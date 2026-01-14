@@ -2,7 +2,7 @@
   import { Layout } from "@budibase/bbui"
   import DatasourceNavigator from "@/components/backend/DatasourceNavigator/DatasourceNavigator.svelte"
   import Panel from "@/components/design/Panel.svelte"
-  import { isActive, goto } from "@roxi/routify"
+  import { isActive, goto as gotoStore } from "@roxi/routify"
   import { datasources, builderStore } from "@/stores/builder"
   import NavHeader from "@/components/common/NavHeader.svelte"
   import TopBar from "@/components/common/TopBar.svelte"
@@ -15,6 +15,8 @@
   let searchValue: string
   let panelWidth = 260
   let apiModal: APIModal
+
+  $: goto = $gotoStore
 
   const loadPanelWidth = () => {
     const saved = localStorage.getItem("api-panel-width")
@@ -61,7 +63,7 @@
     !hasRestDatasources && !$isActive("./new") && $isActive(APIS_BASE_ROUTE)
 
   $: if (shouldRedirectToNew) {
-    $goto("./new")
+    goto("./new")
   }
 </script>
 

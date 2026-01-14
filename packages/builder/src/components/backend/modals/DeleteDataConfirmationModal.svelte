@@ -10,13 +10,13 @@
   import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
   import { utils } from "@budibase/shared-core"
   import { SourceType } from "@budibase/types"
-  import { goto, params } from "@roxi/routify"
+  import { goto as gotoStore, params as paramsStore } from "@roxi/routify"
   import { DB_TYPE_EXTERNAL } from "@/constants/backend"
   import { get } from "svelte/store"
   import type { Table, Datasource, Query } from "@budibase/types"
 
-  $goto
-  $params
+  $: goto = $gotoStore
+  $: params = $paramsStore
 
   export let source: Table | Datasource | Query | undefined
 
@@ -63,7 +63,7 @@
   }
 
   async function deleteTable(table: Table & { datasourceId?: string }) {
-    const isSelected = $params.tableId === table._id
+    const isSelected = params.tableId === table._id
     try {
       await tables.delete({
         _id: table._id!,
@@ -75,7 +75,7 @@
       }
       notifications.success("Table deleted")
       if (isSelected) {
-        $goto(`./datasource/[datasourceId]`, {
+        goto(`./datasource/[datasourceId]`, {
           datasourceId: table.datasourceId!,
         })
       }
@@ -91,7 +91,7 @@
       const isSelected =
         get(datasources).selectedDatasourceId === datasource._id
       if (isSelected) {
-        $goto("./datasource")
+        goto("./datasource")
       }
     } catch (error) {
       notifications.error("Error deleting datasource")
@@ -102,7 +102,7 @@
     try {
       // Go back to the datasource if we are deleting the active query
       if ($queries.selectedQueryId === query._id) {
-        $goto(`./datasource/[datasourceId]`, {
+        goto(`./datasource/[datasourceId]`, {
           datasourceId: query.datasourceId,
         })
       }

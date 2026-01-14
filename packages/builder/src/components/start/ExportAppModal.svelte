@@ -14,7 +14,6 @@
 
   export let appId: string
   export let published
-  let includeInternalTablesRows = true
   let encrypt = true
 
   let password: string | null = null
@@ -64,7 +63,6 @@
 
     try {
       const downloaded = await downloadFile(url, {
-        excludeRows: !includeInternalTablesRows,
         encryptPassword: password,
       })
       if (!downloaded) {
@@ -86,16 +84,10 @@
 >
   {#if currentStep === Step.CONFIG}
     <Body>
-      <Toggle
-        text="Export rows from internal tables"
-        bind:value={includeInternalTablesRows}
-      />
       <Toggle text="Encrypt my export" bind:value={encrypt} />
     </Body>
     <InlineAlert
-      header={encrypt
-        ? "Please note SuperToolMake does not encrypt attachments during the export process to ensure efficient export of large attachments."
-        : "Do not share your SuperToolMake exports publicly as they may contain sensitive information such as database credentials or secret keys."}
+      header={"Do not share your exports publicly as they may contain sensitive information such as database credentials or secret keys."}
     />
   {/if}
   {#if currentStep === Step.SET_PASSWORD}

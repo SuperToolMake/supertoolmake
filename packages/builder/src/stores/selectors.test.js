@@ -15,6 +15,14 @@ describe("selectors", () => {
         )
       ).toEqual({ some: "data", name: "integrationOne" })
     })
+
+    it("returns null when datasource is undefined", () => {
+      expect(integrationForDatasource({}, undefined)).toBe(null)
+    })
+
+    it("returns null when datasource has no source", () => {
+      expect(integrationForDatasource({}, {})).toBe(null)
+    })
   })
 
   describe("hasData", () => {

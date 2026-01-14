@@ -7,7 +7,9 @@
 
   export let datasource
 
-  $: integration = integrationForDatasource($integrations, datasource)
+  $: integration = datasource
+    ? integrationForDatasource($integrations, datasource)
+    : null
 
   let modal
 
@@ -29,13 +31,15 @@
   }
 </script>
 
-<EditDatasourceConfigButton on:click={modal.show} {datasource} />
-<Modal bind:this={modal}>
-  <DatasourceConfigEditor
-    {integration}
-    config={datasource.config}
-    showNameField
-    nameFieldValue={datasource.name}
-    onSubmit={saveDatasource}
-  />
-</Modal>
+{#if datasource}
+  <EditDatasourceConfigButton on:click={modal.show} {datasource} />
+  <Modal bind:this={modal}>
+    <DatasourceConfigEditor
+      {integration}
+      config={datasource.config}
+      showNameField
+      nameFieldValue={datasource.name}
+      onSubmit={saveDatasource}
+    />
+  </Modal>
+{/if}
