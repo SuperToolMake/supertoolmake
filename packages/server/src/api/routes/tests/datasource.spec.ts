@@ -430,7 +430,7 @@ if (descriptions.length) {
               table.increments("id").primary()
               table.enum("enum", enumOptions, {
                 useNative: true,
-                enumName: "enum",
+                enumName: "enum_large",
               })
             })
 
@@ -445,6 +445,7 @@ if (descriptions.length) {
             ).toEqual(enumOptions)
 
             await client.schema.dropTable("options")
+            await client.raw('DROP TYPE IF EXISTS "enum_large"')
           })
 
         !isOracle &&
@@ -475,6 +476,7 @@ if (descriptions.length) {
             ).toEqual(enumOptions)
 
             await client.schema.dropTable("options")
+            await client.raw('DROP TYPE IF EXISTS "enum"')
           })
 
         !isOracle &&
@@ -509,6 +511,7 @@ if (descriptions.length) {
             ).toEqual(enumOptions)
 
             await client.schema.dropTable("options")
+            await client.raw('DROP TYPE IF EXISTS "enum"')
           })
       })
 
