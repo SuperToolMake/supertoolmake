@@ -445,7 +445,9 @@ if (descriptions.length) {
             ).toEqual(enumOptions)
 
             await client.schema.dropTable("options")
-            await client.raw('DROP TYPE IF EXISTS "enum_large"')
+            if (datasource.source === "POSTGRES") {
+              await client.raw('DROP TYPE IF EXISTS "enum_large"')
+            }
           })
 
         !isOracle &&
@@ -476,7 +478,9 @@ if (descriptions.length) {
             ).toEqual(enumOptions)
 
             await client.schema.dropTable("options")
-            await client.raw('DROP TYPE IF EXISTS "enum"')
+            if (datasource.source === "POSTGRES") {
+              await client.raw('DROP TYPE IF EXISTS "enum"')
+            }
           })
 
         !isOracle &&
@@ -511,7 +515,9 @@ if (descriptions.length) {
             ).toEqual(enumOptions)
 
             await client.schema.dropTable("options")
-            await client.raw('DROP TYPE IF EXISTS "enum"')
+            if (datasource.source === "POSTGRES") {
+              await client.raw('DROP TYPE IF EXISTS "enum"')
+            }
           })
       })
 
