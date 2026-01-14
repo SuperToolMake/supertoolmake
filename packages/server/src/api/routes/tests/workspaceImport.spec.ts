@@ -2,8 +2,6 @@ import path from "path"
 import { getAppObjectStorageEtags } from "../../../tests/utilities/objectStore"
 import * as setup from "./utilities"
 
-const PASSWORD = "testtest"
-
 describe("/applications/:appId/import", () => {
   let request = setup.getRequest()
   let config = setup.getConfig()
