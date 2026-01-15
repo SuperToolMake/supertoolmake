@@ -94,7 +94,7 @@ echo "Starting Redis runner..."
 ./redis-runner.sh &
 
 echo "Starting callback CouchDB runner..."
-./bbcouch-runner.sh &
+./couch-runner.sh &
 
 # only start minio if use s3 isn't passed
 if [[ -z "${USE_S3}" ]]; then
@@ -128,10 +128,10 @@ fi
 sleep 10
 
 pushd app
-pm2 start --name app "yarn run:docker"
+pm2 start --name app "npm run run:docker"
 popd
 pushd worker
-pm2 start --name worker "yarn run:docker"
+pm2 start --name worker "npm run run:docker"
 popd
 
 echo "end of runner.sh, sleeping ..."

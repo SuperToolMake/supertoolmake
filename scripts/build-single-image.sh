@@ -5,7 +5,7 @@ version=$(./scripts/getCurrentVersion.sh)
 
 docker build \
   -f hosting/single/Dockerfile \
-  -t budibase:latest \
-  --build-arg BUDIBASE_VERSION=$version \
+  -t supertoolmake:latest \
+  --build-arg SUPER_VERSION=$version \
   --build-arg TARGETBUILD=single \
   .

@@ -14,16 +14,6 @@ ENV SERVICE=app-service
 ENV ACCOUNT_PORTAL_URL=https://account.budibase.app
 ENV TOP_LEVEL_PATH=/
 
-# handle node-gyp and install postgres client for pg_dump utils
-RUN apk add --no-cache \
-    g++ \
-    make \
-    python3 \
-    jq \
-    bash \
-    postgresql-client \
-    git
-
 RUN yarn global add pm2
 
 WORKDIR /

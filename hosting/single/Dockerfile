@@ -44,15 +44,11 @@ ENV TARGETBUILD=$TARGETBUILD
 
 # Install base dependencies
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends software-properties-common nginx uuid-runtime redis-server libaio1 gettext-base python3-pip python3-venv
+    apt-get install -y --no-install-recommends software-properties-common nginx uuid-runtime redis-server libaio1 gettext-base python3-pip python3-venv wget curl
 
-# Install postgres client for pg_dump utils
-RUN apt install -y software-properties-common apt-transport-https ca-certificates gnupg \
-    && curl -fsSl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | tee /usr/share/keyrings/postgresql.gpg > /dev/null \
-    && echo deb [arch=amd64,arm64,ppc64el signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main | tee /etc/apt/sources.list.d/postgresql.list \
-    && apt update -y \
-    && apt install postgresql-client-15 -y \
-    && apt remove software-properties-common apt-transport-https gpg -y
+# Install Node.js 22
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y nodejs
 
 # We use pm2 in order to run multiple node processes in a single container
 RUN npm install --global pm2
@@ -87,6 +83,8 @@ COPY hosting/single/redis-runner.sh .
 RUN chmod +x ./redis-runner.sh
 COPY hosting/single/healthcheck.sh .
 RUN chmod +x ./healthcheck.sh
+COPY hosting/single/couch-runner.sh .
+RUN chmod +x ./couch-runner.sh
 
 # Script below sets the path for storing data based on $DATA_DIR
 # For Azure App Service install SSH & point data locations to /home
@@ -110,10 +108,10 @@ EXPOSE 443
 EXPOSE 2222
 VOLUME /data
 
-ARG BUDIBASE_VERSION
+ARG SUPER_VERSION
 # Ensuring the version argument is sent
-RUN test -n "$BUDIBASE_VERSION"
-ENV BUDIBASE_VERSION=$BUDIBASE_VERSION
+RUN test -n "$SUPER_VERSION"
+ENV SUPER_VERSION=$SUPER_VERSION
 
 HEALTHCHECK --interval=15s --timeout=15s --start-period=45s CMD "/healthcheck.sh"
 
@@ -123,4 +121,5 @@ ENV NODE_ENV=production
 ENV NODE_OPTIONS="--no-node-snapshot"
 WORKDIR /
 
-CMD ["./runner.sh"]
+# Override the inherited ENTRYPOINT from the base CouchDB image
+ENTRYPOINT ["./runner.sh"]

@@ -5,7 +5,6 @@ COUCHDB_ERLANG_COOKIE=${COUCHDB_ERLANG_COOKIE:-B9CFC32C-3458-4A86-8448-B3C753991
 
 mkdir -p ${DATA_DIR}
 mkdir -p ${DATA_DIR}/couch/{dbs,views}
-mkdir -p ${DATA_DIR}/search
 chown -R couchdb:couchdb ${DATA_DIR}/couch
 
 echo ${TARGETBUILD} > /buildtarget.txt
@@ -13,7 +12,7 @@ if [[ "${TARGETBUILD}" = "aas" ]]; then
     # Azure AppService uses /home for persistent data & SSH on port 2222
     DATA_DIR="${DATA_DIR:-/home}"
     WEBSITES_ENABLE_APP_SERVICE_STORAGE=true
-    mkdir -p $DATA_DIR/{search,minio,couch}
+    mkdir -p $DATA_DIR/{minio,couch}
     mkdir -p $DATA_DIR/couch/{dbs,views}
     chown -R couchdb:couchdb $DATA_DIR/couch/
     apt update
@@ -24,6 +23,7 @@ if [[ "${TARGETBUILD}" = "aas" ]]; then
         && (sleep 1;/tmp/ssh_setup.sh 2>&1 > /dev/null)
     cp /etc/sshd_config /etc/ssh/sshd_config
     /etc/init.d/ssh restart
+
     sed -i "s#DATA_DIR#/home#g" /opt/couchdb/etc/local.ini
 elif [[ "${TARGETBUILD}" = "single" ]]; then
     # In the single image build, the Dockerfile specifies /data as a volume
@@ -39,7 +39,6 @@ elif [[ "${TARGETBUILD}" = "docker-compose" ]]; then
 elif [[ -n $KUBERNETES_SERVICE_HOST ]]; then
     # In Kubernetes the directory /opt/couchdb/data has a persistent volume
     # mount for storing database data.
-
     # We remove the database_dir and view_index_dir settings from the local.ini
     # in Kubernetes because it will default to /opt/couchdb/data which is what
     # our Helm chart was using prior to us switching to using our own CouchDB
@@ -58,6 +57,9 @@ fi
 
 sed -i "s#COUCHDB_ERLANG_COOKIE#${COUCHDB_ERLANG_COOKIE}#g" /opt/couchdb/etc/vm.args
 
+
+
+
 # Start CouchDB.
 /docker-entrypoint.sh /opt/couchdb/bin/couchdb > /dev/stdout 2>&1 &
 
@@ -71,4 +73,6 @@ done
 # function correctly, so we create them here.
 curl -X PUT -u "${COUCHDB_USER}:${COUCHDB_PASSWORD}" http://localhost:5984/_users
 curl -X PUT -u "${COUCHDB_USER}:${COUCHDB_PASSWORD}" http://localhost:5984/_replicator
+
+
 sleep infinity
