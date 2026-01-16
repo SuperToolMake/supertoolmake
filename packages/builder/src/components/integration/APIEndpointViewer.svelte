@@ -58,6 +58,7 @@
   import { readableToRuntimeMap, runtimeToReadableMap } from "@/dataBinding"
   import ResponsePanel from "./ResponsePanel.svelte"
   import AuthPicker from "./rest/AuthPicker.svelte"
+  import AccessLevelSelect from "@/components/integration/AccessLevelSelect.svelte"
 
   $: goto = $gotoStore
   $params
@@ -713,6 +714,11 @@
     </div>
     <div class="actions">
       <div class="grouped">
+        {#if query}
+          <div class="access">
+            <AccessLevelSelect {query} label="Access" />
+          </div>
+        {/if}
         {#if query && selectedEndpointOption}
           <AuthPicker
             bind:authConfigId={query.fields.authConfigId}
@@ -1082,6 +1088,7 @@
   }
   .actions .grouped {
     display: flex;
+    gap: var(--spacing-m);
   }
   .send :global(.spectrum-Button-label) {
     color: white;
@@ -1163,6 +1170,11 @@
     display: flex;
     flex-direction: row;
     gap: var(--spacing-s);
+  }
+  .access {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-m);
   }
   .embed :global(.cm-editor) {
     min-height: 200px;
