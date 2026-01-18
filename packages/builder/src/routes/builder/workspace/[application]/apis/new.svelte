@@ -299,7 +299,6 @@
         on:click={openRestModal}
         title="Custom REST API"
         disabled={templateDisabled}
-        centered
       >
         <IntegrationIcon
           integrationType={restIntegration.name}
