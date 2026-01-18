@@ -1,4 +1,8 @@
-import type { ImportEndpoint } from "@budibase/types"
+import type {
+  ImportEndpoint,
+  ImportRestQueryInfoRequest,
+  RestTemplateSpec,
+} from "@budibase/types"
 
 const normalizeEndpointLabel = (value?: string) =>
   (value || "").toLowerCase().replace(/[^a-z0-9]/g, "")
@@ -23,4 +27,20 @@ export const formatEndpointLabel = (endpoint: ImportEndpoint) => {
     return path
   }
   return name
+}
+
+export const getRestTemplateImportInfoRequest = (
+  spec?: RestTemplateSpec | null
+): ImportRestQueryInfoRequest | undefined => {
+  if (!spec) {
+    return undefined
+  }
+  const payload: ImportRestQueryInfoRequest = {}
+  if (spec.url) {
+    payload.url = spec.url
+  }
+  if (!payload.url) {
+    return undefined
+  }
+  return payload
 }
