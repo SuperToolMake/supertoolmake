@@ -1,19 +1,22 @@
 export interface RestTemplateSpec {
-  version:
-    | `${number}-${number}-${number}`
-    | `${number}.${number}`
-    | `${number}.${number}.${number}`
-  url: string
+  version: string
+  url?: string
 }
 
 export type RestTemplateSpecVersion = RestTemplateSpec["version"]
 
 export type RestTemplateName =
+  | "Ansible AWX"
+  | "Attio"
   | "BambooHR"
+  | "Confluence"
+  | "Discord"
+  | "Figma"
   | "GitHub"
   | "Jira Cloud"
   | "Okta Management"
   | "PagerDuty"
+  | "ServiceNow"
   | "Slack Web API"
   | "Stripe"
   | "VirusTotal"
@@ -82,18 +85,23 @@ export type RestTemplateName =
   | "X"
   | HubSpotRestTemplateName
   | MicrosoftSharepointRestTemplateName
+  | SplunkRestTemplateName
   | TwilioRestTemplateName
+  | ZendeskRestTemplateName
 
 export type RestTemplateGroupName =
   | "HubSpot"
   | "Microsoft SharePoint"
+  | "Splunk"
   | "Twilio"
   | "Zendesk"
 
 export type RestTemplateGroups = {
   HubSpot: HubSpotRestTemplateName
   "Microsoft SharePoint": MicrosoftSharepointRestTemplateName
+  Splunk: SplunkRestTemplateName
   Twilio: TwilioRestTemplateName
+  Zendesk: ZendeskRestTemplateName
 }
 
 export type HubSpotRestTemplateName =
@@ -239,17 +247,32 @@ export type TwilioRestTemplateName =
   | "Twilio Voice"
   | "Twilio Wireless"
 
+export type SplunkRestTemplateName =
+  | "Splunk Admin Config Service"
+  | "Splunk Enterprise Security"
+  | "Splunk Mission Control Automation"
+
+export type ZendeskRestTemplateName = "Sunshine Conversations"
+
+export type MicrosoftSharepointRestTemplateName =
+  | "SharePoint Drives"
+  | "SharePoint Shares"
+  | "SharePoint Sites"
+
 export interface RestTemplate {
   name: RestTemplateName
   description: string
   specs: RestTemplateSpec[]
   icon: string
+  operationsCount: number
+  verified?: true
 }
 
 export interface RestTemplateWithoutIcon<Name> {
   name: Name
   description: string
   specs: RestTemplateSpec[]
+  operationsCount: number
 }
 
 export interface RestTemplateGroup<
@@ -258,6 +281,8 @@ export interface RestTemplateGroup<
   name: TemplateGroupName
   description: string
   icon: string
+  operationsCount: number
+  verified?: true
   templates: RestTemplateWithoutIcon<RestTemplateGroups[TemplateGroupName]>[]
 }
 
