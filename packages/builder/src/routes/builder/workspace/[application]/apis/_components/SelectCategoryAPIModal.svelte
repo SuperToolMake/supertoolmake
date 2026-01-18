@@ -86,7 +86,6 @@
   const resetGroupSelection = () => {
     activeGroup = null
     activeGroupTemplateName = null
-    searchValue = ""
   }
 
   const confirmGroupTemplateSelection = () => {
