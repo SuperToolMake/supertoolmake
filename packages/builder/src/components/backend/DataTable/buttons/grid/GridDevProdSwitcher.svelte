@@ -7,6 +7,7 @@
 
   $: isDevMode = $dataEnvironmentStore.mode === DataEnvironmentMode.DEVELOPMENT
   $: tableId = $tables.selected?._id!
+  $: isBudiUsersTable = tableId === TableNames.USERS
   $: isInternal = $tables.selected?.sourceType !== DB_TYPE_EXTERNAL
   $: tableDatasource = $datasources.list.find(datasource => {
     return datasource._id === $tables.selected?.sourceId
@@ -54,11 +55,9 @@
         on:left={handleLeft}
         on:right={handleRight}
       />
-    </AbsTooltip>
-  {:else}
-    <Switcher {...switcherProps} on:left={handleLeft} on:right={handleRight} />
-  {/if}
-</div>
+    {/if}
+  </div>
+{/if}
 
 <style>
   .wrapper {
