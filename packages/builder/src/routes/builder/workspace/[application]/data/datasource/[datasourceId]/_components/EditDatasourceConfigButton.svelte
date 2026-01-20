@@ -21,9 +21,6 @@
     if (datasource.source === IntegrationTypes.SNOWFLAKE) {
       return `${datasource.config.warehouse}:${datasource.config.database}:${datasource.config.schema}`
     }
-    if (datasource.source === IntegrationTypes.ARANGODB) {
-      return `${datasource.config.url}:${datasource.config.databaseName}`
-    }
     if (datasource.source === IntegrationTypes.COUCHDB) {
       return datasource.config.database
     }
@@ -43,9 +40,6 @@
     }
     if (datasource.source === IntegrationTypes.MONGODB) {
       return datasource.config.db
-    }
-    if (datasource.source === IntegrationTypes.AIRTABLE) {
-      return datasource.config.base
     }
     if (datasource.source === IntegrationTypes.GOOGLE_SHEETS) {
       return datasource.config.spreadsheetId

@@ -5,9 +5,7 @@ import elasticsearch from "./elasticsearch"
 import couchdb from "./couchdb"
 import sqlServer from "./microsoftSqlServer"
 import s3 from "./s3"
-import airtable from "./airtable"
 import mysql from "./mysql"
-import arangodb from "./arangodb"
 import rest from "./rest"
 import firebase from "./firebase"
 import redis from "./redis"
@@ -35,9 +33,6 @@ const DEFINITIONS: Record<SourceName, Integration | undefined> = {
   [SourceName.REDIS]: redis.schema,
   [SourceName.SNOWFLAKE]: snowflake.schema,
   [SourceName.ORACLE]: oracle.schema,
-  /* deprecated - not available through UI */
-  [SourceName.ARANGODB]: arangodb.schema,
-  [SourceName.AIRTABLE]: airtable.schema,
 }
 
 type IntegrationBaseConstructor = new (...args: any[]) => IntegrationBase
@@ -64,9 +59,6 @@ const INTEGRATIONS: Record<SourceName, IntegrationBaseConstructor | undefined> =
     [SourceName.REDIS]: redis.integration,
     [SourceName.SNOWFLAKE]: snowflake.integration,
     [SourceName.ORACLE]: oracle.integration,
-    /* deprecated - not available through UI */
-    [SourceName.ARANGODB]: arangodb.integration,
-    [SourceName.AIRTABLE]: airtable.integration,
   }
 
 export async function getDefinition(
