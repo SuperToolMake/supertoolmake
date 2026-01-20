@@ -43,10 +43,10 @@ Also ensure your IDE has permissions for mounting the volumes defined in <a href
 
 You will know yarn dev has worked correctly when there are no build errors of course, but also you will see the following containers running:
 
-- budi-nginx-dev
-- budi-couchdb3-dev
-- budi-redis-dev
-- budi-minio-dev
+- super-tool-nginx-dev
+- super-tool-couchdb3-dev
+- super-tool-redis-dev
+- super-tool-minio-dev
 
 Once running, visit [localhost:10000/builder](http://localhost:10000/builder)
 
