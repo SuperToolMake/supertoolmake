@@ -75,6 +75,6 @@ jobs:
 
        - name: Build and push Docker image
          run: |
-           IMAGE_NAME=ghcr.io/${{ github.repository }}:${{ needs.tag-release.outputs.version }}
-           docker build -f hosting/single/Dockerfile --build-arg SUPER_VERSION=${{ needs.tag-release.outputs.version }} -t $IMAGE_NAME .
-           docker push $IMAGE_NAME
+            IMAGE_NAME=ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]'):${{ needs.tag-release.outputs.version }}
+            docker build -f hosting/single/Dockerfile --build-arg SUPER_VERSION=${{ needs.tag-release.outputs.version }} -t $IMAGE_NAME .
+            docker push $IMAGE_NAME
