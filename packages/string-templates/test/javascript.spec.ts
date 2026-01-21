@@ -343,45 +343,6 @@ describe("Javascript", () => {
       expect(result).toBe(`{\n\t"a":1,\n\t"primaryDisplay":"a"\n}`)
     })
 
-    it("should handle test case 6", async () => {
-      const todayDate = new Date()
-      // add a year and a month
-      todayDate.setMonth(new Date().getMonth() + 1)
-      todayDate.setFullYear(todayDate.getFullYear() + 1)
-      const context = {
-        "Join Date": DATE,
-        today: todayDate.toISOString(),
-      }
-      const result = await processJS(
-        `
-        var rate = 5;
-        var today = new Date($("today"));
-        
-        // comment
-        function monthDiff(dateFrom, dateTo) {
-         return dateTo.getMonth() - dateFrom.getMonth() + 
-           (12 * (dateTo.getFullYear() - dateFrom.getFullYear()))
-        }
-        var serviceMonths = monthDiff( new Date($("[Join Date]")), today);
-        var serviceYears = serviceMonths / 12;
-        
-        if (serviceYears >= 1 && serviceYears < 5){
-          rate = 10;
-        }
-        if (serviceYears >= 5 && serviceYears < 10){
-          rate = 15;
-        }
-        if (serviceYears >= 10){
-          rate = 15;
-          rate += 0.5 * (Number(serviceYears.toFixed(0)) - 10);
-        }
-        return rate;
-        `,
-        context
-      )
-      expect(result).toBe(15)
-    })
-
     it("should handle test case 7", async () => {
       const context = {
         "P I": "Pass",

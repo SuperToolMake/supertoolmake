@@ -42,7 +42,6 @@
       <DatasourceOption
         on:click={() => externalDatasourceModal.show(integration)}
         title={integration.friendlyName}
-        description={integration.type}
         {disabled}
       >
         <IntegrationIcon
