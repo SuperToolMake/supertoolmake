@@ -89,3 +89,9 @@ jobs:
           IMAGE_NAME=ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]'):${{ needs.tag-release.outputs.version }}
           docker build -f hosting/single/Dockerfile --build-arg SUPER_VERSION=${{ needs.tag-release.outputs.version }} -t $IMAGE_NAME .
           docker push $IMAGE_NAME
+
+      - name: Create GitHub release
+        run: |
+          gh release create ${{ needs.tag-release.outputs.version }} --title "Release ${{ needs.tag-release.outputs.version }}" --notes "Automated release ${{ needs.tag-release.outputs.version }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
