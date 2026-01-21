@@ -542,7 +542,7 @@
                 <div class="auth-entity-title">Users</div>
                 <div class="auth-entity-access-title">Access</div>
               </div>
-              {#each filteredUsers as user}
+              {#each filteredUsers as user (user._id)}
                 <div class="auth-entity">
                   <div class="details">
                     <div class="user-groups">
