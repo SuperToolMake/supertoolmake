@@ -3,6 +3,10 @@ concurrency:
   group: tag-release
   cancel-in-progress: false
 
+permissions:
+  contents: write
+  packages: write
+
 on:
   workflow_dispatch:
     inputs:
