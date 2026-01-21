@@ -56,25 +56,36 @@ jobs:
           new_version=$(./scripts/getCurrentVersion.sh)
           echo "version=$new_version" >> $GITHUB_OUTPUT
 
-        
+
   trigger-release:
-     needs: [tag-release]
-     runs-on: ubuntu-latest
-     steps:
-       - name: Checkout code
-         uses: actions/checkout@v4
-         with:
-           token: ${{ secrets.PERSONAL_ACCESS_TOKEN || github.token }}
+    needs: [tag-release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN || github.token }}
 
-       - name: Log in to GitHub Container Registry
-         uses: docker/login-action@v3
-         with:
-           registry: ghcr.io
-           username: ${{ github.actor }}
-           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: yarn
 
-       - name: Build and push Docker image
-         run: |
-            IMAGE_NAME=ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]'):${{ needs.tag-release.outputs.version }}
-            docker build -f hosting/single/Dockerfile --build-arg SUPER_VERSION=${{ needs.tag-release.outputs.version }} -t $IMAGE_NAME .
-            docker push $IMAGE_NAME
+      - run: yarn --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        run: |
+          IMAGE_NAME=ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]'):${{ needs.tag-release.outputs.version }}
+          docker build -f hosting/single/Dockerfile --build-arg SUPER_VERSION=${{ needs.tag-release.outputs.version }} -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
