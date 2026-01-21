@@ -1,0 +1,80 @@
+name: Release
+concurrency:
+  group: tag-release
+  cancel-in-progress: false
+
+on:
+  workflow_dispatch:
+    inputs:
+      versioning:
+        type: choice
+        description: "Versioning type: patch, minor, major"
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
+        required: true
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+    with:
+      run_as_oss: false
+
+  tag-release:
+    needs: ci
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.tag-release.outputs.version }}
+
+    steps:
+      - name: Fail if branch is not master
+        if: github.ref != 'refs/heads/master'
+        run: |
+          echo "Ref is not master, you must run this job from master."
+          exit 1
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - run: cd scripts && yarn
+      - name: Tag release
+        id: tag-release
+        run: |
+          cd scripts
+          # setup the username and email.
+          git config --global user.name "Super Tool Make Staging Release Bot"
+          git config --global user.email "<>"
+          BUMP_TYPE_INPUT=${{ github.event.inputs.versioning }}
+          BUMP_TYPE=${BUMP_TYPE_INPUT:-"patch"}
+          ./versionCommit.sh $BUMP_TYPE
+
+          cd ..
+          new_version=$(./scripts/getCurrentVersion.sh)
+          echo "version=$new_version" >> $GITHUB_OUTPUT
+
+        
+  trigger-release:
+     needs: [tag-release]
+     runs-on: ubuntu-latest
+     steps:
+       - name: Checkout code
+         uses: actions/checkout@v4
+         with:
+           submodules: true
+           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+       - name: Log in to GitHub Container Registry
+         uses: docker/login-action@v3
+         with:
+           registry: ghcr.io
+           username: ${{ github.actor }}
+           password: ${{ secrets.GITHUB_TOKEN }}
+
+       - name: Build and push Docker image
+         run: |
+           IMAGE_NAME=ghcr.io/${{ github.repository }}:${{ needs.tag-release.outputs.version }}
+           docker build -f hosting/single/Dockerfile --build-arg SUPER_VERSION=${{ needs.tag-release.outputs.version }} -t $IMAGE_NAME .
+           docker push $IMAGE_NAME
