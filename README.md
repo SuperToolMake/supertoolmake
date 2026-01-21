@@ -26,12 +26,13 @@
   Running via Docker
 </h3>
 <p>
-A single image container is provided under [Packages](https://github.com/SuperToolMake/supertoolmake/pkgs/container/supertoolmake)
+  A single image container is provided under <a href="https://github.com/SuperToolMake/supertoolmake/pkgs/container/supertoolmake">Packages</a>. 
+  <br />Pull down the latest image.
 
-If you are not using _Docker Desktop_, you can use [Colima](https://github.com/abiosoft/colima).
-<br />Run `colima start` to spin up the docker runtime.
+  If you are not using _Docker Desktop_, you can use [Colima](https://github.com/abiosoft/colima).
+  <br />Run `colima start` to spin up the docker runtime.
 
-Run the container with the command:
+  Run the container with the command:
 
 ```
 docker run -d -t \
