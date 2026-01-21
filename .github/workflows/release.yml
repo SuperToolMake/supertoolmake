@@ -92,6 +92,6 @@ jobs:
 
       - name: Create GitHub release
         run: |
-          gh release create ${{ needs.tag-release.outputs.version }} --title "Release ${{ needs.tag-release.outputs.version }}""
+          gh release create ${{ needs.tag-release.outputs.version }} --title "Release ${{ needs.tag-release.outputs.version }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
