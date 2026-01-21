@@ -23,15 +23,32 @@
 </p>
 
 <h3>
-  Local development
+  Running via Docker
 </h3>
 <p>
-  To run locally, you will need to have <b>docker</b> installed.
+A single image container is provided under [Packages](https://github.com/SuperToolMake/supertoolmake/pkgs/container/supertoolmake)
 
 If you are not using _Docker Desktop_, you can use [Colima](https://github.com/abiosoft/colima).
 <br />Run `colima start` to spin up the docker runtime.
 
-Also ensure your IDE has permissions for mounting the volumes defined in <a href="/hosting/docker-compose.dev.yaml">docker-compose.dev.yaml</a>.
+Run the container with the command:
+
+```
+docker run -d -t \
+  --name=supertoolmake \
+  -p 10000:80 \
+  -v /local/path/data:/data \
+  --restart unless-stopped \
+  ghcr.io/supertoolmake/supertoolmake:latest
+```
+
+</p>
+
+<h3>
+  Local development
+</h3>
+<p>
+  Ensure your IDE has permissions for mounting the volumes defined in <a href="/hosting/docker-compose.dev.yaml">docker-compose.dev.yaml</a>.
 <br />For example, in macOS I had to do this via `Privacy & Security > Files & Folders`
 
 </p>
