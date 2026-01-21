@@ -21,11 +21,11 @@ on:
         required: true
 
 jobs:
-#   ci:
-#     uses: ./.github/workflows/ci.yml
+  ci:
+    uses: ./.github/workflows/ci.yml
 
   tag-release:
-    # needs: ci
+    needs: ci
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.tag-release.outputs.version }}
@@ -92,6 +92,6 @@ jobs:
 
       - name: Create GitHub release
         run: |
-          gh release create ${{ needs.tag-release.outputs.version }} --title "Release ${{ needs.tag-release.outputs.version }}" --notes "Automated release ${{ needs.tag-release.outputs.version }}"
+          gh release create ${{ needs.tag-release.outputs.version }} --title "Release ${{ needs.tag-release.outputs.version }}""
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
