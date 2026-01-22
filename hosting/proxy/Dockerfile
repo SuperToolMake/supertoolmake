@@ -12,7 +12,7 @@ COPY 80-listen-on-ipv6-by-default.sh /docker-entrypoint.d/80-listen-on-ipv6-by-d
 RUN chmod +x /docker-entrypoint.d/80-listen-on-ipv6-by-default.sh
 
 # Error handling
-COPY error.html /usr/share/nginx/html/error.html
+# COPY error.html /usr/share/nginx/html/error.html  # Removed as file not found in build context
 
 # Default environment
 ENV PROXY_RATE_LIMIT_WEBHOOKS_PER_SECOND=10
