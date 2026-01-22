@@ -21,11 +21,11 @@ on:
         required: true
 
 jobs:
-  # ci:
-  #   uses: ./.github/workflows/ci.yml
+  ci:
+    uses: ./.github/workflows/ci.yml
 
   tag-release:
-    # needs: ci
+    needs: ci
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.tag-release.outputs.version }}
@@ -95,7 +95,6 @@ jobs:
         run: |
              IMAGE_BASE=ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
              docker build -f hosting/proxy/Dockerfile -t $IMAGE_BASE/proxy:${{ needs.tag-release.outputs.version }} -t $IMAGE_BASE/proxy:latest .
-             docker push $IMAGE_BASE/proxy:${{ needs.tag-release.outputs.version }}
              docker push $IMAGE_BASE/proxy:latest
 
       - name: Create GitHub release

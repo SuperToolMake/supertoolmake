@@ -21,20 +21,20 @@ services:
       retries: 3
 
   proxy-service:
-      container_name: super-tool-nginx-dev
-      restart: on-failure
-      image: ghcr.io/supertoolmake/proxy:latest
-  volumes:
+    container_name: super-tool-nginx-dev
+    restart: on-failure
+    image: ghcr.io/supertoolmake/supertoolmake/proxy:latest
+    volumes:
       - ./nginx.dev.conf:/etc/nginx/templates/nginx.conf.template
       - ./proxy/error.html:/usr/share/nginx/html/error.html
-  ports:
+    ports:
       - "${MAIN_PORT}:10000"
-  depends_on:
+    depends_on:
       - minio-service
       - couchdb-service
-  extra_hosts:
+    extra_hosts:
       - "host.docker.internal:host-gateway"
-  environment:
+    environment:
       - PROXY_ADDRESS=host.docker.internal
 
   couchdb-service:
