@@ -86,10 +86,17 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-            IMAGE_BASE=ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
-            docker build -f hosting/single/Dockerfile --build-arg SUPER_VERSION=${{ needs.tag-release.outputs.version }} -t $IMAGE_BASE:${{ needs.tag-release.outputs.version }} -t $IMAGE_BASE:latest .
-            docker push $IMAGE_BASE:${{ needs.tag-release.outputs.version }}
-            docker push $IMAGE_BASE:latest
+             IMAGE_BASE=ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+             docker build -f hosting/single/Dockerfile --build-arg SUPER_VERSION=${{ needs.tag-release.outputs.version }} -t $IMAGE_BASE:${{ needs.tag-release.outputs.version }} -t $IMAGE_BASE:latest .
+             docker push $IMAGE_BASE:${{ needs.tag-release.outputs.version }}
+             docker push $IMAGE_BASE:latest
+
+      - name: Build and push proxy Docker image
+        run: |
+             IMAGE_BASE=ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+             docker build -f hosting/proxy/Dockerfile -t $IMAGE_BASE/proxy:${{ needs.tag-release.outputs.version }} -t $IMAGE_BASE/proxy:latest .
+             docker push $IMAGE_BASE/proxy:${{ needs.tag-release.outputs.version }}
+             docker push $IMAGE_BASE/proxy:latest
 
       - name: Create GitHub release
         run: |
