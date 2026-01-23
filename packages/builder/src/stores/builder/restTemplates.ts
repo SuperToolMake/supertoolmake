@@ -26,6 +26,7 @@ import IntercomLogo from "assets/rest-template-icons/intercom.svg"
 import MicrosoftSharepointLogo from "assets/rest-template-icons/microsoft-sharepoint.svg"
 import MicrosoftTeamsLogo from "assets/rest-template-icons/microsoft-teams.svg"
 import NotionLogo from "assets/rest-template-icons/notion.svg"
+import OpenRouterLogo from "assets/rest-template-icons/openrouter.svg"
 import TrelloLogo from "assets/rest-template-icons/trello.svg"
 import XLogo from "assets/rest-template-icons/x.svg"
 import ZendeskLogo from "assets/rest-template-icons/zendesk.svg"
@@ -1947,6 +1948,19 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
       ],
       operationsCount: 20,
       icon: NotionLogo,
+    },
+    {
+      name: "OpenRouter",
+      description: "OpenAI-compatible API with additional OpenRouter features",
+      specs: [
+        {
+          version: "1.0.0",
+          url: "https://openrouter.ai/openapi.yaml",
+        },
+      ],
+      operationsCount: 57,
+      icon: OpenRouterLogo,
+      verified: true,
     },
     {
       name: "Trello",

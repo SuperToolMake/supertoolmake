@@ -23,6 +23,7 @@ export type RestTemplateName =
   | "Gitlab"
   | "Intercom"
   | "Notion"
+  | "OpenRouter"
   | "Trello"
   | "X"
   | HubSpotRestTemplateName
