@@ -2,7 +2,7 @@ import { db as dbCore, encryption, objectStore } from "@budibase/backend-core"
 import fs from "fs"
 import fsp from "fs/promises"
 import { join } from "path"
-import tar from "tar"
+import * as tar from "tar"
 import { v4 as uuid } from "uuid"
 import { ObjectStoreBuckets } from "../../../constants"
 import {
