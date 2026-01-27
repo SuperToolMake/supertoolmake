@@ -291,6 +291,18 @@ export const search = async (
     }
   }
 
+  const hasWorkspaceId =
+    body && Object.prototype.hasOwnProperty.call(body, "workspaceId")
+
+  if (hasWorkspaceId) {
+    let response = await searchWorkspaceUsers(body)
+    if (!users.hasBuilderPermissions(ctx.user)) {
+      response.data = stripUsers(response.data)
+    }
+    ctx.body = response
+    return
+  }
+
   let response: SearchUsersResponse = { data: [] }
 
   if (body.paginate === false) {
@@ -318,6 +330,84 @@ export const search = async (
   }
 
   ctx.body = response
+}
+
+const DEFAULT_USER_LIMIT = 8
+
+const searchWorkspaceUsers = async (
+  body: SearchUsersRequest
+): Promise<SearchUsersResponse> => {
+  const workspaceId = body.workspaceId
+  if (!workspaceId) {
+    return { data: [], hasNextPage: false }
+  }
+
+  const limit = body.limit ?? DEFAULT_USER_LIMIT
+  const query = body.query
+  const filtered: User[] = []
+  let cursor = body.bookmark
+  let nextPage: string | undefined
+  const groupAccessCache = new Map<string, boolean>()
+
+  const getBookmarkValue = (user: User) => {
+    if (query?.string?.email && user.email) {
+      return user.email.toLowerCase()
+    }
+    return user._id
+  }
+
+  const hasWorkspaceAccess = (user: User) => {
+    if (users.isAdminOrBuilder(user, workspaceId)) {
+      return true
+    }
+    if (user.roles?.[workspaceId]) {
+      return true
+    }
+    return false
+  }
+
+  while (filtered.length <= limit) {
+    const page = await userSdk.core.paginatedUsers({
+      bookmark: cursor,
+      query,
+      limit,
+    })
+
+    if (!page.data?.length) {
+      break
+    }
+
+    for (const user of page.data) {
+      if (!hasWorkspaceAccess(user)) {
+        continue
+      }
+      filtered.push(user)
+      if (filtered.length === limit + 1) {
+        nextPage = getBookmarkValue(user)
+        break
+      }
+    }
+
+    if (filtered.length === limit + 1 || !page.hasNextPage) {
+      break
+    }
+    cursor = page.nextPage
+  }
+
+  const hasNextPage = filtered.length > limit
+  const data = hasNextPage ? filtered.slice(0, limit) : filtered
+
+  for (let user of data) {
+    if (user) {
+      delete user.password
+    }
+  }
+
+  return {
+    data,
+    hasNextPage,
+    nextPage: hasNextPage ? nextPage : undefined,
+  }
 }
 
 // called internally by app server user fetch

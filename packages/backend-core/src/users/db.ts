@@ -222,7 +222,12 @@ export class UserDB {
     }
 
     const addUsers = async () => {
-      if (!opts.isAccountHolder) {
+      const isNewUser = !dbUser
+      const isEmailChanging = !!dbUser && !!email && dbUser.email !== email
+      const shouldValidateUniqueUser =
+        !opts.isAccountHolder && !!email && (isNewUser || isEmailChanging)
+
+      if (shouldValidateUniqueUser) {
         await validateUniqueUser(email, tenantId)
       }
 
