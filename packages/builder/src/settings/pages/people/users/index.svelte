@@ -13,9 +13,7 @@
   import { users } from "@/stores/portal/users"
   import { auth } from "@/stores/portal/auth"
   import { organisation } from "@/stores/portal/organisation"
-  import { admin } from "@/stores/portal/admin"
   import { appStore } from "@/stores/builder/app"
-  import { onMount } from "svelte"
   import DeleteRowsButton from "@/components/backend/DataTable/buttons/DeleteRowsButton.svelte"
   import AppsTableRenderer from "./_components/AppsTableRenderer.svelte"
   import RoleTableRenderer from "./_components/RoleTableRenderer.svelte"
@@ -40,11 +38,7 @@
   import type { UserInfo } from "@/types"
   import { routeActions } from "@/settings/pages"
 
-  interface User extends UserDoc {
-    tenantOwnerEmail?: string
-  }
-
-  interface EnrichedUser extends User {
+  interface EnrichedUser extends UserDoc {
     name: string
     apps: string[]
     access: number
@@ -86,16 +80,13 @@
     passwordModal: Modal,
     importUsersModal: Modal
   let searchEmail: string | undefined = undefined
-  let selectedRows: User[] = []
+  let selectedRows: UserDoc[] = []
   let bulkSaveResponse: BulkUserCreated
 
   let currentWorkspaceId = ""
   let workspaceReady = false
   let isWorkspaceQueryReady = false
   let tableLoading = false
-  let groupsLoaded = true
-  let tenantOwner = null
-  let isOwner = true
 
   $: currentWorkspaceId = $appStore.appId
     ? sdk.applications.getProdAppID($appStore.appId)
@@ -105,8 +96,7 @@
     !isWorkspaceOnly ||
     ($fetch.query as { workspaceId?: string })?.workspaceId ===
       currentWorkspaceId
-  $: tableLoading =
-    !workspaceReady || !isWorkspaceQueryReady || !$fetch.loaded || !groupsLoaded
+  $: tableLoading = !workspaceReady || !isWorkspaceQueryReady || !$fetch.loaded
 
   $: customRenderers = [
     { column: "email", component: EmailTableRenderer },
@@ -153,9 +143,9 @@
   $: inviteTitle = isWorkspaceOnly
     ? "Invite users to workspace"
     : "Invite users to organisation"
-  $: enrichedUsers = buildEnrichedUsers($fetch.rows as User[])
+  $: enrichedUsers = buildEnrichedUsers($fetch.rows as UserDoc[])
 
-  const buildEnrichedUsers = (rows: User[]): EnrichedUser[] => {
+  const buildEnrichedUsers = (rows: UserDoc[]): EnrichedUser[] => {
     return (
       rows?.map<EnrichedUser>(user => {
         const role = Constants.ExtendedBudibaseRoleOptions.find(
@@ -381,16 +371,6 @@
     }
     return Constants.Roles.BASIC
   }
-
-  onMount(async () => {
-    try {
-      tenantOwner = await users.getAccountHolder()
-    } catch (err: any) {
-      if (err.status !== 404) {
-        notifications.error("Error fetching account holder")
-      }
-    }
-  })
 </script>
 
 <div class="people-page">
