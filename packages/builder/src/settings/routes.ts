@@ -72,14 +72,8 @@ export const orgRoutes = (
       routes: [
         {
           path: "workspace",
-          title: "Workspace",
+          title: "Users",
           comp: Pages.get("workspace_users"),
-        },
-        {
-          path: "users",
-          title: "Organisation",
-          comp: Pages.get("users"),
-          routes: [{ path: ":userId", comp: Pages.get("user"), title: "User" }],
         },
         {
           path: "invites",
