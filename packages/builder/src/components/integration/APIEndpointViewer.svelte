@@ -31,7 +31,11 @@
     type PreviewQueryResponse,
     type UIInternalDatasource,
   } from "@budibase/types"
-  import { customQueryIconColor, QUERY_VERB_MAP } from "@/helpers/data/utils"
+  import {
+    customQueryIconColor,
+    getRestTemplateQueryDisplayName,
+    QUERY_VERB_MAP,
+  } from "@/helpers/data/utils"
   import { RestBodyTypes } from "@/constants/backend"
   import KeyValueBuilder from "./KeyValueBuilder.svelte"
   import APIEndpointVerbBadge from "./APIEndpointVerbBadge.svelte"
@@ -179,6 +183,7 @@
     updated.readable = true
     updated.restTemplateMetadata = endpoint
       ? {
+          originalName: endpoint.name,
           operationId: endpoint.operationId,
           docsUrl: endpoint.docsUrl,
           description: endpoint.description,
@@ -422,12 +427,13 @@
     if (query._id && query.restTemplateMetadata) {
       const metadata = query.restTemplateMetadata
       const method = QUERY_VERB_MAP[query.queryVerb]
+      const endpointName = getRestTemplateQueryDisplayName(query)
 
       const endpoint = {
         id:
           metadata.operationId ||
           `${method.toLowerCase()}::${metadata.originalPath}`,
-        name: query.name || metadata.operationId || "",
+        name: endpointName,
         method,
         path: metadata.originalPath || "",
         description: metadata.description || "",
