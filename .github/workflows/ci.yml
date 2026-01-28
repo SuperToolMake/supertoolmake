@@ -100,11 +100,11 @@ jobs:
       - name: Test
         run: |
           if ${{ env.ONLY_AFFECTED_TASKS }}; then
-            yarn test -- --ignore=@budibase/worker --ignore=@budibase/server --ignore=@budibase/builder --ignore=@budibase/upgrade-tests --no-prefix --since=${{ env.NX_BASE_BRANCH }} -- --verbose --reporters=default --reporters=github-actions
-            yarn test -- --scope=@budibase/builder --since=${{ env.NX_BASE_BRANCH }}
+            yarn test -- --ignore=@budibase/worker --ignore=@budibase/server --ignore=@budibase/builder --ignore=@budibase/upgrade-tests --ignore=@budibase/client --no-prefix --since=${{ env.NX_BASE_BRANCH }} -- --verbose --reporters=default --reporters=github-actions
+            yarn test -- --scope=@budibase/builder --scope=@budibase/client --since=${{ env.NX_BASE_BRANCH }}
           else
-            yarn test -- --ignore=@budibase/worker --ignore=@budibase/server --ignore=@budibase/builder --ignore=@budibase/upgrade-tests --no-prefix -- --verbose --reporters=default --reporters=github-actions
-            yarn test -- --scope=@budibase/builder --no-prefix
+            yarn test -- --ignore=@budibase/worker --ignore=@budibase/server --ignore=@budibase/builder --ignore=@budibase/upgrade-tests --ignore=@budibase/client --no-prefix -- --verbose --reporters=default --reporters=github-actions
+            yarn test -- --scope=@budibase/builder --scope=@budibase/client --no-prefix
           fi
 
   test-worker:
@@ -265,7 +265,7 @@ jobs:
             echo "Error: Client build file not found at $CLIENT_FILE"
             exit 1
           fi
-          
+
           SIZE_BYTES=$(stat -c%s "$CLIENT_FILE")
           SIZE_MB=$(awk "BEGIN {printf \"%.2f\", $SIZE_BYTES / 1024 / 1024}")
           MAX_SIZE_BYTES=$((1 * 1024 * 1024))
