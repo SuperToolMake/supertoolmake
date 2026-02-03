@@ -517,6 +517,7 @@
                       allowPublic={false}
                       allowCreator={true}
                       quiet={true}
+                      bordered={false}
                       on:change={e => {
                         onUpdateUserInvite(invite, e.detail)
                       }}
@@ -560,6 +561,7 @@
                       allowPublic={false}
                       allowCreator={true}
                       quiet={true}
+                      bordered={false}
                       on:addcreator={() => {}}
                       on:change={e => {
                         onUpdateUser(user, e.detail)

@@ -208,7 +208,7 @@
   async function createUserFlow() {
     const assignToWorkspace = userData.assignToWorkspace ?? isWorkspaceOnly
     const payload = (userData?.users ?? []).map(user => {
-      const workspaceRole = getWorkspaceRole(user.role)
+      const workspaceRole = getWorkspaceRole(user.role, user.appRole)
       return {
         email: user.email,
         builder: user.role === Constants.BudibaseRoles.Developer,
@@ -294,7 +294,10 @@
             const matchingUser = userData.users.find(
               created => created.email === user.email
             )
-            const role = getWorkspaceRole(matchingUser?.role)
+            const role = getWorkspaceRole(
+              matchingUser?.role,
+              matchingUser?.appRole
+            )
             if (!role) {
               return
             }
@@ -359,7 +362,8 @@
       .join("")
       .slice(0, length)
   }
-  const getWorkspaceRole = (role?: string) => {
+
+  const getWorkspaceRole = (role?: string, appRole?: string) => {
     if (!isWorkspaceOnly || !currentWorkspaceId || !role) {
       return undefined
     }
@@ -368,6 +372,9 @@
     }
     if (role === Constants.BudibaseRoles.Admin) {
       return Constants.Roles.CREATOR
+    }
+    if (role === Constants.BudibaseRoles.AppUser) {
+      return appRole || Constants.Roles.BASIC
     }
     return Constants.Roles.BASIC
   }
