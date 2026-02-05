@@ -347,7 +347,6 @@ const searchWorkspaceUsers = async (
   const filtered: User[] = []
   let cursor = body.bookmark
   let nextPage: string | undefined
-  const groupAccessCache = new Map<string, boolean>()
 
   const getBookmarkValue = (user: User) => {
     if (query?.string?.email && user.email) {
