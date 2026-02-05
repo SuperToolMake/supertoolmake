@@ -83,9 +83,6 @@
   let lastSyncedQueryName
 
   $: staticVariables = datasource?.config?.staticVariables || {}
-  $: if (queryId) {
-    lastViewedQueryId = queryId
-  }
   $: if (query && query._id && query._id !== lastSyncedQueryId) {
     lastSyncedQueryId = query._id
     lastSyncedQueryName = query.name
