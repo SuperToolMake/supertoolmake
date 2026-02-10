@@ -510,11 +510,12 @@ export const inviteMultiple = async (
 export const removeMultipleInvites = async (
   ctx: Ctx<DeleteInviteUsersRequest, DeleteInviteUsersResponse>
 ) => {
+  const tenantId = context.getTenantId()
   const inviteCodesToRemove = ctx.request.body.map(
     (invite: DeleteInviteUserRequest) => invite.code
   )
   for (const code of inviteCodesToRemove) {
-    await cache.invite.deleteCode(code)
+    await cache.invite.deleteCode(code, tenantId)
   }
   ctx.body = {
     message: "User invites successfully removed.",
@@ -523,9 +524,13 @@ export const removeMultipleInvites = async (
 
 export const checkInvite = async (ctx: UserCtx<void, CheckInviteResponse>) => {
   const { code } = ctx.params
+  const tenantId =
+    typeof ctx.request.query.tenantId === "string"
+      ? ctx.request.query.tenantId
+      : undefined
   let invite
   try {
-    invite = await cache.invite.getCode(code)
+    invite = await cache.invite.getCode(code, tenantId)
   } catch (e) {
     console.warn("Error getting invite from code", e)
     ctx.throw(400, "There was a problem with the invite")
@@ -558,7 +563,8 @@ export const addWorkspaceIdToInvite = async (
   const prodWorkspaceId = db.getProdWorkspaceID(workspaceId)
 
   try {
-    const invite = await cache.invite.getCode(code)
+    const tenantId = context.getTenantId()
+    const invite = await cache.invite.getCode(code, tenantId)
     invite.info.apps ??= {}
     invite.info.apps[prodWorkspaceId] = role
 
@@ -581,7 +587,8 @@ export const removeWorkspaceIdFromInvite = async (
   const prodWorkspaceId = db.getProdWorkspaceID(workspaceId)
 
   try {
-    const invite = await cache.invite.getCode(code)
+    const tenantId = context.getTenantId()
+    const invite = await cache.invite.getCode(code, tenantId)
     invite.info.apps ??= {}
     delete invite.info.apps[prodWorkspaceId]
 
@@ -595,7 +602,13 @@ export const removeWorkspaceIdFromInvite = async (
 export const inviteAccept = async (
   ctx: Ctx<AcceptUserInviteRequest, AcceptUserInviteResponse>
 ) => {
-  const { inviteCode, password, firstName, lastName } = ctx.request.body
+  const { inviteCode, password, firstName, lastName, tenantId } =
+    ctx.request.body
+  const queryTenantId =
+    typeof ctx.request.query.tenantId === "string"
+      ? ctx.request.query.tenantId
+      : undefined
+  const resolvedTenantId = tenantId || queryTenantId
   try {
     await locks.doWithLock(
       {
@@ -606,7 +619,10 @@ export const inviteAccept = async (
       },
       async () => {
         // info is an extension of the user object that was stored by global
-        const { email, info } = await cache.invite.getCode(inviteCode)
+        const { email, info } = await cache.invite.getCode(
+          inviteCode,
+          resolvedTenantId
+        )
         const user = await tenancy.doInTenant(info.tenantId, async () => {
           let request: any = {
             firstName,
@@ -635,7 +651,7 @@ export const inviteAccept = async (
           return saved
         })
 
-        await cache.invite.deleteCode(inviteCode)
+        await cache.invite.deleteCode(inviteCode, resolvedTenantId)
 
         ctx.body = {
           _id: user._id!,
