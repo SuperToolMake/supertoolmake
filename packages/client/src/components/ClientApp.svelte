@@ -48,6 +48,7 @@
   import DevToolsHeader from "./devtools/DevToolsHeader.svelte"
   import DevTools from "./devtools/DevTools.svelte"
   import SnippetsProvider from "./context/SnippetsProvider.svelte"
+  import FreeFooter from "./FreeFooter.svelte"
   import EmbedProvider from "./context/EmbedProvider.svelte"
   import DNDSelectionIndicators from "./preview/DNDSelectionIndicators.svelte"
   import { ActionTypes } from "@/constants"
@@ -259,6 +260,10 @@
                             <DevTools />
                           {/if}
                         </div>
+
+                        {#if !$builderStore.inBuilder}
+                          <FreeFooter />
+                        {/if}
                       </div>
 
                       <!-- Preview and dev tools utilities  -->
