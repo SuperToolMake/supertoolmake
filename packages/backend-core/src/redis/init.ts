@@ -8,7 +8,6 @@ let userClient: Client,
   writethroughClient: Client,
   lockClient: Client,
   socketClient: Client,
-  inviteClient: Client,
   inviteListClient: Client,
   passwordResetClient: Client,
   docWritethroughClient: Client
@@ -20,7 +19,6 @@ export async function init() {
   cacheClient = await Client.init(utils.Databases.GENERIC_CACHE)
   lockClient = await Client.init(utils.Databases.LOCKS)
   writethroughClient = await Client.init(utils.Databases.WRITE_THROUGH)
-  inviteClient = await Client.init(utils.Databases.INVITATIONS)
   inviteListClient = await Client.init(utils.Databases.INVITATIONS_LIST)
   passwordResetClient = await Client.init(utils.Databases.PW_RESETS)
   socketClient = await Client.init(
@@ -37,7 +35,6 @@ export async function shutdown() {
   await cacheClient?.finish()
   await writethroughClient?.finish()
   await lockClient?.finish()
-  await inviteClient?.finish()
   await inviteListClient?.finish()
   await passwordResetClient?.finish()
   await socketClient?.finish()
@@ -95,13 +92,6 @@ export async function getSocketClient() {
     await init()
   }
   return socketClient
-}
-
-export async function getInviteClient() {
-  if (!inviteClient) {
-    await init()
-  }
-  return inviteClient
 }
 
 export async function getInviteListClient() {
