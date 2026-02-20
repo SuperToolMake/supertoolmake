@@ -83,7 +83,6 @@
       options.unshift({
         _id: Constants.Roles.CREATOR,
         name: "Can edit",
-        tag: null,
       })
     }
 
@@ -139,7 +138,10 @@
     getOptionLabel={role => role.name}
     getOptionValue={role => role._id}
     getOptionColour={getColor}
-    isOptionEnabled={() => {
+    isOptionEnabled={option => {
+      if (option._id === Constants.Roles.CREATOR) {
+        return allowCreator
+      }
       return true
     }}
     {error}
@@ -160,6 +162,9 @@
     getOptionColour={getColor}
     getOptionIcon={getIcon}
     isOptionEnabled={option => {
+      if (option._id === Constants.Roles.CREATOR) {
+        return allowCreator
+      }
       return option.enabled !== false
     }}
     {placeholder}

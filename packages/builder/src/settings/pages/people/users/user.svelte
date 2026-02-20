@@ -15,6 +15,7 @@
     notifications,
     Banner,
     Table,
+    ProgressCircle,
   } from "@budibase/bbui"
   import { onMount, getContext } from "svelte"
   import { users } from "@/stores/portal/users"
@@ -67,6 +68,8 @@
   let user
   let loaded = false
   let userFieldsToUpdate = {}
+  let roleUpdateTarget
+  let saving = false
 
   $: isSSO = !!user?.provider
   $: isAdmin = sdk.users.isAdmin($auth.user)
@@ -128,12 +131,28 @@
   }
 
   async function saveUser() {
+    if (saving || Object.keys(userFieldsToUpdate).length === 0) {
+      return
+    }
+
+    saving = true
     try {
-      await users.save({ ...user, ...userFieldsToUpdate })
+      const shouldClearWorkspaceRoles =
+        globalRole === Constants.BudibaseRoles.Admin &&
+        roleUpdateTarget &&
+        roleUpdateTarget !== Constants.BudibaseRoles.Admin
+      await users.save({
+        ...user,
+        ...userFieldsToUpdate,
+        ...(shouldClearWorkspaceRoles ? { roles: {} } : {}),
+      })
       userFieldsToUpdate = {}
+      roleUpdateTarget = undefined
       await fetchUser()
     } catch (error) {
       notifications.error("Error updating user")
+    } finally {
+      saving = false
     }
   }
 
@@ -163,6 +182,7 @@
         },
       }
     }
+    roleUpdateTarget = detail
     userFieldsToUpdate = {
       ...userFieldsToUpdate,
       ...flags,
@@ -269,9 +289,17 @@
     <div>
       <Button
         cta
-        disabled={Object.keys(userFieldsToUpdate).length === 0}
-        on:click={saveUser}>Save</Button
+        disabled={saving || Object.keys(userFieldsToUpdate).length === 0}
+        on:click={saveUser}
       >
+        {#if saving}
+          <div class="save-loading">
+            <ProgressCircle overBackground={true} size="S" />
+          </div>
+        {:else}
+          Save
+        {/if}
+      </Button>
     </div>
 
     <Layout gap="S" noPadding>
@@ -346,5 +374,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+  .save-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
   }
 </style>

@@ -52,7 +52,8 @@ export interface Route {
 // Used to store route and metadata when parsed
 export interface MatchedRoute {
   entry: Route
-  params: Record<string, any>
+  params: Record<string, unknown>
+  hash?: string
 }
 
 export const buildRoute = (pattern: string) => {
