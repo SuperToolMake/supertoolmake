@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Body, ModalContent, RadioGroup, notifications } from "@budibase/bbui"
+  import { Body, ModalContent, Select, notifications } from "@budibase/bbui"
   import { admin } from "@/stores/portal/admin"
   import { emailValidator, Constants } from "@budibase/frontend-core"
   import { parseUserEmailsFromCSV } from "@/helpers"
@@ -15,15 +15,11 @@
   let files: File[] = []
   let csvString: string | undefined = undefined
   let userEmails: string[] = []
-  let usersRole: string | undefined = undefined
+  let usersRole: string = Constants.BudibaseRoles.AppUser
   let invalidEmails: string[] = []
 
   $: importDisabled =
     !userEmails.length || !validEmails(userEmails) || !usersRole
-  $: roleOptions = Constants.BudibaseRoleOptions.map(option => ({
-    ...option,
-    label: `${option.label} - ${option.subtitle}`,
-  }))
 
   const validEmails = (userEmails: string[]): boolean => {
     invalidEmails = [] // Reset invalid emails
@@ -83,7 +79,10 @@
   cancelText="Cancel"
   showCloseIcon={false}
   onConfirm={() =>
-    createUsersFromCsv({ userEmails, usersRole: usersRole || "" })}
+    createUsersFromCsv({
+      userEmails,
+      usersRole: usersRole || "",
+    })}
   disabled={importDisabled}
 >
   <Body size="S">Import your users email addresses from a CSV file</Body>
@@ -94,7 +93,19 @@
       {#if files[0]}{files[0].name}{:else}Upload{/if}
     </label>
   </div>
-  <RadioGroup bind:value={usersRole} options={roleOptions} />
+
+  <div class="role-select">
+    <Select
+      label="Select role"
+      placeholder={false}
+      bind:value={usersRole}
+      options={Constants.BudibaseRoleOptions}
+      getOptionLabel={option => option.label}
+      getOptionValue={option => option.value}
+      getOptionSubtitle={option => option.subtitle}
+      showSelectedSubtitle={true}
+    />
+  </div>
 </ModalContent>
 
 <style>
@@ -144,5 +155,12 @@
 
   input[type="file"] {
     display: none;
+  }
+
+  .role-select :global(.spectrum-Picker) {
+    height: auto;
+    align-items: center;
+    padding-top: var(--spacing-m);
+    padding-bottom: var(--spacing-m);
   }
 </style>

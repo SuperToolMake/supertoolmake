@@ -300,7 +300,12 @@ export class UserDB {
     const addUsers = async () => {
       for (const user of newUsers) {
         usersToSave.push(
-          UserDB.buildUser(user, { hashPassword: true }, tenantId, undefined)
+          UserDB.buildUser(
+            user,
+            { hashPassword: true, requirePassword: true },
+            tenantId,
+            undefined
+          )
         )
       }
 
@@ -309,8 +314,6 @@ export class UserDB {
 
       // Post-processing of bulk added users, e.g. events and cache operations
       for (const user of usersToBulkSave) {
-        // TODO: Refactor to bulk insert users into the info db
-        // instead of relying on looping tenant creation
         await platform.users.addUser(tenantId, user._id!, user.email)
       }
 
@@ -324,9 +327,9 @@ export class UserDB {
       return {
         successful: saved,
         unsuccessful,
-      } as BulkUserCreated
+      }
     }
-    return await addUsers()
+    return (await addUsers()) as BulkUserCreated
   }
 
   static async bulkDelete(

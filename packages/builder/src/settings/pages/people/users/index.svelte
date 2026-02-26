@@ -391,7 +391,7 @@
   }
 
   const createUsersFromCsv = async (userCsvData: any) => {
-    const { userEmails, usersRole } = userCsvData
+    const { userEmails, usersRole, usersAppRole } = userCsvData
 
     const users: UserInfo[] = []
     for (const email of userEmails) {
@@ -403,6 +403,10 @@
       const newUser = {
         email: email.trim(),
         role: usersRole,
+        appRole:
+          usersRole === Constants.BudibaseRoles.AppUser
+            ? usersAppRole || Constants.Roles.BASIC
+            : undefined,
         password: generatePassword(12),
         forceResetPassword: true,
       }
@@ -410,7 +414,10 @@
       users.push(newUser)
     }
 
-    userData = await removingDuplicities({ users })
+    userData = await removingDuplicities({
+      users,
+      assignToWorkspace: isWorkspaceOnly,
+    })
     if (!userData.users.length) return
 
     return createUsers()
@@ -612,14 +619,16 @@
           />
         {:else}
           <Search bind:value={searchEmail} placeholder="Search" />
-          <ActionButton
-            size="M"
-            quiet
-            on:click={importUsersModal.show}
-            disabled={readonly}
-          >
-            <Icon name={"upload-simple"} size="M" />
-          </ActionButton>
+          {#if !isWorkspaceOnly}
+            <ActionButton
+              size="M"
+              quiet
+              on:click={importUsersModal.show}
+              disabled={readonly}
+            >
+              <Icon name={"upload-simple"} size="M" />
+            </ActionButton>
+          {/if}
           <Button
             size="M"
             disabled={readonly}
@@ -689,9 +698,11 @@
   />
 </Modal>
 
-<Modal bind:this={importUsersModal}>
-  <ImportUsersModal {createUsersFromCsv} />
-</Modal>
+{#if !isWorkspaceOnly}
+  <Modal bind:this={importUsersModal}>
+    <ImportUsersModal {createUsersFromCsv} />
+  </Modal>
+{/if}
 
 {#if isWorkspaceOnly}
   <Modal bind:this={editWorkspaceUserModal} closeOnOutsideClick={false}>

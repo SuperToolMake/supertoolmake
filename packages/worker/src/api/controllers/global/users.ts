@@ -8,7 +8,7 @@ import {
   tenancy,
   users,
 } from "@budibase/backend-core"
-import { utils } from "@budibase/shared-core"
+import { dataFilters, utils } from "@budibase/shared-core"
 import {
   AcceptUserInviteRequest,
   AcceptUserInviteResponse,
@@ -342,11 +342,31 @@ const searchWorkspaceUsers = async (
     return { data: [], hasNextPage: false }
   }
 
+  const prodWorkspaceId = db.getProdWorkspaceID(workspaceId)
   const limit = body.limit ?? DEFAULT_USER_LIMIT
   const query = body.query
-  const filtered: User[] = []
-  let cursor = body.bookmark
-  let nextPage: string | undefined
+  const globalDb = context.getGlobalDB()
+
+  const [workspaceUsers, globalPermissionUsers] = await Promise.all([
+    db.queryGlobalView<User>(
+      db.ViewName.USER_BY_WORKSPACE,
+      db.getUsersByWorkspaceParams(prodWorkspaceId, {
+        include_docs: true,
+      }),
+      undefined,
+      { arrayResponse: true }
+    ) as Promise<User[]>,
+    globalDb
+      .find<User>({
+        selector: {
+          _id: {
+            $regex: `^${db.DocumentType.USER}${db.SEPARATOR}`,
+          },
+          $or: [{ "admin.global": true }, { "builder.global": true }],
+        },
+      })
+      .then(response => response.docs),
+  ])
 
   const getBookmarkValue = (user: User) => {
     if (query?.string?.email && user.email) {
@@ -356,45 +376,47 @@ const searchWorkspaceUsers = async (
   }
 
   const hasWorkspaceAccess = (user: User) => {
-    if (users.isAdminOrBuilder(user, workspaceId)) {
+    if (users.isAdminOrBuilder(user, prodWorkspaceId)) {
       return true
     }
-    if (user.roles?.[workspaceId]) {
+    if (user.roles?.[prodWorkspaceId]) {
       return true
     }
     return false
   }
 
-  while (filtered.length <= limit) {
-    const page = await userSdk.core.paginatedUsers({
-      bookmark: cursor,
-      query,
-      limit,
-    })
-
-    if (!page.data?.length) {
-      break
+  const dedupedUsers = new Map<string, User>()
+  for (const user of [...workspaceUsers, ...globalPermissionUsers]) {
+    if (user?._id) {
+      dedupedUsers.set(user._id, user)
     }
-
-    for (const user of page.data) {
-      if (!hasWorkspaceAccess(user)) {
-        continue
-      }
-      filtered.push(user)
-      if (filtered.length === limit + 1) {
-        nextPage = getBookmarkValue(user)
-        break
-      }
-    }
-
-    if (filtered.length === limit + 1 || !page.hasNextPage) {
-      break
-    }
-    cursor = page.nextPage
   }
 
-  const hasNextPage = filtered.length > limit
-  const data = hasNextPage ? filtered.slice(0, limit) : filtered
+  let filtered = [...dedupedUsers.values()].filter(hasWorkspaceAccess)
+
+  if (query) {
+    filtered = dataFilters.search(filtered, { query }).rows
+  }
+
+  filtered.sort((userA, userB) => {
+    if (query?.string?.email) {
+      const emailA = userA.email?.toLowerCase() || ""
+      const emailB = userB.email?.toLowerCase() || ""
+      if (emailA !== emailB) {
+        return emailA.localeCompare(emailB)
+      }
+    }
+    return (userA._id || "").localeCompare(userB._id || "")
+  })
+
+  const bookmark = body.bookmark
+  const pagedUsers = bookmark
+    ? filtered.filter(user => (getBookmarkValue(user) || "") >= bookmark)
+    : filtered
+  const pageData = pagedUsers.slice(0, limit + 1)
+  const hasNextPage = pageData.length > limit
+  const data = hasNextPage ? pageData.slice(0, limit) : pageData
+  const nextPage = hasNextPage ? getBookmarkValue(pageData[limit]) : undefined
 
   for (let user of data) {
     if (user) {

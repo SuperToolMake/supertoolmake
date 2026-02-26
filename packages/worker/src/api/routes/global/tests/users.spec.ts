@@ -789,6 +789,24 @@ describe("/api/global/users", () => {
       expect(response.body.data.length).toBe(0)
     })
 
+    it("should include global admins in workspace search", async () => {
+      const workspaceId = "app_workspace_filter_global_admin"
+      const email = structures.users.newEmail()
+      await config.createUser({
+        email,
+        admin: { global: true },
+        builder: { global: true },
+      })
+
+      const response = await config.api.users.searchUsers({
+        workspaceId,
+        query: { string: { email } },
+      })
+
+      expect(response.body.data.length).toBe(1)
+      expect(response.body.data[0].email).toBe(email)
+    })
+
     it("should return no users when workspaceId is empty", async () => {
       const email = structures.users.newEmail()
       await config.createUser({ email })
