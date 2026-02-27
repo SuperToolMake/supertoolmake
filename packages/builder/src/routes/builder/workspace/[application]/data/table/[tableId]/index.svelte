@@ -52,6 +52,7 @@
   let productionEmpty = false
   let productionHasRows = true
   let productionRowUnsubscribe: (() => void) | null = null
+  let highlightUsersAccessButton = false
 
   const dataLayoutContext = getContext("data-layout") as {
     registerGridDispatch?: Function
@@ -116,6 +117,9 @@
   $: if (id !== previousTableId) {
     missingProductionDefinition = false
     previousTableId = id
+  }
+  $: if (!isUsersTable || !$appStore.features.disableUserMetadata) {
+    highlightUsersAccessButton = false
   }
   $: externalClipboardData = {
     clipboard: gridClipboard,
@@ -225,6 +229,12 @@
     }
   }
 
+  const handleGridRowClick = () => {
+    if (isUsersTable && $appStore.features.disableUserMetadata) {
+      highlightUsersAccessButton = true
+    }
+  }
+
   const publishProductionTable = async (seedProductionTables: boolean) => {
     if (tablePublishing) {
       return
@@ -305,12 +315,18 @@
         externalClipboard={externalClipboardData}
         on:updatedatasource={handleGridTableUpdate}
         on:definitionMissing={handleDefinitionMissing}
+        on:rowclick={handleGridRowClick}
       >
         <!-- Controls -->
         <svelte:fragment slot="controls">
           {#if !isProductionMode}
             {#if isUsersTable && $appStore.features.disableUserMetadata}
-              <GridUsersTableButton />
+              <GridUsersTableButton
+                highlighted={highlightUsersAccessButton}
+                on:manage={() => {
+                  highlightUsersAccessButton = false
+                }}
+              />
             {/if}
             <GridManageAccessButton />
             {#if relationshipsEnabled}
