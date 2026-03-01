@@ -240,7 +240,7 @@ export function authenticated(
         finalise(ctx, { authenticated: false, version, publicEndpoint })
         return next()
       } else {
-        ctx.throw(err.status || 403, err)
+        ctx.throw(err.status || 403, err.message)
       }
     }
   }) as Middleware

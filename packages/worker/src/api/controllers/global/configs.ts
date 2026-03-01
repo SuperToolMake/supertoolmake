@@ -149,7 +149,7 @@ export async function save(
         break
     }
   } catch (err: any) {
-    ctx.throw(400, err)
+    ctx.throw(400, err.message)
   }
 
   try {
@@ -191,7 +191,7 @@ export async function save(
       _rev: response.rev,
     }
   } catch (err: any) {
-    ctx.throw(400, err)
+    ctx.throw(400, err.message)
   }
 }
 
@@ -274,7 +274,7 @@ export async function publicOidc(ctx: Ctx<void, GetPublicOIDCConfigResponse>) {
       ]
     }
   } catch (err: any) {
-    ctx.throw(err.status, err)
+    ctx.throw(err.status, err.message)
   }
 }
 
@@ -346,7 +346,7 @@ export async function publicSettings(
       },
     }
   } catch (err: any) {
-    ctx.throw(err.status, err)
+    ctx.throw(err.status, err.message)
   }
 }
 
@@ -403,7 +403,7 @@ export async function destroy(ctx: UserCtx<void, DeleteConfigResponse>) {
     await cache.destroy(cache.CacheKey.CHECKLIST)
     ctx.body = { message: "Config deleted successfully" }
   } catch (err: any) {
-    ctx.throw(err.status, err)
+    ctx.throw(err.status, err.message)
   }
 }
 
@@ -462,6 +462,6 @@ export async function configChecklist(ctx: Ctx<void, ConfigChecklistResponse>) {
       }
     )
   } catch (err: any) {
-    ctx.throw(err.status, err)
+    ctx.throw(err.status, err.message)
   }
 }
