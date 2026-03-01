@@ -219,7 +219,8 @@ describe("/applications", () => {
         expect(screens.length).toEqual(6)
 
         const tables = await config.api.table.fetch()
-        expect(tables.length).toEqual(3)
+        // SuperToolMake: Internal tables are skipped!
+        expect(tables.length).toEqual(1)
       })
 
       const fileEtags = await getAppObjectStorageEtags(newApp.appId)
