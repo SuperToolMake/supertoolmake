@@ -8,7 +8,10 @@ import {
   Document,
   DocumentType,
   DocumentTypesToImport,
+  InternalTable,
   RowValue,
+  Table,
+  TableSourceType,
   Workspace,
 } from "@budibase/types"
 import backups from "../backups"
@@ -19,6 +22,21 @@ export type FileAttributes = {
 }
 
 const DESIGN_DOCUMENTS_TO_IMPORT = [DesignDocuments.MIGRATIONS]
+
+export function isImportableTable(doc: Document): boolean {
+  const type = (doc as any).type
+  if (type !== "table") {
+    return true
+  }
+  const table = doc as Table
+  if (
+    table.sourceType === TableSourceType.INTERNAL ||
+    table.sourceType === undefined
+  ) {
+    return table._id === InternalTable.USER_METADATA
+  }
+  return true
+}
 
 async function getNewWorkspaceMetadata(
   tempDb: Database,
@@ -132,7 +150,11 @@ async function getImportableDocuments(db: Database) {
     delete doc._rev
     uniqueMap.set(doc._id!, doc)
   })
-  return Array.from(uniqueMap.values())
+  // Filter out internal tables (except ta_users) as they should not be imported
+  const filteredDocuments = Array.from(uniqueMap.values()).filter(
+    isImportableTable
+  )
+  return filteredDocuments
 }
 
 export async function updateWithExport(
