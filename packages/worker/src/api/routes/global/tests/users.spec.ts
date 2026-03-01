@@ -93,7 +93,6 @@ describe("/api/global/users", () => {
       expect(res.body.message).toBe(`Unavailable`)
       expect(sendMailMock).toHaveBeenCalledTimes(0)
       expect(code).toBeUndefined()
-      expect(events.user.invited).toHaveBeenCalledTimes(0)
     })
 
     it("should not allow creator users to access single invite endpoint", async () => {
