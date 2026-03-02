@@ -7,14 +7,14 @@
 
   import { hasData } from "@/stores/selectors"
   import { Body } from "@budibase/bbui"
-  import { params, goto } from "@roxi/routify"
+  import { params, goto as gotoStore } from "@roxi/routify"
   import CreateExternalDatasourceModal from "./_components/CreateExternalDatasourceModal/index.svelte"
   import DatasourceOption from "./_components/DatasourceOption.svelte"
   import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
   import CreationPage from "@/components/common/CreationPage.svelte"
   import { IntegrationTypes } from "@/constants/backend"
 
-  $goto
+  $: goto = $gotoStore
   $params
 
   let externalDatasourceModal: CreateExternalDatasourceModal
@@ -31,7 +31,7 @@
 
 <CreationPage
   showClose={hasData($datasources, $tables)}
-  onClose={() => $goto("./table")}
+  onClose={() => goto("../table")}
   heading="Add new data source"
 >
   <div class="subHeading">
