@@ -29,7 +29,6 @@ const SQL_CLIENT_SOURCE_MAP: Record<SourceName, SqlClient | undefined> = {
   [SourceName.MYSQL]: SqlClient.MY_SQL,
   [SourceName.SQL_SERVER]: SqlClient.MS_SQL,
   [SourceName.ORACLE]: SqlClient.ORACLE,
-  [SourceName.DYNAMODB]: undefined,
   [SourceName.MONGODB]: undefined,
   [SourceName.ELASTICSEARCH]: undefined,
   [SourceName.COUCHDB]: undefined,
@@ -37,7 +36,6 @@ const SQL_CLIENT_SOURCE_MAP: Record<SourceName, SqlClient | undefined> = {
   [SourceName.REST]: undefined,
   [SourceName.FIRESTORE]: undefined,
   [SourceName.REDIS]: undefined,
-  [SourceName.SNOWFLAKE]: undefined,
 }
 
 const XSS_INPUT_REGEX =

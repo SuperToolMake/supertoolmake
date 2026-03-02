@@ -176,7 +176,6 @@ export const DB_TYPE_EXTERNAL = "external"
 
 export const IntegrationTypes = {
   COUCHDB: "COUCHDB",
-  DYNAMODB: "DYNAMODB",
   ELASTICSEARCH: "ELASTICSEARCH",
   FIRESTORE: "FIRESTORE",
   GOOGLE_SHEETS: "GOOGLE_SHEETS",
@@ -188,7 +187,6 @@ export const IntegrationTypes = {
   REDIS: "REDIS",
   REST: "REST",
   S3: "S3",
-  SNOWFLAKE: "SNOWFLAKE",
   SQL_SERVER: "SQL_SERVER",
 }
 
@@ -199,7 +197,6 @@ export const IntegrationNames = {
   [IntegrationTypes.S3]: "S3",
   [IntegrationTypes.MYSQL]: "MySQL",
   [IntegrationTypes.REST]: "REST",
-  [IntegrationTypes.DYNAMODB]: "DynamoDB",
   [IntegrationTypes.ELASTICSEARCH]: "ElasticSearch",
   [IntegrationTypes.SQL_SERVER]: "SQL Server",
   [IntegrationTypes.ORACLE]: "Oracle",
@@ -207,7 +204,6 @@ export const IntegrationNames = {
   [IntegrationTypes.GOOGLE_SHEETS]: "Google Sheets",
   [IntegrationTypes.FIRESTORE]: "Firestore",
   [IntegrationTypes.REDIS]: "Redis",
-  [IntegrationTypes.SNOWFLAKE]: "Snowflake",
 }
 
 export const SchemaTypeOptions = [

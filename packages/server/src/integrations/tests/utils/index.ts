@@ -2,7 +2,6 @@ import { testContainerUtils } from "@budibase/backend-core/tests"
 import { Datasource, SourceName } from "@budibase/types"
 import { Knex } from "knex"
 import TestConfiguration from "../../../tests/utilities/TestConfiguration"
-import * as dynamodb from "./dynamodb"
 import * as elasticsearch from "./elasticsearch"
 import "./images"
 import * as mariadb from "./mariadb"
@@ -25,7 +24,6 @@ export enum DatabaseName {
   MARIADB = "mariadb",
   ORACLE = "oracle",
   ELASTICSEARCH = "elasticsearch",
-  DYNAMODB = "dynamodb",
 }
 
 const DATASOURCE_PLUS = [
@@ -49,7 +47,6 @@ const providers: Record<DatabaseName, DatasourceProvider> = {
   // rest
   [DatabaseName.ELASTICSEARCH]: elasticsearch.getDatasource,
   [DatabaseName.MONGODB]: mongodb.getDatasource,
-  [DatabaseName.DYNAMODB]: dynamodb.getDatasource,
 }
 
 export interface DatasourceDescribeReturnPromise {

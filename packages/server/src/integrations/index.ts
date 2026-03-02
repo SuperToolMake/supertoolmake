@@ -1,5 +1,4 @@
 import postgres from "./postgres"
-import dynamodb from "./dynamodb"
 import mongodb from "./mongodb"
 import elasticsearch from "./elasticsearch"
 import couchdb from "./couchdb"
@@ -9,7 +8,6 @@ import mysql from "./mysql"
 import rest from "./rest"
 import firebase from "./firebase"
 import redis from "./redis"
-import snowflake from "./snowflake"
 import oracle from "./oracle"
 import {
   SourceName,
@@ -21,7 +19,6 @@ import cloneDeep from "lodash/cloneDeep"
 
 const DEFINITIONS: Record<SourceName, Integration | undefined> = {
   [SourceName.POSTGRES]: postgres.schema,
-  [SourceName.DYNAMODB]: dynamodb.schema,
   [SourceName.MONGODB]: mongodb.schema,
   [SourceName.ELASTICSEARCH]: elasticsearch.schema,
   [SourceName.COUCHDB]: couchdb.schema,
@@ -31,7 +28,6 @@ const DEFINITIONS: Record<SourceName, Integration | undefined> = {
   [SourceName.REST]: rest.schema,
   [SourceName.FIRESTORE]: firebase.schema,
   [SourceName.REDIS]: redis.schema,
-  [SourceName.SNOWFLAKE]: snowflake.schema,
   [SourceName.ORACLE]: oracle.schema,
 }
 
@@ -47,7 +43,6 @@ export function isDatasourcePlusConstructor(
 const INTEGRATIONS: Record<SourceName, IntegrationBaseConstructor | undefined> =
   {
     [SourceName.POSTGRES]: postgres.integration,
-    [SourceName.DYNAMODB]: dynamodb.integration,
     [SourceName.MONGODB]: mongodb.integration,
     [SourceName.ELASTICSEARCH]: elasticsearch.integration,
     [SourceName.COUCHDB]: couchdb.integration,
@@ -57,7 +52,6 @@ const INTEGRATIONS: Record<SourceName, IntegrationBaseConstructor | undefined> =
     [SourceName.REST]: rest.integration,
     [SourceName.FIRESTORE]: firebase.integration,
     [SourceName.REDIS]: redis.integration,
-    [SourceName.SNOWFLAKE]: snowflake.integration,
     [SourceName.ORACLE]: oracle.integration,
   }
 

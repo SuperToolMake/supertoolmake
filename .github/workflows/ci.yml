@@ -149,7 +149,6 @@ jobs:
             mongodb,
             mariadb,
             elasticsearch,
-            dynamodb,
             none,
           ]
     steps:
@@ -188,8 +187,6 @@ jobs:
             docker pull postgres:9.5.25
           elif [ "${{ matrix.datasource }}" == "elasticsearch" ]; then
             docker pull elasticsearch@${{ steps.dotenv.outputs.ELASTICSEARCH_SHA }}
-          elif [ "${{ matrix.datasource }}" == "dynamodb" ]; then
-            docker pull amazon/dynamodb-local@${{ steps.dotenv.outputs.DYNAMODB_SHA }}
           fi
           docker pull minio/minio &
           docker pull redis &

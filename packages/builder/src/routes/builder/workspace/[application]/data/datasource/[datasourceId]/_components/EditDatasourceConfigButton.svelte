@@ -24,9 +24,6 @@
     if (datasource.source === IntegrationTypes.COUCHDB) {
       return datasource.config.database
     }
-    if (datasource.source === IntegrationTypes.DYNAMODB) {
-      return `${datasource.config.endpoint}:${datasource.config.region}`
-    }
     if (datasource.source === IntegrationTypes.S3) {
       return datasource.config.endpoint
         ? `${datasource.config.endpoint}:${datasource.config.region}`
