@@ -1,6 +1,6 @@
 import env from "./environment"
 import Koa from "koa"
-import koaBody from "koa-body"
+import koaBody, { HttpMethodEnum } from "koa-body"
 import http from "http"
 import * as api from "./api"
 import { Thread } from "./threads"
@@ -26,7 +26,12 @@ export default function createKoaApp() {
       textLimit: `${mbNumber}mb`,
       // @ts-ignore
       enableTypes: ["json", "form", "text"],
-      parsedMethods: ["POST", "PUT", "PATCH", "DELETE"],
+      parsedMethods: [
+        HttpMethodEnum.POST,
+        HttpMethodEnum.PUT,
+        HttpMethodEnum.PATCH,
+        HttpMethodEnum.DELETE,
+      ],
       formidable: {
         maxFileSize: parseInt(env.MAX_IMPORT_SIZE_MB || "100") * 1024 * 1024,
       },
