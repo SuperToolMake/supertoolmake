@@ -4,7 +4,8 @@
   import { restTemplates } from "@/stores/builder/restTemplates"
   import { sortedIntegrations as integrations } from "@/stores/builder/sortedIntegrations"
   import { queries } from "@/stores/builder"
-  import { configFromIntegration } from "@/stores/selectors" //??
+  import { configFromIntegration } from "@/stores/selectors"
+  import { getRestTemplateImportInfoRequest } from "@/helpers/restTemplates"
   import { datasources } from "@/stores/builder/datasources"
   import { IntegrationTypes } from "@/constants/backend"
   import {
@@ -69,15 +70,11 @@
   }
 
   const loadTemplateInfo = async (spec?: RestTemplateSpec | null) => {
-    if (!spec?.url) {
+    const request = getRestTemplateImportInfoRequest(spec)
+    if (!request) {
       return undefined
     }
-    try {
-      return await queries.fetchImportInfo({ url: spec.url })
-    } catch (err) {
-      console.warn("Failed to load template metadata", err)
-      return undefined
-    }
+    return await queries.fetchImportInfo(request)
   }
 
   const applySecurityHeaders = (
@@ -174,15 +171,16 @@
       })
 
       notifications.success(`${selectedTemplate.name} API created`)
+      modal.hide()
     } catch (error: any) {
       notifications.error(
         `Error importing template - ${error?.message || "Unknown error"}`
       )
+    } finally {
+      loading = false
+      selectedTemplate = null
+      targetSpec = null
     }
-    modal.hide()
-    loading = false
-    selectedTemplate = null
-    targetSpec = null
   }
 
   const buildDatasourceName = (

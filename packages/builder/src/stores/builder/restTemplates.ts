@@ -39,7 +39,6 @@ interface RestTemplatesState {
 const hubspotRestTemplateGroup: RestTemplateGroup<"HubSpot"> = {
   name: "HubSpot",
   icon: HubSpotLogo,
-  verified: true,
   description:
     "CRM, marketing, CMS, and automation APIs for HubSpot's platform.",
   operationsCount: 1274,
@@ -1212,7 +1211,6 @@ const hubspotRestTemplateGroup: RestTemplateGroup<"HubSpot"> = {
 const twilioRestTemplateGroup: RestTemplateGroup<"Twilio"> = {
   name: "Twilio",
   icon: TwilioLogo,
-  verified: true,
   description:
     "Combines powerful communications APIs with AI and first-party data.",
   operationsCount: 795,
@@ -1603,7 +1601,6 @@ const twilioRestTemplateGroup: RestTemplateGroup<"Twilio"> = {
 const zendeskRestTemplateGroup: RestTemplateGroup<"Zendesk"> = {
   name: "Zendesk",
   icon: ZendeskLogo,
-  verified: true,
   description: "Customer support and messaging APIs from Zendesk.",
   operationsCount: 68,
   templates: [
@@ -1625,7 +1622,6 @@ const microsoftSharepointRestTemplateGroup: RestTemplateGroup<"Microsoft SharePo
   {
     name: "Microsoft SharePoint",
     icon: MicrosoftSharepointLogo,
-    verified: true,
     description:
       "Microsoft Graph SharePoint APIs for sites, drives, and shared items.",
     operationsCount: 2826,
@@ -1669,7 +1665,6 @@ const microsoftSharepointRestTemplateGroup: RestTemplateGroup<"Microsoft SharePo
 const splunkRestTemplateGroup: RestTemplateGroup<"Splunk"> = {
   name: "Splunk",
   icon: SplunkLogo,
-  verified: true,
   description:
     "Official OpenAPI specifications for Splunk Cloud and Splunk Enterprise Security.",
   operationsCount: 151,
@@ -1726,7 +1721,6 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
       ],
       operationsCount: 66,
       icon: AttioLogo,
-      verified: true,
     },
     {
       name: "BambooHR",
@@ -1740,7 +1734,6 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
       ],
       operationsCount: 134,
       icon: BambooHRLogo,
-      verified: true,
     },
     {
       name: "Confluence",
@@ -1748,12 +1741,11 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
       specs: [
         {
           version: "2.0.0",
-          url: "https://dac-static.atlassian.com/cloud/confluence/openapi-v2.v3.json?_v=1.8327.0",
+          url: "https://raw.githubusercontent.com/Budibase/openapi-rest-templates/refs/heads/main/confluence/openapi.json",
         },
       ],
       operationsCount: 212,
       icon: ConfluenceLogo,
-      verified: true,
     },
     {
       name: "Discord",
@@ -1766,7 +1758,6 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
       ],
       operationsCount: 227,
       icon: DiscordLogo,
-      verified: true,
     },
     {
       name: "Figma",
@@ -1780,7 +1771,6 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
       ],
       operationsCount: 46,
       icon: FigmaLogo,
-      verified: true,
     },
     {
       name: "GitHub",
@@ -1794,7 +1784,6 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
       ],
       operationsCount: 1078,
       icon: GitHubLogo,
-      verified: true,
     },
     {
       name: "Jira Cloud",
@@ -1808,21 +1797,6 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
       ],
       operationsCount: 616,
       icon: JiraLogo,
-      verified: true,
-    },
-    {
-      name: "Microsoft Teams",
-      description:
-        "Use Microsoft Graph to manage teams, channels, chats, and messages.",
-      specs: [
-        {
-          version: "v1.0",
-          url: "https://raw.githubusercontent.com/Budibase/openapi-rest-templates/main/ms-teams/openapi.yaml",
-        },
-      ],
-      operationsCount: 552,
-      icon: MicrosoftTeamsLogo,
-      verified: true,
     },
     {
       name: "Okta Management",
@@ -1836,7 +1810,6 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
       ],
       operationsCount: 694,
       icon: OktaLogo,
-      verified: true,
     },
     {
       name: "PagerDuty",
@@ -1850,7 +1823,6 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
       ],
       operationsCount: 390,
       icon: PagerDutyLogo,
-      verified: true,
     },
     {
       name: "Slack Web API",
@@ -1864,7 +1836,6 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
       ],
       operationsCount: 172,
       icon: SlackLogo,
-      verified: true,
     },
     {
       name: "ServiceNow",
@@ -1878,7 +1849,6 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
       ],
       operationsCount: 25,
       icon: ServiceNowLogo,
-      verified: true,
     },
     {
       name: "VirusTotal",
@@ -1892,25 +1862,7 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
       ],
       operationsCount: 159,
       icon: VirusTotalLogo,
-      verified: true,
     },
-    {
-      name: "Stripe",
-      description:
-        "Secure payment processing, subscriptions, billing, and reporting APIs",
-      specs: [
-        {
-          version: "2026-01-28.clover",
-          url: "https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.yaml",
-        },
-      ],
-      operationsCount: 587,
-      icon: StripeLogo,
-      verified: true,
-    },
-    /**
-     * UNVERIFIED
-     */
     {
       name: "Gitlab",
       description: "The most comprehensive DevSecOps platform.",
@@ -1924,6 +1876,19 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
       icon: GitlabLogo,
     },
     {
+      name: "Stripe",
+      description:
+        "Secure payment processing, subscriptions, billing, and reporting APIs",
+      specs: [
+        {
+          version: "2026-01-28.clover",
+          url: "https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.yaml",
+        },
+      ],
+      operationsCount: 587,
+      icon: StripeLogo,
+    },
+    {
       name: "Intercom",
       description:
         "The leading AI Agent for customer service delivering the highest quality answers and handling the most complex queries",
@@ -1935,6 +1900,19 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
       ],
       operationsCount: 110,
       icon: IntercomLogo,
+    },
+    {
+      name: "Microsoft Teams",
+      description:
+        "Use Microsoft Graph to manage teams, channels, chats, and messages.",
+      specs: [
+        {
+          version: "v1.0",
+          url: "https://raw.githubusercontent.com/Budibase/openapi-rest-templates/main/ms-teams/openapi.yaml",
+        },
+      ],
+      operationsCount: 552,
+      icon: MicrosoftTeamsLogo,
     },
     {
       name: "Notion",
@@ -1960,7 +1938,6 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
       ],
       operationsCount: 57,
       icon: OpenRouterLogo,
-      verified: true,
     },
     {
       name: "Trello",
