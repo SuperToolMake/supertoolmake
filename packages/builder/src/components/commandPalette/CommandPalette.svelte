@@ -11,7 +11,6 @@
   import { goto, params, isActive } from "@roxi/routify"
   import {
     previewStore,
-    builderStore,
     sortedScreens,
     appStore,
     datasources,
@@ -19,6 +18,7 @@
     tables,
   } from "@/stores/builder"
   import { themeStore } from "@/stores/portal"
+  import { bb } from "@/stores/bb"
   import { getContext } from "svelte"
   import { ThemeOptions, BUILDER_URLS } from "@budibase/shared-core"
   import { IntegrationTypes } from "@/constants/backend"
@@ -39,7 +39,7 @@
       name: "Invite users and manage app access",
       description: "",
       icon: "user",
-      action: () => builderStore.showBuilderSidePanel(),
+      action: () => bb.settings("/people/workspace"),
       requiresApp: true,
     },
     ...navigationCommands(),
