@@ -12,29 +12,41 @@ import gracefulShutdown from "http-graceful-shutdown"
 export default function createKoaApp() {
   const app = new Koa()
   app.proxy = true
+  const parsedMethods = [
+    HttpMethodEnum.POST,
+    HttpMethodEnum.PUT,
+    HttpMethodEnum.PATCH,
+    HttpMethodEnum.DELETE,
+  ]
 
   let mbNumber = parseInt(env.HTTP_MB_LIMIT || "10")
   if (!mbNumber || isNaN(mbNumber)) {
     mbNumber = 10
   }
-  // set up top level koa middleware
-  app.use(
-    koaBody({
-      multipart: true,
-      formLimit: `${mbNumber}mb`,
-      jsonLimit: `${mbNumber}mb`,
-      textLimit: `${mbNumber}mb`,
-      parsedMethods: [
-        HttpMethodEnum.POST,
-        HttpMethodEnum.PUT,
-        HttpMethodEnum.PATCH,
-        HttpMethodEnum.DELETE,
-      ],
-      formidable: {
-        maxFileSize: parseInt(env.MAX_IMPORT_SIZE_MB || "100") * 1024 * 1024,
-      },
+  const defaultBodyParser = koaBody({
+    multipart: true,
+    formLimit: `${mbNumber}mb`,
+    jsonLimit: `${mbNumber}mb`,
+    textLimit: `${mbNumber}mb`,
+    parsedMethods,
+    formidable: {
+      maxFileSize: parseInt(env.MAX_IMPORT_SIZE_MB || "100") * 1024 * 1024,
+    },
+  })
+
+  app.use(async (ctx, next) => {
+    return await defaultBodyParser(ctx, async () => {
+      // Koa 3 + koa-body can leave request.body undefined for empty payloads.
+      // Preserve previous behavior expected across controllers/tests.
+      if (
+        ctx.request.body == null &&
+        parsedMethods.includes(ctx.method as HttpMethodEnum)
+      ) {
+        ctx.request.body = {}
+      }
+      await next()
     })
-  )
+  })
 
   app.use(middleware.correlation)
   app.use(middleware.pino)
