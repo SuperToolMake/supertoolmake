@@ -24,8 +24,6 @@ export default function createKoaApp() {
       formLimit: `${mbNumber}mb`,
       jsonLimit: `${mbNumber}mb`,
       textLimit: `${mbNumber}mb`,
-      // @ts-ignore
-      enableTypes: ["json", "form", "text"],
       parsedMethods: [
         HttpMethodEnum.POST,
         HttpMethodEnum.PUT,

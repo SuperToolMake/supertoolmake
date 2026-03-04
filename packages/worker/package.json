@@ -70,6 +70,7 @@
   },
   "devDependencies": {
     "@types/jsonwebtoken": "9.0.3",
+    "@types/koa": "3.0.1",
     "@types/koa__router": "12.0.4",
     "@types/lodash": "4.14.200",
     "@types/maildev": "^0.0.7",

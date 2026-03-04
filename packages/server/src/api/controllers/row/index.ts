@@ -351,5 +351,6 @@ export const exportRows = async (
     customHeaders,
   })
   ctx.attachment(fileName)
+  ctx.type = format === "csv" ? "text/csv" : "application/json"
   ctx.body = apiFileReturn(content)
 }

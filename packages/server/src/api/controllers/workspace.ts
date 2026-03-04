@@ -741,8 +741,8 @@ export async function importToWorkspace(
     ctx.throw(400, "Must only supply one app export")
   }
   const fileAttributes = {
-    type: workspaceExport.type!,
-    path: workspaceExport.path!,
+    type: workspaceExport.mimetype!,
+    path: workspaceExport.filepath!,
   }
   try {
     await sdk.workspaces.updateWithExport(workspaceId, fileAttributes, password)

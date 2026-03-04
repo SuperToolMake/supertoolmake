@@ -43,6 +43,36 @@ import {
 import AppComponent from "./templates/App.svelte"
 import { render } from "svelte/server"
 
+const getUploadFilename = (file: unknown) => {
+  if (!file || typeof file !== "object") {
+    return undefined
+  }
+  const upload = file as {
+    originalFilename?: string | null
+  }
+  return upload.originalFilename || undefined
+}
+
+const getUploadPath = (file: unknown) => {
+  if (!file || typeof file !== "object") {
+    return undefined
+  }
+  const upload = file as {
+    filepath?: string
+  }
+  return upload.filepath
+}
+
+const getUploadMimeType = (file: unknown) => {
+  if (!file || typeof file !== "object") {
+    return undefined
+  }
+  const upload = file as {
+    mimetype?: string | null
+  }
+  return upload.mimetype || undefined
+}
+
 export const uploadFile = async function (
   ctx: Ctx<void, ProcessAttachmentResponse>
 ) {
@@ -55,16 +85,20 @@ export const uploadFile = async function (
 
   ctx.body = await Promise.all(
     files.map(async file => {
-      if (!file.name) {
+      const fileName = getUploadFilename(file)
+      const filePath = getUploadPath(file)
+      const rawMimeType = getUploadMimeType(file)
+
+      if (!fileName) {
         throw new BadRequestError(
           "Attempted to upload a file without a filename"
         )
       }
 
-      const extension = [...file.name.split(".")].pop()
+      const extension = [...fileName.split(".")].pop()
       if (!extension) {
         throw new BadRequestError(
-          `File "${file.name}" has no extension, an extension is required to upload a file`
+          `File "${fileName}" has no extension, an extension is required to upload a file`
         )
       }
 
@@ -73,7 +107,7 @@ export const uploadFile = async function (
         InvalidFileExtensions.includes(extension.toLowerCase())
       ) {
         throw new BadRequestError(
-          `File "${file.name}" has an invalid extension: "${extension}"`
+          `File "${fileName}" has an invalid extension: "${extension}"`
         )
       }
 
@@ -85,13 +119,13 @@ export const uploadFile = async function (
       const response = await objectStore.upload({
         bucket: ObjectStoreBuckets.APPS,
         filename: s3Key,
-        path: file.path,
-        type: file.type,
+        path: filePath,
+        type: rawMimeType,
       })
 
       return {
         size: file.size,
-        name: file.name,
+        name: fileName,
         url: await objectStore.getAppFileUrl(s3Key),
         extension,
         key: response.Key!,
@@ -106,7 +140,10 @@ export async function processPWAZip(ctx: UserCtx) {
     ctx.throw(400, "No file or multiple files provided")
   }
 
-  if (!file.path || !file.name?.toLowerCase().endsWith(".zip")) {
+  const filePath = getUploadPath(file)
+  const fileName = getUploadFilename(file)
+
+  if (!filePath || !fileName?.toLowerCase().endsWith(".zip")) {
     ctx.throw(400, "Invalid file - must be a zip file")
   }
 
@@ -114,7 +151,7 @@ export async function processPWAZip(ctx: UserCtx) {
   try {
     await fsp.mkdir(tempDir, { recursive: true })
 
-    await extract(file.path, { dir: tempDir })
+    await extract(filePath, { dir: tempDir })
     const iconsJsonPath = join(tempDir, "icons.json")
 
     if (!fs.existsSync(iconsJsonPath)) {
