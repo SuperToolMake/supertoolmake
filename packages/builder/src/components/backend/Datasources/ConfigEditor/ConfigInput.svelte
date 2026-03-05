@@ -6,6 +6,7 @@
   import FieldGroupField from "./fields/FieldGroup.svelte"
   import SelectField from "./fields/Select.svelte"
   import StringField from "./fields/String.svelte"
+  import ConnectionField from "./fields/Connection.svelte"
   import { DatasourceFieldType } from "@budibase/types"
 
   export let type: `${DatasourceFieldType}`
@@ -34,6 +35,8 @@
       return FieldGroupField
     } else if (type === "select") {
       return SelectField
+    } else if (type === "connection") {
+      return ConnectionField
     } else {
       return StringField
     }
@@ -53,5 +56,6 @@
   {visible}
   on:blur
   on:change
+  on:parsed
   on:nestedFieldBlur
 />

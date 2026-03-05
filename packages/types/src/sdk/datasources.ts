@@ -45,6 +45,7 @@ export enum DatasourceFieldType {
   FILE = "file",
   FIELD_GROUP = "fieldGroup",
   SELECT = "select",
+  CONNECTION = "connection",
 }
 
 export enum SourceName {

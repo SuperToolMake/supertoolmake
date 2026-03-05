@@ -68,6 +68,11 @@ const SCHEMA: Integration = {
     [DatasourceFeature.FETCH_TABLE_NAMES]: true,
   },
   datasource: {
+    directConnection: {
+      type: DatasourceFieldType.CONNECTION,
+      display: "Direct connection",
+      required: false,
+    },
     host: {
       type: DatasourceFieldType.STRING,
       default: HOST_ADDRESS,
