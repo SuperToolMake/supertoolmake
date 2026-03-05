@@ -77,6 +77,9 @@
   textarea {
     width: 100%;
     resize: none;
+    min-height: 48px !important;
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
     field-sizing: content;
   }
   .error {
