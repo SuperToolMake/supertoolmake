@@ -12,9 +12,10 @@
   let isFocused = false
   let isHidden = false
   let inputValue = ""
+  let rawInput = value
 
   $: {
-    if (!isFocused && isHidden && value) {
+    if (isHidden && value) {
       inputValue = "••••••••••••"
     } else {
       inputValue = value || ""
@@ -39,6 +40,7 @@
   const handleInput = (e: Event) => {
     const target = e.target as HTMLTextAreaElement
     const connStr = target.value
+    rawInput = connStr
 
     if (!isHidden && connStr === "••••••••••••") {
       return
@@ -54,16 +56,10 @@
 
   const handleFocus = () => {
     isFocused = true
-    if (isHidden && value) {
-      inputValue = value
-    }
   }
 
   const handleBlur = () => {
     isFocused = false
-    if (isHidden && value) {
-      inputValue = "••••••••••••"
-    }
     dispatch("blur")
   }
 
@@ -92,10 +88,17 @@
       on:input={handleInput}
       on:focus={handleFocus}
       on:blur={handleBlur}
+      readonly={isHidden}
     ></textarea>
-    <button class="visibility-toggle" on:click={toggleVisibility} type="button">
-      <Icon size="S" name={isHidden ? "eye-slash" : "eye"} />
-    </button>
+    {#if !!rawInput}
+      <button
+        class="visibility-toggle"
+        on:click={toggleVisibility}
+        type="button"
+      >
+        <Icon size="S" name={isHidden ? "eye-slash" : "eye"} />
+      </button>
+    {/if}
   </div>
   {#if error}
     <div class="error">{error}</div>
