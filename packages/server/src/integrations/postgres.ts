@@ -102,6 +102,7 @@ const SCHEMA: Integration = {
       type: DatasourceFieldType.BOOLEAN,
       default: false,
       required: false,
+      display: "SSL",
     },
     rejectUnauthorized: {
       type: DatasourceFieldType.BOOLEAN,
@@ -113,18 +114,21 @@ const SCHEMA: Integration = {
       type: DatasourceFieldType.LONGFORM,
       default: false,
       required: false,
+      hidden: `{{ssl}} !== true`,
     },
     clientKey: {
       display: "Client key",
       type: DatasourceFieldType.LONGFORM,
       default: false,
       required: false,
+      hidden: `{{ssl}} !== true`,
     },
     clientCert: {
       display: "Client cert",
       type: DatasourceFieldType.LONGFORM,
       default: false,
       required: false,
+      hidden: `{{ssl}} !== true`,
     },
   },
   query: {

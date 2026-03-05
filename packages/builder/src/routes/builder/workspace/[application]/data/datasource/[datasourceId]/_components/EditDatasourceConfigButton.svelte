@@ -29,9 +29,6 @@
         ? `${datasource.config.endpoint}:${datasource.config.region}`
         : `s3.${datasource.config.region}.amazonaws.com`
     }
-    if (datasource.source === IntegrationTypes.ELASTICSEARCH) {
-      return datasource.config.url
-    }
     if (datasource.source === IntegrationTypes.FIRESTORE) {
       return datasource.config.projectId
     }
