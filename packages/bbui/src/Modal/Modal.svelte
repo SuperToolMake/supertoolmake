@@ -84,9 +84,9 @@
   function focusModal(node: HTMLElement): void {
     if (!autoFocus) return
     tick().then(() => {
-      const inputs = node.querySelectorAll("input")
+      const inputs = node.querySelectorAll("input, textarea")
       if (inputs?.length) {
-        inputs[0].focus()
+        ;(inputs[0] as HTMLInputElement).focus()
       } else if (modal) {
         const confirm = modal.querySelector(".confirm-wrap .spectrum-Button")
         if (confirm) {
