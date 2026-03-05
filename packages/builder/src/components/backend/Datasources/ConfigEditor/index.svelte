@@ -6,7 +6,9 @@
   import { get } from "svelte/store"
   import type { UIIntegration } from "@budibase/types"
   import InfoDisplay from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
-  import { SourceName } from "@budibase/types"
+  import { SourceName, DatasourceFieldType } from "@budibase/types"
+
+  const CONNECTION_TYPE = "connection"
 
   export let integration: UIIntegration
   export let config: Record<string, any>
@@ -19,6 +21,13 @@
 
   $: configStore = createValidatedConfigStore(integration, config)
   $: nameStore = createValidatedNameStore(nameFieldValue, showNameField)
+
+  $: connectionFields = ($configStore.validatedConfig as any[]).filter(
+    f => f.type === CONNECTION_TYPE
+  )
+  $: regularFields = ($configStore.validatedConfig as any[]).filter(
+    f => f.type !== CONNECTION_TYPE
+  )
 
   const parseConnectionString = (connStr: string) => {
     try {
@@ -131,6 +140,24 @@
   disabled={$configStore.preventSubmit || $nameStore.preventSubmit}
   size="L"
 >
+  {#if connectionFields.length > 0}
+    {#each connectionFields as { type, key, value, error, name, config, placeholder }}
+      <ConfigInput
+        {type}
+        {value}
+        {error}
+        {name}
+        {config}
+        {placeholder}
+        on:blur={() => configStore.markFieldActive(key)}
+        on:change={e => handleFieldChange(key, e.detail)}
+        on:parsed={e => handleParsedFields(key, e.detail)}
+        on:nestedFieldBlur={e =>
+          configStore.markFieldActive(`${key}.${e.detail}`)}
+      />
+    {/each}
+  {/if}
+
   <Layout noPadding>
     <Body size="XS">
       {#if integration.warningMessage}
@@ -140,7 +167,6 @@
           icon="warning"
         />
       {/if}
-      <p>Connect your database to SuperToolMake using the config below.</p>
     </Body>
   </Layout>
 
@@ -155,7 +181,7 @@
     />
   {/if}
 
-  {#each $configStore.validatedConfig as { type, key, value, error, name, config, placeholder }}
+  {#each regularFields as { type, key, value, error, name, config, placeholder }}
     <ConfigInput
       {type}
       {value}

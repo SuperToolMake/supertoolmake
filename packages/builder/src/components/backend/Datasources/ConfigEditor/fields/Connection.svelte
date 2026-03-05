@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { Label, Input } from "@budibase/bbui"
+  import { Label } from "@budibase/bbui"
   import { createEventDispatcher } from "svelte"
 
+  export let name
   export let value
   export let error
+  export let placeholder
 
   const dispatch = createEventDispatcher()
 
-  let useDirectConnection = false
-
-  $: useDirectConnection = !!value
+  let isFocused = false
 
   const parseConnectionString = (connStr: string) => {
     try {
@@ -26,8 +26,9 @@
     }
   }
 
-  const handleInput = (e: CustomEvent) => {
-    const connStr = e.detail
+  const handleInput = (e: Event) => {
+    const target = e.target as HTMLTextAreaElement
+    const connStr = target.value
     dispatch("change", connStr)
 
     const parsed = parseConnectionString(connStr)
@@ -35,32 +36,51 @@
       dispatch("parsed", parsed)
     }
   }
+
+  const handleBlur = () => {
+    isFocused = false
+    dispatch("blur")
+  }
 </script>
 
 <div class="connection-field">
-  <div class="input-row">
-    <Label>Direct connection</Label>
-    <Input
-      on:blur
-      on:change={handleInput}
-      type="text"
+  <Label>{name}</Label>
+  <div
+    class="spectrum-Textfield spectrum-Textfield--multiline"
+    class:is-focused={isFocused}
+    class:is-invalid={!!error}
+  >
+    <textarea
+      class="spectrum-Textfield-input"
       {value}
-      {error}
-      placeholder="postgresql://user:password@host:5432/database"
-    />
+      placeholder={placeholder ||
+        "postgresql://user:password@host:5432/database"}
+      on:input={handleInput}
+      on:focus={() => (isFocused = true)}
+      on:blur={handleBlur}
+    ></textarea>
   </div>
+  {#if error}
+    <div class="error">{error}</div>
+  {/if}
 </div>
 
 <style>
   .connection-field {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-m);
+    gap: var(--spacing-s);
   }
-  .input-row {
-    display: grid;
-    grid-template-columns: 20% 1fr;
-    grid-gap: var(--spacing-l);
-    align-items: center;
+  .spectrum-Textfield {
+    width: 100%;
+  }
+  textarea {
+    width: 100%;
+    resize: none;
+    field-sizing: content;
+  }
+  .error {
+    color: var(--spectrum-global-color-red-600);
+    font-size: var(--spectrum-global-dimension-static-size-75);
   }
 </style>
