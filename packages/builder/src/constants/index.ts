@@ -15,7 +15,6 @@ export const IntegrationNames = {
   S3: "S3",
   MYSQL: "MySQL",
   REST: "REST",
-  ELASTICSEARCH: "ElasticSearch",
   SQL_SERVER: "SQL Server",
   ORACLE: "Oracle",
   GOOGLE_SHEETS: "Google Sheets",

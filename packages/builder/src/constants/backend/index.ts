@@ -176,7 +176,6 @@ export const DB_TYPE_EXTERNAL = "external"
 
 export const IntegrationTypes = {
   COUCHDB: "COUCHDB",
-  ELASTICSEARCH: "ELASTICSEARCH",
   FIRESTORE: "FIRESTORE",
   GOOGLE_SHEETS: "GOOGLE_SHEETS",
   INTERNAL: "INTERNAL",
@@ -197,7 +196,6 @@ export const IntegrationNames = {
   [IntegrationTypes.S3]: "S3",
   [IntegrationTypes.MYSQL]: "MySQL",
   [IntegrationTypes.REST]: "REST",
-  [IntegrationTypes.ELASTICSEARCH]: "ElasticSearch",
   [IntegrationTypes.SQL_SERVER]: "SQL Server",
   [IntegrationTypes.ORACLE]: "Oracle",
   [IntegrationTypes.INTERNAL]: "Internal",

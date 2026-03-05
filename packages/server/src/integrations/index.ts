@@ -1,6 +1,5 @@
 import postgres from "./postgres"
 import mongodb from "./mongodb"
-import elasticsearch from "./elasticsearch"
 import couchdb from "./couchdb"
 import sqlServer from "./microsoftSqlServer"
 import s3 from "./s3"
@@ -20,7 +19,6 @@ import cloneDeep from "lodash/cloneDeep"
 const DEFINITIONS: Record<SourceName, Integration | undefined> = {
   [SourceName.POSTGRES]: postgres.schema,
   [SourceName.MONGODB]: mongodb.schema,
-  [SourceName.ELASTICSEARCH]: elasticsearch.schema,
   [SourceName.COUCHDB]: couchdb.schema,
   [SourceName.SQL_SERVER]: sqlServer.schema,
   [SourceName.S3]: s3.schema,
@@ -44,7 +42,6 @@ const INTEGRATIONS: Record<SourceName, IntegrationBaseConstructor | undefined> =
   {
     [SourceName.POSTGRES]: postgres.integration,
     [SourceName.MONGODB]: mongodb.integration,
-    [SourceName.ELASTICSEARCH]: elasticsearch.integration,
     [SourceName.COUCHDB]: couchdb.integration,
     [SourceName.SQL_SERVER]: sqlServer.integration,
     [SourceName.S3]: s3.integration,

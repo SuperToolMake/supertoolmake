@@ -2,7 +2,6 @@ import { testContainerUtils } from "@budibase/backend-core/tests"
 import { Datasource, SourceName } from "@budibase/types"
 import { Knex } from "knex"
 import TestConfiguration from "../../../tests/utilities/TestConfiguration"
-import * as elasticsearch from "./elasticsearch"
 import "./images"
 import * as mariadb from "./mariadb"
 import * as mongodb from "./mongodb"
@@ -23,7 +22,6 @@ export enum DatabaseName {
   SQL_SERVER = "mssql",
   MARIADB = "mariadb",
   ORACLE = "oracle",
-  ELASTICSEARCH = "elasticsearch",
 }
 
 const DATASOURCE_PLUS = [
@@ -45,7 +43,6 @@ const providers: Record<DatabaseName, DatasourceProvider> = {
   [DatabaseName.ORACLE]: oracle.getDatasource,
 
   // rest
-  [DatabaseName.ELASTICSEARCH]: elasticsearch.getDatasource,
   [DatabaseName.MONGODB]: mongodb.getDatasource,
 }
 
@@ -177,7 +174,6 @@ export function datasourceDescribe(opts: DatasourceDescribeOpts) {
     isMSSQL: dbName === DatabaseName.SQL_SERVER,
     isOracle: dbName === DatabaseName.ORACLE,
     isMariaDB: dbName === DatabaseName.MARIADB,
-    isElasticsearch: dbName === DatabaseName.ELASTICSEARCH,
   }))
 }
 

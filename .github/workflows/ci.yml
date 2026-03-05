@@ -148,7 +148,6 @@ jobs:
             postgres_legacy,
             mongodb,
             mariadb,
-            elasticsearch,
             none,
           ]
     steps:
@@ -185,8 +184,6 @@ jobs:
             docker pull mariadb@${{ steps.dotenv.outputs.MARIADB_SHA }}
           elif [ "${{ matrix.datasource }}" == "postgres_legacy" ]; then
             docker pull postgres:9.5.25
-          elif [ "${{ matrix.datasource }}" == "elasticsearch" ]; then
-            docker pull elasticsearch@${{ steps.dotenv.outputs.ELASTICSEARCH_SHA }}
           fi
           docker pull minio/minio &
           docker pull redis &

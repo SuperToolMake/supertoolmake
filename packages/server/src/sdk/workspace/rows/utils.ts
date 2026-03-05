@@ -30,7 +30,6 @@ const SQL_CLIENT_SOURCE_MAP: Record<SourceName, SqlClient | undefined> = {
   [SourceName.SQL_SERVER]: SqlClient.MS_SQL,
   [SourceName.ORACLE]: SqlClient.ORACLE,
   [SourceName.MONGODB]: undefined,
-  [SourceName.ELASTICSEARCH]: undefined,
   [SourceName.COUCHDB]: undefined,
   [SourceName.S3]: undefined,
   [SourceName.REST]: undefined,

@@ -1,5 +1,4 @@
 import Postgres from "./Postgres.svelte"
-import Elasticsearch from "./Elasticsearch.svelte"
 import MongoDB from "./MongoDB.svelte"
 import CouchDB from "./CouchDB.svelte"
 import S3 from "./S3.svelte"
@@ -14,7 +13,6 @@ import Custom from "./Custom.svelte"
 const ICONS = {
   POSTGRES: Postgres,
   MONGODB: MongoDB,
-  ELASTICSEARCH: Elasticsearch,
   COUCHDB: CouchDB,
   SQL_SERVER: SqlServer,
   S3: S3,
