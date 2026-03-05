@@ -6,7 +6,7 @@
   import { get } from "svelte/store"
   import type { UIIntegration } from "@budibase/types"
   import InfoDisplay from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
-  import { SourceName, DatasourceFieldType } from "@budibase/types"
+  import { SourceName } from "@budibase/types"
 
   const CONNECTION_TYPE = "connection"
 
