@@ -18,6 +18,7 @@
   }) => Promise<void> | void = () => {}
   export let showNameField: boolean = false
   export let nameFieldValue: string = ""
+  export let defaultHideConnectionUrl: boolean | undefined = false
 
   $: configStore = createValidatedConfigStore(integration, config)
   $: nameStore = createValidatedNameStore(nameFieldValue, showNameField)
@@ -149,6 +150,7 @@
         {name}
         {config}
         {placeholder}
+        {defaultHideConnectionUrl}
         on:blur={() => configStore.markFieldActive(key)}
         on:change={e => handleFieldChange(key, e.detail)}
         on:parsed={e => handleParsedFields(key, e.detail)}

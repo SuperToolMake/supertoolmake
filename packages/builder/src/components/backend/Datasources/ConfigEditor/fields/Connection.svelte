@@ -6,13 +6,13 @@
   export let value
   export let error
   export let placeholder
+  export let defaultHideConnectionUrl: boolean | undefined = false
 
   const dispatch = createEventDispatcher()
 
   let isFocused = false
-  let isHidden = false
+  let isHidden = defaultHideConnectionUrl
   let inputValue = ""
-  let rawInput = value
 
   $: {
     if (isHidden && value) {
@@ -40,7 +40,6 @@
   const handleInput = (e: Event) => {
     const target = e.target as HTMLTextAreaElement
     const connStr = target.value
-    rawInput = connStr
 
     if (!isHidden && connStr === "••••••••••••") {
       return
@@ -90,7 +89,7 @@
       on:blur={handleBlur}
       readonly={isHidden}
     ></textarea>
-    {#if !!rawInput}
+    {#if !!value}
       <button
         class="visibility-toggle"
         on:click={toggleVisibility}

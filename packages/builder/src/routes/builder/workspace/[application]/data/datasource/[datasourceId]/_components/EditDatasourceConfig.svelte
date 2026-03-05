@@ -35,6 +35,7 @@
   <EditDatasourceConfigButton on:click={modal.show} {datasource} />
   <Modal bind:this={modal}>
     <DatasourceConfigEditor
+      defaultHideConnectionUrl={true}
       {integration}
       config={datasource.config}
       showNameField

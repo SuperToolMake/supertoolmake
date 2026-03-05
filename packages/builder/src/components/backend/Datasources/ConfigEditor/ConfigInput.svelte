@@ -16,6 +16,7 @@
   export let config: any = undefined
   export let placeholder: string | undefined = undefined
   export let visible: boolean = true
+  export let defaultHideConnectionUrl: boolean | undefined = false
 
   // don't pass "number" type as it stops those options from being configurable
   // with an environment variable
@@ -54,6 +55,7 @@
   {config}
   {placeholder}
   {visible}
+  {defaultHideConnectionUrl}
   on:blur
   on:change
   on:parsed
