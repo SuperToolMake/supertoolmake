@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Label } from "@budibase/bbui"
+  import { Label, Icon } from "@budibase/bbui"
   import { createEventDispatcher } from "svelte"
 
   export let name
@@ -10,6 +10,16 @@
   const dispatch = createEventDispatcher()
 
   let isFocused = false
+  let isHidden = false
+  let inputValue = ""
+
+  $: {
+    if (!isFocused && isHidden && value) {
+      inputValue = "••••••••••••"
+    } else {
+      inputValue = value || ""
+    }
+  }
 
   const parseConnectionString = (connStr: string) => {
     try {
@@ -29,6 +39,11 @@
   const handleInput = (e: Event) => {
     const target = e.target as HTMLTextAreaElement
     const connStr = target.value
+
+    if (!isHidden && connStr === "••••••••••••") {
+      return
+    }
+
     dispatch("change", connStr)
 
     const parsed = parseConnectionString(connStr)
@@ -37,9 +52,28 @@
     }
   }
 
+  const handleFocus = () => {
+    isFocused = true
+    if (isHidden && value) {
+      inputValue = value
+    }
+  }
+
   const handleBlur = () => {
     isFocused = false
+    if (isHidden && value) {
+      inputValue = "••••••••••••"
+    }
     dispatch("blur")
+  }
+
+  const toggleVisibility = () => {
+    isHidden = !isHidden
+    if (!isHidden && value) {
+      inputValue = value
+    } else if (isHidden && value) {
+      inputValue = "••••••••••••"
+    }
   }
 </script>
 
@@ -52,13 +86,16 @@
   >
     <textarea
       class="spectrum-Textfield-input"
-      {value}
+      value={inputValue}
       placeholder={placeholder ||
         "postgresql://user:password@host:5432/database"}
       on:input={handleInput}
-      on:focus={() => (isFocused = true)}
+      on:focus={handleFocus}
       on:blur={handleBlur}
     ></textarea>
+    <button class="visibility-toggle" on:click={toggleVisibility} type="button">
+      <Icon size="S" name={isHidden ? "eye-slash" : "eye"} />
+    </button>
   </div>
   {#if error}
     <div class="error">{error}</div>
@@ -73,6 +110,9 @@
   }
   .spectrum-Textfield {
     width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
   }
   textarea {
     width: 100%;
@@ -81,9 +121,24 @@
     padding-top: 12px !important;
     padding-bottom: 12px !important;
     field-sizing: content;
+    padding-right: 36px;
+  }
+  .visibility-toggle {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--spectrum-global-color-gray-600);
+  }
+  .visibility-toggle:hover {
+    color: var(--spectrum-global-color-gray-800);
   }
   .error {
     color: var(--spectrum-global-color-red-600);
-    font-size: var(--spectrum-global-dimension-static-size-75);
+    font-size: var(--spectrum-global-color-red-600);
   }
 </style>
