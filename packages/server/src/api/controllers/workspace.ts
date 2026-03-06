@@ -201,7 +201,7 @@ async function createOnboardingDefaultWorkspaceApp(
 ): Promise<string> {
   const workspaceApp = await sdk.workspaceApps.create({
     name: name,
-    url: "/",
+    url: "/welcome",
     navigation: {
       ...defaultAppNavigator(name),
       links: [],
@@ -257,7 +257,7 @@ export async function fetchClientApps(
         // TODO: this can be removed when the flag is cleaned from packages/builder/src/pages/builder/apps/index.svelte
         prodId: workspace.appId,
         name: `${workspaceApp.name}`,
-        url: `${workspace.url}${workspaceApp.url || ""}`.replace(/\/$/, ""),
+        url: `${workspaceApp.url || ""}`.replace(/\/$/, ""),
         updatedAt: workspace.updatedAt,
       })
     }
@@ -376,7 +376,7 @@ async function performWorkspaceCreate(
     }
   }
 
-  const workspaceId = getDevWorkspaceID(generateWorkspaceID(tenantId))
+  const workspaceId = getDevWorkspaceID(generateWorkspaceID())
 
   return await context.doInWorkspaceContext(workspaceId, async () => {
     const instance = await createInstance(workspaceId)

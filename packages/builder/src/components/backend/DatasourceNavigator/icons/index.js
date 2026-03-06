@@ -1,6 +1,5 @@
 import Postgres from "./Postgres.svelte"
 import MongoDB from "./MongoDB.svelte"
-import CouchDB from "./CouchDB.svelte"
 import S3 from "./S3.svelte"
 import SqlServer from "./SQLServer.svelte"
 import MySQL from "./MySQL.svelte"

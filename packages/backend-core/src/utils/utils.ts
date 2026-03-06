@@ -38,7 +38,8 @@ async function resolveAppUrl(ctx: Ctx) {
     a => a.url && a.url.toLowerCase() === possibleUrl
   )[0]
 
-  return workspace && workspace.appId ? workspace.appId : undefined
+  // Multi-workspace functionality has been removed, so assume a default
+  return workspace && workspace.appId ? workspace.appId : "app_573"
 }
 
 export function isServingApp(ctx: Ctx) {

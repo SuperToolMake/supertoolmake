@@ -51,10 +51,10 @@ export function buildLiveUrl(
   fullUrl: boolean
 ) {
   const liveUrl = buildUrl({
-    paths: [`/app${url}`, workspaceAppUrl],
+    paths: ["/app"],
     route: "", // Ignore the route for live urls
     fullUrl,
   })
 
-  return liveUrl
+  return liveUrl + workspaceAppUrl
 }
