@@ -26,7 +26,6 @@
   import GridScreensButton from "@/components/backend/DataTable/buttons/grid/GridScreensButton.svelte"
   import GridRowActionsButton from "@/components/backend/DataTable/buttons/grid/GridRowActionsButton.svelte"
   import GridDevProdSwitcher from "@/components/backend/DataTable/buttons/grid/GridDevProdSwitcher.svelte"
-  import GridDevWarning from "@/components/backend/DataTable/alert/grid/GridDevWarning.svelte"
   import { DB_TYPE_EXTERNAL } from "@/constants/backend"
   import { getContext } from "svelte"
   import {
@@ -90,8 +89,6 @@
   $: relationshipsEnabled = relationshipSupport(tableDatasource)
   $: currentTheme = $themeStore?.theme
   $: darkMode = !currentTheme.includes("light")
-  $: canSwitchToProduction =
-    isInternal || tableDatasource?.usesEnvironmentVariables
   $: isProductionMode =
     $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION
 
@@ -219,9 +216,6 @@
         <GridEditUserModal />
       {:else}
         <GridCreateEditRowModal />
-      {/if}
-      {#if !isProductionMode && canSwitchToProduction}
-        <GridDevWarning />
       {/if}
     </Grid>
   {/key}
