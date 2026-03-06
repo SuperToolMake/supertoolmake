@@ -52,7 +52,6 @@ export enum SourceName {
   FIRESTORE = "FIRESTORE",
   MONGODB = "MONGODB",
   MYSQL = "MYSQL",
-  ORACLE = "ORACLE",
   POSTGRES = "POSTGRES",
   REDIS = "REDIS",
   REST = "REST",

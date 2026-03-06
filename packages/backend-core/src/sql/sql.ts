@@ -196,7 +196,6 @@ class InternalBuilder {
       SqlClient.MS_SQL,
       SqlClient.MY_SQL,
       SqlClient.MARIADB,
-      SqlClient.ORACLE,
     ]
     return requiresJsonAsString.includes(this.client)
   }
@@ -229,9 +228,6 @@ class InternalBuilder {
 
   private castIntToString(identifier: string | Knex.Raw): Knex.Raw {
     switch (this.client) {
-      case SqlClient.ORACLE: {
-        return this.knex.raw("to_char(??)", [identifier])
-      }
       case SqlClient.POSTGRES: {
         return this.knex.raw("??::TEXT", [identifier])
       }
@@ -336,42 +332,6 @@ class InternalBuilder {
     })
   }
 
-  // OracleDB can't use character-large-objects (CLOBs) in WHERE clauses,
-  // so when we use them we need to wrap them in to_char(). This function
-  // converts a field name to the appropriate identifier.
-  private convertClobs(
-    field: string,
-    opts?: { forSelect?: boolean }
-  ): Knex.Raw {
-    if (this.client !== SqlClient.ORACLE) {
-      throw new Error(
-        "you've called convertClobs on a DB that's not Oracle, this is a mistake"
-      )
-    }
-    const parts = this.splitIdentifier(field)
-    const col = parts.pop()!
-    const schema = this.table.schema[col]
-    let identifier = this.rawQuotedIdentifier(field)
-
-    if (
-      schema.type === FieldType.STRING ||
-      schema.type === FieldType.LONGFORM ||
-      schema.type === FieldType.BB_REFERENCE_SINGLE ||
-      schema.type === FieldType.BB_REFERENCE ||
-      schema.type === FieldType.OPTIONS
-    ) {
-      if (opts?.forSelect) {
-        identifier = this.knex.raw("to_char(??) as ??", [
-          identifier,
-          this.rawQuotedIdentifier(col),
-        ])
-      } else {
-        identifier = this.knex.raw("to_char(??)", [identifier])
-      }
-    }
-    return identifier
-  }
-
   private parse(input: any, schema: FieldSchema) {
     if (Array.isArray(input)) {
       return JSON.stringify(input)
@@ -391,22 +351,6 @@ class InternalBuilder {
 
     if (this.SPECIAL_SELECT_CASES.POSTGRES_ARRAY(schema)) {
       return `{${input}}`
-    }
-
-    if (
-      this.client === SqlClient.ORACLE &&
-      schema.type === FieldType.DATETIME &&
-      schema.timeOnly
-    ) {
-      if (input instanceof Date) {
-        const hours = input.getHours().toString().padStart(2, "0")
-        const minutes = input.getMinutes().toString().padStart(2, "0")
-        const seconds = input.getSeconds().toString().padStart(2, "0")
-        return `${hours}:${minutes}:${seconds}`
-      }
-      if (typeof input === "string") {
-        return new Date(`1970-01-01T${input}Z`)
-      }
     }
 
     if (typeof input === "string" && schema.type === FieldType.DATETIME) {
@@ -714,12 +658,6 @@ class InternalBuilder {
       if (filters?.fuzzyOr || shouldOr) {
         q = q.or
       }
-      if (this.client === SqlClient.ORACLE) {
-        return q.whereRaw(`LOWER(??) LIKE ?`, [
-          this.rawQuotedIdentifier(key),
-          `%${value.toLowerCase()}%`,
-        ])
-      }
       return q.whereILike(
         // @ts-expect-error knex types are wrong, raw is fine here
         this.rawQuotedIdentifier(key),
@@ -853,19 +791,11 @@ class InternalBuilder {
           if (shouldOr) {
             q = q.or
           }
-          if (this.client === SqlClient.ORACLE) {
-            // @ts-ignore
-            key = this.convertClobs(key)
-          }
           return q.whereIn(key, values)
         },
         (q, key: string[], array) => {
           if (shouldOr) {
             q = q.or
-          }
-          if (this.client === SqlClient.ORACLE) {
-            // @ts-ignore
-            key = key.map(k => this.convertClobs(k))
           }
           return q.whereIn(key, Array.isArray(array) ? array : [array])
         }
@@ -876,21 +806,14 @@ class InternalBuilder {
         if (shouldOr) {
           q = q.or
         }
-        if (this.client === SqlClient.ORACLE) {
-          return q.whereRaw(`LOWER(??) LIKE ?`, [
-            this.rawQuotedIdentifier(key),
-            `${value.toLowerCase()}%`,
+        const schema = this.getFieldSchema(key)
+        if (this.SPECIAL_SELECT_CASES.POSTGRES_ENUM(schema)) {
+          return q.whereRaw(`??::text ilike ?`, [
+            this.knex.raw(this.quote(schema!.name)),
+            `${value}%`,
           ])
         } else {
-          const schema = this.getFieldSchema(key)
-          if (this.SPECIAL_SELECT_CASES.POSTGRES_ENUM(schema)) {
-            return q.whereRaw(`??::text ilike ?`, [
-              this.knex.raw(this.quote(schema!.name)),
-              `${value}%`,
-            ])
-          } else {
-            return q.whereILike(key, `${value}%`)
-          }
+          return q.whereILike(key, `${value}%`)
         }
       })
     }
@@ -919,22 +842,15 @@ class InternalBuilder {
         let high = value.high
         let low = value.low
 
-        if (this.client === SqlClient.ORACLE) {
-          rawKey = this.convertClobs(key)
-        }
-
         if (shouldOr) {
           q = q.or
         }
 
         if (lowValid && highValid) {
-          // @ts-expect-error knex types are wrong, raw is fine here
           return q.whereBetween(rawKey, [low, high])
         } else if (lowValid) {
-          // @ts-expect-error knex types are wrong, raw is fine here
           return q.where(rawKey, ">=", low)
         } else if (highValid) {
-          // @ts-expect-error knex types are wrong, raw is fine here
           return q.where(rawKey, "<=", high)
         }
         return q
@@ -950,12 +866,6 @@ class InternalBuilder {
             this.rawQuotedIdentifier(key),
             value,
           ])
-        } else if (this.client === SqlClient.ORACLE) {
-          const identifier = this.convertClobs(key)
-          return q.where(subq =>
-            // @ts-expect-error knex types are wrong, raw is fine here
-            subq.whereNotNull(identifier).andWhere(identifier, value)
-          )
         } else {
           return q.whereRaw(`COALESCE(?? = ?, FALSE)`, [
             this.rawQuotedIdentifier(key),
@@ -974,19 +884,6 @@ class InternalBuilder {
             this.rawQuotedIdentifier(key),
             value,
           ])
-        } else if (this.client === SqlClient.ORACLE) {
-          const identifier = this.convertClobs(key)
-          return (
-            q
-              .where(subq =>
-                subq.not
-                  // @ts-expect-error knex types are wrong, raw is fine here
-                  .whereNull(identifier)
-                  .and.where(identifier, "!=", value)
-              )
-              // @ts-expect-error knex types are wrong, raw is fine here
-              .or.whereNull(identifier)
-          )
         } else {
           return q.whereRaw(`COALESCE(?? != ?, TRUE)`, [
             this.rawQuotedIdentifier(key),
@@ -1071,21 +968,12 @@ class InternalBuilder {
         // TODO: figure out a way to remove this conditional, not relying on
         // the defaults of each datastore.
         let nulls: "first" | "last" | undefined = undefined
-        if (
-          this.client === SqlClient.POSTGRES ||
-          this.client === SqlClient.ORACLE
-        ) {
+        if (this.client === SqlClient.POSTGRES) {
           nulls = value.direction === SortOrder.ASCENDING ? "first" : "last"
         }
 
         const composite = `${aliased}.${key}`
-        let identifier
-
-        if (this.client === SqlClient.ORACLE) {
-          identifier = this.convertClobs(composite)
-        } else {
-          identifier = this.rawQuotedIdentifier(composite)
-        }
+        const identifier = this.rawQuotedIdentifier(composite)
 
         query = query.orderByRaw(`?? ?? ${nulls ? "nulls ??" : ""}`, [
           identifier,
@@ -1235,7 +1123,7 @@ class InternalBuilder {
 
       const fieldListFormatted = fieldList
         .map(f => {
-          const separator = this.client === SqlClient.ORACLE ? " VALUE " : ","
+          const separator = ","
           return this.knex.raw(`?${separator}??`, [f[0], f[1]]).toString()
         })
         .join(",")
@@ -1299,7 +1187,6 @@ class InternalBuilder {
           )
           break
         case SqlClient.MY_SQL:
-        case SqlClient.ORACLE:
           wrapperQuery = standardWrap(
             this.knex.raw(`json_arrayagg(json_object(${fieldListFormatted}))`)
           )
@@ -1418,29 +1305,10 @@ class InternalBuilder {
     let query = this.qualifiedKnex({ alias: false })
     const parsedBody = this.parseBody(body)
 
-    if (this.client === SqlClient.ORACLE) {
-      // Oracle doesn't seem to automatically insert nulls
-      // if we don't specify them, so we need to do that here
-      for (const [column, schema] of Object.entries(this.query.table.schema)) {
-        if (
-          schema.constraints?.presence === true ||
-          schema.type === FieldType.AUTO ||
-          schema.type === FieldType.LINK
-        ) {
-          continue
-        }
-
-        const value = parsedBody[column]
-        if (value == null) {
-          parsedBody[column] = null
-        }
-      }
-    } else {
-      // make sure no null values in body for creation
-      for (let [key, value] of Object.entries(parsedBody)) {
-        if (value == null) {
-          delete parsedBody[key]
-        }
+    // make sure no null values in body for creation
+    for (let [key, value] of Object.entries(parsedBody)) {
+      if (value == null) {
+        delete parsedBody[key]
       }
     }
 
@@ -1479,11 +1347,8 @@ class InternalBuilder {
         throw new Error("Primary key is required for upsert")
       }
       return query.insert(parsedBody).onConflict(primary).merge()
-    } else if (
-      this.client === SqlClient.MS_SQL ||
-      this.client === SqlClient.ORACLE
-    ) {
-      // No upsert or onConflict support in MSSQL/Oracle yet, see:
+    } else if (this.client === SqlClient.MS_SQL) {
+      // No upsert or onConflict support in MSSQL yet, see:
       //   https://github.com/knex/knex/pull/6050
       return query.insert(parsedBody)
     }
@@ -1619,9 +1484,6 @@ class SqlQueryBuilder extends SqlTableQueryBuilder {
     const sqlClient = this.getSqlClient()
     const config: Knex.Config = {
       client: this.getBaseSqlClient(),
-    }
-    if (sqlClient === SqlClient.ORACLE) {
-      config.useNullAsDefault = true
     }
     const client = knex(config)
     let query: Knex.QueryBuilder

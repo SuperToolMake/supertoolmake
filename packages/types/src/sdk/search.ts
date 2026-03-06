@@ -222,5 +222,4 @@ export enum SqlClient {
   POSTGRES = "pg",
   MY_SQL = "mysql2",
   MARIADB = "mariadb",
-  ORACLE = "oracledb",
 }

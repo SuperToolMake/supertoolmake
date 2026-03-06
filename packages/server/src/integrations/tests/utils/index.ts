@@ -7,7 +7,6 @@ import * as mariadb from "./mariadb"
 import * as mongodb from "./mongodb"
 import * as mssql from "./mssql"
 import * as mysql from "./mysql"
-import * as oracle from "./oracle"
 import * as postgres from "./postgres"
 
 export type DatasourceProvider = () => Promise<Datasource | undefined>
@@ -21,7 +20,6 @@ export enum DatabaseName {
   MYSQL = "mysql",
   SQL_SERVER = "mssql",
   MARIADB = "mariadb",
-  ORACLE = "oracle",
 }
 
 const DATASOURCE_PLUS = [
@@ -30,7 +28,6 @@ const DATASOURCE_PLUS = [
   DatabaseName.MYSQL,
   DatabaseName.SQL_SERVER,
   DatabaseName.MARIADB,
-  DatabaseName.ORACLE,
 ]
 
 const providers: Record<DatabaseName, DatasourceProvider> = {
@@ -40,7 +37,6 @@ const providers: Record<DatabaseName, DatasourceProvider> = {
   [DatabaseName.MYSQL]: mysql.getDatasource,
   [DatabaseName.SQL_SERVER]: mssql.getDatasource,
   [DatabaseName.MARIADB]: mariadb.getDatasource,
-  [DatabaseName.ORACLE]: oracle.getDatasource,
 
   // rest
   [DatabaseName.MONGODB]: mongodb.getDatasource,
@@ -63,7 +59,6 @@ export interface DatasourceDescribeReturn {
   isPostgres: boolean
   isMongodb: boolean
   isMSSQL: boolean
-  isOracle: boolean
 }
 
 async function createDatasources(
@@ -162,7 +157,6 @@ export function datasourceDescribe(opts: DatasourceDescribeOpts) {
       DatabaseName.POSTGRES,
       DatabaseName.POSTGRES_LEGACY,
       DatabaseName.SQL_SERVER,
-      DatabaseName.ORACLE,
     ].includes(dbName),
     isMySQL: dbName === DatabaseName.MYSQL,
     isPostgres:
@@ -172,7 +166,6 @@ export function datasourceDescribe(opts: DatasourceDescribeOpts) {
     isLegacy: dbName === DatabaseName.POSTGRES_LEGACY,
     isMongodb: dbName === DatabaseName.MONGODB,
     isMSSQL: dbName === DatabaseName.SQL_SERVER,
-    isOracle: dbName === DatabaseName.ORACLE,
     isMariaDB: dbName === DatabaseName.MARIADB,
   }))
 }
@@ -193,9 +186,6 @@ export async function knexClient(ds: Datasource, opts?: Knex.Config) {
     }
     case SourceName.SQL_SERVER: {
       return mssql.knexClient(ds, opts)
-    }
-    case SourceName.ORACLE: {
-      return oracle.knexClient(ds, opts)
     }
     default: {
       throw new Error(`Unsupported source: ${ds.source}`)

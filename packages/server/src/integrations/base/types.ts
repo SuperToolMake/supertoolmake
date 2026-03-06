@@ -89,21 +89,6 @@ export interface MySQLColumn {
   Extra: null | string
 }
 
-/**
- * Raw query response
- */
-export interface OracleColumnsResponse {
-  TABLE_NAME: string
-  COLUMN_NAME: string
-  DATA_TYPE: string
-  DATA_DEFAULT: null | string
-  COLUMN_ID: number
-  CONSTRAINT_NAME: null | string
-  CONSTRAINT_TYPE: null | string
-  R_CONSTRAINT_NAME: null | string
-  SEARCH_CONDITION: null | string
-}
-
 export enum TriggeringEvent {
   INSERT = "INSERT",
   DELETE = "DELETE",
@@ -125,41 +110,4 @@ export enum TriggerType {
   AFTER_STATEMENT = "AFTER STATEMENT",
   INSTEAD_OF = "INSTEAD OF",
   COMPOUND = "COMPOUND",
-}
-
-export interface OracleTriggersResponse {
-  TABLE_NAME: string
-  TRIGGER_NAME: string
-  TRIGGER_TYPE: TriggerType
-  TRIGGERING_EVENT: TriggeringEvent
-  TRIGGER_BODY: string
-}
-
-/**
- * An oracle constraint
- */
-export interface OracleConstraint {
-  name: string
-  type: string
-  relatedConstraintName: null | string
-  searchCondition: null | string
-}
-
-/**
- * An oracle column and it's related constraints
- */
-export interface OracleColumn {
-  name: string
-  type: string
-  default: null | string
-  id: number
-  constraints: { [key: string]: OracleConstraint }
-}
-
-/**
- * An oracle table and it's related columns
- */
-export interface OracleTable {
-  name: string
-  columns: { [key: string]: OracleColumn }
 }

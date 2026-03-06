@@ -103,8 +103,6 @@ async function runBuild(entry, outfile) {
       "sqlite3",
       "mysql",
       "mysql2",
-      "oracle",
-      "oracledb",
       "pg",
       "pg-query-stream",
       "pg-native",

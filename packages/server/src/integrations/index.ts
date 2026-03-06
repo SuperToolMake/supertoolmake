@@ -6,7 +6,6 @@ import mysql from "./mysql"
 import rest from "./rest"
 import firebase from "./firebase"
 import redis from "./redis"
-import oracle from "./oracle"
 import {
   SourceName,
   Integration,
@@ -24,7 +23,6 @@ const DEFINITIONS: Record<SourceName, Integration | undefined> = {
   [SourceName.REST]: rest.schema,
   [SourceName.FIRESTORE]: firebase.schema,
   [SourceName.REDIS]: redis.schema,
-  [SourceName.ORACLE]: oracle.schema,
 }
 
 type IntegrationBaseConstructor = new (...args: any[]) => IntegrationBase
@@ -46,7 +44,6 @@ const INTEGRATIONS: Record<SourceName, IntegrationBaseConstructor | undefined> =
     [SourceName.REST]: rest.integration,
     [SourceName.FIRESTORE]: firebase.integration,
     [SourceName.REDIS]: redis.integration,
-    [SourceName.ORACLE]: oracle.integration,
   }
 
 export async function getDefinition(

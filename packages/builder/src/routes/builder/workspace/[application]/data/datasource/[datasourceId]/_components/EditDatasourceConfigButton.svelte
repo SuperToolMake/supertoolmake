@@ -10,7 +10,6 @@
     if (
       datasource.source === IntegrationTypes.POSTGRES ||
       datasource.source === IntegrationTypes.MYSQL ||
-      datasource.source === IntegrationTypes.ORACLE ||
       datasource.source === IntegrationTypes.REDIS
     ) {
       return `${datasource.config.host}:${datasource.config.port}`

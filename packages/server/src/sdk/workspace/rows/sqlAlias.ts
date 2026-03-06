@@ -21,11 +21,7 @@ const WRITE_OPERATIONS: Operation[] = [
   Operation.UPDATE,
   Operation.DELETE,
 ]
-const DISABLED_WRITE_CLIENTS: SqlClient[] = [
-  SqlClient.MY_SQL,
-  SqlClient.MS_SQL,
-  SqlClient.ORACLE,
-]
+const DISABLED_WRITE_CLIENTS: SqlClient[] = [SqlClient.MY_SQL, SqlClient.MS_SQL]
 
 const DISABLED_OPERATIONS: Operation[] = [
   Operation.CREATE_TABLE,

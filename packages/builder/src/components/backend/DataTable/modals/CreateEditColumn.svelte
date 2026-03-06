@@ -766,7 +766,7 @@
       {/if}
     </div>
     {#if !editableColumn.timeOnly}
-      {#if datasource?.source !== SourceName.ORACLE && datasource?.source !== SourceName.SQL_SERVER && !editableColumn.dateOnly}
+      {#if datasource?.source !== SourceName.SQL_SERVER && !editableColumn.dateOnly}
         <div>
           <div class="row">
             <Label>Time zones</Label>

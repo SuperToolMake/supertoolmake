@@ -15,7 +15,6 @@ export const IntegrationNames = {
   MYSQL: "MySQL",
   REST: "REST",
   SQL_SERVER: "SQL Server",
-  ORACLE: "Oracle",
   GOOGLE_SHEETS: "Google Sheets",
 }
 

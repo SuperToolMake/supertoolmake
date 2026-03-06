@@ -4,11 +4,6 @@ export function isSQL(datasource: Datasource): boolean {
   if (!datasource || !datasource.source) {
     return false
   }
-  const SQL = [
-    SourceName.POSTGRES,
-    SourceName.SQL_SERVER,
-    SourceName.MYSQL,
-    SourceName.ORACLE,
-  ]
+  const SQL = [SourceName.POSTGRES, SourceName.SQL_SERVER, SourceName.MYSQL]
   return SQL.indexOf(datasource.source) !== -1 || datasource.isSQL === true
 }

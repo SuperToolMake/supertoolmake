@@ -11,7 +11,7 @@ const descriptions = datasourceDescribe({
 if (descriptions.length) {
   describe.each(descriptions)(
     "queries ($dbName)",
-    ({ config, dsProvider, isOracle, isMSSQL, isPostgres, isMySQL }) => {
+    ({ config, dsProvider, isMSSQL, isPostgres, isMySQL }) => {
       let rawDatasource: Datasource
       let datasource: Datasource
       let client: Knex
@@ -359,7 +359,7 @@ if (descriptions.length) {
             datasourceId: datasource._id!,
             queryVerb: "read",
             fields: {
-              sql: `SELECT '{{ foo }}' AS foo ${isOracle ? "FROM dual" : ""}`,
+              sql: `SELECT '{{ foo }}' AS foo `,
             },
             parameters: [],
             transformer: "return data",
@@ -370,7 +370,7 @@ if (descriptions.length) {
 
           const response = await config.api.query.preview(request)
 
-          let key = isOracle ? "FOO" : "foo"
+          let key = "foo"
           expect(response.schema).toEqual({
             [key]: {
               name: key,
@@ -413,7 +413,7 @@ if (descriptions.length) {
             datasourceId: datasource._id!,
             queryVerb: "read",
             fields: {
-              sql: `SELECT '{{ foo }}' AS foo ${isOracle ? "FROM dual" : ""}`,
+              sql: `SELECT '{{ foo }}' AS foo `,
             },
             parameters: [],
             transformer: "return data",
@@ -422,7 +422,7 @@ if (descriptions.length) {
             readable: true,
           })
 
-          let key = isOracle ? "FOO" : "foo"
+          let key = "foo"
           expect(preview.schema).toEqual({
             [key]: {
               name: key,
@@ -467,7 +467,7 @@ if (descriptions.length) {
             datasourceId: datasource._id!,
             queryVerb: "read",
             fields: {
-              sql: `SELECT '{{ foo }}' AS foo ${isOracle ? "FROM dual" : ""}`,
+              sql: `SELECT '{{ foo }}' AS foo `,
             },
             parameters: [],
             transformer: "return data",
@@ -476,7 +476,7 @@ if (descriptions.length) {
             readable: true,
           })
 
-          let key = isOracle ? "FOO" : "foo"
+          let key = "foo"
           expect(preview.schema).toEqual({
             [key]: {
               name: key,
@@ -554,46 +554,44 @@ if (descriptions.length) {
             )
           })
 
-          // Oracle doesn't automatically coerce strings into dates.
-          !isOracle &&
-            it.each(["2021-02-05T12:01:00.000Z", "2021-02-05"])(
-              "should coerce %s into a date",
-              async datetimeStr => {
-                const date = new Date(datetimeStr)
-                const query = await createQuery({
-                  fields: {
-                    sql: client(tableName)
-                      .insert({
-                        name: "foo",
-                        birthday: client.raw("{{ birthday }}"),
-                      })
-                      .toString(),
+          it.each(["2021-02-05T12:01:00.000Z", "2021-02-05"])(
+            "should coerce %s into a date",
+            async datetimeStr => {
+              const date = new Date(datetimeStr)
+              const query = await createQuery({
+                fields: {
+                  sql: client(tableName)
+                    .insert({
+                      name: "foo",
+                      birthday: client.raw("{{ birthday }}"),
+                    })
+                    .toString(),
+                },
+                parameters: [
+                  {
+                    name: "birthday",
+                    default: "",
                   },
-                  parameters: [
-                    {
-                      name: "birthday",
-                      default: "",
-                    },
-                  ],
-                  queryVerb: "create",
-                })
+                ],
+                queryVerb: "create",
+              })
 
-                const result = await config.api.query.execute(query._id!, {
-                  parameters: { birthday: datetimeStr },
-                })
+              const result = await config.api.query.execute(query._id!, {
+                parameters: { birthday: datetimeStr },
+              })
 
-                expect(result.data).toEqual([{ created: true }])
+              expect(result.data).toEqual([{ created: true }])
 
-                const rows = await client(tableName)
-                  .where({ birthday: datetimeStr })
-                  .select()
-                expect(rows).toHaveLength(1)
+              const rows = await client(tableName)
+                .where({ birthday: datetimeStr })
+                .select()
+              expect(rows).toHaveLength(1)
 
-                for (const row of rows) {
-                  expect(new Date(row.birthday)).toEqual(date)
-                }
+              for (const row of rows) {
+                expect(new Date(row.birthday)).toEqual(date)
               }
-            )
+            }
+          )
 
           it.each(["2021,02,05", "202205-1500"])(
             "should not coerce %s as a date",
@@ -927,7 +925,7 @@ if (descriptions.length) {
             } catch (err: any) {
               error = err.message
             }
-            if (isMSSQL || isOracle) {
+            if (isMSSQL) {
               expect(error).toBeUndefined()
             } else {
               expect(error).toBeDefined()
