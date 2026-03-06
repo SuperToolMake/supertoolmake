@@ -155,7 +155,7 @@ describe("/applications", () => {
         isOnboarding: "true",
       })
       expect(newWorkspace._id).toBeDefined()
-      expect(newWorkspace.name).toBe("Default workspace")
+      expect(newWorkspace.name).toBe("Workspace")
 
       // Check sample resources in the newly created app context
       await config.withApp(newWorkspace, async () => {

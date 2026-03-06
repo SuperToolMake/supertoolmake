@@ -66,7 +66,7 @@ import { doesUserHaveLock } from "../../utilities/redis"
 import { builderSocket } from "../../websockets"
 import { getGlobalUser } from "../../utilities/global"
 
-const DEFAULT_WORKSPACE_NAME = "Default workspace"
+const DEFAULT_WORKSPACE_NAME = "Workspace"
 
 // utility function, need to do away with this
 async function getLayouts() {

@@ -90,8 +90,6 @@
     "mode:cloud": "yarn env:selfhost:disable && yarn env:multi:enable && yarn env:account:disable",
     "security:audit": "node scripts/audit.js",
     "postinstall": "husky install",
-    "submodules:load": "git submodule init && git submodule update && yarn",
-    "submodules:unload": "git submodule deinit --all && yarn",
     "add-app-migration": "node scripts/add-app-migration.js --title"
   },
   "workspaces": {
