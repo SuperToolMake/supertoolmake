@@ -16,10 +16,8 @@
   type ParsedInvite = {
     _id: string
     email: string
-    builder?: {
-      apps: string[]
-    }
-    apps?: string[]
+    builder?: InviteWithCode["info"]["builder"]
+    admin?: InviteWithCode["info"]["admin"]
   }
 
   let selectedInvites: ParsedInvite[] = []
@@ -35,15 +33,11 @@
   $: schema = {
     email: {
       sortable: false,
-      width: "2fr",
+      width: "1fr",
       minWidth: "200px",
     },
     role: {
       displayName: "Access",
-      sortable: false,
-      width: "1fr",
-    },
-    apps: {
       sortable: false,
       width: "1fr",
     },
@@ -55,16 +49,13 @@
 
   const invitesToSchema = (invites: InviteWithCode[]): ParsedInvite[] => {
     return invites.map(invite => {
-      const { admin, builder, apps } = invite.info
+      const { admin, builder } = invite.info
 
       return {
         _id: invite.code,
         email: invite.email,
-        builder: {
-          apps: builder?.apps || [],
-        },
-        admin,
-        apps: apps ? [...new Set(Object.keys(apps))] : undefined,
+        builder: builder ? { ...builder } : undefined,
+        admin: admin ? { ...admin } : undefined,
       }
     })
   }

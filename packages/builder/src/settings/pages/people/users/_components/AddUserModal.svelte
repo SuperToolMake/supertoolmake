@@ -27,7 +27,7 @@
   let emailsInput = []
   let emailError = null
   const maxItems = 15
-  let selectedRole = Constants.BudibaseRoles.AppUser
+  let selectedRole = Constants.BudibaseRoles.Creator
   const builtInEndUserRoles = [Constants.Roles.BASIC, Constants.Roles.ADMIN]
   const excludedRoleIds = [
     ...builtInEndUserRoles,
@@ -76,7 +76,36 @@
   ]
   $: hasError = userData.find(x => x.error != null)
   $: parsedEmails = useWorkspaceInviteModal ? emailsInput : []
-  $: passwordInviteDisabled = $organisation?.isSSOEnforced
+  $: userCount = useWorkspaceInviteModal ? parsedEmails.length : userData.length
+  $: reached = licensing.usersLimitReached(userCount)
+  $: smtpConfigured =
+    $admin.loaded && ($admin.cloud || !!$admin.checklist?.smtp?.checked)
+  $: emailInviteDisabled = $admin.loaded ? !smtpConfigured : false
+  $: passwordInviteDisabled = $organisation.isSSOEnforced
+  $: onboardingOptions = [
+    {
+      label: "Send email invites",
+      subtitle: emailInviteDisabled ? "Requires SMTP setup" : undefined,
+      value: OnboardingType.EMAIL,
+      disabled: emailInviteDisabled,
+    },
+    {
+      label: "Generate passwords for each user",
+      value: OnboardingType.PASSWORD,
+      disabled: passwordInviteDisabled,
+    },
+  ]
+  $: if (emailInviteDisabled && passwordInviteDisabled) {
+    onboardingType = null
+  } else if (emailInviteDisabled) {
+    onboardingType = OnboardingType.PASSWORD
+  } else if (passwordInviteDisabled) {
+    onboardingType = OnboardingType.EMAIL
+  } else if (!onboardingType) {
+    onboardingType = OnboardingType.EMAIL
+  }
+
+  $: internalGroups = $groups?.filter(g => !g?.scimInfo?.isSync)
 
   function removeInput(idx) {
     userData = userData.filter((e, i) => i !== idx)
@@ -218,33 +247,27 @@
     {/if}
   </svelte:fragment>
   {#if useWorkspaceInviteModal}
-    <Layout noPadding gap="S">
-      <PillInput
-        label="Type or paste emails below, separated by commas"
-        bind:value={emailsInput}
-        error={emailError}
-        splitOnSpace={true}
-        maxItems={maxItems + 1}
-        on:change={handleEmailsChange}
-      />
+    <div class="workspace-invite-modal">
+      <Layout noPadding gap="S">
+        <PillInput
+          label="Type or paste emails below, separated by commas"
+          bind:value={emailsInput}
+          error={emailError}
+          splitOnSpace={true}
+          maxItems={maxItems + 1}
+          on:change={handleEmailsChange}
+        />
 
-      <div class="role-select">
-        <Select
-          label="Select role"
-          placeholder={false}
+        <GlobalRoleSelect
           bind:value={selectedRole}
           options={Constants.BudibaseRoleOptions}
-          getOptionLabel={option => option.label}
-          getOptionValue={option => option.value}
-          getOptionSubtitle={option => option.subtitle}
-          showSelectedSubtitle={true}
+          size="L"
         />
-      </div>
 
-      {#if workspaceOnly && selectedRole === Constants.BudibaseRoles.AppUser}
-        <div class="role-select-compact">
+        {#if workspaceOnly && selectedRole === Constants.BudibaseRoles.AppUser}
           <Select
             label="Select end user role"
+            size="L"
             bind:value={endUserRole}
             options={endUserRoleOptions}
             getOptionLabel={option => option.label}
@@ -252,31 +275,31 @@
             getOptionColour={option => option.color}
             placeholder={false}
           />
-        </div>
-      {/if}
+        {/if}
 
-      <div class="onboarding">
-        <Label>Select onboarding</Label>
-        <RadioGroup
-          bind:value={onboardingType}
-          options={[
-            {
-              label: "Send email invites",
-              value: OnboardingType.EMAIL,
-            },
-            {
-              label: "Generate passwords for each user",
-              value: OnboardingType.PASSWORD,
-              disabled: passwordInviteDisabled,
-            },
-          ]}
-          getOptionLabel={option => option.label}
-          getOptionValue={option => option.value}
-          getOptionSubtitle={option => option.subtitle}
-          getOptionDisabled={option => option.disabled}
-        />
-      </div>
-    </Layout>
+        <div class="onboarding">
+          <Label size="L">Select onboarding</Label>
+          <RadioGroup
+            bind:value={onboardingType}
+            options={onboardingOptions}
+            getOptionLabel={option => option.label}
+            getOptionValue={option => option.value}
+            getOptionSubtitle={option => option.subtitle}
+            getOptionDisabled={option => option.disabled}
+          />
+        </div>
+
+        {#if reached}
+          <div class="user-notification">
+            <Icon name="info" />
+            <span>
+              {capitalise($licensing.license.plan.type)} plan is limited to {$licensing.userLimit}
+              users. Upgrade your plan to add more users</span
+            >
+          </div>
+        {/if}
+      </Layout>
+    </div>
   {:else}
     <Layout noPadding gap="XS">
       <Label>Email address</Label>
@@ -327,7 +350,7 @@
     gap: var(--spacing-s);
   }
   .onboarding :global(.spectrum-FieldGroup--vertical) {
-    gap: var(--spacing-xs);
+    gap: 0;
   }
   .onboarding :global(.spectrum-Radio-label.radio-label) {
     display: inline-flex;
@@ -336,7 +359,7 @@
   }
   .onboarding :global(.radio-label-subtitle) {
     color: var(--spectrum-global-color-gray-600);
-    font-size: 12px;
+    font-size: 14px;
   }
   .onboarding :global(.spectrum-Radio-button:before) {
     background: var(--spectrum-global-color-black);
@@ -359,10 +382,15 @@
     align-items: flex-start;
     gap: var(--spacing-xs);
   }
-  .role-select :global(.spectrum-Picker) {
-    height: auto;
-    align-items: center;
-    padding-top: var(--spacing-m);
-    padding-bottom: var(--spacing-m);
+  .workspace-invite-modal :global(.spectrum-Radio-label),
+  .workspace-invite-modal :global(.spectrum-Textfield-input),
+  .workspace-invite-modal :global(.spectrum-Tags-itemLabel),
+  .workspace-invite-modal :global(.error),
+  .workspace-invite-modal :global(.radio-label-subtitle) {
+    font-size: 14px;
+  }
+  .workspace-invite-modal :global(.pill-input) {
+    gap: 6px;
+    padding: 8px;
   }
 </style>
