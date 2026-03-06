@@ -49,7 +49,6 @@ export enum DatasourceFieldType {
 }
 
 export enum SourceName {
-  COUCHDB = "COUCHDB",
   FIRESTORE = "FIRESTORE",
   MONGODB = "MONGODB",
   MYSQL = "MYSQL",

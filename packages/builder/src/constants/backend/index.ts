@@ -192,7 +192,6 @@ export const IntegrationTypes = {
 export const IntegrationNames = {
   [IntegrationTypes.POSTGRES]: "PostgreSQL",
   [IntegrationTypes.MONGODB]: "MongoDB",
-  [IntegrationTypes.COUCHDB]: "CouchDB",
   [IntegrationTypes.S3]: "S3",
   [IntegrationTypes.MYSQL]: "MySQL",
   [IntegrationTypes.REST]: "REST",

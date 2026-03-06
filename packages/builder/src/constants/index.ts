@@ -11,7 +11,6 @@ export const AppStatus = {
 export const IntegrationNames = {
   POSTGRES: "PostgreSQL",
   MONGODB: "MongoDB",
-  COUCHDB: "CouchDB",
   S3: "S3",
   MYSQL: "MySQL",
   REST: "REST",
