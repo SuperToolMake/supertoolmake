@@ -139,6 +139,16 @@ async function getImportableDocuments(db: Database) {
     documents = documents.concat(response.rows.map(row => row.doc!))
   }
 
+  const isWorkspaceAppDoc = (doc: Document): doc is Workspace => {
+    return doc._id?.startsWith("workspace_app_") ?? false
+  }
+  // make sure the app url is not root '/'
+  for (const doc of documents) {
+    if (isWorkspaceAppDoc(doc) && doc.url === "/") {
+      doc.url = `/${encodeURIComponent(doc.name.toLocaleLowerCase())}`
+    }
+  }
+
   const designDocs = await db.getMultiple(DESIGN_DOCUMENTS_TO_IMPORT, {
     allowMissing: true,
   })
