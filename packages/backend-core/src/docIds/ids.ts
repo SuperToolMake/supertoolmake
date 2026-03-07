@@ -12,7 +12,7 @@ import { newid } from "./newid"
  * @returns The new workspace ID which the workspace doc can be stored under.
  */
 export const generateWorkspaceID = () => {
-  return WORKSPACE_PREFIX + "573"
+  return WORKSPACE_PREFIX + "workspace"
 }
 
 /**

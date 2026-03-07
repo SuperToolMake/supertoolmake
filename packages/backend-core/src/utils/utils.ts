@@ -39,7 +39,7 @@ async function resolveAppUrl(ctx: Ctx) {
   )[0]
 
   // Multi-workspace functionality has been removed, so assume a default
-  return workspace && workspace.appId ? workspace.appId : "app_573"
+  return workspace && workspace.appId ? workspace.appId : "app_workspace"
 }
 
 export function isServingApp(ctx: Ctx) {
