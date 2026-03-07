@@ -1,6 +1,6 @@
 <script lang="ts">
   import { buildLiveUrl } from "@/helpers/urls"
-  import { appStore, screenStore, workspaceAppStore } from "@/stores/builder"
+  import { screenStore, workspaceAppStore } from "@/stores/builder"
   import * as screenTemplating from "@/templates/screenTemplating"
   import {
     Body,
@@ -198,7 +198,7 @@
       disabled={editingPublishedApp}
     />
     <div class="live-url-display">
-      {buildLiveUrl($appStore, data.url, false)}
+      {buildLiveUrl(data.url, false)}
     </div>
 
     {#if editingPublishedApp}

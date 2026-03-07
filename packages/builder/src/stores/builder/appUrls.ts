@@ -13,7 +13,7 @@ export const selectedAppUrls = derived(
 
     const previewUrl = buildPreviewUrl($appStore, workspacePrefix, route, true)
 
-    const liveUrl = buildLiveUrl($appStore, workspacePrefix, true)
+    const liveUrl = buildLiveUrl(workspacePrefix, true)
     return { previewUrl, liveUrl }
   }
 )

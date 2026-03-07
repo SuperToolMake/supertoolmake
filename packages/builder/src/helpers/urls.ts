@@ -45,11 +45,7 @@ export function buildPreviewUrl(
   return previewUrl
 }
 
-export function buildLiveUrl(
-  { url }: { url: string },
-  workspaceAppUrl: string,
-  fullUrl: boolean
-) {
+export function buildLiveUrl(workspaceAppUrl: string, fullUrl: boolean) {
   const liveUrl = buildUrl({
     paths: ["/app"],
     route: "", // Ignore the route for live urls

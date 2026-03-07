@@ -102,7 +102,7 @@
       return null
     }
 
-    const liveUrl = buildLiveUrl($appStore, workspaceApp.url ?? "", true)
+    const liveUrl = buildLiveUrl(workspaceApp.url ?? "", true)
 
     return liveUrl || null
   }

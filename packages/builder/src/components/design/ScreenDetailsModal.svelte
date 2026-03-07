@@ -19,7 +19,7 @@
 
   $: workspacePrefix = selectedWorkspaceApp ? selectedWorkspaceApp.url : ""
 
-  $: liveUrl = buildLiveUrl($appStore, workspacePrefix, true)
+  $: liveUrl = buildLiveUrl(workspacePrefix, true)
 
   $: hashRoute = !route ? "" : `#${route}`
 
