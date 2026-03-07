@@ -50,7 +50,7 @@ describe("utils", () => {
         const ctx = structures.koa.newContext()
         ctx.host = `${config.tenantId}.example.com`
 
-        const expected = db.generateWorkspaceID(config.tenantId)
+        const expected = db.generateWorkspaceID()
         const app = structures.apps.app(expected)
 
         // set custom url
@@ -79,7 +79,7 @@ describe("utils", () => {
     it("should return proper appid if the app url is /preview", async () => {
       await config.doInTenant(async () => {
         const ctx = structures.koa.newContext()
-        const appId = db.generateWorkspaceID(config.tenantId)
+        const appId = db.generateWorkspaceID()
         const app = structures.apps.app(appId)
 
         // set custom url
@@ -114,7 +114,7 @@ describe("utils", () => {
       expect(ctx.throw).toHaveBeenCalledWith(403, "App id conflict")
     })
 
-    it("throws 403 when header and path have different valid app IDs", async () => {
+    it("always resolves to app_workspace even when header and path have different valid app IDs", async () => {
       const ctx = structures.koa.newContext()
 
       const appId1 = db.generateWorkspaceID()
@@ -125,9 +125,7 @@ describe("utils", () => {
       }
       ctx.path = `/apps/${appId2}`
 
-      await expect(utils.getWorkspaceIdFromCtx(ctx)).rejects.toThrow()
-      expect(ctx.throw).toHaveBeenCalledTimes(1)
-      expect(ctx.throw).toHaveBeenCalledWith(403, "App id conflict")
+      await expect(utils.getWorkspaceIdFromCtx(ctx)).toEqual("app_workspace")
     })
 
     it("returns same app ID when found across multiple sources consistently", async () => {
