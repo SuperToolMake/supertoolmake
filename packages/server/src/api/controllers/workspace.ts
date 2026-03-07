@@ -353,7 +353,6 @@ async function performWorkspaceCreate(
 
   const isOnboarding = body.isOnboarding === "true"
   const useTemplate = body.useTemplate === "true"
-  const tenantId = tenancy.isMultiTenant() ? tenancy.getTenantId() : null
 
   const appName = isOnboarding ? DEFAULT_WORKSPACE_NAME : name
 
