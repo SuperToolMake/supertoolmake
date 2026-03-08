@@ -54,14 +54,6 @@ export function getTableParams(tableId?: Optional, otherProps = {}) {
 }
 
 /**
- * Generates a new table ID.
- * @returns The new table ID which the table doc can be stored under.
- */
-export function generateTableID() {
-  return dbCore.generateTableID()
-}
-
-/**
  * Generates a new link doc ID. This is currently not usable with the alldocs call,
  * instead a view is built to make walking to tree easier.
  * @param tableId1 The ID of the linker table.
