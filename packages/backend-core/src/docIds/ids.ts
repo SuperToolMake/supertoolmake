@@ -11,16 +11,12 @@ import { newid } from "./newid"
  * Multi-workspace functionality has been removed, so assume a defaults
  * @returns The new workspace ID which the workspace doc can be stored under.
  */
-export const generateWorkspaceID = () => {
-  return WORKSPACE_PREFIX + "workspace"
-}
-
-/**
- * Generates a new table ID.
- * @returns The new table ID which the table doc can be stored under.
- */
-export function generateTableID() {
-  return `${DocumentType.TABLE}${SEPARATOR}${newid()}`
+export const generateWorkspaceID = (tenantId?: string) => {
+  let id = WORKSPACE_PREFIX
+  if (tenantId) {
+    id += `${tenantId}${SEPARATOR}`
+  }
+  return `${id}workspace`
 }
 
 /**
