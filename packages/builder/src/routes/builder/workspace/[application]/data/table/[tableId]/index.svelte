@@ -102,7 +102,6 @@
   $: relationshipsEnabled = relationshipSupport(tableDatasource)
   $: currentTheme = $themeStore?.theme
   $: darkMode = !currentTheme.includes("light")
-  $: canSwitchToProduction = isInternal
   $: isProductionMode =
     $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION
   $: isDeployed =

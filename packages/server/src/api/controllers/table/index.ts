@@ -288,9 +288,6 @@ export async function publish(
     _id === tableId ||
     _id.endsWith(`${SEPARATOR}${tableId}`) ||
     _id.includes(tableSegment)
-  const isDataDoc = (_id: string) =>
-    _id.startsWith(`${DocumentType.ROW}${SEPARATOR}`) ||
-    _id.startsWith(`${DocumentType.LINK}${SEPARATOR}`)
 
   const replication = new dbCore.Replication({
     source: dbCore.getDevWorkspaceID(appId),
