@@ -60,7 +60,10 @@ describe("/api/global/roles", () => {
   })
 
   beforeEach(async () => {
-    workspaceId = db.generateWorkspaceID(config.tenantId)
+    workspaceId = db.generateWorkspaceID({
+      tenantId: config.tenantId,
+      random: true,
+    })
     workspaceDb = db.getDB(workspaceId)
     const mockWorkspaceDB = context.getWorkspaceDB as jest.Mock
     mockWorkspaceDB.mockReturnValue(workspaceDb)
