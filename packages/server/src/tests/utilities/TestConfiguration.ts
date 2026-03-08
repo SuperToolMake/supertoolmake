@@ -659,7 +659,6 @@ export default class TestConfiguration {
 
   async publish() {
     await this._req(deployController.publishWorkspace)
-    // @ts-ignore
     const prodAppId = this.getDevWorkspaceId().replace("_dev", "")
     this.prodWorkspaceId = prodAppId
 
