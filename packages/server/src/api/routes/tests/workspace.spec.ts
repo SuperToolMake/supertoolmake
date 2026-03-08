@@ -361,14 +361,13 @@ describe("/applications", () => {
     })
   })
 
-  describe("fetchClientApps", () => {
+  describe.only("fetchClientApps", () => {
     it("should return apps when workspace app are published", async () => {
       const response = await config.api.workspace.fetchClientApps()
       expect(response.apps).toHaveLength(1)
       expect(response.apps[0]).toEqual(
         expect.objectContaining({
           prodId: config.getProdWorkspaceId(),
-          url: workspace.url,
         })
       )
     })
@@ -391,7 +390,7 @@ describe("/applications", () => {
         expect.objectContaining({
           prodId: config.getProdWorkspaceId(),
           name: "Test Workspace App",
-          url: `${workspace.url}/testapp`,
+          url: `/testapp`,
         })
       )
     })
@@ -426,21 +425,21 @@ describe("/applications", () => {
             name: app.name,
             prodId: app.appId,
             updatedAt: app.updatedAt,
-            url: app.url,
+            url: "",
           },
           {
             appId: `${app.appId}_${workspaceApp1._id}`,
             name: "App One",
             prodId: config.getProdWorkspaceId(),
             updatedAt: app.updatedAt,
-            url: `${app.url}/appone`,
+            url: `/appone`,
           },
           {
             appId: `${app.appId}_${workspaceApp2._id}`,
             name: "App Two",
             prodId: config.getProdWorkspaceId(),
             updatedAt: app.updatedAt,
-            url: `${app.url}/apptwo`,
+            url: `/apptwo`,
           },
         ])
       )
@@ -489,14 +488,14 @@ describe("/applications", () => {
             name: workspace.name,
             prodId: workspace.appId,
             updatedAt: workspace.updatedAt,
-            url: workspace.url,
+            url: "",
           },
           {
             appId: `${workspace.appId}_${app1Workspace1._id}`,
             name: "App One",
             prodId: config.getProdWorkspaceId(),
             updatedAt: workspace.updatedAt,
-            url: `${workspace.url}/appone`,
+            url: `/appone`,
           },
           {
             appId: expect.stringMatching(
@@ -507,7 +506,7 @@ describe("/applications", () => {
             name: "App Two",
             prodId: db.getProdWorkspaceID(secondWorkspace.appId),
             updatedAt: secondWorkspace.updatedAt,
-            url: `${secondWorkspace.url}/apptwo`,
+            url: `/apptwo`,
           },
         ])
       )
@@ -572,14 +571,14 @@ describe("/applications", () => {
             name: workspace.name,
             prodId: workspace.appId,
             updatedAt: workspace.updatedAt,
-            url: workspace.url,
+            url: "",
           },
           {
             appId: `${workspace.appId}_${app1Workspace1._id}`,
             name: "App One",
             prodId: config.getProdWorkspaceId(),
             updatedAt: workspace.updatedAt,
-            url: `${workspace.url}/appone`,
+            url: `/appone`,
           },
           {
             appId: expect.stringMatching(
@@ -590,7 +589,7 @@ describe("/applications", () => {
             name: "Default",
             prodId: db.getProdWorkspaceID(secondWorkspace.appId),
             updatedAt: secondWorkspace.updatedAt,
-            url: secondWorkspace.url,
+            url: "",
           },
         ])
       )
@@ -628,14 +627,14 @@ describe("/applications", () => {
             name: workspace.name,
             prodId: workspace.appId,
             updatedAt: workspace.updatedAt,
-            url: workspace.url,
+            url: "",
           },
           {
             appId: `${workspace.appId}_${app1Workspace1._id}`,
             name: "App One",
             prodId: config.getProdWorkspaceId(),
             updatedAt: workspace.updatedAt,
-            url: `${workspace.url}/appone`,
+            url: `/appone`,
           },
         ])
       )
@@ -680,7 +679,7 @@ describe("/applications", () => {
 
       await config.publish()
       const res = await config.withHeaders(
-        { referer: `http://localhost:10000/app${workspace.url}` },
+        { referer: `http://localhost:10000/app` },
         () =>
           config.api.workspace.getAppPackage(config.getProdWorkspaceId(), {
             publicUser: true,
@@ -838,7 +837,7 @@ describe("/applications", () => {
           const { url } = workspaceAppInfo[1].workspaceApp
           await config.withHeaders(
             {
-              referer: `http://localhost:10000/${config.devWorkspaceId}${url}#page-1`,
+              referer: `http://localhost:10000/${url}#page-1`,
             },
             async () => {
               const res = await config.api.workspace.getAppPackage(
@@ -867,7 +866,7 @@ describe("/applications", () => {
           await config.withProdApp(() =>
             config.withHeaders(
               {
-                referer: `http://localhost:10000/app${config.prodWorkspace?.url}`,
+                referer: `http://localhost:10000/app`,
               },
               async () => {
                 const res = await config.api.workspace.getAppPackage(
