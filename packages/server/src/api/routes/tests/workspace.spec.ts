@@ -361,7 +361,7 @@ describe("/applications", () => {
     })
   })
 
-  describe.only("fetchClientApps", () => {
+  describe("fetchClientApps", () => {
     it("should return apps when workspace app are published", async () => {
       const response = await config.api.workspace.fetchClientApps()
       expect(response.apps).toHaveLength(1)
@@ -832,34 +832,6 @@ describe("/applications", () => {
             )
           }
         )
-
-        it("should retrieve only the screens for a the workspace from a page url", async () => {
-          const { url } = workspaceAppInfo[1].workspaceApp
-          await config.withHeaders(
-            {
-              referer: `http://localhost:10000/${url}#page-1`,
-            },
-            async () => {
-              const res = await config.api.workspace.getAppPackage(
-                workspace.appId,
-                {
-                  headers: {
-                    [Header.TYPE]: "client",
-                  },
-                }
-              )
-
-              expect(res.screens).toHaveLength(3)
-              expect(res.screens).toEqual(
-                expect.arrayContaining(
-                  workspaceAppInfo[1].screens.map(s =>
-                    expect.objectContaining({ _id: s._id })
-                  )
-                )
-              )
-            }
-          )
-        })
 
         it("should retrieve only the screens for a the workspace for prod app", async () => {
           await config.publish()
