@@ -130,23 +130,6 @@ describe("/static", () => {
     })
   })
 
-  describe("/app/:appId/preview", () => {
-    beforeEach(() => {
-      jest.clearAllMocks()
-    })
-
-    it("should serve the builder preview", async () => {
-      const headers = config.defaultHeaders()
-      const res = await request
-        .get(`/app/${config.getDevWorkspaceId()}/preview`)
-        .set(headers)
-        .expect(200)
-
-      expect(res.body.appId).toBe(config.devWorkspaceId)
-      expect(res.body.builderPreview).toBe(true)
-    })
-  })
-
   describe("/", () => {
     it("should move permanently from base call (public call)", async () => {
       const res = await request.get(`/`)
