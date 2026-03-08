@@ -539,7 +539,7 @@ export default class TestConfiguration {
   async newTenant(appName = newid()): Promise<Workspace> {
     this.csrfToken = generator.hash()
 
-    this.tenantId = "default"
+    this.tenantId = structures.tenant.id()
     this.user = await this.globalUser()
     this.userMetadataId = generateUserMetadataID(this.user._id!)
 

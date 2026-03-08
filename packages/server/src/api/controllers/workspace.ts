@@ -131,24 +131,20 @@ interface AppTemplate {
 }
 
 async function createInstance(appId: string) {
-  try {
-    const db = context.getWorkspaceDB()
-    await db.put({
-      _id: "_design/database",
-      // view collation information, read before writing any complex views:
-      // https://docs.couchdb.org/en/master/ddocs/views/collation.html#collation-specification
-      views: {},
-    })
+  const db = context.getWorkspaceDB()
+  await db.put({
+    _id: "_design/database",
+    // view collation information, read before writing any complex views:
+    // https://docs.couchdb.org/en/master/ddocs/views/collation.html#collation-specification
+    views: {},
+  })
 
-    // NOTE: indexes need to be created before any tables/templates
-    // add view for linked rows
-    await createLinkView()
-    await createRoutingView()
+  // NOTE: indexes need to be created before any tables/templates
+  // add view for linked rows
+  await createLinkView()
+  await createRoutingView()
 
-    await db.put(USERS_TABLE_SCHEMA)
-  } catch (e) {
-    // conflict during tests, just continue
-  }
+  await db.put(USERS_TABLE_SCHEMA)
 
   return { _id: appId }
 }
