@@ -7,6 +7,7 @@
   export let error
   export let placeholder
   export let defaultHideConnectionUrl: boolean | undefined = false
+  export let size: "S" | "M" | "L" | "XL" = "L"
 
   const dispatch = createEventDispatcher()
 
@@ -81,6 +82,7 @@
   >
     <textarea
       class="spectrum-Textfield-input"
+      class:spectrum-Textfield-input--large={size === "L"}
       value={inputValue}
       placeholder={placeholder ||
         "postgresql://user:password@host:5432/database"}
@@ -116,8 +118,11 @@
     display: flex;
     align-items: center;
   }
+  .spectrum-Textfield-input--large {
+    max-width: 600px;
+  }
+
   textarea {
-    width: 100%;
     resize: none;
     min-height: 48px !important;
     padding-top: 12px !important;
