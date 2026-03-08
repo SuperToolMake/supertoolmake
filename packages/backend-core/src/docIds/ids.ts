@@ -8,15 +8,19 @@ import { newid } from "./newid"
 
 /**
  * Generates a default workspace ID.
- * Multi-workspace functionality has been removed, so assume a defaults
+ * Multi-workspace functionality has been removed, so assume defaults
+ * @param opts Optionally allow a random workspaceId to be generated, for testing as an example
  * @returns The new workspace ID which the workspace doc can be stored under.
  */
-export const generateWorkspaceID = (tenantId?: string) => {
+export const generateWorkspaceID = (opts?: {
+  tenantId?: string
+  random: boolean
+}) => {
   let id = WORKSPACE_PREFIX
-  if (tenantId) {
-    id += `${tenantId}${SEPARATOR}`
+  if (opts?.tenantId) {
+    id += `${opts.tenantId}${SEPARATOR}`
   }
-  return `${id}workspace`
+  return `${id}${opts?.random ? newid() : "workspace"}`
 }
 
 /**

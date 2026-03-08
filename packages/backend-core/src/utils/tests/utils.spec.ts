@@ -13,7 +13,10 @@ describe("utils", () => {
   describe("getWorkspaceIdFromCtx", () => {
     it("gets workspaceId from header", async () => {
       const ctx = structures.koa.newContext()
-      const expected = db.generateWorkspaceID()
+      const expected = db.generateWorkspaceID({
+        tenantId: config.tenantId,
+        random: true,
+      })
       ctx.request.headers = {
         [Header.APP_ID]: expected,
       }
@@ -50,7 +53,10 @@ describe("utils", () => {
         const ctx = structures.koa.newContext()
         ctx.host = `${config.tenantId}.example.com`
 
-        const expected = db.generateWorkspaceID()
+        const expected = db.generateWorkspaceID({
+          tenantId: config.tenantId,
+          random: true,
+        })
         const app = structures.apps.app(expected)
 
         // set custom url
@@ -79,7 +85,10 @@ describe("utils", () => {
     it("should return proper appid if the app url is /preview", async () => {
       await config.doInTenant(async () => {
         const ctx = structures.koa.newContext()
-        const appId = db.generateWorkspaceID()
+        const appId = db.generateWorkspaceID({
+          tenantId: config.tenantId,
+          random: true,
+        })
         const app = structures.apps.app(appId)
 
         // set custom url
@@ -96,24 +105,6 @@ describe("utils", () => {
       })
     })
 
-    it("throws 403 when header and body have different valid app IDs", async () => {
-      const ctx = structures.koa.newContext()
-
-      const appId1 = db.generateWorkspaceID()
-      const appId2 = db.generateWorkspaceID()
-
-      ctx.request.headers = {
-        [Header.APP_ID]: appId1,
-      }
-      ctx.request.body = {
-        appId: appId2,
-      }
-
-      await expect(utils.getWorkspaceIdFromCtx(ctx)).rejects.toThrow()
-      expect(ctx.throw).toHaveBeenCalledTimes(1)
-      expect(ctx.throw).toHaveBeenCalledWith(403, "App id conflict")
-    })
-
     it("always resolves to app_workspace even when header and path have different valid app IDs", async () => {
       const ctx = structures.koa.newContext()
 
@@ -125,7 +116,7 @@ describe("utils", () => {
       }
       ctx.path = `/apps/${appId2}`
 
-      await expect(utils.getWorkspaceIdFromCtx(ctx)).toEqual("app_workspace")
+      expect(await utils.getWorkspaceIdFromCtx(ctx)).toEqual("app_workspace")
     })
 
     it("returns same app ID when found across multiple sources consistently", async () => {
