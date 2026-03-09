@@ -30,6 +30,15 @@
     "[data-grid-ignore]",
   ]
 
+  const hasTextSelection = () => {
+    const selection = window.getSelection()
+    if (!selection || selection.rangeCount === 0) {
+      return false
+    }
+    const selectedText = selection.toString().trim()
+    return selectedText.length > 0
+  }
+
   // Global key listener which intercepts all key events
   const handleKeyDown = e => {
     // Ignore completely if the grid is not focused
@@ -56,6 +65,9 @@
     if (e.metaKey || e.ctrlKey) {
       switch (e.key) {
         case "c":
+          if (hasTextSelection()) {
+            return
+          }
           return handle(() => dispatch("copy"))
         case "v":
           return dispatch("paste")
