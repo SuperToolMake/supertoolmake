@@ -119,7 +119,7 @@
     align-items: center;
   }
   .spectrum-Textfield-input--large {
-    max-width: 600px;
+    max-width: 562px;
   }
 
   textarea {
@@ -128,7 +128,6 @@
     padding-top: 12px !important;
     padding-bottom: 12px !important;
     field-sizing: content;
-    padding-right: 36px;
   }
   .visibility-toggle {
     position: absolute;
