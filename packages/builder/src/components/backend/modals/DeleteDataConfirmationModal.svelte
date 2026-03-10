@@ -12,6 +12,7 @@
   import { SourceType, Theme } from "@budibase/types"
   import { goto as gotoStore, params as paramsStore } from "@roxi/routify"
   import { DB_TYPE_EXTERNAL } from "@/constants/backend"
+  import { IntegrationTypes } from "@/constants/backend"
   import { get } from "svelte/store"
   import type { Table, Datasource, Query } from "@budibase/types"
   import { themeStore } from "@/stores/portal"
@@ -104,9 +105,55 @@
     try {
       // Go back to the datasource if we are deleting the active query
       if ($queries.selectedQueryId === query._id) {
-        goto(`./datasource/[datasourceId]`, {
-          datasourceId: query.datasourceId,
-        })
+        const appId = $appStore.appId
+        const datasource = $datasources.list.find(
+          ds => ds._id === query.datasourceId
+        )
+        const isRestQuery = datasource?.source === IntegrationTypes.REST
+
+        if (!isRestQuery) {
+          goto(
+            `/builder/workspace/${appId}/data/datasource/${query.datasourceId}`
+          )
+        } else {
+          const base = `/builder/workspace/${appId}/apis`
+          const nextQuery = $queries.list.find(
+            q => q.datasourceId === query.datasourceId && q._id !== query._id
+          )
+          if (nextQuery) {
+            goto(`${base}/query/${nextQuery._id}`)
+          } else {
+            // For the scenario where the datasource has no remaining queries,
+            // prefer other REST datasources that have queries (alphabetical order)
+            const otherDatasources = $datasources.list
+              .filter(
+                ds =>
+                  ds.source === IntegrationTypes.REST &&
+                  ds._id !== query.datasourceId
+              )
+              .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
+
+            let found = false
+            for (const ds of otherDatasources) {
+              const otherQuery = $queries.list.find(
+                q => q.datasourceId === ds._id
+              )
+              if (otherQuery) {
+                goto(`${base}/query/${otherQuery._id}`)
+                found = true
+                break
+              }
+            }
+
+            if (!found) {
+              if (otherDatasources.length) {
+                goto(`${base}/query/new/${otherDatasources[0]._id}`)
+              } else {
+                goto(`${base}/query/new/${query.datasourceId}`)
+              }
+            }
+          }
+        }
       }
       await queries.delete(query)
       await datasources.fetch()

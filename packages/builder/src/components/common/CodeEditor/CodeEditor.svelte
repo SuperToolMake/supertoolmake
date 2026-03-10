@@ -86,12 +86,13 @@
   export let lineWrapping = true
   export let renderBindingsAsTags = false
   export let renderMarkdownDecorations = false
+  // Allows context specific customisation, like the params in API Editor
+  export let extraExtensions: Extension[] = []
   export let getCaretPosition: CaretPositionFn = () => ({
     start: 0,
     end: 0,
   })
   export let insertAtPos: InsertAtPositionFn = () => {}
-
   const dispatch = createEventDispatcher()
 
   let textarea: HTMLDivElement
@@ -487,6 +488,7 @@
       doc: String(value),
       extensions: buildExtensions([
         ...baseExtensions,
+        ...extraExtensions,
         dropdown == DropdownPosition.Absolute
           ? tooltips({
               position: "absolute",
