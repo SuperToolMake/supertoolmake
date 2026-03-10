@@ -1,10 +1,8 @@
 <script lang="ts">
   import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
-  import HeroBanner from "@/components/common/HeroBanner.svelte"
   import PublishStatusBadge from "@/components/common/PublishStatusBadge.svelte"
   import TopBar from "@/components/common/TopBar.svelte"
   import VersionModal from "@/components/deploy/VersionModal.svelte"
-  import { BannerType } from "@/constants/banners"
   import { capitalise, durationFromNow } from "@/helpers"
   import { buildLiveUrl } from "@/helpers/urls"
   import FavouriteResourceButton from "@/routes/builder/_components/FavouriteResourceButton.svelte"
@@ -32,7 +30,6 @@
     WorkspaceResource,
     type UIWorkspaceApp,
   } from "@budibase/types"
-  import AppsHero from "assets/apps-hero-x1.png"
   import NoResults from "../_components/NoResults.svelte"
   import { url } from "@roxi/routify"
 
@@ -221,18 +218,6 @@
 </script>
 
 <div class="apps-index">
-  <HeroBanner
-    key={BannerType.APPS}
-    title="Build modern apps and forms to power your workflows"
-    linkTitle="App building 101"
-    linkHref="https://docs.budibase.com/docs/app-building-101"
-    image={AppsHero}
-    color="#732B00"
-  >
-    Transform internal workflows with modern apps and forms. Connect SQL, REST
-    APIs and create beautiful interfaces with pre-built components in minutes.
-  </HeroBanner>
-
   <TopBar icon="browser" breadcrumbs={[{ text: "Apps" }]} showPublish={false}>
     {#if updateAvailable && $isOnlyUser}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
