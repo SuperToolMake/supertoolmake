@@ -39,6 +39,7 @@ docker run -d -t \
   --name=supertoolmake \
   -p 10000:80 \
   -v /local/path/data:/data \
+  -v /local/path/data:/opt/couchdb/data \
   --restart unless-stopped \
   ghcr.io/supertoolmake/supertoolmake:latest
 ```
