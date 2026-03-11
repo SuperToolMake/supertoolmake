@@ -94,7 +94,9 @@
   ]
   $: enrichedCommands = commands.map(cmd => ({
     ...cmd,
-    searchValue: `${cmd.type} ${cmd.name}`.toLowerCase().replace(/_/g, " "),
+    searchValue: `${cmd.type} ${cmd.name} ${cmd.codeName || ""}`
+      .toLowerCase()
+      .replace(/_/g, " "),
   }))
   $: results = filterResults(enrichedCommands, search, inApp)
   $: categories = groupResults(results)
@@ -326,8 +328,10 @@
                 <Icon size="M" name={command.icon} />
                 <strong>{command.type}:&nbsp;</strong>
                 <div class="name">
-                  <!--eslint-disable-next-line svelte/no-at-html-tags-->
-                  {@html command.name}
+                  {command.name}
+                  {#if command.codeName}
+                    <code>{command.codeName}</code>
+                  {/if}
                 </div>
               </div>
             {/each}
@@ -405,6 +409,7 @@
     white-space: nowrap;
   }
   .name :global(code) {
+    margin-left: 4px;
     font-size: 12px;
     background: var(--background-alt);
     padding: 4px;
