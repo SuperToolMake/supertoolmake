@@ -228,7 +228,8 @@
       defaultAuthApplied = true
     } else if (
       defaultAuth &&
-      (editableQuery.fields?.authConfigId || editableQuery.fields?.authConfigType)
+      (editableQuery.fields?.authConfigId ||
+        editableQuery.fields?.authConfigType)
     ) {
       defaultAuthApplied = true
     }
@@ -590,10 +591,7 @@
       const datasourceType = datasource?.source
       const integrationInfo = $integrations[datasourceType]
 
-      const { _id } = await queries.save(
-        queryToSave.datasourceId,
-        queryToSave
-      )
+      const { _id } = await queries.save(queryToSave.datasourceId, queryToSave)
 
       const existingVariables = datasource?.config?.dynamicVariables || []
       const updatedVariables = rebuildVariables(
@@ -705,9 +703,8 @@
   ) => {
     if (editableQuery) {
       editableQuery.fields.headers = keyValueArrayToRecord(e.detail)
-      editableQuery.fields.disabledHeaders = restUtils.flipHeaderState(
-        enabledHeaders
-      )
+      editableQuery.fields.disabledHeaders =
+        restUtils.flipHeaderState(enabledHeaders)
     }
   }
 
@@ -912,7 +909,6 @@
 
     return updated
   }
-
 </script>
 
 <div class="request-heading">
