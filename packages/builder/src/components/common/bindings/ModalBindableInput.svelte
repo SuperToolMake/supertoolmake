@@ -4,7 +4,7 @@
 
 <DrawerBindableInput
   {...$$props}
-  drawerForceModal
+  forceModal
   on:change
   on:blur
   on:drawerHide

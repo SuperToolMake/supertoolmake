@@ -1,11 +1,10 @@
 <script>
   import { queries, datasources } from "@/stores/builder"
   import QueryViewer from "@/components/integration/QueryViewer.svelte"
+  import RestQueryViewer from "@/components/integration/RestQueryViewer.svelte"
   import { IntegrationTypes } from "@/constants/backend"
   import { cloneDeep } from "lodash/fp"
-  import { params, goto as gotoStore } from "@roxi/routify"
-
-  $: goto = $gotoStore
+  import { goto } from "@roxi/routify"
 
   $: query = $queries.selected
   $: editableQuery = cloneDeep(query)
@@ -13,14 +12,15 @@
   $: isRestQuery = datasource?.source === IntegrationTypes.REST
   $: {
     if (query && isRestQuery) {
-      goto(`/builder/workspace/[application]/apis/query/[queryId]`, {
-        application: $params.application,
-        queryId: query._id,
-      })
+      $goto(`../../../apis/query/[queryId]`, { queryId: query._id })
     }
   }
 </script>
 
-{#if query && !isRestQuery}
-  <QueryViewer query={editableQuery} />
+{#if query}
+  {#if isRestQuery}
+    <RestQueryViewer queryId={$queries.selectedQueryId} />
+  {:else}
+    <QueryViewer query={editableQuery} />
+  {/if}
 {/if}

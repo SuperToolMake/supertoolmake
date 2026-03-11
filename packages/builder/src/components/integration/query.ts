@@ -174,8 +174,8 @@ export function buildQueryBindings(
 
   const dataSourceStaticBindings = toBindingsArray(
     staticVariables,
-    "Connection.Static",
-    "Connection Static"
+    "Datasource.Static",
+    "Datasource Static"
   ) as EnrichedBinding[]
 
   const mergedBindings: EnrichedBinding[] = [

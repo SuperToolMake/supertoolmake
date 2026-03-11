@@ -23,8 +23,7 @@
   export let updateOnChange: boolean = true
   export let key: string | null = null
   export let disableBindings: boolean = false
-  export let drawerForceModal: boolean = false
-  export let drawerZIndex: number | undefined = undefined
+  export let forceModal: boolean = false
   export let context: any | undefined = undefined
   export let autocomplete: boolean | undefined = undefined
   export let multiline: boolean = false
@@ -102,8 +101,7 @@
   on:drawerShow
   bind:this={bindingDrawer}
   title={title || placeholder || "Bindings"}
-  forceModal={drawerForceModal}
-  zIndex={drawerZIndex}
+  {forceModal}
 >
   <Button cta slot="buttons" on:click={saveBinding}>Save</Button>
   <svelte:component

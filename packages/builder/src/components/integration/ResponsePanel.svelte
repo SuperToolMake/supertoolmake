@@ -223,6 +223,9 @@
     display: flex;
     gap: var(--spacing-m);
   }
+  .stats.compact {
+    justify-content: space-between;
+  }
   .green {
     color: var(--spectrum-global-color-green-600);
   }
