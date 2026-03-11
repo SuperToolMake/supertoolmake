@@ -62,15 +62,7 @@ RUN mkdir -p /var/log/nginx && \
     usermod -a -G tty www-data
 
 # Setup minio
-WORKDIR /minio
-
-# A 2022 version of minio that supports gateway mode
-COPY scripts/resources/minio /minio
-RUN chmod +x minio
-
-# Handles the installation of minio in non-aas environments
-COPY scripts/install-minio.sh ./install.sh
-RUN chmod +x install.sh && ./install.sh
+COPY --from=minio/minio:latest /usr/bin/minio /minio/minio
 
 # Setup redis
 COPY hosting/single/redis.conf /etc/redis/redis.conf
