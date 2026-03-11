@@ -7,8 +7,7 @@ RUN apt-get update && \
   apt-get install -y --no-install-recommends redis-server
 
 WORKDIR /minio
-ADD scripts/install-minio.sh ./install.sh
-RUN chmod +x install.sh && ./install.sh
+COPY --from=minio/minio:latest /usr/bin/minio /minio/minio
 
 WORKDIR /
 
