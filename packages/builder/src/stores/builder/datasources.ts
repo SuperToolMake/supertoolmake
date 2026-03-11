@@ -352,4 +352,23 @@ export class DatasourceStore extends DerivedBudiStore<
   }
 }
 
+export const hasRestTemplate = (
+  datasource?: Datasource | UIInternalDatasource
+): datasource is Datasource & { restTemplate: RestTemplateName } => {
+  return !!(
+    datasource &&
+    datasource.source === SourceName.REST &&
+    (datasource as Datasource).restTemplate
+  )
+}
+
+export const getRestTemplateIdentifier = (
+  datasource?: Datasource | UIInternalDatasource
+): RestTemplateName | undefined => {
+  if (!hasRestTemplate(datasource)) {
+    return undefined
+  }
+  return datasource.restTemplate
+}
+
 export const datasources = new DatasourceStore()
