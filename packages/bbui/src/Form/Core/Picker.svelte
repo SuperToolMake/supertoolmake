@@ -279,7 +279,6 @@
   <div
     class="popover-content"
     class:auto-width={autoWidth}
-    class:wrap-text={wrapText}
     class:size-s={size === "S"}
     class:size-m={size === "M"}
     class:size-l={size === "L"}
