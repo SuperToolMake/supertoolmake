@@ -17,6 +17,7 @@
 
   export let application
 
+  let sideNav
   let promise = getPackage(application)
   let showInviteUsersModal = false
   $: if ($bb.settings.open && showInviteUsersModal) {

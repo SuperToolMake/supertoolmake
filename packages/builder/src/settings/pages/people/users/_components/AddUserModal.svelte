@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import {
     keepOpen,
     Label,
@@ -14,7 +14,8 @@
   import { organisation } from "@/stores/portal/organisation"
   import { roles } from "@/stores/builder"
   import { Constants, emailValidator } from "@budibase/frontend-core"
-
+  import { admin } from "@/stores/portal"
+  import GlobalRoleSelect from "@/components/common/GlobalRoleSelect.svelte"
   import { OnboardingType } from "@/constants"
 
   export let showOnboardingTypeModal
@@ -24,8 +25,8 @@
   export let inviteTitle = "Invite users to workspace"
 
   const password = generatePassword(12)
-  let emailsInput = []
-  let emailError = null
+  let emailsInput: string[] = []
+  let emailError: string | null = null
   const maxItems = 15
   let selectedRole = Constants.BudibaseRoles.Creator
   const builtInEndUserRoles = [Constants.Roles.BASIC, Constants.Roles.ADMIN]
@@ -36,11 +37,14 @@
     Constants.Roles.CREATOR,
     Constants.Roles.GROUP,
   ]
-  let roleColorLookup = {}
-  $: roleColorLookup = ($roles || []).reduce((acc, role) => {
-    acc[role._id] = role.uiMetadata?.color
-    return acc
-  }, {})
+  let roleColorLookup: Record<string, string | undefined> = {}
+  $: roleColorLookup = ($roles || []).reduce(
+    (acc: Record<string, string | undefined>, role) => {
+      acc[role._id] = role.uiMetadata?.color
+      return acc
+    },
+    {} as Record<string, string | undefined>
+  )
   $: customEndUserRoleOptions = ($roles || [])
     .filter(role => !excludedRoleIds.includes(role._id))
     .map(role => ({
@@ -64,20 +68,29 @@
     ...customEndUserRoleOptions,
   ]
   let endUserRole = Constants.Roles.BASIC
-  let onboardingType = OnboardingType.EMAIL
+  let onboardingType:
+    | (typeof OnboardingType)[keyof typeof OnboardingType]
+    | null = OnboardingType.EMAIL
 
-  $: userData = [
+  type UserData = {
+    email: string
+    role: string
+    password: string
+    forceResetPassword: boolean
+    error: string | null
+  }
+
+  let userData: UserData[] = [
     {
       email: "",
       role: "appUser",
       password,
       forceResetPassword: true,
+      error: null,
     },
   ]
   $: hasError = userData.find(x => x.error != null)
   $: parsedEmails = useWorkspaceInviteModal ? emailsInput : []
-  $: userCount = useWorkspaceInviteModal ? parsedEmails.length : userData.length
-  $: reached = licensing.usersLimitReached(userCount)
   $: smtpConfigured =
     $admin.loaded && ($admin.cloud || !!$admin.checklist?.smtp?.checked)
   $: emailInviteDisabled = $admin.loaded ? !smtpConfigured : false
@@ -105,9 +118,7 @@
     onboardingType = OnboardingType.EMAIL
   }
 
-  $: internalGroups = $groups?.filter(g => !g?.scimInfo?.isSync)
-
-  function removeInput(idx) {
+  function removeInput(idx: number) {
     userData = userData.filter((e, i) => i !== idx)
   }
   function addNewInput() {
@@ -123,7 +134,7 @@
     ]
   }
 
-  function validateInput(input, index) {
+  function validateInput(input: UserData, index: number) {
     if (input.email) {
       input.email = input.email.trim()
     }
@@ -184,7 +195,7 @@
     }))
   }
 
-  function generatePassword(length) {
+  function generatePassword(length: number) {
     const array = new Uint8Array(length)
     window.crypto.getRandomValues(array)
     return Array.from(array, byte => byte.toString(36).padStart(2, "0"))
@@ -232,7 +243,7 @@
   showCloseIcon={false}
   disabled={useWorkspaceInviteModal
     ? !parsedEmails.length || !onboardingType || !!emailError
-    : hasError || !userData.length}
+    : !!hasError || !userData.length}
 >
   <svelte:fragment slot="header">
     {#if useWorkspaceInviteModal}
@@ -252,7 +263,7 @@
         <PillInput
           label="Type or paste emails below, separated by commas"
           bind:value={emailsInput}
-          error={emailError}
+          error={emailError ?? undefined}
           splitOnSpace={true}
           maxItems={maxItems + 1}
           on:change={handleEmailsChange}
@@ -288,16 +299,6 @@
             getOptionDisabled={option => option.disabled}
           />
         </div>
-
-        {#if reached}
-          <div class="user-notification">
-            <Icon name="info" />
-            <span>
-              {capitalise($licensing.license.plan.type)} plan is limited to {$licensing.userLimit}
-              users. Upgrade your plan to add more users</span
-            >
-          </div>
-        {/if}
       </Layout>
     </div>
   {:else}
@@ -312,10 +313,11 @@
           <div style="flex: 1 1 auto;">
             <InputDropdown
               inputType="email"
-              bind:inputValue={input.email}
-              bind:dropdownValue={input.role}
+              autofocus={false}
+              bind:inputValue={input.email as unknown as null | undefined}
+              bind:dropdownValue={input.role as unknown as null | undefined}
               options={Constants.BudibaseRoleOptions}
-              error={input.error}
+              error={(input.error ?? undefined) as null | undefined}
               on:blur={() => validateInput(input, index)}
             />
           </div>

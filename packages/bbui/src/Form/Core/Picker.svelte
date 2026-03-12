@@ -76,6 +76,7 @@
   export let allSelected: boolean = false
   export let toggleSelectAll: () => void = () => {}
   export let hideChevron: boolean = false
+  export let wrapText: boolean = false
 
   const maxHeight = 360
   const VIRTUALIZATION_THRESHOLD = 200
@@ -279,6 +280,7 @@
   <div
     class="popover-content"
     class:auto-width={autoWidth}
+    class:wrap-text={wrapText}
     class:size-s={size === "S"}
     class:size-m={size === "M"}
     class:size-l={size === "L"}
@@ -577,6 +579,10 @@
   .popover-content.size-l .subtitle-text {
     font-size: 14px;
     line-height: 18px;
+  }
+
+  .popover-content.wrap-text .spectrum-Menu-itemLabel {
+    white-space: normal;
   }
 
   .select-all-item {

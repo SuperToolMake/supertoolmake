@@ -48,6 +48,7 @@
   export let loading: boolean | undefined = false
   export let searchPlaceholder: string | undefined = undefined
   export let hideChevron: boolean = false
+  export let wrapText: boolean = false
 
   const dispatch = createEventDispatcher()
   const onChange = (e: CustomEvent<any>) => {
@@ -79,6 +80,7 @@
     {align}
     {footer}
     {hideChevron}
+    {wrapText}
     {getOptionLabel}
     {getOptionValue}
     {getOptionIcon}
