@@ -70,7 +70,7 @@ class UserStore extends BudiStore<UserState> {
         userInfo: {
           admin: user.admin ? { global: true } : undefined,
           builder,
-          roles: user.apps ? user.apps : undefined,
+          apps: user.apps ? user.apps : undefined,
         },
       }
     })

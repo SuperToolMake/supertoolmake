@@ -148,10 +148,8 @@ describe("/applications", () => {
       })
     })
 
-    it("creates app when onboarding", async () => {
-      const name = "Welcome app"
+    it("creates default workspace without sample data when onboarding", async () => {
       const newWorkspace = await config.api.workspace.create({
-        name,
         isOnboarding: "true",
       })
       expect(newWorkspace._id).toBeDefined()
@@ -166,6 +164,62 @@ describe("/applications", () => {
         expect(app.name).toBe(name)
 
         const res = await config.api.workspace.getDefinition(newWorkspace.appId)
+        expect(res.screens.length).toEqual(0)
+
+        const tables = await config.api.table.fetch()
+        expect(tables.length).toEqual(1)
+      })
+    })
+
+    it("creates a uniquely named default workspace when onboarding workspace already exists", async () => {
+      await config.api.workspace.create({
+        isOnboarding: "true",
+      })
+
+      const secondWorkspace = await config.api.workspace.create({
+        isOnboarding: "true",
+      })
+
+      expect(secondWorkspace.name).toBe("Workspace 2")
+      expect(secondWorkspace.navigation?.title).toBe("Workspace 2")
+    })
+
+    it("creates app from template", async () => {
+      nock("https://prod-budi-templates.s3-eu-west-1.amazonaws.com")
+        .get(`/templates/app/expense-approval.tar.gz`)
+        .replyWithFile(
+          200,
+          path.resolve(__dirname, "data", "expense-approval.tar.gz")
+        )
+
+      const newApp = await config.api.workspace.create({
+        name: generateAppName(),
+        useTemplate: "true",
+        templateKey: "app/expense-approval",
+      })
+      expect(newApp._id).toBeDefined()
+
+      // Check resources from template in the newly created app context
+      await config.withApp(newApp, async () => {
+        const res = await config.api.workspace.getDefinition(newApp.appId)
+        expect(res.screens.length).toEqual(6)
+
+        const tables = await config.api.table.fetch()
+        expect(tables.length).toEqual(4)
+      })
+    })
+
+    it("creates app from file", async () => {
+      const newApp = await config.api.workspace.create({
+        name: generateAppName(),
+        useTemplate: "true",
+        fileToImport: "src/api/routes/tests/data/old-app.txt", // export.tx was empty
+      })
+      expect(newApp._id).toBeDefined()
+
+      // Check resources from import file in the newly created app context
+      await config.withApp(newApp, async () => {
+        const res = await config.api.workspace.getDefinition(newApp.appId)
         expect(res.screens.length).toEqual(1)
 
         const tables = await config.api.table.fetch()
