@@ -31,17 +31,10 @@
     user?: WorkspaceUser | null
     workspaceId: string
     readonly?: boolean
-    isTenantOwner?: boolean
     onsaved?: () => void
   }
 
-  let {
-    user = null,
-    workspaceId,
-    readonly = false,
-    isTenantOwner = false,
-    onsaved,
-  }: Props = $props()
+  let { user = null, workspaceId, readonly = false, onsaved }: Props = $props()
 
   const builtInEndUserRoles = [Constants.Roles.BASIC, Constants.Roles.ADMIN]
   const excludedRoleIds = [
@@ -49,7 +42,6 @@
     Constants.Roles.PUBLIC,
     Constants.Roles.POWER,
     Constants.Roles.CREATOR,
-    Constants.Roles.GROUP,
   ]
 
   const roleColorLookup = $derived(
@@ -80,9 +72,6 @@
           "var(--spectrum-global-color-static-magenta-400)",
       }))
   )
-  const hasGroupMembership = $derived(
-    Array.isArray(user?.userGroups) && user.userGroups.length > 0
-  )
   const endUserRoleOptions = $derived([
     {
       label: "Basic user",
@@ -94,22 +83,9 @@
       value: Constants.Roles.ADMIN,
       color: roleColorLookup[Constants.Roles.ADMIN],
     },
-    ...(hasGroupMembership
-      ? [
-          {
-            label: "Controlled by group",
-            value: Constants.Roles.GROUP,
-            color: roleColorLookup[Constants.Roles.GROUP],
-          },
-        ]
-      : []),
     ...customEndUserRoleOptions,
   ])
-  const roleOptions = $derived(
-    isTenantOwner
-      ? Constants.ExtendedBudibaseRoleOptions
-      : Constants.BudibaseRoleOptions
-  )
+  const roleOptions = $derived(Constants.BudibaseRoleOptions)
   const disableFields = $derived(readonly || !!user?.scimInfo?.isSync)
   const hasChanges = $derived(
     !!initialDraft &&
@@ -133,9 +109,6 @@
   })
 
   const sanitizeAppRole = (appRole: string) => {
-    if (appRole === Constants.Roles.GROUP && !hasGroupMembership) {
-      return Constants.Roles.BASIC
-    }
     const rolesLoaded = ($roles || []).length > 0
     if (
       rolesLoaded &&
@@ -166,10 +139,7 @@
     !user || canWorkspaceRoleOverrideGlobalRole(users.getUserRole(user))
   )
   const disableRole = $derived(
-    disableFields ||
-      isTenantOwner ||
-      user?._id === $auth.user?._id ||
-      !canEditWorkspaceRole
+    disableFields || user?._id === $auth.user?._id || !canEditWorkspaceRole
   )
 
   const createDraft = (user: WorkspaceUser): UserDraft => {
@@ -179,16 +149,12 @@
       canWorkspaceRoleOverrideGlobalRole(globalRole) && workspaceMappedRole
         ? workspaceMappedRole
         : globalRole
-    const appRole =
-      user.roles?.[workspaceId] ||
-      (user.workspaceRole === Constants.Roles.GROUP
-        ? Constants.Roles.GROUP
-        : Constants.Roles.BASIC)
+    const appRole = user.roles?.[workspaceId] || Constants.Roles.BASIC
     return {
       firstName: user.firstName || "",
       lastName: user.lastName || "",
       email: user.email || "",
-      role: isTenantOwner ? "owner" : role,
+      role,
       appRole: sanitizeAppRole(appRole),
     }
   }
@@ -201,9 +167,6 @@
       return Constants.Roles.ADMIN
     }
     if (role === Constants.BudibaseRoles.AppUser) {
-      if (appRole === Constants.Roles.GROUP) {
-        return undefined
-      }
       return appRole || Constants.Roles.BASIC
     }
     return Constants.Roles.BASIC
