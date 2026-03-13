@@ -445,6 +445,16 @@
       </div>
 
       <div class="links">
+        {#if appId}
+          <SideNavLink
+            icon="user-gear"
+            text="Custom roles"
+            url={$url("./roles", { application: appId })}
+            isActive={$isActive("./roles", { application: appId })}
+            {collapsed}
+            on:click={keepCollapsed}
+          />
+        {/if}
         <span class="root-nav" class:error={backupErrorCount}>
           {#if collapsed && backupErrorCount}
             <span class="status-indicator">

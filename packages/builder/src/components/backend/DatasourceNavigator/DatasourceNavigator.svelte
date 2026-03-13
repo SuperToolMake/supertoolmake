@@ -5,12 +5,10 @@
     datasources,
     queries,
     tables,
-    userSelectedResourceMap,
     dataEnvironmentStore,
     workspaceDeploymentStore,
   } from "@/stores/builder"
   import QueryNavItem from "./QueryNavItem.svelte"
-  import NavItem from "@/components/common/NavItem.svelte"
   import TableNavigator from "@/components/backend/TableNavigator/TableNavigator.svelte"
   import DatasourceNavItem from "./DatasourceNavItem/DatasourceNavItem.svelte"
   import { enrichDatasources } from "./datasourceUtils"
@@ -23,7 +21,6 @@
 
   export let searchTerm
   export let datasourceFilter = _ => true
-  export let showManageRoles = true
   export let datasourceSort
   let toggledDatasources = {}
 
@@ -74,15 +71,6 @@
 </script>
 
 <div class="hierarchy-items-container">
-  {#if showManageRoles}
-    <NavItem
-      icon="user-gear"
-      text="Custom roles"
-      selected={$isActive("./roles")}
-      on:click={() => $goto("./roles")}
-      selectedBy={$userSelectedResourceMap.roles}
-    />
-  {/if}
   {#each displayedDatasources.filter(ds => ds.show) as datasource}
     <DatasourceNavItem
       {datasource}

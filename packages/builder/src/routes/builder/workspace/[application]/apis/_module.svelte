@@ -91,7 +91,6 @@
               searchTerm={searchValue}
               {datasourceFilter}
               datasourceSort={sortByDatasourceName}
-              showManageRoles={false}
             />
           </Layout>
         </Panel>
