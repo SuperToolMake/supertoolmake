@@ -405,9 +405,11 @@ async function performWorkspaceCreate(
       ? fileToImport.type
       : undefined
     const filePath =
-      fileToImport.filepath || (typeof legacyPath === "string" ? legacyPath : "")
+      fileToImport.filepath ||
+      (typeof legacyPath === "string" ? legacyPath : "")
     const fileType =
-      fileToImport.mimetype || (typeof legacyType === "string" ? legacyType : "")
+      fileToImport.mimetype ||
+      (typeof legacyType === "string" ? legacyType : "")
 
     if (!filePath) {
       ctx.throw(400, "Invalid import file path")
@@ -432,7 +434,8 @@ async function performWorkspaceCreate(
     const instance = await createInstance(workspaceId)
     const db = context.getWorkspaceDB()
     const shouldImportTemplate =
-      !!instanceConfig.file || (!!instanceConfig.useTemplate && !!instanceConfig.key)
+      !!instanceConfig.file ||
+      (!!instanceConfig.useTemplate && !!instanceConfig.key)
     const isImport = !!instanceConfig.file
 
     if (shouldImportTemplate) {
