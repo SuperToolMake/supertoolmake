@@ -445,6 +445,28 @@
       </div>
 
       <div class="links">
+        {#if appId}
+          <SideNavLink
+            icon="user-gear"
+            text="Custom roles"
+            url={$url("./roles", { application: appId })}
+            isActive={$isActive("./roles", { application: appId })}
+            {collapsed}
+            on:click={keepCollapsed}
+          />
+        {/if}
+        {#if appId}
+          <SideNavLink
+            icon="users"
+            text="Users"
+            isActive={false}
+            on:click={() => {
+              bb.settings("/people/workspace")
+              keepCollapsed()
+            }}
+            {collapsed}
+          />
+        {/if}
         <span class="root-nav" class:error={backupErrorCount}>
           {#if collapsed && backupErrorCount}
             <span class="status-indicator">
@@ -460,7 +482,7 @@
             {collapsed}
             isActive={false}
             on:click={() => {
-              bb.settings()
+              bb.settings("/general/info")
               keepCollapsed()
             }}
           >
@@ -474,18 +496,6 @@
             </svelte:fragment>
           </SideNavLink>
         </span>
-        {#if appId}
-          <SideNavLink
-            icon="user-plus"
-            text="Invite member"
-            isActive={false}
-            on:click={() => {
-              bb.settings("/people/workspace#invite")
-              keepCollapsed()
-            }}
-            {collapsed}
-          />
-        {/if}
         <SideNavUserSettings {collapsed} />
       </div>
       <div class="popover-container"></div>

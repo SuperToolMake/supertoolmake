@@ -2,7 +2,6 @@
   import { onMount } from "svelte"
   import { tables } from "@/stores/builder"
   import { goto } from "@roxi/routify"
-  import { TableNames } from "@/constants"
 
   $goto
 
@@ -10,7 +9,7 @@
     if ($tables.selected) {
       $goto(`../[tableId]`, { tableId: $tables.selected._id })
     } else {
-      $goto(`../[tableId]`, { tableId: TableNames.USERS })
+      $goto("../new")
     }
   })
 </script>

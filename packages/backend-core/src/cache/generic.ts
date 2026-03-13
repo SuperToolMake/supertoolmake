@@ -5,7 +5,6 @@ const GENERIC = new BaseCache()
 export const CacheKey = {
   CHECKLIST: "checklist",
   INSTALLATION: "installation",
-  ANALYTICS_ENABLED: "analyticsEnabled",
   UNIQUE_TENANT_ID: "uniqueTenantId",
   EVENTS: "events",
   BACKFILL_METADATA: "backfillMetadata",
