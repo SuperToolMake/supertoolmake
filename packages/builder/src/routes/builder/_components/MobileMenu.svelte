@@ -59,7 +59,11 @@
       {/each}
     </SideNav>
     <div>
-      <ActionButton quiet on:click={() => bb.settings("/general/info")} icon="sliders">
+      <ActionButton
+        quiet
+        on:click={() => bb.settings("/general/info")}
+        icon="sliders"
+      >
         Settings
       </ActionButton>
     </div>
