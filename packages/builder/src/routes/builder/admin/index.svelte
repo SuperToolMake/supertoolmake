@@ -152,7 +152,7 @@
           disabled={Object.keys(errors).length > 0 || submitted}
           on:click={save}
         >
-          Create super admin user
+          Create admin user
         </Button>
       </Layout>
     </Layout>
