@@ -136,7 +136,9 @@
     )
   }
   const canEditWorkspaceRole = $derived(
-    !user || canWorkspaceRoleOverrideGlobalRole(users.getUserRole(user))
+    !user ||
+      canWorkspaceRoleOverrideGlobalRole(users.getUserRole(user)) ||
+      users.getUserRole(user) === Constants.BudibaseRoles.Admin
   )
   const disableRole = $derived(
     disableFields || user?._id === $auth.user?._id || !canEditWorkspaceRole
