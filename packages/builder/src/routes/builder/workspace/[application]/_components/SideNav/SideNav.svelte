@@ -476,11 +476,11 @@
         </span>
         {#if appId}
           <SideNavLink
-            icon="user-plus"
-            text="Invite member"
+            icon="users"
+            text="Users"
             isActive={false}
             on:click={() => {
-              bb.settings("/people/workspace#invite")
+              bb.settings("/people/workspace")
               keepCollapsed()
             }}
             {collapsed}
