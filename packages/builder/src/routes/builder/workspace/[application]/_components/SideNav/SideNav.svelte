@@ -481,7 +481,7 @@
             text="Invite member"
             isActive={false}
             on:click={() => {
-              builderStore.showBuilderSidePanel()
+              bb.settings("/people/workspace#invite")
               keepCollapsed()
             }}
             {collapsed}

@@ -626,6 +626,33 @@ export default class TestConfiguration {
     )
   }
 
+  async createWorkspaceWithOnboarding(
+    _name = "Workspace",
+    url?: string
+  ): Promise<Workspace> {
+    this.devWorkspaceId = undefined
+    this.devWorkspace = await this.api.workspace.create({
+      isOnboarding: "true",
+      url,
+    })
+    this.devWorkspaceId = this.devWorkspace.appId
+
+    const { workspaceApps } = await this.api.workspaceApp.fetch()
+    const defaultWorkspaceApp =
+      workspaceApps.find(app => app.isDefault) || workspaceApps[0]
+    this.defaultWorkspaceAppId = defaultWorkspaceApp?._id
+
+    return await context.doInWorkspaceContext(
+      this.devWorkspace.appId!,
+      async () => {
+        this.prodWorkspace = await this.publish()
+        this.allWorkspaces.push(this.prodWorkspace)
+        this.allWorkspaces.push(this.devWorkspace!)
+        return this.devWorkspace!
+      }
+    )
+  }
+
   async publish() {
     await this._req(deployController.publishWorkspace)
     const prodAppId = this.getDevWorkspaceId().replace("_dev", "")
