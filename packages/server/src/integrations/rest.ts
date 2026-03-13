@@ -490,10 +490,7 @@ export class RestIntegration implements IntegrationBase {
             }
           }
         )
-        const ensureHeaderObject = (): Record<
-          string,
-          string | readonly string[]
-        > => {
+        const ensureHeaderObject = (): Record<string, string> => {
           if (!input.headers) {
             const headerObject: Record<string, string> = {}
             return headerObject
@@ -511,7 +508,14 @@ export class RestIntegration implements IntegrationBase {
           if (input.headers instanceof Headers) {
             return Object.fromEntries(input.headers)
           }
-          return input.headers
+          const headerObject: Record<string, string> = {}
+          for (const [name, value] of Object.entries(
+            input.headers as Record<string, string | readonly string[]>
+          )) {
+            headerObject[name] =
+              typeof value === "string" ? value : value.join(", ")
+          }
+          return headerObject
         }
 
         const headers = ensureHeaderObject()
