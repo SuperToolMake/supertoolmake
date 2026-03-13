@@ -6,7 +6,6 @@
   import ExportAppModal from "@/components/start/ExportAppModal.svelte"
   import ImportAppModal from "@/components/start/ImportAppModal.svelte"
   import { appStore, deploymentStore, isOnlyUser } from "@/stores/builder"
-  import { appsStore } from "@/stores/portal"
   import { admin } from "@/stores/portal/admin"
   import {
     Body,
@@ -16,8 +15,6 @@
     Icon,
     Layout,
     Modal,
-    notifications,
-    TooltipPosition,
   } from "@budibase/bbui"
 
   let versionModal: VersionModal
@@ -29,13 +26,6 @@
 
   $: updateAvailable = $appStore.upgradableVersion !== $appStore.version
   $: revertAvailable = $appStore.revertableVersion != null
-  $: hasOnlyOneWorkspace = $appsStore.apps.length <= 1
-  $: disableDeleteWorkspace = !$isOnlyUser || hasOnlyOneWorkspace
-  $: deleteWorkspaceTooltip = hasOnlyOneWorkspace
-    ? "At least one workspace is required."
-    : !$isOnlyUser
-      ? "Unavailable - another user is editing this workspace"
-      : undefined
 
   const exportApp = (opts: { published: any }) => {
     exportPublishedVersion = !!opts?.published

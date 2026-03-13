@@ -2,4 +2,4 @@
   import UsersPage from "./index.svelte"
 </script>
 
-<UsersPage workspaceOnly={true} />
+<UsersPage />

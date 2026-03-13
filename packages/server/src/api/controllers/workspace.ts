@@ -147,6 +147,15 @@ interface AppTemplate {
   key?: string
 }
 
+type LegacyUploadedFile = {
+  path?: string
+  type?: string
+}
+
+function isLegacyUploadedFile(file: File): file is File & LegacyUploadedFile {
+  return "path" in file || "type" in file
+}
+
 async function createInstance(appId: string) {
   const db = context.getWorkspaceDB()
   await db.put({
@@ -387,8 +396,28 @@ async function performWorkspaceCreate(
     key: templateKey,
   }
   if (ctx.request.files && ctx.request.files.fileToImport) {
+    const importFile = ctx.request.files.fileToImport
+    const fileToImport = Array.isArray(importFile) ? importFile[0] : importFile
+    const legacyPath = isLegacyUploadedFile(fileToImport)
+      ? fileToImport.path
+      : undefined
+    const legacyType = isLegacyUploadedFile(fileToImport)
+      ? fileToImport.type
+      : undefined
+    const filePath =
+      fileToImport.filepath ||
+      (typeof legacyPath === "string" ? legacyPath : "")
+    const fileType =
+      fileToImport.mimetype ||
+      (typeof legacyType === "string" ? legacyType : "")
+
+    if (!filePath) {
+      ctx.throw(400, "Invalid import file path")
+    }
+
     instanceConfig.file = {
-      ...(ctx.request.files.fileToImport as any),
+      type: fileType,
+      path: filePath,
       password: encryptionPassword,
     }
   } else if (typeof body.file?.path === "string") {
@@ -404,7 +433,21 @@ async function performWorkspaceCreate(
   return await context.doInWorkspaceContext(workspaceId, async () => {
     const instance = await createInstance(workspaceId)
     const db = context.getWorkspaceDB()
+    const shouldImportTemplate =
+      !!instanceConfig.file ||
+      (!!instanceConfig.useTemplate && !!instanceConfig.key)
     const isImport = !!instanceConfig.file
+
+    if (shouldImportTemplate) {
+      try {
+        await sdk.backups.importApp(workspaceId, db, {
+          file: instanceConfig.file,
+          key: instanceConfig.key,
+        })
+      } catch (err: any) {
+        ctx.throw(400, err.message || "Failed to import app template")
+      }
+    }
 
     await addCreatorToUsersTable(ctx)
 

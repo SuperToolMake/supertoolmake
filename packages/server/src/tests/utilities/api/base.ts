@@ -121,10 +121,17 @@ export abstract class TestAPI {
       req = req.send(body)
     }
     for (const [key, value] of Object.entries(fields)) {
+      // Multipart form fields should omit undefined values.
+      if (value === undefined) {
+        continue
+      }
       req = req.field(key, value)
     }
 
     for (const [key, value] of Object.entries(files)) {
+      if (value === undefined) {
+        continue
+      }
       if (isAttachedFile(value)) {
         req = req.attach(key, value.file, value.name)
       } else {

@@ -29,10 +29,10 @@
   A single image container is provided under <a href="https://github.com/SuperToolMake/supertoolmake/pkgs/container/supertoolmake">Packages</a>. 
   <br />Pull down the latest image.
 
-  If you are not using _Docker Desktop_, you can use [Colima](https://github.com/abiosoft/colima).
-  <br />Run `colima start` to spin up the docker runtime.
+If you are not using _Docker Desktop_, you can use [Colima](https://github.com/abiosoft/colima).
+<br />Run `colima start` to spin up the docker runtime.
 
-  Run the container with the command:
+Run the container with the command:
 
 ```
 docker run -d -t \
@@ -69,6 +69,6 @@ You will know yarn dev has worked correctly when there are no build errors of co
 
 Once running, visit [localhost:10000/builder](http://localhost:10000/builder)
 
-You should be prompted to create a super admin:
+You should be prompted to create an admin:
 
 <img src="docs/super_admin.png" width="640">

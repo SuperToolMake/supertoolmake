@@ -15,7 +15,6 @@
   import BBLogo from "assets/BBLogo.svelte"
   import {
     appStore,
-    builderStore,
     workspaceFavouriteStore,
     workspaceAppStore,
     datasources,
@@ -481,7 +480,7 @@
             text="Invite member"
             isActive={false}
             on:click={() => {
-              builderStore.showBuilderSidePanel()
+              bb.settings("/people/workspace#invite")
               keepCollapsed()
             }}
             {collapsed}

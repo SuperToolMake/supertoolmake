@@ -383,7 +383,6 @@ const searchWorkspaceUsers = async (
   const prodWorkspaceId = db.getProdWorkspaceID(workspaceId)
   const limit = body.limit ?? DEFAULT_USER_LIMIT
   const query = body.query
-  const globalDb = context.getGlobalDB()
 
   const [workspaceUsers, globalPermissionUsers] = await Promise.all([
     db.queryGlobalView<User>(
