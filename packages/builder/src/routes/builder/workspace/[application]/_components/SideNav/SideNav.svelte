@@ -15,7 +15,6 @@
   import BBLogo from "assets/BBLogo.svelte"
   import {
     appStore,
-    builderStore,
     workspaceFavouriteStore,
     workspaceAppStore,
     datasources,
