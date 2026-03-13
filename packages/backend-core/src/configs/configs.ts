@@ -12,7 +12,6 @@ import {
   SMTPInnerConfig,
 } from "@budibase/types"
 import { DocumentType, SEPARATOR } from "../constants"
-import { CacheKey, TTL, withCache } from "../cache"
 import * as context from "../context"
 import env from "../environment"
 
@@ -69,9 +68,6 @@ export async function getSettingsConfigDoc(): Promise<SettingsConfig> {
     tenantAware: true,
     config: config.config,
   })
-  config.config.analyticsEnabled = await analyticsEnabled({
-    config: config.config,
-  })
 
   return config
 }
@@ -104,48 +100,6 @@ export async function getPlatformUrl(
   }
 
   return platformUrl
-}
-
-export const analyticsEnabled = async (opts?: {
-  config?: SettingsInnerConfig
-}) => {
-  // cloud - always use the environment variable
-  if (!env.SELF_HOSTED) {
-    return !!env.ENABLE_ANALYTICS
-  }
-
-  // self host - prefer the settings doc
-  // use cache as events have high throughput
-  const enabledInDB = await withCache(
-    CacheKey.ANALYTICS_ENABLED,
-    TTL.ONE_DAY,
-    async () => {
-      const config = opts?.config
-        ? opts.config
-        : // direct to db to prevent infinite loop
-          (await getConfig<SettingsConfig>(ConfigType.SETTINGS))?.config
-
-      // need to do explicit checks in case the field is not set
-      if (config?.analyticsEnabled === false) {
-        return false
-      } else if (config?.analyticsEnabled === true) {
-        return true
-      }
-    }
-  )
-
-  if (enabledInDB !== undefined) {
-    return enabledInDB
-  }
-
-  // fallback to the environment variable
-  // explicitly check for 0 or false here, undefined or otherwise is treated as true
-  const envEnabled: any = env.ENABLE_ANALYTICS
-  if (envEnabled === 0 || envEnabled === false) {
-    return false
-  } else {
-    return true
-  }
 }
 
 // GOOGLE

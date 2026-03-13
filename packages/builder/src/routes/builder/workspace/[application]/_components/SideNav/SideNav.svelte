@@ -455,6 +455,18 @@
             on:click={keepCollapsed}
           />
         {/if}
+        {#if appId}
+          <SideNavLink
+            icon="users"
+            text="Users"
+            isActive={false}
+            on:click={() => {
+              bb.settings("/people/workspace")
+              keepCollapsed()
+            }}
+            {collapsed}
+          />
+        {/if}
         <span class="root-nav" class:error={backupErrorCount}>
           {#if collapsed && backupErrorCount}
             <span class="status-indicator">
@@ -484,18 +496,6 @@
             </svelte:fragment>
           </SideNavLink>
         </span>
-        {#if appId}
-          <SideNavLink
-            icon="users"
-            text="Users"
-            isActive={false}
-            on:click={() => {
-              bb.settings("/people/workspace")
-              keepCollapsed()
-            }}
-            {collapsed}
-          />
-        {/if}
         <SideNavUserSettings {collapsed} />
       </div>
       <div class="popover-container"></div>
