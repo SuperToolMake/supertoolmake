@@ -96,7 +96,8 @@
     : ""
   $: workspaceReady = !!currentWorkspaceId
   $: isWorkspaceQueryReady =
-    ($fetch.query as { workspaceId?: string })?.workspaceId === currentWorkspaceId
+    ($fetch.query as { workspaceId?: string })?.workspaceId ===
+    currentWorkspaceId
   $: tableLoading = !workspaceReady || !isWorkspaceQueryReady || !$fetch.loaded
 
   $: customRenderers = [
@@ -176,7 +177,9 @@
     if (!workspaceId) {
       return
     }
-    const query: Record<string, any> = { workspaceId }
+    const query: { workspaceId: string; fuzzy?: { email: string } } = {
+      workspaceId,
+    }
     if (email) {
       query.fuzzy = { email }
     }
@@ -248,16 +251,22 @@
   }
 
   const removingDuplicities = async (userData: UserData): Promise<UserData> => {
+    const currentUserEmails = new Set(
+      ((await users.fetch()) || []).map(x => x.email.toLowerCase())
+    )
     const newUsers: UserInfo[] = []
     const seenEmails = new Set<string>()
 
     for (const user of userData?.users ?? []) {
       const email = user.email.toLowerCase()
-      if (seenEmails.has(email)) {
+      if (seenEmails.has(email) || currentUserEmails.has(email)) {
         continue
       }
       seenEmails.add(email)
       newUsers.push(user)
+    }
+    if ((userData?.users?.length || 0) > 0 && !newUsers.length) {
+      notifications.info("There are no new users to add.")
     }
     return { ...userData, users: newUsers }
   }
