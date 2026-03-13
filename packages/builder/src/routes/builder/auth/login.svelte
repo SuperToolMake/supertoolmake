@@ -9,7 +9,7 @@
     FancyForm,
     FancyInput,
   } from "@budibase/bbui"
-  import { goto } from "@roxi/routify"
+  import { goto as gotoStore } from "@roxi/routify"
   import { auth, organisation, oidc } from "@/stores/portal"
   import GoogleButton from "./_components/GoogleButton.svelte"
   import OIDCButton from "./_components/OIDCButton.svelte"
@@ -18,7 +18,7 @@
   import { onMount } from "svelte"
   import { pushNumSessionsInvalidated } from "../../../../../frontend-core/src"
 
-  $goto
+  $: goto = $gotoStore
 
   let loaded = false
   let form
@@ -39,7 +39,7 @@
         formData?.password
       )
       if ($auth?.user?.forceResetPassword) {
-        $goto("./reset")
+        goto("../reset")
       } else {
         notifications.success("Logged in successfully")
         pushNumSessionsInvalidated(loginResult.invalidatedSessionCount || 0)
@@ -145,7 +145,7 @@
           </Layout>
           <Layout gap="XS" noPadding justifyItems="center">
             <div class="user-actions">
-              <ActionButton size="L" quiet on:click={() => $goto("./forgot")}>
+              <ActionButton size="L" quiet on:click={() => goto("../forgot")}>
                 Forgot password?
               </ActionButton>
             </div>

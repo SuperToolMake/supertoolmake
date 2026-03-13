@@ -55,7 +55,6 @@ export interface SettingsInnerConfig {
   docsUrl?: string
   logoUrlEtag?: string
   uniqueTenantId?: string
-  analyticsEnabled?: boolean
   isSSOEnforced?: boolean
   createdVersion?: string
   lockedBy?: LockReason

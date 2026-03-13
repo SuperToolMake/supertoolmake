@@ -5,15 +5,12 @@
     datasources,
     queries,
     tables,
-    userSelectedResourceMap,
     dataEnvironmentStore,
     workspaceDeploymentStore,
   } from "@/stores/builder"
   import QueryNavItem from "./QueryNavItem.svelte"
-  import NavItem from "@/components/common/NavItem.svelte"
   import TableNavigator from "@/components/backend/TableNavigator/TableNavigator.svelte"
   import DatasourceNavItem from "./DatasourceNavItem/DatasourceNavItem.svelte"
-  import { TableNames } from "@/constants"
   import { enrichDatasources } from "./datasourceUtils"
   import { onMount } from "svelte"
   import { DataEnvironmentMode } from "@budibase/types"
@@ -24,8 +21,6 @@
 
   export let searchTerm
   export let datasourceFilter = _ => true
-  export let showAppUsers = true
-  export let showManageRoles = true
   export let datasourceSort
   let toggledDatasources = {}
 
@@ -66,42 +61,16 @@
     toggledDatasources[datasource._id] = !datasource.open
   }
 
-  const appUsersTableName = "End users"
-  $: showAppUsersTable =
-    showAppUsers &&
-    (!searchTerm ||
-      appUsersTableName.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1)
-
   onMount(() => {
     if ($tables.selected) {
       toggledDatasources[$tables.selected.sourceId] = true
     }
   })
 
-  $: showNoResults =
-    searchTerm && !showAppUsersTable && !enrichedDataSources.find(ds => ds.show)
+  $: showNoResults = searchTerm && !enrichedDataSources.find(ds => ds.show)
 </script>
 
 <div class="hierarchy-items-container">
-  {#if showAppUsersTable}
-    <NavItem
-      icon="users-three"
-      text={appUsersTableName}
-      selected={$isActive("./table/[tableId]") &&
-        $tables.selected?._id === TableNames.USERS}
-      on:click={() => selectTable(TableNames.USERS)}
-      selectedBy={$userSelectedResourceMap[TableNames.USERS]}
-    />
-  {/if}
-  {#if showManageRoles}
-    <NavItem
-      icon="user-gear"
-      text="Custom roles"
-      selected={$isActive("./roles")}
-      on:click={() => $goto("./roles")}
-      selectedBy={$userSelectedResourceMap.roles}
-    />
-  {/if}
   {#each displayedDatasources.filter(ds => ds.show) as datasource}
     <DatasourceNavItem
       {datasource}

@@ -6,7 +6,6 @@
     Input,
     notifications,
     ProgressCircle,
-    Toggle,
   } from "@budibase/bbui"
   import { organisation } from "@/stores/portal/organisation"
   import { admin } from "@/stores/portal/admin"
@@ -16,7 +15,6 @@
     isSSOEnforced: $organisation.isSSOEnforced,
     company: $organisation.company,
     platformUrl: $organisation.platformUrl,
-    analyticsEnabled: $organisation.analyticsEnabled,
   })
 
   let loading = false
@@ -29,7 +27,6 @@
         isSSOEnforced: $values.isSSOEnforced,
         company: $values.company ?? "",
         platformUrl: $values.platformUrl ?? "",
-        analyticsEnabled: $values.analyticsEnabled,
       }
 
       // Update settings
@@ -57,12 +54,6 @@
           Platform URL
         </Label>
         <Input thin bind:value={$values.platformUrl} />
-      </div>
-    {/if}
-    {#if !$admin.cloud}
-      <div class="field">
-        <Label size="L">Analytics</Label>
-        <Toggle text="" bind:value={$values.analyticsEnabled} />
       </div>
     {/if}
   </div>

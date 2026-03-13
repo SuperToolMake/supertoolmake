@@ -183,7 +183,6 @@ export async function save(
     body._id = configs.generateConfigID(type)
     const response = await configs.save(body)
     await cache.bustCache(cache.CacheKey.CHECKLIST)
-    await cache.bustCache(cache.CacheKey.ANALYTICS_ENABLED)
 
     ctx.body = {
       type,
