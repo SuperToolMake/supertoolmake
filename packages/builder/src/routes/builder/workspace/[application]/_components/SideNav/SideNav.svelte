@@ -482,7 +482,7 @@
             {collapsed}
             isActive={false}
             on:click={() => {
-              bb.settings()
+              bb.settings("/general/info")
               keepCollapsed()
             }}
           >
