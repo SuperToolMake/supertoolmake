@@ -280,7 +280,7 @@ export class ScreenStore extends BudiStore<ScreenState> {
    * supports deeply mutating the current doc rather than just appending data.
    */
   sequentialScreenPatch = Utils.sequential(
-    async (patchFn: (screen: Screen) => boolean, screenId: string): Promise<Screen | void> => {
+    async (patchFn: (screen: Screen) => boolean, screenId: string): Promise<Screen | undefined> => {
       const state = get(this.store)
       const screen = state.screens.find((screen) => screen._id === screenId)
       if (!screen) {
@@ -307,7 +307,7 @@ export class ScreenStore extends BudiStore<ScreenState> {
   async patch(
     patchFn: (screen: Screen) => any,
     screenId?: string | null
-  ): Promise<SaveScreenResponse | void> {
+  ): Promise<SaveScreenResponse | undefined> {
     // Default to the currently selected screen
     if (!screenId) {
       const state = get(this.store)

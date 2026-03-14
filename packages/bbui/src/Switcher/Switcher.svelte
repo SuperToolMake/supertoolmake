@@ -15,8 +15,8 @@ export let selected: "left" | "right" = "left"
 export let disabled = false
 
 const dispatch = createEventDispatcher<{
-  left: void
-  right: void
+  left: undefined
+  right: undefined
 }>()
 </script>
 

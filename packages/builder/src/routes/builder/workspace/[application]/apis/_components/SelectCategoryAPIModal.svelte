@@ -19,7 +19,7 @@ export let customDisabled = false
 
 const dispatch = createEventDispatcher<{
   selectTemplate: TemplateSelection
-  custom: void
+  custom: undefined
 }>()
 
 let scrolling = false

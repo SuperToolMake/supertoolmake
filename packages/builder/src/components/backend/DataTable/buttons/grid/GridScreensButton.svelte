@@ -5,7 +5,7 @@ import { createEventDispatcher, getContext } from "svelte"
 import ScreensPopover from "@/components/common/ScreensPopover.svelte"
 import { screenStore } from "@/stores/builder"
 
-const dispatch = createEventDispatcher<{ generate: void }>()
+const dispatch = createEventDispatcher<{ generate: undefined }>()
 
 const { datasource } = getContext("grid")
 
