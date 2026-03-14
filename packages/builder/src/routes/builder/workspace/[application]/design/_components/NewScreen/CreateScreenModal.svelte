@@ -235,7 +235,7 @@ const fetchPermission = (resourceId: string) => {
 
 const deletePermission = (resourceId: string) => {
   delete permissions[resourceId]
-  permissions = permissions
+  permissions = { ...permissions }
 }
 
 const handleTableOrViewToggle = ({ detail: tableOrView }: { detail: SourceOption }) => {

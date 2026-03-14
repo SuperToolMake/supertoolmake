@@ -22,12 +22,12 @@ const removeField = (name) => {
 
 const updateFieldValue = (idx, value) => {
   fields[idx][1] = value
-  fields = fields
+  fields = [...fields]
 }
 
 const updateFieldName = (idx, name) => {
   fields[idx][0] = name
-  fields = fields
+  fields = [...fields]
 }
 
 const onChange = (fields) => {

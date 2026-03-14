@@ -26,7 +26,6 @@ export let componentName
 
 const setExplanationSubject = (option) => {
   detailsModalSubject = option
-  root = root
 }
 
 $: explanationWithPresets = getExplanationWithPresets(explanation, $appStore.typeSupportPresets)

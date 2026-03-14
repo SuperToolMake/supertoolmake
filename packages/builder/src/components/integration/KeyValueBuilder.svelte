@@ -77,7 +77,7 @@ function deleteEntry(idx: number) {
 
 function changed() {
   // Required for reactivity
-  fields = fields
+  fields = [...fields]
   const newActivity: Record<string, boolean> = {}
   for (let idx = 0; idx < fields.length; idx++) {
     const fieldName = fields[idx].name

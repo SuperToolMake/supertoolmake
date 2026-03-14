@@ -56,7 +56,7 @@
       "correctness": {
         "noConstructorReturn": "warn",
         "noInvalidUseBeforeDeclaration": "error",
-        "noSelfAssign": "warn",
+        "noSelfAssign": "error",
         "noUnusedVariables": "error",
         "noUnusedFunctionParameters": "error",
         "noUnusedImports": "error",

@@ -157,7 +157,7 @@ const deleteColumn = (name) => {
     return
   }
   delete schema[name]
-  schema = schema
+  schema = { ...schema }
 }
 
 $: displayColumnOptions = Object.keys(schema || {}).filter((column) => {

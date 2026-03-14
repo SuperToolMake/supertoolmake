@@ -13,7 +13,7 @@ export let customParams = {}
 
 function deleteQueryBinding(idx) {
   queryBindings.splice(idx, 1)
-  queryBindings = queryBindings
+  queryBindings = [...queryBindings]
 }
 
 // This is necessary due to the way readable and writable bindings are stored.

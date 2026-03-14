@@ -91,7 +91,7 @@ async function saveOIDC() {
 }
 
 const refreshScopes = (idx) => {
-  providers.oidc.config.configs[idx].scopes = providers.oidc.config.configs[idx].scopes
+  providers.oidc.config.configs[idx].scopes = [...(providers.oidc.config.configs[idx].scopes || [])]
 }
 
 const copyToClipboard = async (value) => {

@@ -56,7 +56,7 @@ const deleteAction = (index) => {
 
   // Delete the action
   actions.splice(index, 1)
-  actions = actions
+  actions = [...actions]
 
   // Select a new action if we deleted the selected one
   if (isSelected) {

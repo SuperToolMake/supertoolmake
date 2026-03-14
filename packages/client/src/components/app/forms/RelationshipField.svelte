@@ -152,7 +152,7 @@ type OptionsMap = Record<string, BasicRelatedRow>
     }
 
     // Reassign to trigger reactivity
-    optionsMap = optionsMap
+    optionsMap = { ...optionsMap }
   }
 
 const parseId = (id: string) => {
@@ -235,7 +235,7 @@ const parseId = (id: string) => {
       }
 
       // Reassign to trigger reactivity
-      optionsMap = optionsMap
+      optionsMap = { ...optionsMap }
       updateOptions(optionsMap)
     } catch (error) {
       console.error("Error loading missing row IDs", error)

@@ -9,7 +9,8 @@ setContext("fancy-form", {
   },
   unregisterField: (id) => {
     delete fields[id]
-    fields = fields
+    // Trigger Svelte reactivity after mutating the object.
+    fields = { ...fields }
   },
 })
 

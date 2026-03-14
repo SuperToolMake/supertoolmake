@@ -75,12 +75,12 @@ function saveView() {
 
 function removeFilter(idx) {
   view.filters.splice(idx, 1)
-  view.filters = view.filters
+  view = { ...view, filters: [...view.filters] }
 }
 
 function addFilter() {
   view.filters.push({ conjunction: "AND" })
-  view.filters = view.filters
+  view = { ...view, filters: [...view.filters] }
 }
 
 function isMultipleChoice(field) {
