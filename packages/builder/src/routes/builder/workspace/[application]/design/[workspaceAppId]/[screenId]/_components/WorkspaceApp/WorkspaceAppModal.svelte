@@ -4,7 +4,7 @@ import {
   Icon,
   Input,
   keepOpen,
-  type Modal,
+  Modal,
   ModalContent,
   notifications,
 } from "@budibase/bbui"

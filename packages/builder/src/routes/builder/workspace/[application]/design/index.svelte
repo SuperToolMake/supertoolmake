@@ -12,14 +12,14 @@ import {
 } from "@budibase/bbui"
 import { PublishResourceState, type UIWorkspaceApp, WorkspaceResource } from "@budibase/types"
 import { url } from "@roxi/routify"
-import type ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
+import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
 import PublishStatusBadge from "@/components/common/PublishStatusBadge.svelte"
 import TopBar from "@/components/common/TopBar.svelte"
 import VersionModal from "@/components/deploy/VersionModal.svelte"
 import { capitalise, durationFromNow } from "@/helpers"
 import { buildLiveUrl } from "@/helpers/urls"
 import FavouriteResourceButton from "@/routes/builder/_components/FavouriteResourceButton.svelte"
-import type WorkspaceAppModal from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/_components/WorkspaceApp/WorkspaceAppModal.svelte"
+import WorkspaceAppModal from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/_components/WorkspaceApp/WorkspaceAppModal.svelte"
 import {
   appStore,
   contextMenuStore,

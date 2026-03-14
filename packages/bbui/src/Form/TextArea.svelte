@@ -1,7 +1,7 @@
 <script lang="ts">
 import { createEventDispatcher } from "svelte"
 import type { LabelPosition } from "../types"
-import type TextArea from "./Core/TextArea.svelte"
+import TextArea from "./Core/TextArea.svelte"
 import Field from "./Field.svelte"
 
 export let value: string | undefined = undefined

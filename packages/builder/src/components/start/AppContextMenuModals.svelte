@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { Modal } from "@budibase/bbui"
+import { Modal } from "@budibase/bbui"
 import type { EnrichedApp } from "@/types"
 import DuplicateAppModal from "./DuplicateAppModal.svelte"
 import ExportAppModal from "./ExportAppModal.svelte"

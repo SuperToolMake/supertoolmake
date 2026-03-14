@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ActionButton, Button, Input, type Popover } from "@budibase/bbui"
+import { ActionButton, Button, Input, Popover } from "@budibase/bbui"
 import { createEventDispatcher } from "svelte"
 import phosphorIcons from "./phosphorIcons"
 

@@ -7,7 +7,7 @@ import {
   Icon,
   Layout,
   MenuItem,
-  type Modal,
+  Modal,
   notifications,
   Page,
 } from "@budibase/bbui"

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Button, type Modal, notifications, Pagination, Search, Table } from "@budibase/bbui"
+import { Button, Modal, notifications, Pagination, Search, Table } from "@budibase/bbui"
 import { Constants, fetchData, Utils } from "@budibase/frontend-core"
 import { sdk } from "@budibase/shared-core"
 import type { BulkUserCreated, InviteUsersResponse, User as UserDoc } from "@budibase/types"

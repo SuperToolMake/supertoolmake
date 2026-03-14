@@ -1,7 +1,7 @@
 <script lang="ts">
 import { ActionButton, List, ListItem, PopoverAlignment } from "@budibase/bbui"
 import type { ScreenUsage } from "@budibase/types"
-import type DetailPopover from "@/components/common/DetailPopover.svelte"
+import DetailPopover from "@/components/common/DetailPopover.svelte"
 import { appStore, workspaceAppStore } from "@/stores/builder"
 
 export let screens: ScreenUsage[] = []

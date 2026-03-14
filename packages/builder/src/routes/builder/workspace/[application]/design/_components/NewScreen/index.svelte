@@ -2,15 +2,15 @@
 import {
   Body,
   keepOpen,
-  type Modal,
+  Modal,
   ModalCancelFrom,
   ModalContent,
   notifications,
 } from "@budibase/bbui"
 import CreationPage from "@/components/common/CreationPage.svelte"
-import type { AutoScreenTypes } from "@/constants"
+import { AutoScreenTypes } from "@/constants"
 import { appStore, screenStore, workspaceAppStore } from "@/stores/builder"
-import type CreateScreenModal from "./CreateScreenModal.svelte"
+import CreateScreenModal from "./CreateScreenModal.svelte"
 import blank from "./images/blank.svg"
 import form from "./images/formUpdate.svg"
 import table from "./images/tableInline.svg"

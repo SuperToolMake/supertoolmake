@@ -1,5 +1,5 @@
 <script lang="ts">
-import { type Modal, notifications } from "@budibase/bbui"
+import { Modal, notifications } from "@budibase/bbui"
 import type {
   RestTemplate,
   RestTemplateGroup,

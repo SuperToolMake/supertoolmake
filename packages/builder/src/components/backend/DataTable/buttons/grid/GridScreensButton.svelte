@@ -2,7 +2,7 @@
 import { Button } from "@budibase/bbui"
 import type { Screen, ScreenUsage } from "@budibase/types"
 import { createEventDispatcher, getContext } from "svelte"
-import type ScreensPopover from "@/components/common/ScreensPopover.svelte"
+import ScreensPopover from "@/components/common/ScreensPopover.svelte"
 import { screenStore } from "@/stores/builder"
 
 const dispatch = createEventDispatcher<{ generate: void }>()

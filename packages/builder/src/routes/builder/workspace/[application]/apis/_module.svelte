@@ -10,7 +10,7 @@ import TopBar from "@/components/common/TopBar.svelte"
 import Panel from "@/components/design/Panel.svelte"
 import { IntegrationTypes } from "@/constants/backend"
 import { builderStore, datasources } from "@/stores/builder"
-import type APIModal from "./_components/APIModal.svelte"
+import APIModal from "./_components/APIModal.svelte"
 
 let searchValue: string
 let panelWidth = 260

@@ -8,10 +8,10 @@ import {
   ListItem,
   PopoverAlignment,
 } from "@budibase/bbui"
-import type { RestAuthType } from "@budibase/types"
+import { RestAuthType } from "@budibase/types"
 import { goto as gotoStore } from "@roxi/routify"
 import { onMount } from "svelte"
-import type DetailPopover from "@/components/common/DetailPopover.svelte"
+import DetailPopover from "@/components/common/DetailPopover.svelte"
 import { bb } from "@/stores/bb"
 import { appStore, oauth2 } from "@/stores/builder"
 

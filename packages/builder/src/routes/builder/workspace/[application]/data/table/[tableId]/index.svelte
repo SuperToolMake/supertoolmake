@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Banner, Button, notifications } from "@budibase/bbui"
-import { type Grid, gridClipboard } from "@budibase/frontend-core"
+import { Grid, gridClipboard } from "@budibase/frontend-core"
 import type { Store as GridStore } from "@budibase/frontend-core/src/components/grid/stores"
 import {
   DataEnvironmentMode,
@@ -13,7 +13,7 @@ import { getContext, onDestroy } from "svelte"
 import { productionAPI } from "@/api"
 import ProductionBlankState from "@/components/backend/DataTable/blankstates/ProductionBlankState.svelte"
 import GridExportButton from "@/components/backend/DataTable/buttons/grid/GridExportButton.svelte"
-import type GridGenerateButton from "@/components/backend/DataTable/buttons/grid/GridGenerateButton.svelte"
+import GridGenerateButton from "@/components/backend/DataTable/buttons/grid/GridGenerateButton.svelte"
 import GridImportButton from "@/components/backend/DataTable/buttons/grid/GridImportButton.svelte"
 import GridManageAccessButton from "@/components/backend/DataTable/buttons/grid/GridManageAccessButton.svelte"
 import GridRelationshipButton from "@/components/backend/DataTable/buttons/grid/GridRelationshipButton.svelte"

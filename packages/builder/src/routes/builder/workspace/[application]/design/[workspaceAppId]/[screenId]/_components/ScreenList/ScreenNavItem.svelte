@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Helpers, Icon, type Modal, notifications } from "@budibase/bbui"
+import { Helpers, Icon, Modal, notifications } from "@budibase/bbui"
 import type { Screen } from "@budibase/types"
-import type ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
+import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
 import NavItem from "@/components/common/NavItem.svelte"
 import ScreenDetailsModal from "@/components/design/ScreenDetailsModal.svelte"
 import { capitalise } from "@/helpers"

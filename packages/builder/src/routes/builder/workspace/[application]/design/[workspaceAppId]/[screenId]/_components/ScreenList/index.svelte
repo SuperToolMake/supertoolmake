@@ -5,7 +5,7 @@ import { params } from "@roxi/routify"
 import NavHeader from "@/components/common/NavHeader.svelte"
 import { getVerticalResizeActions } from "@/components/common/resizable"
 import { workspaceAppStore } from "@/stores/builder/workspaceApps"
-import type NewScreenModal from "../../../../_components/NewScreen/index.svelte"
+import NewScreenModal from "../../../../_components/NewScreen/index.svelte"
 import ScreenNavItem from "./ScreenNavItem.svelte"
 
 const [resizable, resizableHandle] = getVerticalResizeActions()

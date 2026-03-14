@@ -4,7 +4,7 @@ import {
   Body,
   Button,
   DatePicker,
-  type Drawer,
+  Drawer,
   DrawerContent,
   Icon,
   Layout,

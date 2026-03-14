@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Body, Divider, Icon, type Modal, StatusLight } from "@budibase/bbui"
+import { Body, Divider, Icon, Modal, StatusLight } from "@budibase/bbui"
 import { beforeUrlChange, goto } from "@roxi/routify"
 import { tick } from "svelte"
 import NewPill from "@/components/common/NewPill.svelte"
@@ -9,7 +9,7 @@ import Router from "@/settings/Router.svelte"
 import { bb } from "@/stores/bb"
 import { flattenedRoutes, permittedRoutes } from "@/stores/routing"
 import { isRouteHREF, isSettingIcon, type MatchedRoute, type Route } from "@/types/routing"
-import type ModalSideBar from "./ModalSideBar.svelte"
+import ModalSideBar from "./ModalSideBar.svelte"
 
 export const show = () => modal.show()
 

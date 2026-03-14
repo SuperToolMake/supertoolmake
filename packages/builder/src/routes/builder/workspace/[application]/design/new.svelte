@@ -1,7 +1,7 @@
 <script lang="ts">
 import { onMount } from "svelte"
 import { workspaceAppStore } from "@/stores/builder"
-import type NewScreen from "./_components/NewScreen/index.svelte"
+import NewScreen from "./_components/NewScreen/index.svelte"
 
 let newScreenModal: NewScreen
 $: workspaceAppId =

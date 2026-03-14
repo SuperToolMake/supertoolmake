@@ -1,7 +1,7 @@
 <script lang="ts">
 import { createEventDispatcher } from "svelte"
 import Layout from "../Layout/Layout.svelte"
-import type Popover from "../Popover/Popover.svelte"
+import Popover from "../Popover/Popover.svelte"
 import "@spectrum-css/popover/dist/index-vars.css"
 import { DefaultAppTheme, ensureValidTheme, getThemeClassNames } from "@budibase/shared-core"
 import type { Theme } from "@budibase/types"

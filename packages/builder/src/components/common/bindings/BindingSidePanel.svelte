@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Icon, Input, Layout, type Popover } from "@budibase/bbui"
+import { Icon, Input, Layout, Popover } from "@budibase/bbui"
 import { convertToJS } from "@budibase/string-templates"
 import type { EnrichedBinding, Helper } from "@budibase/types"
 import { BindingMode } from "@budibase/types"

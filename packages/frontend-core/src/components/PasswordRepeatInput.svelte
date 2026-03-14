@@ -1,5 +1,5 @@
 <script lang="ts">
-import { type FancyForm, FancyInput } from "@budibase/bbui"
+import { FancyForm, FancyInput } from "@budibase/bbui"
 import { createValidationStore, requiredValidator } from "../utils/validation"
 
 export let passwordForm: FancyForm | undefined = undefined

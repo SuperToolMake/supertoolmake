@@ -9,7 +9,7 @@ import {
   Input,
   Label,
   Layout,
-  type Modal,
+  Modal,
   notifications,
   Select,
 } from "@budibase/bbui"

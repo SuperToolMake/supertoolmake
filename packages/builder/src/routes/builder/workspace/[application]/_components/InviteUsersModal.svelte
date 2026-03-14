@@ -1,5 +1,5 @@
 <script lang="ts">
-import { keepOpen, type Modal, notifications } from "@budibase/bbui"
+import { keepOpen, Modal, notifications } from "@budibase/bbui"
 import { sdk } from "@budibase/shared-core"
 import type { BulkUserCreated, InviteUsersResponse } from "@budibase/types"
 import { onMount } from "svelte"

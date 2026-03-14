@@ -10,7 +10,7 @@ import { createEventDispatcher } from "svelte"
 import { SchemaTypeOptionsExpanded } from "@/constants/backend"
 import { EditorModes } from "../common/CodeEditor"
 import CodeEditor from "../common/CodeEditor/CodeEditor.svelte"
-import type DynamicVariableModal from "./DynamicVariableModal.svelte"
+import DynamicVariableModal from "./DynamicVariableModal.svelte"
 import KeyValueBuilder from "./KeyValueBuilder.svelte"
 import { keyValueArrayToRecord, shouldShowVariables } from "./query"
 

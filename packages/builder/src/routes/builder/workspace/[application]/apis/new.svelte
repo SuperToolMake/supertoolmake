@@ -5,7 +5,7 @@ import {
   Heading,
   keepOpen,
   Layout,
-  type Modal,
+  Modal,
   ModalCancelFrom,
   ModalContent,
   notifications,
@@ -35,7 +35,7 @@ import { formatEndpointLabel, getRestTemplateImportInfoRequest } from "@/helpers
 import { datasources, sortedIntegrations as integrations, queries } from "@/stores/builder"
 import { restTemplates } from "@/stores/builder/restTemplates"
 import { configFromIntegration } from "@/stores/selectors"
-import type CreateExternalDatasourceModal from "../data/_components/CreateExternalDatasourceModal/index.svelte"
+import CreateExternalDatasourceModal from "../data/_components/CreateExternalDatasourceModal/index.svelte"
 import DatasourceOption from "../data/_components/DatasourceOption.svelte"
 import RestTemplateOption from "../data/_components/RestTemplateOption.svelte"
 

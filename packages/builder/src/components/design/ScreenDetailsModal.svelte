@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Input, keepOpen, type ModalContent } from "@budibase/bbui"
+import { Input, keepOpen, ModalContent } from "@budibase/bbui"
 import { get } from "svelte/store"
 import sanitizeUrl from "@/helpers/sanitizeUrl"
 import { buildLiveUrl } from "@/helpers/urls"
