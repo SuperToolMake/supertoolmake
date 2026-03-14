@@ -1,7 +1,6 @@
 import postgres from "./postgres"
 import mongodb from "./mongodb"
 import sqlServer from "./microsoftSqlServer"
-import s3 from "./s3"
 import mysql from "./mysql"
 import rest from "./rest"
 import firebase from "./firebase"
@@ -18,7 +17,6 @@ const DEFINITIONS: Record<SourceName, Integration | undefined> = {
   [SourceName.POSTGRES]: postgres.schema,
   [SourceName.MONGODB]: mongodb.schema,
   [SourceName.SQL_SERVER]: sqlServer.schema,
-  [SourceName.S3]: s3.schema,
   [SourceName.MYSQL]: mysql.schema,
   [SourceName.REST]: rest.schema,
   [SourceName.FIRESTORE]: firebase.schema,
@@ -39,7 +37,6 @@ const INTEGRATIONS: Record<SourceName, IntegrationBaseConstructor | undefined> =
     [SourceName.POSTGRES]: postgres.integration,
     [SourceName.MONGODB]: mongodb.integration,
     [SourceName.SQL_SERVER]: sqlServer.integration,
-    [SourceName.S3]: s3.integration,
     [SourceName.MYSQL]: mysql.integration,
     [SourceName.REST]: rest.integration,
     [SourceName.FIRESTORE]: firebase.integration,
