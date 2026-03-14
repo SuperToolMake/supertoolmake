@@ -132,7 +132,7 @@ const resetGroupSelection = () => {
 }
 
 const confirmGroupTemplateSelection = () => {
-  if (!activeGroup || !selectedGroupTemplate) {
+  if (!(activeGroup && selectedGroupTemplate)) {
     return
   }
   dispatch("selectTemplate", {
@@ -165,7 +165,7 @@ const handleIntersect = async (entries: IntersectionObserverEntry[]) => {
 }
 
 const ensureObserver = () => {
-  if (!scrollContainer || !loadTrigger) {
+  if (!(scrollContainer && loadTrigger)) {
     return
   }
   observer?.disconnect()

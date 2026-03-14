@@ -24,5 +24,5 @@ export async function isWorkspacePublished(prodworkspaceId: string): Promise<boo
   }
 
   const existingWorkspaces = await db.getWorkspacesByIDs([prodworkspaceId])
-  return !!existingWorkspaces.length
+  return Boolean(existingWorkspaces.length)
 }

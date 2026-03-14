@@ -288,7 +288,7 @@ export default class TestConfiguration {
     let existing: Partial<User> = {}
     try {
       existing = await db.get<User>(_id)
-    } catch (_err) {
+    } catch {
       // ignore
     }
     const user: User = {
@@ -418,10 +418,10 @@ export default class TestConfiguration {
     const authToken = jwt.sign(authObj, coreEnv.JWT_SECRET as Secret)
 
     let cookie: (string | string[])[] = [`${constants.Cookie.Auth}=${authToken}`]
-    const tempHeaderCookie = this.temporaryHeaders?.["Cookie"]
+    const tempHeaderCookie = this.temporaryHeaders?.Cookie
     let hasAuth = false
     if (Array.isArray(tempHeaderCookie)) {
-      hasAuth = !!tempHeaderCookie.find((cookie) => cookie.includes(constants.Cookie.Auth))
+      hasAuth = Boolean(tempHeaderCookie.find((cookie) => cookie.includes(constants.Cookie.Auth)))
     } else if (typeof tempHeaderCookie === "string") {
       hasAuth = tempHeaderCookie.includes(constants.Cookie.Auth)
     }
@@ -429,7 +429,7 @@ export default class TestConfiguration {
       cookie = [tempHeaderCookie]
     } else if (tempHeaderCookie) {
       cookie.push(tempHeaderCookie)
-      delete this.temporaryHeaders?.["Cookie"]
+      delete this.temporaryHeaders?.Cookie
     }
     const headers: any = {
       Accept: "application/json",
@@ -551,7 +551,7 @@ export default class TestConfiguration {
     const db = tenancy.getTenantDB(this.getTenantId())
     const id = dbCore.generateDevInfoID(userId)
     const devInfo = await db.tryGet<DevInfo>(id)
-    if (devInfo && devInfo.apiKey) {
+    if (devInfo?.apiKey) {
       return devInfo.apiKey
     }
 
@@ -646,7 +646,7 @@ export default class TestConfiguration {
   }
 
   async createTable(config?: TableToBuild, options = { skipReassigning: false }) {
-    if (config != null && config._id) {
+    if (config?._id) {
       delete config._id
     }
     config = config || basicTable()
@@ -657,7 +657,7 @@ export default class TestConfiguration {
   }
 
   async createExternalTable(config?: TableToBuild, options = { skipReassigning: false }) {
-    if (config != null && config._id) {
+    if (config?._id) {
       delete config._id
     }
     config = config || basicTable()
@@ -718,7 +718,7 @@ export default class TestConfiguration {
     if (!this.table) {
       throw "Test requires table to be configured."
     }
-    const tableId = (config && config.tableId) || this.table._id!
+    const tableId = config?.tableId || this.table._id!
     config = config || basicRow(tableId!)
     return this.api.row.save(tableId, config)
   }

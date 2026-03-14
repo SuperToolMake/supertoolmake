@@ -42,7 +42,7 @@ const getButtons = ({ buttons, buttonsCollapsed }) => {
 
 // Apply button conditions and return filtered/modified buttons for a specific row
 const getButtonsForRow = (buttons, row) => {
-  if (!buttons || !row) return buttons
+  if (!(buttons && row)) return buttons
 
   const rowMetadata = $metadata?.[row._id]?.button || {}
 

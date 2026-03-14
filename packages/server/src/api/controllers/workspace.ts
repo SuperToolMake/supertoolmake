@@ -82,7 +82,7 @@ async function getLayouts() {
 }
 
 function getUserRoleId(ctx: UserCtx) {
-  return !ctx.user?.role || !ctx.user.role._id ? roles.BUILTIN_ROLE_IDS.PUBLIC : ctx.user.role._id
+  return !ctx.user?.role?._id ? roles.BUILTIN_ROLE_IDS.PUBLIC : ctx.user.role._id
 }
 
 function checkWorkspaceUrl(ctx: UserCtx, apps: Workspace[], url: string, currentAppId?: string) {
@@ -191,7 +191,7 @@ async function addCreatorToUsersTable(ctx: UserCtx) {
   let creator
   try {
     creator = await getGlobalUser(metadataId)
-  } catch (_err) {
+  } catch {
     return
   }
 
@@ -348,7 +348,7 @@ async function performWorkspaceCreate(
     useTemplate,
     key: templateKey,
   }
-  if (ctx.request.files && ctx.request.files.fileToImport) {
+  if (ctx.request.files?.fileToImport) {
     const importFile = ctx.request.files.fileToImport
     const fileToImport = Array.isArray(importFile) ? importFile[0] : importFile
     const legacyPath = isLegacyUploadedFile(fileToImport) ? fileToImport.path : undefined
@@ -379,8 +379,9 @@ async function performWorkspaceCreate(
     const instance = await createInstance(workspaceId)
     const db = context.getWorkspaceDB()
     const shouldImportTemplate =
-      !!instanceConfig.file || (!!instanceConfig.useTemplate && !!instanceConfig.key)
-    const isImport = !!instanceConfig.file
+      Boolean(instanceConfig.file) ||
+      (Boolean(instanceConfig.useTemplate) && Boolean(instanceConfig.key))
+    const isImport = Boolean(instanceConfig.file)
 
     if (shouldImportTemplate) {
       try {
@@ -484,7 +485,7 @@ async function performWorkspaceCreate(
 
         // Fetch the latest version of the workspace after these changes
         newWorkspace = await sdk.workspaces.metadata.get()
-      } catch (_err) {
+      } catch {
         ctx.throw(400, "App created, but failed to add onboarding screens")
       }
     }

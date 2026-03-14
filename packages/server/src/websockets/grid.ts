@@ -27,7 +27,7 @@ export default class GridSocket extends BaseSocket {
       let valid = true
 
       // Validate datasource
-      if (!resourceId || !appId) {
+      if (!(resourceId && appId)) {
         // Ignore if no table or app specified
         valid = false
       }
@@ -64,7 +64,7 @@ export default class GridSocket extends BaseSocket {
           const sessions = await this.getRoomSessions(room)
           callback({ users: sessions })
         })
-      } catch (_error) {
+      } catch {
         socket.disconnect(true)
       }
     })

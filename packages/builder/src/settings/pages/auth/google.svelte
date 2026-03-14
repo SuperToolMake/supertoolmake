@@ -65,7 +65,9 @@ $: {
     : (googleSaveButtonDisabled = false)
 }
 
-$: googleComplete = !!(providers.google?.config?.clientID && providers.google?.config?.clientSecret)
+$: googleComplete = Boolean(
+  providers.google?.config?.clientID && providers.google?.config?.clientSecret
+)
 
 async function saveConfig(config) {
   // Delete unsupported fields
@@ -104,7 +106,7 @@ const copyToClipboard = async (value) => {
 onMount(async () => {
   try {
     await organisation.init()
-  } catch (error) {
+  } catch {
     notifications.error("Error getting org config")
   }
 
@@ -112,7 +114,7 @@ onMount(async () => {
   let googleDoc
   try {
     googleDoc = await API.getConfig(ConfigTypes.Google)
-  } catch (error) {
+  } catch {
     notifications.error("Error fetching Google OAuth config")
   }
   if (!googleDoc?._id) {

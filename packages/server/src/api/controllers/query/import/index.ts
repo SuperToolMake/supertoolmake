@@ -174,7 +174,7 @@ export class RestImporter {
     let datasource: Datasource | undefined
     try {
       datasource = await db.get<Datasource>(datasourceId)
-    } catch (_err) {
+    } catch {
       return {}
     }
     const staticVariables = datasource?.config?.staticVariables

@@ -20,7 +20,7 @@ $: updateAvailable = $appStore.upgradableVersion !== $appStore.version
 $: revertAvailable = $appStore.revertableVersion != null
 
 const exportApp = (opts: { published: any }) => {
-  exportPublishedVersion = !!opts?.published
+  exportPublishedVersion = Boolean(opts?.published)
   exportModal.show()
 }
 </script>

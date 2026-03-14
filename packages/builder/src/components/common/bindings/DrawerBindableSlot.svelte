@@ -56,7 +56,7 @@ const onBlur = () => {
 }
 
 const isValidDate = (value) => {
-  return !value || !isNaN(new Date(value).valueOf())
+  return !(value && isNaN(new Date(value).valueOf()))
 }
 
 const hasValidLinks = (value) => {
@@ -97,7 +97,7 @@ const validationMap = {
   array: hasValidOptions,
   longform: (value) => !isJSBinding(value),
   json: (value) => !isJSBinding(value),
-  options: (value) => !isJSBinding(value) && !findHBSBlocks(value)?.length,
+  options: (value) => !(isJSBinding(value) || findHBSBlocks(value)?.length),
   boolean: isValidBoolean,
 }
 

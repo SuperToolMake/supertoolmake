@@ -194,7 +194,7 @@ const handleBudibaseEvent = async (event) => {
     if (context) {
       try {
         context = JSON.parse(context)
-      } catch (error) {
+      } catch {
         context = null
       }
     }
@@ -212,7 +212,7 @@ const confirmDeleteComponent = (componentId) => {
 const deleteComponent = async () => {
   try {
     await componentStore.delete({ _id: idToDelete })
-  } catch (error) {
+  } catch {
     notifications.error("Error deleting component")
   }
   idToDelete = null

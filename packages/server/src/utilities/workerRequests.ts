@@ -29,7 +29,7 @@ export function createRequest<TBody>(request: Request<TBody>): RequestInit {
 
   if (!ctx && coreEnv.INTERNAL_API_KEY) {
     headers[constants.Header.API_KEY] = coreEnv.INTERNAL_API_KEY
-  } else if (ctx && ctx.headers) {
+  } else if (ctx?.headers) {
     // copy all utilised headers over - copying everything can have
     // side effects like requests being rejected due to odd content types etc
     for (const header of Object.values(constants.Header)) {

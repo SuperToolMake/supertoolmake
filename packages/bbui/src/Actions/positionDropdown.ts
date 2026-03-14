@@ -113,7 +113,6 @@ export default function positionDropdown(element: HTMLElement, opts: Opts) {
       // Applies the X strategy to our styles
       const applyXStrategy = (strategy: Strategy) => {
         switch (strategy) {
-          case "StartToStart":
           default:
             styles.left = anchorBounds.left
             break
@@ -146,7 +145,6 @@ export default function positionDropdown(element: HTMLElement, opts: Opts) {
             styles.top = anchorBounds.bottom - elementBounds.height
             applyMaxHeight(anchorBounds.bottom - screenOffset)
             break
-          case "StartToEnd":
           default:
             styles.top = anchorBounds.bottom + offset
             applyMaxHeight(winHeight - anchorBounds.bottom - screenOffset)

@@ -94,8 +94,10 @@ export const createValidatedConfigStore = (
           newStore[field.key] = field.value
         })
         if (
-          !("config" in integration.datasource[key]) ||
-          !integration.datasource[key].config?.nestedFields
+          !(
+            "config" in integration.datasource[key] &&
+            integration.datasource[key].config?.nestedFields
+          )
         ) {
           arrayValue.forEach((field) => {
             newStore[field.key] = field.value
@@ -160,7 +162,7 @@ export const createValidatedConfigStore = (
           return $configStore[key]
         }
 
-        if (!properties.hidden || !eval(processStringSync(properties.hidden, $configStore))) {
+        if (!(properties.hidden && eval(processStringSync(properties.hidden, $configStore)))) {
           validatedConfig.push({
             key,
             value: getValue(),

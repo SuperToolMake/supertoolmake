@@ -149,7 +149,7 @@ const getHeightStyle = (
   if (loading) {
     return `height: ${effectiveHeaderHeight + visibleRowCount * rowHeight}px;`
   }
-  if (!rowCount || !visibleRowCount || totalRowCount <= rowCount) {
+  if (!(rowCount && visibleRowCount) || totalRowCount <= rowCount) {
     return ""
   }
   return `height: ${effectiveHeaderHeight + visibleRowCount * rowHeight}px;`
@@ -183,7 +183,7 @@ const sortRows = (
 ): any[] => {
   sortColumn = sortColumn ?? defaultSortColumn
   sortOrder = sortOrder ?? defaultSortOrder
-  if (!sortColumn || !sortOrder || disableSorting) {
+  if (!(sortColumn && sortOrder) || disableSorting) {
     return rows
   }
   return rows.slice().sort((a, b) => {
@@ -229,10 +229,10 @@ const getFields = (
   let columns: any[] = []
   let autoColumns: any[] = []
   Object.entries(schema || {}).forEach(([field, fieldSchema]) => {
-    if (!field || !fieldSchema) {
+    if (!(field && fieldSchema)) {
       return
     }
-    if (!autoSortColumns || !fieldSchema?.autocolumn) {
+    if (!(autoSortColumns && fieldSchema?.autocolumn)) {
       columns.push(fieldSchema)
     } else if (showAutoColumns) {
       autoColumns.push(fieldSchema)
@@ -281,7 +281,7 @@ const toggleSelectRow = (row: any): void => {
 }
 
 const toggleSelectAll = (e: CustomEvent): void => {
-  const select = !!e.detail
+  const select = Boolean(e.detail)
   if (select) {
     const next = [...selectedRows]
     // Add any rows which are not already in selected rows

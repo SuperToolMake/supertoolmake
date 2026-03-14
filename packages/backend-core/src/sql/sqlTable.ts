@@ -29,7 +29,7 @@ function generateSchema(
   oldTable?: Table,
   renamed?: RenameColumn
 ) {
-  const primaryKeys = table && table.primary ? table.primary : []
+  const primaryKeys = table?.primary ? table.primary : []
   const columns = Object.values(table.schema)
   // all columns in a junction table will be meta
   const metaCols = columns.filter((col) => (col as NumberFieldMetadata).meta)
@@ -55,7 +55,7 @@ function generateSchema(
   for (const [key, column] of Object.entries(table.schema)) {
     // skip things that are already correct
     const oldColumn = oldTable?.schema[key]
-    if ((oldColumn && oldColumn.type) || columnTypeSet.includes(key) || renamed?.updated === key) {
+    if (oldColumn?.type || columnTypeSet.includes(key) || renamed?.updated === key) {
       continue
     }
     const columnType = column.type
@@ -73,7 +73,7 @@ function generateSchema(
         break
       case FieldType.NUMBER:
         // if meta is specified then this is a junction table entry
-        if (column.meta && column.meta.toKey && column.meta.toTable) {
+        if (column.meta?.toKey && column.meta.toTable) {
           const { toKey, toTable } = column.meta
           schema.integer(key).unsigned()
           schema.foreign(key).references(`${toTable}.${toKey}`)
@@ -111,13 +111,13 @@ function generateSchema(
           column.relationshipType !== RelationshipType.MANY_TO_ONE &&
           column.relationshipType !== RelationshipType.MANY_TO_MANY
         ) {
-          if (!column.foreignKey || !column.tableId) {
+          if (!(column.foreignKey && column.tableId)) {
             throw new Error("Invalid relationship schema")
           }
           const { tableName } = breakExternalTableId(column.tableId)
           // @ts-expect-error
           const relatedTable = tables[tableName]
-          if (!relatedTable || !relatedTable.primary) {
+          if (!relatedTable?.primary) {
             throw new Error("Referenced table doesn't exist or has no primary keys")
           }
           const relatedPrimary = relatedTable.primary[0]
@@ -228,7 +228,7 @@ class SqlTableQueryBuilder {
     }
 
     let query: Knex.SchemaBuilder
-    if (!json.table || !json.tables) {
+    if (!(json.table && json.tables)) {
       throw new Error("Cannot execute without table being specified")
     }
     if (json.table.sourceType === TableSourceType.INTERNAL) {

@@ -197,7 +197,7 @@ export function buildQueryBindings(
 }
 
 export const shouldShowVariables = (dynamicVariables: Record<string, any>, success: boolean) => {
-  return !!(dynamicVariables && (Object.keys(dynamicVariables).length > 0 || success))
+  return Boolean(dynamicVariables && (Object.keys(dynamicVariables).length > 0 || success))
 }
 
 export function buildQuery(
@@ -313,7 +313,7 @@ export function getDefaultRestAuthConfig(datasource: Datasource | UIInternalData
   | undefined {
   const config = datasource?.config?.authConfigs?.[0]
   if (!isRestAuthConfig(config)) {
-    return undefined
+    return
   }
   return {
     authConfigId: config._id,

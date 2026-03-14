@@ -154,7 +154,7 @@ const onAddAction = (actionType) => {
 }
 
 const recordOriginalActionIndex = (id) => {
-  if (!actions || !id) {
+  if (!(actions && id)) {
     return
   }
   if (draggingActionId !== id) {

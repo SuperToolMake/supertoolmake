@@ -242,7 +242,7 @@ $: {
     }
   }
 }
-$: if (query && query._id && query._id !== lastSyncedQueryId) {
+$: if (query?._id && query._id !== lastSyncedQueryId) {
   lastSyncedQueryId = query._id
   lastSyncedQueryName = query.name
 }
@@ -346,7 +346,8 @@ $: if (builtQuery && !originalBuiltQuery) {
 }
 
 $: queryDirty =
-  (!!originalBuiltQuery && !isEqual(builtQuery, originalBuiltQuery)) || !!localDynamicVariables
+  (Boolean(originalBuiltQuery) && !isEqual(builtQuery, originalBuiltQuery)) ||
+  Boolean(localDynamicVariables)
 
 $: prettyBody = query?.fields?.requestBody
   ? prettifyQueryRequestBody(query, mergedBindings)
@@ -521,7 +522,7 @@ function parseLegacyQuery(query: Query, endpoints: ImportEndpoint[] | undefined)
 
 // SAVE/PREVIEW
 async function saveQuery(redirectIfNew = true) {
-  if (!builtQuery || !datasource) {
+  if (!(builtQuery && datasource)) {
     return
   }
   savingQuery = true
@@ -570,7 +571,7 @@ async function saveQuery(redirectIfNew = true) {
     localDynamicVariables = undefined
 
     return { ok: true }
-  } catch (err) {
+  } catch {
     notifications.error(`Error saving query`)
   } finally {
     savingQuery = false
@@ -580,7 +581,7 @@ async function saveQuery(redirectIfNew = true) {
 }
 
 async function previewQuery() {
-  if (!selectedEndpointOption || !query || !builtQuery) return
+  if (!(selectedEndpointOption && query && builtQuery)) return
   try {
     validateQuery(
       requestURL,

@@ -31,7 +31,7 @@ const updatePassword = async () => {
     await API.updateSelf({ password })
     notifySuccess(resolvedLabels.successText)
     dispatch("save")
-  } catch (error) {
+  } catch {
     notifyError(resolvedLabels.errorText)
   }
 }

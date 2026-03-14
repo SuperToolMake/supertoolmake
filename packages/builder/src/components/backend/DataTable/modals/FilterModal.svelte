@@ -66,13 +66,13 @@ export let view = {}
 
 $: viewTable = $tables.list.find(({ _id }) => _id === $views.selected?.tableId)
 $: fields = viewTable && Object.keys(viewTable.schema)
-$: schema = viewTable && viewTable.schema ? viewTable.schema : {}
+$: schema = viewTable?.schema ? viewTable.schema : {}
 
 function saveView() {
   try {
     views.save(view)
     notifications.success(`View ${view.name} saved`)
-  } catch (error) {
+  } catch {
     notifications.error("Error saving view")
   }
 }

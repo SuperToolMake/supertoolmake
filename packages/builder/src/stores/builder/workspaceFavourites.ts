@@ -28,7 +28,7 @@ export class WorkspaceFavouriteStore extends BudiStore<WorkspaceFavourite[]> {
     try {
       const resp: WorkspaceFavouriteResponse = await API.workspace.fetch()
       this.set(resp.favourites)
-    } catch (_e: any) {
+    } catch {
       console.error("Could not init workspace favourites")
     }
   }

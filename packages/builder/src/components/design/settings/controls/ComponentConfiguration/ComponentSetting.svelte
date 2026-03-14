@@ -29,7 +29,7 @@ function getDisplayName(showInstanceName: boolean, item: any, componentDef: any)
 // multiple settings sections, as we assume a flat array.
 const updatedNestedFlags = (originalSettings: ComponentSetting[]) => {
   const effectiveSettings = settings || originalSettings
-  if (!nested || !effectiveSettings?.length) {
+  if (!(nested && effectiveSettings?.length)) {
     return effectiveSettings
   }
   let newSettings = effectiveSettings.map((setting: ComponentSetting) => ({

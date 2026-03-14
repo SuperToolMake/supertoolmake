@@ -9,7 +9,7 @@ export let heading = ""
 export let subheading = ""
 export let destinationUrl = "/"
 
-$: showImage = !!imageUrl
+$: showImage = Boolean(imageUrl)
 </script>
 
 <div class="container" use:styleable={$component.styles}>

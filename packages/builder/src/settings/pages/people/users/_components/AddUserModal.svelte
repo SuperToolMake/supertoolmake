@@ -88,7 +88,7 @@ let userData: UserData[] = [
 ]
 $: hasError = userData.find((x) => x.error != null)
 $: parsedEmails = useWorkspaceInviteModal ? emailsInput : []
-$: smtpConfigured = $admin.loaded && ($admin.cloud || !!$admin.checklist?.smtp?.checked)
+$: smtpConfigured = $admin.loaded && ($admin.cloud || Boolean($admin.checklist?.smtp?.checked))
 $: emailInviteDisabled = $admin.loaded ? !smtpConfigured : false
 $: passwordInviteDisabled = $organisation.isSSOEnforced
 $: onboardingOptions = [
@@ -200,7 +200,7 @@ function generatePassword(length: number) {
 const onConfirm = () => {
   if (useWorkspaceInviteModal) {
     const isValid = validateWorkspaceEmails()
-    if (!isValid || !onboardingType) {
+    if (!(isValid && onboardingType)) {
       return keepOpen
     }
 

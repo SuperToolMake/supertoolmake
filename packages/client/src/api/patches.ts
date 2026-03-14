@@ -34,7 +34,7 @@ export const patchAPI = (API: APIClient) => {
               row[`${key}_text`] =
                 row[key]
                   ?.map((option) => option?.primaryDisplay)
-                  .filter((option) => !!option)
+                  .filter((option) => Boolean(option))
                   .join(", ") || ""
             }
           }

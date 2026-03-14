@@ -17,7 +17,7 @@ export function querystringToBody(ctx: Ctx, next: any) {
   let json
   try {
     json = JSON.parse(decoded)
-  } catch (_err) {
+  } catch {
     return next()
   }
   ctx.request.body = json

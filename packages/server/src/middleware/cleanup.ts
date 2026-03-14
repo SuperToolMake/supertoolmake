@@ -6,7 +6,7 @@ export const cleanupMiddleware = (async (_ctx: Ctx, next: Next) => {
   const resp = await next()
 
   const current = context.getCurrentContext()
-  if (!current || !current.cleanup) {
+  if (!current?.cleanup) {
     return resp
   }
 

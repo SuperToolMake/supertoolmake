@@ -114,7 +114,7 @@ export async function fetchStrategyConfig(
   try {
     const { clientID, clientSecret, configUrl } = oidcConfig
 
-    if (!clientID || !clientSecret || !callbackUrl || !configUrl) {
+    if (!(clientID && clientSecret && callbackUrl && configUrl)) {
       // check for remote config and all required elements
       throw new Error(
         "Configuration invalid. Must contain clientID, clientSecret, callbackUrl and configUrl"

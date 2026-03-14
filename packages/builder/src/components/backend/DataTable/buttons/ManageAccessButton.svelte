@@ -30,7 +30,9 @@ $: selectedRoleHighlight = selectedRoleColor
 $: readableRole = selectedRoleID ? selectedRole?.uiMetadata.displayName : null
 $: buttonLabel = readableRole ? `Access: ${readableRole}` : "Access"
 
-$: builtInRoles = builtins.map((roleId) => $roles.find((x) => x._id === roleId)).filter((r) => !!r)
+$: builtInRoles = builtins
+  .map((roleId) => $roles.find((x) => x._id === roleId))
+  .filter((r) => Boolean(r))
 $: customRoles = $roles
   .filter((x) => !builtins.includes(x._id))
   .slice()

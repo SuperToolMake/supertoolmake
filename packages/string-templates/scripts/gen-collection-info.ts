@@ -121,7 +121,7 @@ function getCommentInfo(file: string, func: string): BudibaseAnnotation {
     docs.example = examples.join(" ")
   }
   // hacky example fix
-  if (docs.example && docs.example.includes("product")) {
+  if (docs.example?.includes("product")) {
     docs.example = docs.example.replace("product", "multiply")
   }
   docs.description = blocks[0].trim()

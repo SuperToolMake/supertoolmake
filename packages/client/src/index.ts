@@ -123,7 +123,7 @@ const loadBudibase = async () => {
   // Update builder store with any builder flags
   builderStore.set({
     ...get(builderStore),
-    inBuilder: !!window["##BUDIBASE_IN_BUILDER##"],
+    inBuilder: Boolean(window["##BUDIBASE_IN_BUILDER##"]),
     screen: window["##BUDIBASE_PREVIEW_SCREEN##"],
     selectedComponentId: window["##BUDIBASE_SELECTED_COMPONENT_ID##"],
     previewId: window["##BUDIBASE_PREVIEW_ID##"],
@@ -181,7 +181,7 @@ const loadBudibase = async () => {
       let stringifiedContext = null
       try {
         stringifiedContext = JSON.stringify(context)
-      } catch (_error) {
+      } catch {
         // Ignore - invalid context
       }
       eventStore.actions.dispatchEvent("provide-context", {

@@ -20,7 +20,7 @@ import {
 let button: any
 let popover: any
 
-$: hasErrors = !!$screenComponentErrorList.length
+$: hasErrors = Boolean($screenComponentErrorList.length)
 
 function getErrorTitle(error: UIComponentError) {
   const titleParts = [$screenComponentsList.find((c) => c._id === error.componentId)!._instanceName]

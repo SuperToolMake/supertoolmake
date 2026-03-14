@@ -34,7 +34,7 @@ $: isOwner = sdk.users.hasAdminPermissions(user)
 $: isBuilder = sdk.users.hasBuilderPermissions(user)
 // Re-run initBuilder when user logs in
 $: {
-  const isAuthenticated = !!$auth.user
+  const isAuthenticated = Boolean($auth.user)
   if (isAuthenticated && !hasAuthenticated) {
     initPromise = initBuilder()
   }
@@ -49,16 +49,18 @@ derivedMemo(
   [admin, auth, enrichedApps, isActive, appsStore, loaded],
   ([$admin, $auth, $enrichedApps, $isActive, $appsStore, $loaded]) => {
     // Only run remaining logic when fully loaded
-    if (!$loaded || !$admin.loaded || !$auth.loaded) {
+    if (!($loaded && $admin.loaded && $auth.loaded)) {
       return null
     }
 
     // Set the return url on logout
     if (
-      !$auth.user &&
-      !CookieUtils.getCookie(Constants.Cookies.ReturnUrl) &&
-      !$auth.postLogout &&
-      !isOnPreLoginPage()
+      !(
+        $auth.user ||
+        CookieUtils.getCookie(Constants.Cookies.ReturnUrl) ||
+        $auth.postLogout ||
+        isOnPreLoginPage()
+      )
     ) {
       CookieUtils.setCookie(Constants.Cookies.ReturnUrl, window.location.href)
       return
@@ -77,7 +79,7 @@ derivedMemo(
     }
 
     // Redirect to log in at any time if the user isn't authenticated
-    if (!$auth.user && !isOnPreLoginPage()) {
+    if (!($auth.user || isOnPreLoginPage())) {
       goto(`./auth`)
       return
     }
@@ -120,7 +122,7 @@ derivedMemo(
       }
 
       // Redirect non-builders to apps unless they're already there
-      if (!isBuilder && !$isActive("./apps")) {
+      if (!(isBuilder || $isActive("./apps"))) {
         goto(`./apps`)
         return
       }
@@ -192,7 +194,7 @@ const handleKeyDown = (e) => {
 
 onMount(() => {
   initPromise = initBuilder()
-  hasAuthenticated = !!$auth.user
+  hasAuthenticated = Boolean($auth.user)
 })
 </script>
 

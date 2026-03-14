@@ -23,7 +23,7 @@ function saveView() {
   try {
     views.save(view)
     notifications.success(`View ${view.name} saved`)
-  } catch (error) {
+  } catch {
     notifications.error("Error saving view")
   }
 }

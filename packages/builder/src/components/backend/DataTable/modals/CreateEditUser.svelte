@@ -31,11 +31,11 @@ const getUserSchema = (table) => {
 
 const getCustomSchemaKeys = (schema) => {
   let customSchema = { ...schema }
-  delete customSchema["email"]
-  delete customSchema["roleId"]
-  delete customSchema["status"]
-  delete customSchema["firstName"]
-  delete customSchema["lastName"]
+  delete customSchema.email
+  delete customSchema.roleId
+  delete customSchema.status
+  delete customSchema.firstName
+  delete customSchema.lastName
   return Object.entries(customSchema)
 }
 

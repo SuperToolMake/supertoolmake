@@ -89,7 +89,7 @@ export function getListOfAppsInMulti(tmpPath: string) {
 export async function importApp(appId: string, db: Database, template: TemplateType) {
   const prodAppId = dbCore.getProdWorkspaceID(appId)
   let dbStream: fs.ReadStream
-  const isTar = template.file && template?.file?.type?.endsWith("gzip")
+  const isTar = template?.file?.type?.endsWith("gzip")
   const isDirectory = template.file && (await fsp.lstat(template.file.path)).isDirectory()
   let tmpPath: string | undefined
   if (template.file && (isTar || isDirectory)) {
@@ -98,7 +98,7 @@ export async function importApp(appId: string, db: Database, template: TemplateT
       await decryptFiles(tmpPath, template.file.password)
     }
     const contents = await fsp.readdir(tmpPath)
-    const stillEncrypted = !!contents.find((name) => name.endsWith(".enc"))
+    const stillEncrypted = Boolean(contents.find((name) => name.endsWith(".enc")))
     if (stillEncrypted) {
       throw new Error("Files are encrypted but no password has been supplied.")
     }

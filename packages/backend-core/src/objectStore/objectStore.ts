@@ -428,7 +428,7 @@ export async function* listAllObjects(bucketName: string, path: string): AsyncGe
         yield obj
       }
     }
-    isTruncated = !!response.IsTruncated
+    isTruncated = Boolean(response.IsTruncated)
     token = response.NextContinuationToken
   } while (isTruncated && token)
 }
@@ -607,7 +607,7 @@ export async function getReadStream(
     Key: path,
   }
   const response = await client.getObject(params)
-  if (!response.Body || !(response.Body instanceof stream.Readable)) {
+  if (!(response.Body && response.Body instanceof stream.Readable)) {
     throw new Error("Unable to retrieve stream - invalid response")
   }
   return {
@@ -633,7 +633,7 @@ export async function getObjectMetadata(
 
   try {
     return await client.headObject(params)
-  } catch (_err: any) {
+  } catch {
     throw new Error("Unable to retrieve metadata from object")
   }
 }
@@ -671,7 +671,7 @@ export function extractBucketAndPath(url: string): { bucket: string; path: strin
   const regex = new RegExp(`^${SIGNED_FILE_PREFIX}/(?<bucket>[^/]+)/(?<path>.+)$`)
   const match = baseUrl.match(regex)
 
-  if (match && match.groups) {
+  if (match?.groups) {
     const { bucket, path } = match.groups
     return { bucket, path }
   }

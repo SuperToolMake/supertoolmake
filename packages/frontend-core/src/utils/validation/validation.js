@@ -21,5 +21,5 @@ export function createValidationStore(initialValue, ...validators) {
 function validate(value, validators) {
   const failing = validators.find((v) => v(value) !== true)
 
-  return failing && failing(value)
+  return failing?.(value)
 }

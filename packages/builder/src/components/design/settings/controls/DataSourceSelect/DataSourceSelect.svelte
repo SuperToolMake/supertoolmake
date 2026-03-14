@@ -140,7 +140,7 @@ const handleCSV = async (e) => {
     }
     modal.hide()
     saveCustomData()
-  } catch (error) {
+  } catch {
     notifications.error("Failed to parse CSV")
     modal.hide()
     drawer.show()

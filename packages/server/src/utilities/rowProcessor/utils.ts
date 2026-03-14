@@ -13,7 +13,7 @@ import { AutoFieldDefaultNames } from "../../constants"
  * subtype the auto column should be.
  */
 export function fixAutoColumnSubType(column: FieldSchema): AutoColumnFieldMetadata | FieldSchema {
-  if (!column.autocolumn || !column.name || column.subtype) {
+  if (!(column.autocolumn && column.name) || column.subtype) {
     return column
   }
   // the columns which get auto generated
@@ -45,7 +45,7 @@ export function processDates<T extends Row | Row[]>(table: Table, inputRows: T):
     if (schema.dateOnly) {
       continue
     }
-    if (!schema.timeOnly && !schema.ignoreTimezones) {
+    if (!(schema.timeOnly || schema.ignoreTimezones)) {
       datesWithTZ.push(column)
     }
   }

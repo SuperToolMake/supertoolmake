@@ -76,7 +76,7 @@ const duplicateApp = async () => {
     }
     onDuplicateSuccess()
     notifications.success("App duplicated successfully")
-  } catch (err) {
+  } catch {
     notifications.error("Error duplicating app")
     duplicating = false
   }

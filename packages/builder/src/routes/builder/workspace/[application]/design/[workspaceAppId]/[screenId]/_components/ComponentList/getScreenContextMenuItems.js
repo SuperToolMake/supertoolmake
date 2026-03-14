@@ -12,7 +12,7 @@ const getContextMenuItems = (component, showCopy) => {
   const pasteComponent = (mode) => {
     try {
       componentStore.paste(component, mode)
-    } catch (_error) {
+    } catch {
       notifications.error("Error saving component")
     }
   }

@@ -48,7 +48,7 @@ export async function processInputBBReferences(
   value: string | string[] | { _id: string }[],
   subtype: BBReferenceFieldSubType
 ): Promise<string[] | null> {
-  if (!value || !value[0]) {
+  if (!value?.[0]) {
     return null
   }
 
@@ -57,7 +57,7 @@ export async function processInputBBReferences(
     referenceIds = value
       .split(",")
       .map((u) => u.trim())
-      .filter((u) => !!u)
+      .filter((u) => Boolean(u))
   } else {
     referenceIds = value.map((idOrDoc) => (typeof idOrDoc === "string" ? idOrDoc : idOrDoc._id))
   }
@@ -108,7 +108,7 @@ export async function processOutputBBReference(
   subtype: BBReferenceFieldSubType.USER
 ): Promise<UserReferenceInfo | undefined> {
   if (!value) {
-    return undefined
+    return
   }
 
   switch (subtype) {
@@ -124,7 +124,7 @@ export async function processOutputBBReference(
         }
       }
       if (!user) {
-        return undefined
+        return
       }
 
       return {
@@ -145,16 +145,16 @@ export async function processOutputBBReferences(
   subtype: BBReferenceFieldSubType
 ): Promise<UserReferenceInfo[] | undefined> {
   if (!value || (Array.isArray(value) && value.length === 0)) {
-    return undefined
+    return
   }
-  const ids = typeof value === "string" ? value.split(",").filter((id) => !!id) : value
+  const ids = typeof value === "string" ? value.split(",").filter((id) => Boolean(id)) : value
 
   switch (subtype) {
     case BBReferenceFieldSubType.USER:
     case BBReferenceFieldSubType.USERS: {
       const { users } = await cache.user.getUsers(ids)
       if (!users.length) {
-        return undefined
+        return
       }
 
       return users.map((u) => ({

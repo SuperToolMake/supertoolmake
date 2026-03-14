@@ -70,7 +70,7 @@ const parseValue = (value) => {
 // Builds a lookup map to quickly check which rows are selected
 const buildLookupMap = (value, isOpen) => {
   let map = {}
-  if (!isOpen || !value?.length) {
+  if (!(isOpen && value?.length)) {
     return map
   }
   for (let i = 0; i < value.length; i++) {
@@ -91,12 +91,12 @@ const isRowSelected = (row) => {
 const search = async (searchString, force = false) => {
   // Avoid update state at all if we've already handled the update and this is
   // a wasted search due to svelte reactivity
-  if (!force && !searchString && !lastSearchString) {
+  if (!(force || searchString || lastSearchString)) {
     return
   }
 
   // Reset state if this search is invalid
-  if (!schema?.tableId || !isOpen) {
+  if (!(schema?.tableId && isOpen)) {
     lastSearchString = null
     candidateIndex = null
     searchResults = []

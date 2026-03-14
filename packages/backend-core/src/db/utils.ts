@@ -20,7 +20,7 @@ export * from "../docIds"
  * but it may not be 100% accurate in full efficiency mode (some tenantless workspaces may be missed).
  */
 export async function getAllDbs(opts = { efficient: false }) {
-  const efficient = opts && opts.efficient
+  const efficient = opts?.efficient
 
   let dbs: any[] = []
   async function addDbs(queryString?: string) {
@@ -76,10 +76,10 @@ export async function getAllWorkspaces({
   efficient?: boolean
 } = {}): Promise<Workspace[] | string[]> {
   let tenantId = getTenantId()
-  if (!env.MULTI_TENANCY && !tenantId) {
+  if (!(env.MULTI_TENANCY || tenantId)) {
     tenantId = DEFAULT_TENANT_ID
   }
-  const dbs = await getAllDbs({ efficient: efficient || false })
+  const dbs = await getAllDbs({ efficient: efficient })
   const workspaceDbNames = dbs.filter((dbName: any) => {
     if (env.isTest() && !dbName) {
       return false

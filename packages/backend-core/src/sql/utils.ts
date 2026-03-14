@@ -43,7 +43,7 @@ export function getNativeSql(query: Knex.SchemaBuilder | Knex.QueryBuilder): Sql
 }
 
 export function isExternalTable(table: Table) {
-  if (table?.sourceId && table.sourceId.includes(DocumentType.DATASOURCE + SEPARATOR)) {
+  if (table?.sourceId?.includes(DocumentType.DATASOURCE + SEPARATOR)) {
     return true
   } else if (table?.sourceType === TableSourceType.EXTERNAL) {
     return true
@@ -78,7 +78,7 @@ export function breakExternalTableId(tableId: string) {
   if (tableName.includes(ENCODED_SPACE)) {
     tableName = decodeURIComponent(tableName)
   }
-  if (!datasourceId || !tableName) {
+  if (!(datasourceId && tableName)) {
     throw new Error("Unable to get datasource/table name from table ID")
   }
   return { datasourceId, tableName }
@@ -125,7 +125,7 @@ export function breakRowIdField(_id: string | { _id: string }): any[] {
   try {
     const parsed = JSON.parse(decoded)
     return Array.isArray(parsed) ? parsed : [parsed]
-  } catch (_err) {
+  } catch {
     // wasn't json - likely was handlebars for a many to many
     return [_id]
   }
@@ -152,7 +152,7 @@ export function isValidISODateStringWithoutTimezone(str: string) {
 export function extractDate(str: string) {
   const match = str.match(DATE_REGEX)
   if (!match) {
-    return undefined
+    return
   }
   return match[0]
 }
@@ -180,11 +180,11 @@ function isValidManyToManyRelationship(
   relationship: RelationshipsJson
 ): relationship is ManyToManyRelationshipJson {
   return (
-    !!relationship.through &&
-    !!relationship.fromPrimary &&
-    !!relationship.from &&
-    !!relationship.toPrimary &&
-    !!relationship.to
+    Boolean(relationship.through) &&
+    Boolean(relationship.fromPrimary) &&
+    Boolean(relationship.from) &&
+    Boolean(relationship.toPrimary) &&
+    Boolean(relationship.to)
   )
 }
 
@@ -194,5 +194,5 @@ export function validateManyToMany(
   if (isValidManyToManyRelationship(relationship)) {
     return relationship
   }
-  return undefined
+  return
 }

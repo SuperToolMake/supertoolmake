@@ -35,7 +35,7 @@ const createRouteStore = () => {
     let routeConfig
     try {
       routeConfig = await API.fetchClientAppRoutes()
-    } catch (_error) {
+    } catch {
       routeConfig = null
     }
     const routes: Route[] = []

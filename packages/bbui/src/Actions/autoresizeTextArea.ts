@@ -1,7 +1,7 @@
 function resize(e: Event) {
   const target = e.target as HTMLTextAreaElement
   target.style.height = "1px"
-  target.style.height = +target.scrollHeight + "px"
+  target.style.height = Number(target.scrollHeight) + "px"
 }
 
 export default function (el: HTMLTextAreaElement) {

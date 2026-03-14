@@ -29,9 +29,7 @@ $: password = $firstPassword
 $: firstPasswordError =
   ($firstTouched && $passwordError) || ($repeatTouched && validatePassword(password))
 $: error =
-  !$firstPassword ||
-  !$firstTouched ||
-  !$repeatTouched ||
+  !($firstPassword && $firstTouched && $repeatTouched) ||
   $firstPassword !== $repeatPassword ||
   firstPasswordError
 </script>

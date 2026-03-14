@@ -92,7 +92,7 @@ const getCategoryNames = (categories: [string, EnrichedBinding[]][], showSnippet
 }
 
 const showBindingPopover = (binding: EnrichedBinding, target: HTMLElement) => {
-  if (!context || !binding.value || binding.value === "") {
+  if (!(context && binding.value) || binding.value === "") {
     return
   }
   stopHidingPopover()

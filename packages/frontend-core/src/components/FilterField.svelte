@@ -56,7 +56,7 @@ const onConfirmBinding = () => {
 }
 
 const isValidDate = (value) => {
-  return !value || !isNaN(new Date(value).valueOf())
+  return !(value && isNaN(new Date(value).valueOf()))
 }
 
 const hasValidOptions = (value) => {
@@ -95,7 +95,7 @@ const validationMap = {
   bb_reference_single: hasValidLinks,
   array: hasValidOptions,
   longform: (value) => !isJSBinding(value),
-  options: (value) => !isJSBinding(value) && !findHBSBlocks(value)?.length,
+  options: (value) => !(isJSBinding(value) || findHBSBlocks(value)?.length),
   boolean: isValidBoolean,
 }
 

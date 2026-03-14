@@ -43,7 +43,7 @@ export const initialise = (context: StoreContext) => {
 
   // Derive if the current sort column exists in the schema
   const sortColumnExists = derived([sort, schema], ([$sort, $schema]) => {
-    if (!$sort?.column || !$schema) {
+    if (!($sort?.column && $schema)) {
       return true
     }
     return $schema[$sort.column] != null

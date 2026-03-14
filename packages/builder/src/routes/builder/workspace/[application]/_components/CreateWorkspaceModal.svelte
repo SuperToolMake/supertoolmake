@@ -46,7 +46,7 @@ $: {
 
 // filename should be separated to avoid updates everytime any other form element changes
 $: filename = $values.file?.name
-$: encryptedFile = !!filename && isEncryptedRegex.test(filename)
+$: encryptedFile = Boolean(filename) && isEncryptedRegex.test(filename)
 
 onMount(async () => {
   if ($auth.user?.firstName) {
@@ -172,7 +172,9 @@ const Step = { CONFIG: "config", SET_PASSWORD: "set_password" }
 let currentStep = Step.CONFIG
 
 // Check if create button should be enabled
-$: isCreateValid = template?.fromFile ? $validation.valid && !!$values.file : $validation.valid
+$: isCreateValid = template?.fromFile
+  ? $validation.valid && Boolean($values.file)
+  : $validation.valid
 
 $: stepConfig = {
   [Step.CONFIG]: {

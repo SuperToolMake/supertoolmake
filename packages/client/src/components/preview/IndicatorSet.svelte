@@ -197,8 +197,8 @@ const updatePosition = () => {
       intersectionObserver.observe(element)
       intersectionObservers.push(intersectionObserver)
       indicator.visible = false
-      indicator.insideSidePanel = !!element.closest(".side-panel")
-      indicator.insideModal = !!element.closest(".modal-content")
+      indicator.insideSidePanel = Boolean(element.closest(".side-panel"))
+      indicator.insideModal = Boolean(element.closest(".modal-content"))
     }
 
     return indicator

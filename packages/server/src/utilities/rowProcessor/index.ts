@@ -58,8 +58,12 @@ export async function processAutoColumn(
   // if a row doesn't have a revision then it doesn't exist yet
   const creating = !row._rev
   // check its not user table, or whether any of the processing options have been disabled
-  const shouldUpdateUserFields =
-    !isUserTable && !opts?.reprocessing && !opts?.noAutoRelationships && !noUser
+  const shouldUpdateUserFields = !(
+    isUserTable ||
+    opts?.reprocessing ||
+    opts?.noAutoRelationships ||
+    noUser
+  )
 
   let autoIdAllocations: Record<string, number> = {}
   if (creating) {
@@ -123,7 +127,7 @@ export async function processAutoColumn(
 }
 
 async function processDefaultValues(table: Table, row: Row) {
-  const ctx: { ["Current User"]?: User; user?: User } = {}
+  const ctx: { "Current User"?: User; user?: User } = {}
 
   const identity = context.getIdentity()
   if (identity?._id && identity.type === IdentityType.USER) {
@@ -205,7 +209,7 @@ export async function inputProcessing(
       ? isExternalColumnName(key)
       : isInternalColumnName(key)
     // cleanse fields that aren't in the schema
-    if (!field && !isBuiltinColumn) {
+    if (!(field || isBuiltinColumn)) {
       delete clonedRow[key]
     }
     // field isn't found - might be a built-in column, skip over it
@@ -225,7 +229,7 @@ export async function inputProcessing(
     }
   }
 
-  if (!clonedRow._id || !clonedRow._rev) {
+  if (!(clonedRow._id && clonedRow._rev)) {
     clonedRow._id = row._id
     clonedRow._rev = row._rev
   }

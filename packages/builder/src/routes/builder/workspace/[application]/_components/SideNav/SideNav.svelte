@@ -94,7 +94,7 @@ $: appId = $appStore.appId
 $: !$pinned && unPin()
 
 // keep sidebar expanded when workspace selector is open
-$: collapsed = !focused && !$pinned && !workspaceMenuOpen
+$: collapsed = !(focused || $pinned || workspaceMenuOpen)
 // keep sidebar expanded when selector is open, even if mouse leaves
 $: navFocused = focused || workspaceMenuOpen
 
@@ -146,7 +146,7 @@ const generateResourceLookup = (allResourceStores: Readable<AllResourceStores>) 
         }
 
         const favourite = favourites[id]
-        if (!favourite || !hasName(resource)) {
+        if (!(favourite && hasName(resource))) {
           continue
         }
 
@@ -254,7 +254,7 @@ const setFocused = (nextFocused: boolean) => {
   if (ignoreFocus) {
     return
   }
-  if (!focused && !resourceLookup) {
+  if (!(focused || resourceLookup)) {
     initFavourites()
   }
   focused = nextFocused

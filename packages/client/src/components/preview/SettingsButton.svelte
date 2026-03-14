@@ -15,7 +15,7 @@ export let disabled = false
 const dispatch = createEventDispatcher()
 
 $: currentValue = component?.[prop]
-$: active = prop && (bool ? !!currentValue : currentValue === value)
+$: active = prop && (bool ? Boolean(currentValue) : currentValue === value)
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

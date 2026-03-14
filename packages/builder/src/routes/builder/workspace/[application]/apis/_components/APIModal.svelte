@@ -71,7 +71,7 @@ const handleCustom = async (integration?: UIIntegration) => {
 const loadTemplateInfo = async (spec?: RestTemplateSpec | null) => {
   const request = getRestTemplateImportInfoRequest(spec)
   if (!request) {
-    return undefined
+    return
   }
   return await queries.fetchImportInfo(request)
 }

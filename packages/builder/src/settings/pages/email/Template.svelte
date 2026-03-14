@@ -68,7 +68,7 @@ async function saveTemplate(): Promise<void> {
     // Save your template config
     await email.saveTemplate(selectedTemplate)
     notifications.success("Template saved")
-  } catch (error) {
+  } catch {
     notifications.error("Failed to update template settings")
   }
 }

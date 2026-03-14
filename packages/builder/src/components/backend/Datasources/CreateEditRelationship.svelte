@@ -97,7 +97,7 @@ function getTable(id) {
 
 function invalidThroughTable() {
   // need to know the foreign key columns to check error
-  if (!throughId || !throughToKey || !throughFromKey) {
+  if (!(throughId && throughToKey && throughFromKey)) {
     return false
   }
   const throughTbl = plusTables.find((tbl) => tbl._id === throughId)
@@ -132,11 +132,11 @@ function manyToManyRelationshipExistsFn() {
     (link.throughTo === throughFromKey && link.throughFrom === throughToKey)
 
   const allLinks = [...fromThroughLinks, ...toThroughLinks]
-  return !!allLinks.find((link) => link.through === throughId && matchAgainstUserInput(link))
+  return Boolean(allLinks.find((link) => link.through === throughId && matchAgainstUserInput(link)))
 }
 
 function getErrorCount(errors) {
-  return Object.entries(errors).filter((entry) => !!entry[1]).length
+  return Object.entries(errors).filter((entry) => Boolean(entry[1])).length
 }
 
 function allRequiredAttributesSet(relationshipType) {
@@ -149,7 +149,7 @@ function allRequiredAttributesSet(relationshipType) {
 }
 
 function validate() {
-  if (!allRequiredAttributesSet(relationshipType) && !hasValidated) {
+  if (!(allRequiredAttributesSet(relationshipType) || hasValidated)) {
     return
   }
 

@@ -44,7 +44,7 @@ const getScreenSettings = (screen) => {
           props: {
             options: ["Extra small", "Small", "Medium", "Large", "Max"],
             placeholder: "Default",
-            disabled: !!screen.layoutId,
+            disabled: Boolean(screen.layoutId),
           },
         },
         {

@@ -72,7 +72,7 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
       } else if (json?.error) {
         message = JSON.stringify(json.error)
       }
-    } catch (_error) {
+    } catch {
       // Do nothing
     }
 
@@ -140,7 +140,7 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
     if (json) {
       try {
         requestBody = JSON.stringify(body)
-      } catch (_error) {
+      } catch {
         throw makeError("Invalid JSON body", url, method)
       }
     }
@@ -154,7 +154,7 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
         body: requestBody,
         credentials: "same-origin",
       })
-    } catch (_error) {
+    } catch {
       delete cache[url]
       throw makeError("Failed to send request", url, method)
     }

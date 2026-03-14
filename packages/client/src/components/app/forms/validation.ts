@@ -149,7 +149,7 @@ const evaluateRule = (rule: UIFieldValidationRule, value: any) => {
  */
 const parseType = (value: any, type: `${FieldType}`) => {
   // Treat nulls or empty strings as null
-  if (!exists(value) || !type) {
+  if (!(exists(value) && type)) {
     return null
   }
 
@@ -191,7 +191,7 @@ const parseType = (value: any, type: `${FieldType}`) => {
 
   // Parse links, treating no elements as null
   if (type === FieldType.LINK) {
-    if (!Array.isArray(value) || !value.length) {
+    if (!(Array.isArray(value) && value.length)) {
       return null
     }
     return value
@@ -199,7 +199,7 @@ const parseType = (value: any, type: `${FieldType}`) => {
 
   // Parse array, treating no elements as null
   if (type === FieldType.ARRAY) {
-    if (!Array.isArray(value) || !value.length) {
+    if (!(Array.isArray(value) && value.length)) {
       return null
     }
     return value
@@ -303,7 +303,7 @@ const notRegexHandler = (value: any, rule: UIFieldValidationRule) => {
 // Evaluates a contains constraint
 const containsHandler = (value: any, rule: UIFieldValidationRule) => {
   const expectedValue = parseType(rule.value, "string")
-  return value && value.includes(expectedValue)
+  return value?.includes(expectedValue)
 }
 
 // Evaluates a not contains constraint
@@ -319,7 +319,7 @@ const jsonHandler = (value: any) => {
   try {
     JSON.parse(JSON.stringify(value))
     return true
-  } catch (_error) {
+  } catch {
     return false
   }
 }

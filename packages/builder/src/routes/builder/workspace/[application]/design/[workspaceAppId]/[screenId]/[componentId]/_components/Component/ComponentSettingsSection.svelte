@@ -69,7 +69,7 @@ const updateSetting = async (setting, value) => {
     } else {
       await componentStore.updateSetting(setting.key, value)
     }
-  } catch (error) {
+  } catch {
     notifications.error("Error updating component prop")
   }
 }

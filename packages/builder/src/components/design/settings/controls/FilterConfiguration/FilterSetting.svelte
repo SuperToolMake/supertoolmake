@@ -34,7 +34,7 @@ const onToggle = (item) => {
 }
 
 const getOperatorOptions = () => {
-  if (!item?.field || !schema?.[item.field]) {
+  if (!(item?.field && schema?.[item.field])) {
     return []
   }
   const schemaField = schema[item.field]

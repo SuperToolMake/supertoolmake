@@ -33,7 +33,7 @@ const getFieldValue = (val) => {
 async function fetchRows(linkedTableId) {
   try {
     rows = await API.fetchTableData(linkedTableId)
-  } catch (error) {
+  } catch {
     rows = []
   }
 }

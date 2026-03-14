@@ -143,7 +143,7 @@ const getNormalFields = (schema) => {
 }
 
 const getEditTitle = (detailsFormBlockId, primaryDisplay) => {
-  if (!primaryDisplay || !detailsFormBlockId) {
+  if (!(primaryDisplay && detailsFormBlockId)) {
     return "Edit"
   }
   const prefix = safe(detailsFormBlockId + "-repeater")

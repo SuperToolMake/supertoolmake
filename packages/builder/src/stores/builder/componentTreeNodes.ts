@@ -66,7 +66,7 @@ export class ComponentTreeNodesStore extends BudiStore<OpenNodesState> {
 
   isNodeExpanded(componentId: string): boolean {
     const openNodes = get(this)
-    return !!openNodes[`nodeOpen-${componentId}`]
+    return Boolean(openNodes[`nodeOpen-${componentId}`])
   }
 }
 

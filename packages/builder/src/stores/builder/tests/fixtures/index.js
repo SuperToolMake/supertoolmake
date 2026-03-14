@@ -93,10 +93,10 @@ export const generateAppPackage = ({
   const appId = "app_dev_" + getDocId()
 
   const features = {}
-  features["componentValidation"] = appValidation
+  features.componentValidation = appValidation
 
   if (disableUserMetadata) {
-    features["disableUserMetadata"] = false
+    features.disableUserMetadata = false
   }
 
   return {

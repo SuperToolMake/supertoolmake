@@ -77,16 +77,17 @@ const endUserRoleOptions = $derived([
   ...customEndUserRoleOptions,
 ])
 const roleOptions = $derived(Constants.BudibaseRoleOptions)
-const disableFields = $derived(readonly || !!user?.scimInfo?.isSync)
+const disableFields = $derived(readonly || Boolean(user?.scimInfo?.isSync))
 const hasChanges = $derived(
-  !!initialDraft &&
+  Boolean(initialDraft) &&
     (draft.firstName !== initialDraft.firstName ||
       draft.lastName !== initialDraft.lastName ||
       draft.role !== initialDraft.role ||
       draft.appRole !== initialDraft.appRole)
 )
 const hasRoleChanges = $derived(
-  !!initialDraft && (draft.role !== initialDraft.role || draft.appRole !== initialDraft.appRole)
+  Boolean(initialDraft) &&
+    (draft.role !== initialDraft.role || draft.appRole !== initialDraft.appRole)
 )
 
 $effect(() => {
@@ -112,7 +113,7 @@ const getRoleFromWorkspaceRole = (workspaceRole?: string) => {
   if (workspaceRole) {
     return Constants.BudibaseRoles.AppUser
   }
-  return undefined
+  return
 }
 
 const canWorkspaceRoleOverrideGlobalRole = (globalRole: string) => {
@@ -160,13 +161,13 @@ const getWorkspaceRole = (role: string, appRole: string) => {
 }
 
 const onConfirm = async () => {
-  if (!user?._id || !hasChanges) {
+  if (!(user?._id && hasChanges)) {
     return
   }
 
   try {
     const current = await users.get(user._id)
-    if (!current?._id || !current?._rev) {
+    if (!(current?._id && current?._rev)) {
       notifications.error("Error updating user")
       return keepOpen
     }

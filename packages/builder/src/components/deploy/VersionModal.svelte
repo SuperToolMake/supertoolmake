@@ -39,7 +39,7 @@ const refreshAppPackage = async () => {
   try {
     const pkg = await API.fetchAppPackage(appId)
     await initialise(pkg)
-  } catch (error) {
+  } catch {
     notifications.error("Error fetching app package")
   }
 }

@@ -45,7 +45,7 @@ const save = async () => {
     } else {
       await componentStore.updateCustomStyle(value)
     }
-  } catch (error) {
+  } catch {
     notifications.error("Error updating custom style")
   }
   drawer.hide()

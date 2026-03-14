@@ -47,7 +47,7 @@ $: error = getErrorStore(rowFocused, cellId)
 
 // Determine if the cell is editable
 $: readonly =
-  hasCustomFormat || columns.actions.isReadonly(column) || (!$config.canEditRows && !row._isNewRow)
+  hasCustomFormat || columns.actions.isReadonly(column) || !($config.canEditRows || row._isNewRow)
 
 // Register this cell API if this cell is focused
 $: {

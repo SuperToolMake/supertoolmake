@@ -546,7 +546,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
   // Checks if a changeset for a row actually mutates the row or not
   const changesAreValid = (row: UIRow, changes: Record<string, any>) => {
     const columns = Object.keys(changes || {})
-    if (!row || !columns.length) {
+    if (!(row && columns.length)) {
       return false
     }
 
@@ -574,7 +574,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
     }
 
     // Check this is a valid change
-    if (!row || !changesAreValid(row, changes)) {
+    if (!(row && changesAreValid(row, changes))) {
       return false
     }
 
@@ -778,7 +778,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
       // Ensure we have a unique _id.
       // We generate one for non DS+ where required, but trust that any existing
       // _id values are unique (e.g. Mongo)
-      if (!$hasBudibaseIdentifiers && !newRow._id?.length) {
+      if (!($hasBudibaseIdentifiers || newRow._id?.length)) {
         newRow._id = generateRowID()
       }
 

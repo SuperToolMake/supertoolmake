@@ -114,7 +114,7 @@ const getLabels = (dataProvider, labelColumn, labelType) => {
     if (!["string", "number", "boolean"].includes(typeof value)) {
       return ""
     } else if (labelType === "datetime") {
-      return formatters["Datetime"](value)
+      return formatters.Datetime(value)
     }
 
     return value

@@ -53,7 +53,7 @@ const inviteUsers = async (userData: UserData) => {
     notifications.error("Error adding some users to workspace")
   }
   if (!usersForInvite.length) {
-    if (!result.assignedCount && !result.failedCount) {
+    if (!(result.assignedCount || result.failedCount)) {
       notifications.info("No users available to invite")
     }
     return
@@ -85,7 +85,7 @@ const createUsers = async (userData: UserData) => {
     notifications.error("Error adding some users to workspace")
   }
   if (!usersForCreation.users.length) {
-    if (!result.assignedCount && !result.failedCount) {
+    if (!(result.assignedCount || result.failedCount)) {
       notifications.info("No users available to create")
     }
     return

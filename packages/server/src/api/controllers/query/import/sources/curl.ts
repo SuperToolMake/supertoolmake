@@ -25,12 +25,12 @@ const parseBody = (curl: any) => {
           key = key.substring(1)
         }
         return JSON.parse(key)
-      } catch (_e) {
+      } catch {
         // do nothing
       }
     }
   }
-  return undefined
+  return
 }
 
 const parseCookie = (curl: any) => {
@@ -54,7 +54,7 @@ export class Curl extends ImportSource {
   isSupported = async (data: string): Promise<boolean> => {
     try {
       this.curl = parseCurl(data)
-    } catch (_err) {
+    } catch {
       return false
     }
     return true
@@ -106,7 +106,7 @@ export class Curl extends ImportSource {
 
     const cookieHeader = parseCookie(this.curl)
     if (cookieHeader) {
-      headers["Cookie"] = cookieHeader
+      headers.Cookie = cookieHeader
     }
 
     const query = this.constructQuery(

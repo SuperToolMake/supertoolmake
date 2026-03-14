@@ -82,7 +82,7 @@ export const url = (
           return true
         }
         // make it clear that this is a url path and cannot be a full url
-        return !value.includes("http") && !value.includes("www") && !value.includes(".")
+        return !(value.includes("http") || value.includes("www") || value.includes("."))
       })
   )
 }

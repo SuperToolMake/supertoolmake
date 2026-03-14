@@ -96,7 +96,7 @@ const updatePosition = () => {
   if (!insideGrid) {
     domBoundary = domBoundary.getElementsByClassName(`${id}-dom`)[0] || domBoundary.children?.[0]
   }
-  if (!domBoundary || !self) {
+  if (!(domBoundary && self)) {
     return reset()
   }
 

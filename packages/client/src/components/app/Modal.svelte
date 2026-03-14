@@ -28,7 +28,8 @@ $: {
 
 $: open = $modalStore.contentId === $component.id
 
-$: resolvedHideCloseIcon = hideCloseIcon === undefined ? !!ignoreClicksOutside : hideCloseIcon
+$: resolvedHideCloseIcon =
+  hideCloseIcon === undefined ? Boolean(ignoreClicksOutside) : hideCloseIcon
 
 const handleModalClose = async () => {
   if (onClose) {

@@ -84,7 +84,7 @@ async function deleteDatasource(datasource: Datasource) {
     if (isSelected) {
       goto("./datasource")
     }
-  } catch (error) {
+  } catch {
     notifications.error("Error deleting datasource")
   }
 }
@@ -100,13 +100,13 @@ async function deleteQuery(query: Query) {
     await queries.delete(query)
     await datasources.fetch()
     notifications.success("Query deleted")
-  } catch (error) {
+  } catch {
     notifications.error("Error deleting query")
   }
 }
 
 async function deleteSource() {
-  if (!source || !sourceType) {
+  if (!(source && sourceType)) {
     throw new Error("Unable to delete - no data source found.")
   }
 

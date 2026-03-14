@@ -25,7 +25,7 @@ export const convertOldFieldFormat = (fields) => {
 }
 
 export const getComponentForField = (field, schema) => {
-  if (!field || !schema?.[field]) {
+  if (!(field && schema?.[field])) {
     return null
   }
   const type = schema[field].type

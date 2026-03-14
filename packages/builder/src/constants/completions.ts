@@ -11,7 +11,7 @@ export function handlebarsCompletions(): Helper[] {
       label: helperName,
       displayText: helperName,
       description: helperConfig.description,
-      allowsJs: !helperConfig.requiresBlock && !helpersToRemoveForJs.includes(helperName),
+      allowsJs: !(helperConfig.requiresBlock || helpersToRemoveForJs.includes(helperName)),
       args: helperConfig.args,
     }))
   )

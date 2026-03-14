@@ -99,7 +99,7 @@ const updateSanitsedFields = (value) => {
 }
 
 const getValidColumns = (columns, options) => {
-  if (!Array.isArray(columns) || !columns.length) {
+  if (!(Array.isArray(columns) && columns.length)) {
     return []
   }
 

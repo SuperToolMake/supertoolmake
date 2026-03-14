@@ -143,7 +143,7 @@ const handleScroll = (e) => {
 
 async function handleKeyDown(evt) {
   keys[evt.key] = true
-  if ((keys["Meta"] || keys["Control"]) && keys["Enter"]) {
+  if ((keys.Meta || keys.Control) && keys.Enter) {
     await runQuery({ suppressErrors: false })
   }
 }

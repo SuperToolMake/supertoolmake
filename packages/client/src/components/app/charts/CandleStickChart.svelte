@@ -48,7 +48,7 @@ $: options = {
   },
   xaxis: {
     tooltip: {
-      formatter: formatters["Datetime"],
+      formatter: formatters.Datetime,
     },
     type: "datetime",
     title: {

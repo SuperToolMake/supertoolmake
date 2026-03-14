@@ -87,9 +87,7 @@ export const deriveStores = (context: StoreContext): ClipboardDerivedStore => {
       }
 
       if (
-        !hasClipboardData ||
-        !$config.canEditRows ||
-        !$focusedCellAPI ||
+        !(hasClipboardData && $config.canEditRows && $focusedCellAPI) ||
         $focusedRowId === NewRowID
       ) {
         return false
@@ -97,7 +95,7 @@ export const deriveStores = (context: StoreContext): ClipboardDerivedStore => {
 
       // Prevent single-single pasting if the cell is readonly
       const multiCellPaste = $selectedCellCount > 1
-      if (!$clipboard.multiCellCopy && !multiCellPaste && $focusedCellAPI.isReadonly()) {
+      if (!($clipboard.multiCellCopy || multiCellPaste) && $focusedCellAPI.isReadonly()) {
         return false
       }
       return true

@@ -236,7 +236,7 @@ function copyExistingPropsOver(
   entities: Record<string, Table>,
   tableIds: string[]
 ): Table {
-  if (entities && entities[tableName]) {
+  if (entities?.[tableName]) {
     if (entities[tableName]?.primaryDisplay) {
       table.primaryDisplay = entities[tableName].primaryDisplay
     }

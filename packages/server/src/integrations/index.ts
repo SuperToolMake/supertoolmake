@@ -29,7 +29,7 @@ type DatasourcePlusConstructor = new (...args: any[]) => DatasourcePlus
 export function isDatasourcePlusConstructor(
   integration: IntegrationBaseConstructor
 ): integration is DatasourcePlusConstructor {
-  return !!integration.prototype.query
+  return Boolean(integration.prototype.query)
 }
 
 const INTEGRATIONS: Record<SourceName, IntegrationBaseConstructor | undefined> = {

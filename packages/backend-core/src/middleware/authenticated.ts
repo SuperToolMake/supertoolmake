@@ -35,11 +35,11 @@ function timeMinusOneMinute() {
 }
 
 function finalise(ctx: Ctx, opts: FinaliseOpts = {}) {
-  ctx.publicEndpoint = opts.publicEndpoint || false
-  ctx.isAuthenticated = opts.authenticated || false
+  ctx.publicEndpoint = opts.publicEndpoint
+  ctx.isAuthenticated = opts.authenticated
   ctx.loginMethod = opts.loginMethod
   ctx.user = opts.user
-  ctx.internal = opts.internal || false
+  ctx.internal = opts.internal
   ctx.version = opts.version
 }
 
@@ -66,7 +66,7 @@ async function checkApiKey(
         },
         db
       )) as string
-    } catch (_err) {
+    } catch {
       userId = undefined
     }
     if (userId) {
@@ -136,7 +136,7 @@ export function authenticated(
         try {
           // getting session handles error checking (if session exists etc)
           session = await getSession(userId, sessionId)
-          if (opts && opts.populateUser) {
+          if (opts?.populateUser) {
             user = await getUser({
               userId,
               tenantId: session.tenantId,
@@ -189,7 +189,7 @@ export function authenticated(
       }
 
       const isUser = (user: any): user is User & { budibaseAccess?: string } => {
-        return user && user.email
+        return user?.email
       }
 
       // isAuthenticated is a function, so use a variable to be able to check authed state
@@ -216,7 +216,7 @@ export function authenticated(
         ctx.throw(403, err.message)
       }
       // allow configuring for public access
-      if ((opts && opts.publicAllowed) || publicEndpoint) {
+      if (opts?.publicAllowed || publicEndpoint) {
         finalise(ctx, { authenticated: false, version, publicEndpoint })
         return next()
       } else {

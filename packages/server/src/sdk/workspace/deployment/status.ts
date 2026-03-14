@@ -79,7 +79,7 @@ export async function status() {
   ) => {
     const id = resource._id!
     const resourcePublishedAt = metadata?.resourcesPublishedAt?.[id]
-    const isPublished = prodIds.has(id) || !!resourcePublishedAt
+    const isPublished = prodIds.has(id) || Boolean(resourcePublishedAt)
 
     map[id] = {
       published: isPublished,
@@ -107,7 +107,7 @@ export async function status() {
       publishedAt: resourcePublishedAt,
       unpublishedChanges:
         !resourcePublishedAt ||
-        !!workspaceScreens.find((screen) => screen.updatedAt! > resourcePublishedAt),
+        Boolean(workspaceScreens.find((screen) => screen.updatedAt! > resourcePublishedAt)),
       state: getPublishedState(workspaceApp, resourcePublishedAt),
     }
   }

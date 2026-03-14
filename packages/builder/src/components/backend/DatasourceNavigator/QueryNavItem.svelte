@@ -62,7 +62,7 @@ const getContextMenuItems = () => {
         try {
           const newQuery = await queries.duplicate(query)
           goto("./query/[queryId]", { queryId: newQuery._id })
-        } catch (error) {
+        } catch {
           notifications.error("Error duplicating query")
         }
       },

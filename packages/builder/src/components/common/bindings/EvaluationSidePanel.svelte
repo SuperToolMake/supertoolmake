@@ -15,7 +15,7 @@ export let expression: string | null = null
 
 $: error = expressionError != null
 $: empty = expression == null || expression?.trim() === ""
-$: success = !error && !empty
+$: success = !(error || empty)
 $: highlightedResult = highlight(expressionResult)
 $: highlightedLogs = expressionLogs.map((l) => ({
   log: l.log.map((part) => highlight(part)).join(", "),
@@ -39,7 +39,7 @@ const highlight = (json?: JSONValue | null) => {
   // Attempt to parse and then stringify, in case this is valid result
   try {
     json = JSON.stringify(JSON.parse(json as any), null, 2)
-  } catch (err) {
+  } catch {
     // couldn't parse/stringify, just treat it as the raw input
   }
 

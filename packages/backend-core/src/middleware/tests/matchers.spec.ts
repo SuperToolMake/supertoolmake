@@ -15,7 +15,7 @@ describe("matchers", () => {
 
     const built = matchers.buildMatcherRegex(pattern)
 
-    expect(!!matchers.matches(ctx, built)).toBe(true)
+    expect(Boolean(matchers.matches(ctx, built))).toBe(true)
   })
 
   it("wildcards path", () => {
@@ -31,7 +31,7 @@ describe("matchers", () => {
 
     const built = matchers.buildMatcherRegex(pattern)
 
-    expect(!!matchers.matches(ctx, built)).toBe(true)
+    expect(Boolean(matchers.matches(ctx, built))).toBe(true)
   })
 
   it("matches with param", () => {
@@ -47,7 +47,7 @@ describe("matchers", () => {
 
     const built = matchers.buildMatcherRegex(pattern)
 
-    expect(!!matchers.matches(ctx, built)).toBe(true)
+    expect(Boolean(matchers.matches(ctx, built))).toBe(true)
   })
 
   it("doesn't match by path", () => {
@@ -63,7 +63,7 @@ describe("matchers", () => {
 
     const built = matchers.buildMatcherRegex(pattern)
 
-    expect(!!matchers.matches(ctx, built)).toBe(false)
+    expect(Boolean(matchers.matches(ctx, built))).toBe(false)
   })
 
   it("doesn't match by method", () => {
@@ -79,7 +79,7 @@ describe("matchers", () => {
 
     const built = matchers.buildMatcherRegex(pattern)
 
-    expect(!!matchers.matches(ctx, built)).toBe(false)
+    expect(Boolean(matchers.matches(ctx, built))).toBe(false)
   })
 
   it("matches by path and wildcard method", () => {
@@ -95,6 +95,6 @@ describe("matchers", () => {
 
     const built = matchers.buildMatcherRegex(pattern)
 
-    expect(!!matchers.matches(ctx, built)).toBe(true)
+    expect(Boolean(matchers.matches(ctx, built))).toBe(true)
   })
 })

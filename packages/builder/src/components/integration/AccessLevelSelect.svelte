@@ -25,7 +25,7 @@ async function updateRole(role: string) {
         })
       }
     }
-  } catch (error) {
+  } catch {
     notifications.error("Error updating role")
   }
 }
@@ -36,14 +36,14 @@ async function getPermissions(queryToFetch: Query) {
     return
   }
   fetched = queryToFetch
-  if (!queryToFetch || !queryToFetch._id) {
+  if (!queryToFetch?._id) {
     roleId = Constants.Roles.BASIC
     loaded = true
     return
   }
   try {
-    roleId = (await permissions.forResource(queryToFetch._id))["read"].role
-  } catch (err) {
+    roleId = (await permissions.forResource(queryToFetch._id)).read.role
+  } catch {
     roleId = Constants.Roles.BASIC
   }
   loaded = true

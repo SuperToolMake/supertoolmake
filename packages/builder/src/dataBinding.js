@@ -141,7 +141,7 @@ export const toBindingsArray = (valueMap, prefix, category) => {
  * Utility to covert a map of readable bindings to runtime
  */
 export const readableToRuntimeMap = (bindings, ctx) => {
-  if (!bindings || !ctx) {
+  if (!(bindings && ctx)) {
     return {}
   }
   return Object.keys(ctx).reduce((acc, key) => {
@@ -154,7 +154,7 @@ export const readableToRuntimeMap = (bindings, ctx) => {
  * Utility to covert a map of runtime bindings to readable bindings
  */
 export const runtimeToReadableMap = (bindings, ctx) => {
-  if (!bindings || !ctx) {
+  if (!(bindings && ctx)) {
     return {}
   }
   return Object.keys(ctx).reduce((acc, key) => {
@@ -167,7 +167,7 @@ export const runtimeToReadableMap = (bindings, ctx) => {
  * Gets the bindable properties exposed by a certain component.
  */
 export const getComponentBindableProperties = (asset, componentId) => {
-  if (!asset || !componentId) {
+  if (!(asset && componentId)) {
     return []
   }
 
@@ -199,7 +199,7 @@ export const getAllComponentContexts = (
   type,
   options = { includeSelf: false }
 ) => {
-  if (!asset || !componentId) {
+  if (!(asset && componentId)) {
     return []
   }
   const map = {}
@@ -365,7 +365,7 @@ export const makeReadableKeyPropSafe = (key) => {
  */
 const generateComponentContextBindings = (asset, componentContext) => {
   const { component, definition, contexts } = componentContext
-  if (!component || !definition || !contexts?.length) {
+  if (!(component && definition && contexts?.length)) {
     return []
   }
 
@@ -531,7 +531,7 @@ export const getUserBindings = () => {
   const { schema } = getSchemaForDatasourcePlus(TableNames.USERS)
   // add props that are not in the user metadata table schema
   // but will be there for logged-in user
-  schema["globalId"] = { type: FieldType.STRING }
+  schema.globalId = { type: FieldType.STRING }
   const keys = Object.keys(schema).sort()
   const safeUser = makePropSafe("user")
 
@@ -1005,10 +1005,10 @@ export const getSchemaForDatasource = (asset, datasource, options) => {
     // Add schema properties if required
     if (schema) {
       if (addId) {
-        schema["_id"] = { type: "string" }
+        schema._id = { type: "string" }
       }
       if (addRev) {
-        schema["_rev"] = { type: "string" }
+        schema._rev = { type: "string" }
       }
     }
 
@@ -1060,7 +1060,7 @@ export const buildFormSchema = (component, asset) => {
 
     if (!component.fields) {
       Object.values(info.schema)
-        .filter(({ autocolumn, name }) => !autocolumn && !["_rev", "_id"].includes(name))
+        .filter(({ autocolumn, name }) => !(autocolumn || ["_rev", "_id"].includes(name)))
         .forEach(({ name }) => {
           schema[name] = { type: info?.schema[name].type }
         })

@@ -30,7 +30,7 @@ async function forgot() {
   try {
     await auth.forgotPassword(email)
     notifications.success("Email sent - please check your inbox")
-  } catch (err) {
+  } catch {
     submitted = false
     notifications.error("Unable to send reset password link")
   }
@@ -39,7 +39,7 @@ async function forgot() {
 onMount(async () => {
   try {
     await organisation.init()
-  } catch (error) {
+  } catch {
     notifications.error("Error getting org config")
   }
 })

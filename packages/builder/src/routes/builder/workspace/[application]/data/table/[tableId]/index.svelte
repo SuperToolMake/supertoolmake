@@ -113,7 +113,7 @@ $: if (id !== previousTableId) {
   missingProductionDefinition = false
   previousTableId = id
 }
-$: if (!isUsersTable || !$appStore.features.disableUserMetadata) {
+$: if (!(isUsersTable && $appStore.features.disableUserMetadata)) {
   highlightUsersAccessButton = false
 }
 $: externalClipboardData = {
@@ -165,7 +165,7 @@ $: {
 }
 
 const relationshipSupport = (datasource?: Datasource | UIDatasource | UIInternalDatasource) => {
-  if (!datasource || !("source" in datasource)) {
+  if (!(datasource && "source" in datasource)) {
     return false
   }
   const integration = $integrations[datasource?.source]
@@ -185,7 +185,7 @@ const verifyAutocolumns = (table?: Table) => {
   // Check for duplicates
   return Object.values(table?.schema || {}).reduce(
     (acc, fieldSchema) => {
-      if (!fieldSchema.autocolumn || !fieldSchema.subtype) {
+      if (!(fieldSchema.autocolumn && fieldSchema.subtype)) {
         return acc
       }
       let fieldKey: string =
@@ -248,7 +248,7 @@ const checkProductionRowPresence = async () => {
     if (tableId === id) {
       productionHasRows = Boolean(res?.rows?.length)
     }
-  } catch (error) {
+  } catch {
     if (tableId === id) {
       productionHasRows = true
     }

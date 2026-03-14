@@ -235,7 +235,7 @@ export class DatasourceStore extends DerivedBudiStore<
   }
 
   async deleteDatasource(datasource: Datasource) {
-    if (!datasource?._id || !datasource?._rev) {
+    if (!(datasource?._id && datasource?._rev)) {
       return
     }
     await API.deleteDatasource(datasource._id, datasource._rev)

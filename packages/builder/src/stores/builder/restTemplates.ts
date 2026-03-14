@@ -1974,7 +1974,7 @@ export class RestTemplatesStore extends BudiStore<RestTemplatesState> {
 
   getByName(name?: RestTemplateName) {
     if (!name) {
-      return undefined
+      return
     }
     const template = this.templates.find((template) => template.name === name)
     if (template) {
@@ -1989,7 +1989,7 @@ export class RestTemplatesStore extends BudiStore<RestTemplatesState> {
         }
       }
     }
-    return undefined
+    return
   }
 }
 

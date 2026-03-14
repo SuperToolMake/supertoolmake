@@ -261,7 +261,7 @@ class InternalBuilder {
   private generateSelectStatement(): (string | Knex.Raw)[] | "*" {
     const { table, resource } = this.query
 
-    if (!resource || !resource.fields || resource.fields.length === 0) {
+    if (!resource?.fields || resource.fields.length === 0) {
       return "*"
     }
 
@@ -1002,7 +1002,7 @@ class InternalBuilder {
         toPrimary,
       } = relationship
       // skip invalid relationships
-      if (!toTable || !fromTable) {
+      if (!(toTable && fromTable)) {
         continue
       }
 
@@ -1266,16 +1266,16 @@ class InternalBuilder {
     // handle pagination
     let foundOffset: number | null = null
     let foundLimit = limits?.query || limits?.base
-    if (paginate && paginate.page && paginate.limit) {
+    if (paginate?.page && paginate.limit) {
       // @ts-expect-error
       const page = paginate.page <= 1 ? 0 : paginate.page - 1
       const offset = page * paginate.limit
       foundLimit = paginate.limit
       foundOffset = offset
-    } else if (paginate && paginate.offset && paginate.limit) {
+    } else if (paginate?.offset && paginate.limit) {
       foundLimit = paginate.limit
       foundOffset = paginate.offset
-    } else if (paginate && paginate.limit) {
+    } else if (paginate?.limit) {
       foundLimit = paginate.limit
     }
     // counting should not sort, limit or offset
@@ -1422,7 +1422,7 @@ class SqlQueryBuilder extends SqlTableQueryBuilder {
   }
 
   async getReturningRow(queryFn: QueryFunction, json: EnrichedQueryJson) {
-    if (!json.extra || !json.extra.idFilter) {
+    if (!json.extra?.idFilter) {
       return {}
     }
     const input = this._query({
@@ -1441,7 +1441,7 @@ class SqlQueryBuilder extends SqlTableQueryBuilder {
   // when creating if an ID has been inserted need to make sure
   // the id filter is enriched with it before trying to retrieve the row
   checkLookupKeys(id: any, json: EnrichedQueryJson) {
-    if (!id || !json.table.primary) {
+    if (!(id && json.table.primary)) {
       return json
     }
     const primaryKey = json.table.primary[0]

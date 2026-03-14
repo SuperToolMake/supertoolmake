@@ -21,7 +21,7 @@ $: readableText = isJSBinding(item.text)
 // We will need to update this in future if the normal button component
 // gets broken into multiple settings sections, as we assume a flat array.
 const updatedNestedFlags = (settings) => {
-  if (!nested || !settings?.length) {
+  if (!(nested && settings?.length)) {
     return settings
   }
   let newSettings = settings.map((setting) => ({

@@ -183,7 +183,7 @@ const importTemplateSelection = async (
 const getEndpointIcon = (endpoint: ImportEndpoint) => {
   const method = (endpoint.method || "").toUpperCase()
   if (!method) {
-    return undefined
+    return
   }
   const verbKey = endpoint.queryVerb || method.toLowerCase()
   const color = customQueryIconColor(verbKey)
@@ -218,7 +218,7 @@ const compareEndpointOrder = (a: ImportEndpoint, b: ImportEndpoint) => {
 }
 
 const importTemplate = async () => {
-  if (!pendingTemplate || !pendingSpec || !selectedEndpointId || !restIntegration) {
+  if (!(pendingTemplate && pendingSpec && selectedEndpointId && restIntegration)) {
     notifications.error("Select an endpoint to import")
     return keepOpen
   }
@@ -335,7 +335,7 @@ const cancelGroupSelection = () => {
 }
 
 const confirmGroupSelection = () => {
-  if (!selectedTemplateGroup || !selectedGroupTemplateName) {
+  if (!(selectedTemplateGroup && selectedGroupTemplateName)) {
     notifications.error("Select a template")
     return
   }

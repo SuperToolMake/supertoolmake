@@ -8,7 +8,7 @@ const normalizeEmail = (e: string) => (e || "").toLowerCase()
 const lockKey = (email: string) => `auth:login:lock:${normalizeEmail(email)}`
 
 const isLocked = async (email: string) => {
-  return !!(await cache.get(lockKey(email)))
+  return Boolean(await cache.get(lockKey(email)))
 }
 
 /**

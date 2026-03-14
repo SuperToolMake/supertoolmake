@@ -57,7 +57,7 @@ const onChange = (newValue: string | undefined) => {
 }
 
 const getSelectedLabel = (value: string | undefined) => {
-  if (!value || !options?.length) {
+  if (!(value && options?.length)) {
     return ""
   }
   const selectedOption = options.find((x) => getOptionValue(x) === value)

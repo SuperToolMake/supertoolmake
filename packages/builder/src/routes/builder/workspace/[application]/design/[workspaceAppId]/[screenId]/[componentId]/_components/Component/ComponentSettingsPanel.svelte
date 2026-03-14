@@ -13,7 +13,7 @@ import DesignSection from "./DesignSection.svelte"
 const onUpdateName = async (value) => {
   try {
     await componentStore.updateSetting("_instanceName", value)
-  } catch (error) {
+  } catch {
     notifications.error("Error updating component name")
   }
 }

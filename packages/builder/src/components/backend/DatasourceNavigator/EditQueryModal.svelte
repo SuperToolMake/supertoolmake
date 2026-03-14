@@ -21,7 +21,7 @@ const save = async () => {
     updatedQuery.name = updatedName
     await queries.save(updatedQuery.datasourceId, updatedQuery)
     notifications.success("Query renamed successfully")
-  } catch (err) {
+  } catch {
     notifications.error("Error renaming query")
   }
 }
@@ -32,8 +32,8 @@ const checkValid = (evt) => {
 }
 
 const initForm = () => {
-  originalName = query.name + ""
-  updatedName = query.name + ""
+  originalName = String(query.name)
+  updatedName = String(query.name)
   error = ""
 }
 </script>

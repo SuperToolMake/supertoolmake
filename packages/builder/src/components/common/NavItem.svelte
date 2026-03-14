@@ -47,7 +47,7 @@ const onIconClick = (e: Event) => {
 }
 
 const scrollToView = () => {
-  if (!scrollApi || !contentRef) {
+  if (!(scrollApi && contentRef)) {
     return
   }
   const bounds = contentRef.getBoundingClientRect()

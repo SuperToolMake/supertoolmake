@@ -45,7 +45,7 @@ const stringify = (text: any): string => {
   if (typeof text !== "string") {
     try {
       return JSON.stringify(text)
-    } catch (e) {
+    } catch {
       return ""
     }
   }

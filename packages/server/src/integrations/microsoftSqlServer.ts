@@ -265,7 +265,7 @@ class SqlServerIntegration extends Sql implements DatasourcePlus {
         password: this.config.password,
         server: this.config.server,
         database: this.config.database,
-        port: +this.config.port,
+        port: Number(this.config.port),
         options: {
           encrypt,
           enableArithAbort: true,
@@ -315,7 +315,7 @@ class SqlServerIntegration extends Sql implements DatasourcePlus {
             },
           }
           clientCfg.options ??= {}
-          clientCfg.options.trustServerCertificate = !!trustServerCertificate
+          clientCfg.options.trustServerCertificate = Boolean(trustServerCertificate)
           break
         }
         case null:
@@ -342,7 +342,7 @@ class SqlServerIntegration extends Sql implements DatasourcePlus {
     }
   }
 
-  async internalQuery(query: SqlQuery, operation: string | undefined = undefined) {
+  async internalQuery(query: SqlQuery, operation: string | undefined) {
     const client = this.client!
     const request = client.request()
     this.index = 0
@@ -444,8 +444,8 @@ class SqlServerIntegration extends Sql implements DatasourcePlus {
           continue
         }
         const hasDefault = def.COLUMN_DEFAULT
-        const isAuto = !!autoColumns.find((col) => col === name)
-        const required = !!requiredColumns.find((col) => col === name)
+        const isAuto = Boolean(autoColumns.find((col) => col === name))
+        const required = Boolean(requiredColumns.find((col) => col === name))
         schema[name] = generateColumnDefinition({
           autocolumn: isAuto,
           name,

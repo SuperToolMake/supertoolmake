@@ -14,7 +14,7 @@ export function pinoSettings(): Options {
     logger,
     genReqId: correlator.getId,
     autoLogging: {
-      ignore: (req: IncomingMessage) => !!req.url?.includes("/health"),
+      ignore: (req: IncomingMessage) => Boolean(req.url?.includes("/health")),
     },
     serializers: {
       req: (req) => {

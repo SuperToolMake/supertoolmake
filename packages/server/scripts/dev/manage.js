@@ -42,8 +42,7 @@ async function nuke() {
 const managementCommand = process.argv.slice(2)[0]
 
 if (
-  !managementCommand ||
-  !Object.values(Commands).some((command) => managementCommand === command)
+  !(managementCommand && Object.values(Commands).some((command) => managementCommand === command))
 ) {
   throw new Error(
     "You must supply either an 'up', 'down' or 'nuke' commmand to manage the budibase development environment."

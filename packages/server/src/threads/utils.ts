@@ -54,7 +54,7 @@ export function formatResponse(resp: any) {
   if (typeof resp === "string") {
     try {
       resp = JSON.parse(resp)
-    } catch (_err) {
+    } catch {
       resp = { response: resp }
     }
   }

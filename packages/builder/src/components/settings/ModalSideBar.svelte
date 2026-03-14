@@ -16,7 +16,7 @@ let initialized = false
 let previousCollapsed: boolean | undefined
 
 $: !$pinned && unPin()
-$: collapsed = !focused && !$pinned
+$: collapsed = !(focused || $pinned)
 
 // Only dispatch when collapsed actually changes
 $: {

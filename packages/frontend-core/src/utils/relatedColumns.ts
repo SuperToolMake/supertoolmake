@@ -33,7 +33,7 @@ const columnTypeManyParser = {
 
     return value.map((v) => parseDate(v))
   },
-  [FieldType.BOOLEAN]: (value: any[]) => value.map((v) => !!v),
+  [FieldType.BOOLEAN]: (value: any[]) => value.map((v) => Boolean(v)),
   [FieldType.BB_REFERENCE_SINGLE]: (value: any[]) => [
     ...new Map(value.map((i) => [i._id, i])).values(),
   ],

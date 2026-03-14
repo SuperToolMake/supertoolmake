@@ -42,7 +42,7 @@ function getUrl(app: EnrichedApp | PublishedWorkspaceData) {
 const logout = async () => {
   try {
     await auth.logout()
-  } catch (error) {
+  } catch {
     // Swallow error and do nothing
   }
 }
@@ -50,7 +50,7 @@ const logout = async () => {
 onMount(async () => {
   try {
     await clientAppsStore.load()
-  } catch (error) {
+  } catch {
     notifications.error("Error loading apps")
   }
   loaded = true

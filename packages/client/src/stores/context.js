@@ -35,7 +35,7 @@ export const createContextStore = (parentContext) => {
 
   // Provides some action in context
   const provideAction = (providerId, actionType, callback) => {
-    if (!providerId || !actionType) {
+    if (!(providerId && actionType)) {
       return
     }
 

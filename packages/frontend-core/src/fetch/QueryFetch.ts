@@ -7,9 +7,9 @@ export default class QueryFetch extends BaseDataFetch<QueryDatasource, Query> {
   async determineFeatureFlags() {
     const definition = await this.getDefinition()
     const supportsPagination =
-      !!definition?.fields?.pagination?.type &&
-      !!definition?.fields?.pagination?.location &&
-      !!definition?.fields?.pagination?.pageParam
+      Boolean(definition?.fields?.pagination?.type) &&
+      Boolean(definition?.fields?.pagination?.location) &&
+      Boolean(definition?.fields?.pagination?.pageParam)
     return { supportsPagination }
   }
 
@@ -28,7 +28,7 @@ export default class QueryFetch extends BaseDataFetch<QueryDatasource, Query> {
         definition.fields = datasource.fields
       }
       return definition
-    } catch (_error) {
+    } catch {
       return null
     }
   }
@@ -84,7 +84,7 @@ export default class QueryFetch extends BaseDataFetch<QueryDatasource, Query> {
         cursor: nextCursor,
         hasNextPage,
       }
-    } catch (_error) {
+    } catch {
       return {
         rows: [],
         hasNextPage: false,

@@ -8,7 +8,7 @@ export let label
 const inputChanged = (ev) => {
   try {
     values = ev.detail.split("\n")
-  } catch (_) {
+  } catch {
     values = []
   }
 }

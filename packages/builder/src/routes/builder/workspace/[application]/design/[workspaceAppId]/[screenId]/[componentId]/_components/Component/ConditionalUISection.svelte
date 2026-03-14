@@ -28,7 +28,7 @@ const save = async () => {
     } else {
       await componentStore.updateConditions(tempValue)
     }
-  } catch (error) {
+  } catch {
     notifications.error("Error updating conditions")
   }
   drawer.hide()

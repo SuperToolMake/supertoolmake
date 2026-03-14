@@ -32,7 +32,7 @@ let popover
 $: allSmall = $columns.every((col) => col.width === smallColSize)
 $: allMedium = $columns.every((col) => col.width === mediumColSize)
 $: allLarge = $columns.every((col) => col.width === largeColSize)
-$: custom = !allSmall && !allMedium && !allLarge
+$: custom = !(allSmall || allMedium || allLarge)
 $: columnSizeOptions = [
   {
     label: "Small",

@@ -53,7 +53,7 @@ onMount(async () => {
   try {
     await auth.getSelf()
     await organisation.init()
-  } catch (error) {
+  } catch {
     notifications.error("Error getting org config")
   }
   loaded = true

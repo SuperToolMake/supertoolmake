@@ -18,7 +18,7 @@ const createAuthStore = () => {
     // First try and get the global user, to see if we are logged in at all
     try {
       globalSelf = await API.fetchBuilderSelf()
-    } catch (_error) {
+    } catch {
       store.set(undefined)
       return
     }
@@ -29,7 +29,7 @@ const createAuthStore = () => {
       if (hasAppSelfUser(res)) {
         appSelf = res
       }
-    } catch (_error) {
+    } catch {
       // Swallow
     }
 
@@ -41,7 +41,7 @@ const createAuthStore = () => {
     try {
       await API.logOut()
       window.location.href = "/"
-    } catch (_error) {
+    } catch {
       // Do nothing
     }
 

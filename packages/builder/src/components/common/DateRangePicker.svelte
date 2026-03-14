@@ -16,7 +16,7 @@ $: valueStore.set(value)
 $: parseValue($valueStore)
 
 const parseValue = (value) => {
-  if (!Array.isArray(value) || !value[0] || !value[1]) {
+  if (!(Array.isArray(value) && value[0] && value[1])) {
     date1 = null
     date2 = null
   } else {

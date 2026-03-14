@@ -28,7 +28,7 @@ $: parsedFrom = fromDate ? parseDate(fromDate, { enableTime }) : undefined
 $: parsedTo = toDate ? parseDate(toDate, { enableTime }) : undefined
 
 const parseValue = (value: string[]) => {
-  if (!Array.isArray(value) || !value[0] || !value[1]) {
+  if (!(Array.isArray(value) && value[0] && value[1])) {
     fromDate = null
     toDate = null
   } else {

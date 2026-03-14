@@ -82,7 +82,7 @@ $: componentId = targetComponent?.embeddedData?.componentId ?? targetComponent?.
 $: target = componentStore.actions.getComponentById(componentId)
 
 // Ensure the target has intialised
-$: loaded = (targetComponent?.embeddedData?.loaded ?? targetComponent?.loaded) || false
+$: loaded = targetComponent?.embeddedData?.loaded ?? targetComponent?.loaded
 
 // Init the target component
 $: loaded && initTarget(target)
@@ -132,7 +132,7 @@ const getValidOperatorsForType = (
   value: string
   label: string
 }[] => {
-  if (!config?.field || !config.columnType || !schema) {
+  if (!(config?.field && config.columnType && schema)) {
     return []
   }
 
@@ -185,7 +185,7 @@ const buildExtension = (filters: Record<string, SearchFilter>) => {
 }
 
 const fire = (extension: UISearchFilter) => {
-  if (!$component?.id || !componentId) return
+  if (!($component?.id && componentId)) return
 
   if (Object.keys(filters).length == 0) {
     removeExtension?.($component.id)

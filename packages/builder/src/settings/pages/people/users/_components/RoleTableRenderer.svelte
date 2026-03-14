@@ -12,7 +12,7 @@ const getRoleFromWorkspaceRole = (workspaceRole) => {
   if (workspaceRole) {
     return Constants.BudibaseRoles.AppUser
   }
-  return undefined
+  return
 }
 
 const canWorkspaceRoleOverrideGlobalRole = (globalRole) => {

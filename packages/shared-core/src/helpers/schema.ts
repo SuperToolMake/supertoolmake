@@ -20,7 +20,7 @@ export function isDeprecatedSingleUserColumn(
 
 export function isRequired(constraints: FieldConstraints | undefined) {
   const isRequired =
-    !!constraints &&
+    Boolean(constraints) &&
     ((typeof constraints.presence !== "boolean" && constraints.presence?.allowEmpty === false) ||
       constraints.presence === true)
   return isRequired

@@ -212,7 +212,7 @@ export class ExternalRequest<T extends Operation> {
       checkFilters(filters)
     }
     // there is no id, just use the user provided filters
-    if (!idCopy || !table) {
+    if (!(idCopy && table)) {
       return filters
     }
     // if used as URL parameter it will have been joined
@@ -291,7 +291,7 @@ export class ExternalRequest<T extends Operation> {
       if (row[key] === undefined || newRow[key]) {
         continue
       }
-      if (!(this.operation === Operation.BULK_UPSERT) && !isEditableColumn(field)) {
+      if (!(this.operation === Operation.BULK_UPSERT || isEditableColumn(field))) {
         continue
       }
       // parse floats/numbers
@@ -300,7 +300,7 @@ export class ExternalRequest<T extends Operation> {
       } else if (field.type === FieldType.LINK) {
         const { tableName: linkTableName } = breakExternalTableId(field.tableId)
         // table has to exist for many to many
-        if (!linkTableName || !this.tables[linkTableName]) {
+        if (!(linkTableName && this.tables[linkTableName])) {
           continue
         }
         const linkTable = this.tables[linkTableName]
@@ -412,11 +412,11 @@ export class ExternalRequest<T extends Operation> {
         lookupField = field.foreignKey
         fieldName = field.fieldName
       }
-      if (!relatedTableId || !lookupField || !fieldName) {
+      if (!(relatedTableId && lookupField && fieldName)) {
         throw new Error("Unable to lookup relationships - undefined column properties.")
       }
 
-      if (!lookupField || !row?.[lookupField]) {
+      if (!(lookupField && row?.[lookupField])) {
         continue
       }
       const endpoint = getEndpoint(relatedTableId, Operation.READ)
@@ -469,7 +469,7 @@ export class ExternalRequest<T extends Operation> {
       const linkTable = this.getTable(tableId)
       const relationshipPrimary = linkTable?.primary || []
       const linkPrimary = relationshipPrimary[0]
-      if (!linkTable || !linkPrimary) {
+      if (!(linkTable && linkPrimary)) {
         return
       }
 
@@ -503,7 +503,7 @@ export class ExternalRequest<T extends Operation> {
 
         const matchesPrimaryLink =
           row[linkPrimary] === relationship.id || row[linkPrimary] === body?.[linkPrimary]
-        if (!matchesPrimaryLink || !linkSecondary) {
+        if (!(matchesPrimaryLink && linkSecondary)) {
           return matchesPrimaryLink
         }
 
@@ -600,7 +600,7 @@ export class ExternalRequest<T extends Operation> {
       }
       switch (table.schema[sortColumn]?.type) {
         case FieldType.NUMBER:
-          if (sort && sort[sortColumn]) {
+          if (sort?.[sortColumn]) {
             sort[sortColumn].type = SortType.NUMBER
           }
           break

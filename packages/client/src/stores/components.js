@@ -26,7 +26,7 @@ const createComponentStore = () => {
       const { inBuilder, selectedComponentId } = $builderStore
 
       // Avoid any of this logic if we aren't in the builder preview
-      if (!inBuilder && !$devToolsStore.visible) {
+      if (!(inBuilder || $devToolsStore.visible)) {
         return {}
       }
 

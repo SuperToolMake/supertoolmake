@@ -277,7 +277,7 @@ function buildCondition(filter: undefined): undefined
 function buildCondition(filter: SearchFilter): SearchFilters
 function buildCondition(filter?: SearchFilter): SearchFilters | undefined {
   // Ignore empty or invalid filters
-  if (!filter || !filter?.operator || !filter?.field) {
+  if (!(filter?.operator && filter?.field)) {
     return
   }
 
@@ -532,7 +532,7 @@ export function search<T extends Record<string, any>>(
  * @param query the JSON query
  */
 export function runQuery<T extends Record<string, any>>(docs: T[], query: SearchFilters): T[] {
-  if (!docs || !Array.isArray(docs)) {
+  if (!(docs && Array.isArray(docs))) {
     return []
   }
   if (!query) {
@@ -555,7 +555,7 @@ export function runQuery<T extends Record<string, any>>(docs: T[], query: Search
         const result = test(valueToCheck, testValue)
         if (query.allOr && result) {
           return true
-        } else if (!query.allOr && !result) {
+        } else if (!(query.allOr || result)) {
           return false
         }
       }
@@ -598,11 +598,11 @@ export function runQuery<T extends Record<string, any>>(docs: T[], query: Search
       return false
     }
 
-    const docNum = +docValue
+    const docNum = Number(docValue)
     if (!isNaN(docNum)) {
-      const lowNum = +testValue.low
-      const highNum = +testValue.high
-      if (!isNaN(lowNum) && !isNaN(highNum)) {
+      const lowNum = Number(testValue.low)
+      const highNum = Number(testValue.high)
+      if (!(isNaN(lowNum) || isNaN(highNum))) {
         return docNum >= lowNum && docNum <= highNum
       } else if (!isNaN(lowNum)) {
         return docNum >= lowNum
@@ -846,7 +846,7 @@ export function sort<T extends Record<string, any>>(
   sortOrder: SortOrder,
   sortType = SortType.STRING
 ): T[] {
-  if (!sort || !sortOrder || !sortType) {
+  if (!(sort && sortOrder && sortType)) {
     return docs
   }
 

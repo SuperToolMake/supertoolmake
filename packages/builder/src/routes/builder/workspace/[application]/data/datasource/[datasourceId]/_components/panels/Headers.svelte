@@ -34,7 +34,7 @@ const onDefaultHeaderUpdate = (headers) => {
   const prev = localUpdatedDatasource.config.defaultHeaders || {}
   if (!isEqual(prev, flatHeaders)) {
     localUpdatedDatasource.config.defaultHeaders = flatHeaders
-    markDirty && markDirty()
+    markDirty?.()
   }
 }
 </script>

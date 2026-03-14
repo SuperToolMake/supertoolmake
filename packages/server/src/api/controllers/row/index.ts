@@ -93,7 +93,7 @@ export const save = async (ctx: UserCtx<SaveRowRequest, SaveRowResponse>) => {
   }
 
   // if it has an ID already then it's a patch
-  if (body && body._id) {
+  if (body?._id) {
     return patch(ctx as UserCtx<PatchRowRequest, PatchRowResponse>)
   }
   const saveQuery = async () => {
@@ -127,7 +127,7 @@ export async function find(ctx: UserCtx<void, FindRowResponse>) {
   const rowId = ctx.params.rowId
   try {
     ctx.body = await sdk.rows.find(sourceId, rowId)
-  } catch (_e) {
+  } catch {
     ctx.throw(404, "That row couldn't be found")
   }
 }
@@ -260,15 +260,15 @@ function replaceTableNamesInFilters(
       const matches = key.match(`^(?<relation>.+)\\.(?<field>.+)`)
 
       // this is the possible table name which we need to check if it needs to be converted
-      const relatedTableName = matches?.groups?.["relation"]
-      const field = matches?.groups?.["field"]
+      const relatedTableName = matches?.groups?.relation
+      const field = matches?.groups?.field
 
-      if (!relatedTableName || !field) {
+      if (!(relatedTableName && field)) {
         continue
       }
 
       const table = allTables.find((r) => r._id === tableId)
-      const isColumnName = !!table?.schema[relatedTableName]
+      const isColumnName = Boolean(table?.schema[relatedTableName])
       if (!table || isColumnName) {
         continue
       }

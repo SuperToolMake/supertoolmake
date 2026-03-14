@@ -27,18 +27,18 @@ const isSimpleOperationId = (operationId?: string): boolean => {
 
 const getShortText = (value?: string): string | undefined => {
   if (!value) {
-    return undefined
+    return
   }
   const trimmed = value.trim()
   if (!trimmed) {
-    return undefined
+    return
   }
   const firstLine = trimmed
     .split(/\r?\n/)
     .map((line) => line.trim())
     .find((line) => line.length > 0)
   if (!firstLine) {
-    return undefined
+    return
   }
   if (firstLine.length > MAX_TEXT_LENGTH) {
     return `${firstLine.slice(0, MAX_TEXT_LENGTH - 3).trim()}...`
@@ -77,7 +77,7 @@ const buildFallbackName = (methodName: string, path: string): string => {
   const normalizedMethod = methodName.trim()
   let segments = path.split("/").filter(Boolean)
   segments = segments.filter(
-    (segment) => !isVersionSegment(segment) && !isPathParamSegment(segment)
+    (segment) => !(isVersionSegment(segment) || isPathParamSegment(segment))
   )
   const resource = buildResourceName(segments)
   const methodLabel = normalizedMethod

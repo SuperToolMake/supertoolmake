@@ -82,7 +82,7 @@ export const createActions = (context: StoreContext): MenuActions => {
     }
 
     // Only focus this cell if not in multi row mode
-    if (!multiRowMode && !multiCellMode) {
+    if (!(multiRowMode || multiCellMode)) {
       focusedCellId.set(cellId)
     }
 

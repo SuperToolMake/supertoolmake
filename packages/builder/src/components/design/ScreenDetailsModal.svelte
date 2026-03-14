@@ -47,7 +47,7 @@ const routeExists = (url: string) => {
       screen.routing.route.toLowerCase() === url.toLowerCase() && screen.routing.roleId === role
   )
 }
-$: disabled = !route || !!error || !touched
+$: disabled = !route || Boolean(error) || !touched
 
 const confirmScreenDetails = async () => {
   if (disabled) {

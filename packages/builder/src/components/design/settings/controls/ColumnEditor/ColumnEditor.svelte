@@ -37,7 +37,7 @@ $: updateBoundValue(sanitisedValue)
 $: enrichedSchemaFields = getSchemaFields(schema, $tables.list)
 
 $: {
-  value = (value || []).filter((column) => (schema || {})[column.name || column] !== undefined)
+  value = (value || []).filter((column) => schema?.[column.name || column] !== undefined)
 }
 
 const getText = (value) => {
@@ -68,7 +68,7 @@ const updateBoundValue = (value) => {
 }
 
 const getValidColumns = (columns, options) => {
-  if (!Array.isArray(columns) || !columns.length) {
+  if (!(Array.isArray(columns) && columns.length)) {
     return []
   }
   // We need to account for legacy configs which would just be an array

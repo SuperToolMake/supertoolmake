@@ -140,11 +140,11 @@ const getCategories = (dataProvider, labelColumn) => {
 const getFormatter = (labelType, yAxisUnits, horizontal, axis) => {
   const isLabelAxis = (axis === "y" && horizontal) || (axis === "x" && !horizontal)
   if (labelType === "datetime" && isLabelAxis) {
-    return formatters["Datetime"]
+    return formatters.Datetime
   }
 
   if (isLabelAxis) {
-    return formatters["Default"]
+    return formatters.Default
   }
 
   return formatters[yAxisUnits]

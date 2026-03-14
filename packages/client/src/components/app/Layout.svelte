@@ -151,7 +151,7 @@ function evaluateNavItemConditions(conditions = []) {
   if (visible == null) {
     // If any show condition exists, default to hidden unless one matches
     const hasShow = conditions.some((cond) => cond.action === "show")
-    return hasShow ? false : true
+    return !hasShow
   }
   return visible
 }

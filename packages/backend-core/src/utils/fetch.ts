@@ -14,7 +14,7 @@ function createProxyDispatcher(options?: { rejectUnauthorized?: boolean }): Prox
 
   const proxyUrl = httpsProxy || httpProxy
 
-  if (!proxyUrl || !proxyUrl.trim()) {
+  if (!proxyUrl?.trim()) {
     return false
   }
 
@@ -23,7 +23,7 @@ function createProxyDispatcher(options?: { rejectUnauthorized?: boolean }): Prox
   // Validate URL format
   try {
     new URL(trimmedProxyUrl)
-  } catch (_error) {
+  } catch {
     console.log("[fetch] Invalid proxy URL format:", proxyUrl)
     return false
   }
@@ -75,13 +75,13 @@ export function getProxyDispatcher(options?: {
 }): ProxyAgent | boolean {
   // Don't cache if custom options are provided
   if (options) {
-    return createProxyDispatcher(options) || false
+    return createProxyDispatcher(options)
   }
 
   if (cachedDispatcher === null) {
     cachedDispatcher = createProxyDispatcher()
   }
-  return cachedDispatcher || false
+  return cachedDispatcher
 }
 
 /**

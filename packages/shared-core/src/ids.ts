@@ -22,12 +22,12 @@ export function getVirtualDocumentType(id: string): VirtualDocumentType | undefi
 const EXTERNAL_TABLE_ID_REGEX = new RegExp(`^${DocumentType.DATASOURCE_PLUS}_(.+)__(.+)$`)
 
 const idCheckFor = (type: DocumentType | VirtualDocumentType): ((id: string) => boolean) => {
-  return (id: string): boolean => !!id && id.startsWith(`${type}${SEPARATOR}`)
+  return (id: string): boolean => Boolean(id) && id.startsWith(`${type}${SEPARATOR}`)
 }
 
 export const isExternalTableId = (id: string): boolean => {
   const matches = id.match(EXTERNAL_TABLE_ID_REGEX)
-  return !!id && matches !== null
+  return Boolean(id) && matches !== null
 }
 
 /**

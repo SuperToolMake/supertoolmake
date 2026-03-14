@@ -4,7 +4,7 @@ import ExportButton from "../ExportButton.svelte"
 
 const { rows, columns, datasource, sort, selectedRows, filter } = getContext("grid")
 
-$: disabled = !$rows.length || !$columns.length
+$: disabled = !($rows.length && $columns.length)
 $: selectedRowArray = Object.keys($selectedRows).map((id) => ({ _id: id }))
 </script>
 

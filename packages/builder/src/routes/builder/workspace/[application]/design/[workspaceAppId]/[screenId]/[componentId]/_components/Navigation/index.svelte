@@ -51,7 +51,7 @@ const update = async (key, value) => {
     let navigation = $nav
     navigation[key] = value
     await nav.save(navigation)
-  } catch (error) {
+  } catch {
     notifications.error("Error updating navigation settings")
   }
 }

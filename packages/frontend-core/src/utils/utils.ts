@@ -277,7 +277,7 @@ export const buildMultiStepFormBlockDefaultProps = (props?: {
   const { _id, stepCount, currentStep, actionType, dataSource } = props || {}
 
   // Sanity check
-  if (!_id || !stepCount) {
+  if (!(_id && stepCount)) {
     return
   }
 
@@ -401,7 +401,7 @@ export function parseFilter(filter: UISearchFilter) {
         }
         return group
       })
-      .filter((group): group is SearchFilterGroup => !!group)
+      .filter((group): group is SearchFilterGroup => Boolean(group))
   }
 
   return update

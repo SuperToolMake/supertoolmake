@@ -38,7 +38,7 @@ const stringifyValue = (value: any): string => {
   }
   try {
     return JSON.stringify(value)
-  } catch (_e) {
+  } catch {
     return ""
   }
 }
@@ -58,7 +58,7 @@ const stringifyField = (value: any, schema: FieldSchema): string => {
       const arrayValue = Array.isArray(value) ? value : [value]
       return arrayValue
         .map((x) => x.primaryDisplay)
-        .filter((x) => !!x)
+        .filter((x) => Boolean(x))
         .join(", ")
     }
 

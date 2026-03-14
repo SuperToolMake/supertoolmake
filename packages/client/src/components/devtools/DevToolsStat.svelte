@@ -15,7 +15,7 @@ const copyValue = async () => {
   try {
     await Helpers.copyToClipboard(value)
     notificationStore.actions.success("Copied to clipboard")
-  } catch (error) {
+  } catch {
     notificationStore.actions.error(
       "Failed to copy to clipboard. Check the dev console for the value."
     )

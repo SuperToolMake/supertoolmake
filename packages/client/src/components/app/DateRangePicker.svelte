@@ -29,7 +29,7 @@ $: queryExtension = getQueryExtension(field, value)
 $: addExtension?.($component.id, queryExtension)
 
 const getQueryExtension = (field, value) => {
-  if (!field || !value) {
+  if (!(field && value)) {
     return null
   }
   let low = dayjs.utc().subtract(1, "year")

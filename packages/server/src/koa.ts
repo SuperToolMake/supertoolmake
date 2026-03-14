@@ -78,7 +78,7 @@ export default function createKoaApp() {
   process.on("uncaughtException", async (err) => {
     // @ts-expect-error
     // don't worry about this error, comes from zlib isn't important
-    if (err?.["code"] === "ERR_INVALID_CHAR") {
+    if (err?.code === "ERR_INVALID_CHAR") {
       logging.logAlert("Uncaught exception.", err)
       return
     }

@@ -39,7 +39,7 @@ import AppComponent from "./templates/App.svelte"
 
 const getUploadFilename = (file: unknown) => {
   if (!file || typeof file !== "object") {
-    return undefined
+    return
   }
   const upload = file as {
     originalFilename?: string | null
@@ -49,7 +49,7 @@ const getUploadFilename = (file: unknown) => {
 
 const getUploadPath = (file: unknown) => {
   if (!file || typeof file !== "object") {
-    return undefined
+    return
   }
   const upload = file as {
     filepath?: string
@@ -59,7 +59,7 @@ const getUploadPath = (file: unknown) => {
 
 const getUploadMimeType = (file: unknown) => {
   if (!file || typeof file !== "object") {
-    return undefined
+    return
   }
   const upload = file as {
     mimetype?: string | null
@@ -128,7 +128,7 @@ export async function processPWAZip(ctx: UserCtx) {
   const filePath = getUploadPath(file)
   const fileName = getUploadFilename(file)
 
-  if (!filePath || !fileName?.toLowerCase().endsWith(".zip")) {
+  if (!(filePath && fileName?.toLowerCase().endsWith(".zip"))) {
     ctx.throw(400, "Invalid file - must be a zip file")
   }
 
@@ -147,11 +147,11 @@ export async function processPWAZip(ctx: UserCtx) {
     try {
       const iconsContent = await fsp.readFile(iconsJsonPath, "utf-8")
       iconsData = JSON.parse(iconsContent)
-    } catch (_error) {
+    } catch {
       ctx.throw(400, "Invalid icons.json file - could not parse JSON")
     }
 
-    if (!iconsData.icons || !Array.isArray(iconsData.icons)) {
+    if (!(iconsData.icons && Array.isArray(iconsData.icons))) {
       ctx.throw(400, "Invalid icons.json file - missing icons array")
     }
 
@@ -160,7 +160,7 @@ export async function processPWAZip(ctx: UserCtx) {
     const appId = context.getProdWorkspaceId()
 
     for (const icon of iconsData.icons) {
-      if (!icon.src || !icon.sizes || !fs.existsSync(join(baseDir, icon.src))) {
+      if (!(icon.src && icon.sizes && fs.existsSync(join(baseDir, icon.src)))) {
         continue
       }
 
@@ -220,7 +220,7 @@ export const serveApp = async (ctx: UserCtx<void, ServeAppResponse>) => {
     const workspaceApp = await sdk.workspaceApps.getMatchedWorkspaceApp(ctx.url)
 
     const appInfo = await sdk.workspaces.metadata.get()
-    const hideDevTools = !!ctx.params.appUrl
+    const hideDevTools = Boolean(ctx.params.appUrl)
     const sideNav = workspaceApp?.navigation.navigation === "Left"
     const hideFooter = false
     const themeVariables = getThemeVariables(appInfo.theme)
@@ -377,7 +377,7 @@ export const getSignedUploadURL = async (
     if (!datasource) {
       ctx.throw(400, "The specified datasource could not be found")
     }
-  } catch (_error) {
+  } catch {
     ctx.throw(400, "The specified datasource could not be found")
   }
 
@@ -387,7 +387,7 @@ export const getSignedUploadURL = async (
   const awsRegion = (datasource?.config?.region || "eu-west-1") as string
   if (datasource?.source === "S3") {
     const { bucket, key } = ctx.request.body || {}
-    if (!bucket || !key) {
+    if (!(bucket && key)) {
       ctx.throw(400, "bucket and key values are required")
     }
     try {
@@ -480,7 +480,7 @@ export async function servePwaManifest(ctx: UserCtx<void, any>) {
 
     ctx.set("Content-Type", "application/json")
     ctx.body = manifest
-  } catch (_error) {
+  } catch {
     ctx.status = 500
     ctx.body = { message: "Error generating manifest" }
   }

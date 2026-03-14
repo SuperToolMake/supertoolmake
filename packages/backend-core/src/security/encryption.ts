@@ -24,7 +24,6 @@ export function getSecret(secretOption: SecretOption): string {
       secret = env.ENCRYPTION_KEY
       secretName = "ENCRYPTION_KEY"
       break
-    case SecretOption.API:
     default:
       secret = env.API_ENCRYPTION_KEY
       secretName = "API_ENCRYPTION_KEY"

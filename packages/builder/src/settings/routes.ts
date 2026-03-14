@@ -167,10 +167,10 @@ export const filterRoutes = (routes: Route[]): Route[] =>
       const filteredChildRoutes = route?.routes ? filterRoutes(route.routes) : []
 
       // Check if any child has an error
-      const hasChildError = filteredChildRoutes.some((child) => child.error?.() || false)
+      const hasChildError = filteredChildRoutes.some((child) => child.error?.())
 
       // Check if this route itself has an error
-      const hasOwnError = route.error?.() || false
+      const hasOwnError = route.error?.()
 
       return {
         ...route,

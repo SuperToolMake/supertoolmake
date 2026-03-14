@@ -270,7 +270,7 @@ const initialiseField = (field: FieldSchema | undefined, savingColumn: boolean) 
   isCreating = !field
   if (field && !savingColumn) {
     editableColumn = cloneDeep(field) as FieldSchemaConfig
-    originalName = editableColumn.name ? editableColumn.name + "" : undefined
+    originalName = editableColumn.name ? String(editableColumn.name) : undefined
     linkEditDisabled = originalName != null
     hasPrimaryDisplay =
       $tables.selected?.primaryDisplay == null ||
@@ -575,7 +575,7 @@ const sanitiseDefaultValue = (
 }
 
 function handleNameInput(evt: any) {
-  if (!uneditable && !(linkEditDisabled && editableColumn.type === FieldType.LINK)) {
+  if (!(uneditable || (linkEditDisabled && editableColumn.type === FieldType.LINK))) {
     editableColumn.name = evt.target.value
   }
 }

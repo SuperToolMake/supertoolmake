@@ -151,7 +151,7 @@ export const deriveStores = (context: StoreContext): UIDerivedStore => {
     [cellSelection, rowLookupMap, columnLookupMap],
     ([$cellSelection, $rowLookupMap, $columnLookupMap]) => {
       const { sourceCellId, targetCellId } = $cellSelection
-      if (!sourceCellId || !targetCellId || sourceCellId === targetCellId) {
+      if (!(sourceCellId && targetCellId) || sourceCellId === targetCellId) {
         return []
       }
       const $rows = get(rows)

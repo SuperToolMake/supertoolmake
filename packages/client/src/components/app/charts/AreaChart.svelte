@@ -138,11 +138,11 @@ const getFormatter = (labelType, yAxisUnits, axis) => {
   const isLabelAxis = axis === "x"
 
   if (labelType === "datetime" && isLabelAxis) {
-    return formatters["Datetime"]
+    return formatters.Datetime
   }
 
   if (isLabelAxis) {
-    return formatters["Default"]
+    return formatters.Default
   }
 
   return formatters[yAxisUnits]

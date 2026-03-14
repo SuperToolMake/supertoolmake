@@ -71,7 +71,7 @@ let userFieldsToUpdate = {}
 let roleUpdateTarget
 let saving = false
 
-$: isSSO = !!user?.provider
+$: isSSO = Boolean(user?.provider)
 $: isAdmin = sdk.users.isAdmin($auth.user)
 $: isScim = user?.scimInfo?.isSync
 $: readonly = !isAdmin || isScim
@@ -111,7 +111,7 @@ const getRole = (prodAppId, user) => {
 
 const getNameLabel = (user) => {
   const { firstName, lastName, email } = user || {}
-  if (!firstName && !lastName) {
+  if (!(firstName || lastName)) {
     return email || ""
   }
   let label
@@ -145,7 +145,7 @@ async function saveUser() {
     userFieldsToUpdate = {}
     roleUpdateTarget = undefined
     await fetchUser()
-  } catch (error) {
+  } catch {
     notifications.error("Error updating user")
   } finally {
     saving = false
@@ -200,7 +200,7 @@ onMount(async () => {
   try {
     await Promise.all([fetchUser(), roles.fetch()])
     loaded = true
-  } catch (error) {
+  } catch {
     notifications.error("Error fetching users")
   }
 })

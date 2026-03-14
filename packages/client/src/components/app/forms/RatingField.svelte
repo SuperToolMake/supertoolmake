@@ -48,7 +48,7 @@ const sizeSpacing: Record<Size, number> = {
 }
 
 $: spacing = sizeSpacing[size] || sizeSpacing.M
-$: enabled = !fieldState?.disabled && !fieldState?.readonly
+$: enabled = !(fieldState?.disabled || fieldState?.readonly)
 
 const handleClick = (value: number): void => {
   if (enabled) {

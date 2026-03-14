@@ -41,7 +41,7 @@ export async function fetchSmtp() {
     // Always attach the auth for the forms purpose -
     // this will be removed later if required
     ensureAuth(smtpConfig as Config)
-  } catch (_error) {
+  } catch {
     notifications.error("Error fetching SMTP config")
     return null
   }

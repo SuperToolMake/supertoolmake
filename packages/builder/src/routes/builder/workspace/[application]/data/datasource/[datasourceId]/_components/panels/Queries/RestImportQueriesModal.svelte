@@ -96,7 +96,7 @@ async function importQueries() {
       return keepOpen
     }
 
-    if (!datasourceId && !createDatasource) {
+    if (!(datasourceId || createDatasource)) {
       throw new Error("No datasource id")
     }
 

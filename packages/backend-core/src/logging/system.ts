@@ -21,10 +21,10 @@ export function getSingleFileMaxSizeInfo(totalMaxSize: string) {
     console.warn(`totalMaxSize does not have a valid value`, {
       totalMaxSize,
     })
-    return undefined
+    return
   }
 
-  const size = +match[1]
+  const size = Number(match[1])
   const unit = match[2]
   if (size === 1) {
     switch (unit) {
@@ -37,7 +37,7 @@ export function getSingleFileMaxSizeInfo(totalMaxSize: string) {
       case "G":
         return { size: `${(size * 1000) / 2}M`, totalHistoryFiles: 1 }
       default:
-        return undefined
+        return
     }
   }
 

@@ -46,7 +46,7 @@ $: defaultValues = searchable
   .map(
     (column: UIFieldSchema): FilterConfig => ({
       field: column.name,
-      active: !!value == false ? false : !!column.visible,
+      active: Boolean(value) == false ? false : Boolean(column.visible),
       columnType: column.type,
     })
   )

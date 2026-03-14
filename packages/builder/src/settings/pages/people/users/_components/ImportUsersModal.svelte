@@ -16,7 +16,7 @@ let userEmails: string[] = []
 let usersRole: string = Constants.BudibaseRoles.AppUser
 let invalidEmails: string[] = []
 
-$: importDisabled = !userEmails.length || !validEmails(userEmails) || !usersRole
+$: importDisabled = !(userEmails.length && validEmails(userEmails) && usersRole)
 
 const validEmails = (userEmails: string[]): boolean => {
   invalidEmails = [] // Reset invalid emails

@@ -233,7 +233,7 @@ const formApi = {
     }
 
     // Auto columns are always disabled
-    const isAutoColumn = !!schema?.[field]?.autocolumn
+    const isAutoColumn = Boolean(schema?.[field]?.autocolumn)
 
     // Construct field info
     const fieldInfo = writable<FieldInfo>({
@@ -273,7 +273,7 @@ const formApi = {
     stepFields.forEach((field) => {
       const fieldValid = get(field).fieldApi.validate()
       valid = valid && fieldValid
-      if (!valid && !hasScrolled) {
+      if (!(valid || hasScrolled)) {
         handleScrollToField({ field: get(field) })
         hasScrolled = true
       }
@@ -377,7 +377,7 @@ const makeFieldApi = (field: string) => {
     const fieldInfo = getField(field)
 
     // Auto columns are always disabled
-    const isAutoColumn = !!schema?.[field]?.autocolumn
+    const isAutoColumn = Boolean(schema?.[field]?.autocolumn)
 
     // Update disabled state
     fieldInfo.update((state) => {

@@ -141,7 +141,7 @@ const filterStructure = (structure, allowedComponents, search) => {
       if (search) {
         const nameMatch = name.includes(search)
         const aliasMatch = (aliases[name] || []).some((x) => x.includes(search))
-        if (!nameMatch && !aliasMatch) {
+        if (!(nameMatch || aliasMatch)) {
           return false
         }
       }

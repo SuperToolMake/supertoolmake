@@ -70,7 +70,7 @@ describe("rest", () => {
 
   const extractFormEntries = (body: unknown): Record<string, string> | undefined => {
     if (!body) {
-      return undefined
+      return
     }
     const entriesFn = (
       body as {
@@ -96,7 +96,7 @@ describe("rest", () => {
       })
       return result
     }
-    return undefined
+    return
   }
 
   async function createQuery(fields: any) {

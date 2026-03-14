@@ -17,7 +17,7 @@ function pickFallbackDisplayField(
       return name
     }
   }
-  return undefined
+  return
 }
 
 interface BuilderTableStore {

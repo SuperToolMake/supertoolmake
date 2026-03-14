@@ -531,7 +531,7 @@ export class RestIntegration implements IntegrationBase {
         } else if (string) {
           try {
             payload = JSON.parse(string) as JSONValue
-          } catch (_err) {
+          } catch {
             payload = object as JSONValue
           }
         } else {
@@ -716,7 +716,7 @@ export class RestIntegration implements IntegrationBase {
         error: error.message,
         cause: error.cause?.message,
         code: error.cause?.code,
-        hasDispatcher: !!input.dispatcher,
+        hasDispatcher: Boolean(input.dispatcher),
         isHttpsUrl: url.startsWith("https://"),
         rejectUnauthorized,
       })

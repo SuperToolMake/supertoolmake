@@ -112,11 +112,11 @@ const buildPseudoInstance = (cfg: Partial<Component>) => {
       _instanceName: cfg._instanceName || Helpers.uuid(),
       ...cfg,
     })
-    if (!instance || !instance._id) {
+    if (!instance?._id) {
       return null
     }
     return instance
-  } catch (error) {
+  } catch {
     return null
   }
 }

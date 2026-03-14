@@ -81,10 +81,10 @@ let isWorkspaceQueryReady = false
 let tableLoading = false
 
 $: currentWorkspaceId = $appStore.appId ? sdk.applications.getProdAppID($appStore.appId) : ""
-$: workspaceReady = !!currentWorkspaceId
+$: workspaceReady = Boolean(currentWorkspaceId)
 $: isWorkspaceQueryReady =
   ($fetch.query as { workspaceId?: string })?.workspaceId === currentWorkspaceId
-$: tableLoading = !workspaceReady || !isWorkspaceQueryReady || !$fetch.loaded
+$: tableLoading = !(workspaceReady && isWorkspaceQueryReady && $fetch.loaded)
 
 $: customRenderers = [
   { column: "email", component: EmailTableRenderer },
@@ -140,12 +140,11 @@ const buildEnrichedUsers = (rows: UserDoc[]): EnrichedUser[] => {
         ...user,
         name: user.firstName ? user.firstName + " " + user.lastName : "",
         workspaceRole,
-        __selectable:
+        __selectable: !(
           role.value === Constants.BudibaseRoles.Owner ||
           $auth.user?.email === user.email ||
           isWorkspaceTenantAdmin
-            ? false
-            : true,
+        ),
         apps: sdk.users.userAppAccessList(user),
         access: role.sortOrder,
       }
@@ -223,7 +222,7 @@ async function createUserFlow() {
     inviteUsersResponse = await users.invite(payload)
     await refreshUserList()
     inviteConfirmationModal.show()
-  } catch (error) {
+  } catch {
     if (assignedExistingUsers) {
       await refreshUserList()
     }
@@ -305,7 +304,7 @@ const assignExistingUsersToWorkspace = async (
         const saved = await users.save({ ...fullUser, ...roleUpdates })
         rev = saved?._rev || rev
       }
-      if (!user._id || !rev) {
+      if (!(user._id && rev)) {
         throw new Error("User ID or revision missing")
       }
       await users.addUserToWorkspace(user._id, role, rev)
@@ -411,14 +410,14 @@ const deleteUsers = async () => {
     notifications.success(`Successfully deleted ${selectedRows.length} users`)
     selectedRows = []
     await refreshUserList()
-  } catch (error) {
+  } catch {
     notifications.error("Error deleting users")
   }
 }
 
 const getWorkspaceRole = (role?: string, appRole?: string) => {
-  if (!currentWorkspaceId || !role) {
-    return undefined
+  if (!(currentWorkspaceId && role)) {
+    return
   }
   if (role === Constants.BudibaseRoles.Creator) {
     return Constants.Roles.CREATOR

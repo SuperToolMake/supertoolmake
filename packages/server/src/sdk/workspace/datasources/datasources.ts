@@ -233,7 +233,7 @@ export async function removeSecretSingle(datasource: Datasource) {
 }
 
 export function mergeConfigs(update: Datasource, old: Datasource) {
-  if (!update.config || !old.config) {
+  if (!(update.config && old.config)) {
     return update
   }
   // specific to REST datasources, fix the auth configs again if required
@@ -262,7 +262,7 @@ export function mergeConfigs(update: Datasource, old: Datasource) {
     if (value !== PASSWORD_REPLACEMENT) {
       continue
     }
-    if (update.config && old.config && old.config?.[key]) {
+    if (update.config && old.config?.[key]) {
       update.config[key] = old.config?.[key]
     } else if (update.config) {
       delete update.config[key]
@@ -295,7 +295,7 @@ export async function save(
   const db = context.getWorkspaceDB()
   const plus = datasource.plus
 
-  const fetchSchema = opts?.fetchSchema || false
+  const fetchSchema = opts?.fetchSchema
   const tablesFilter = opts?.tablesFilter || []
 
   datasource = addDatasourceFlags({

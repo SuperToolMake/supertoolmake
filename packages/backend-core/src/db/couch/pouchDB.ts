@@ -91,7 +91,7 @@ export async function closePouchDB(db: PouchDB.Database) {
   try {
     // specifically await so that if there is an error, it can be ignored
     return await db.close()
-  } catch (_err) {
+  } catch {
     // ignore error, already closed
   }
 }

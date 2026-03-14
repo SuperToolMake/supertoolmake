@@ -19,7 +19,7 @@ export default class QueryArrayFetch extends FieldFetch<QueryArrayFieldDatasourc
       }
 
       return result
-    } catch (_error) {
+    } catch {
       return null
     }
   }

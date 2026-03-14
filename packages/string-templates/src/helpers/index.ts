@@ -38,7 +38,7 @@ export const HELPERS = [
     try {
       const parsed = JSON.parse(decoded)
       return Array.isArray(parsed) ? parsed : [parsed]
-    } catch (_err) {
+    } catch {
       // wasn't json - likely was handlebars for a many to many
       return [_id]
     }
@@ -50,7 +50,7 @@ export const HELPERS = [
       return new Handlebars.SafeString(JSON.stringify(value))
     }
     // null/undefined values produce bad results
-    if (__opts && __opts.onlyFound && value == null) {
+    if (__opts?.onlyFound && value == null) {
       return __opts.input
     }
     if (value == null || typeof value !== "string") {
@@ -61,7 +61,7 @@ export const HELPERS = [
       value = (value as any).string
     }
     let text: any = value
-    if (__opts && __opts.escapeNewlines) {
+    if (__opts?.escapeNewlines) {
       text = value.replace(/\n/g, "\\n")
     }
     text = new Handlebars.SafeString(text.replace(/&amp;/g, "&"))

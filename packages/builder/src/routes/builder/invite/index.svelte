@@ -84,7 +84,7 @@ onMount(async () => {
     await organisation.init()
     await getInvite()
     loaded = true
-  } catch (error) {
+  } catch {
     notifications.error("Error getting invite config")
   }
 })

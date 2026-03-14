@@ -20,7 +20,7 @@ let ref: HTMLInputElement
 let focused = false
 let autofilled = false
 
-$: placeholder = !autofilled && !focused && !value
+$: placeholder = !(autofilled || focused || value)
 
 const onChange = (e: UIEvent) => {
   const newValue = e.target.value

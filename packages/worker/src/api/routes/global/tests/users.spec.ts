@@ -813,7 +813,7 @@ describe("/api/global/users", () => {
     it("should be able to search by email with numeric prefixing", async () => {
       const user = await config.createUser()
       const response = await config.api.users.searchUsers({
-        query: { string: { ["999:email"]: user.email } },
+        query: { string: { "999:email": user.email } },
       })
       expect(response.body.data.length).toBe(1)
       expect(response.body.data[0].email).toBe(user.email)
@@ -847,7 +847,7 @@ describe("/api/global/users", () => {
     it("should be able to search by _id with numeric prefixing", async () => {
       const user = await config.createUser()
       const response = await config.api.users.searchUsers({
-        query: { equal: { ["1:_id"]: user._id } },
+        query: { equal: { "1:_id": user._id } },
       })
       expect(response.body.data.length).toBe(1)
       expect(response.body.data[0]._id).toBe(user._id)
@@ -859,8 +859,8 @@ describe("/api/global/users", () => {
         {
           query: {
             string: {
-              ["1:email"]: user.email,
-              ["2:email"]: "something else",
+              "1:email": user.email,
+              "2:email": "something else",
             },
           },
         },
@@ -874,8 +874,8 @@ describe("/api/global/users", () => {
         {
           query: {
             string: {
-              ["_id"]: user.email,
-              ["999:_id"]: "something else",
+              _id: user.email,
+              "999:_id": "something else",
             },
           },
         },

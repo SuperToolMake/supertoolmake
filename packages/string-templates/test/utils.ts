@@ -10,7 +10,7 @@ function tryParseJson(str: string) {
 
   try {
     return JSON.parse(str.replace(/'/g, '"'))
-  } catch (_e) {
+  } catch {
     // do nothing
   }
 }

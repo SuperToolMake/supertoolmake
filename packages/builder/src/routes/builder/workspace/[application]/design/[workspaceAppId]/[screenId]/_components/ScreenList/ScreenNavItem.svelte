@@ -39,7 +39,7 @@ const createDuplicateScreen = async ({ route }: { route: string }) => {
       ...duplicateScreen,
       navigationLinkLabel: linkLabel,
     })
-  } catch (error) {
+  } catch {
     notifications.error("Error duplicating screen")
   }
 }
@@ -48,7 +48,7 @@ const deleteScreen = async () => {
   try {
     await screenStore.delete(screen)
     notifications.success("Deleted screen successfully")
-  } catch (err) {
+  } catch {
     notifications.error("Error deleting screen")
   }
 }
@@ -58,7 +58,7 @@ $: noPaste = !$componentStore.componentToPaste
 const pasteComponent = (mode: "inside") => {
   try {
     componentStore.paste(screen.props, mode, screen)
-  } catch (error) {
+  } catch {
     notifications.error("Error saving component")
   }
 }

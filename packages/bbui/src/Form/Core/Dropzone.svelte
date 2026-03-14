@@ -59,7 +59,7 @@ $: {
       reader.onload = (e) => {
         selectedUrl = e.target?.result as string
       }
-    } catch (error) {
+    } catch {
       selectedUrl = undefined
     }
   }

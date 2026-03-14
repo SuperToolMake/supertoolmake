@@ -26,7 +26,7 @@ const FieldTypeToComponentMap = {
 
 const getFieldSchema = (field) => {
   const fieldSchemaName = field.field || field.name
-  if (!fieldSchemaName || !schema?.[fieldSchemaName]) {
+  if (!(fieldSchemaName && schema?.[fieldSchemaName])) {
     return null
   }
   return schema[fieldSchemaName]

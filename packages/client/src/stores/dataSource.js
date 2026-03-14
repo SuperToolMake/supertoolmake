@@ -8,7 +8,7 @@ export const createDataSourceStore = () => {
 
   // Registers a new dataSource instance
   const registerDataSource = (dataSource, instanceId, refresh) => {
-    if (!dataSource || !instanceId || !refresh) {
+    if (!(dataSource && instanceId && refresh)) {
       return
     }
 
@@ -85,7 +85,7 @@ export const createDataSourceStore = () => {
       try {
         const definition = await API.fetchTableDefinition(dataSourceId)
         schema = definition?.schema
-      } catch (_error) {
+      } catch {
         schema = null
       }
     }

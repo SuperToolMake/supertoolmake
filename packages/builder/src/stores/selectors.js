@@ -2,7 +2,7 @@ import { DatasourceFeature } from "@budibase/types"
 import { cloneDeep } from "lodash/fp"
 
 export const integrationForDatasource = (integrations, datasource) => {
-  if (!datasource || !datasource.source) return null
+  if (!datasource?.source) return null
   return {
     name: datasource.source,
     ...integrations[datasource.source],

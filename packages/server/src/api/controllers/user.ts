@@ -50,7 +50,7 @@ export async function destroyMetadata(ctx: UserCtx<void, DeleteUserMetadataRespo
   try {
     const dbUser = await sdk.users.get(ctx.params.id)
     await db.remove(dbUser._id!, dbUser._rev)
-  } catch (_err) {
+  } catch {
     // error just means the global user has no config in this app
   }
   ctx.body = {

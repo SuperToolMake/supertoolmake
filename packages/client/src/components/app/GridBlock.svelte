@@ -65,7 +65,7 @@ $: data = {
   embeddedData: {
     dataSource: table,
     componentId: $component.id,
-    loaded: !!$rowMap,
+    loaded: Boolean($rowMap),
   },
 }
 
@@ -90,7 +90,7 @@ $: actions = [
 ]
 
 $: extendedFilter = extendFilter(initialFilter, filterExtensions)
-$: autoRefreshEnabled = !$builderStore.inBuilder || !$builderStore.selectedComponentId
+$: autoRefreshEnabled = !($builderStore.inBuilder && $builderStore.selectedComponentId)
 $: autoRefreshActions.setUp(
   autoRefreshEnabled ? autoRefresh : null,
   gridContext?.rows?.actions?.refreshData
@@ -102,7 +102,7 @@ $: autoRefreshActions.setUp(
  * @param extension Filter extension
  */
 const addFilterExtension = (componentId, extension) => {
-  if (!componentId || !extension) {
+  if (!(componentId && extension)) {
     return
   }
   filterExtensions = { ...filterExtensions, [componentId]: extension }
@@ -175,7 +175,7 @@ const getSchemaOverrides = (columns, context) => {
     overrides[column.field] = {
       displayName: column.label,
       order: idx,
-      visible: !!column.active,
+      visible: Boolean(column.active),
       conditions: enrichGridConditions(column.conditions, context),
       format: createFormatter(column),
 

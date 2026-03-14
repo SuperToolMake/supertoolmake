@@ -7,7 +7,7 @@ if (env.MOCK_REDIS) {
   try {
     // ioredis mock is all in memory
     MockRedis = require("ioredis-mock")
-  } catch (_err) {
+  } catch {
     console.log("Mock redis unavailable")
   }
 }
@@ -140,14 +140,14 @@ class RedisWrapper {
     const response = await this.client.get(this.prefixed(key))
     // overwrite the prefixed key
     // @ts-expect-error TODO(mel): Why are these types wrong?
-    if (response != null && response.key) {
+    if (response?.key) {
       // @ts-expect-error
       response.key = key
     }
     // if its not an object just return the response
     try {
       return JSON.parse(response!)
-    } catch (_err) {
+    } catch {
       return response
     }
   }
@@ -167,7 +167,7 @@ class RedisWrapper {
 
         try {
           acc[key] = result ? (JSON.parse(result) as T) : null
-        } catch (_err) {
+        } catch {
           // TODO: this is a filthy lie but downstream code expects this, I have
           // no idea how it actually works if if this branch is ever hit in
           // practice.

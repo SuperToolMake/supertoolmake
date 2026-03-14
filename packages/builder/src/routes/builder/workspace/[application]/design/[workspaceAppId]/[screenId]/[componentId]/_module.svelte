@@ -22,7 +22,7 @@ const validate = (id: string) => {
   if (id === `${$screenStore.selectedScreenId}-screen`) return true
   if (id === `${$screenStore.selectedScreenId}-navigation`) return true
 
-  return !!findComponent($selectedScreen?.props, id)
+  return Boolean(findComponent($selectedScreen?.props, id))
 }
 
 onMount(() => {

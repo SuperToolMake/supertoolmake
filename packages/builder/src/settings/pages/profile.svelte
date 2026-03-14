@@ -63,7 +63,7 @@ async function generateAPIKey() {
   try {
     apiKey = await auth.generateAPIKey()
     notifications.success("New API key generated")
-  } catch (err) {
+  } catch {
     notifications.error("Unable to generate new API key")
   }
 }
@@ -71,7 +71,7 @@ async function generateAPIKey() {
 onMount(async () => {
   try {
     apiKey = await auth.fetchAPIKey()
-  } catch (err) {
+  } catch {
     notifications.error("Unable to fetch API key")
   }
 })

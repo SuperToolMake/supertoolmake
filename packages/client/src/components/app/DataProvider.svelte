@@ -44,7 +44,7 @@ $: fetch.update({
   paginate,
 })
 $: schema = sanitizeSchema($fetch.schema)
-$: autoRefreshEnabled = !$builderStore.inBuilder || !$builderStore.selectedComponentId
+$: autoRefreshEnabled = !($builderStore.inBuilder && $builderStore.selectedComponentId)
 $: autoRefreshActions.setUp(autoRefreshEnabled ? autoRefresh : null, fetch.refresh)
 $: actions = [
   {
@@ -123,7 +123,7 @@ const sanitizeSchema = (schema: TableSchema | null) => {
 }
 
 const addQueryExtension = (key: string, extension: any) => {
-  if (!key || !extension) {
+  if (!(key && extension)) {
     return
   }
   queryExtensions = { ...queryExtensions, [key]: extension }

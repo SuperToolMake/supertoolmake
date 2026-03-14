@@ -1,7 +1,7 @@
 const NonErrors = ["AccountError"]
 
 function isSuppressed(e?: any) {
-  return e && e["suppressAlert"]
+  return e?.suppressAlert
 }
 
 export function logAlert(message: string, e?: any) {

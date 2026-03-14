@@ -70,7 +70,7 @@ export default class AliasTables {
       if (isWrite && isDisabledClient) {
         return false
       }
-    } catch (_err) {
+    } catch {
       // if we can't get an SQL client, we can't alias
       return false
     }

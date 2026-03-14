@@ -19,8 +19,8 @@ export async function processTable(table: Table): Promise<Table> {
   table = { ...table }
   if (table._id && isExternalTableID(table._id)) {
     // Old created external tables might have a missing field name breaking some UI such as filters
-    if (table.schema["id"] && !table.schema["id"].name) {
-      table.schema["id"].name = "id"
+    if (table.schema.id && !table.schema.id.name) {
+      table.schema.id.name = "id"
     }
     return {
       ...table,
@@ -165,8 +165,8 @@ export async function getTable(tableId: string): Promise<Table> {
 export async function doesTableExist(tableId: string): Promise<boolean> {
   try {
     const table = await getTable(tableId)
-    return !!table
-  } catch (_err) {
+    return Boolean(table)
+  } catch {
     return false
   }
 }
@@ -180,7 +180,7 @@ export async function getExternalTablesInDatasource(
   datasourceId: string
 ): Promise<Record<string, Table>> {
   const datasource = await datasources.get(datasourceId, { enriched: true })
-  if (!datasource || !datasource.entities) {
+  if (!datasource?.entities) {
     throw new Error("Datasource is not configured fully.")
   }
   return await processEntities(datasource.entities)

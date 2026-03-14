@@ -98,7 +98,7 @@ export async function startup(opts: { app?: Koa; server?: Server; force?: boolea
     await tenancy.doInTenant(tenantId, async () => {
       const exists = await users.doesUserExist(bbAdminEmail)
       const checklist = await getChecklist()
-      if (!checklist?.adminUser?.checked || !exists) {
+      if (!(checklist?.adminUser?.checked && exists)) {
         try {
           const user = await users.UserDB.createAdminUser(bbAdminEmail, tenantId, {
             password: bbAdminPassword,

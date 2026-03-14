@@ -10,7 +10,7 @@ const parseArrayString = (value: string | unknown) => {
     try {
       result = JSON.parse(value.replace(/'/g, '"'))
       return result
-    } catch (_e) {
+    } catch {
       return value
     }
   }
@@ -39,7 +39,7 @@ export const TYPE_TRANSFORM_MAP: Record<
       if (Array.isArray(link) && typeof link[0] === "object") {
         return link.map((el) => {
           const objEl = el as { _id: unknown }
-          return objEl && objEl._id ? objEl._id : el
+          return objEl?._id ? objEl._id : el
         })
       }
       if (typeof link === "string") {
@@ -149,10 +149,10 @@ export const TYPE_TRANSFORM_MAP: Record<
           throw new Error("input was not a string")
         }
         if (input === "") {
-          return undefined
+          return
         }
         return JSON.parse(input)
-      } catch (_err) {
+      } catch {
         return input
       }
     },

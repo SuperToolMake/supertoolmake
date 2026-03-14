@@ -26,7 +26,7 @@ $: isBuilderActive = (testUrl) => {
 }
 $: builderActive = isBuilderActive(url)
 $: containsActiveLink = (subLinks || []).some((x) => isBuilderActive(x.url))
-$: expanded = !!$navStateStore[text] || containsActiveLink
+$: expanded = Boolean($navStateStore[text]) || containsActiveLink
 $: renderLeftNav = leftNav || mobile
 $: caret = !renderLeftNav || expanded ? "caret-down" : "caret-right"
 $: collapsedText = getShortText(text)

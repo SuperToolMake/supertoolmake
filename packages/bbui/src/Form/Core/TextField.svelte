@@ -1,94 +1,94 @@
 <script lang="ts">
-import "@spectrum-css/textfield/dist/index-vars.css"
-import type { UIEvent } from "@budibase/types"
-import { createEventDispatcher, onMount, tick } from "svelte"
-import type { FullAutoFill } from "svelte/elements"
+  import "@spectrum-css/textfield/dist/index-vars.css"
+  import type { UIEvent } from "@budibase/types"
+  import { createEventDispatcher, onMount, tick } from "svelte"
+  import type { FullAutoFill } from "svelte/elements"
 
-export let value: string | null = null
-export let placeholder: string | undefined = undefined
-export let type = "text"
-export let disabled = false
-export let id = null
-export let readonly = false
-export let updateOnChange = true
-export let quiet = false
-export let align: "left" | "right" | "center" | undefined = undefined
-export let autofocus: boolean | null = false
-export let autocomplete: FullAutoFill | boolean | null | undefined = undefined
+  export let value: string | null = null
+  export let placeholder: string | undefined = undefined
+  export let type = "text"
+  export let disabled = false
+  export let id = null
+  export let readonly = false
+  export let updateOnChange = true
+  export let quiet = false
+  export let align: "left" | "right" | "center" | undefined = undefined
+  export let autofocus: boolean | null = false
+  export let autocomplete: FullAutoFill | boolean | null | undefined = undefined
 
-const dispatch = createEventDispatcher()
+  const dispatch = createEventDispatcher()
 
-let field: any
-let focus = false
+  let field: any
+  let focus = false
 
-const updateValue = (newValue: any) => {
-  if (readonly || disabled) {
-    return
+  const updateValue = (newValue: any) => {
+    if (readonly || disabled) {
+      return
+    }
+    if (type === "number") {
+      const float = parseFloat(newValue as string)
+      newValue = isNaN(float) ? null : float
+    }
+    dispatch("change", newValue)
   }
-  if (type === "number") {
-    const float = parseFloat(newValue as string)
-    newValue = isNaN(float) ? null : float
-  }
-  dispatch("change", newValue)
-}
 
-const onFocus = () => {
-  if (readonly || disabled) {
-    return
+  const onFocus = () => {
+    if (readonly || disabled) {
+      return
+    }
+    focus = true
   }
-  focus = true
-}
 
-const onBlur = (event: UIEvent) => {
-  if (readonly || disabled) {
-    return
+  const onBlur = (event: UIEvent) => {
+    if (readonly || disabled) {
+      return
+    }
+    focus = false
+    updateValue(event?.target?.value)
   }
-  focus = false
-  updateValue(event?.target?.value)
-}
 
-const onInput = (event: UIEvent) => {
-  if (readonly || !updateOnChange || disabled) {
-    return
-  }
-  updateValue(event.target?.value)
-}
-
-const updateValueOnEnter = (event: UIEvent) => {
-  if (readonly || disabled) {
-    return
-  }
-  if (event.key === "Enter") {
+  const onInput = (event: UIEvent) => {
+    if (readonly || !updateOnChange || disabled) {
+      return
+    }
     updateValue(event.target?.value)
   }
-}
 
-const getInputMode = (type: string) => {
-  if (type === "bigint") {
-    return "numeric"
+  const updateValueOnEnter = (event: UIEvent) => {
+    if (readonly || disabled) {
+      return
+    }
+    if (event.key === "Enter") {
+      updateValue(event.target?.value)
+    }
   }
-  return type === "number" ? "decimal" : "text"
-}
 
-let autocompleteValue: FullAutoFill | null | undefined
-
-$: autocompleteValue =
-  typeof autocomplete === "boolean"
-    ? autocomplete
-      ? "on"
-      : "off"
-    : autocomplete === null
-      ? null
-      : autocomplete
-
-onMount(async () => {
-  if (disabled) return
-  focus = autofocus || false
-  if (focus) {
-    await tick()
-    field.focus()
+  const getInputMode = (type: string) => {
+    if (type === "bigint") {
+      return "numeric"
+    }
+    return type === "number" ? "decimal" : "text"
   }
-})
+
+  let autocompleteValue: FullAutoFill | null | undefined
+
+  $: autocompleteValue =
+    typeof autocomplete === "boolean"
+      ? autocomplete
+        ? "on"
+        : "off"
+      : autocomplete === null
+        ? null
+        : autocomplete
+
+  onMount(async () => {
+    if (disabled) return
+    focus = autofocus || false
+    if (focus) {
+      await tick()
+      field.focus()
+    }
+  })
 </script>
 
 <div

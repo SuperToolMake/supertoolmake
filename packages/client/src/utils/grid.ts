@@ -184,7 +184,7 @@ export const gridLayout = (node: HTMLDivElement, metadata: GridMetadata) => {
     }
 
     // Add draggable attribute
-    node.setAttribute("draggable", (!!draggable).toString())
+    node.setAttribute("draggable", Boolean(draggable).toString())
   }
 
   // Removes the previously set up listeners

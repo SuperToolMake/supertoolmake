@@ -20,7 +20,7 @@ type TableMap = Record<string, Table>
 export function isManyToMany(
   field: RelationshipFieldMetadata
 ): field is ManyToManyRelationshipFieldMetadata {
-  return !!(field as ManyToManyRelationshipFieldMetadata).through
+  return Boolean((field as ManyToManyRelationshipFieldMetadata).through)
 }
 
 /**
@@ -40,7 +40,7 @@ export function buildExternalRelationships(table: Table, tables: TableMap): Rela
       continue
     }
     const linkTable = tables[linkTableName]
-    if (!table.primary || !linkTable.primary) {
+    if (!(table.primary && linkTable.primary)) {
       continue
     }
     const definition: RelationshipsJson = {
@@ -114,8 +114,10 @@ export async function buildSqlFieldList(
     return Object.entries(table.schema)
       .filter(
         ([columnName, column]) =>
-          !nonMappedColumns.includes(column.type) &&
-          !existing.find((field: string) => field === columnName)
+          !(
+            nonMappedColumns.includes(column.type) ||
+            existing.find((field: string) => field === columnName)
+          )
       )
       .map(([columnName]) => columnName)
   }

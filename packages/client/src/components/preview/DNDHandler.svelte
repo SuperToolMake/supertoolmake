@@ -75,7 +75,7 @@ const onDragStart = (e: DragEvent) => {
     return
   }
   const component = e.target.closest(".component")
-  if (!(component instanceof HTMLElement) || !component.classList.contains("draggable")) {
+  if (!(component instanceof HTMLElement && component.classList.contains("draggable"))) {
     return
   }
 
@@ -231,7 +231,7 @@ const handleEvent = (e: DragEvent) => {
 
 // Callback when on top of a component
 const onDragOver = (e: DragEvent) => {
-  if (!source || !target || gridScreen) {
+  if (!(source && target) || gridScreen) {
     return
   }
   handleEvent(e)
@@ -263,7 +263,7 @@ const onDragEnter = async (e: DragEvent) => {
 
 // Callback when dropping a drag on top of some component
 const onDrop = async () => {
-  if (!source || !drop?.parent || drop?.index == null) {
+  if (!(source && drop?.parent) || drop?.index == null) {
     return
   }
 

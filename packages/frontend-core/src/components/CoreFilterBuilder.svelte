@@ -90,7 +90,7 @@ const getValidOperatorsForType = (filter) => {
     return [OperatorOptions.Equals, OperatorOptions.NotEquals]
   }
 
-  if (!filter?.field && !filter?.name) {
+  if (!(filter?.field || filter?.name)) {
     return []
   }
 

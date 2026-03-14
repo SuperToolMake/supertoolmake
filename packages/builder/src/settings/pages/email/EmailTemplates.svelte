@@ -36,7 +36,7 @@ onMount(async () => {
   try {
     smtpConfig = await fetchSmtp()
     await email.fetchTemplates()
-  } catch (error) {
+  } catch {
     notifications.error("Error fetching email templates")
   }
 })

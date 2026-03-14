@@ -48,7 +48,7 @@ const parseDateDisplay = (
   filter: SearchFilter | undefined,
   fieldSchema: FieldSchema | undefined
 ) => {
-  if (!filter || !fieldSchema || fieldSchema.type !== FieldType.DATETIME) return ""
+  if (!(filter && fieldSchema) || fieldSchema.type !== FieldType.DATETIME) return ""
 
   if (filter.operator === RangeOperator.RANGE) {
     const enableTime = !fieldSchema.dateOnly
@@ -85,7 +85,7 @@ const parseMultiDisplay = (value: string[] | undefined) => {
 const displayText = (filter: SearchFilter | undefined, fieldSchema: FieldSchema | undefined) => {
   filterMeta = undefined
   filterTitle = undefined
-  if (!filter || !fieldSchema) return
+  if (!(filter && fieldSchema)) return
 
   // Default to the base value. This could be a string or an array
   // Some of the values could be refs for users.

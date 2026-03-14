@@ -134,7 +134,7 @@ const getContextMenuOptions = (workspaceApp: UIWorkspaceApp) => {
     {
       icon: "globe-simple",
       name: "View live app",
-      visible: !!liveUrl,
+      visible: Boolean(liveUrl),
       callback: () => openLiveWorkspaceApp(liveUrl),
     },
 
@@ -192,8 +192,8 @@ $: filteredWorkspaceApps = workspaceApps
     }
   })
   .sort((a, b) => {
-    const aIsFav = !!a.favourite._id
-    const bIsFav = !!b.favourite._id
+    const aIsFav = Boolean(a.favourite._id)
+    const bIsFav = Boolean(b.favourite._id)
 
     // Group by favourite status
     if (aIsFav !== bIsFav) {

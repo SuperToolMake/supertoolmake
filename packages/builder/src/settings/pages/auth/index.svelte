@@ -103,10 +103,10 @@ $: {
     : (oidcSaveButtonDisabled = false)
 }
 
-$: oidcComplete = !!(
+$: oidcComplete = Boolean(
   providers.oidc?.config?.configs[0].configUrl &&
-  providers.oidc?.config?.configs[0].clientID &&
-  providers.oidc?.config?.configs[0].clientSecret
+    providers.oidc?.config?.configs[0].clientID &&
+    providers.oidc?.config?.configs[0].clientSecret
 )
 
 const onFileSelected = (e) => {
@@ -167,7 +167,7 @@ async function saveOIDC() {
 let defaultScopes = ["profile", "email", "offline_access"]
 
 const refreshScopes = (idx) => {
-  providers.oidc.config.configs[idx]["scopes"] = providers.oidc.config.configs[idx]["scopes"]
+  providers.oidc.config.configs[idx].scopes = providers.oidc.config.configs[idx].scopes
 }
 
 let scopesFields = [
@@ -186,7 +186,7 @@ const copyToClipboard = async (value) => {
 onMount(async () => {
   try {
     await organisation.init()
-  } catch (error) {
+  } catch {
     notifications.error("Error getting org config")
   }
 
@@ -196,7 +196,7 @@ onMount(async () => {
   let oidcLogos
   try {
     oidcLogos = await API.getOIDCLogos()
-  } catch (error) {
+  } catch {
     notifications.error("Error fetching OIDC logos")
   }
   if (oidcLogos?.config) {
@@ -218,7 +218,7 @@ onMount(async () => {
   let oidcDoc
   try {
     oidcDoc = await API.getConfig(ConfigTypes.OIDC)
-  } catch (error) {
+  } catch {
     notifications.error("Error fetching OIDC config")
   }
   if (!oidcDoc?._id) {

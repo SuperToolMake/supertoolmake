@@ -136,9 +136,7 @@ export async function revertClientLibrary(appId: string) {
   if (hasBackup) {
     await forEachObject(appId, async (filePath) => {
       if (
-        !filePath.includes("/.bak/") &&
-        !filePath.endsWith(".bak") &&
-        !restoredFiles.has(filePath)
+        !(filePath.includes("/.bak/") || filePath.endsWith(".bak") || restoredFiles.has(filePath))
       ) {
         await objectStore.deleteFile(ObjectStoreBuckets.APPS, filePath)
       }

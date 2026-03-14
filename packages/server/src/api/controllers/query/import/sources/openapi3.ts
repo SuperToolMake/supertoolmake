@@ -49,8 +49,8 @@ export class OpenAPI3 extends OpenAPISource {
   private securityHeaders: Map<string, string> = new Map()
 
   private resolveRef<T>(ref: string): T | undefined {
-    if (!ref || !ref.startsWith("#/")) {
-      return undefined
+    if (!ref?.startsWith("#/")) {
+      return
     }
     const parts = ref
       .slice(2)
@@ -60,7 +60,7 @@ export class OpenAPI3 extends OpenAPISource {
     let current: any = this.document
     for (const part of parts) {
       if (current == null || typeof current !== "object") {
-        return undefined
+        return
       }
       current = current[part]
     }
@@ -69,7 +69,7 @@ export class OpenAPI3 extends OpenAPISource {
 
   private resolveMaybeRef<T>(value: T | OpenAPIV3.ReferenceObject | undefined): T | undefined {
     if (!value) {
-      return undefined
+      return
     }
     if (isReferenceObject(value)) {
       return this.resolveRef<T>(value.$ref)
@@ -108,23 +108,23 @@ export class OpenAPI3 extends OpenAPISource {
   ): GeneratedRequestBody | undefined {
     const request = this.resolveMaybeRef<OpenAPIV3.RequestBodyObject>(operation.requestBody)
     if (!request) {
-      return undefined
+      return
     }
     const supportedMimeTypes = this.getMimeTypes(operation)
     const mimeType = mimeTypeOverride || supportedMimeTypes[0]
     if (!mimeType) {
-      return undefined
+      return
     }
     const content = request.content[mimeType]
     if (!content) {
-      return undefined
+      return
     }
     if (content.example) {
       return generateRequestBodyFromExample(content.example, bindingRoot)
     }
     const schema = this.resolveMaybeRef<OpenAPIV3.SchemaObject>(content.schema)
     if (!schema) {
-      return undefined
+      return
     }
     if (schema.example) {
       return generateRequestBodyFromExample(schema.example, bindingRoot)
@@ -210,12 +210,12 @@ export class OpenAPI3 extends OpenAPISource {
 
   private getSecuritySchemeHeader(scheme?: OpenAPIV3.SecuritySchemeObject): string | undefined {
     if (!scheme) {
-      return undefined
+      return
     }
     if (scheme.type === "apiKey" && scheme.in === "header" && scheme.name) {
       return scheme.name
     }
-    return undefined
+    return
   }
 
   private isSecurityHeader(name?: string): boolean {
@@ -236,7 +236,7 @@ export class OpenAPI3 extends OpenAPISource {
       } else {
         return false
       }
-    } catch (_err) {
+    } catch {
       return false
     }
   }

@@ -218,7 +218,7 @@ const onClickComponentLink = (component: ComponentUsingState) => {
 }
 
 const handleStateInspectorChange = (e: CustomEvent) => {
-  if (!selectedKey || !$previewStore.selectedComponentContext) {
+  if (!(selectedKey && $previewStore.selectedComponentContext)) {
     return
   }
   const stateUpdate = {

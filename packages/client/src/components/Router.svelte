@@ -54,7 +54,7 @@ onMount(() => {
     try {
       const state = JSON.parse(atob(queryParams.state))
       stateStore.actions.initialise(state)
-    } catch (error) {
+    } catch {
       // Swallow error and do nothing
     }
   }

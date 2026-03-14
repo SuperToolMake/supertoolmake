@@ -71,7 +71,7 @@ export const getAdditionalDataContext = () => {
 
 // Builds a full details page URL for the card title
 const buildFullCardUrl = (link, url, repeaterId, linkColumn) => {
-  if (!link || !url || !repeaterId) {
+  if (!(link && url && repeaterId)) {
     return null
   }
   const col = linkColumn || "_id"

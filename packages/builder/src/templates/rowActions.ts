@@ -34,7 +34,7 @@ export const getRowActionButtonTemplates = async ({
   const type = instance?._component
   const isGridBlock = type?.endsWith("/gridblock")
   const isFormBlock = type?.endsWith("/formblock") || type?.endsWith("/multistepformblock")
-  if (!isGridBlock && !isFormBlock) {
+  if (!(isGridBlock || isFormBlock)) {
     return []
   }
 

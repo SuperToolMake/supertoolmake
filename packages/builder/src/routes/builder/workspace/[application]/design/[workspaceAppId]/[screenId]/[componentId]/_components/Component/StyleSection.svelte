@@ -26,7 +26,7 @@ const getControlProps = (props) => {
 const updateStyle = async (key, val) => {
   try {
     await componentStore.updateStyle(key, val)
-  } catch (error) {
+  } catch {
     notifications.error("Error updating style")
   }
 }

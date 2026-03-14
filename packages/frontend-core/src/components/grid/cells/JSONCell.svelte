@@ -13,7 +13,7 @@ const getStringifiedValue = (value) => {
   }
   try {
     return JSON.stringify(value, null, 2)
-  } catch (error) {
+  } catch {
     return null
   }
 }
@@ -27,7 +27,7 @@ const parse = (value) => {
   try {
     const parsed = JSON.parse(trimmed)
     onChange(parsed)
-  } catch (error) {
+  } catch {
     // Swallow
   }
 }

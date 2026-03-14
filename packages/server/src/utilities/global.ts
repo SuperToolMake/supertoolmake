@@ -5,7 +5,7 @@ import { getGlobalIDFromUserMetadataID } from "../db/utils"
 import env from "../environment"
 
 export async function processUser(user: ContextUser, opts: { appId?: string } = {}) {
-  if (!user || !user.roles) {
+  if (!user?.roles) {
     return user
   }
   user = cloneDeep(user)

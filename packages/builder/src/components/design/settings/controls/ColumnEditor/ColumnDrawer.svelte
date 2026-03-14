@@ -61,7 +61,7 @@ const addAllColumns = () => {
   options.forEach((field) => {
     const fieldSchema = schema[field]
     const hasCol = columns && columns.findIndex((x) => x.name === field) !== -1
-    if (!fieldSchema?.autocolumn && !hasCol) {
+    if (!(fieldSchema?.autocolumn || hasCol)) {
       newColumns.push({
         name: field,
         displayName: field,

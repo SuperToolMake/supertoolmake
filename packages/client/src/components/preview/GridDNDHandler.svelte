@@ -157,7 +157,7 @@ const handleEvent = (e: DragEvent) => {
 const startDraggingPlaceholder = () => {
   const domComponent = document.getElementsByClassName(DNDPlaceholderID)[0]
   const domGrid = domComponent?.closest(".grid")
-  if (!(domComponent instanceof HTMLElement) || !(domGrid instanceof HTMLElement)) {
+  if (!(domComponent instanceof HTMLElement && domGrid instanceof HTMLElement)) {
     return
   }
   const styles = getComputedStyle(domComponent)
@@ -215,7 +215,7 @@ const onDragStart = (e: DragEvent) => {
   // Find grid parent and read from DOM
   const domComponent = document.getElementsByClassName(id)[0]
   const domGrid = domComponent?.closest(".grid")
-  if (!(domComponent instanceof HTMLElement) || !(domGrid instanceof HTMLElement)) {
+  if (!(domComponent instanceof HTMLElement && domGrid instanceof HTMLElement)) {
     return
   }
   const styles = getComputedStyle(domComponent)

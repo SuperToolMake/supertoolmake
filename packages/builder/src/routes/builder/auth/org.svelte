@@ -20,7 +20,7 @@ async function setOrg() {
     // re-init now org selected
     await admin.init()
     $goto("../")
-  } catch (error) {
+  } catch {
     notifications.error("Error setting organisation")
   }
 }

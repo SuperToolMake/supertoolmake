@@ -42,7 +42,7 @@ $: type = meta?.type
 $: label = meta.name ? capitalise(meta.name) : ""
 
 const timeStamp = resolveTimeStamp(value)
-const isTimeStamp = !!timeStamp || meta?.timeOnly
+const isTimeStamp = Boolean(timeStamp) || meta?.timeOnly
 
 $: currentTheme = $themeStore?.theme
 $: darkMode = !currentTheme.includes("light")

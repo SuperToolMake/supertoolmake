@@ -80,13 +80,13 @@ let lastSyncedQueryId
 let lastSyncedQueryName
 
 $: staticVariables = datasource?.config?.staticVariables || {}
-$: if (query && query._id && query._id !== lastSyncedQueryId) {
+$: if (query?._id && query._id !== lastSyncedQueryId) {
   lastSyncedQueryId = query._id
   lastSyncedQueryName = query.name
 }
 $: if (mounted && queryId && $queries.list && query) {
   const updatedQuery = $queries.list.find((q) => q._id === queryId)
-  if (updatedQuery && updatedQuery._rev && updatedQuery._rev !== query._rev) {
+  if (updatedQuery?._rev && updatedQuery._rev !== query._rev) {
     query._rev = updatedQuery._rev
   }
   if (
@@ -275,7 +275,7 @@ async function saveQuery(redirectIfNew = true) {
 
     queryNameLabel.disableEditingState()
     return { ok: true }
-  } catch (err) {
+  } catch {
     notifications.error(`Error saving query`)
   } finally {
     saving = false
@@ -396,10 +396,10 @@ const rebuildVariables = (queryId) => {
 }
 
 const shouldShowVariables = (dynamicVariables, variablesReadOnly) => {
-  return !!(
+  return Boolean(
     dynamicVariables &&
-    // show when editable or when read only and not empty
-    (!variablesReadOnly || Object.keys(dynamicVariables).length > 0)
+      // show when editable or when read only and not empty
+      (!variablesReadOnly || Object.keys(dynamicVariables).length > 0)
   )
 }
 
@@ -437,7 +437,7 @@ onMount(async () => {
   try {
     // Clear any unsaved changes to the datasource
     await datasources.init()
-  } catch (error) {
+  } catch {
     notifications.error("Error getting datasources")
   }
 

@@ -22,7 +22,7 @@ let appContextMenuModals
 $: contextMenuOpen = `${app.appId}-index` === $contextMenuStore.id
 $: editing = app.sessions?.length
 $: isBuilder = sdk.users.isBuilder($auth.user, app?.devId)
-$: unclickable = !isBuilder && !app.deployed
+$: unclickable = !(isBuilder || app.deployed)
 
 const handleDefaultClick = () => {
   if (!isBuilder) {
@@ -35,11 +35,11 @@ const handleDefaultClick = () => {
 }
 
 const goToBuilder = () => {
-  goto && goto(`../../workspace/${app.devId}`)
+  goto?.(`../../workspace/${app.devId}`)
 }
 
 const goToOverview = () => {
-  goto && goto(`../../workspace/${app.devId}/settings`)
+  goto?.(`../../workspace/${app.devId}/settings`)
 }
 
 const goToApp = () => {

@@ -79,7 +79,7 @@ const deleteUsers = async () => {
     }
 
     notifications.success(`Successfully deleted ${selectedInvites.length} users`)
-  } catch (error) {
+  } catch {
     notifications.error("Error deleting users")
   }
 }
@@ -88,7 +88,7 @@ onMount(async () => {
   try {
     pendingInvites = await users.getInvites()
     invitesLoaded = true
-  } catch (err) {
+  } catch {
     notifications.error("Error fetching user invitations")
   }
 })

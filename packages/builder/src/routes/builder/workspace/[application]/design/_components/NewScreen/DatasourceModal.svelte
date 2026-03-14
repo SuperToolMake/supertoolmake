@@ -39,7 +39,7 @@ const getDatasources = (rawDatasources: (Datasource | UIInternalDatasource)[]) =
   const datasources = []
 
   for (const rawDatasource of rawDatasources) {
-    if (rawDatasource.source === IntegrationNames.REST || !rawDatasource["entities"]) {
+    if (rawDatasource.source === IntegrationNames.REST || !rawDatasource.entities) {
       continue
     }
 

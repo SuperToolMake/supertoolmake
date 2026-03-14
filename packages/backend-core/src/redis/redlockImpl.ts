@@ -128,7 +128,7 @@ export async function doWithLock<T>(
       // We keep extending the lock while the task is running
       const extendInIntervals = (): void => {
         timeout = setTimeout(async () => {
-          lock = await lock!.extend(ttl, () => opts.onExtend && opts.onExtend())
+          lock = await lock!.extend(ttl, () => opts.onExtend?.())
 
           extendInIntervals()
         }, ttl / 2)

@@ -31,7 +31,7 @@ export function hide() {
 const update = async (property: string, value: any) => {
   try {
     await themeStore.saveCustom({ [property]: value }, $appStore.appId)
-  } catch (error) {
+  } catch {
     notifications.error("Error updating custom theme")
   }
 }

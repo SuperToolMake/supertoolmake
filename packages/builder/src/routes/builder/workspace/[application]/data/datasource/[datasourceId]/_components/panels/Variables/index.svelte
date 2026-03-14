@@ -45,7 +45,7 @@ const handleStaticChange = (newUnparsedStaticVariables) => {
   const newStaticVariables = buildStaticVariablesObject(newUnparsedStaticVariables)
   if (!isEqual(prev, newStaticVariables)) {
     localUpdatedDatasource.config.staticVariables = newStaticVariables
-    markDirty && markDirty()
+    markDirty?.()
   }
 }
 

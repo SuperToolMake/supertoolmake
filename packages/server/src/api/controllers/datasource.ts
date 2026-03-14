@@ -208,7 +208,7 @@ export async function update(ctx: UserCtx<UpdateDatasourceRequest, UpdateDatasou
   if (datasource.entities) {
     for (let table of Object.values(datasource.entities)) {
       const oldTable = baseDatasource.entities?.[table.name]
-      if (!oldTable || !isEqual(oldTable, table)) {
+      if (!(oldTable && isEqual(oldTable, table))) {
         table = await processTable(table)
         builderSocket?.emitTableUpdate(ctx, table, { includeOriginator: true })
       }

@@ -32,7 +32,7 @@ async function removeDeprecated(db: Database, viewName: ViewName) {
       delete designDoc.views?.[deprecatedNames]
     }
     await db.put(designDoc)
-  } catch (_err) {
+  } catch {
     // doesn't exist, ignore
   }
 }
@@ -41,7 +41,7 @@ export async function createView(db: Database, viewJs: string, viewName: string)
   let designDoc
   try {
     designDoc = await db.get<DesignDocument>(DESIGN_DB)
-  } catch (_err) {
+  } catch {
     // no design doc, make one
     designDoc = DesignDoc()
   }

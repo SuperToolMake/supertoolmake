@@ -47,7 +47,7 @@ function testObject(object: any) {
   // JSON stringify will fail if there are any cycles, stops infinite recursion
   try {
     JSON.stringify(object)
-  } catch (_err) {
+  } catch {
     throw "Unable to process inputs to JSON, cannot recurse"
   }
 }
@@ -219,7 +219,7 @@ function processStringSyncInternal(
     return opts?.logging ? postprocessWithLogs(processedString) : postprocess(processedString)
   }
   try {
-    if (opts && opts.onlyFound) {
+    if (opts?.onlyFound) {
       let logs: Log[] = []
       const blocks = findHBSBlocks(string)
       for (const block of blocks) {
@@ -335,7 +335,7 @@ export function isValid(string: any, opts?: any): boolean {
     template(context)
     return true
   } catch (err: any) {
-    const msg = err && err.message ? err.message : err
+    const msg = err?.message ? err.message : err
     if (!msg) {
       return false
     }

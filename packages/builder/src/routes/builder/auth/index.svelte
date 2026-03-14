@@ -22,7 +22,7 @@ onMount(async () => {
     await auth.validateTenantId()
     await admin.init()
     await auth.checkQueryString()
-  } catch (error) {
+  } catch {
     notifications.error("Error getting checklist")
   }
   loaded = true

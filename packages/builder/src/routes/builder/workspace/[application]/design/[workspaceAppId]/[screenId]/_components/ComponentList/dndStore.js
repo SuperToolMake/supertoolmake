@@ -91,7 +91,7 @@ const createDNDStore = () => {
     },
     drop: async () => {
       const state = get(store)
-      if (!state.valid || !state.source || !state.target) {
+      if (!(state.valid && state.source && state.target)) {
         return
       }
       actions.reset()

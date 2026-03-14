@@ -71,7 +71,7 @@ export abstract class ImportSource {
 
   protected normalizeMethod = (method?: string): string | undefined => {
     if (!method) {
-      return undefined
+      return
     }
     return method.toLowerCase()
   }
@@ -135,7 +135,7 @@ export abstract class ImportSource {
     queryString: string,
     headers: object = {},
     parameters: QueryParameter[] = [],
-    body: unknown = undefined,
+    body: unknown,
     bodyBindings: Record<string, string> = {},
     explicitBodyType?: BodyType,
     restTemplateMetadata?: RestTemplateQueryMetadata

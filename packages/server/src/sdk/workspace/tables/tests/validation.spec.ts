@@ -96,7 +96,7 @@ const OTHER_PROJECT_COLS = ["idP", "Name", "client"]
 
 describe("validation and update of external table schemas", () => {
   function getForeignKeyColumn(datasource: Datasource) {
-    return datasource.entities!["project"].schema.idC
+    return datasource.entities!.project.schema.idC
   }
 
   function checkOtherColumns(table: Table, _compareTable: Table, columnsToCheck: string[]) {

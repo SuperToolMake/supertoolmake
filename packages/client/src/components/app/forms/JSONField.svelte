@@ -32,7 +32,7 @@ const serialiseValue = (value) => {
 const parseValue = (value) => {
   try {
     return JSON.parse(value)
-  } catch (error) {
+  } catch {
     return value
   }
 }

@@ -26,7 +26,7 @@ export async function loadTemplateConfig(pathTo: string) {
     const config = readStaticFile(pathTo)
     const parsed = yaml.parse(config)
 
-    if (!parsed || !parsed.templates) {
+    if (!parsed?.templates) {
       console.log(`No email templates found: ${pathTo}`)
       return
     }

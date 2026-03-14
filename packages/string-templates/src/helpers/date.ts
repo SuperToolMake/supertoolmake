@@ -61,7 +61,7 @@ function getContext(thisArg: any, locals: any, options: any) {
   if (!isApp(thisArg)) {
     context = Object.assign({}, thisArg, context)
   }
-  if (isApp(thisArg) && thisArg.view && thisArg.view.data) {
+  if (isApp(thisArg) && thisArg.view?.data) {
     context = Object.assign({}, context, thisArg.view.data)
   }
   return context

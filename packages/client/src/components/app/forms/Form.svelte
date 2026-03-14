@@ -74,7 +74,7 @@ const getInitialValues = (
 const fetchSchema = async (dataSource: DataFetchDatasource) => {
   try {
     definition = await fetchDatasourceDefinition(dataSource)
-  } catch (error) {
+  } catch {
     definition = undefined
   }
   const res = await fetchDatasourceSchema(dataSource)

@@ -131,7 +131,7 @@ export async function search(
     }
     return response
   } catch (err: any) {
-    if (err.message && err.message.includes("does not exist")) {
+    if (err.message?.includes("does not exist")) {
       throw new Error(`Table updated externally, please re-fetch - ${err.message}`, { cause: err })
     } else {
       throw err
@@ -167,7 +167,7 @@ export async function exportRows(options: ExportRowsParams): Promise<ExportRowsR
 
   const datasource = await sdk.datasources.get(datasourceId)
   const table = await sdk.tables.getTable(tableId)
-  if (!datasource || !datasource.entities) {
+  if (!datasource?.entities) {
     throw new HTTPError("Datasource has not been configured for plus API.", 400)
   }
 
@@ -176,7 +176,7 @@ export async function exportRows(options: ExportRowsParams): Promise<ExportRowsR
   let headers
 
   // Filter data to only specified columns if required
-  if (columns && columns.length) {
+  if (columns?.length) {
     for (let i = 0; i < result.rows.length; i++) {
       rows[i] = {}
       for (const column of columns) {
