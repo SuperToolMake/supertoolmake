@@ -58,7 +58,7 @@
         "useIsArray": "error"
       },
       "correctness": {
-        "noConstructorReturn": "warn",
+        "noConstructorReturn": "error",
         "noInvalidUseBeforeDeclaration": "error",
         "noSelfAssign": "error",
         "noUnusedVariables": "error",

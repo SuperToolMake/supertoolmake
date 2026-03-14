@@ -9,7 +9,6 @@ export class ResourceIdGetter {
     this.parameter = ctxProperty
     this.main = null
     this.sub = null
-    return this
   }
 
   mainResource(field: string) {

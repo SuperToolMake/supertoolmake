@@ -16,10 +16,7 @@ import {
   type User,
 } from "@budibase/types"
 import { cloneDeep } from "lodash/fp"
-import {
-  getTableFromSource,
-  isUserMetadataTable,
-} from "../../api/controllers/row/utils"
+import { getTableFromSource, isUserMetadataTable } from "../../api/controllers/row/utils"
 import { InternalTables } from "../../db/utils"
 import { isExternalTableID } from "../../integrations/utils"
 import { allocateAutoColumnValues } from "./autoColumnState"
@@ -145,14 +142,12 @@ async function processDefaultValues(table: Table, row: Row) {
 
   for (const [key, schema] of Object.entries(table.schema)) {
     const isEmpty =
-      row[key] == null ||
-      row[key] === "" ||
-      (Array.isArray(row[key]) && row[key].length === 0)
+      row[key] == null || row[key] === "" || (Array.isArray(row[key]) && row[key].length === 0)
 
     if ("default" in schema && schema.default != null && isEmpty) {
       let processed: string | string[]
       if (Array.isArray(schema.default)) {
-        processed = schema.default.map(val => processStringSync(val, ctx))
+        processed = schema.default.map((val) => processStringSync(val, ctx))
       } else if (typeof schema.default === "string") {
         processed = processStringSync(schema.default, ctx)
       } else {
@@ -162,10 +157,7 @@ async function processDefaultValues(table: Table, row: Row) {
       try {
         row[key] = coerce(processed, schema.type)
       } catch (err: any) {
-        throw new HTTPError(
-          `Invalid default value for field '${key}' - ${err.message}`,
-          400
-        )
+        throw new HTTPError(`Invalid default value for field '${key}' - ${err.message}`, 400)
       }
     }
   }
@@ -315,33 +307,18 @@ export async function coreOutputProcessing(
   for (const [property, column] of Object.entries(table.schema)) {
     if (!opts.skipBBReferences && column.type == FieldType.BB_REFERENCE) {
       for (const row of rows) {
-        row[property] = await processOutputBBReferences(
-          row[property],
-          column.subtype
-        )
+        row[property] = await processOutputBBReferences(row[property], column.subtype)
       }
-    } else if (
-      !opts.skipBBReferences &&
-      column.type == FieldType.BB_REFERENCE_SINGLE
-    ) {
+    } else if (!opts.skipBBReferences && column.type == FieldType.BB_REFERENCE_SINGLE) {
       for (const row of rows) {
-        row[property] = await processOutputBBReference(
-          row[property],
-          column.subtype
-        )
+        row[property] = await processOutputBBReference(row[property], column.subtype)
       }
     } else if (column.type === FieldType.DATETIME && column.timeOnly) {
       for (const row of rows) {
         if (row[property] instanceof Date) {
           const hours = row[property].getUTCHours().toString().padStart(2, "0")
-          const minutes = row[property]
-            .getUTCMinutes()
-            .toString()
-            .padStart(2, "0")
-          const seconds = row[property]
-            .getUTCSeconds()
-            .toString()
-            .padStart(2, "0")
+          const minutes = row[property].getUTCMinutes().toString().padStart(2, "0")
+          const seconds = row[property].getUTCSeconds().toString().padStart(2, "0")
           row[property] = `${hours}:${minutes}:${seconds}`
         }
       }
@@ -409,17 +386,11 @@ export async function coreOutputProcessing(
   }
 
   if (!isUserMetadataTable(table._id!)) {
-    const protectedColumns = isExternal
-      ? PROTECTED_EXTERNAL_COLUMNS
-      : PROTECTED_INTERNAL_COLUMNS
+    const protectedColumns = isExternal ? PROTECTED_EXTERNAL_COLUMNS : PROTECTED_INTERNAL_COLUMNS
 
-    const tableFields = Object.keys(table.schema).filter(
-      f => table.schema[f].visible !== false
-    )
+    const tableFields = Object.keys(table.schema).filter((f) => table.schema[f].visible !== false)
 
-    const fields = [...tableFields, ...protectedColumns].map(f =>
-      f.toLowerCase()
-    )
+    const fields = [...tableFields, ...protectedColumns].map((f) => f.toLowerCase())
 
     for (const row of rows) {
       for (const key of Object.keys(row)) {
