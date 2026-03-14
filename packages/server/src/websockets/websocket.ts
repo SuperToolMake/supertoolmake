@@ -162,7 +162,7 @@ export class BaseSocket {
     const sessionsExist = await Promise.all(
       sessionIds.map((id) => this.redisClient?.exists(this.getSessionKey(id)))
     )
-    const prunedSessionIds = sessionIds.filter((id, idx) => {
+    const prunedSessionIds = sessionIds.filter((_id, idx) => {
       if (!sessionsExist[idx]) {
         this.io.to(room).emit(SocketEvent.UserDisconnect, {
           sessionId: sessionIds[idx],

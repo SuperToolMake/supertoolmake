@@ -29,13 +29,13 @@ export function buildVerifyFn(saveUserFn: SaveSSOUserFunction) {
    */
   return async (
     issuer: string,
-    sub: string,
+    _sub: string,
     profile: SSOProfile,
     jwtClaims: JwtClaims,
     accessToken: string,
     refreshToken: string,
-    idToken: string,
-    params: any,
+    _idToken: string,
+    _params: any,
     done: Function
   ) => {
     const details: SSOAuthDetails = {

@@ -2,7 +2,7 @@ import { context } from "@budibase/backend-core"
 import type { Ctx } from "@budibase/types"
 import type { Middleware, Next } from "koa"
 
-export const cleanupMiddleware = (async (ctx: Ctx, next: Next) => {
+export const cleanupMiddleware = (async (_ctx: Ctx, next: Next) => {
   const resp = await next()
 
   const current = context.getCurrentContext()

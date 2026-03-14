@@ -54,7 +54,7 @@ $: options = {
     },
     events: {
       // Clicking on a bucket
-      dataPointSelection: (event, chartContext, opts) => {
+      dataPointSelection: (_event, _chartContext, opts) => {
         const bucketIndex = opts.dataPointIndex
         const rows = dataProvider.rows || []
         const values = rows

@@ -235,7 +235,7 @@ const getAllBindings = (actionBindings, eventContextBindings, actions) => {
 
   // Based on the above, filter out the asynchronous automations from the bindings
   let contextBindings = asynchronousAutomationIndexes
-    ? eventContextBindings.filter((binding, index) => {
+    ? eventContextBindings.filter((_binding, index) => {
         return !asynchronousAutomationIndexes.includes(index)
       })
     : eventContextBindings

@@ -19,7 +19,7 @@ export const options = {
  * @param done callback from passport to return user information and errors
  * @returns The authenticated user, or errors if they occur
  */
-export async function authenticate(ctx: Ctx, email: string, password: string, done: Function) {
+export async function authenticate(_ctx: Ctx, email: string, password: string, done: Function) {
   if (!email) return authError(done, "Email Required")
   if (!password) return authError(done, "Password Required")
 

@@ -27,7 +27,7 @@ export function isRequired(constraints: FieldConstraints | undefined) {
 }
 
 export function decodeNonAscii(str: string): string {
-  return str.replace(/\\u([0-9a-fA-F]{4})/g, (match, p1) => String.fromCharCode(parseInt(p1, 16)))
+  return str.replace(/\\u([0-9a-fA-F]{4})/g, (_match, p1) => String.fromCharCode(parseInt(p1, 16)))
 }
 
 export function isNumeric(field: FieldSchema) {

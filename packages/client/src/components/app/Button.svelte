@@ -44,7 +44,7 @@ $: componentText = getComponentText(text, $builderStore, $component)
 $: customBg =
   $component.styles?.normal?.background || $component.styles?.normal?.["background-image"]
 
-const getComponentText = (text, builderState, componentState) => {
+const getComponentText = (text, _builderState, componentState) => {
   if (componentState.editing) {
     return text || " "
   }

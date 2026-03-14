@@ -67,7 +67,7 @@ $: options = {
     },
     events: {
       // Clicking on a bar or group of bars
-      dataPointSelection: (event, chartContext, opts) => {
+      dataPointSelection: (_event, _chartContext, opts) => {
         const barsIndex = opts.dataPointIndex
         const row = dataProvider.rows[barsIndex]
 

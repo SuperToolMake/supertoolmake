@@ -65,7 +65,7 @@ export async function postAuth(passport: Passport, ctx: UserCtx, next: Function)
       }
     ),
     { successRedirect: "/", failureRedirect: "/error" },
-    async (err: any, tokens: string[]) => {
+    async (_err: any, tokens: string[]) => {
       const baseUrl = `/builder/workspace/${authStateCookie.appId}/data`
 
       const id = utils.newid()

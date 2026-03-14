@@ -227,7 +227,7 @@ export abstract class PublicAPI extends TestAPI {
   prefix = "/api/public/v1"
 
   async getHeaders(
-    opts?: RequestOpts,
+    _opts?: RequestOpts,
     extras?: Record<string, string | string[]>
   ): Promise<Record<string, string | string[]>> {
     const apiKey = await this.config.generateApiKey()

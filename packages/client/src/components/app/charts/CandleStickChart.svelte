@@ -39,7 +39,7 @@ $: options = {
     },
     events: {
       // Clicking on a Candlestick
-      dataPointSelection: (event, chartContext, opts) => {
+      dataPointSelection: (_event, _chartContext, opts) => {
         const candlelstickIndex = opts.dataPointIndex
         const row = dataProvider.rows[candlelstickIndex]
         handleCandlestickClick(row)
@@ -69,7 +69,7 @@ function handleCandlestickClick(candlestick) {
   onClick?.({ candlestick })
 }
 
-const getValueAsUnixTime = (dataprovider, dateColumn, row) => {
+const getValueAsUnixTime = (_dataprovider, dateColumn, row) => {
   const value = row[dateColumn]
 
   if (dataProvider?.schema?.[dateColumn]?.type === "datetime") {

@@ -55,7 +55,7 @@ $: options = {
     },
     events: {
       // Clicking on a slice of the donut
-      dataPointSelection: (event, chartContext, opts) => {
+      dataPointSelection: (_event, _chartContext, opts) => {
         const segmentIndex = opts.dataPointIndex
         const row = dataProvider.rows[segmentIndex]
 

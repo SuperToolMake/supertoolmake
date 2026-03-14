@@ -115,7 +115,7 @@ $: if (emailInviteDisabled && passwordInviteDisabled) {
 }
 
 function removeInput(idx: number) {
-  userData = userData.filter((e, i) => i !== idx)
+  userData = userData.filter((_e, i) => i !== idx)
 }
 function addNewInput() {
   userData = [

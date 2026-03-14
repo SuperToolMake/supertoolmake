@@ -17,7 +17,7 @@ export const hide = () => {
   modal.hide()
 }
 
-function checkValid(vars, name) {
+function checkValid(_vars, name) {
   if (!name) {
     return false
   }

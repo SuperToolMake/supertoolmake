@@ -64,7 +64,7 @@ $: options = {
     },
     events: {
       // Clicking on a line
-      markerClick: (event, chartContext, opts) => {
+      markerClick: (_event, _chartContext, opts) => {
         const dataPointIndex = opts.dataPointIndex
         const row = dataProvider.rows[dataPointIndex]
 

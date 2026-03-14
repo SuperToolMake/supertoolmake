@@ -23,7 +23,7 @@ async function populateUsersFromDB(
   const getUsersResponse = await UserDB.bulkGet(userIds)
 
   // Handle missed user ids
-  const notFoundIds = userIds.filter((uid, i) => !getUsersResponse[i])
+  const notFoundIds = userIds.filter((_uid, i) => !getUsersResponse[i])
 
   const users = getUsersResponse.filter((x) => x)
 

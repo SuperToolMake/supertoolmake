@@ -55,7 +55,8 @@
         "noConstructorReturn": "warn",
         "noInvalidUseBeforeDeclaration": "warn",
         "noSelfAssign": "warn",
-        "noUnusedVariables": "error"
+        "noUnusedVariables": "error",
+        "noUnusedFunctionParameters": "error"
       },
       "security": {
         "noGlobalEval": "warn"
