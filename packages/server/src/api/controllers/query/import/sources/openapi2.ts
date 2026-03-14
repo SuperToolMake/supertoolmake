@@ -1,3 +1,4 @@
+import { URL } from "node:url"
 import {
   BodyType,
   type Query,
@@ -5,7 +6,6 @@ import {
   type RestTemplateQueryMetadata,
 } from "@budibase/types"
 import { OpenAPIV2 } from "openapi-types"
-import { URL } from "url"
 import { QueryVerbToHttpMethod } from "../../../../../constants"
 import type { GetQueriesOptions, ImportInfo } from "./base"
 import { OpenAPISource } from "./base/openapi"

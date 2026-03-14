@@ -1,6 +1,6 @@
+import vm from "node:vm"
 import browserVM from "@budibase/vm-browserify"
 import { create, type TemplateDelegate } from "handlebars"
-import vm from "vm"
 import { convertHBSBlock } from "./conversion"
 import { isTest } from "./environment"
 import { UserScriptError } from "./errors"

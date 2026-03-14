@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const yargs = require("yargs")
-const fs = require("fs")
-const { join } = require("path")
+const fs = require("node:fs")
+const { join } = require("node:path")
 require("../src/db").init()
 const { db: dbCore } = require("@budibase/backend-core")
 // load environment

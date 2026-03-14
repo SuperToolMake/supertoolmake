@@ -1,3 +1,4 @@
+import type http from "node:http"
 import { permissions } from "@budibase/backend-core"
 import { BuilderSocketEvent } from "@budibase/shared-core"
 import type {
@@ -11,7 +12,6 @@ import type {
   Workspace,
   WorkspaceApp,
 } from "@budibase/types"
-import type http from "http"
 import type Koa from "koa"
 import type { Socket } from "socket.io"
 import { authorizedMiddleware as authorized } from "../middleware/authorized"

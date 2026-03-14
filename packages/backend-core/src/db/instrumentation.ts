@@ -1,3 +1,4 @@
+import type { Writable } from "node:stream"
 import type {
   AllDocsResponse,
   AnyDocument,
@@ -16,7 +17,6 @@ import type {
   DocumentListParams,
   OkResponse,
 } from "nano"
-import type { Writable } from "stream"
 
 export class DDInstrumentedDatabase implements Database {
   constructor(private readonly db: Database) {}

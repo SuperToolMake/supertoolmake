@@ -1,5 +1,5 @@
+import { join } from "node:path"
 import type { Config } from "jest"
-import { join } from "path"
 
 const baseConfig: Config = {
   setupFiles: ["./src/tests/jestEnv.ts"],

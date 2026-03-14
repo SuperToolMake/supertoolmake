@@ -1,7 +1,7 @@
+import { join, resolve } from "node:path"
 import { env as coreEnv } from "@budibase/backend-core"
 import { ServiceType } from "@budibase/types"
 import cloneDeep from "lodash/cloneDeep"
-import { join, resolve } from "path"
 
 coreEnv._set("SERVICE_TYPE", ServiceType.WORKER)
 

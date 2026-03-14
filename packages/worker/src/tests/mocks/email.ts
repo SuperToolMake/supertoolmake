@@ -1,5 +1,5 @@
+import { promisify } from "node:util"
 import MailDev from "maildev"
-import { promisify } from "util"
 import type TestConfiguration from "../TestConfiguration"
 
 /**
@@ -74,7 +74,7 @@ export interface Email {
 
 export function getUnusedPort(): Promise<number> {
   return new Promise((resolve, reject) => {
-    const server = require("net").createServer()
+    const server = require("node:net").createServer()
     server.unref()
     server.on("error", reject)
     server.listen(0, () => {

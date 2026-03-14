@@ -327,7 +327,7 @@ describe("REST Integration", () => {
     })
 
     it("should allow encoded form data", () => {
-      const { URLSearchParams } = require("url")
+      const { URLSearchParams } = require("node:url")
       const output = integration.addBody("encoded", input, {})
       expect(output.body instanceof URLSearchParams).toEqual(true)
       expect(output.body!.toString()).toEqual("a=1&b=2")

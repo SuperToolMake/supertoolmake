@@ -1,5 +1,5 @@
+import qs from "node:querystring"
 import type { PWAManifestImage } from "@budibase/types"
-import qs from "querystring"
 import { DEFAULT_TENANT_ID, getTenantId } from "../../context"
 import env from "../../environment"
 import * as cloudfront from "../cloudfront"

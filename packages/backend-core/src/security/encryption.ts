@@ -1,7 +1,7 @@
-import crypto from "crypto"
-import fs from "fs"
-import { join } from "path"
-import zlib from "zlib"
+import crypto from "node:crypto"
+import fs from "node:fs"
+import { join } from "node:path"
+import zlib from "node:zlib"
 import env from "../environment"
 
 const ALGO = "aes-256-ctr"

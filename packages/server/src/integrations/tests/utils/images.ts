@@ -1,5 +1,5 @@
+import { join } from "node:path"
 import dotenv from "dotenv"
-import { join } from "path"
 
 const path = join(__dirname, "..", "..", "..", "..", "images-sha.env")
 dotenv.config({

@@ -1,5 +1,5 @@
+import http from "node:http"
 import { logging, middleware, timers } from "@budibase/backend-core"
-import http from "http"
 import gracefulShutdown from "http-graceful-shutdown"
 import Koa from "koa"
 import koaBody, { HttpMethodEnum } from "koa-body"

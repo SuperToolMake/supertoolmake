@@ -1,3 +1,4 @@
+import crypto from "node:crypto"
 import {
   utils as backendCoreUtils,
   cache,
@@ -49,7 +50,6 @@ import {
   type UserCtx,
   type UserIdentifier,
 } from "@budibase/types"
-import crypto from "crypto"
 import emailValidator from "email-validator"
 import env from "../../../environment"
 import * as userSdk from "../../../sdk/users"

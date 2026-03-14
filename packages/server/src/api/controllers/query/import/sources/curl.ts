@@ -1,4 +1,4 @@
-import { URL } from "url"
+import { URL } from "node:url"
 import type { Query } from "../../../../../definitions/common"
 import { type GetQueriesOptions, type ImportInfo, ImportSource } from "./base"
 

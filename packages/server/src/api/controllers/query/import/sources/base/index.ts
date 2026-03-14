@@ -1,3 +1,4 @@
+import type { URL } from "node:url"
 import { ValidQueryNameRegex } from "@budibase/shared-core"
 import {
   BodyType,
@@ -7,7 +8,6 @@ import {
   type QueryVerb,
   type RestTemplateQueryMetadata,
 } from "@budibase/types"
-import type { URL } from "url"
 import { buildKeyValueRequestBody, serialiseRequestBody } from "../utils/requestBody"
 
 export interface ImportInfo {

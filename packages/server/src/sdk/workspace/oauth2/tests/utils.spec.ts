@@ -1,7 +1,7 @@
+import path from "node:path"
 import { cache } from "@budibase/backend-core"
 import { generator, utils as testUtils } from "@budibase/backend-core/tests"
 import { OAuth2CredentialsMethod, OAuth2GrantType } from "@budibase/types"
-import path from "path"
 import { GenericContainer, Wait } from "testcontainers"
 import tk from "timekeeper"
 import { startContainer } from "../../../../integrations/tests/utils"

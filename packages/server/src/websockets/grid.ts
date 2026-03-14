@@ -1,7 +1,7 @@
+import type http from "node:http"
 import { auth, permissions } from "@budibase/backend-core"
 import { GridSocketEvent } from "@budibase/shared-core"
 import type { Ctx, Row, Table, WorkspaceApp } from "@budibase/types"
-import type http from "http"
 import type Koa from "koa"
 import { userAgent } from "koa-useragent"
 import type { Socket } from "socket.io"

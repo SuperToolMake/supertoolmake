@@ -1,3 +1,4 @@
+import type { ReadStream, WriteStream } from "node:fs"
 import {
   type AllDocsResponse,
   type AnyDocument,
@@ -13,7 +14,6 @@ import {
   type RowResponse,
   type RowValue,
 } from "@budibase/types"
-import type { ReadStream, WriteStream } from "fs"
 import Nano, { type DocumentListParams } from "nano"
 import { newid } from "../../docIds/newid"
 import { checkSlashesInUrl } from "../../helpers"

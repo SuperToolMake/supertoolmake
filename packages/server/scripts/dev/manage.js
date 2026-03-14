@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const compose = require("docker-compose")
-const path = require("path")
+const path = require("node:path")
 
 // This script wraps docker-compose allowing you to manage your dev infrastructure with simple commands.
 const CONFIG = {

@@ -1,4 +1,6 @@
 // init the licensing mock
+
+import type { Server } from "node:http"
 import {
   cache,
   constants,
@@ -33,7 +35,6 @@ import {
   type WithRequired,
   type Workspace,
 } from "@budibase/types"
-import type { Server } from "http"
 import jwt, { type Secret } from "jsonwebtoken"
 import supertest from "supertest"
 import { init as dbInit } from "../../db"

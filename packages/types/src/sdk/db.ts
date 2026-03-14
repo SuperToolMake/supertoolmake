@@ -1,7 +1,7 @@
-import type { ReadStream } from "fs"
+import type { ReadStream } from "node:fs"
+import type { Writable } from "node:stream"
 import type Nano from "nano"
 import type { DocumentListParams } from "nano"
-import type { Writable } from "stream"
 import type {
   AllDocsResponse,
   AnyDocument,

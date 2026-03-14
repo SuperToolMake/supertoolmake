@@ -4,6 +4,7 @@ import * as controllers from "./controllers"
 
 dbConfig.init()
 
+import type http from "node:http"
 import {
   constants,
   context,
@@ -23,7 +24,6 @@ import {
   type SMTPInnerConfig,
   type User,
 } from "@budibase/types"
-import type http from "http"
 import jwt, { type Secret } from "jsonwebtoken"
 import supertest from "supertest"
 import { Config } from "../constants"

@@ -1,5 +1,13 @@
 const sanitize = require("sanitize-s3-objectkey")
 
+import fs, { type PathLike, type ReadStream } from "node:fs"
+import fsp from "node:fs/promises"
+import https from "node:https"
+import { join } from "node:path"
+import stream, { type Readable } from "node:stream"
+import { pipeline } from "node:stream/promises"
+import type { ReadableStream } from "node:stream/web"
+import zlib from "node:zlib"
 import {
   type _Object,
   GetObjectCommand,
@@ -14,17 +22,9 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { utils } from "@budibase/shared-core"
 import { NodeHttpHandler } from "@smithy/node-http-handler"
 import type { NodeJsClient } from "@smithy/types"
-import fs, { type PathLike, type ReadStream } from "fs"
-import fsp from "fs/promises"
-import https from "https"
 import fetch from "node-fetch"
-import { join } from "path"
-import stream, { type Readable } from "stream"
-import { pipeline } from "stream/promises"
-import type { ReadableStream } from "stream/web"
 import tar from "tar-fs"
 import { v4 } from "uuid"
-import zlib from "zlib"
 import { WORKSPACE_DEV_PREFIX, WORKSPACE_PREFIX } from "../db"
 import env from "../environment"
 import { bucketTTLConfig, budibaseTempDir } from "./utils"

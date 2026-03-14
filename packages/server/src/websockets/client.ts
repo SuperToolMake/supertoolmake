@@ -1,5 +1,5 @@
+import type http from "node:http"
 import { permissions } from "@budibase/backend-core"
-import type http from "http"
 import type Koa from "koa"
 import { authorizedMiddleware as authorized } from "../middleware/authorized"
 import { BaseSocket } from "./websocket"

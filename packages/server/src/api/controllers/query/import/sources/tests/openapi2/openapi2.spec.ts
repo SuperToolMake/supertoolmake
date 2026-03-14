@@ -1,7 +1,7 @@
+import { readFileSync } from "node:fs"
+import { join } from "node:path"
 import { BodyType, type Query } from "@budibase/types"
-import { readFileSync } from "fs"
 import { groupBy, mapValues } from "lodash"
-import { join } from "path"
 import { OpenAPI2 } from "../../openapi2"
 
 const getData = (file: string, extension: string) => {

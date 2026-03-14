@@ -1,6 +1,6 @@
-import { readFileSync, writeFileSync } from "fs"
+import { readFileSync, writeFileSync } from "node:fs"
+import { dirname, join } from "node:path"
 import { marked } from "marked"
-import { dirname, join } from "path"
 import { EXTERNAL_FUNCTION_COLLECTIONS, HelperFunctionBuiltin } from "../src/helpers/constants"
 
 const helpers = require("@budibase/handlebars-helpers")

@@ -1,3 +1,5 @@
+import fs from "node:fs"
+import { pipeline } from "node:stream/promises"
 import { context, objectStore, sql } from "@budibase/backend-core"
 import { helpers, utils } from "@budibase/shared-core"
 import {
@@ -8,9 +10,7 @@ import {
   StringFieldSubType,
   type Table,
 } from "@budibase/types"
-import fs from "fs"
 import { cloneDeep, merge } from "lodash"
-import { pipeline } from "stream/promises"
 import tmp from "tmp"
 import { v4 } from "uuid"
 import { parseStringPromise as xmlParser } from "xml2js"
