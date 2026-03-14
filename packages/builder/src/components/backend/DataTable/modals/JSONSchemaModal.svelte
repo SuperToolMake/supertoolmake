@@ -1,235 +1,229 @@
 <script>
-  import Editor from "@/components/integration/QueryEditor.svelte"
-  import {
-    ModalContent,
-    Tabs,
-    Tab,
-    Button,
-    Input,
-    Select,
-    Body,
-    Layout,
-    ActionButton,
-  } from "@budibase/bbui"
-  import { onMount, createEventDispatcher } from "svelte"
-  import { isPlainObject } from "lodash"
-  import { FIELDS } from "@/constants/backend"
-  import { generate } from "@/helpers/schemaGenerator"
-  import { JsonFieldSubType } from "@budibase/types"
+import {
+  ActionButton,
+  Body,
+  Button,
+  Input,
+  Layout,
+  ModalContent,
+  Select,
+  Tab,
+  Tabs,
+} from "@budibase/bbui"
+import { JsonFieldSubType } from "@budibase/types"
+import { isPlainObject } from "lodash"
+import { createEventDispatcher, onMount } from "svelte"
+import Editor from "@/components/integration/QueryEditor.svelte"
+import { FIELDS } from "@/constants/backend"
+import { generate } from "@/helpers/schemaGenerator"
 
-  export let schema = {}
-  export let json
-  export let subtype
+export let schema = {}
+export let json
+export let subtype
 
-  let dispatcher = createEventDispatcher()
-  let mode = "Form"
-  let fieldCount = 0
-  let fieldKeys = [],
-    fieldTypes = []
-  let arrayDetected = false
-  let workingSchema = {}
-  let schemaWrapper
-  let keyValueOptions = [
-    { label: "String", value: FIELDS.STRING.type },
-    { label: "Number", value: FIELDS.NUMBER.type },
-    { label: "Boolean", value: FIELDS.BOOLEAN.type },
-    { label: "Object", value: FIELDS.JSON.type },
-    { label: "Array", value: FIELDS.ARRAY.type },
-  ]
-  let invalid = false
+let dispatcher = createEventDispatcher()
+let mode = "Form"
+let fieldCount = 0
+let fieldKeys = [],
+  fieldTypes = []
+let arrayDetected = false
+let workingSchema = {}
+let schemaWrapper
+let keyValueOptions = [
+  { label: "String", value: FIELDS.STRING.type },
+  { label: "Number", value: FIELDS.NUMBER.type },
+  { label: "Boolean", value: FIELDS.BOOLEAN.type },
+  { label: "Object", value: FIELDS.JSON.type },
+  { label: "Array", value: FIELDS.ARRAY.type },
+]
+let invalid = false
 
-  const isSchemaEntry = value =>
-    isPlainObject(value) && ("type" in value || "schema" in value)
+const isSchemaEntry = (value) => isPlainObject(value) && ("type" in value || "schema" in value)
 
-  const unpackSchemaValue = value => {
-    if (isSchemaEntry(value)) {
-      return {
-        wrapper: value,
-        map: value.schema || {},
-      }
+const unpackSchemaValue = (value) => {
+  if (isSchemaEntry(value)) {
+    return {
+      wrapper: value,
+      map: value.schema || {},
     }
+  }
 
-    if (
-      isPlainObject(value) &&
-      Object.values(value || {}).every(isSchemaEntry)
-    ) {
-      return {
-        wrapper: null,
-        map: value,
-      }
-    }
-
+  if (isPlainObject(value) && Object.values(value || {}).every(isSchemaEntry)) {
     return {
       wrapper: null,
-      map: {},
+      map: value,
     }
   }
 
-  const packSchemaValue = (map, wrapper) => {
-    if (isPlainObject(wrapper) && "schema" in wrapper) {
-      return {
-        ...wrapper,
-        schema: map,
-      }
-    }
-    return map
+  return {
+    wrapper: null,
+    map: {},
   }
+}
 
-  function updateStateFromSchema(nextSchema = {}) {
-    schema = nextSchema || {}
-    const { wrapper, map } = unpackSchemaValue(schema)
-    schemaWrapper = wrapper
-    workingSchema = map
-    fieldKeys = Object.keys(workingSchema)
-    fieldTypes = fieldKeys.map(
-      key => workingSchema[key]?.type || FIELDS.STRING.type
-    )
-    fieldCount = fieldKeys.length
-    if (!arrayDetected && schemaWrapper?.subtype === JsonFieldSubType.ARRAY) {
-      arrayDetected = true
+const packSchemaValue = (map, wrapper) => {
+  if (isPlainObject(wrapper) && "schema" in wrapper) {
+    return {
+      ...wrapper,
+      schema: map,
     }
   }
+  return map
+}
 
-  function mergeArrayItems(items) {
-    return items.reduce((acc, item) => {
-      if (isPlainObject(item)) {
-        acc = mergeObjects(acc, item)
-      }
-      return acc
-    }, {})
+function updateStateFromSchema(nextSchema = {}) {
+  schema = nextSchema || {}
+  const { wrapper, map } = unpackSchemaValue(schema)
+  schemaWrapper = wrapper
+  workingSchema = map
+  fieldKeys = Object.keys(workingSchema)
+  fieldTypes = fieldKeys.map((key) => workingSchema[key]?.type || FIELDS.STRING.type)
+  fieldCount = fieldKeys.length
+  if (!arrayDetected && schemaWrapper?.subtype === JsonFieldSubType.ARRAY) {
+    arrayDetected = true
   }
+}
 
-  function mergeObjects(target = {}, source = {}) {
-    const result = { ...target }
-    for (const [key, value] of Object.entries(source)) {
-      if (Array.isArray(value)) {
-        result[key] = mergeArraySamples(target[key], value)
-      } else if (isPlainObject(value)) {
-        result[key] = mergeObjects(target[key], value)
-      } else {
-        result[key] = value
-      }
+function mergeArrayItems(items) {
+  return items.reduce((acc, item) => {
+    if (isPlainObject(item)) {
+      acc = mergeObjects(acc, item)
     }
-    return result
-  }
+    return acc
+  }, {})
+}
 
-  function mergeArraySamples(existing, incoming) {
-    const existingSample = Array.isArray(existing) ? existing[0] : undefined
-    const incomingSample = incoming[0]
-    if (isPlainObject(existingSample) || isPlainObject(incomingSample)) {
-      return [
-        mergeObjects(
-          isPlainObject(existingSample) ? existingSample : {},
-          isPlainObject(incomingSample) ? incomingSample : {}
-        ),
-      ]
+function mergeObjects(target = {}, source = {}) {
+  const result = { ...target }
+  for (const [key, value] of Object.entries(source)) {
+    if (Array.isArray(value)) {
+      result[key] = mergeArraySamples(target[key], value)
+    } else if (isPlainObject(value)) {
+      result[key] = mergeObjects(target[key], value)
+    } else {
+      result[key] = value
     }
-    return [incomingSample != null ? incomingSample : existingSample]
   }
+  return result
+}
 
-  function deriveSchemaFromJson(parsedJson) {
-    const jsonIsArray = Array.isArray(parsedJson)
-    arrayDetected = jsonIsArray
-    if (jsonIsArray) {
-      const mergedItems = mergeArrayItems(parsedJson)
-      if (Object.keys(mergedItems).length === 0) {
-        updateStateFromSchema({})
-        return
-      }
-      const generated = generate(mergedItems)
-      updateStateFromSchema(generated || {})
+function mergeArraySamples(existing, incoming) {
+  const existingSample = Array.isArray(existing) ? existing[0] : undefined
+  const incomingSample = incoming[0]
+  if (isPlainObject(existingSample) || isPlainObject(incomingSample)) {
+    return [
+      mergeObjects(
+        isPlainObject(existingSample) ? existingSample : {},
+        isPlainObject(incomingSample) ? incomingSample : {}
+      ),
+    ]
+  }
+  return [incomingSample != null ? incomingSample : existingSample]
+}
+
+function deriveSchemaFromJson(parsedJson) {
+  const jsonIsArray = Array.isArray(parsedJson)
+  arrayDetected = jsonIsArray
+  if (jsonIsArray) {
+    const mergedItems = mergeArrayItems(parsedJson)
+    if (Object.keys(mergedItems).length === 0) {
+      updateStateFromSchema({})
       return
     }
-    if (isPlainObject(parsedJson)) {
-      const generated = generate(parsedJson)
-      updateStateFromSchema(generated || {})
-    } else {
-      updateStateFromSchema({})
+    const generated = generate(mergedItems)
+    updateStateFromSchema(generated || {})
+    return
+  }
+  if (isPlainObject(parsedJson)) {
+    const generated = generate(parsedJson)
+    updateStateFromSchema(generated || {})
+  } else {
+    updateStateFromSchema({})
+  }
+}
+
+async function onJsonUpdate({ detail }) {
+  const input = detail.value
+  json = input
+  try {
+    // check json valid first
+    let inputJson = JSON.parse(input)
+    deriveSchemaFromJson(inputJson)
+    invalid = false
+  } catch (err) {
+    // json not currently valid
+    invalid = true
+  }
+}
+
+function saveSchema() {
+  const newSchema = {}
+  for (let [index, key] of fieldKeys.entries()) {
+    // they were added to schema, rather than generated
+    newSchema[key] = {
+      ...workingSchema[key],
+      type: fieldTypes[index],
     }
   }
+  const packedSchema = packSchemaValue(newSchema, schemaWrapper)
+  updateStateFromSchema(packedSchema)
+  dispatcher("save", {
+    schema: packedSchema,
+    json,
+    subtype: arrayDetected ? JsonFieldSubType.ARRAY : undefined,
+  })
+}
 
-  async function onJsonUpdate({ detail }) {
-    const input = detail.value
-    json = input
+function removeKey(index) {
+  const keyToRemove = fieldKeys[index]
+  fieldKeys = fieldKeys.filter((_, i) => i !== index)
+  fieldTypes = fieldTypes.filter((_, i) => i !== index)
+  fieldCount = fieldKeys.length
+  if (workingSchema && keyToRemove in workingSchema) {
+    const updatedSchema = { ...workingSchema }
+    delete updatedSchema[keyToRemove]
+    const packedSchema = packSchemaValue(updatedSchema, schemaWrapper)
+    updateStateFromSchema(packedSchema)
+  }
+  if (json) {
     try {
-      // check json valid first
-      let inputJson = JSON.parse(input)
-      deriveSchemaFromJson(inputJson)
-      invalid = false
+      const parsed = JSON.parse(json)
+      if (Array.isArray(parsed)) {
+        for (let item of parsed) {
+          if (isPlainObject(item)) {
+            delete item[keyToRemove]
+          }
+        }
+        json = JSON.stringify(parsed, null, 2)
+      } else if (isPlainObject(parsed)) {
+        delete parsed[keyToRemove]
+        json = JSON.stringify(parsed, null, 2)
+      }
     } catch (err) {
-      // json not currently valid
+      // json not valid, ignore
+    }
+  }
+}
+
+function addField() {
+  fieldKeys = [...fieldKeys, ""]
+  fieldTypes = [...fieldTypes, FIELDS.STRING.type]
+  fieldCount = fieldKeys.length
+}
+
+onMount(() => {
+  arrayDetected = subtype === JsonFieldSubType.ARRAY
+  if (json) {
+    try {
+      deriveSchemaFromJson(JSON.parse(json))
+      invalid = false
+      return
+    } catch (err) {
       invalid = true
     }
   }
-
-  function saveSchema() {
-    const newSchema = {}
-    for (let [index, key] of fieldKeys.entries()) {
-      // they were added to schema, rather than generated
-      newSchema[key] = {
-        ...workingSchema[key],
-        type: fieldTypes[index],
-      }
-    }
-    const packedSchema = packSchemaValue(newSchema, schemaWrapper)
-    updateStateFromSchema(packedSchema)
-    dispatcher("save", {
-      schema: packedSchema,
-      json,
-      subtype: arrayDetected ? JsonFieldSubType.ARRAY : undefined,
-    })
-  }
-
-  function removeKey(index) {
-    const keyToRemove = fieldKeys[index]
-    fieldKeys = fieldKeys.filter((_, i) => i !== index)
-    fieldTypes = fieldTypes.filter((_, i) => i !== index)
-    fieldCount = fieldKeys.length
-    if (workingSchema && keyToRemove in workingSchema) {
-      const updatedSchema = { ...workingSchema }
-      delete updatedSchema[keyToRemove]
-      const packedSchema = packSchemaValue(updatedSchema, schemaWrapper)
-      updateStateFromSchema(packedSchema)
-    }
-    if (json) {
-      try {
-        const parsed = JSON.parse(json)
-        if (Array.isArray(parsed)) {
-          for (let item of parsed) {
-            if (isPlainObject(item)) {
-              delete item[keyToRemove]
-            }
-          }
-          json = JSON.stringify(parsed, null, 2)
-        } else if (isPlainObject(parsed)) {
-          delete parsed[keyToRemove]
-          json = JSON.stringify(parsed, null, 2)
-        }
-      } catch (err) {
-        // json not valid, ignore
-      }
-    }
-  }
-
-  function addField() {
-    fieldKeys = [...fieldKeys, ""]
-    fieldTypes = [...fieldTypes, FIELDS.STRING.type]
-    fieldCount = fieldKeys.length
-  }
-
-  onMount(() => {
-    arrayDetected = subtype === JsonFieldSubType.ARRAY
-    if (json) {
-      try {
-        deriveSchemaFromJson(JSON.parse(json))
-        invalid = false
-        return
-      } catch (err) {
-        invalid = true
-      }
-    }
-    updateStateFromSchema(schema)
-  })
+  updateStateFromSchema(schema)
+})
 </script>
 
 <ModalContent

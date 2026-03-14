@@ -29,7 +29,7 @@ export function getPermissionType(resourceId: string) {
 export function getBasePermissions(resourceId: string): Record<string, string> {
   const type = getPermissionType(resourceId)
   const basePermissions: Record<string, string> = {}
-  for (let [roleId, role] of Object.entries(roles.getBuiltinRoles())) {
+  for (const [roleId, role] of Object.entries(roles.getBuiltinRoles())) {
     if (!role.permissionId) {
       continue
     }
@@ -39,23 +39,19 @@ export function getBasePermissions(resourceId: string): Record<string, string> {
       continue
     }
 
-    const typedPermission = perms.permissions.find(perm => perm.type === type)
+    const typedPermission = perms.permissions.find((perm) => perm.type === type)
     if (!typedPermission) {
       continue
     }
 
     if (CURRENTLY_SUPPORTED_LEVELS.includes(typedPermission.level)) {
       const level = typedPermission.level
-      basePermissions[level] = roles.lowerBuiltinRoleID(
-        basePermissions[level],
-        roleId
-      )
+      basePermissions[level] = roles.lowerBuiltinRoleID(basePermissions[level], roleId)
       if (permissions.isPermissionLevelHigherThanRead(level)) {
-        basePermissions[permissions.PermissionLevel.READ] =
-          roles.lowerBuiltinRoleID(
-            basePermissions[permissions.PermissionLevel.READ],
-            roleId
-          )
+        basePermissions[permissions.PermissionLevel.READ] = roles.lowerBuiltinRoleID(
+          basePermissions[permissions.PermissionLevel.READ],
+          roleId
+        )
       }
     }
   }

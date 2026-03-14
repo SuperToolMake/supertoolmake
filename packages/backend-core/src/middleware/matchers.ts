@@ -1,14 +1,12 @@
-import { Ctx, EndpointMatcher, RegexMatcher } from "@budibase/types"
+import type { Ctx, EndpointMatcher, RegexMatcher } from "@budibase/types"
 
 const PARAM_REGEX = /\/:(.*?)(\/.*)?$/g
 
-export const buildMatcherRegex = (
-  patterns: EndpointMatcher[]
-): RegexMatcher[] => {
+export const buildMatcherRegex = (patterns: EndpointMatcher[]): RegexMatcher[] => {
   if (!patterns) {
     return []
   }
-  return patterns.map(pattern => {
+  return patterns.map((pattern) => {
     let route = pattern.route
     const method = pattern.method
 
@@ -16,7 +14,7 @@ export const buildMatcherRegex = (
     // use a wildcard pattern
     const matches = route.match(PARAM_REGEX)
     if (matches) {
-      for (let match of matches) {
+      for (const match of matches) {
         const suffix = match.endsWith("/") ? "/" : ""
         const pattern = "/.*" + suffix
         route = route.replace(match, pattern)
@@ -31,9 +29,7 @@ export const matches = (ctx: Ctx, options: RegexMatcher[]) => {
   return options.find(({ regex, method }) => {
     const urlMatch = regex.test(ctx.request.url)
     const methodMatch =
-      method === "ALL"
-        ? true
-        : ctx.request.method.toLowerCase() === method.toLowerCase()
+      method === "ALL" ? true : ctx.request.method.toLowerCase() === method.toLowerCase()
     return urlMatch && methodMatch
   })
 }

@@ -1,17 +1,17 @@
 <script>
-  import { onMount } from "svelte"
-  import { tables } from "@/stores/builder"
-  import { goto } from "@roxi/routify"
+import { goto } from "@roxi/routify"
+import { onMount } from "svelte"
+import { tables } from "@/stores/builder"
 
-  $goto
+$goto
 
-  onMount(() => {
-    if ($tables.selected) {
-      $goto(`../[tableId]`, { tableId: $tables.selected._id })
-    } else {
-      $goto("../new")
-    }
-  })
+onMount(() => {
+  if ($tables.selected) {
+    $goto(`../[tableId]`, { tableId: $tables.selected._id })
+  } else {
+    $goto("../new")
+  }
+})
 </script>
 
 {#if !$tables.list?.length}

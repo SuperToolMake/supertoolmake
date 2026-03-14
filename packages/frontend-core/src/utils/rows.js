@@ -23,10 +23,7 @@ const isBetterSample = (newValue, oldValue) => {
   if (newType === "string" && newValue.length > oldValue.length) {
     return true
   }
-  if (
-    newType === "object" &&
-    Object.keys(newValue).length > Object.keys(oldValue).length
-  ) {
+  if (newType === "object" && Object.keys(newValue).length > Object.keys(oldValue).length) {
     return true
   }
 
@@ -39,10 +36,10 @@ const isBetterSample = (newValue, oldValue) => {
  * contains "good" examples for every property of all the samples.
  * The generate sample will have a value for all keys across all samples.
  */
-export const generateGoldenSample = samples => {
-  let goldenSample = {}
-  samples?.slice(0, 100).forEach(sample => {
-    Object.keys(sample).forEach(key => {
+export const generateGoldenSample = (samples) => {
+  const goldenSample = {}
+  samples?.slice(0, 100).forEach((sample) => {
+    Object.keys(sample).forEach((key) => {
       if (isBetterSample(sample[key], goldenSample[key])) {
         goldenSample[key] = sample[key]
       }

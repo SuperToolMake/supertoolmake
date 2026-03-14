@@ -1,4 +1,4 @@
-import {
+import type {
   AllDocsResponse,
   Database,
   DatabaseQueryOpts,
@@ -6,13 +6,7 @@ import {
   DesignDocument,
   Document,
 } from "@budibase/types"
-import {
-  DeprecatedViews,
-  DocumentType,
-  SEPARATOR,
-  StaticDatabases,
-  ViewName,
-} from "../constants"
+import { DeprecatedViews, DocumentType, SEPARATOR, StaticDatabases, ViewName } from "../constants"
 import { getGlobalDB } from "../context"
 import env from "../environment"
 import { doWithDB } from "./"
@@ -34,7 +28,7 @@ async function removeDeprecated(db: Database, viewName: ViewName) {
   }
   try {
     const designDoc = await db.get<DesignDocument>(DESIGN_DB)
-    for (let deprecatedNames of DeprecatedViews[viewName]) {
+    for (const deprecatedNames of DeprecatedViews[viewName]) {
       delete designDoc.views?.[deprecatedNames]
     }
     await db.put(designDoc)
@@ -43,11 +37,7 @@ async function removeDeprecated(db: Database, viewName: ViewName) {
   }
 }
 
-export async function createView(
-  db: Database,
-  viewJs: string,
-  viewName: string
-): Promise<void> {
+export async function createView(db: Database, viewJs: string, viewName: string): Promise<void> {
   let designDoc
   try {
     designDoc = await db.get<DesignDocument>(DESIGN_DB)
@@ -147,7 +137,7 @@ export const queryView = async <T extends Document>(
 ): Promise<T[] | T> => {
   const response = await queryViewRaw<T>(viewName, params, db, createFunc, opts)
   const rows = response.rows
-  const docs = rows.map(row => (params.include_docs ? row.doc! : row.value))
+  const docs = rows.map((row) => (params.include_docs ? row.doc! : row.value))
 
   // if arrayResponse has been requested, always return array regardless of length
   if (opts?.arrayResponse) {

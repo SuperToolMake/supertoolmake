@@ -1,5 +1,5 @@
+import type { SearchWorkspaceBackupsRequest } from "@budibase/types"
 import { API } from "@/api"
-import { SearchWorkspaceBackupsRequest } from "@budibase/types"
 import { BudiStore } from "../BudiStore"
 
 interface BackupState {
@@ -12,7 +12,7 @@ export class BackupStore extends BudiStore<BackupState> {
   }
 
   selectBackup(backupId: string) {
-    this.update(state => {
+    this.update((state) => {
       state.selectedBackup = backupId
       return state
     })

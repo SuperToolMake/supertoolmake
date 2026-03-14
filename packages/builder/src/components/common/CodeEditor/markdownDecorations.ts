@@ -1,10 +1,5 @@
-import {
-  Decoration,
-  EditorView,
-  ViewPlugin,
-  ViewUpdate,
-} from "@codemirror/view"
 import type { DecorationSet } from "@codemirror/view"
+import { Decoration, type EditorView, ViewPlugin, type ViewUpdate } from "@codemirror/view"
 
 // CSS classes for each markdown element
 const markdownClasses = {
@@ -50,9 +45,7 @@ const processRegexMatches = (
 
     if (overlapsHbs(start, end)) continue
 
-    decorations.push(
-      Decoration.mark({ class: getClassName(match) }).range(start, end)
-    )
+    decorations.push(Decoration.mark({ class: getClassName(match) }).range(start, end))
   }
 
   return decorations
@@ -79,7 +72,7 @@ const buildMarkdownDecorations = (view: EditorView): DecorationSet => {
 
   const overlapsHbs = (start: number, end: number) =>
     hbsRanges.some(
-      r =>
+      (r) =>
         (start >= r.from && start < r.to) ||
         (end > r.from && end <= r.to) ||
         (start <= r.from && end >= r.to)
@@ -95,7 +88,7 @@ const buildMarkdownDecorations = (view: EditorView): DecorationSet => {
         text,
         from,
         overlapsHbs,
-        match => className[match[1].length as keyof typeof className]
+        (match) => className[match[1].length as keyof typeof className]
       )
     )
 
@@ -180,6 +173,6 @@ export const markdownDecorationPlugin = ViewPlugin.fromClass(
     }
   },
   {
-    decorations: v => v.decorations,
+    decorations: (v) => v.decorations,
   }
 )

@@ -1,4 +1,4 @@
-import { User, SearchIndex } from "@budibase/types"
+import { SearchIndex, type User } from "@budibase/types"
 import { getGlobalDB } from "../../context"
 
 export async function createUserIndex() {
@@ -12,7 +12,7 @@ export async function createUserIndex() {
     }
   }
 
-  const fn = function (user: User) {
+  const fn = (user: User) => {
     if (user._id && !user._id.startsWith("us_")) {
       return
     }
@@ -27,11 +27,11 @@ export async function createUserIndex() {
     ]
 
     function idx(input: Record<string, any>, prev?: string) {
-      for (let key of Object.keys(input)) {
+      for (const key of Object.keys(input)) {
         if (ignoredFields.includes(key)) {
           continue
         }
-        let idxKey = prev != null ? `${prev}.${key}` : key
+        const idxKey = prev != null ? `${prev}.${key}` : key
         if (typeof input[key] === "string") {
           // @ts-expect-error index is available in a CouchDB map function
           // eslint-disable-next-line no-undef

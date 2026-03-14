@@ -1,20 +1,19 @@
 <script>
-  import { Layout, Body, Button } from "@budibase/bbui"
-  import { downloadStream } from "@budibase/frontend-core"
-  import Spinner from "@/components/common/Spinner.svelte"
+import { Body, Button, Layout } from "@budibase/bbui"
+import { downloadStream } from "@budibase/frontend-core"
+import { API } from "@/api"
+import Spinner from "@/components/common/Spinner.svelte"
 
-  import { API } from "@/api"
+let loading = false
 
-  let loading = false
-
-  async function download() {
-    loading = true
-    try {
-      await downloadStream(await API.getSystemLogs())
-    } finally {
-      loading = false
-    }
+async function download() {
+  loading = true
+  try {
+    await downloadStream(await API.getSystemLogs())
+  } finally {
+    loading = false
   }
+}
 </script>
 
 <Layout noPadding>

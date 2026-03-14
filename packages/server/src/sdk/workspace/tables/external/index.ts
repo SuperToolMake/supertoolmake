@@ -4,21 +4,18 @@ import {
   FieldType,
   Operation,
   RelationshipType,
-  RenameColumn,
-  Table,
-  TableRequest,
-  WithoutDocMetadata,
+  type RenameColumn,
+  type Table,
+  type TableRequest,
+  type WithoutDocMetadata,
 } from "@budibase/types"
 import { cloneDeep } from "lodash/fp"
 import { makeTableRequest } from "../../../../api/controllers/table/ExternalRequest"
-import {
-  foreignKeyStructure,
-  hasTypeChanged,
-} from "../../../../api/controllers/table/utils"
-import {
-  breakExternalTableId,
-  buildExternalTableId,
-} from "../../../../integrations/utils"
+import { foreignKeyStructure, hasTypeChanged } from "../../../../api/controllers/table/utils"
+import { breakExternalTableId, buildExternalTableId } from "../../../../integrations/utils"
+import datasourceSdk from "../../datasources"
+import { getTable } from "../getters"
+import { populateExternalTableSchemas } from "../validation"
 import {
   cleanupRelationships,
   generateLinkSchema,
@@ -27,10 +24,6 @@ import {
   isRelationshipSetup,
 } from "./utils"
 
-import datasourceSdk from "../../datasources"
-import { getTable } from "../getters"
-import { populateExternalTableSchemas } from "../validation"
-
 const DEFAULT_PRIMARY_COLUMN = "id"
 
 function noPrimaryKey(table: Table) {
@@ -38,11 +31,7 @@ function noPrimaryKey(table: Table) {
 }
 
 function validate(table: Table, oldTable?: Table) {
-  if (
-    !oldTable &&
-    table.schema[DEFAULT_PRIMARY_COLUMN] &&
-    noPrimaryKey(table)
-  ) {
+  if (!oldTable && table.schema[DEFAULT_PRIMARY_COLUMN] && noPrimaryKey(table)) {
     throw new Error(
       "External tables with no `primary` column set will define an `id` column, but we found an `id` column in the supplied schema. Either set a `primary` column or remove the `id` column."
     )
@@ -54,34 +43,25 @@ function validate(table: Table, oldTable?: Table) {
 
   const autoSubTypes = Object.values(AutoFieldSubType)
   // check for auto columns, they are not allowed
-  for (let [key, column] of Object.entries(table.schema)) {
+  for (const [key, column] of Object.entries(table.schema)) {
     // this column is a special case, do not validate it
     if (key === DEFAULT_PRIMARY_COLUMN) {
       continue
     }
     // the auto-column type should never be used
     if (column.type === FieldType.AUTO) {
-      throw new Error(
-        `Column "${key}" has type "${FieldType.AUTO}" - this is not supported.`
-      )
+      throw new Error(`Column "${key}" has type "${FieldType.AUTO}" - this is not supported.`)
     }
 
-    if (
-      column.subtype &&
-      autoSubTypes.includes(column.subtype as AutoFieldSubType)
-    ) {
-      throw new Error(
-        `Column "${key}" has subtype "${column.subtype}" - this is not supported.`
-      )
+    if (column.subtype && autoSubTypes.includes(column.subtype as AutoFieldSubType)) {
+      throw new Error(`Column "${key}" has subtype "${column.subtype}" - this is not supported.`)
     }
 
     if (column.type === FieldType.DATETIME) {
       const oldColumn = oldTable?.schema[key] as typeof column
 
       if (oldColumn && column.timeOnly !== oldColumn.timeOnly) {
-        throw new Error(
-          `Column "${key}" can not change from time to datetime or viceversa.`
-        )
+        throw new Error(`Column "${key}" can not change from time to datetime or viceversa.`)
       }
     }
   }
@@ -121,7 +101,7 @@ export async function save(
   update: Table,
   opts?: { tableId?: string; renaming?: RenameColumn }
 ) {
-  let tableToSave: TableRequest = {
+  const tableToSave: TableRequest = {
     ...update,
     type: "table",
     _id: buildExternalTableId(datasourceId, update.name),
@@ -158,48 +138,29 @@ export async function save(
   const extraTablesToUpdate = []
 
   // check if relations need setup
-  for (let schema of Object.values(tableToSave.schema)) {
+  for (const schema of Object.values(tableToSave.schema)) {
     if (schema.type !== FieldType.LINK || isRelationshipSetup(schema)) {
       continue
     }
     const schemaTableId = schema.tableId
-    const relatedTable = Object.values(tables).find(
-      table => table._id === schemaTableId
-    )
+    const relatedTable = Object.values(tables).find((table) => table._id === schemaTableId)
     if (!relatedTable) {
       continue
     }
     const relatedColumnName = schema.fieldName!
     const relationType = schema.relationshipType
     if (relationType === RelationshipType.MANY_TO_MANY) {
-      const junctionTable = generateManyLinkSchema(
-        datasource,
-        schema,
-        tableToSave,
-        relatedTable
-      )
+      const junctionTable = generateManyLinkSchema(datasource, schema, tableToSave, relatedTable)
       if (tables[junctionTable.name]) {
-        throw new Error(
-          "Junction table already exists, cannot create another relationship."
-        )
+        throw new Error("Junction table already exists, cannot create another relationship.")
       }
       tables[junctionTable.name] = junctionTable
       extraTablesToUpdate.push(junctionTable)
     } else {
-      const fkTable =
-        relationType === RelationshipType.ONE_TO_MANY
-          ? tableToSave
-          : relatedTable
-      const foreignKey = generateLinkSchema(
-        schema,
-        tableToSave,
-        relatedTable,
-        relationType
-      )
+      const fkTable = relationType === RelationshipType.ONE_TO_MANY ? tableToSave : relatedTable
+      const foreignKey = generateLinkSchema(schema, tableToSave, relatedTable, relationType)
       if (fkTable.schema[foreignKey] != null) {
-        throw new Error(
-          `Unable to generate foreign key - column ${foreignKey} already in use.`
-        )
+        throw new Error(`Unable to generate foreign key - column ${foreignKey} already in use.`)
       }
       fkTable.schema[foreignKey] = foreignKeyStructure(foreignKey)
       if (fkTable.constrained == null) {
@@ -225,23 +186,17 @@ export async function save(
   }
 
   const operation = tableId ? Operation.UPDATE_TABLE : Operation.CREATE_TABLE
-  await makeTableRequest(
-    datasource,
-    operation,
-    tableToSave,
-    oldTable,
-    opts?.renaming
-  )
+  await makeTableRequest(datasource, operation, tableToSave, oldTable, opts?.renaming)
   // update any extra tables (like foreign keys in other tables)
-  for (let extraTable of extraTablesToUpdate) {
+  for (const extraTable of extraTablesToUpdate) {
     const oldExtraTable = oldTables[extraTable.name]
-    let op = oldExtraTable ? Operation.UPDATE_TABLE : Operation.CREATE_TABLE
+    const op = oldExtraTable ? Operation.UPDATE_TABLE : Operation.CREATE_TABLE
     await makeTableRequest(datasource, op, extraTable, oldExtraTable)
   }
 
   // make sure the constrained list, all still exist
   if (Array.isArray(tableToSave.constrained)) {
-    tableToSave.constrained = tableToSave.constrained.filter(constraint =>
+    tableToSave.constrained = tableToSave.constrained.filter((constraint) =>
       Object.keys(tableToSave.schema).includes(constraint)
     )
   }

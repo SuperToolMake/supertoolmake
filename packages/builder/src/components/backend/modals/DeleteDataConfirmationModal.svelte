@@ -1,170 +1,157 @@
 <script lang="ts">
-  import { Link, notifications } from "@budibase/bbui"
-  import {
-    appStore,
-    datasources,
-    queries,
-    screenStore,
-    tables,
-  } from "@/stores/builder"
-  import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
-  import { utils } from "@budibase/shared-core"
-  import { SourceType, Theme } from "@budibase/types"
-  import { goto as gotoStore, params as paramsStore } from "@roxi/routify"
-  import { DB_TYPE_EXTERNAL } from "@/constants/backend"
-  import { get } from "svelte/store"
-  import type { Table, Datasource, Query } from "@budibase/types"
-  import { themeStore } from "@/stores/portal"
+import { Link, notifications } from "@budibase/bbui"
+import { utils } from "@budibase/shared-core"
+import type { Datasource, Query, Table } from "@budibase/types"
+import { SourceType, Theme } from "@budibase/types"
+import { goto as gotoStore, params as paramsStore } from "@roxi/routify"
+import { get } from "svelte/store"
+import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
+import { DB_TYPE_EXTERNAL } from "@/constants/backend"
+import { appStore, datasources, queries, screenStore, tables } from "@/stores/builder"
+import { themeStore } from "@/stores/portal"
 
-  $: goto = $gotoStore
-  $: params = $paramsStore
-  $: isDarkTheme = ![Theme.LIGHTEST, Theme.LIGHT].includes($themeStore.theme)
+$: goto = $gotoStore
+$: params = $paramsStore
+$: isDarkTheme = ![Theme.LIGHTEST, Theme.LIGHT].includes($themeStore.theme)
 
-  export let source: Table | Datasource | Query | undefined
+export let source: Table | Datasource | Query | undefined
 
-  let confirmDeleteDialog: any
-  let affectedScreens: { text: string; url: string }[] = []
-  let sourceType: SourceType | undefined = undefined
+let confirmDeleteDialog: any
+let affectedScreens: { text: string; url: string }[] = []
+let sourceType: SourceType | undefined
 
-  const getDatasourceQueries = () => {
-    if (sourceType !== SourceType.DATASOURCE) {
-      return ""
-    }
-    const sourceId = getSourceID()
-    const queryList = get(queries).list.filter(
-      query => query.datasourceId === sourceId
-    )
-    return queryList
+const getDatasourceQueries = () => {
+  if (sourceType !== SourceType.DATASOURCE) {
+    return ""
   }
+  const sourceId = getSourceID()
+  const queryList = get(queries).list.filter((query) => query.datasourceId === sourceId)
+  return queryList
+}
 
-  function getSourceID(): string {
-    if (!source) {
-      throw new Error("No data source provided.")
-    }
-    return source._id!
+function getSourceID(): string {
+  if (!source) {
+    throw new Error("No data source provided.")
   }
+  return source._id!
+}
 
-  export const show = async () => {
-    const usage = await screenStore.usageInScreens(getSourceID())
-    affectedScreens = processScreens(usage.screens)
-    sourceType = usage.sourceType
-    confirmDeleteDialog.show()
-  }
+export const show = async () => {
+  const usage = await screenStore.usageInScreens(getSourceID())
+  affectedScreens = processScreens(usage.screens)
+  sourceType = usage.sourceType
+  confirmDeleteDialog.show()
+}
 
-  function processScreens(
-    screens: { url: string; _id: string }[]
-  ): { text: string; url: string }[] {
-    return screens.map(({ url, _id }) => ({
-      text: url,
-      url: `/builder/workspace/${$appStore.appId}/design/${_id}`,
-    }))
-  }
+function processScreens(screens: { url: string; _id: string }[]): { text: string; url: string }[] {
+  return screens.map(({ url, _id }) => ({
+    text: url,
+    url: `/builder/workspace/${$appStore.appId}/design/${_id}`,
+  }))
+}
 
-  function hideDeleteDialog() {
-    sourceType = undefined
-  }
+function hideDeleteDialog() {
+  sourceType = undefined
+}
 
-  async function deleteTable(table: Table & { datasourceId?: string }) {
-    const isSelected = params.tableId === table._id
-    try {
-      await tables.delete({
-        _id: table._id!,
-        _rev: table._rev!,
-      })
+async function deleteTable(table: Table & { datasourceId?: string }) {
+  const isSelected = params.tableId === table._id
+  try {
+    await tables.delete({
+      _id: table._id!,
+      _rev: table._rev!,
+    })
 
-      if (table.sourceType === DB_TYPE_EXTERNAL) {
-        await datasources.fetch()
-      }
-      notifications.success("Table deleted")
-      if (isSelected) {
-        goto(`./datasource/[datasourceId]`, {
-          datasourceId: table.datasourceId!,
-        })
-      }
-    } catch (error: any) {
-      notifications.error(`Error deleting table - ${error.message}`)
-    }
-  }
-
-  async function deleteDatasource(datasource: Datasource) {
-    try {
-      await datasources.delete(datasource)
-      notifications.success("Datasource deleted")
-      const isSelected =
-        get(datasources).selectedDatasourceId === datasource._id
-      if (isSelected) {
-        goto("./datasource")
-      }
-    } catch (error) {
-      notifications.error("Error deleting datasource")
-    }
-  }
-
-  async function deleteQuery(query: Query) {
-    try {
-      // Go back to the datasource if we are deleting the active query
-      if ($queries.selectedQueryId === query._id) {
-        goto(`./datasource/[datasourceId]`, {
-          datasourceId: query.datasourceId,
-        })
-      }
-      await queries.delete(query)
+    if (table.sourceType === DB_TYPE_EXTERNAL) {
       await datasources.fetch()
-      notifications.success("Query deleted")
-    } catch (error) {
-      notifications.error("Error deleting query")
     }
+    notifications.success("Table deleted")
+    if (isSelected) {
+      goto(`./datasource/[datasourceId]`, {
+        datasourceId: table.datasourceId!,
+      })
+    }
+  } catch (error: any) {
+    notifications.error(`Error deleting table - ${error.message}`)
+  }
+}
+
+async function deleteDatasource(datasource: Datasource) {
+  try {
+    await datasources.delete(datasource)
+    notifications.success("Datasource deleted")
+    const isSelected = get(datasources).selectedDatasourceId === datasource._id
+    if (isSelected) {
+      goto("./datasource")
+    }
+  } catch (error) {
+    notifications.error("Error deleting datasource")
+  }
+}
+
+async function deleteQuery(query: Query) {
+  try {
+    // Go back to the datasource if we are deleting the active query
+    if ($queries.selectedQueryId === query._id) {
+      goto(`./datasource/[datasourceId]`, {
+        datasourceId: query.datasourceId,
+      })
+    }
+    await queries.delete(query)
+    await datasources.fetch()
+    notifications.success("Query deleted")
+  } catch (error) {
+    notifications.error("Error deleting query")
+  }
+}
+
+async function deleteSource() {
+  if (!source || !sourceType) {
+    throw new Error("Unable to delete - no data source found.")
   }
 
-  async function deleteSource() {
-    if (!source || !sourceType) {
-      throw new Error("Unable to delete - no data source found.")
-    }
+  switch (sourceType) {
+    case SourceType.TABLE:
+      return await deleteTable(source as Table)
+    case SourceType.QUERY:
+      return await deleteQuery(source as Query)
+    case SourceType.DATASOURCE:
+      return await deleteDatasource(source as Datasource)
+    default:
+      utils.unreachable(sourceType)
+  }
+}
 
-    switch (sourceType) {
-      case SourceType.TABLE:
-        return await deleteTable(source as Table)
-      case SourceType.QUERY:
-        return await deleteQuery(source as Query)
-      case SourceType.DATASOURCE:
-        return await deleteDatasource(source as Datasource)
-      default:
-        utils.unreachable(sourceType)
+function buildMessage(sourceType: string) {
+  if (!source) {
+    return ""
+  }
+  const screenCount = affectedScreens.length
+  let message = `Removing ${source?.name} `
+  let initialLength = message.length
+  const hasChanged = () => message.length !== initialLength
+
+  if (sourceType === SourceType.TABLE) {
+    const views = "views" in source ? Object.values(source?.views ?? []) : []
+    message += `will delete its data${
+      views.length ? `${screenCount ? "," : " and"} views (${views.length})` : ""
+    }`
+  } else if (sourceType === SourceType.DATASOURCE) {
+    const queryList = getDatasourceQueries()
+    if (queryList.length) {
+      message += `will delete its queries (${queryList.length})`
     }
   }
-
-  function buildMessage(sourceType: string) {
-    if (!source) {
-      return ""
-    }
-    const screenCount = affectedScreens.length
-    let message = `Removing ${source?.name} `
-    let initialLength = message.length
-    const hasChanged = () => message.length !== initialLength
-
-    if (sourceType === SourceType.TABLE) {
-      const views = "views" in source ? Object.values(source?.views ?? []) : []
-      message += `will delete its data${
-        views.length
-          ? `${screenCount ? "," : " and"} views (${views.length})`
-          : ""
-      }`
-    } else if (sourceType === SourceType.DATASOURCE) {
-      const queryList = getDatasourceQueries()
-      if (queryList.length) {
-        message += `will delete its queries (${queryList.length})`
-      }
-    }
-    if (screenCount) {
-      message +=
-        initialLength !== message.length
-          ? ", and break connected screens:"
-          : "will break connected screens:"
-    } else if (hasChanged()) {
-      message += "."
-    }
-    return hasChanged() ? message : ""
+  if (screenCount) {
+    message +=
+      initialLength !== message.length
+        ? ", and break connected screens:"
+        : "will break connected screens:"
+  } else if (hasChanged()) {
+    message += "."
   }
+  return hasChanged() ? message : ""
+}
 </script>
 
 <ConfirmDialog

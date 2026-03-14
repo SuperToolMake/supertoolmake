@@ -81,15 +81,7 @@ export function getComponentStructure({ chatbox } = { chatbox: false }) {
     {
       name: "Chart",
       icon: "GraphBarVertical",
-      children: [
-        "bar",
-        "line",
-        "area",
-        "candlestick",
-        "pie",
-        "donut",
-        "histogram",
-      ],
+      children: ["bar", "line", "area", "candlestick", "pie", "donut", "histogram"],
     },
   ]
 

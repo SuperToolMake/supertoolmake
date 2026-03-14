@@ -1,124 +1,122 @@
 <script>
-  import { getContext } from "svelte"
-  import GridCell from "./GridCell.svelte"
-  import { getCellRenderer } from "../lib/renderers"
-  import { derived, writable } from "svelte/store"
-  import TextCell from "./TextCell.svelte"
+import { getContext } from "svelte"
+import { derived, writable } from "svelte/store"
+import { getCellRenderer } from "../lib/renderers"
+import GridCell from "./GridCell.svelte"
+import TextCell from "./TextCell.svelte"
 
-  const {
-    rows,
-    columns,
-    focusedCellId,
-    focusedCellAPI,
-    menu,
-    config,
-    validation,
-    selectedCells,
-    selectedCellCount,
-  } = getContext("grid")
+const {
+  rows,
+  columns,
+  focusedCellId,
+  focusedCellAPI,
+  menu,
+  config,
+  validation,
+  selectedCells,
+  selectedCellCount,
+} = getContext("grid")
 
-  export let highlighted
-  export let rowFocused
-  export let rowSelected
-  export let rowIdx
-  export let topRow = false
-  export let focused
-  export let selectedUser
-  export let column
-  export let row
-  export let cellId
-  export let updateValue = rows.actions.updateValue
-  export let contentLines = 1
-  export let hidden = false
-  export let isSelectingCells = false
-  export let cellSelected = false
+export let highlighted
+export let rowFocused
+export let rowSelected
+export let rowIdx
+export let topRow = false
+export let focused
+export let selectedUser
+export let column
+export let row
+export let cellId
+export let updateValue = rows.actions.updateValue
+export let contentLines = 1
+export let hidden = false
+export let isSelectingCells = false
+export let cellSelected = false
 
-  const emptyError = writable(null)
+const emptyError = writable(null)
 
-  let api
+let api
 
-  // Get the appropriate cell renderer and value
-  $: hasCustomFormat = column.format && !row._isNewRow
-  $: renderer = hasCustomFormat ? TextCell : getCellRenderer(column)
-  $: value = hasCustomFormat ? row.__formatted?.[column.name] : row[column.name]
+// Get the appropriate cell renderer and value
+$: hasCustomFormat = column.format && !row._isNewRow
+$: renderer = hasCustomFormat ? TextCell : getCellRenderer(column)
+$: value = hasCustomFormat ? row.__formatted?.[column.name] : row[column.name]
 
-  // Get the error for this cell if the cell is focused or selected
-  $: error = getErrorStore(rowFocused, cellId)
+// Get the error for this cell if the cell is focused or selected
+$: error = getErrorStore(rowFocused, cellId)
 
-  // Determine if the cell is editable
-  $: readonly =
-    hasCustomFormat ||
-    columns.actions.isReadonly(column) ||
-    (!$config.canEditRows && !row._isNewRow)
+// Determine if the cell is editable
+$: readonly =
+  hasCustomFormat || columns.actions.isReadonly(column) || (!$config.canEditRows && !row._isNewRow)
 
-  // Register this cell API if this cell is focused
-  $: {
-    if (focused) {
-      focusedCellAPI.set(cellAPI)
-    }
+// Register this cell API if this cell is focused
+$: {
+  if (focused) {
+    focusedCellAPI.set(cellAPI)
   }
+}
 
-  // Callbacks for cell selection
-  $: updateSelectionCallback = isSelectingCells ? updateSelection : null
-  $: stopSelectionCallback = isSelectingCells ? stopSelection : null
+// Callbacks for cell selection
+$: updateSelectionCallback = isSelectingCells ? updateSelection : null
+$: stopSelectionCallback = isSelectingCells ? stopSelection : null
 
-  const getErrorStore = (selected, cellId) => {
-    if (!selected) {
-      return emptyError
-    }
-    return derived(validation, $validation => $validation[cellId])
+const getErrorStore = (selected, cellId) => {
+  if (!selected) {
+    return emptyError
   }
+  return derived(validation, ($validation) => $validation[cellId])
+}
 
-  const cellAPI = {
-    focus: () => api?.focus?.(),
-    blur: () => api?.blur?.(),
-    isActive: () => api?.isActive?.() ?? false,
-    onKeyDown: (...params) => api?.onKeyDown?.(...params),
-    isReadonly: () => readonly,
-    getType: () => column.schema.type,
-    getValue: () => value,
-    setValue: (value, options = { apply: true }) => {
-      validation.actions.setError(cellId, null)
-      updateValue({
-        rowId: row._id,
-        column: column.name,
-        value,
-        apply: options?.apply,
-      })
-    },
+const cellAPI = {
+  focus: () => api?.focus?.(),
+  blur: () => api?.blur?.(),
+  isActive: () => api?.isActive?.() ?? false,
+  onKeyDown: (...params) => api?.onKeyDown?.(...params),
+  isReadonly: () => readonly,
+  getType: () => column.schema.type,
+  getValue: () => value,
+  setValue: (value, options = { apply: true }) => {
+    validation.actions.setError(cellId, null)
+    updateValue({
+      rowId: row._id,
+      column: column.name,
+      value,
+      apply: options?.apply,
+    })
+  },
+}
+
+const startSelection = (e) => {
+  if (e.button !== 0 || e.shiftKey) {
+    return
   }
+  selectedCells.actions.startSelecting(cellId)
+}
 
-  const startSelection = e => {
-    if (e.button !== 0 || e.shiftKey) {
-      return
-    }
-    selectedCells.actions.startSelecting(cellId)
-  }
-
-  const updateSelection = e => {
-    if (e.buttons !== 1) {
-      selectedCells.actions.stopSelecting()
-      return
-    }
-    selectedCells.actions.updateTarget(cellId)
-  }
-
-  const stopSelection = () => {
+const updateSelection = (e) => {
+  if (e.buttons !== 1) {
     selectedCells.actions.stopSelecting()
+    return
   }
+  selectedCells.actions.updateTarget(cellId)
+}
 
-  const handleClick = e => {
-    if (e.shiftKey && $focusedCellId) {
-      // If we have a focused cell, select the range from that cell to here
-      selectedCells.actions.selectRange($focusedCellId, cellId)
-    } else if (e.shiftKey && $selectedCellCount) {
-      // If we already have a selected range of cell, update it
-      selectedCells.actions.updateTarget(cellId)
-    } else {
-      // Otherwise just select this cell
-      focusedCellId.set(cellId)
-    }
+const stopSelection = () => {
+  selectedCells.actions.stopSelecting()
+}
+
+const handleClick = (e) => {
+  if (e.shiftKey && $focusedCellId) {
+    // If we have a focused cell, select the range from that cell to here
+    selectedCells.actions.selectRange($focusedCellId, cellId)
+  } else if (e.shiftKey && $selectedCellCount) {
+    // If we already have a selected range of cell, update it
+    selectedCells.actions.updateTarget(cellId)
+  } else {
+    // Otherwise just select this cell
+    focusedCellId.set(cellId)
   }
+}
 </script>
 
 <GridCell

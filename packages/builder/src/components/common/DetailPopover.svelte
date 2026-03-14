@@ -1,23 +1,18 @@
 <script lang="ts">
-  import {
-    Popover,
-    Icon,
-    PopoverAlignment,
-    type PopoverAPI,
-  } from "@budibase/bbui"
+import { Icon, Popover, PopoverAlignment, type PopoverAPI } from "@budibase/bbui"
 
-  export let title: string = ""
-  export let subtitle: string | undefined = undefined
-  export let align: PopoverAlignment = PopoverAlignment.Left
-  export let showPopover: boolean = true
-  export let width: number | undefined = undefined
+export let title: string = ""
+export let subtitle: string | undefined = undefined
+export let align: PopoverAlignment = PopoverAlignment.Left
+export let showPopover: boolean = true
+export let width: number | undefined = undefined
 
-  let popover: PopoverAPI | undefined
-  let anchor: HTMLElement | undefined
-  let open: boolean = false
+let popover: PopoverAPI | undefined
+let anchor: HTMLElement | undefined
+let open: boolean = false
 
-  export const show = () => popover?.show()
-  export const hide = () => popover?.hide()
+export const show = () => popover?.show()
+export const hide = () => popover?.hide()
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

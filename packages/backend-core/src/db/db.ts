@@ -1,7 +1,7 @@
-import { directCouchQuery, CouchDatabase } from "./couch"
-import { Database, DatabaseOpts } from "@budibase/types"
-import { DDInstrumentedDatabase } from "./instrumentation"
 import { dataFilters } from "@budibase/shared-core"
+import type { Database, DatabaseOpts } from "@budibase/types"
+import { CouchDatabase, directCouchQuery } from "./couch"
+import { DDInstrumentedDatabase } from "./instrumentation"
 
 export const removeKeyNumbering = dataFilters.removeKeyNumbering
 

@@ -1,7 +1,6 @@
-import { writable, get, Writable } from "svelte/store"
-
-import { Store as StoreContext } from "."
+import { get, type Writable, writable } from "svelte/store"
 import { parseCellID } from "../lib/utils"
+import type { Store as StoreContext } from "."
 
 interface MenuStoreData {
   left: number
@@ -97,7 +96,7 @@ export const createActions = (context: StoreContext): MenuActions => {
   }
 
   const close = () => {
-    menu.update(state => ({
+    menu.update((state) => ({
       ...state,
       visible: false,
     }))

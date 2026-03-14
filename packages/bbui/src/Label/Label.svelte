@@ -1,10 +1,10 @@
 <script lang="ts">
-  import "@spectrum-css/fieldlabel/dist/index-vars.css"
-  import TooltipWrapper from "../Tooltip/TooltipWrapper.svelte"
+import "@spectrum-css/fieldlabel/dist/index-vars.css"
+import TooltipWrapper from "../Tooltip/TooltipWrapper.svelte"
 
-  export let size: "S" | "M" | "L" = "M"
-  export let tooltip: string = ""
-  export let muted: boolean | undefined = undefined
+export let size: "S" | "M" | "L" = "M"
+export let tooltip: string = ""
+export let muted: boolean | undefined = undefined
 </script>
 
 <TooltipWrapper {tooltip} {size}>

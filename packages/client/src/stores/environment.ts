@@ -1,6 +1,6 @@
-import { API } from "@/api"
 import type { GetEnvironmentResponse } from "@budibase/types"
 import { writable } from "svelte/store"
+import { API } from "@/api"
 
 interface EnvironmentState extends GetEnvironmentResponse {
   loaded: boolean

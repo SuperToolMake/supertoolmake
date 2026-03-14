@@ -1,41 +1,34 @@
 <script>
-  import {
-    Layout,
-    Button,
-    Label,
-    Input,
-    notifications,
-    ProgressCircle,
-  } from "@budibase/bbui"
-  import { organisation } from "@/stores/portal/organisation"
-  import { admin } from "@/stores/portal/admin"
-  import { writable } from "svelte/store"
+import { Button, Input, Label, Layout, notifications, ProgressCircle } from "@budibase/bbui"
+import { writable } from "svelte/store"
+import { admin } from "@/stores/portal/admin"
+import { organisation } from "@/stores/portal/organisation"
 
-  const values = writable({
-    isSSOEnforced: $organisation.isSSOEnforced,
-    company: $organisation.company,
-    platformUrl: $organisation.platformUrl,
-  })
+const values = writable({
+  isSSOEnforced: $organisation.isSSOEnforced,
+  company: $organisation.company,
+  platformUrl: $organisation.platformUrl,
+})
 
-  let loading = false
+let loading = false
 
-  async function saveConfig() {
-    loading = true
+async function saveConfig() {
+  loading = true
 
-    try {
-      const config = {
-        isSSOEnforced: $values.isSSOEnforced,
-        company: $values.company ?? "",
-        platformUrl: $values.platformUrl ?? "",
-      }
-
-      // Update settings
-      await organisation.save(config)
-    } catch (error) {
-      notifications.error("Error saving org config")
+  try {
+    const config = {
+      isSSOEnforced: $values.isSSOEnforced,
+      company: $values.company ?? "",
+      platformUrl: $values.platformUrl ?? "",
     }
-    loading = false
+
+    // Update settings
+    await organisation.save(config)
+  } catch (error) {
+    notifications.error("Error saving org config")
   }
+  loading = false
+}
 </script>
 
 <Layout noPadding gap="S">

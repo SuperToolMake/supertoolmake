@@ -1,26 +1,14 @@
-import tk from "timekeeper"
-
 import _ from "lodash"
-import {
-  DBTestConfiguration,
-  generator,
-  structures,
-  utils,
-} from "../../../tests"
+import tk from "timekeeper"
+import { DBTestConfiguration, generator, structures, utils } from "../../../tests"
 import { getDB } from "../../db"
 
-import {
-  DocWritethrough,
-  DocWritethroughProcessor,
-  init,
-} from "../docWritethrough"
+import { DocWritethrough, DocWritethroughProcessor, init } from "../docWritethrough"
 
 const initialTime = Date.now()
 
 async function waitForQueueCompletion() {
-  await utils.queue.processMessages(
-    DocWritethroughProcessor.queue.getBullQueue()
-  )
+  await utils.queue.processMessages(DocWritethroughProcessor.queue.getBullQueue())
 }
 
 beforeAll(() => utils.queue.useRealQueues())
@@ -171,10 +159,7 @@ describe("docWritethrough", () => {
 
     it("concurrent patches to different docWritethrough will not pollute each other", async () => {
       await config.doInTenant(async () => {
-        const secondDocWritethrough = new DocWritethrough(
-          db,
-          structures.db.id()
-        )
+        const secondDocWritethrough = new DocWritethrough(db, structures.db.id())
 
         const doc1Patch = generatePatchObject(2)
         await docWritethrough.patch(doc1Patch)
@@ -212,9 +197,7 @@ describe("docWritethrough", () => {
         await docWritethrough.patch(initialPatch)
         await waitForQueueCompletion()
 
-        expect(await db.tryGet(documentId)).toEqual(
-          expect.objectContaining(initialPatch)
-        )
+        expect(await db.tryGet(documentId)).toEqual(expect.objectContaining(initialPatch))
 
         await db.remove(await db.get(documentId))
 
@@ -223,21 +206,15 @@ describe("docWritethrough", () => {
         await docWritethrough.patch(extraPatch)
         await waitForQueueCompletion()
 
-        expect(await db.tryGet(documentId)).toEqual(
-          expect.objectContaining(extraPatch)
-        )
-        expect(await db.tryGet(documentId)).not.toEqual(
-          expect.objectContaining(initialPatch)
-        )
+        expect(await db.tryGet(documentId)).toEqual(expect.objectContaining(extraPatch))
+        expect(await db.tryGet(documentId)).not.toEqual(expect.objectContaining(initialPatch))
       })
     })
 
     it("concurrent calls will not cause conflicts", async () => {
       async function parallelPatch(count: number) {
-        const patches = Array.from({ length: count }).map(() =>
-          generatePatchObject(1)
-        )
-        await Promise.all(patches.map(p => docWritethrough.patch(p)))
+        const patches = Array.from({ length: count }).map(() => generatePatchObject(1))
+        await Promise.all(patches.map((p) => docWritethrough.patch(p)))
 
         return patches.reduce((acc, c) => {
           acc = { ...acc, ...c }
@@ -251,25 +228,19 @@ describe("docWritethrough", () => {
         expect(queueMessageSpy).toHaveBeenCalledTimes(5)
 
         await waitForQueueCompletion()
-        expect(await db.tryGet(documentId)).toEqual(
-          expect.objectContaining(patches)
-        )
+        expect(await db.tryGet(documentId)).toEqual(expect.objectContaining(patches))
 
         patches = { ...patches, ...(await parallelPatch(40)) }
         expect(queueMessageSpy).toHaveBeenCalledTimes(45)
 
         await waitForQueueCompletion()
-        expect(await db.tryGet(documentId)).toEqual(
-          expect.objectContaining(patches)
-        )
+        expect(await db.tryGet(documentId)).toEqual(expect.objectContaining(patches))
 
         patches = { ...patches, ...(await parallelPatch(10)) }
         expect(queueMessageSpy).toHaveBeenCalledTimes(55)
 
         await waitForQueueCompletion()
-        expect(await db.tryGet(documentId)).toEqual(
-          expect.objectContaining(patches)
-        )
+        expect(await db.tryGet(documentId)).toEqual(expect.objectContaining(patches))
       })
     })
 
@@ -286,9 +257,7 @@ describe("docWritethrough", () => {
         await incrementalPatches(5)
 
         await waitForQueueCompletion()
-        expect(await db.tryGet(documentId)).toEqual(
-          expect.objectContaining({ [keyToOverride]: 5 })
-        )
+        expect(await db.tryGet(documentId)).toEqual(expect.objectContaining({ [keyToOverride]: 5 }))
 
         await incrementalPatches(40)
         await waitForQueueCompletion()

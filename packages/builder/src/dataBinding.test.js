@@ -1,22 +1,23 @@
-import { expect, describe, it, vi } from "vitest"
-import {
-  runtimeToReadableBinding,
-  readableToRuntimeBinding,
-  updateReferencesInObject,
-  getSchemaForDatasource,
-} from "@/dataBinding"
 import { JSONUtils } from "@budibase/frontend-core"
+import { describe, expect, it, vi } from "vitest"
+import {
+  getSchemaForDatasource,
+  readableToRuntimeBinding,
+  runtimeToReadableBinding,
+  updateReferencesInObject,
+} from "@/dataBinding"
+
 function createMockStore(initialValue) {
   let value = initialValue
   return {
-    subscribe: run => {
+    subscribe: (run) => {
       run(value)
       return () => {}
     },
-    set: newValue => {
+    set: (newValue) => {
       value = newValue
     },
-    update: updater => {
+    update: (updater) => {
       value = updater(value)
     },
     _value: () => value,
@@ -56,10 +57,7 @@ function createBuilderStores() {
 
 vi.mock("@/stores/builder", () => createBuilderStores().module)
 
-import {
-  tables as tablesStore,
-  queries as queriesStore,
-} from "@/stores/builder"
+import { queries as queriesStore, tables as tablesStore } from "@/stores/builder"
 
 const getTablesStore = () => tablesStore
 const getQueriesStore = () => queriesStore
@@ -90,27 +88,15 @@ describe("Builder dataBinding", () => {
     it("should convert a runtime binding to a readable one", () => {
       const textWithBindings = `Hello {{ [user].[firstName] }}! The count is {{ count }}.`
       expect(
-        runtimeToReadableBinding(
-          bindableProperties,
-          textWithBindings,
-          "readableBinding"
-        )
-      ).toEqual(
-        `Hello {{ Current User.firstName }}! The count is {{ Binding.count }}.`
-      )
+        runtimeToReadableBinding(bindableProperties, textWithBindings, "readableBinding")
+      ).toEqual(`Hello {{ Current User.firstName }}! The count is {{ Binding.count }}.`)
     })
 
     it("should not convert to readable binding if it is already readable", () => {
       const textWithBindings = `Hello {{ [user].[firstName] }}! The count is {{ Binding.count }}.`
       expect(
-        runtimeToReadableBinding(
-          bindableProperties,
-          textWithBindings,
-          "readableBinding"
-        )
-      ).toEqual(
-        `Hello {{ Current User.firstName }}! The count is {{ Binding.count }}.`
-      )
+        runtimeToReadableBinding(bindableProperties, textWithBindings, "readableBinding")
+      ).toEqual(`Hello {{ Current User.firstName }}! The count is {{ Binding.count }}.`)
     })
   })
 
@@ -156,33 +142,19 @@ describe("Builder dataBinding", () => {
     it("should convert a readable binding to a runtime one", () => {
       const textWithBindings = `Hello {{ Current User.firstName }}! The count is {{ Binding.count }}.`
       expect(
-        readableToRuntimeBinding(
-          bindableProperties,
-          textWithBindings,
-          "runtimeBinding"
-        )
+        readableToRuntimeBinding(bindableProperties, textWithBindings, "runtimeBinding")
       ).toEqual(`Hello {{ [user].[firstName] }}! The count is {{ count }}.`)
     })
     it("should not convert a partial match", () => {
       const textWithBindings = `location {{ _location Zlocation location locationZ _location_ }}`
       expect(
-        readableToRuntimeBinding(
-          bindableProperties,
-          textWithBindings,
-          "runtimeBinding"
-        )
-      ).toEqual(
-        `location {{ _location Zlocation [location] locationZ _location_ }}`
-      )
+        readableToRuntimeBinding(bindableProperties, textWithBindings, "runtimeBinding")
+      ).toEqual(`location {{ _location Zlocation [location] locationZ _location_ }}`)
     })
     it("should handle special characters in the readable binding", () => {
       const textWithBindings = `{{ foo.baz }}`
       expect(
-        readableToRuntimeBinding(
-          bindableProperties,
-          textWithBindings,
-          "runtimeBinding"
-        )
+        readableToRuntimeBinding(bindableProperties, textWithBindings, "runtimeBinding")
       ).toEqual(`{{ [foo].[baz] }}`)
     })
   })
@@ -264,11 +236,9 @@ describe("Builder dataBinding", () => {
         ],
       })
 
-      const jsonArraySpy = vi
-        .spyOn(JSONUtils, "getJSONArrayDatasourceSchema")
-        .mockReturnValue({
-          value: { type: "string" },
-        })
+      const jsonArraySpy = vi.spyOn(JSONUtils, "getJSONArrayDatasourceSchema").mockReturnValue({
+        value: { type: "string" },
+      })
 
       const datasource = {
         type: "jsonarray",
@@ -289,7 +259,7 @@ describe("Builder dataBinding", () => {
 
   describe("updateReferencesInObject", () => {
     it("should increment steps in sequence on 'add'", () => {
-      let obj = [
+      const obj = [
         {
           id: "a0",
           parameters: {
@@ -375,7 +345,7 @@ describe("Builder dataBinding", () => {
     })
 
     it("should decrement steps in sequence on 'delete'", () => {
-      let obj = [
+      const obj = [
         {
           id: "a1",
           parameters: {
@@ -437,7 +407,7 @@ describe("Builder dataBinding", () => {
     })
 
     it("should handle on 'move' to a lower index", () => {
-      let obj = [
+      const obj = [
         {
           id: "a1",
           parameters: {
@@ -512,7 +482,7 @@ describe("Builder dataBinding", () => {
     })
 
     it("should not decrement references that sit before the moved action", () => {
-      let obj = [
+      const obj = [
         {
           id: "queryAction",
           parameters: {
@@ -545,7 +515,7 @@ describe("Builder dataBinding", () => {
     })
 
     it("should skip move updates when the original index is invalid", () => {
-      let obj = [
+      const obj = [
         {
           id: "queryAction",
           parameters: {
@@ -566,7 +536,7 @@ describe("Builder dataBinding", () => {
     })
 
     it("should handle on 'move' to a higher index", () => {
-      let obj = [
+      const obj = [
         {
           id: "b2",
           parameters: {
@@ -641,7 +611,7 @@ describe("Builder dataBinding", () => {
     })
 
     it("should handle on 'move' of action being referenced, dragged to a higher index", () => {
-      let obj = [
+      const obj = [
         {
           "##eventHandlerType": "Validate Form",
           id: "cCD0Dwcnq",
@@ -720,7 +690,7 @@ describe("Builder dataBinding", () => {
     })
 
     it("should handle on 'move' of action being referenced, dragged to a lower index", () => {
-      let obj = [
+      const obj = [
         {
           "##eventHandlerType": "Save Row",
           parameters: {

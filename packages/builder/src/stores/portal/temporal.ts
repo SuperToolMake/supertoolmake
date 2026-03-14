@@ -17,16 +17,12 @@ class TemporalStore extends BudiStore<TemporalState> {
     )
   }
 
-  setExpiring = (
-    key: string,
-    data: Record<string, any>,
-    durationSeconds: number
-  ) => {
+  setExpiring = (key: string, data: Record<string, any>, durationSeconds: number) => {
     const updated: TemporalItem = {
       ...data,
       expiry: Date.now() + durationSeconds * 1000,
     }
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       [key]: updated,
     }))
@@ -39,7 +35,7 @@ class TemporalStore extends BudiStore<TemporalState> {
     }
     const currentExpiry = entry.expiry
     if (currentExpiry < Date.now()) {
-      this.update(state => {
+      this.update((state) => {
         delete state[key]
         return state
       })

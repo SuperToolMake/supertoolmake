@@ -1,8 +1,8 @@
+import type { AnyDocument } from "@budibase/types"
 import _ from "lodash"
-import { AnyDocument } from "@budibase/types"
 import { generator } from "../../../tests"
-import { CouchDatabase } from "../couch"
 import { newid } from "../../utils"
+import { CouchDatabase } from "../couch"
 
 describe("DatabaseImpl", () => {
   const database = new CouchDatabase(generator.word())

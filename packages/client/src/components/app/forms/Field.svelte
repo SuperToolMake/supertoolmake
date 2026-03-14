@@ -1,123 +1,115 @@
 <script lang="ts">
-  import { getContext, onDestroy } from "svelte"
-  import type { Readable } from "svelte/store"
-  import { writable } from "svelte/store"
-  import { Icon } from "@budibase/bbui"
-  import { memo } from "@budibase/frontend-core"
-  import Placeholder from "../Placeholder.svelte"
-  import InnerForm from "./InnerForm.svelte"
-  import type {
-    FieldSchema,
-    FieldType,
-    UIFieldValidationRule,
-  } from "@budibase/types"
-  import type { FieldApi, FieldState, FormField } from "@/types"
+import { Icon } from "@budibase/bbui"
+import { memo } from "@budibase/frontend-core"
+import type { FieldSchema, FieldType, UIFieldValidationRule } from "@budibase/types"
+import { getContext, onDestroy } from "svelte"
+import type { Readable } from "svelte/store"
+import { writable } from "svelte/store"
+import type { FieldApi, FieldState, FormField } from "@/types"
+import Placeholder from "../Placeholder.svelte"
+import InnerForm from "./InnerForm.svelte"
 
-  interface FieldInfo {
-    field: string
-    type: FieldType
-    defaultValue: string | string[] | undefined
-    disabled: boolean
-    readonly: boolean
-    validation?: UIFieldValidationRule[]
-    formStep: number
+interface FieldInfo {
+  field: string
+  type: FieldType
+  defaultValue: string | string[] | undefined
+  disabled: boolean
+  readonly: boolean
+  validation?: UIFieldValidationRule[]
+  formStep: number
+}
+
+export let label: string | undefined = undefined
+export let field: string | undefined = undefined
+export let fieldState: FieldState | undefined
+export let fieldApi: FieldApi | undefined
+export let fieldSchema: FieldSchema | undefined
+export let defaultValue: string | string[] | undefined = undefined
+export let type: FieldType
+export let disabled = false
+export let readonly = false
+export let validation: UIFieldValidationRule[] | undefined
+export let span = 6
+export let helpText: string | undefined = undefined
+
+// Get contexts
+const formContext = getContext("form")
+const formStepContext = getContext("form-step")
+const fieldGroupContext = getContext("field-group")
+const { styleable, builderStore, Provider } = getContext("sdk")
+const component = getContext("component")
+
+// Register field with form
+const formApi = formContext?.formApi
+const labelPos = fieldGroupContext?.labelPosition || "above"
+
+let formField: Readable<FormField> | undefined
+let touched = false
+let labelNode: HTMLElement | undefined
+
+// Memoize values required to register the field to avoid loops
+const formStep = formStepContext || writable(1)
+const fieldInfo = memo<FieldInfo>({
+  field: field || $component.name,
+  type,
+  defaultValue,
+  disabled,
+  readonly,
+  validation,
+  formStep: $formStep || 1,
+})
+$: fieldInfo.set({
+  field: field || $component.name,
+  type,
+  defaultValue,
+  disabled,
+  readonly,
+  validation,
+  formStep: $formStep || 1,
+})
+$: registerField($fieldInfo)
+
+$: schemaType = fieldSchema?.type !== "bigint" ? fieldSchema?.type : "string"
+
+// Focus label when editing
+$: $component.editing && labelNode?.focus()
+
+// Update form properties in parent component on every store change
+$: unsubscribe = formField?.subscribe(
+  (value?: { fieldState: FieldState; fieldApi: FieldApi; fieldSchema: FieldSchema }) => {
+    fieldState = value?.fieldState
+    fieldApi = value?.fieldApi
+    fieldSchema = value?.fieldSchema
   }
+)
 
-  export let label: string | undefined = undefined
-  export let field: string | undefined = undefined
-  export let fieldState: FieldState | undefined
-  export let fieldApi: FieldApi | undefined
-  export let fieldSchema: FieldSchema | undefined
-  export let defaultValue: string | string[] | undefined = undefined
-  export let type: FieldType
-  export let disabled = false
-  export let readonly = false
-  export let validation: UIFieldValidationRule[] | undefined
-  export let span = 6
-  export let helpText: string | undefined = undefined
+// Determine label class from position
+$: labelClass = labelPos === "above" ? "" : `spectrum-FieldLabel--${labelPos}`
 
-  // Get contexts
-  const formContext = getContext("form")
-  const formStepContext = getContext("form-step")
-  const fieldGroupContext = getContext("field-group")
-  const { styleable, builderStore, Provider } = getContext("sdk")
-  const component = getContext("component")
-
-  // Register field with form
-  const formApi = formContext?.formApi
-  const labelPos = fieldGroupContext?.labelPosition || "above"
-
-  let formField: Readable<FormField> | undefined
-  let touched = false
-  let labelNode: HTMLElement | undefined
-
-  // Memoize values required to register the field to avoid loops
-  const formStep = formStepContext || writable(1)
-  const fieldInfo = memo<FieldInfo>({
-    field: field || $component.name,
-    type,
-    defaultValue,
-    disabled,
-    readonly,
-    validation,
-    formStep: $formStep || 1,
-  })
-  $: fieldInfo.set({
-    field: field || $component.name,
-    type,
-    defaultValue,
-    disabled,
-    readonly,
-    validation,
-    formStep: $formStep || 1,
-  })
-  $: registerField($fieldInfo)
-
-  $: schemaType = fieldSchema?.type !== "bigint" ? fieldSchema?.type : "string"
-
-  // Focus label when editing
-  $: $component.editing && labelNode?.focus()
-
-  // Update form properties in parent component on every store change
-  $: unsubscribe = formField?.subscribe(
-    (value?: {
-      fieldState: FieldState
-      fieldApi: FieldApi
-      fieldSchema: FieldSchema
-    }) => {
-      fieldState = value?.fieldState
-      fieldApi = value?.fieldApi
-      fieldSchema = value?.fieldSchema
-    }
+const registerField = (info: FieldInfo) => {
+  formField = formApi?.registerField(
+    info.field,
+    info.type,
+    info.defaultValue,
+    info.disabled,
+    info.readonly,
+    info.validation,
+    info.formStep
   )
+}
 
-  // Determine label class from position
-  $: labelClass = labelPos === "above" ? "" : `spectrum-FieldLabel--${labelPos}`
-
-  const registerField = (info: FieldInfo) => {
-    formField = formApi?.registerField(
-      info.field,
-      info.type,
-      info.defaultValue,
-      info.disabled,
-      info.readonly,
-      info.validation,
-      info.formStep
-    )
+const updateLabel = (e: Event) => {
+  if (touched) {
+    const label = e.target as HTMLLabelElement
+    builderStore.actions.updateProp("label", label.textContent)
   }
+  touched = false
+}
 
-  const updateLabel = (e: Event) => {
-    if (touched) {
-      const label = e.target as HTMLLabelElement
-      builderStore.actions.updateProp("label", label.textContent)
-    }
-    touched = false
-  }
-
-  onDestroy(() => {
-    fieldApi?.deregister()
-    unsubscribe?.()
-  })
+onDestroy(() => {
+  fieldApi?.deregister()
+  unsubscribe?.()
+})
 </script>
 
 <Provider data={{ value: fieldState?.value }}>

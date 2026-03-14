@@ -1,12 +1,12 @@
 import { context, objectStore, sql } from "@budibase/backend-core"
 import { helpers, utils } from "@budibase/shared-core"
 import {
-  Datasource,
-  FieldSchema,
+  type Datasource,
+  type FieldSchema,
   FieldType,
-  SqlQuery,
+  type SqlQuery,
   StringFieldSubType,
-  Table,
+  type Table,
 } from "@budibase/types"
 import fs from "fs"
 import { cloneDeep, merge } from "lodash"
@@ -69,11 +69,7 @@ const SQL_DATE_TYPE_MAP: Record<string, PrimitiveTypes> = {
 }
 
 const SQL_DATE_ONLY_TYPES = ["date"]
-const SQL_TIME_ONLY_TYPES = [
-  "time",
-  "time without time zone",
-  "time with time zone",
-]
+const SQL_TIME_ONLY_TYPES = ["time", "time without time zone", "time with time zone"]
 
 const SQL_STRING_TYPE_MAP: Record<string, FieldType.STRING> = {
   varchar: FieldType.STRING,
@@ -128,11 +124,7 @@ export const isValidFilter = sql.utils.isValidFilter
 
 const isCloud = env.isProd() && !env.SELF_HOSTED
 const isSelfHost = env.isProd() && env.SELF_HOSTED
-export const HOST_ADDRESS = isSelfHost
-  ? "host.docker.internal"
-  : isCloud
-    ? ""
-    : "localhost"
+export const HOST_ADDRESS = isSelfHost ? "host.docker.internal" : isCloud ? "" : "localhost"
 
 export function generateColumnDefinition(config: {
   externalType: string
@@ -142,11 +134,10 @@ export function generateColumnDefinition(config: {
   options?: string[]
   userDefinedType?: string
 }) {
-  let { externalType, autocolumn, name, presence, options, userDefinedType } =
-    config
+  const { externalType, autocolumn, name, presence, options, userDefinedType } = config
   let foundType = FieldType.STRING
   const lowerCaseType = externalType.toLowerCase()
-  let matchingTypes: { external: string; internal: PrimitiveTypes }[] = []
+  const matchingTypes: { external: string; internal: PrimitiveTypes }[] = []
 
   // In at least MySQL, the external type of an ENUM column is "enum('option1',
   // 'option2', ...)", which can potentially contain any type name as a
@@ -168,7 +159,7 @@ export function generateColumnDefinition(config: {
   } else if (userDefinedType && userDefinedType in SQL_USER_DEFINED_TYPE_MAP) {
     foundType = SQL_USER_DEFINED_TYPE_MAP[userDefinedType]
   } else {
-    for (let [external, internal] of Object.entries(SQL_TYPE_MAP)) {
+    for (const [external, internal] of Object.entries(SQL_TYPE_MAP)) {
       if (lowerCaseType.includes(external)) {
         matchingTypes.push({ external, internal })
       }
@@ -208,8 +199,7 @@ export function generateColumnDefinition(config: {
   if (schema.type === FieldType.DATETIME) {
     schema.dateOnly = SQL_DATE_ONLY_TYPES.includes(lowerCaseType)
     schema.timeOnly =
-      SQL_TIME_ONLY_TYPES.includes(lowerCaseType) ||
-      lowerCaseType.startsWith("time(")
+      SQL_TIME_ONLY_TYPES.includes(lowerCaseType) || lowerCaseType.startsWith("time(")
   }
 
   // Set subtype for Postgres array types
@@ -258,8 +248,8 @@ function copyExistingPropsOver(
     }
 
     const existingTableSchema = entities[tableName].schema
-    for (let key in existingTableSchema) {
-      if (!Object.prototype.hasOwnProperty.call(existingTableSchema, key)) {
+    for (const key in existingTableSchema) {
+      if (!Object.hasOwn(existingTableSchema, key)) {
         continue
       }
 
@@ -284,8 +274,7 @@ function copyExistingPropsOver(
 
         case FieldType.LINK:
           shouldKeepSchema =
-            existingColumnType === FieldType.LINK &&
-            tableIds.includes(column.tableId)
+            existingColumnType === FieldType.LINK && tableIds.includes(column.tableId)
           break
 
         case FieldType.STRING:
@@ -320,19 +309,14 @@ function copyExistingPropsOver(
 
       // copy the BB schema in case of special props
       if (shouldKeepSchema) {
-        const fetchedColumnDefinition: FieldSchema | undefined =
-          table.schema[key]
+        const fetchedColumnDefinition: FieldSchema | undefined = table.schema[key]
         table.schema[key] = {
           // merge the properties - anything missing will be filled in, old definition preferred
           // have to clone due to the way merge works
-          ...merge(
-            cloneDeep(fetchedColumnDefinition),
-            existingTableSchema[key]
-          ),
+          ...merge(cloneDeep(fetchedColumnDefinition), existingTableSchema[key]),
           // always take externalType and autocolumn from the fetched definition
           externalType:
-            existingTableSchema[key].externalType ||
-            fetchedColumnDefinition?.externalType,
+            existingTableSchema[key].externalType || fetchedColumnDefinition?.externalType,
           autocolumn: fetchedColumnDefinition?.autocolumn,
         } as FieldSchema
         // check constraints which can be fetched from the DB (they could be updated)
@@ -348,8 +332,7 @@ function copyExistingPropsOver(
           }
           // true or undefined - consistent with old API
           if (fetchedConstraints.presence) {
-            table.schema[key].constraints!.presence =
-              fetchedConstraints.presence
+            table.schema[key].constraints!.presence = fetchedConstraints.presence
           } else if (oldConstraints?.presence === true) {
             delete table.schema[key].constraints?.presence
           }
@@ -370,9 +353,9 @@ export function finaliseExternalTables(
   tables: Record<string, Table>,
   entities: Record<string, Table>
 ): Record<string, Table> {
-  let finalTables: Record<string, Table> = {}
-  const tableIds = Object.values(tables).map(table => table._id!)
-  for (let [name, table] of Object.entries(tables)) {
+  const finalTables: Record<string, Table> = {}
+  const tableIds = Object.values(tables).map((table) => table._id!)
+  for (const [name, table] of Object.entries(tables)) {
     finalTables[name] = copyExistingPropsOver(name, table, entities, tableIds)
   }
   // sort the tables by name, this is for the UI to display them in alphabetical order
@@ -381,18 +364,16 @@ export function finaliseExternalTables(
     .reduce((r, [k, v]) => ({ ...r, [k]: v }), {})
 }
 
-export function checkExternalTables(
-  tables: Record<string, Table>
-): Record<string, string> {
+export function checkExternalTables(tables: Record<string, Table>): Record<string, string> {
   const invalidColumns = Object.values(InvalidColumns) as string[]
   const errors: Record<string, string> = {}
-  for (let [name, table] of Object.entries(tables)) {
+  for (const [name, table] of Object.entries(tables)) {
     if (!table.primary || table.primary.length === 0) {
       errors[name] = "Table must have a primary key."
     }
 
     const columnNames = Object.keys(table.schema)
-    if (columnNames.find(f => invalidColumns.includes(f))) {
+    if (columnNames.find((f) => invalidColumns.includes(f))) {
       errors[name] = "Table contains invalid columns."
     }
   }
@@ -414,16 +395,10 @@ export async function handleXml(rawXml: string) {
   return { data, rawXml }
 }
 
-export async function handleFileResponse(
-  response: any,
-  filename: string,
-  startTime: number
-) {
+export async function handleFileResponse(response: any, filename: string, startTime: number) {
   let presignedUrl,
     size = 0
-  const fileExtension = filename.includes(".")
-    ? filename.split(".").slice(1).join(".")
-    : ""
+  const fileExtension = filename.includes(".") ? filename.split(".").slice(1).join(".") : ""
 
   const processedFileName = `${v4()}.${fileExtension}`
   const key = `${context.getProdWorkspaceId()}/${processedFileName}`

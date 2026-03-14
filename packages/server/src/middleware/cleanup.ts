@@ -1,5 +1,5 @@
-import { Ctx } from "@budibase/types"
 import { context } from "@budibase/backend-core"
+import type { Ctx } from "@budibase/types"
 import type { Middleware, Next } from "koa"
 
 export const cleanupMiddleware = (async (ctx: Ctx, next: Next) => {
@@ -10,8 +10,8 @@ export const cleanupMiddleware = (async (ctx: Ctx, next: Next) => {
     return resp
   }
 
-  let errors = []
-  for (let fn of current.cleanup) {
+  const errors = []
+  for (const fn of current.cleanup) {
     try {
       await fn()
     } catch (e) {

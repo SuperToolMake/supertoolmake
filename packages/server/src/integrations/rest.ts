@@ -1,42 +1,41 @@
+import { blacklist } from "@budibase/backend-core"
+import { utils } from "@budibase/shared-core"
 import {
   BodyType,
   DatasourceFieldType,
   HttpMethod,
-  Integration,
-  IntegrationBase,
-  JSONValue,
-  PaginationConfig,
-  PaginationValues,
+  type Integration,
+  type IntegrationBase,
+  type JSONValue,
+  type PaginationConfig,
+  type PaginationValues,
   QueryType,
   RestAuthType,
-  RestConfig,
-  RestQueryFields as RestQuery,
+  type RestConfig,
+  type RestQueryFields as RestQuery,
 } from "@budibase/types"
-import get from "lodash/get"
-import qs from "querystring"
-import { formatBytes } from "../utilities"
-import { performance } from "perf_hooks"
-import { URLSearchParams } from "url"
-import { blacklist } from "@budibase/backend-core"
-import { handleFileResponse, handleXml } from "./utils"
 import { parse } from "content-disposition"
+import get from "lodash/get"
 import path from "path"
-import { Builder as XmlBuilder } from "xml2js"
-import { getAttachmentHeaders } from "./utils/restUtils"
-import { utils } from "@budibase/shared-core"
-import sdk from "../sdk"
-import { getProxyDispatcher } from "../utilities"
+import { performance } from "perf_hooks"
+import qs from "querystring"
 import {
-  fetch,
-  Response,
-  RequestInit,
   Agent,
-  Headers,
   FormData,
+  fetch,
   getGlobalDispatcher,
+  Headers,
   MockAgent,
+  type RequestInit,
+  type Response,
 } from "undici"
+import { URLSearchParams } from "url"
+import { Builder as XmlBuilder } from "xml2js"
 import environment from "../environment"
+import sdk from "../sdk"
+import { formatBytes, getProxyDispatcher } from "../utilities"
+import { handleFileResponse, handleXml } from "./utils"
+import { getAttachmentHeaders } from "./utils/restUtils"
 
 const coreFields = {
   path: {
@@ -234,29 +233,24 @@ export class RestIntegration implements IntegrationBase {
     this.config = config
   }
 
-  async parseResponse(
-    response: Response,
-    pagination?: PaginationConfig
-  ): Promise<ParsedResponse> {
+  async parseResponse(response: Response, pagination?: PaginationConfig): Promise<ParsedResponse> {
     let data: JSONValue | undefined,
       raw: string | undefined,
       headers: Record<string, string[] | string> = {},
       filename: string | undefined
 
-    const { contentType, contentDisposition } = getAttachmentHeaders(
-      response.headers,
-      { downloadImages: this.config.downloadImages }
-    )
+    const { contentType, contentDisposition } = getAttachmentHeaders(response.headers, {
+      downloadImages: this.config.downloadImages,
+    })
     let contentLength = response.headers.get("content-length")
-    let isSuccess = response.status >= 200 && response.status < 300
+    const isSuccess = response.status >= 200 && response.status < 300
     if (
       (contentDisposition.includes("filename") ||
         contentDisposition.includes("attachment") ||
         contentDisposition.includes("form-data")) &&
       isSuccess
     ) {
-      filename =
-        path.basename(parse(contentDisposition).parameters?.filename) || ""
+      filename = path.basename(parse(contentDisposition).parameters?.filename) || ""
     }
 
     let triedParsing = false,
@@ -269,9 +263,7 @@ export class RestIntegration implements IntegrationBase {
         if (!contentLength && responseTxt) {
           contentLength = Buffer.byteLength(responseTxt, "utf8").toString()
         }
-        const hasContent =
-          (contentLength && parseInt(contentLength) > 0) ||
-          responseTxt.length > 0
+        const hasContent = (contentLength && parseInt(contentLength) > 0) || responseTxt.length > 0
         if (response.status === 204) {
           data = []
           raw = ""
@@ -284,7 +276,7 @@ export class RestIntegration implements IntegrationBase {
           contentType.includes("application/xml")
         ) {
           triedParsing = true
-          let xmlResponse = await handleXml(responseTxt)
+          const xmlResponse = await handleXml(responseTxt)
           data = xmlResponse.data as JSONValue
           raw = xmlResponse.rawXml
         } else {
@@ -353,7 +345,7 @@ export class RestIntegration implements IntegrationBase {
       }
 
       // Prepend query string with pagination params
-      let paginationString = params.toString()
+      const paginationString = params.toString()
       if (paginationString) {
         queryString = `${paginationString}&${queryString}`
       }
@@ -409,12 +401,7 @@ export class RestIntegration implements IntegrationBase {
     let jsonValue: JSONValue | undefined
 
     if (body != null) {
-      const {
-        bodyString,
-        bodyObject,
-        parseError,
-        jsonValue: parsedJson,
-      } = normaliseBody(body)
+      const { bodyString, bodyObject, parseError, jsonValue: parsedJson } = normaliseBody(body)
       string = bodyString
       object = bodyObject
       error = parseError
@@ -422,9 +409,7 @@ export class RestIntegration implements IntegrationBase {
     }
 
     // Util to add pagination values to a certain body type
-    const addPaginationToBody = (
-      insertFn: (pageParam: string, page?: string | number) => void
-    ) => {
+    const addPaginationToBody = (insertFn: (pageParam: string, page?: string | number) => void) => {
       if (pagination?.location === "body") {
         if (pagination?.pageParam && paginationValues?.page != null) {
           insertFn(pagination.pageParam, paginationValues.page)
@@ -442,16 +427,14 @@ export class RestIntegration implements IntegrationBase {
         break
       case BodyType.ENCODED: {
         const params = new URLSearchParams()
-        for (let [key, value] of Object.entries(object)) {
+        for (const [key, value] of Object.entries(object)) {
           params.append(key, String(value))
         }
-        addPaginationToBody(
-          (key: string, value: number | string | undefined) => {
-            if (value != null) {
-              params.append(key, String(value))
-            }
+        addPaginationToBody((key: string, value: number | string | undefined) => {
+          if (value != null) {
+            params.append(key, String(value))
           }
-        )
+        })
         input.body = params
         break
       }
@@ -480,16 +463,14 @@ export class RestIntegration implements IntegrationBase {
           }
           form.append(key, String(value))
         }
-        for (let [key, value] of Object.entries(object)) {
+        for (const [key, value] of Object.entries(object)) {
           appendFormValue(key, value)
         }
-        addPaginationToBody(
-          (key: string, value: number | string | undefined) => {
-            if (value != null) {
-              appendFormValue(key, value)
-            }
+        addPaginationToBody((key: string, value: number | string | undefined) => {
+          if (value != null) {
+            appendFormValue(key, value)
           }
-        )
+        })
         const ensureHeaderObject = (): Record<string, string> => {
           if (!input.headers) {
             const headerObject: Record<string, string> = {}
@@ -512,8 +493,7 @@ export class RestIntegration implements IntegrationBase {
           for (const [name, value] of Object.entries(
             input.headers as Record<string, string | readonly string[]>
           )) {
-            headerObject[name] =
-              typeof value === "string" ? value : value.join(", ")
+            headerObject[name] = typeof value === "string" ? value : value.join(", ")
           }
           return headerObject
         }
@@ -522,7 +502,7 @@ export class RestIntegration implements IntegrationBase {
 
         // Delete Content-Type to allow fetch to auto-generate the correct header/boundary.
         const existingContentTypeKey = Object.keys(headers).find(
-          key => key.toLowerCase() === "content-type"
+          (key) => key.toLowerCase() === "content-type"
         )
         if (existingContentTypeKey) {
           delete headers[existingContentTypeKey]
@@ -563,12 +543,10 @@ export class RestIntegration implements IntegrationBase {
             ...payload,
           }
           if (pagination.pageParam && paginationValues?.page != null) {
-            mutablePayload[pagination.pageParam] =
-              paginationValues.page as JSONValue
+            mutablePayload[pagination.pageParam] = paginationValues.page as JSONValue
           }
           if (pagination.sizeParam && paginationValues?.limit != null) {
-            mutablePayload[pagination.sizeParam] =
-              paginationValues.limit as JSONValue
+            mutablePayload[pagination.sizeParam] = paginationValues.limit as JSONValue
           }
           payload = mutablePayload
         } else if (pagination?.location === "body") {
@@ -584,8 +562,7 @@ export class RestIntegration implements IntegrationBase {
           }
         }
 
-        input.body =
-          typeof payload === "string" ? payload : JSON.stringify(payload)
+        input.body = typeof payload === "string" ? payload : JSON.stringify(payload)
         // @ts-expect-error
         input.headers["Content-Type"] = "application/json"
         break
@@ -611,9 +588,7 @@ export class RestIntegration implements IntegrationBase {
     }
 
     const headers: Record<string, string> = {}
-    const authConfig = this.config.authConfigs.filter(
-      c => c._id === authConfigId
-    )[0]
+    const authConfig = this.config.authConfigs.filter((c) => c._id === authConfigId)[0]
     // check the config still exists before proceeding
     // if not - do nothing
     if (authConfig) {
@@ -658,7 +633,7 @@ export class RestIntegration implements IntegrationBase {
     }
 
     if (disabledHeaders) {
-      for (let headerKey of Object.keys(this.headers)) {
+      for (const headerKey of Object.keys(this.headers)) {
         if (disabledHeaders[headerKey]) {
           delete this.headers[headerKey]
         }
@@ -666,13 +641,7 @@ export class RestIntegration implements IntegrationBase {
     }
 
     let input: RequestInit = { method, headers: this.headers }
-    input = this.addBody(
-      bodyType,
-      requestBody,
-      input,
-      pagination,
-      paginationValues
-    )
+    input = this.addBody(bodyType, requestBody, input, pagination, paginationValues)
 
     // Deprecated by rejectUnauthorized
     if (this.config.legacyHttpParser) {
@@ -681,18 +650,14 @@ export class RestIntegration implements IntegrationBase {
       // do with ESM that are above my pay grade.
 
       // https://github.com/nodejs/node/issues/43798
-      // @ts-ignore
+      // @ts-expect-error
       input.extraHttpOptions = { insecureHTTPParser: true }
     }
 
     this.startTimeMs = performance.now()
     const url = this.getUrl(path, queryString, pagination, paginationValues)
-    const disableBlacklistForLocalDevelopment =
-      environment.isDev() && !environment.isTest()
-    if (
-      !disableBlacklistForLocalDevelopment &&
-      (await blacklist.isBlacklisted(url))
-    ) {
+    const disableBlacklistForLocalDevelopment = environment.isDev() && !environment.isTest()
+    if (!disableBlacklistForLocalDevelopment && (await blacklist.isBlacklisted(url))) {
       throw new Error("Cannot connect to URL.")
     }
 
@@ -772,11 +737,7 @@ export class RestIntegration implements IntegrationBase {
       }
       throw error
     }
-    if (
-      response.status === 401 &&
-      authConfigType === RestAuthType.OAUTH2 &&
-      retry401
-    ) {
+    if (response.status === 401 && authConfigType === RestAuthType.OAUTH2 && retry401) {
       await sdk.oauth2.cleanStoredToken(authConfigId!)
       return await this._req(query, false)
     }

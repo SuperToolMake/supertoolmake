@@ -1,12 +1,12 @@
-import * as setup from "../utilities"
-import TestConfiguration from "../../../../tests/utilities/TestConfiguration"
-import { BodyType, Datasource, SourceName } from "@budibase/types"
-import { getCachedVariable } from "../../../../threads/utils"
 import { blacklist, setEnv as setCoreEnv } from "@budibase/backend-core"
 import { generator } from "@budibase/backend-core/tests"
+import { BodyType, type Datasource, SourceName } from "@budibase/types"
 import type { MockAgent } from "undici"
 import { setEnv as setServerEnv } from "../../../../environment"
 import { installHttpMocking, resetHttpMocking } from "../../../../tests/jestEnv"
+import type TestConfiguration from "../../../../tests/utilities/TestConfiguration"
+import { getCachedVariable } from "../../../../threads/utils"
+import * as setup from "../utilities"
 
 describe("rest", () => {
   let config: TestConfiguration
@@ -27,11 +27,7 @@ describe("rest", () => {
       return body.toString()
     }
     if (ArrayBuffer.isView(body)) {
-      return Buffer.from(
-        body.buffer,
-        body.byteOffset,
-        body.byteLength
-      ).toString()
+      return Buffer.from(body.buffer, body.byteOffset, body.byteLength).toString()
     }
     if (body instanceof ArrayBuffer) {
       return Buffer.from(body).toString()
@@ -72,9 +68,7 @@ describe("rest", () => {
     return String(value)
   }
 
-  const extractFormEntries = (
-    body: unknown
-  ): Record<string, string> | undefined => {
+  const extractFormEntries = (body: unknown): Record<string, string> | undefined => {
     if (!body) {
       return undefined
     }
@@ -85,9 +79,7 @@ describe("rest", () => {
     ).entries
     if (typeof entriesFn === "function") {
       const result: Record<string, string> = {}
-      for (const [key, value] of entriesFn.call(body) as Iterable<
-        [unknown, unknown]
-      >) {
+      for (const [key, value] of entriesFn.call(body) as Iterable<[unknown, unknown]>) {
         result[String(key)] = valueToString(value)
       }
       return result
@@ -444,8 +436,7 @@ describe("rest", () => {
       readable: true,
       fields: {
         path: "www.example.com",
-        queryString:
-          "test={{myEmail}}&testName={{myName}}&testParam={{testParam}}",
+        queryString: "test={{myEmail}}&testName={{myName}}&testParam={{testParam}}",
       },
     })
   })
@@ -466,9 +457,7 @@ describe("rest", () => {
 
     const user = config.getUserDetails()
     const expectedBody =
-      "This is plain text and this is my email: " +
-      user.email +
-      ". This is a test param: 1234"
+      "This is plain text and this is my email: " + user.email + ". This is a test param: 1234"
     mockAgent!
       .get("http://www.example.com")
       .intercept({ path: "/", method: "POST", query: { testParam: "1234" } })

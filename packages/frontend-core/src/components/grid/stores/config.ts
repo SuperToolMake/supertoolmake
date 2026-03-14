@@ -1,6 +1,6 @@
+import { derived, type Readable } from "svelte/store"
 import { derivedMemo } from "../../../utils"
-import { derived, Readable } from "svelte/store"
-import { BaseStoreProps, Store as StoreContext } from "."
+import type { BaseStoreProps, Store as StoreContext } from "."
 
 type ConfigStore = {
   [key in keyof BaseStoreProps]: Readable<BaseStoreProps[key]>
@@ -19,7 +19,7 @@ export type Store = ConfigStore & ConfigDerivedStore
 export const createStores = (context: StoreContext): ConfigStore => {
   const { props } = context
   const getProp = <T extends keyof BaseStoreProps>(prop: T) =>
-    derivedMemo(props, $props => $props[prop])
+    derivedMemo(props, ($props) => $props[prop])
 
   // Derive and memoize some props so that we can react to them in isolation
   const datasource = getProp("datasource")
@@ -47,34 +47,31 @@ export const deriveStores = (context: StoreContext): ConfigDerivedStore => {
   const { props, hasNonAutoColumn } = context
 
   // Derive features
-  const config = derived(
-    [props, hasNonAutoColumn],
-    ([$props, $hasNonAutoColumn]) => {
-      let config: ConfigState = { ...$props, canSelectRows: false }
-      const type = $props.datasource?.type
+  const config = derived([props, hasNonAutoColumn], ([$props, $hasNonAutoColumn]) => {
+    const config: ConfigState = { ...$props, canSelectRows: false }
+    const type = $props.datasource?.type
 
-      // Disable adding rows if we don't have any valid columns
-      if (!$hasNonAutoColumn) {
-        config.canAddRows = false
-      }
-
-      // Disable features for non DS+
-      if (type && !["table"].includes(type)) {
-        config.canAddRows = false
-        config.canEditRows = false
-        config.canDeleteRows = false
-        config.canExpandRows = false
-        config.canSaveSchema = false
-        config.canEditColumns = false
-      }
-
-      // Determine if we can select rows. Always true in the meantime as you can
-      // use the selected rows binding regardless of readonly state.
-      config.canSelectRows = true
-
-      return config
+    // Disable adding rows if we don't have any valid columns
+    if (!$hasNonAutoColumn) {
+      config.canAddRows = false
     }
-  )
+
+    // Disable features for non DS+
+    if (type && !["table"].includes(type)) {
+      config.canAddRows = false
+      config.canEditRows = false
+      config.canDeleteRows = false
+      config.canExpandRows = false
+      config.canSaveSchema = false
+      config.canEditColumns = false
+    }
+
+    // Determine if we can select rows. Always true in the meantime as you can
+    // use the selected rows binding regardless of readonly state.
+    config.canSelectRows = true
+
+    return config
+  })
 
   return {
     config,

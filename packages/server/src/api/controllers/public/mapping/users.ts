@@ -1,5 +1,5 @@
-import { User } from "./types"
-import { RequiredKeys } from "@budibase/types"
+import type { RequiredKeys } from "@budibase/types"
+import type { User } from "./types"
 
 function user(body: any): RequiredKeys<User> {
   return {

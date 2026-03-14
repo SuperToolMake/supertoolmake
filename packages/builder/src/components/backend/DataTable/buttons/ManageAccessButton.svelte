@@ -1,112 +1,92 @@
 <script>
-  import {
-    ActionButton,
-    Input,
-    Select,
-    Label,
-    List,
-    ListItem,
-    notifications,
-  } from "@budibase/bbui"
-  import { permissions as permissionsStore, roles } from "@/stores/builder"
-  import DetailPopover from "@/components/common/DetailPopover.svelte"
-  import { PermissionSource } from "@budibase/types"
-  import { capitalise } from "@/helpers"
-  import InfoDisplay from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
-  import { Roles } from "@/constants/backend"
+import { ActionButton, Input, Label, List, ListItem, notifications, Select } from "@budibase/bbui"
+import { PermissionSource } from "@budibase/types"
+import DetailPopover from "@/components/common/DetailPopover.svelte"
+import { Roles } from "@/constants/backend"
+import { capitalise } from "@/helpers"
+import InfoDisplay from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
+import { permissions as permissionsStore, roles } from "@/stores/builder"
 
-  export let resourceId
+export let resourceId
 
-  const inheritedRoleId = "inherited"
-  const builtins = [Roles.ADMIN, Roles.POWER, Roles.BASIC, Roles.PUBLIC]
+const inheritedRoleId = "inherited"
+const builtins = [Roles.ADMIN, Roles.POWER, Roles.BASIC, Roles.PUBLIC]
 
-  let permissions
-  let showPopover = true
-  let dependantsInfoMessage
+let permissions
+let showPopover = true
+let dependantsInfoMessage
 
-  $: fetchPermissions(resourceId)
-  $: roleMismatch = checkRoleMismatch(permissions)
-  $: selectedRoleID = roleMismatch ? null : permissions?.[0]?.value
-  $: selectedRole = $roles.find(x => x._id === selectedRoleID)
-  $: selectedRoleColor = selectedRole?.uiMetadata?.color
-  $: selectedRoleHighlight = selectedRoleColor
-    ? window
-        .getComputedStyle(document.body)
-        .getPropertyValue(
-          selectedRoleColor.substring(4, selectedRoleColor.length - 1)
-        )
-    : "#ff0000"
+$: fetchPermissions(resourceId)
+$: roleMismatch = checkRoleMismatch(permissions)
+$: selectedRoleID = roleMismatch ? null : permissions?.[0]?.value
+$: selectedRole = $roles.find((x) => x._id === selectedRoleID)
+$: selectedRoleColor = selectedRole?.uiMetadata?.color
+$: selectedRoleHighlight = selectedRoleColor
+  ? window
+      .getComputedStyle(document.body)
+      .getPropertyValue(selectedRoleColor.substring(4, selectedRoleColor.length - 1))
+  : "#ff0000"
 
-  $: readableRole = selectedRoleID ? selectedRole?.uiMetadata.displayName : null
-  $: buttonLabel = readableRole ? `Access: ${readableRole}` : "Access"
+$: readableRole = selectedRoleID ? selectedRole?.uiMetadata.displayName : null
+$: buttonLabel = readableRole ? `Access: ${readableRole}` : "Access"
 
-  $: builtInRoles = builtins
-    .map(roleId => $roles.find(x => x._id === roleId))
-    .filter(r => !!r)
-  $: customRoles = $roles
-    .filter(x => !builtins.includes(x._id))
-    .slice()
-    .toSorted((a, b) => {
-      const aName = a.uiMetadata.displayName || a.name
-      const bName = b.uiMetadata.displayName || b.name
-      return aName < bName ? -1 : 1
-    })
+$: builtInRoles = builtins.map((roleId) => $roles.find((x) => x._id === roleId)).filter((r) => !!r)
+$: customRoles = $roles
+  .filter((x) => !builtins.includes(x._id))
+  .slice()
+  .toSorted((a, b) => {
+    const aName = a.uiMetadata.displayName || a.name
+    const bName = b.uiMetadata.displayName || b.name
+    return aName < bName ? -1 : 1
+  })
 
-  const fetchPermissions = async id => {
-    const res = await permissionsStore.forResourceDetailed(id)
-    permissions = Object.entries(res?.permissions || {}).map(([perm, info]) => {
-      let enriched = {
-        permission: perm,
-        value:
-          info.permissionType === PermissionSource.INHERITED
-            ? inheritedRoleId
-            : info.role,
-        options: [...$roles],
-      }
-      if (info.inheritablePermission) {
-        enriched.options.unshift({
-          _id: inheritedRoleId,
-          name: `Inherit (${
-            $roles.find(x => x._id === info.inheritablePermission).name
-          })`,
-        })
-      }
-      return enriched
-    })
-  }
-
-  const checkRoleMismatch = permissions => {
-    if (!permissions || permissions.length < 2) {
-      return false
+const fetchPermissions = async (id) => {
+  const res = await permissionsStore.forResourceDetailed(id)
+  permissions = Object.entries(res?.permissions || {}).map(([perm, info]) => {
+    let enriched = {
+      permission: perm,
+      value: info.permissionType === PermissionSource.INHERITED ? inheritedRoleId : info.role,
+      options: [...$roles],
     }
-    return (
-      permissions[0].value !== permissions[1].value ||
-      permissions[0].value === inheritedRoleId
-    )
-  }
-
-  const changePermission = async role => {
-    if (role === selectedRoleID) {
-      return
-    }
-    try {
-      await permissionsStore.save({
-        level: "read",
-        role,
-        resource: resourceId,
+    if (info.inheritablePermission) {
+      enriched.options.unshift({
+        _id: inheritedRoleId,
+        name: `Inherit (${$roles.find((x) => x._id === info.inheritablePermission).name})`,
       })
-      await permissionsStore.save({
-        level: "write",
-        role,
-        resource: resourceId,
-      })
-      await fetchPermissions(resourceId)
-      notifications.success("Updated permissions")
-    } catch (error) {
-      console.error(error)
-      notifications.error("Error updating permissions")
     }
+    return enriched
+  })
+}
+
+const checkRoleMismatch = (permissions) => {
+  if (!permissions || permissions.length < 2) {
+    return false
   }
+  return permissions[0].value !== permissions[1].value || permissions[0].value === inheritedRoleId
+}
+
+const changePermission = async (role) => {
+  if (role === selectedRoleID) {
+    return
+  }
+  try {
+    await permissionsStore.save({
+      level: "read",
+      role,
+      resource: resourceId,
+    })
+    await permissionsStore.save({
+      level: "write",
+      role,
+      resource: resourceId,
+    })
+    await fetchPermissions(resourceId)
+    notifications.success("Updated permissions")
+  } catch (error) {
+    console.error(error)
+    notifications.error("Error updating permissions")
+  }
+}
 </script>
 
 <DetailPopover title="Select access role" {showPopover}>

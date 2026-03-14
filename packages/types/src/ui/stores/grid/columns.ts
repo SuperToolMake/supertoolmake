@@ -1,4 +1,4 @@
-import { FieldSchema, FieldType, UICondition, UIRow } from "@budibase/types"
+import type { FieldSchema, FieldType, UICondition, UIRow } from "@budibase/types"
 
 export type UIColumn = FieldSchema & {
   label: string

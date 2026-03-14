@@ -1,5 +1,5 @@
 import { LITERAL_MARKER } from "../helpers/constants"
-import { Log } from "../types"
+import type { Log } from "../types"
 
 export enum PostProcessorNames {
   CONVERT_LITERALS = "convert-literals",
@@ -28,18 +28,12 @@ export const processors = [
   new Postprocessor(
     PostProcessorNames.CONVERT_LITERALS,
     (statement: string): { result: any; logs?: Log[] } => {
-      if (
-        typeof statement !== "string" ||
-        !statement.includes(LITERAL_MARKER)
-      ) {
+      if (typeof statement !== "string" || !statement.includes(LITERAL_MARKER)) {
         return { result: statement }
       }
       const splitMarkerIndex = statement.indexOf("-")
       const type = statement.substring(12, splitMarkerIndex)
-      const value = statement.substring(
-        splitMarkerIndex + 1,
-        statement.length - 2
-      )
+      const value = statement.substring(splitMarkerIndex + 1, statement.length - 2)
       switch (type) {
         case "string":
           return { result: value }

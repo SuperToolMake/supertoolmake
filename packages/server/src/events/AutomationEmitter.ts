@@ -1,12 +1,12 @@
 import { context } from "@budibase/backend-core"
 import {
-  ContextEmitter,
+  type ContextEmitter,
   DocumentType,
-  EventType,
-  Row,
-  Table,
-  UserBindings,
-  Workspace,
+  type EventType,
+  type Row,
+  type Table,
+  type UserBindings,
+  type Workspace,
 } from "@budibase/types"
 import env from "../environment"
 import mainEmitter from "./index"
@@ -28,7 +28,7 @@ class AutomationEmitter implements ContextEmitter {
   async getMaxAutomationChain() {
     const db = context.getWorkspaceDB()
     const appMetadata = await db.get<Workspace>(DocumentType.WORKSPACE_METADATA)
-    let chainAutomations = appMetadata?.automations?.chainAutomations
+    const chainAutomations = appMetadata?.automations?.chainAutomations
 
     if (chainAutomations === true) {
       return MAX_AUTOMATIONS_ALLOWED
@@ -56,7 +56,7 @@ class AutomationEmitter implements ContextEmitter {
     oldRow?: Row
     user: UserBindings
   }) {
-    let MAX_AUTOMATION_CHAIN = await this.getMaxAutomationChain()
+    const MAX_AUTOMATION_CHAIN = await this.getMaxAutomationChain()
 
     // don't emit even if we've reached max automation chain
     if (this.chainCount >= MAX_AUTOMATION_CHAIN) {
@@ -75,7 +75,7 @@ class AutomationEmitter implements ContextEmitter {
   }
 
   async emitTable(eventName: string, appId: string, table?: Table) {
-    let MAX_AUTOMATION_CHAIN = await this.getMaxAutomationChain()
+    const MAX_AUTOMATION_CHAIN = await this.getMaxAutomationChain()
 
     // don't emit even if we've reached max automation chain
     if (this.chainCount >= MAX_AUTOMATION_CHAIN) {

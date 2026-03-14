@@ -1,8 +1,8 @@
 import {
+  type JobQueue,
   QueuedProcessor,
-  JobQueue,
+  type QueuedProcessorOptions,
   UnretriableError,
-  QueuedProcessorOptions,
 } from "../../src/queue"
 import { generator } from "../core/utilities"
 import { useRealQueues } from "../core/utilities/utils/queue"
@@ -73,22 +73,16 @@ describe("QueuedProcessor", () => {
       const jobError = new Error("Job processing failed")
       processor.processFn.mockRejectedValue(jobError)
 
-      await expect(processor.execute(testData)).rejects.toThrow(
-        "Job processing failed"
-      )
+      await expect(processor.execute(testData)).rejects.toThrow("Job processing failed")
 
       expect(processor.processFn).toHaveBeenCalledTimes(3)
     })
 
     it("should handle UnretriableError by moving job to failed", async () => {
-      const unretriableError = new UnretriableError(
-        "This error cannot be retried"
-      )
+      const unretriableError = new UnretriableError("This error cannot be retried")
       processor.processFn.mockRejectedValue(unretriableError)
 
-      await expect(processor.execute(testData)).rejects.toThrow(
-        "This error cannot be retried"
-      )
+      await expect(processor.execute(testData)).rejects.toThrow("This error cannot be retried")
 
       expect(processor.processFn).toHaveBeenCalledTimes(1)
     })

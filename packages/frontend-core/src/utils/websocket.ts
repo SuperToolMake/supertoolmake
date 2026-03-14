@@ -1,5 +1,5 @@
-import { io, Socket } from "socket.io-client"
 import { SocketEvent, SocketSessionTTL } from "@budibase/shared-core"
+import { io, type Socket } from "socket.io-client"
 import { APISessionID } from "../api"
 
 const DefaultOptions = {
@@ -9,10 +9,7 @@ export interface ExtendedSocket extends Socket {
   onOther: (event: string, callback: (data: any) => void) => void
 }
 
-export const createWebsocket = (
-  path: string,
-  options = DefaultOptions
-): ExtendedSocket => {
+export const createWebsocket = (path: string, options = DefaultOptions): ExtendedSocket => {
   if (!path) {
     throw "A websocket path must be provided"
   }
@@ -26,7 +23,7 @@ export const createWebsocket = (
   const proto = tls ? "wss:" : "ws:"
   const host = location.hostname
   const port = location.port || (tls ? 443 : 80)
-  let socket = io(`${proto}//${host}:${port}`, {
+  const socket = io(`${proto}//${host}:${port}`, {
     path,
     // Cap reconnection attempts to 3 (total of 15 seconds before giving up)
     reconnectionAttempts: 3,
@@ -55,7 +52,7 @@ export const createWebsocket = (
   // Helper utility to ignore events that were triggered due to API
   // changes made by us
   socket.onOther = (event: string, callback: (data: any) => void) => {
-    socket.on(event, data => {
+    socket.on(event, (data) => {
       if (data?.apiSessionId !== APISessionID) {
         callback(data)
       }

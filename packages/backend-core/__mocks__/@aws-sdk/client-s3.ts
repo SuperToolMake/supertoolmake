@@ -28,4 +28,4 @@ export class S3 {
   }
 }
 
-export const GetObjectCommand = jest.fn(inputs => ({ inputs }))
+export const GetObjectCommand = jest.fn((inputs) => ({ inputs }))

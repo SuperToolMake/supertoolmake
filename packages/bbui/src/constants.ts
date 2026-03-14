@@ -22,7 +22,7 @@ export enum TooltipType {
   Negative = "negative",
 }
 
-export const enum ModalCancelFrom {
+export enum ModalCancelFrom {
   CLOSE_BUTTON = "close_button",
   CANCEL_BUTTON = "cancel_button",
   ESCAPE_KEY = "escape_key",

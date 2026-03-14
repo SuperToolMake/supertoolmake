@@ -1,298 +1,274 @@
 <script lang="ts">
-  import {
-    Context,
-    Icon,
-    Body,
-    Link,
-    Divider,
-    TooltipPosition,
-    TooltipType,
-    notifications,
-    StatusLight,
-  } from "@budibase/bbui"
-  import { createLocalStorageStore, derivedMemo } from "@budibase/frontend-core"
-  import { url, goto as gotoStore, isActive } from "@roxi/routify"
-  import BBLogo from "assets/BBLogo.svelte"
-  import {
-    appStore,
-    workspaceFavouriteStore,
-    workspaceAppStore,
-    datasources,
-    tables,
-    queries,
-  } from "@/stores/builder"
-  import FavouriteResourceButton from "@/routes/builder/_components/FavouriteResourceButton.svelte"
-  import { enrichedApps } from "@/stores/portal"
-  import SideNavLink from "./SideNavLink.svelte"
-  import SideNavUserSettings from "./SideNavUserSettings.svelte"
-  import { onDestroy, setContext } from "svelte"
-  import {
-    type Datasource,
-    type Query,
-    type Table,
-    type UIInternalDatasource,
-    type UIWorkspaceApp,
-    type WorkspaceFavourite,
-    PublishResourceState,
-    WorkspaceResource,
-  } from "@budibase/types"
-  import { derived, get, type Readable } from "svelte/store"
-  import { IntegrationTypes } from "@/constants/backend"
-  import { bb } from "@/stores/bb"
-  import { buildLiveUrl } from "@/helpers/urls"
-  import { type EnrichedApp } from "@/types"
+import {
+  Body,
+  Context,
+  Divider,
+  Icon,
+  Link,
+  notifications,
+  StatusLight,
+  TooltipPosition,
+  TooltipType,
+} from "@budibase/bbui"
+import { createLocalStorageStore, derivedMemo } from "@budibase/frontend-core"
+import {
+  type Datasource,
+  PublishResourceState,
+  type Query,
+  type Table,
+  type UIInternalDatasource,
+  type UIWorkspaceApp,
+  type WorkspaceFavourite,
+  WorkspaceResource,
+} from "@budibase/types"
+import { goto as gotoStore, isActive, url } from "@roxi/routify"
+import BBLogo from "assets/BBLogo.svelte"
+import { onDestroy, setContext } from "svelte"
+import { derived, get, type Readable } from "svelte/store"
+import { IntegrationTypes } from "@/constants/backend"
+import { buildLiveUrl } from "@/helpers/urls"
+import FavouriteResourceButton from "@/routes/builder/_components/FavouriteResourceButton.svelte"
+import { bb } from "@/stores/bb"
+import {
+  appStore,
+  datasources,
+  queries,
+  tables,
+  workspaceAppStore,
+  workspaceFavouriteStore,
+} from "@/stores/builder"
+import { enrichedApps } from "@/stores/portal"
+import type { EnrichedApp } from "@/types"
+import SideNavLink from "./SideNavLink.svelte"
+import SideNavUserSettings from "./SideNavUserSettings.svelte"
 
-  export const show = () => {
-    pinned.set(true)
-  }
-  $: backupErrors = getBackupErrors($enrichedApps || [], appId)
-  $: backupErrorCount = Object.keys(backupErrors).length
+export const show = () => {
+  pinned.set(true)
+}
+$: backupErrors = getBackupErrors($enrichedApps || [], appId)
+$: backupErrorCount = Object.keys(backupErrors).length
 
-  const getBackupErrors = (apps: EnrichedApp[], appId: string) => {
-    const target = apps.find(app => app.devId === appId)
-    return target?.backupErrors || {}
-  }
+const getBackupErrors = (apps: EnrichedApp[], appId: string) => {
+  const target = apps.find((app) => app.devId === appId)
+  return target?.backupErrors || {}
+}
 
-  $: goto = $gotoStore
+$: goto = $gotoStore
 
-  type ResourceLinkFn = (_id: string) => string
+type ResourceLinkFn = (_id: string) => string
 
-  interface UIFavouriteResource {
-    name: string
-    icon: string
-    workspaceApp?: UIWorkspaceApp
-  }
-  interface AllResourceStores {
-    apps: UIWorkspaceApp[]
-    datasources: (Datasource | UIInternalDatasource)[]
-    tables: Table[]
-    queries: Query[]
-  }
+interface UIFavouriteResource {
+  name: string
+  icon: string
+  workspaceApp?: UIWorkspaceApp
+}
+interface AllResourceStores {
+  apps: UIWorkspaceApp[]
+  datasources: (Datasource | UIInternalDatasource)[]
+  tables: Table[]
+  queries: Query[]
+}
 
-  setContext(Context.PopoverRoot, ".nav .popover-container")
+setContext(Context.PopoverRoot, ".nav .popover-container")
 
-  // Default icon mapping
-  const ResourceIcons: Record<WorkspaceResource, string> = {
-    [WorkspaceResource.DATASOURCE]: "plugs-connected",
-    [WorkspaceResource.TABLE]: "table",
-    [WorkspaceResource.WORKSPACE_APP]: "browser",
-    [WorkspaceResource.QUERY]: "database", // regular db queries
-  }
+// Default icon mapping
+const ResourceIcons: Record<WorkspaceResource, string> = {
+  [WorkspaceResource.DATASOURCE]: "plugs-connected",
+  [WorkspaceResource.TABLE]: "table",
+  [WorkspaceResource.WORKSPACE_APP]: "browser",
+  [WorkspaceResource.QUERY]: "database", // regular db queries
+}
 
-  const datasourceLookup = datasources.lookup
-  const favouriteLookup = workspaceFavouriteStore.lookup
-  const pinned = createLocalStorageStore("builder-nav-pinned", true)
-  const navLogoSize = 24
+const datasourceLookup = datasources.lookup
+const favouriteLookup = workspaceFavouriteStore.lookup
+const pinned = createLocalStorageStore("builder-nav-pinned", true)
+const navLogoSize = 24
 
-  let ignoreFocus = false
-  let focused = false
-  let timeout: ReturnType<typeof setTimeout> | undefined
-  let resourceLookup: Readable<Record<string, UIFavouriteResource>> | null =
-    null
-  let workspaceMenuOpen = false
+let ignoreFocus = false
+let focused = false
+let timeout: ReturnType<typeof setTimeout> | undefined
+let resourceLookup: Readable<Record<string, UIFavouriteResource>> | null = null
+let workspaceMenuOpen = false
 
-  $: appId = $appStore.appId
-  $: !$pinned && unPin()
+$: appId = $appStore.appId
+$: !$pinned && unPin()
 
-  // keep sidebar expanded when workspace selector is open
-  $: collapsed = !focused && !$pinned && !workspaceMenuOpen
-  // keep sidebar expanded when selector is open, even if mouse leaves
-  $: navFocused = focused || workspaceMenuOpen
+// keep sidebar expanded when workspace selector is open
+$: collapsed = !focused && !$pinned && !workspaceMenuOpen
+// keep sidebar expanded when selector is open, even if mouse leaves
+$: navFocused = focused || workspaceMenuOpen
 
-  // Ignore resources without names
-  $: favourites = $workspaceFavouriteStore
-    .filter(f => $resourceLookup?.[f.resourceId])
-    .sort((a, b) => a.resourceId.localeCompare(b.resourceId))
+// Ignore resources without names
+$: favourites = $workspaceFavouriteStore
+  .filter((f) => $resourceLookup?.[f.resourceId])
+  .sort((a, b) => a.resourceId.localeCompare(b.resourceId))
 
-  const initResourceStores = (): Readable<AllResourceStores> =>
-    derived(
-      [
-        workspaceAppStore,
-        datasources,
-        tables,
-        queries,
-        workspaceFavouriteStore,
-      ],
-      ([$apps, $datasources, $tables, $queries]) => ({
-        apps: $apps.workspaceApps,
-        datasources: $datasources.list,
-        tables: $tables.list,
-        queries: $queries.list,
-      })
-    )
-
-  type ResourceItem = AllResourceStores[keyof AllResourceStores][number]
-
-  const getResourceId = (item: ResourceItem) => {
-    if ("_id" in item && typeof item._id === "string") {
-      return item._id
-    }
-    if ("id" in item && typeof item.id === "string") {
-      return item.id
-    }
-  }
-
-  const hasName = (
-    item: ResourceItem
-  ): item is ResourceItem & { name: string } =>
-    "name" in item && typeof item.name === "string"
-
-  const isQueryResource = (item: ResourceItem): item is Query =>
-    "datasourceId" in item && typeof item.datasourceId === "string"
-
-  const generateResourceLookup = (
-    allResourceStores: Readable<AllResourceStores>
-  ) => {
-    return derivedMemo(allResourceStores, stores => {
-      const lookup: Record<string, UIFavouriteResource> = {}
-      const favourites = get(favouriteLookup)
-      const datasourceMap = get(datasourceLookup)
-
-      for (const key of Object.keys(stores) as Array<keyof AllResourceStores>) {
-        const resources = stores[key] as ResourceItem[]
-        for (const resource of resources) {
-          const id = getResourceId(resource)
-          if (!id) {
-            continue
-          }
-
-          const favourite = favourites[id]
-          if (!favourite || !hasName(resource)) {
-            continue
-          }
-
-          const isRestQuery =
-            favourite.resourceType === WorkspaceResource.QUERY &&
-            isQueryResource(resource) &&
-            datasourceMap[resource.datasourceId]?.source ===
-              IntegrationTypes.REST
-
-          const entry: UIFavouriteResource = {
-            name: resource.name,
-            icon: isRestQuery
-              ? "webhooks-logo"
-              : ResourceIcons[favourite.resourceType],
-          }
-
-          if (favourite.resourceType === WorkspaceResource.WORKSPACE_APP) {
-            const workspaceApp = stores.apps.find(app => app._id === id)
-            if (workspaceApp) {
-              entry.workspaceApp = workspaceApp
-            }
-          }
-
-          lookup[id] = entry
-        }
-      }
-
-      return lookup
+const initResourceStores = (): Readable<AllResourceStores> =>
+  derived(
+    [workspaceAppStore, datasources, tables, queries, workspaceFavouriteStore],
+    ([$apps, $datasources, $tables, $queries]) => ({
+      apps: $apps.workspaceApps,
+      datasources: $datasources.list,
+      tables: $tables.list,
+      queries: $queries.list,
     })
-  }
+  )
 
-  // None of this needs to be done if the side bar is closed
-  const initFavourites = () => {
-    const stores = initResourceStores()
-    resourceLookup = generateResourceLookup(stores)
-  }
+type ResourceItem = AllResourceStores[keyof AllResourceStores][number]
 
-  const resourceLink = (favourite: WorkspaceFavourite) => {
-    const appPrefix = `/builder/workspace/[application]`
-    const link: Record<WorkspaceResource, ResourceLinkFn> = {
-      [WorkspaceResource.DATASOURCE]: (id: string) => {
-        const datasourceMap = get(datasourceLookup) || {}
-        const datasource = datasourceMap[id]
-        return datasource?.source === IntegrationTypes.REST
-          ? `${appPrefix}/apis/datasource/[datasourceId]`
-          : `${appPrefix}/data/datasource/[datasourceId]`
-      },
-      [WorkspaceResource.TABLE]: (id: string) =>
-        `${appPrefix}/data/table/${id}`,
-      [WorkspaceResource.WORKSPACE_APP]: (id: string) => {
-        const wsa = $workspaceAppStore.workspaceApps.find(
-          (app: UIWorkspaceApp) => app._id === id
-        )
-        if (!wsa) {
-          notifications.error("Could not resolve the workspace app URL")
-          return ""
+const getResourceId = (item: ResourceItem) => {
+  if ("_id" in item && typeof item._id === "string") {
+    return item._id
+  }
+  if ("id" in item && typeof item.id === "string") {
+    return item.id
+  }
+}
+
+const hasName = (item: ResourceItem): item is ResourceItem & { name: string } =>
+  "name" in item && typeof item.name === "string"
+
+const isQueryResource = (item: ResourceItem): item is Query =>
+  "datasourceId" in item && typeof item.datasourceId === "string"
+
+const generateResourceLookup = (allResourceStores: Readable<AllResourceStores>) => {
+  return derivedMemo(allResourceStores, (stores) => {
+    const lookup: Record<string, UIFavouriteResource> = {}
+    const favourites = get(favouriteLookup)
+    const datasourceMap = get(datasourceLookup)
+
+    for (const key of Object.keys(stores) as Array<keyof AllResourceStores>) {
+      const resources = stores[key] as ResourceItem[]
+      for (const resource of resources) {
+        const id = getResourceId(resource)
+        if (!id) {
+          continue
         }
-        return `${appPrefix}/design/${wsa.screens[0]?._id}`
-      },
-      [WorkspaceResource.QUERY]: (id: string) => {
-        const queriesStore = get(queries)
-        const datasourceMap = get(datasourceLookup) || {}
-        const query = queriesStore.list?.find(q => q._id === id)
-        const datasource = query?.datasourceId
-          ? datasourceMap[query.datasourceId]
-          : undefined
-        const basePath =
-          datasource?.source === IntegrationTypes.REST ? "apis" : "data"
-        return `${appPrefix}/${basePath}/query/${id}`
-      },
-    }
-    if (!link[favourite.resourceType]) return null
-    return link[favourite.resourceType]?.(favourite.resourceId)
-  }
 
-  const buildLiveWorkspaceAppUrl = (workspaceApp?: UIWorkspaceApp) => {
-    if (!workspaceApp) {
-      return null
-    }
+        const favourite = favourites[id]
+        if (!favourite || !hasName(resource)) {
+          continue
+        }
 
-    const liveUrl = buildLiveUrl(workspaceApp.url ?? "", true)
+        const isRestQuery =
+          favourite.resourceType === WorkspaceResource.QUERY &&
+          isQueryResource(resource) &&
+          datasourceMap[resource.datasourceId]?.source === IntegrationTypes.REST
 
-    return liveUrl || null
-  }
+        const entry: UIFavouriteResource = {
+          name: resource.name,
+          icon: isRestQuery ? "webhooks-logo" : ResourceIcons[favourite.resourceType],
+        }
 
-  const getFavouriteResourceLookup = (
-    favourite: WorkspaceFavourite
-  ): UIFavouriteResource => {
-    return (
-      $resourceLookup?.[favourite.resourceId] ?? {
-        name: favourite.resourceId,
-        icon:
-          ResourceIcons[favourite.resourceType] ??
-          ResourceIcons[WorkspaceResource.TABLE],
+        if (favourite.resourceType === WorkspaceResource.WORKSPACE_APP) {
+          const workspaceApp = stores.apps.find((app) => app._id === id)
+          if (workspaceApp) {
+            entry.workspaceApp = workspaceApp
+          }
+        }
+
+        lookup[id] = entry
       }
-    )
-  }
-
-  const openLiveWorkspaceApp = (liveUrl?: string | null) => {
-    if (!liveUrl) {
-      notifications.error("Could not resolve live workspace app URL")
-      return
     }
-    window.open(liveUrl, "_blank")
-  }
 
-  const unPin = () => {
-    // We need to ignore pointer events for a while since otherwise we would
-    // instantly trigger a mouseenter and show it again
-    ignoreFocus = true
-    focused = false
-    timeout = setTimeout(() => {
-      ignoreFocus = false
-    }, 130)
-  }
-
-  const setFocused = (nextFocused: boolean) => {
-    if (ignoreFocus) {
-      return
-    }
-    if (!focused && !resourceLookup) {
-      initFavourites()
-    }
-    focused = nextFocused
-  }
-
-  const keepCollapsed = () => {
-    if (!$pinned) {
-      unPin()
-    }
-  }
-
-  onDestroy(() => {
-    clearTimeout(timeout)
+    return lookup
   })
+}
+
+// None of this needs to be done if the side bar is closed
+const initFavourites = () => {
+  const stores = initResourceStores()
+  resourceLookup = generateResourceLookup(stores)
+}
+
+const resourceLink = (favourite: WorkspaceFavourite) => {
+  const appPrefix = `/builder/workspace/[application]`
+  const link: Record<WorkspaceResource, ResourceLinkFn> = {
+    [WorkspaceResource.DATASOURCE]: (id: string) => {
+      const datasourceMap = get(datasourceLookup) || {}
+      const datasource = datasourceMap[id]
+      return datasource?.source === IntegrationTypes.REST
+        ? `${appPrefix}/apis/datasource/[datasourceId]`
+        : `${appPrefix}/data/datasource/[datasourceId]`
+    },
+    [WorkspaceResource.TABLE]: (id: string) => `${appPrefix}/data/table/${id}`,
+    [WorkspaceResource.WORKSPACE_APP]: (id: string) => {
+      const wsa = $workspaceAppStore.workspaceApps.find((app: UIWorkspaceApp) => app._id === id)
+      if (!wsa) {
+        notifications.error("Could not resolve the workspace app URL")
+        return ""
+      }
+      return `${appPrefix}/design/${wsa.screens[0]?._id}`
+    },
+    [WorkspaceResource.QUERY]: (id: string) => {
+      const queriesStore = get(queries)
+      const datasourceMap = get(datasourceLookup) || {}
+      const query = queriesStore.list?.find((q) => q._id === id)
+      const datasource = query?.datasourceId ? datasourceMap[query.datasourceId] : undefined
+      const basePath = datasource?.source === IntegrationTypes.REST ? "apis" : "data"
+      return `${appPrefix}/${basePath}/query/${id}`
+    },
+  }
+  if (!link[favourite.resourceType]) return null
+  return link[favourite.resourceType]?.(favourite.resourceId)
+}
+
+const buildLiveWorkspaceAppUrl = (workspaceApp?: UIWorkspaceApp) => {
+  if (!workspaceApp) {
+    return null
+  }
+
+  const liveUrl = buildLiveUrl(workspaceApp.url ?? "", true)
+
+  return liveUrl || null
+}
+
+const getFavouriteResourceLookup = (favourite: WorkspaceFavourite): UIFavouriteResource => {
+  return (
+    $resourceLookup?.[favourite.resourceId] ?? {
+      name: favourite.resourceId,
+      icon: ResourceIcons[favourite.resourceType] ?? ResourceIcons[WorkspaceResource.TABLE],
+    }
+  )
+}
+
+const openLiveWorkspaceApp = (liveUrl?: string | null) => {
+  if (!liveUrl) {
+    notifications.error("Could not resolve live workspace app URL")
+    return
+  }
+  window.open(liveUrl, "_blank")
+}
+
+const unPin = () => {
+  // We need to ignore pointer events for a while since otherwise we would
+  // instantly trigger a mouseenter and show it again
+  ignoreFocus = true
+  focused = false
+  timeout = setTimeout(() => {
+    ignoreFocus = false
+  }, 130)
+}
+
+const setFocused = (nextFocused: boolean) => {
+  if (ignoreFocus) {
+    return
+  }
+  if (!focused && !resourceLookup) {
+    initFavourites()
+  }
+  focused = nextFocused
+}
+
+const keepCollapsed = () => {
+  if (!$pinned) {
+    unPin()
+  }
+}
+
+onDestroy(() => {
+  clearTimeout(timeout)
+})
 </script>
 
 <div class="nav_wrapper" style={`--nav-logo-width: ${navLogoSize}px;`}>

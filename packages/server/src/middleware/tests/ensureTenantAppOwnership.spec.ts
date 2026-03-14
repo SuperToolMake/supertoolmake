@@ -1,6 +1,6 @@
-import { UserCtx } from "@budibase/types"
-import { ensureTenantAppOwnershipMiddleware } from "../ensureTenantAppOwnership"
 import { context, Header, HTTPError } from "@budibase/backend-core"
+import type { UserCtx } from "@budibase/types"
+import { ensureTenantAppOwnershipMiddleware } from "../ensureTenantAppOwnership"
 
 function ctx(opts?: { appId: string }) {
   const ctx = {
@@ -45,8 +45,8 @@ describe("Ensure Tenant Ownership Middleware", () => {
   })
 
   it("throws 400 when appId is missing", async () => {
-    await expect(
-      ensureTenantAppOwnershipMiddleware(ctx(), () => {})
-    ).rejects.toThrow("appId must be provided")
+    await expect(ensureTenantAppOwnershipMiddleware(ctx(), () => {})).rejects.toThrow(
+      "appId must be provided"
+    )
   })
 })

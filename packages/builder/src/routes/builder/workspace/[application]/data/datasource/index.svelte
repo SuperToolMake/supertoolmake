@@ -1,20 +1,20 @@
 <script>
-  import { datasources } from "@/stores/builder"
-  import { goto } from "@roxi/routify"
-  import { onMount } from "svelte"
+import { goto } from "@roxi/routify"
+import { onMount } from "svelte"
+import { datasources } from "@/stores/builder"
 
-  $goto
+$goto
 
-  onMount(async () => {
-    const { list, selected, hasData } = $datasources
-    if (selected) {
-      $goto(`./${selected?._id}`)
-    } else if (hasData && list?.length) {
-      $goto(`./${list[0]._id}`)
-    } else {
-      $goto("../new")
-    }
-  })
+onMount(async () => {
+  const { list, selected, hasData } = $datasources
+  if (selected) {
+    $goto(`./${selected?._id}`)
+  } else if (hasData && list?.length) {
+    $goto(`./${list[0]._id}`)
+  } else {
+    $goto("../new")
+  }
+})
 </script>
 
 {#if !$datasources.list?.length}

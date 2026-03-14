@@ -1,13 +1,13 @@
-import { Document } from "@budibase/types"
+import type { Document } from "@budibase/types"
 
 export {
-  Query,
   Datasource,
-  FieldSchema,
-  TableSchema,
-  Table,
   Document,
+  FieldSchema,
+  Query,
   Row,
+  Table,
+  TableSchema,
 } from "@budibase/types"
 
 export interface Application extends Document {

@@ -1,19 +1,9 @@
-import { Config } from "jest"
+import type { Config } from "jest"
 import { join } from "path"
 
 const baseConfig: Config = {
   setupFiles: ["./src/tests/jestEnv.ts"],
-  moduleFileExtensions: [
-    "js",
-    "mjs",
-    "cjs",
-    "jsx",
-    "ts",
-    "tsx",
-    "json",
-    "node",
-    "svelte",
-  ],
+  moduleFileExtensions: ["js", "mjs", "cjs", "jsx", "ts", "tsx", "json", "node", "svelte"],
   setupFilesAfterEnv: ["./src/tests/jestSetup.ts"],
   globalSetup: "./../../globalSetup.ts",
   transform: {

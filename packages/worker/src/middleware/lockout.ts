@@ -1,6 +1,6 @@
 import { cache } from "@budibase/backend-core"
-import { Ctx } from "@budibase/types"
-import { Next } from "koa"
+import type { Ctx } from "@budibase/types"
+import type { Next } from "koa"
 import env from "../environment"
 import * as userSdk from "../sdk/users"
 
@@ -24,9 +24,7 @@ export default async (ctx: Ctx, next: Next) => {
 
   const dbUser = await userSdk.db.getUserByEmail(email)
   if (dbUser && (await isLocked(email))) {
-    console.log(
-      `[auth] login blocked due to lock email=${normalizeEmail(email)}`
-    )
+    console.log(`[auth] login blocked due to lock email=${normalizeEmail(email)}`)
     ctx.set("X-Account-Locked", "1")
     ctx.set("Retry-After", String(env.LOGIN_LOCKOUT_SECONDS))
     ctx.throw(403, "Account temporarily locked. Try again later.")

@@ -1,8 +1,8 @@
+import type { AppNavigation, WithRequired, WorkspaceApp } from "@budibase/types"
 import * as setup from "./utilities"
-import { AppNavigation, WithRequired, WorkspaceApp } from "@budibase/types"
 
 describe("/navigation", () => {
-  let config = setup.getConfig()
+  const config = setup.getConfig()
   let workspaceApp: WithRequired<WorkspaceApp, "_id">
 
   beforeAll(async () => {

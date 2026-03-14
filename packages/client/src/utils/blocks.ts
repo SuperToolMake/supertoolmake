@@ -1,13 +1,13 @@
+import { Constants } from "@budibase/frontend-core"
 import { makePropSafe as safe } from "@budibase/string-templates"
-import { API } from "../api"
 import {
   BasicOperator,
-  LegacyFilter,
-  UIColumn,
+  type LegacyFilter,
+  type UIColumn,
   UILogicalOperator,
-  UISearchFilter,
+  type UISearchFilter,
 } from "@budibase/types"
-import { Constants } from "@budibase/frontend-core"
+import { API } from "../api"
 
 // Map of data types to component types for search fields inside blocks
 const schemaComponentMap: Record<string, string> = {
@@ -38,8 +38,8 @@ export const enrichSearchColumns = async (
   if (!searchColumns?.length || !schema) {
     return []
   }
-  let enrichedColumns = []
-  for (let column of searchColumns) {
+  const enrichedColumns = []
+  for (const column of searchColumns) {
     let schemaType = schema[column]?.type
 
     // Check if this is a field in another related table. The only way we can
@@ -76,17 +76,13 @@ export const enrichSearchColumns = async (
  * @param columns the enriched search column structure
  * @param formId the ID of the form containing the search fields
  */
-export const enrichFilter = (
-  filter: UISearchFilter,
-  columns: UIColumn[],
-  formId: string
-) => {
+export const enrichFilter = (filter: UISearchFilter, columns: UIColumn[], formId: string) => {
   if (!columns?.length) {
     return filter
   }
 
   const newFilters: LegacyFilter[] = []
-  columns?.forEach(column => {
+  columns?.forEach((column) => {
     const safePath = column.name.split(".").map(safe).join(".")
     const stringType = column.type === "string"
     const dateType = column.type === "datetime"

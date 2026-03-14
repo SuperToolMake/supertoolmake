@@ -1,5 +1,5 @@
-import type { Component } from "svelte"
 import { Input, Select } from "@budibase/bbui"
+import type { Component } from "svelte"
 import ColorPicker from "@/components/design/settings/controls/ColorPicker.svelte"
 
 interface StyleOption {
@@ -237,8 +237,7 @@ export const background: StyleGroup = {
       options: [
         {
           label: "Warm Flame",
-          value:
-            "linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);",
+          value: "linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);",
         },
         {
           label: "Night Fade",
@@ -287,8 +286,7 @@ export const background: StyleGroup = {
         },
         {
           label: "Flamingo Sunrise",
-          value:
-            "-webkit-radial-gradient(center top, rgb(255, 250, 245), rgb(255, 242, 242))",
+          value: "-webkit-radial-gradient(center top, rgb(255, 250, 245), rgb(255, 242, 242))",
         },
         {
           label: "Budi Mist",
@@ -297,13 +295,11 @@ export const background: StyleGroup = {
         },
         {
           label: "Ballet Slipper",
-          value:
-            "linear-gradient(135deg, rgba(252,215,212,1) 20%, rgba(207,218,255,1) 100%);",
+          value: "linear-gradient(135deg, rgba(252,215,212,1) 20%, rgba(207,218,255,1) 100%);",
         },
         {
           label: "Black Noir",
-          value:
-            "linear-gradient(312deg, rgba(60,60,60,1) 0%, rgba(42,42,42,1) 100%);",
+          value: "linear-gradient(312deg, rgba(60,60,60,1) 0%, rgba(42,42,42,1) 100%);",
         },
       ],
     },
@@ -362,18 +358,15 @@ export const border: StyleGroup = {
       options: [
         {
           label: "Small",
-          value:
-            "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
+          value: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
         },
         {
           label: "Medium",
-          value:
-            "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+          value: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
         },
         {
           label: "Large",
-          value:
-            "0 8px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+          value: "0 8px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
         },
       ],
     },

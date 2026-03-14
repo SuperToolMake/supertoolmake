@@ -1,5 +1,5 @@
-import { Document } from "../document"
-import { PermissionLevel, BuiltinPermissionID } from "../../sdk"
+import type { BuiltinPermissionID, PermissionLevel } from "../../sdk"
+import type { Document } from "../document"
 
 export interface RoleUIMetadata {
   displayName?: string

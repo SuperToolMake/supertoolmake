@@ -1,14 +1,10 @@
-import {
-  Ctx,
-  GetTenantIdOptions,
-  TenantResolutionStrategy,
-} from "@budibase/types"
+import { type Ctx, type GetTenantIdOptions, TenantResolutionStrategy } from "@budibase/types"
 import { Header } from "../constants"
 import {
   DEFAULT_TENANT_ID,
   getPlatformURL,
-  getTenantId,
   getTenantIDFromWorkspaceID,
+  getTenantId,
   isMultiTenant,
 } from "../context"
 
@@ -36,10 +32,7 @@ export const isUserInWorkspaceTenant = (workspace: string, user?: any) => {
 
 const ALL_STRATEGIES = Object.values(TenantResolutionStrategy)
 
-export const getTenantIDFromCtx = (
-  ctx: Ctx,
-  opts: GetTenantIdOptions
-): string | undefined => {
+export const getTenantIDFromCtx = (ctx: Ctx, opts: GetTenantIdOptions): string | undefined => {
   // exit early if not multi-tenant
   if (!isMultiTenant()) {
     return DEFAULT_TENANT_ID
@@ -106,10 +99,7 @@ export const getTenantIDFromCtx = (
     const requestHost = ctx.host
     // parse the tenant id from the difference
     if (platformHost && requestHost.includes(platformHost)) {
-      const tenantId = requestHost.substring(
-        0,
-        requestHost.indexOf(`.${platformHost}`)
-      )
+      const tenantId = requestHost.substring(0, requestHost.indexOf(`.${platformHost}`))
       if (tenantId) {
         return tenantId
       }

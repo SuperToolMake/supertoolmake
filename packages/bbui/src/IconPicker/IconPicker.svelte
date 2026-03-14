@@ -1,66 +1,66 @@
 <script lang="ts">
-  import "@spectrum-css/popover/dist/index-vars.css"
-  import clickOutside from "../Actions/clickOutside"
-  import { fly } from "svelte/transition"
-  import Icon from "../Icon/Icon.svelte"
-  import { createEventDispatcher } from "svelte"
+import "@spectrum-css/popover/dist/index-vars.css"
+import { createEventDispatcher } from "svelte"
+import { fly } from "svelte/transition"
+import clickOutside from "../Actions/clickOutside"
+import Icon from "../Icon/Icon.svelte"
 
-  export let value: string | undefined
-  export let size: "S" | "M" | "L" = "M"
-  export let alignRight: boolean = false
+export let value: string | undefined
+export let size: "S" | "M" | "L" = "M"
+export let alignRight: boolean = false
 
-  let open: boolean = false
+let open: boolean = false
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  interface IconCategory {
-    label: string
-    icons: string[]
-  }
+interface IconCategory {
+  label: string
+  icons: string[]
+}
 
-  const iconList: IconCategory[] = [
-    {
-      label: "Icons",
-      icons: [
-        "squares-four",
-        "cursor-click",
-        "funnel",
-        "squares-four",
-        "briefcase",
-        "coins",
-        "shopping-cart",
-        "note",
-        "question",
-        "activity",
-        "flask",
-        "briefcase",
-        "tree-structure",
-        "magnifying-glass-plus",
-        "rocket-launch",
-        "car",
-        "camera",
-        "bug",
-        "share-network",
-        "calculator",
-        "calendar",
-        "chart-donut",
-        "chart-bar-horizontal",
-        "users-three",
-      ],
-    },
-  ]
+const iconList: IconCategory[] = [
+  {
+    label: "Icons",
+    icons: [
+      "squares-four",
+      "cursor-click",
+      "funnel",
+      "squares-four",
+      "briefcase",
+      "coins",
+      "shopping-cart",
+      "note",
+      "question",
+      "activity",
+      "flask",
+      "briefcase",
+      "tree-structure",
+      "magnifying-glass-plus",
+      "rocket-launch",
+      "car",
+      "camera",
+      "bug",
+      "share-network",
+      "calculator",
+      "calendar",
+      "chart-donut",
+      "chart-bar-horizontal",
+      "users-three",
+    ],
+  },
+]
 
-  const onChange = (value: string) => {
-    dispatch("change", value)
+const onChange = (value: string) => {
+  dispatch("change", value)
+  open = false
+}
+
+const handleOutsideClick = (event: MouseEvent) => {
+  if (open) {
+    event.stopPropagation()
     open = false
   }
-
-  const handleOutsideClick = (event: MouseEvent) => {
-    if (open) {
-      event.stopPropagation()
-      open = false
-    }
-  }
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

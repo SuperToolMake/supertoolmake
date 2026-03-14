@@ -1,10 +1,10 @@
-// @ts-ignore
+// @ts-expect-error
 import { iifeWrapper } from "@budibase/string-templates"
 
 export default new Proxy(
   {},
   {
-    get: function (_, name) {
+    get: (_, name) => {
       // Both snippetDefinitions and snippetCache are injected to the isolate
       // global scope before this bundle is loaded, so we can access it from
       // there.

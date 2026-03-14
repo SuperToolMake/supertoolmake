@@ -30,11 +30,7 @@ export class BindingHelpers {
   }
 
   // Adds a data binding to the expression
-  onSelectBinding(
-    value,
-    binding,
-    { js, dontDecode, type = BindingType.READABLE }
-  ) {
+  onSelectBinding(value, binding, { js, dontDecode, type = BindingType.READABLE }) {
     const { start, end } = this.getCaretPosition()
     if (js) {
       const jsVal = dontDecode ? value : decodeJSBinding(value)

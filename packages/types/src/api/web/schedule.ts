@@ -1,8 +1,4 @@
-import {
-  ScheduleMetadata,
-  ScheduleRepeatPeriod,
-  ScheduleType,
-} from "../../documents"
+import type { ScheduleMetadata, ScheduleRepeatPeriod, ScheduleType } from "../../documents"
 
 export interface CreateScheduleRequest {
   type: ScheduleType

@@ -1,58 +1,58 @@
 <script>
-  import { Menu, MenuItem, Helpers } from "@budibase/bbui"
-  import { getContext } from "svelte"
-  import { NewRowID } from "../lib/constants"
-  import GridPopover from "./GridPopover.svelte"
-  import { getCellID } from "../lib/utils"
+import { Helpers, Menu, MenuItem } from "@budibase/bbui"
+import { getContext } from "svelte"
+import { NewRowID } from "../lib/constants"
+import { getCellID } from "../lib/utils"
+import GridPopover from "./GridPopover.svelte"
 
-  const {
-    focusedRow,
-    menu,
-    rows,
-    config,
-    dispatch,
-    focusedRowId,
-    notifications,
-    hasBudibaseIdentifiers,
-    selectedRowCount,
-    copyAllowed,
-    pasteAllowed,
-    selectedCellCount,
-    visibleColumns,
-    selectedCells,
-  } = getContext("grid")
+const {
+  focusedRow,
+  menu,
+  rows,
+  config,
+  dispatch,
+  focusedRowId,
+  notifications,
+  hasBudibaseIdentifiers,
+  selectedRowCount,
+  copyAllowed,
+  pasteAllowed,
+  selectedCellCount,
+  visibleColumns,
+  selectedCells,
+} = getContext("grid")
 
-  let anchor
+let anchor
 
-  $: style = makeStyle($menu)
-  $: isNewRow = $focusedRowId === NewRowID
+$: style = makeStyle($menu)
+$: isNewRow = $focusedRowId === NewRowID
 
-  const makeStyle = menu => {
-    return `left:${menu.left}px; top:${menu.top}px;`
+const makeStyle = (menu) => {
+  return `left:${menu.left}px; top:${menu.top}px;`
+}
+
+const deleteRow = () => {
+  menu.actions.close()
+  rows.actions.deleteRows([$focusedRow])
+  $notifications.success("Deleted 1 row")
+}
+
+const duplicateRow = async () => {
+  menu.actions.close()
+  const newRow = await rows.actions.duplicateRow($focusedRow)
+  if (newRow) {
+    const firstCol = $visibleColumns[0]
+    const lastCol = $visibleColumns[$visibleColumns.length - 1]
+    const startCellId = getCellID(newRow._id, firstCol.name)
+    const endCellId = getCellID(newRow._id, lastCol.name)
+    selectedCells.actions.selectRange(startCellId, endCellId)
   }
+}
 
-  const deleteRow = () => {
-    menu.actions.close()
-    rows.actions.deleteRows([$focusedRow])
-    $notifications.success("Deleted 1 row")
-  }
-
-  const duplicateRow = async () => {
-    menu.actions.close()
-    const newRow = await rows.actions.duplicateRow($focusedRow)
-    if (newRow) {
-      const firstCol = $visibleColumns[0]
-      const lastCol = $visibleColumns[$visibleColumns.length - 1]
-      const startCellId = getCellID(newRow._id, firstCol.name)
-      const endCellId = getCellID(newRow._id, lastCol.name)
-      selectedCells.actions.selectRange(startCellId, endCellId)
-    }
-  }
-
-  const copyToClipboard = async value => {
-    await Helpers.copyToClipboard(value)
-    $notifications.success("Copied to clipboard")
-  }
+const copyToClipboard = async (value) => {
+  await Helpers.copyToClipboard(value)
+  $notifications.success("Copied to clipboard")
+}
 </script>
 
 <div bind:this={anchor} {style} class="menu-anchor"></div>

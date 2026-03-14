@@ -3,9 +3,7 @@ import cloudRestricted from "../../../middleware/cloudRestricted"
 
 export const endpointGroupList = new EndpointGroupList()
 
-export const builderOrAdminRoutes = endpointGroupList.group(
-  auth.workspaceBuilderOrAdmin
-)
+export const builderOrAdminRoutes = endpointGroupList.group(auth.workspaceBuilderOrAdmin)
 builderOrAdminRoutes.lockMiddleware()
 
 export const builderRoutes = endpointGroupList.group(auth.builderOnly)

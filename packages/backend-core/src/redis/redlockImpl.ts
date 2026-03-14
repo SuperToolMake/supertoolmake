@@ -1,14 +1,11 @@
 import { utils } from "@budibase/shared-core"
-import { LockOptions, LockType } from "@budibase/types"
+import { type LockOptions, LockType } from "@budibase/types"
 import Redlock from "redlock"
 import * as context from "../context"
 import { Duration } from "../utils"
 import { getLockClient } from "./init"
 
-async function getClient(
-  type: LockType,
-  opts?: Redlock.Options
-): Promise<Redlock> {
+async function getClient(type: LockType, opts?: Redlock.Options): Promise<Redlock> {
   if (type === LockType.CUSTOM) {
     return newRedlock(opts)
   }
@@ -84,9 +81,7 @@ type UnsuccessfulRedlockExecution = {
   executed: false
 }
 
-type RedlockExecution<T> =
-  | SuccessfulRedlockExecution<T>
-  | UnsuccessfulRedlockExecution
+type RedlockExecution<T> = SuccessfulRedlockExecution<T> | UnsuccessfulRedlockExecution
 
 function getLockName(opts: LockOptions) {
   // determine lock name
@@ -124,8 +119,7 @@ export async function doWithLock<T>(
   try {
     const name = getLockName(opts)
 
-    const ttl =
-      opts.type === LockType.AUTO_EXTEND ? AUTO_EXTEND_POLLING_MS : opts.ttl
+    const ttl = opts.type === LockType.AUTO_EXTEND ? AUTO_EXTEND_POLLING_MS : opts.ttl
 
     // create the lock
     lock = await redlock.lock(name, ttl)

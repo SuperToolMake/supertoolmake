@@ -1,69 +1,66 @@
 <script lang="ts">
-  import { Icon, Input, Drawer, Button, TextArea } from "@budibase/bbui"
-  import type { HTMLInputTypeAttribute } from "svelte/elements"
-  import {
-    readableToRuntimeBinding,
-    runtimeToReadableBinding,
-  } from "@/dataBinding"
-  import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
-  import { createEventDispatcher, setContext } from "svelte"
-  import { isJSBinding } from "@budibase/string-templates"
-  import { builderStore } from "@/stores/builder"
+import { Button, Drawer, Icon, Input, TextArea } from "@budibase/bbui"
+import { isJSBinding } from "@budibase/string-templates"
+import { createEventDispatcher, setContext } from "svelte"
+import type { HTMLInputTypeAttribute } from "svelte/elements"
+import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
+import { readableToRuntimeBinding, runtimeToReadableBinding } from "@/dataBinding"
+import { builderStore } from "@/stores/builder"
 
-  export let panel = ClientBindingPanel
-  export let value: any = ""
-  export let bindings: any[] = []
-  export let title: string | undefined = undefined
-  export let placeholder: string | false | undefined = undefined
-  export let label: string | undefined = undefined
-  export let disabled: boolean = false
-  export let allowHBS: boolean = true
-  export let allowJS: boolean = true
-  export let allowHelpers: boolean = true
-  export let updateOnChange: boolean = true
-  export let key: string | null = null
-  export let disableBindings: boolean = false
-  export let forceModal: boolean = false
-  export let context: any | undefined = undefined
-  export let autocomplete: boolean | undefined = undefined
-  export let multiline: boolean = false
-  export let allowHTML: boolean = false
-  export let inputType: HTMLInputTypeAttribute | undefined = undefined
+export let panel = ClientBindingPanel
+export let value: any = ""
+export let bindings: any[] = []
+export let title: string | undefined = undefined
+export let placeholder: string | false | undefined = undefined
+export let label: string | undefined = undefined
+export let disabled: boolean = false
+export let allowHBS: boolean = true
+export let allowJS: boolean = true
+export let allowHelpers: boolean = true
+export let updateOnChange: boolean = true
+export let key: string | null = null
+export let disableBindings: boolean = false
+export let forceModal: boolean = false
+export let context: any | undefined = undefined
+export let autocomplete: boolean | undefined = undefined
+export let multiline: boolean = false
+export let allowHTML: boolean = false
+export let inputType: HTMLInputTypeAttribute | undefined = undefined
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  let bindingDrawer: any
-  let currentVal = value
-  let scrollable = false
+let bindingDrawer: any
+let currentVal = value
+let scrollable = false
 
-  $: readableValue = runtimeToReadableBinding(bindings, value)
-  $: tempValue = readableValue
-  $: isJS = isJSBinding(value)
+$: readableValue = runtimeToReadableBinding(bindings, value)
+$: tempValue = readableValue
+$: isJS = isJSBinding(value)
 
-  const saveBinding = () => {
-    onChange(tempValue)
-    onBlur()
-    builderStore.propertyFocus(null)
-    bindingDrawer.hide()
-  }
+const saveBinding = () => {
+  onChange(tempValue)
+  onBlur()
+  builderStore.propertyFocus(null)
+  bindingDrawer.hide()
+}
 
-  setContext("binding-drawer-actions", {
-    save: saveBinding,
-  })
+setContext("binding-drawer-actions", {
+  save: saveBinding,
+})
 
-  const onChange = (value: any) => {
-    currentVal = readableToRuntimeBinding(bindings, value)
-    dispatch("change", currentVal)
-  }
+const onChange = (value: any) => {
+  currentVal = readableToRuntimeBinding(bindings, value)
+  dispatch("change", currentVal)
+}
 
-  const onBlur = () => {
-    dispatch("blur", currentVal)
-  }
+const onBlur = () => {
+  dispatch("blur", currentVal)
+}
 
-  const onDrawerHide = (e: any) => {
-    builderStore.propertyFocus(null)
-    dispatch("drawerHide", e.detail)
-  }
+const onDrawerHide = (e: any) => {
+  builderStore.propertyFocus(null)
+  dispatch("drawerHide", e.detail)
+}
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

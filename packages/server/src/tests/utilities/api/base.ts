@@ -1,7 +1,7 @@
-import { ReadStream } from "fs"
-import request, { Response, SuperTest, Test } from "supertest"
+import type { ReadStream } from "fs"
+import request, { type Response, type SuperTest, type Test } from "supertest"
 import { getServer } from "../../../app"
-import TestConfiguration from "../TestConfiguration"
+import type TestConfiguration from "../TestConfiguration"
 
 type Headers = Record<string, string | string[] | undefined>
 type Method = "get" | "post" | "put" | "patch" | "delete"
@@ -16,10 +16,7 @@ function isAttachedFile(file: any): file is AttachedFile {
     return false
   }
   const attachedFile = file as AttachedFile
-  return (
-    Object.hasOwnProperty.call(attachedFile, "file") &&
-    Object.hasOwnProperty.call(attachedFile, "name")
-  )
+  return Object.hasOwn(attachedFile, "file") && Object.hasOwn(attachedFile, "name")
 }
 
 export interface Expectations {
@@ -34,10 +31,7 @@ export interface RequestOpts {
   query?: Record<string, string | undefined>
   body?: Record<string, any>
   fields?: Record<string, any>
-  files?: Record<
-    string,
-    Buffer | ReadStream | string | AttachedFile | undefined
-  >
+  files?: Record<string, Buffer | ReadStream | string | AttachedFile | undefined>
   expectations?: Expectations
   publicUser?: boolean
   useProdApp?: boolean
@@ -69,10 +63,7 @@ export abstract class TestAPI {
     return await this._request<T>("patch", `${this.prefix}${url}`, opts)
   }
 
-  protected _delete = async <T>(
-    url: string,
-    opts?: RequestOpts
-  ): Promise<T> => {
+  protected _delete = async <T>(url: string, opts?: RequestOpts): Promise<T> => {
     return await this._request<T>("delete", `${this.prefix}${url}`, opts)
   }
 
@@ -82,14 +73,7 @@ export abstract class TestAPI {
     opts?: RequestOpts,
     attempt = 0
   ): Promise<Response> => {
-    const {
-      headers = {},
-      query = {},
-      body,
-      fields = {},
-      files = {},
-      expectations,
-    } = opts || {}
+    const { headers = {}, query = {}, body, fields = {}, files = {}, expectations } = opts || {}
     const { status = 200 } = expectations || {}
     const expectHeaders = expectations?.headers || {}
 
@@ -97,7 +81,7 @@ export abstract class TestAPI {
       expectHeaders["Content-Type"] = /^application\/json/
     }
 
-    let queryParams: string[] = []
+    const queryParams: string[] = []
     for (const [key, value] of Object.entries(query)) {
       if (value) {
         queryParams.push(`${key}=${value}`)
@@ -149,7 +133,7 @@ export abstract class TestAPI {
       }
     }
 
-    let resp: Response | undefined = undefined
+    let resp: Response | undefined
     try {
       resp = await req
     } catch (e: any) {
@@ -234,15 +218,8 @@ export abstract class TestAPI {
     return response
   }
 
-  protected _request = async <T>(
-    method: Method,
-    url: string,
-    opts?: RequestOpts
-  ): Promise<T> => {
-    return this._checkResponse(
-      await this._requestRaw(method, url, opts),
-      opts?.expectations
-    ).body
+  protected _request = async <T>(method: Method, url: string, opts?: RequestOpts): Promise<T> => {
+    return this._checkResponse(await this._requestRaw(method, url, opts), opts?.expectations).body
   }
 }
 

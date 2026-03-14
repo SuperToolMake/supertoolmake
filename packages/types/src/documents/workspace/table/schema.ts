@@ -2,12 +2,12 @@
 // column size, position and whether it can be viewed
 import { FieldType } from "../row"
 import {
-  AutoFieldSubType,
-  AutoReason,
-  BBReferenceFieldSubType,
-  JsonFieldSubType,
+  type AutoFieldSubType,
+  type AutoReason,
+  type BBReferenceFieldSubType,
+  type JsonFieldSubType,
   RelationshipType,
-  StringFieldSubType,
+  type StringFieldSubType,
 } from "./constants"
 
 export interface UIFieldMetadata {
@@ -17,8 +17,7 @@ export interface UIFieldMetadata {
   icon?: string
 }
 
-interface BaseRelationshipFieldMetadata
-  extends Omit<BaseFieldSchema, "subtype"> {
+interface BaseRelationshipFieldMetadata extends Omit<BaseFieldSchema, "subtype"> {
   type: FieldType.LINK
   main?: boolean
   fieldName: string
@@ -40,18 +39,15 @@ type ManyToManyJunctionTableMetadata =
       throughTo?: never
     }
 
-export type ManyToManyRelationshipFieldMetadata =
-  BaseRelationshipFieldMetadata & {
-    relationshipType: RelationshipType.MANY_TO_MANY
-  } & ManyToManyJunctionTableMetadata
+export type ManyToManyRelationshipFieldMetadata = BaseRelationshipFieldMetadata & {
+  relationshipType: RelationshipType.MANY_TO_MANY
+} & ManyToManyJunctionTableMetadata
 
-export interface OneToManyRelationshipFieldMetadata
-  extends BaseRelationshipFieldMetadata {
+export interface OneToManyRelationshipFieldMetadata extends BaseRelationshipFieldMetadata {
   relationshipType: RelationshipType.ONE_TO_MANY
   foreignKey?: string
 }
-export interface ManyToOneRelationshipFieldMetadata
-  extends BaseRelationshipFieldMetadata {
+export interface ManyToOneRelationshipFieldMetadata extends BaseRelationshipFieldMetadata {
   relationshipType: RelationshipType.MANY_TO_ONE
   foreignKey?: string
 }
@@ -60,8 +56,7 @@ export type RelationshipFieldMetadata =
   | OneToManyRelationshipFieldMetadata
   | ManyToOneRelationshipFieldMetadata
 
-export interface AutoColumnFieldMetadata
-  extends Omit<BaseFieldSchema, "subtype"> {
+export interface AutoColumnFieldMetadata extends Omit<BaseFieldSchema, "subtype"> {
   type: FieldType.AUTO
   autocolumn: true
   subtype: AutoFieldSubType
@@ -111,15 +106,13 @@ export interface StringFieldMetadata extends Omit<BaseFieldSchema, "subtype"> {
   default?: string
 }
 
-export interface BBReferenceFieldMetadata
-  extends Omit<BaseFieldSchema, "subtype"> {
+export interface BBReferenceFieldMetadata extends Omit<BaseFieldSchema, "subtype"> {
   type: FieldType.BB_REFERENCE
   subtype: BBReferenceFieldSubType
   relationshipType?: RelationshipType
   default?: string[]
 }
-export interface BBReferenceSingleFieldMetadata
-  extends Omit<BaseFieldSchema, "subtype"> {
+export interface BBReferenceSingleFieldMetadata extends Omit<BaseFieldSchema, "subtype"> {
   type: FieldType.BB_REFERENCE_SINGLE
   subtype: Exclude<BBReferenceFieldSubType, BBReferenceFieldSubType.USERS>
   default?: string
@@ -240,9 +233,7 @@ export interface RelationSchemaField extends UIFieldMetadata {
   displayName?: string
 }
 
-export function isRelationshipField(
-  field: FieldSchema
-): field is RelationshipFieldMetadata {
+export function isRelationshipField(field: FieldSchema): field is RelationshipFieldMetadata {
   return field.type === FieldType.LINK
 }
 

@@ -1,59 +1,55 @@
 <script>
-  import { notifications, Icon } from "@budibase/bbui"
-  import {
-    selectedScreen,
-    screenStore,
-    componentStore,
-    userSelectedResourceMap,
-    hoverStore,
-    contextMenuStore,
-  } from "@/stores/builder"
-  import NavItem from "@/components/common/NavItem.svelte"
-  import ComponentTree from "./ComponentTree.svelte"
-  import { dndStore, DropPosition } from "./dndStore.js"
-  import DNDPositionIndicator from "./DNDPositionIndicator.svelte"
-  import ComponentScrollWrapper from "./ComponentScrollWrapper.svelte"
-  import getScreenContextMenuItems from "./getScreenContextMenuItems"
+import { Icon, notifications } from "@budibase/bbui"
+import NavItem from "@/components/common/NavItem.svelte"
+import {
+  componentStore,
+  contextMenuStore,
+  hoverStore,
+  screenStore,
+  selectedScreen,
+  userSelectedResourceMap,
+} from "@/stores/builder"
+import ComponentScrollWrapper from "./ComponentScrollWrapper.svelte"
+import ComponentTree from "./ComponentTree.svelte"
+import DNDPositionIndicator from "./DNDPositionIndicator.svelte"
+import { DropPosition, dndStore } from "./dndStore.js"
+import getScreenContextMenuItems from "./getScreenContextMenuItems"
 
-  $: screenComponentId = `${$screenStore.selectedScreenId}-screen`
-  $: navComponentId = `${$screenStore.selectedScreenId}-navigation`
+$: screenComponentId = `${$screenStore.selectedScreenId}-screen`
+$: navComponentId = `${$screenStore.selectedScreenId}-navigation`
 
-  const onDrop = async () => {
-    try {
-      await dndStore.actions.drop()
-    } catch (error) {
-      console.error(error)
-      notifications.error("Error saving component")
-    }
+const onDrop = async () => {
+  try {
+    await dndStore.actions.drop()
+  } catch (error) {
+    console.error(error)
+    notifications.error("Error saving component")
   }
+}
 
-  const hover = hoverStore.hover
+const hover = hoverStore.hover
 
-  // showCopy is used to hide the copy button when the user right-clicks the empty
-  // background of their component tree. Pasting in the empty space makes sense,
-  // but copying it doesn't
-  const openScreenContextMenu = (e, showCopy) => {
-    const screenComponent = $selectedScreen?.props
-    const definition = componentStore.getDefinition(screenComponent?._component)
-    // "editable" has been repurposed for inline text editing.
-    // It remains here for legacy compatibility.
-    // Future components should define "static": true for indicate they should
-    // not show a context menu.
-    if (definition?.editable !== false && definition?.static !== true) {
-      e.preventDefault()
-      e.stopPropagation()
+// showCopy is used to hide the copy button when the user right-clicks the empty
+// background of their component tree. Pasting in the empty space makes sense,
+// but copying it doesn't
+const openScreenContextMenu = (e, showCopy) => {
+  const screenComponent = $selectedScreen?.props
+  const definition = componentStore.getDefinition(screenComponent?._component)
+  // "editable" has been repurposed for inline text editing.
+  // It remains here for legacy compatibility.
+  // Future components should define "static": true for indicate they should
+  // not show a context menu.
+  if (definition?.editable !== false && definition?.static !== true) {
+    e.preventDefault()
+    e.stopPropagation()
 
-      const items = getScreenContextMenuItems(screenComponent, showCopy)
-      contextMenuStore.open(
-        `${showCopy ? "background-" : ""}screenComponent._id`,
-        items,
-        {
-          x: e.clientX,
-          y: e.clientY,
-        }
-      )
-    }
+    const items = getScreenContextMenuItems(screenComponent, showCopy)
+    contextMenuStore.open(`${showCopy ? "background-" : ""}screenComponent._id`, items, {
+      x: e.clientX,
+      y: e.clientY,
+    })
   }
+}
 </script>
 
 <div class="components">

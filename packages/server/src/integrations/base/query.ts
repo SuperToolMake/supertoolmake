@@ -1,15 +1,9 @@
-import {
-  DatasourcePlusQueryResponse,
-  EnrichedQueryJson,
-  QueryJson,
-} from "@budibase/types"
+import type { DatasourcePlusQueryResponse, EnrichedQueryJson, QueryJson } from "@budibase/types"
 import sdk from "../../sdk"
 import { enrichQueryJson } from "../../sdk/workspace/rows/utils"
 import { getIntegration, isDatasourcePlusConstructor } from "../index"
 
-function isEnriched(
-  json: QueryJson | EnrichedQueryJson
-): json is EnrichedQueryJson {
+function isEnriched(json: QueryJson | EnrichedQueryJson): json is EnrichedQueryJson {
   return "datasource" in json
 }
 

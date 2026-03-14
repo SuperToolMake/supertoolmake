@@ -4,23 +4,14 @@ const SESSIONS_INVALIDATED_KEY = "bb-sessions-invalidated"
 
 // export function checkIfSessionsInvalidatedAndNotify() {
 export function popNumSessionsInvalidated() {
-  const invalidatedCount = parseInt(
-    localStorage.getItem(SESSIONS_INVALIDATED_KEY) || "0",
-    10
-  )
+  const invalidatedCount = parseInt(localStorage.getItem(SESSIONS_INVALIDATED_KEY) || "0", 10)
   localStorage.removeItem(SESSIONS_INVALIDATED_KEY)
   return invalidatedCount
 }
 
 export function pushNumSessionsInvalidated(num: number) {
-  const currentCount = parseInt(
-    localStorage.getItem(SESSIONS_INVALIDATED_KEY) || "0",
-    10
-  )
-  localStorage.setItem(
-    SESSIONS_INVALIDATED_KEY,
-    (currentCount + num).toString()
-  )
+  const currentCount = parseInt(localStorage.getItem(SESSIONS_INVALIDATED_KEY) || "0", 10)
+  localStorage.setItem(SESSIONS_INVALIDATED_KEY, (currentCount + num).toString())
 }
 
 export function invalidationMessage(num: number) {

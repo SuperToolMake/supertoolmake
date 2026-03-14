@@ -1,64 +1,62 @@
 <script lang="ts">
-  import { Context, Icon } from "@budibase/bbui"
-  import { createLocalStorageStore } from "@budibase/frontend-core"
-  import { onMount } from "svelte"
+import { Context, Icon } from "@budibase/bbui"
+import { createLocalStorageStore } from "@budibase/frontend-core"
+import { createEventDispatcher, onDestroy, onMount, setContext } from "svelte"
 
-  import { onDestroy, setContext, createEventDispatcher } from "svelte"
+setContext(Context.PopoverRoot, ".nav .popover-container")
 
-  setContext(Context.PopoverRoot, ".nav .popover-container")
+const dispatch = createEventDispatcher()
 
-  const dispatch = createEventDispatcher()
+const pinned = createLocalStorageStore("settings-nav-pinned", true)
 
-  const pinned = createLocalStorageStore("settings-nav-pinned", true)
+let ignoreFocus = false
+let focused = false
+let timeout: ReturnType<typeof setTimeout> | undefined
+let initialized = false
+let previousCollapsed: boolean | undefined
 
-  let ignoreFocus = false
-  let focused = false
-  let timeout: ReturnType<typeof setTimeout> | undefined
-  let initialized = false
-  let previousCollapsed: boolean | undefined = undefined
+$: !$pinned && unPin()
+$: collapsed = !focused && !$pinned
 
-  $: !$pinned && unPin()
-  $: collapsed = !focused && !$pinned
-
-  // Only dispatch when collapsed actually changes
-  $: {
-    if (initialized && previousCollapsed !== collapsed) {
-      dispatch("toggle", collapsed)
-    }
-    previousCollapsed = collapsed
-  }
-
-  export const unPin = () => {
-    // We need to ignore pointer events for a while since otherwise we would
-    // instantly trigger a mouseenter and show it again
-    ignoreFocus = true
-    focused = false
-    timeout = setTimeout(() => {
-      ignoreFocus = false
-    }, 130)
-  }
-
-  export const setFocused = (nextFocused: boolean) => {
-    if (ignoreFocus) {
-      return
-    }
-    focused = nextFocused
-  }
-
-  export const keepCollapsed = () => {
-    if (!$pinned) {
-      unPin()
-    }
-  }
-
-  onMount(() => {
-    initialized = true
+// Only dispatch when collapsed actually changes
+$: {
+  if (initialized && previousCollapsed !== collapsed) {
     dispatch("toggle", collapsed)
-  })
+  }
+  previousCollapsed = collapsed
+}
 
-  onDestroy(() => {
-    clearTimeout(timeout)
-  })
+export const unPin = () => {
+  // We need to ignore pointer events for a while since otherwise we would
+  // instantly trigger a mouseenter and show it again
+  ignoreFocus = true
+  focused = false
+  timeout = setTimeout(() => {
+    ignoreFocus = false
+  }, 130)
+}
+
+export const setFocused = (nextFocused: boolean) => {
+  if (ignoreFocus) {
+    return
+  }
+  focused = nextFocused
+}
+
+export const keepCollapsed = () => {
+  if (!$pinned) {
+    unPin()
+  }
+}
+
+onMount(() => {
+  initialized = true
+  dispatch("toggle", collapsed)
+})
+
+onDestroy(() => {
+  clearTimeout(timeout)
+})
 </script>
 
 <div class="nav_wrapper">

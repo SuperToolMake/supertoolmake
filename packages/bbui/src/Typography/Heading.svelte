@@ -1,12 +1,12 @@
 <script lang="ts">
-  import "@spectrum-css/typography/dist/index-vars.css"
+import "@spectrum-css/typography/dist/index-vars.css"
 
-  // Sizes
-  export let size: "XS" | "S" | "M" | "L" = "M"
-  export let textAlign: string | undefined = undefined
-  export let noPadding: boolean = false
-  export let weight: "light" | "heavy" | "default" = "default"
-  export let color: string | undefined = undefined
+// Sizes
+export let size: "XS" | "S" | "M" | "L" = "M"
+export let textAlign: string | undefined = undefined
+export let noPadding: boolean = false
+export let weight: "light" | "heavy" | "default" = "default"
+export let color: string | undefined = undefined
 </script>
 
 <h1

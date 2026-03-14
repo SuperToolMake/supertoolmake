@@ -1,7 +1,4 @@
-import {
-  LifecycleRule,
-  PutBucketLifecycleConfigurationCommandInput,
-} from "@aws-sdk/client-s3"
+import type { LifecycleRule, PutBucketLifecycleConfigurationCommandInput } from "@aws-sdk/client-s3"
 import fs from "fs"
 import { tmpdir } from "os"
 import { join } from "path"

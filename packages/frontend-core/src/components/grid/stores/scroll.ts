@@ -1,14 +1,14 @@
-import { writable, derived, get, Writable, Readable } from "svelte/store"
 import { tick } from "svelte"
+import { derived, get, type Readable, type Writable, writable } from "svelte/store"
 import {
-  GutterWidth,
   FocusedCellMinOffset,
-  ScrollBarSize,
+  GutterWidth,
   HPadding,
+  ScrollBarSize,
   VPadding,
 } from "../lib/constants"
 import { parseCellID } from "../lib/utils"
-import { Store as StoreContext } from "."
+import type { Store as StoreContext } from "."
 
 interface ScrollStore {
   scroll: Writable<{
@@ -39,8 +39,8 @@ export const createStores = (): ScrollStore => {
   })
 
   // Derive height and width as primitives to avoid wasted computation
-  const scrollTop = derived(scroll, $scroll => Math.round($scroll.top))
-  const scrollLeft = derived(scroll, $scroll => Math.round($scroll.left))
+  const scrollTop = derived(scroll, ($scroll) => Math.round($scroll.top))
+  const scrollLeft = derived(scroll, ($scroll) => Math.round($scroll.left))
 
   return {
     scroll,
@@ -62,7 +62,7 @@ export const deriveStores = (context: StoreContext) => {
   } = context
 
   // Memoize store primitives
-  const stickyWidth = derived(displayColumn, $displayColumn => {
+  const stickyWidth = derived(displayColumn, ($displayColumn) => {
     return ($displayColumn?.width || 0) + GutterWidth
   })
 
@@ -71,30 +71,21 @@ export const deriveStores = (context: StoreContext) => {
     [visibleColumns, buttonColumnWidth],
     ([$visibleColumns, $buttonColumnWidth]) => {
       let width = GutterWidth + Math.max($buttonColumnWidth, HPadding)
-      $visibleColumns.forEach(col => {
+      $visibleColumns.forEach((col) => {
         width += col.width
       })
       return width
     }
   )
-  const screenWidth = derived(
-    [width, stickyWidth],
-    ([$width, $stickyWidth]) => {
-      return $width + $stickyWidth
-    }
-  )
-  const maxScrollLeft = derived(
-    [contentWidth, screenWidth],
-    ([$contentWidth, $screenWidth]) => {
-      return Math.round(Math.max($contentWidth - $screenWidth, 0))
-    }
-  )
-  const showHScrollbar = derived(
-    [contentWidth, screenWidth],
-    ([$contentWidth, $screenWidth]) => {
-      return $contentWidth > $screenWidth
-    }
-  )
+  const screenWidth = derived([width, stickyWidth], ([$width, $stickyWidth]) => {
+    return $width + $stickyWidth
+  })
+  const maxScrollLeft = derived([contentWidth, screenWidth], ([$contentWidth, $screenWidth]) => {
+    return Math.round(Math.max($contentWidth - $screenWidth, 0))
+  })
+  const showHScrollbar = derived([contentWidth, screenWidth], ([$contentWidth, $screenWidth]) => {
+    return $contentWidth > $screenWidth
+  })
 
   // Derive vertical limits
   const contentHeight = derived(
@@ -110,17 +101,12 @@ export const deriveStores = (context: StoreContext) => {
       return height
     }
   )
-  const maxScrollTop = derived(
-    [height, contentHeight],
-    ([$height, $contentHeight]) =>
-      Math.round(Math.max($contentHeight - $height, 0))
+  const maxScrollTop = derived([height, contentHeight], ([$height, $contentHeight]) =>
+    Math.round(Math.max($contentHeight - $height, 0))
   )
-  const showVScrollbar = derived(
-    [contentHeight, height],
-    ([$contentHeight, $height]) => {
-      return $contentHeight > $height
-    }
-  )
+  const showVScrollbar = derived([contentHeight, height], ([$contentHeight, $height]) => {
+    return $contentHeight > $height
+  })
 
   return {
     stickyWidth,
@@ -162,17 +148,17 @@ export const initialise = (context: StoreContext) => {
     ([$scrollLeft, $maxScrollLeft]) => $scrollLeft > $maxScrollLeft,
     false
   )
-  overscrollTop.subscribe(overscroll => {
+  overscrollTop.subscribe((overscroll) => {
     if (overscroll) {
-      scroll.update(state => ({
+      scroll.update((state) => ({
         ...state,
         top: get(maxScrollTop),
       }))
     }
   })
-  overscrollLeft.subscribe(overscroll => {
+  overscrollLeft.subscribe((overscroll) => {
     if (overscroll) {
-      scroll.update(state => ({
+      scroll.update((state) => ({
         ...state,
         left: get(maxScrollLeft),
       }))
@@ -180,7 +166,7 @@ export const initialise = (context: StoreContext) => {
   })
 
   // Ensure the selected cell is visible
-  focusedCellId.subscribe(async $focusedCellId => {
+  focusedCellId.subscribe(async ($focusedCellId) => {
     await tick()
     const $focusedRow = get(focusedRow)
     const $scroll = get(scroll)
@@ -191,11 +177,10 @@ export const initialise = (context: StoreContext) => {
     if ($focusedRow) {
       // Ensure row is not below bottom of screen
       const rowYPos = $focusedRow.__idx * $rowHeight
-      const bottomCutoff =
-        $scroll.top + $bounds.height - $rowHeight - FocusedCellMinOffset
-      let delta = rowYPos - bottomCutoff
+      const bottomCutoff = $scroll.top + $bounds.height - $rowHeight - FocusedCellMinOffset
+      const delta = rowYPos - bottomCutoff
       if (delta > 0) {
-        scroll.update(state => ({
+        scroll.update((state) => ({
           ...state,
           top: state.top + delta,
         }))
@@ -205,7 +190,7 @@ export const initialise = (context: StoreContext) => {
       else {
         const delta = $scroll.top - rowYPos + FocusedCellMinOffset
         if (delta > 0) {
-          scroll.update(state => ({
+          scroll.update((state) => ({
             ...state,
             top: Math.max(0, state.top - delta),
           }))
@@ -223,10 +208,9 @@ export const initialise = (context: StoreContext) => {
 
     // Ensure column is not cutoff on left edge
     const $stickyWidth = get(stickyWidth)
-    let delta =
-      $scroll.left - column.__left + FocusedCellMinOffset + $stickyWidth
+    let delta = $scroll.left - column.__left + FocusedCellMinOffset + $stickyWidth
     if (delta > 0) {
-      scroll.update(state => ({
+      scroll.update((state) => ({
         ...state,
         left: Math.max(0, state.left - delta),
       }))
@@ -236,11 +220,10 @@ export const initialise = (context: StoreContext) => {
     else {
       const $buttonColumnWidth = get(buttonColumnWidth)
       const rightEdge = column.__left + column.width
-      const rightBound =
-        $bounds.width + $scroll.left - FocusedCellMinOffset - $buttonColumnWidth
+      const rightBound = $bounds.width + $scroll.left - FocusedCellMinOffset - $buttonColumnWidth
       delta = rightEdge - rightBound - $stickyWidth
       if (delta > 0) {
-        scroll.update(state => ({
+        scroll.update((state) => ({
           ...state,
           left: state.left + delta,
         }))

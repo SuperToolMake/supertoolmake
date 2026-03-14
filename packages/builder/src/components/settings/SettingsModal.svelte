@@ -1,141 +1,127 @@
 <script lang="ts">
-  import { Modal, Divider, Body, StatusLight, Icon } from "@budibase/bbui"
-  import NewPill from "@/components/common/NewPill.svelte"
-  import { permittedRoutes, flattenedRoutes } from "@/stores/routing"
-  import { bb } from "@/stores/bb"
-  import Router from "@/settings/Router.svelte"
-  import RouteHeader from "@/settings/RouteHeader.svelte"
-  import { tick } from "svelte"
-  import {
-    isRouteHREF,
-    isSettingIcon,
-    type MatchedRoute,
-    type Route,
-  } from "@/types/routing"
-  import { beforeUrlChange, goto } from "@roxi/routify"
-  import ModalSideBar from "./ModalSideBar.svelte"
-  import SideNavLink from "@/routes/builder/workspace/[application]/_components/SideNav/SideNavLink.svelte"
+import { Body, Divider, Icon, type Modal, StatusLight } from "@budibase/bbui"
+import { beforeUrlChange, goto } from "@roxi/routify"
+import { tick } from "svelte"
+import NewPill from "@/components/common/NewPill.svelte"
+import SideNavLink from "@/routes/builder/workspace/[application]/_components/SideNav/SideNavLink.svelte"
+import RouteHeader from "@/settings/RouteHeader.svelte"
+import Router from "@/settings/Router.svelte"
+import { bb } from "@/stores/bb"
+import { flattenedRoutes, permittedRoutes } from "@/stores/routing"
+import { isRouteHREF, isSettingIcon, type MatchedRoute, type Route } from "@/types/routing"
+import type ModalSideBar from "./ModalSideBar.svelte"
 
-  export const show = () => modal.show()
+export const show = () => modal.show()
 
-  export const hide = () => modal.hide()
+export const hide = () => modal.hide()
 
-  let modal: Modal
-  let scrolling = false
-  let page: HTMLDivElement
-  let modalOpen = false
-  let settingsSideBarCollapsed = false
-  let settingsNav: ModalSideBar
+let modal: Modal
+let scrolling = false
+let page: HTMLDivElement
+let modalOpen = false
+let settingsSideBarCollapsed = false
+let settingsNav: ModalSideBar
 
-  $: ({ route, open } = $bb.settings ?? {})
-  $: matchedRoute = route
+$: ({ route, open } = $bb.settings ?? {})
+$: matchedRoute = route
 
-  $beforeUrlChange(() => {
-    bb.hideSettings()
-    return true
-  })
+$beforeUrlChange(() => {
+  bb.hideSettings()
+  return true
+})
 
-  // Original structure
-  $: routes = $permittedRoutes
+// Original structure
+$: routes = $permittedRoutes
 
-  // Split by assigned group
-  $: routesByGroup = routes.reduce(
-    (acc: Record<string, Route[]>, entry: Route) => {
-      const group: Route[] = (acc[entry.group || "none"] ??= [])
-      group.push(entry)
-      return acc
-    },
-    {}
-  )
+// Split by assigned group
+$: routesByGroup = routes.reduce((acc: Record<string, Route[]>, entry: Route) => {
+  const group: Route[] = (acc[entry.group || "none"] ??= [])
+  group.push(entry)
+  return acc
+}, {})
 
-  // Show/Hide the settings modal as required
-  $: modal, toggleSettings(open)
+// Show/Hide the settings modal as required
+$: modal, toggleSettings(open)
 
-  $: groupEntries = Object.entries(routesByGroup || {})
+$: groupEntries = Object.entries(routesByGroup || {})
 
-  // Reset scroll when path changes
-  $: resetScroll(matchedRoute?.entry?.path)
+// Reset scroll when path changes
+$: resetScroll(matchedRoute?.entry?.path)
 
-  // Pull out the default route
-  $: defaultRoute = $flattenedRoutes.find(r => r.path === "/general/info")
+// Pull out the default route
+$: defaultRoute = $flattenedRoutes.find((r) => r.path === "/general/info")
 
-  // Determine the path when opened
-  $: handlePath($flattenedRoutes, open, matchedRoute)
+// Determine the path when opened
+$: handlePath($flattenedRoutes, open, matchedRoute)
 
-  const handlePath = (
-    routes: Route[],
-    open: boolean,
-    matchedRoute?: MatchedRoute
-  ) => {
-    if (routes && open === true) {
-      if (!matchedRoute) {
-        // Default path when none is set
+const handlePath = (routes: Route[], open: boolean, matchedRoute?: MatchedRoute) => {
+  if (routes && open === true) {
+    if (!matchedRoute) {
+      // Default path when none is set
+      tick().then(() => {
+        bb.settings(defaultRoute?.path || "/profile")
+      })
+    } else {
+      const isValidPath = routes.find((r) => r.path === matchedRoute?.entry?.path)
+
+      // When the user reopens the modal an the
+      if (!isValidPath) {
         tick().then(() => {
           bb.settings(defaultRoute?.path || "/profile")
         })
-      } else {
-        const isValidPath = routes.find(
-          r => r.path === matchedRoute?.entry?.path
-        )
-
-        // When the user reopens the modal an the
-        if (!isValidPath) {
-          tick().then(() => {
-            bb.settings(defaultRoute?.path || "/profile")
-          })
-        }
       }
     }
   }
+}
 
-  const handleScroll = (e: Event) => {
-    const target = e.target as HTMLDivElement
-    scrolling = target?.scrollTop !== 0
+const handleScroll = (e: Event) => {
+  const target = e.target as HTMLDivElement
+  scrolling = target?.scrollTop !== 0
+}
+
+const resetScroll = (path: string | undefined) => {
+  if (page && page?.scrollTop > 0 && path) {
+    page.scrollTop = 0
   }
+}
 
-  const resetScroll = (path: string | undefined) => {
-    if (page && page?.scrollTop > 0 && path) {
-      page.scrollTop = 0
-    }
+const toggleSettings = async (settingsOpen: boolean) => {
+  if (!modal) return
+  if (settingsOpen && !modalOpen) {
+    modalOpen = true
+    modal.show()
+  } else if (!settingsOpen && modalOpen) {
+    modalOpen = false
+    modal.hide()
   }
+}
 
-  const toggleSettings = async (settingsOpen: boolean) => {
-    if (!modal) return
-    if (settingsOpen && !modalOpen) {
-      modalOpen = true
-      modal.show()
-    } else if (!settingsOpen && modalOpen) {
-      modalOpen = false
-      modal.hide()
-    }
-  }
+const navItemClick = (route: Route) => {
+  const { routes } = route
+  let path
 
-  const navItemClick = (route: Route) => {
-    const { routes } = route
-    let path
-
-    // Handle urls
-    if (route.href) {
-      if (isRouteHREF(route.href)) {
-        const { url, target } = route.href
-        window.open(url, target || "_blank")
-      } else {
-        $goto(route.href)
-      }
-      return
-    }
-
-    if (routes?.length) {
-      // Default to first route
-      const landing = routes?.[0]
-      // NOTE - route.path can be optional
-      path = `${route.path}/${landing.path}`
+  // Handle urls
+  if (route.href) {
+    if (isRouteHREF(route.href)) {
+      const { url, target } = route.href
+      window.open(url, target || "_blank")
     } else {
-      // When there are no routes, defer to the main path
-      path = route.path
+      $goto(route.href)
     }
-    bb.settings(`/${path}`)
+    return
   }
+
+  if (routes?.length) {
+    // Default to first route
+    const landing = routes?.[0]
+    // NOTE - route.path can be optional
+    path = `${route.path}/${landing.path}`
+  } else {
+    // When there are no routes, defer to the main path
+    path = route.path
+  }
+  bb.settings(`/${path}`)
+}
 </script>
 
 <div class="settings-wrap">

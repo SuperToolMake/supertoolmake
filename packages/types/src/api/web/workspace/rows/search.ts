@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { Row } from "../../../../documents"
+import type { Row } from "../../../../documents"
 import {
   ArrayOperator,
   BasicOperator,
@@ -7,16 +7,14 @@ import {
   InternalSearchFilterOperator,
   LogicalOperator,
   RangeOperator,
-  SearchFilterKey,
-  SearchFilters,
+  type SearchFilterKey,
+  type SearchFilters,
 } from "../../../../sdk"
-import { PaginationResponse, SortOrder, SortType } from "../../pagination"
+import { type PaginationResponse, SortOrder, SortType } from "../../pagination"
 
-const fieldKey = z
-  .string()
-  .refine(s => s !== InternalSearchFilterOperator.COMPLEX_ID_OPERATOR, {
-    message: `Key '${InternalSearchFilterOperator.COMPLEX_ID_OPERATOR}' is not allowed`,
-  })
+const fieldKey = z.string().refine((s) => s !== InternalSearchFilterOperator.COMPLEX_ID_OPERATOR, {
+  message: `Key '${InternalSearchFilterOperator.COMPLEX_ID_OPERATOR}' is not allowed`,
+})
 
 const stringBasicFilter = z.record(fieldKey, z.string())
 const basicFilter = z.record(fieldKey, z.any())
@@ -84,20 +82,11 @@ export type SearchRowRequest = Omit<InferredSearchRowRequest, "query"> & {
 
 export type SearchViewRowRequest = Pick<
   SearchRowRequest,
-  | "sort"
-  | "sortOrder"
-  | "sortType"
-  | "limit"
-  | "bookmark"
-  | "paginate"
-  | "query"
-  | "countRows"
+  "sort" | "sortOrder" | "sortType" | "limit" | "bookmark" | "paginate" | "query" | "countRows"
 >
 
 export interface SearchRowResponse {
   rows: Row[]
 }
 
-export interface PaginatedSearchRowResponse
-  extends SearchRowResponse,
-    PaginationResponse {}
+export interface PaginatedSearchRowResponse extends SearchRowResponse, PaginationResponse {}

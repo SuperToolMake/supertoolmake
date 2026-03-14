@@ -1,48 +1,48 @@
 <script>
-  import { ActionButton, Button, Body, notifications } from "@budibase/bbui"
-  import DetailPopover from "@/components/common/DetailPopover.svelte"
-  import ExistingTableDataImport from "@/components/backend/TableNavigator/ExistingTableDataImport.svelte"
-  import { dataAPI } from "@/stores/builder"
-  import { createEventDispatcher } from "svelte"
+import { ActionButton, Body, Button, notifications } from "@budibase/bbui"
+import { createEventDispatcher } from "svelte"
+import ExistingTableDataImport from "@/components/backend/TableNavigator/ExistingTableDataImport.svelte"
+import DetailPopover from "@/components/common/DetailPopover.svelte"
+import { dataAPI } from "@/stores/builder"
 
-  export let tableId
-  export let tableType
-  export let disabled
+export let tableId
+export let tableType
+export let disabled
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  let popover
-  let rows = []
-  let allValid = false
-  let displayColumn = null
-  let identifierFields = []
-  let loading = false
+let popover
+let rows = []
+let allValid = false
+let displayColumn = null
+let identifierFields = []
+let loading = false
 
-  const openPopover = () => {
-    rows = []
-    allValid = false
-    displayColumn = null
-    identifierFields = []
+const openPopover = () => {
+  rows = []
+  allValid = false
+  displayColumn = null
+  identifierFields = []
+  loading = false
+  popover.show()
+}
+
+const importData = async () => {
+  try {
+    loading = true
+    await $dataAPI.importTableData(tableId, rows, identifierFields)
+    notifications.success("Rows successfully imported")
+    popover.hide()
+  } catch (error) {
+    console.error(error)
+    notifications.error("Unable to import data")
+  } finally {
     loading = false
-    popover.show()
   }
 
-  const importData = async () => {
-    try {
-      loading = true
-      await $dataAPI.importTableData(tableId, rows, identifierFields)
-      notifications.success("Rows successfully imported")
-      popover.hide()
-    } catch (error) {
-      console.error(error)
-      notifications.error("Unable to import data")
-    } finally {
-      loading = false
-    }
-
-    // Always refresh rows just to be sure
-    dispatch("importrows")
-  }
+  // Always refresh rows just to be sure
+  dispatch("importrows")
+}
 </script>
 
 <DetailPopover title="Import data" bind:this={popover}>

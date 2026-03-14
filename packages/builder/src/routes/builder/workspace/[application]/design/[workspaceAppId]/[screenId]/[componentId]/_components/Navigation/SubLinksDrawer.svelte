@@ -1,55 +1,47 @@
 <script>
-  import {
-    ActionButton,
-    Button,
-    Icon,
-    DrawerContent,
-    Layout,
-    Input,
-    Drawer,
-  } from "@budibase/bbui"
-  import { flip } from "svelte/animate"
-  import { dndzone } from "svelte-dnd-action"
-  import { generate } from "shortid"
-  import { screenStore } from "@/stores/builder"
-  import DrawerBindableCombobox from "@/components/common/bindings/DrawerBindableCombobox.svelte"
+import { ActionButton, Button, Drawer, DrawerContent, Icon, Input, Layout } from "@budibase/bbui"
+import { generate } from "shortid"
+import { flip } from "svelte/animate"
+import { dndzone } from "svelte-dnd-action"
+import DrawerBindableCombobox from "@/components/common/bindings/DrawerBindableCombobox.svelte"
+import { screenStore } from "@/stores/builder"
 
-  export let value = []
-  export let onChange
-  export let navItem
-  export let bindings
+export let value = []
+export let onChange
+export let navItem
+export let bindings
 
-  const flipDurationMs = 150
+const flipDurationMs = 150
 
-  let drawer
-  let subLinks = value?.slice() || []
+let drawer
+let subLinks = value?.slice() || []
 
-  $: count = value?.length ?? 0
-  $: buttonText = `${count || "No"} sub link${count === 1 ? "" : "s"}`
-  $: drawerTitle = navItem.text ? `${navItem.text} sub links` : "Sub links"
-  $: subLinks.forEach(subLink => {
-    if (!subLink.id) {
-      subLink.id = generate()
-    }
-  })
-  $: urlOptions = screenStore.routes
-
-  const addSubLink = () => {
-    subLinks = [...subLinks, {}]
+$: count = value?.length ?? 0
+$: buttonText = `${count || "No"} sub link${count === 1 ? "" : "s"}`
+$: drawerTitle = navItem.text ? `${navItem.text} sub links` : "Sub links"
+$: subLinks.forEach((subLink) => {
+  if (!subLink.id) {
+    subLink.id = generate()
   }
+})
+$: urlOptions = screenStore.routes
 
-  const removeSubLink = id => {
-    subLinks = subLinks.filter(link => link.id !== id)
-  }
+const addSubLink = () => {
+  subLinks = [...subLinks, {}]
+}
 
-  const saveSubLinks = () => {
-    onChange(subLinks)
-    drawer.hide()
-  }
+const removeSubLink = (id) => {
+  subLinks = subLinks.filter((link) => link.id !== id)
+}
 
-  const updateSubLinks = e => {
-    subLinks = e.detail.items
-  }
+const saveSubLinks = () => {
+  onChange(subLinks)
+  drawer.hide()
+}
+
+const updateSubLinks = (e) => {
+  subLinks = e.detail.items
+}
 </script>
 
 <Drawer bind:this={drawer} title={drawerTitle} on:drawerShow on:drawerHide>

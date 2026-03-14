@@ -1,14 +1,12 @@
-import ivm from "isolated-vm"
-import bson from "bson"
-
-import url from "url"
-import crypto from "crypto"
-import querystring from "querystring"
-
-import { BundleType, loadBundle } from "../bundles"
-import { Snippet, VM } from "@budibase/types"
 import { iifeWrapper, UserScriptError } from "@budibase/string-templates"
+import type { Snippet, VM } from "@budibase/types"
+import bson from "bson"
+import crypto from "crypto"
+import ivm from "isolated-vm"
+import querystring from "querystring"
+import url from "url"
 import environment from "../../environment"
+import { BundleType, loadBundle } from "../bundles"
 
 export class JsRequestTimeoutError extends Error {
   static code = "JS_REQUEST_TIMEOUT_ERROR"
@@ -23,7 +21,7 @@ export class IsolatedVM implements VM {
   private isolateAccumulatedTimeout?: number
 
   // By default the wrapper returns itself
-  private codeWrapper: (code: string) => string = code => code
+  private codeWrapper: (code: string) => string = (code) => code
 
   private readonly resultKey = "results"
   private runResultKey: string
@@ -51,8 +49,7 @@ export class IsolatedVM implements VM {
       [this.resultKey]: { [this.runResultKey]: "" },
     })
 
-    this.invocationTimeout =
-      invocationTimeout || environment.JS_PER_INVOCATION_TIMEOUT_MS
+    this.invocationTimeout = invocationTimeout || environment.JS_PER_INVOCATION_TIMEOUT_MS
     this.isolateAccumulatedTimeout = isolateAccumulatedTimeout
   }
 
@@ -72,7 +69,7 @@ export class IsolatedVM implements VM {
 
     this.addToContext({
       helpersStripProtocol: (str: string) => {
-        let parsed = url.parse(str) as any
+        const parsed = url.parse(str) as any
         parsed.protocol = ""
         return parsed.format()
       },
@@ -101,8 +98,8 @@ export class IsolatedVM implements VM {
 
   withSnippets(snippets?: Snippet[]) {
     // Transform snippets into a map for faster access
-    let snippetMap: Record<string, string> = {}
-    for (let snippet of snippets || []) {
+    const snippetMap: Record<string, string> = {}
+    for (const snippet of snippets || []) {
       snippetMap[snippet.name] = snippet.code
     }
     const snippetsSource = loadBundle(BundleType.SNIPPETS)
@@ -152,7 +149,7 @@ export class IsolatedVM implements VM {
     // 2. Deserialise the data within the isolate, to get the original data
     // 3. Process script
     // 4. Stringify the result in order to convert the result from BSON to json
-    this.codeWrapper = code =>
+    this.codeWrapper = (code) =>
       iifeWrapper(`
         const data = bson.deserialize(bsonData, { validation: { utf8: false } }).data;
         const result = ${code}
@@ -163,9 +160,7 @@ export class IsolatedVM implements VM {
 
     const bsonPolyfills = loadBundle(BundleType.BSON_POLYFILLS)
 
-    const script = this.isolate.compileScriptSync(
-      `${bsonPolyfills};${bsonSource}`
-    )
+    const script = this.isolate.compileScriptSync(`${bsonPolyfills};${bsonSource}`)
     script.runSync(this.vm, { timeout: this.invocationTimeout, release: false })
     new Promise(() => {
       script.release()
@@ -236,7 +231,7 @@ export class IsolatedVM implements VM {
   }
 
   private addToContext(context: Record<string, any>) {
-    for (let key in context) {
+    for (const key in context) {
       const value = context[key]
       this.jail.setSync(
         key,
@@ -248,7 +243,7 @@ export class IsolatedVM implements VM {
   }
 
   private removeFromContext(keys: string[]) {
-    for (let key of keys) {
+    for (const key of keys) {
       this.jail.deleteSync(key)
     }
   }

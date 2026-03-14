@@ -1,4 +1,4 @@
-import { DeploymentDoc, DeploymentStatus } from "../../../documents"
+import type { DeploymentDoc, DeploymentStatus } from "../../../documents"
 
 export interface PublishWorkspaceRequest {
   automationIds?: string[]

@@ -1,210 +1,201 @@
 <script lang="ts">
-  import { goto } from "@roxi/routify"
-  import {
-    keepOpen,
-    ModalContent,
-    notifications,
-    Body,
-    Layout,
-    Heading,
-    Select,
-    InlineAlert,
-    ProgressCircle,
-  } from "@budibase/bbui"
-  import {
-    datasources,
-    queries,
-    sortedIntegrations as integrations,
-  } from "@/stores/builder"
-  import { restTemplates } from "@/stores/builder/restTemplates"
-  import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
-  import QueryVerbBadge from "@/components/common/QueryVerbBadge.svelte"
-  import DescriptionViewer from "@/components/common/DescriptionViewer.svelte"
-  import { customQueryIconColor } from "@/helpers/data/utils"
-  import { formatEndpointLabel } from "@/helpers/restTemplates"
-  import { IntegrationTypes } from "@/constants/backend"
-  import type {
-    Datasource,
-    ImportRestQueryRequest,
-    ImportEndpoint,
-    RestTemplate,
-  } from "@budibase/types"
+import {
+  Body,
+  Heading,
+  InlineAlert,
+  keepOpen,
+  Layout,
+  ModalContent,
+  notifications,
+  ProgressCircle,
+  Select,
+} from "@budibase/bbui"
+import type {
+  Datasource,
+  ImportEndpoint,
+  ImportRestQueryRequest,
+  RestTemplate,
+} from "@budibase/types"
+import { goto } from "@roxi/routify"
+import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
+import DescriptionViewer from "@/components/common/DescriptionViewer.svelte"
+import QueryVerbBadge from "@/components/common/QueryVerbBadge.svelte"
+import { IntegrationTypes } from "@/constants/backend"
+import { customQueryIconColor } from "@/helpers/data/utils"
+import { formatEndpointLabel } from "@/helpers/restTemplates"
+import { datasources, sortedIntegrations as integrations, queries } from "@/stores/builder"
+import { restTemplates } from "@/stores/builder/restTemplates"
 
-  export let navigateDatasource = false
-  export let datasourceId: string | undefined = undefined
-  export let createDatasource = false
-  export let onCancel: (() => void) | undefined = undefined
+export let navigateDatasource = false
+export let datasourceId: string | undefined = undefined
+export let createDatasource = false
+export let onCancel: (() => void) | undefined = undefined
 
-  $: datasource = $datasources.selected as Datasource
-  let selectedEndpoint: ImportEndpoint | undefined
-  let template: RestTemplate | undefined
-  $: restIntegration = ($integrations || []).find(
-    integration => integration.name === datasource?.source
-  )
-  $: template =
-    datasource?.restTemplate && $restTemplates
-      ? restTemplates.getByName(datasource.restTemplate)
-      : undefined
-  $: selectedTemplateSpec = template
-    ? template.specs?.find(
-        spec => spec.version === datasource?.restTemplateVersion
-      ) || template.specs?.[0]
+$: datasource = $datasources.selected as Datasource
+let selectedEndpoint: ImportEndpoint | undefined
+let template: RestTemplate | undefined
+$: restIntegration = ($integrations || []).find(
+  (integration) => integration.name === datasource?.source
+)
+$: template =
+  datasource?.restTemplate && $restTemplates
+    ? restTemplates.getByName(datasource.restTemplate)
     : undefined
-  $: resolvedTemplateSpecUrl = selectedTemplateSpec?.url
-  $: templateName = template?.name
-  $: templateIcon = template?.icon
-  $: isTemplateDatasource = Boolean(datasource?.restTemplate && template)
-  $: templateEndpointDescription = selectedEndpoint?.description || ""
-  let endpointOptions: ImportEndpoint[] = []
-  let selectedEndpointId: string | undefined = undefined
-  let endpointsLoading = false
-  let endpointsError: string | null = null
-  let endpointsSourceUrl: string | undefined
-  let loadRequestId = 0
-  $: confirmDisabled = !selectedEndpointId || endpointsLoading
-  let currentTemplateUrl: string | undefined
-  let templateDocsBaseUrl: string | undefined
+$: selectedTemplateSpec = template
+  ? template.specs?.find((spec) => spec.version === datasource?.restTemplateVersion) ||
+    template.specs?.[0]
+  : undefined
+$: resolvedTemplateSpecUrl = selectedTemplateSpec?.url
+$: templateName = template?.name
+$: templateIcon = template?.icon
+$: isTemplateDatasource = Boolean(datasource?.restTemplate && template)
+$: templateEndpointDescription = selectedEndpoint?.description || ""
+let endpointOptions: ImportEndpoint[] = []
+let selectedEndpointId: string | undefined
+let endpointsLoading = false
+let endpointsError: string | null = null
+let endpointsSourceUrl: string | undefined
+let loadRequestId = 0
+$: confirmDisabled = !selectedEndpointId || endpointsLoading
+let currentTemplateUrl: string | undefined
+let templateDocsBaseUrl: string | undefined
 
-  const resetEndpoints = () => {
-    loadRequestId += 1
+const resetEndpoints = () => {
+  loadRequestId += 1
+  endpointOptions = []
+  selectedEndpointId = undefined
+  endpointsError = null
+  endpointsLoading = false
+  endpointsSourceUrl = undefined
+  templateDocsBaseUrl = undefined
+}
+
+const loadTemplateEndpoints = async (specUrl: string) => {
+  resetEndpoints()
+  const requestId = ++loadRequestId
+  endpointsLoading = true
+  endpointsError = null
+
+  try {
+    const info = await queries.fetchImportInfo({ url: specUrl })
+    if (requestId !== loadRequestId) {
+      return
+    }
+    endpointsSourceUrl = specUrl
+    templateDocsBaseUrl = info.docsUrl
+    endpointOptions = (info.endpoints || []).slice().sort((a, b) => compareEndpointOrder(a, b))
+    selectedEndpointId = endpointOptions[0]?.id
+  } catch (error: any) {
+    if (requestId !== loadRequestId) {
+      return
+    }
+    endpointsError = error?.message || "Failed to load endpoints"
     endpointOptions = []
     selectedEndpointId = undefined
-    endpointsError = null
-    endpointsLoading = false
     endpointsSourceUrl = undefined
-    templateDocsBaseUrl = undefined
-  }
-
-  const loadTemplateEndpoints = async (specUrl: string) => {
-    resetEndpoints()
-    const requestId = ++loadRequestId
-    endpointsLoading = true
-    endpointsError = null
-
-    try {
-      const info = await queries.fetchImportInfo({ url: specUrl })
-      if (requestId !== loadRequestId) {
-        return
-      }
-      endpointsSourceUrl = specUrl
-      templateDocsBaseUrl = info.docsUrl
-      endpointOptions = (info.endpoints || [])
-        .slice()
-        .sort((a, b) => compareEndpointOrder(a, b))
-      selectedEndpointId = endpointOptions[0]?.id
-    } catch (error: any) {
-      if (requestId !== loadRequestId) {
-        return
-      }
-      endpointsError = error?.message || "Failed to load endpoints"
-      endpointOptions = []
-      selectedEndpointId = undefined
-      endpointsSourceUrl = undefined
-    } finally {
-      if (requestId === loadRequestId) {
-        endpointsLoading = false
-      }
+  } finally {
+    if (requestId === loadRequestId) {
+      endpointsLoading = false
     }
   }
+}
 
-  $: if (isTemplateDatasource) {
-    const specUrl = resolvedTemplateSpecUrl
-    if (specUrl && specUrl !== currentTemplateUrl) {
-      currentTemplateUrl = specUrl
-      loadTemplateEndpoints(specUrl)
-    }
-  } else if (currentTemplateUrl) {
-    currentTemplateUrl = undefined
+$: if (isTemplateDatasource) {
+  const specUrl = resolvedTemplateSpecUrl
+  if (specUrl && specUrl !== currentTemplateUrl) {
+    currentTemplateUrl = specUrl
+    loadTemplateEndpoints(specUrl)
   }
+} else if (currentTemplateUrl) {
+  currentTemplateUrl = undefined
+}
 
-  const getEndpointId = (endpoint: ImportEndpoint) => endpoint.id
+const getEndpointId = (endpoint: ImportEndpoint) => endpoint.id
 
-  const getEndpointIcon = (endpoint: ImportEndpoint) => {
-    const method = (endpoint.method || "").toUpperCase()
-    if (!method) {
-      return undefined
-    }
-    const verbKey = endpoint.queryVerb || method.toLowerCase()
-    return {
-      component: QueryVerbBadge,
-      props: {
-        verb: method,
-        color: customQueryIconColor(verbKey),
-      },
-    }
+const getEndpointIcon = (endpoint: ImportEndpoint) => {
+  const method = (endpoint.method || "").toUpperCase()
+  if (!method) {
+    return undefined
   }
-
-  const verbOrder: Record<string, number> = {
-    GET: 0,
-    POST: 1,
-    PUT: 2,
-    PATCH: 3,
-    DELETE: 4,
+  const verbKey = endpoint.queryVerb || method.toLowerCase()
+  return {
+    component: QueryVerbBadge,
+    props: {
+      verb: method,
+      color: customQueryIconColor(verbKey),
+    },
   }
+}
 
-  const compareEndpointOrder = (a: ImportEndpoint, b: ImportEndpoint) => {
-    const methodA = (a.method || "").toUpperCase()
-    const methodB = (b.method || "").toUpperCase()
-    const orderA = verbOrder[methodA] ?? 999
-    const orderB = verbOrder[methodB] ?? 999
-    if (orderA !== orderB) {
-      return orderA - orderB
-    }
-    const labelA = formatEndpointLabel(a)
-    const labelB = formatEndpointLabel(b)
-    return labelA.localeCompare(labelB)
+const verbOrder: Record<string, number> = {
+  GET: 0,
+  POST: 1,
+  PUT: 2,
+  PATCH: 3,
+  DELETE: 4,
+}
+
+const compareEndpointOrder = (a: ImportEndpoint, b: ImportEndpoint) => {
+  const methodA = (a.method || "").toUpperCase()
+  const methodB = (b.method || "").toUpperCase()
+  const orderA = verbOrder[methodA] ?? 999
+  const orderB = verbOrder[methodB] ?? 999
+  if (orderA !== orderB) {
+    return orderA - orderB
   }
+  const labelA = formatEndpointLabel(a)
+  const labelB = formatEndpointLabel(b)
+  return labelA.localeCompare(labelB)
+}
 
-  const onSelectEndpoint = (event: CustomEvent<string | undefined>) => {
-    selectedEndpointId = event.detail
-  }
+const onSelectEndpoint = (event: CustomEvent<string | undefined>) => {
+  selectedEndpointId = event.detail
+}
 
-  $: selectedEndpoint = endpointOptions.find(
-    endpoint => endpoint.id === selectedEndpointId
-  )
+$: selectedEndpoint = endpointOptions.find((endpoint) => endpoint.id === selectedEndpointId)
 
-  async function importQueries() {
-    try {
-      if (!selectedEndpointId) {
-        notifications.error("Select an endpoint to import")
-        return keepOpen
-      }
-
-      if (!endpointsSourceUrl) {
-        notifications.error("Import data is missing")
-        return keepOpen
-      }
-
-      if (!datasourceId && !createDatasource) {
-        throw new Error("No datasource id")
-      }
-
-      const body: ImportRestQueryRequest = {
-        url: endpointsSourceUrl,
-        datasourceId,
-        datasource,
-        selectedEndpointId,
-      }
-      const importResult = await queries.importQueries(body)
-      if (!datasourceId) {
-        datasourceId = importResult.datasourceId
-      }
-
-      // reload
-      await datasources.fetch()
-      await queries.fetch()
-
-      if (navigateDatasource) {
-        $goto(`./datasource/${datasourceId}`)
-      }
-
-      notifications.success("Imported successfully")
-    } catch (error: any) {
-      notifications.error(`Error importing queries - ${error.message}`)
-
+async function importQueries() {
+  try {
+    if (!selectedEndpointId) {
+      notifications.error("Select an endpoint to import")
       return keepOpen
     }
+
+    if (!endpointsSourceUrl) {
+      notifications.error("Import data is missing")
+      return keepOpen
+    }
+
+    if (!datasourceId && !createDatasource) {
+      throw new Error("No datasource id")
+    }
+
+    const body: ImportRestQueryRequest = {
+      url: endpointsSourceUrl,
+      datasourceId,
+      datasource,
+      selectedEndpointId,
+    }
+    const importResult = await queries.importQueries(body)
+    if (!datasourceId) {
+      datasourceId = importResult.datasourceId
+    }
+
+    // reload
+    await datasources.fetch()
+    await queries.fetch()
+
+    if (navigateDatasource) {
+      $goto(`./datasource/${datasourceId}`)
+    }
+
+    notifications.success("Imported successfully")
+  } catch (error: any) {
+    notifications.error(`Error importing queries - ${error.message}`)
+
+    return keepOpen
   }
+}
 </script>
 
 <ModalContent

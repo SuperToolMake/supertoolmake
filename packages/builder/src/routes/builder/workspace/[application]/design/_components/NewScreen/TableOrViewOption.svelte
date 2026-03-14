@@ -1,8 +1,8 @@
 <script>
-  import { Icon } from "@budibase/bbui"
+import { Icon } from "@budibase/bbui"
 
-  export let tableOrView
-  export let selected = false
+export let tableOrView
+export let selected = false
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

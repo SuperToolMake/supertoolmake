@@ -1,41 +1,41 @@
 <script lang="ts">
-  import "@spectrum-css/popover/dist/index-vars.css"
-  import Icon from "../Icon/Icon.svelte"
-  import { createEventDispatcher } from "svelte"
-  import { PhosphorIcons } from "./icons"
-  import TextField from "../Form/Core/TextField.svelte"
-  import ActionButton from "../ActionButton/ActionButton.svelte"
-  import Body from "../Typography/Body.svelte"
-  import Popover from "../Popover/Popover.svelte"
-  import { PopoverAlignment } from "../constants"
+import "@spectrum-css/popover/dist/index-vars.css"
+import { createEventDispatcher } from "svelte"
+import ActionButton from "../ActionButton/ActionButton.svelte"
+import { PopoverAlignment } from "../constants"
+import TextField from "../Form/Core/TextField.svelte"
+import Icon from "../Icon/Icon.svelte"
+import Popover from "../Popover/Popover.svelte"
+import Body from "../Typography/Body.svelte"
+import { PhosphorIcons } from "./icons"
 
-  export let value: string | undefined
+export let value: string | undefined
 
-  let open: boolean = false
-  let anchor: HTMLDivElement
-  let searchString = ""
+let open: boolean = false
+let anchor: HTMLDivElement
+let searchString = ""
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  $: icons = searchIcons(searchString)
+$: icons = searchIcons(searchString)
 
-  const searchIcons = (searchString: string) => {
-    if (!searchString) {
-      return PhosphorIcons
-    }
-    const lower = searchString.toLowerCase()
-    return PhosphorIcons.filter(icon => icon.includes(lower))
+const searchIcons = (searchString: string) => {
+  if (!searchString) {
+    return PhosphorIcons
   }
+  const lower = searchString.toLowerCase()
+  return PhosphorIcons.filter((icon) => icon.includes(lower))
+}
 
-  const onChange = (value?: string) => {
-    dispatch("change", value)
-    open = false
-  }
+const onChange = (value?: string) => {
+  dispatch("change", value)
+  open = false
+}
 
-  const openPicker = () => {
-    searchString = ""
-    open = true
-  }
+const openPicker = () => {
+  searchString = ""
+  open = true
+}
 </script>
 
 <div class="preview" bind:this={anchor}>

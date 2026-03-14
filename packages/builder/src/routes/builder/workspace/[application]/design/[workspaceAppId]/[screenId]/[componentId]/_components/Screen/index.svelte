@@ -1,8 +1,8 @@
 <script>
-  import GeneralPanel from "./GeneralPanel.svelte"
-  import { selectedScreen } from "@/stores/builder"
-  import Panel from "@/components/design/Panel.svelte"
-  import { Layout } from "@budibase/bbui"
+import { Layout } from "@budibase/bbui"
+import Panel from "@/components/design/Panel.svelte"
+import { selectedScreen } from "@/stores/builder"
+import GeneralPanel from "./GeneralPanel.svelte"
 </script>
 
 {#if $selectedScreen}

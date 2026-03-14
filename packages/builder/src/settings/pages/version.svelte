@@ -1,56 +1,48 @@
 <script>
-  import { onMount } from "svelte"
-  import {
-    Layout,
-    Heading,
-    Body,
-    Divider,
-    notifications,
-    Label,
-    Link,
-  } from "@budibase/bbui"
-  import { API } from "@/api"
+import { Body, Divider, Heading, Label, Layout, Link, notifications } from "@budibase/bbui"
+import { onMount } from "svelte"
+import { API } from "@/api"
 
-  let version
-  let loaded = false
-  let githubVersion
-  let githubPublishedDate
-  let githubPublishedTime
+let version
+let loaded = false
+let githubVersion
+let githubPublishedDate
+let githubPublishedTime
 
-  async function getVersion() {
-    try {
-      version = await API.getInstallVersion()
-    } catch (error) {
-      notifications.error("Error getting version")
-      version = null
-    }
+async function getVersion() {
+  try {
+    version = await API.getInstallVersion()
+  } catch (error) {
+    notifications.error("Error getting version")
+    version = null
   }
+}
 
-  async function getLatestVersion() {
-    try {
-      //Check github API for the latest release
-      const githubCheck = await fetch(
-        "https://api.github.com/repos/SuperToolMake/supertoolmake/releases/latest"
-      )
-      const githubResponse = await githubCheck.json()
+async function getLatestVersion() {
+  try {
+    //Check github API for the latest release
+    const githubCheck = await fetch(
+      "https://api.github.com/repos/SuperToolMake/supertoolmake/releases/latest"
+    )
+    const githubResponse = await githubCheck.json()
 
-      githubVersion = githubResponse.tag_name
+    githubVersion = githubResponse.tag_name
 
-      //Get the release date and output it in the local time format
-      githubPublishedDate = new Date(githubResponse.published_at)
-      githubPublishedTime = githubPublishedDate.toLocaleTimeString()
-      githubPublishedDate = githubPublishedDate.toLocaleDateString()
-    } catch (error) {
-      notifications.error("Error getting the latest version")
-      githubVersion = null
-    }
+    //Get the release date and output it in the local time format
+    githubPublishedDate = new Date(githubResponse.published_at)
+    githubPublishedTime = githubPublishedDate.toLocaleTimeString()
+    githubPublishedDate = githubPublishedDate.toLocaleDateString()
+  } catch (error) {
+    notifications.error("Error getting the latest version")
+    githubVersion = null
   }
+}
 
-  onMount(async () => {
-    await getVersion()
-    await getLatestVersion()
-    loaded = true
-  })
+onMount(async () => {
+  await getVersion()
+  await getLatestVersion()
+  loaded = true
+})
 </script>
 
 <Layout noPadding>

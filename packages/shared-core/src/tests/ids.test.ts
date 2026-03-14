@@ -25,10 +25,7 @@ describe("ids", () => {
     it("should return true for datasource IDs", () => {
       const found = oneOfEachId.filter(isDatasourceOrDatasourcePlusId)
       expect(found.length).toBe(2)
-      expect(
-        found.filter(id => id.startsWith(`${DocumentType.DATASOURCE_PLUS}_`))
-          .length
-      ).toBe(1)
+      expect(found.filter((id) => id.startsWith(`${DocumentType.DATASOURCE_PLUS}_`)).length).toBe(1)
     })
   })
 
@@ -36,9 +33,7 @@ describe("ids", () => {
     it("should return true for table IDs", () => {
       const found = oneOfEachId.filter(isTableIdOrExternalTableId)
       expect(found.length).toBe(1)
-      expect(
-        found.filter(id => id.startsWith(`${DocumentType.TABLE}_`)).length
-      ).toBe(1)
+      expect(found.filter((id) => id.startsWith(`${DocumentType.TABLE}_`)).length).toBe(1)
     })
 
     it("should return true for external table IDs", () => {

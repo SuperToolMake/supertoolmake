@@ -1,30 +1,28 @@
 <script lang="ts">
-  import { Select, Label, Checkbox } from "@budibase/bbui"
-  import { tables, datasources, rowActions } from "@/stores/builder"
-  import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
-  import type { EnrichedBinding } from "@budibase/types"
+import { Checkbox, Label, Select } from "@budibase/bbui"
+import type { EnrichedBinding } from "@budibase/types"
+import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import { datasources, rowActions, tables } from "@/stores/builder"
 
-  export let parameters
-  export let bindings: EnrichedBinding[] = []
+export let parameters
+export let bindings: EnrichedBinding[] = []
 
-  $: datasourceMap = Object.fromEntries(
-    ($datasources.list || []).map(ds => [ds._id, ds.name])
-  )
-  $: tableOptions = $tables.list.map(table => {
-    const datasourceName = datasourceMap[table.sourceId] || "Unknown"
-    return {
-      label: `${datasourceName} - ${table.name}`,
-      resourceId: table._id,
-    }
-  })
-  $: datasourceOptions = [...(tableOptions || [])]
-  $: resourceId = parameters.resourceId
-  $: rowActions.refreshRowActions(resourceId)
-  $: enabledRowActions = $rowActions[resourceId] || []
-  $: rowActionOptions = enabledRowActions.map(action => ({
-    label: action.name,
-    value: action.id,
-  }))
+$: datasourceMap = Object.fromEntries(($datasources.list || []).map((ds) => [ds._id, ds.name]))
+$: tableOptions = $tables.list.map((table) => {
+  const datasourceName = datasourceMap[table.sourceId] || "Unknown"
+  return {
+    label: `${datasourceName} - ${table.name}`,
+    resourceId: table._id,
+  }
+})
+$: datasourceOptions = [...(tableOptions || [])]
+$: resourceId = parameters.resourceId
+$: rowActions.refreshRowActions(resourceId)
+$: enabledRowActions = $rowActions[resourceId] || []
+$: rowActionOptions = enabledRowActions.map((action) => ({
+  label: action.name,
+  value: action.id,
+}))
 </script>
 
 <div class="root">

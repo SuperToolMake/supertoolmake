@@ -1,6 +1,6 @@
 <script>
-  export let width
-  export let height
+export let width
+export let height
 </script>
 
 <svg

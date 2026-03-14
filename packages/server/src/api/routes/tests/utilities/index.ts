@@ -1,10 +1,10 @@
+import type supertest from "supertest"
 import TestConfiguration from "../../../../tests/utilities/TestConfiguration"
-import supertest from "supertest"
 
 export * as structures from "../../../../tests/utilities/structures"
 
 export function delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 let request: supertest.SuperTest<supertest.Test> | undefined | null,

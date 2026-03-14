@@ -1,21 +1,10 @@
-import {
-  Database,
-  IdentityContext,
-  Snippet,
-  Table,
-  Workspace,
-} from "@budibase/types"
-import {
-  DEFAULT_TENANT_ID,
-  DocumentType,
-  SEPARATOR,
-  StaticDatabases,
-} from "../constants"
+import type { Database, IdentityContext, Snippet, Table, Workspace } from "@budibase/types"
+import { DEFAULT_TENANT_ID, DocumentType, SEPARATOR, StaticDatabases } from "../constants"
 import { getDB } from "../db/db"
 import * as conversions from "../docIds/conversions"
 import env from "../environment"
 import Context from "./Context"
-import { ContextMap } from "./types"
+import type { ContextMap } from "./types"
 
 export function getGlobalDBName(tenantId?: string) {
   // tenant ID can be set externally, for example user API where
@@ -115,14 +104,11 @@ async function newContext<T>(updates: ContextMap, task: () => T) {
   guardMigration()
 
   // see if there already is a context setup
-  let context: ContextMap = updateContext(updates)
+  const context: ContextMap = updateContext(updates)
   return Context.run(context, task)
 }
 
-export async function doInContext(
-  workspaceId: string,
-  task: any
-): Promise<any> {
+export async function doInContext(workspaceId: string, task: any): Promise<any> {
   const tenantId = getTenantIDFromWorkspaceID(workspaceId)
   return newContext(
     {
@@ -133,10 +119,7 @@ export async function doInContext(
   )
 }
 
-export async function doInTenant<T>(
-  tenantId: string | undefined,
-  task: () => T
-): Promise<T> {
+export async function doInTenant<T>(tenantId: string | undefined, task: () => T): Promise<T> {
   // make sure default always selected in single tenancy
   if (!env.MULTI_TENANCY) {
     tenantId = tenantId || DEFAULT_TENANT_ID
@@ -152,10 +135,7 @@ export async function doInTenant<T>(
 // context to be self-host using cloud. This affects things like where their
 // quota documents get stored (because we want to avoid creating a new global
 // DB for each self-host tenant).
-export async function doInSelfHostTenantUsingCloud<T>(
-  tenantId: string,
-  task: () => T
-): Promise<T> {
+export async function doInSelfHostTenantUsingCloud<T>(tenantId: string, task: () => T): Promise<T> {
   const updates = { tenantId, isSelfHostUsingCloud: true }
   return newContext(updates, task)
 }
@@ -165,10 +145,7 @@ export function isSelfHostUsingCloud() {
   return !!context?.isSelfHostUsingCloud
 }
 
-export async function doInWorkspaceContext<T>(
-  workspaceId: string,
-  task: () => T
-): Promise<T> {
+export async function doInWorkspaceContext<T>(workspaceId: string, task: () => T): Promise<T> {
   return _doInWorkspaceContext(workspaceId, task)
 }
 
@@ -190,10 +167,7 @@ async function _doInWorkspaceContext<T>(
   return newContext(updates, task)
 }
 
-export async function doInIdentityContext<T>(
-  identity: IdentityContext,
-  task: () => T
-): Promise<T> {
+export async function doInIdentityContext<T>(identity: IdentityContext, task: () => T): Promise<T> {
   if (!identity) {
     throw new Error("identity is required")
   }
@@ -210,9 +184,7 @@ export async function doInIdentityContext<T>(
 function guardMigration() {
   const context = Context.get()
   if (context?.isMigrating) {
-    throw new Error(
-      "The context cannot be changed, a migration is currently running"
-    )
+    throw new Error("The context cannot be changed, a migration is currently running")
   }
 }
 
@@ -277,10 +249,7 @@ export const getProdWorkspaceId = () => {
   return conversions.getProdWorkspaceID(workspaceId)
 }
 
-export function doInEnvironmentContext<T>(
-  values: Record<string, string>,
-  task: () => T
-) {
+export function doInEnvironmentContext<T>(values: Record<string, string>, task: () => T) {
   if (!values) {
     throw new Error("Must supply environment variables.")
   }
@@ -313,9 +282,7 @@ export async function ensureSnippetContext() {
   let snippets: Snippet[] | undefined
   const db = getWorkspaceDB()
   if (db) {
-    const workspace = await db.tryGet<Workspace>(
-      DocumentType.WORKSPACE_METADATA
-    )
+    const workspace = await db.tryGet<Workspace>(DocumentType.WORKSPACE_METADATA)
     snippets = workspace?.snippets
   }
 
@@ -339,9 +306,7 @@ export function getGlobalDB(): Database {
     throw new Error("Global DB not found")
   }
   if (context.isSelfHostUsingCloud) {
-    throw new Error(
-      "Global DB not found - self-host users using cloud don't have a global DB"
-    )
+    throw new Error("Global DB not found - self-host users using cloud don't have a global DB")
   }
   return getDB(baseGlobalDBName(context?.tenantId))
 }
@@ -363,9 +328,7 @@ export function getWorkspaceDB(opts?: any): Database {
     throw new Error("Unable to retrieve workspace DB - no workspace ID.")
   }
   if (isSelfHostUsingCloud()) {
-    throw new Error(
-      "Workspace DB not found - self-host users using cloud don't have workspace DBs"
-    )
+    throw new Error("Workspace DB not found - self-host users using cloud don't have workspace DBs")
   }
   return getDB(workspaceId, opts)
 }

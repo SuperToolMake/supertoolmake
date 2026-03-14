@@ -11,12 +11,7 @@ export function logAlert(message: string, e?: any) {
   console.error(`bb-alert: ${message}`, e)
 }
 
-export function logAlertWithInfo(
-  message: string,
-  db: string,
-  id: string,
-  error: any
-) {
+export function logAlertWithInfo(message: string, db: string, id: string, error: any) {
   message = `${message} - db: ${db} - doc: ${id} - error: `
   logAlert(message, error)
 }

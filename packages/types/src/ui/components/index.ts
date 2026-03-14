@@ -1,4 +1,4 @@
-import { FieldType } from "@budibase/types"
+import type { FieldType } from "@budibase/types"
 
 export * from "./codeEditor"
 export * from "./errors"
@@ -71,7 +71,7 @@ export interface ComponentContext {
 
 export type ComponentContextType = "action" | "static" | "schema" | "form"
 
-export const enum ComponentContextScopes {
+export enum ComponentContextScopes {
   Local = "local",
   Global = "global",
 }

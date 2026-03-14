@@ -1,21 +1,19 @@
 import {
-  Ctx,
-  FetchOAuth2ConfigsResponse,
-  OAuth2Config,
-  OAuth2ConfigResponse,
+  type Ctx,
+  type FetchOAuth2ConfigsResponse,
+  type InsertOAuth2ConfigRequest,
+  type InsertOAuth2ConfigResponse,
+  type OAuth2Config,
+  type OAuth2ConfigResponse,
   PASSWORD_REPLACEMENT,
-  ValidateConfigResponse,
-  ValidateConfigRequest,
-  InsertOAuth2ConfigRequest,
-  InsertOAuth2ConfigResponse,
-  UpdateOAuth2ConfigRequest,
-  UpdateOAuth2ConfigResponse,
+  type UpdateOAuth2ConfigRequest,
+  type UpdateOAuth2ConfigResponse,
+  type ValidateConfigRequest,
+  type ValidateConfigResponse,
 } from "@budibase/types"
 import sdk from "../../sdk"
 
-function toFetchOAuth2ConfigsResponse(
-  config: OAuth2Config
-): OAuth2ConfigResponse {
+function toFetchOAuth2ConfigsResponse(config: OAuth2Config): OAuth2ConfigResponse {
   return {
     _id: config._id!,
     _rev: config._rev!,
@@ -32,23 +30,19 @@ function toFetchOAuth2ConfigsResponse(
 export async function fetch(ctx: Ctx<void, FetchOAuth2ConfigsResponse>) {
   const configs = await sdk.oauth2.fetch()
 
-  const timestamps = await sdk.oauth2.getLastUsages(configs.map(c => c._id))
+  const timestamps = await sdk.oauth2.getLastUsages(configs.map((c) => c._id))
 
   const response: FetchOAuth2ConfigsResponse = {
-    configs: (configs || []).map(c => ({
+    configs: (configs || []).map((c) => ({
       ...toFetchOAuth2ConfigsResponse(c),
-      lastUsage: timestamps[c._id]
-        ? new Date(timestamps[c._id]).toISOString()
-        : undefined,
+      lastUsage: timestamps[c._id] ? new Date(timestamps[c._id]).toISOString() : undefined,
     })),
   }
 
   ctx.body = response
 }
 
-export async function create(
-  ctx: Ctx<InsertOAuth2ConfigRequest, InsertOAuth2ConfigResponse>
-) {
+export async function create(ctx: Ctx<InsertOAuth2ConfigRequest, InsertOAuth2ConfigResponse>) {
   const { body } = ctx.request
   const newConfig = {
     name: body.name,
@@ -67,9 +61,7 @@ export async function create(
   }
 }
 
-export async function edit(
-  ctx: Ctx<UpdateOAuth2ConfigRequest, UpdateOAuth2ConfigResponse>
-) {
+export async function edit(ctx: Ctx<UpdateOAuth2ConfigRequest, UpdateOAuth2ConfigResponse>) {
   const { body } = ctx.request
 
   if (ctx.params.id !== body._id) {
@@ -101,9 +93,7 @@ export async function remove(ctx: Ctx<void, void>) {
   ctx.status = 204
 }
 
-export async function validate(
-  ctx: Ctx<ValidateConfigRequest, ValidateConfigResponse>
-) {
+export async function validate(ctx: Ctx<ValidateConfigRequest, ValidateConfigResponse>) {
   const { body } = ctx.request
   const config = {
     url: body.url,

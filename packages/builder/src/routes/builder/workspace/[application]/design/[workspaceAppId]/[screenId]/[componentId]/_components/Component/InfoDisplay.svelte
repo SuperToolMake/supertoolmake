@@ -1,12 +1,12 @@
 <script>
-  import { Icon } from "@budibase/bbui"
+import { Icon } from "@budibase/bbui"
 
-  export let title = undefined
-  export let body = undefined
-  export let icon = "question"
-  export let quiet = false
-  export let warning = false
-  export let error = false
+export let title = undefined
+export let body = undefined
+export let icon = "question"
+export let quiet = false
+export let warning = false
+export let error = false
 </script>
 
 <div class="info" class:noTitle={!title} class:warning class:error class:quiet>

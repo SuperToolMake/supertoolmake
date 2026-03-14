@@ -1,8 +1,8 @@
-import { Datasource, SourceName } from "@budibase/types"
+import { generator, type testContainerUtils } from "@budibase/backend-core/tests"
+import { type Datasource, SourceName } from "@budibase/types"
+import knex, { type Knex } from "knex"
 import { GenericContainer, Wait } from "testcontainers"
-import { generator, testContainerUtils } from "@budibase/backend-core/tests"
 import { startContainer } from "."
-import knex, { Knex } from "knex"
 import { MSSQL_IMAGE } from "./images"
 
 let ports: Promise<testContainerUtils.Port[]>
@@ -29,7 +29,7 @@ export async function getDatasource(): Promise<Datasource> {
     )
   }
 
-  const port = (await ports).find(x => x.container === 1433)?.host
+  const port = (await ports).find((x) => x.container === 1433)?.host
   if (!port) {
     throw new Error("SQL Server port not found")
   }

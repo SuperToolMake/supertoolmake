@@ -1,27 +1,21 @@
 import { PutObjectCommand, S3 } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-import {
-  BadRequestError,
-  configs,
-  context,
-  objectStore,
-  utils,
-} from "@budibase/backend-core"
+import { BadRequestError, configs, context, objectStore, utils } from "@budibase/backend-core"
 import { InvalidFileExtensions } from "@budibase/shared-core"
 import { processString } from "@budibase/string-templates"
 import {
-  AppProps,
-  Ctx,
+  type AppProps,
+  type Ctx,
   DocumentType,
-  GetSignedUploadUrlRequest,
-  GetSignedUploadUrlResponse,
-  ProcessAttachmentResponse,
-  PWAManifest,
-  ServeAppResponse,
-  ServeBuilderPreviewResponse,
-  ServeClientLibraryResponse,
-  UserCtx,
-  Workspace,
+  type GetSignedUploadUrlRequest,
+  type GetSignedUploadUrlResponse,
+  type ProcessAttachmentResponse,
+  type PWAManifest,
+  type ServeAppResponse,
+  type ServeBuilderPreviewResponse,
+  type ServeClientLibraryResponse,
+  type UserCtx,
+  type Workspace,
 } from "@budibase/types"
 import extract from "extract-zip"
 import fs from "fs"
@@ -29,6 +23,7 @@ import fsp from "fs/promises"
 import send from "koa-send"
 import { tmpdir } from "os"
 import path from "path"
+import { render } from "svelte/server"
 import * as uuid from "uuid"
 import { ObjectStoreBuckets } from "../../../constants"
 import { getThemeVariables } from "../../../constants/themes"
@@ -41,7 +36,6 @@ import {
   shouldServeLocally,
 } from "../../../utilities/fileSystem"
 import AppComponent from "./templates/App.svelte"
-import { render } from "svelte/server"
 
 const getUploadFilename = (file: unknown) => {
   if (!file || typeof file !== "object") {
@@ -73,26 +67,22 @@ const getUploadMimeType = (file: unknown) => {
   return upload.mimetype || undefined
 }
 
-export const uploadFile = async function (
-  ctx: Ctx<void, ProcessAttachmentResponse>
-) {
+export const uploadFile = async (ctx: Ctx<void, ProcessAttachmentResponse>) => {
   const file = ctx.request?.files?.file
   if (!file) {
     throw new BadRequestError("No file provided")
   }
 
-  let files = file && Array.isArray(file) ? Array.from(file) : [file]
+  const files = file && Array.isArray(file) ? Array.from(file) : [file]
 
   ctx.body = await Promise.all(
-    files.map(async file => {
+    files.map(async (file) => {
       const fileName = getUploadFilename(file)
       const filePath = getUploadPath(file)
       const rawMimeType = getUploadMimeType(file)
 
       if (!fileName) {
-        throw new BadRequestError(
-          "Attempted to upload a file without a filename"
-        )
+        throw new BadRequestError("Attempted to upload a file without a filename")
       }
 
       const extension = [...fileName.split(".")].pop()
@@ -102,13 +92,8 @@ export const uploadFile = async function (
         )
       }
 
-      if (
-        !env.SELF_HOSTED &&
-        InvalidFileExtensions.includes(extension.toLowerCase())
-      ) {
-        throw new BadRequestError(
-          `File "${fileName}" has an invalid extension: "${extension}"`
-        )
+      if (!env.SELF_HOSTED && InvalidFileExtensions.includes(extension.toLowerCase())) {
+        throw new BadRequestError(`File "${fileName}" has an invalid extension: "${extension}"`)
       }
 
       // filenames converted to UUIDs so they are unique
@@ -181,8 +166,7 @@ export async function processPWAZip(ctx: UserCtx) {
 
       const extension = path.extname(icon.src) || ".png"
       const key = `${appId}/pwa/${uuid.v4()}${extension}`
-      const mimeType =
-        icon.type || (extension === ".png" ? "image/png" : "image/jpeg")
+      const mimeType = icon.type || (extension === ".png" ? "image/png" : "image/jpeg")
 
       try {
         const result = await objectStore.upload({
@@ -214,7 +198,7 @@ export async function processPWAZip(ctx: UserCtx) {
   }
 }
 
-export const serveApp = async function (ctx: UserCtx<void, ServeAppResponse>) {
+export const serveApp = async (ctx: UserCtx<void, ServeAppResponse>) => {
   // No app ID found, cannot serve - return message instead
   const workspaceId = context.getWorkspaceId()
   if (!workspaceId) {
@@ -222,8 +206,7 @@ export const serveApp = async function (ctx: UserCtx<void, ServeAppResponse>) {
     return
   }
 
-  const bbHeaderEmbed =
-    ctx.request.get("x-budibase-embed")?.toLowerCase() === "true"
+  const bbHeaderEmbed = ctx.request.get("x-budibase-embed")?.toLowerCase() === "true"
   await Promise.all([configs.getSettingsConfigDoc()])
   // incase running direct from TS
   let appHbsPath = join(__dirname, "app.hbs")
@@ -251,7 +234,7 @@ export const serveApp = async function (ctx: UserCtx<void, ServeAppResponse>) {
        */
       const appName = workspaceApp?.name || `${appInfo.name}`
       const nonce = ctx.state.nonce || ""
-      let props: AppProps = {
+      const props: AppProps = {
         title: appName,
         showSkeletonLoader: appInfo.features?.skeletonLoader ?? false,
         hideDevTools,
@@ -270,7 +253,7 @@ export const serveApp = async function (ctx: UserCtx<void, ServeAppResponse>) {
       const { head, body } = await render(AppComponent, { props: { props } })
       const appHbs = loadHandlebarsFile(appHbsPath)
 
-      let extraHead = ""
+      const extraHead = ""
 
       ctx.body = await processString(appHbs, {
         head: `${head}${extraHead}`,
@@ -295,23 +278,18 @@ export const serveApp = async function (ctx: UserCtx<void, ServeAppResponse>) {
   }
 }
 
-export const serveBuilderPreview = async function (
-  ctx: Ctx<void, ServeBuilderPreviewResponse>
-) {
+export const serveBuilderPreview = async (ctx: Ctx<void, ServeBuilderPreviewResponse>) => {
   const db = context.getWorkspaceDB({ skip_setup: true })
   const appInfo = await db.get<Workspace>(DocumentType.WORKSPACE_METADATA)
 
   if (!env.isJest()) {
-    let appId = context.getWorkspaceId()
+    const appId = context.getWorkspaceId()
     const templateLoc = join(__dirname, "templates")
     const previewLoc = fs.existsSync(templateLoc) ? templateLoc : __dirname
     const previewHbs = loadHandlebarsFile(join(previewLoc, "preview.hbs"))
     const nonce = ctx.state.nonce || ""
-    let props: any = {
-      clientLibPath: await objectStore.clientLibraryUrl(
-        appId!,
-        appInfo.version
-      ),
+    const props: any = {
+      clientLibPath: await objectStore.clientLibraryUrl(appId!, appInfo.version),
       nonce,
     }
 
@@ -334,9 +312,7 @@ function serveLocalFile(ctx: Ctx, fileName: string) {
   return send(ctx, fileName, { root })
 }
 
-export const serveClientLibrary = async function (
-  ctx: Ctx<void, ServeClientLibraryResponse>
-) {
+export const serveClientLibrary = async (ctx: Ctx<void, ServeClientLibraryResponse>) => {
   const workspaceId = context.getWorkspaceId()
 
   if (!workspaceId) {
@@ -356,7 +332,7 @@ export const serveClientLibrary = async function (
   }
 }
 
-export const serve3rdPartyFile = async function (ctx: Ctx) {
+export const serve3rdPartyFile = async (ctx: Ctx) => {
   const { file } = ctx.params
 
   const workspaceId = context.getWorkspaceId()
@@ -380,7 +356,7 @@ export const serve3rdPartyFile = async function (ctx: Ctx) {
   }
 }
 
-export const serveServiceWorker = async function (ctx: Ctx) {
+export const serveServiceWorker = async (ctx: Ctx) => {
   const serviceWorkerContent = `
     self.addEventListener('install', () => {
     self.skipWaiting();
@@ -390,9 +366,9 @@ export const serveServiceWorker = async function (ctx: Ctx) {
   ctx.body = serviceWorkerContent
 }
 
-export const getSignedUploadURL = async function (
+export const getSignedUploadURL = async (
   ctx: Ctx<GetSignedUploadUrlRequest, GetSignedUploadUrlResponse>
-) {
+) => {
   // Ensure datasource is valid
   let datasource
   try {
@@ -474,7 +450,7 @@ export async function servePwaManifest(ctx: UserCtx<void, any>) {
         manifest.icons = await objectStore.enrichPWAImages(appInfo.pwa.icons)
 
         const desktopScreenshot = manifest.icons.find(
-          icon => icon.sizes === "1240x600" || icon.sizes === "2480x1200"
+          (icon) => icon.sizes === "1240x600" || icon.sizes === "2480x1200"
         )
         if (desktopScreenshot) {
           manifest.screenshots.push({
@@ -487,7 +463,7 @@ export async function servePwaManifest(ctx: UserCtx<void, any>) {
         }
 
         const mobileScreenshot = manifest.icons.find(
-          icon => icon.sizes === "620x620" || icon.sizes === "1024x1024"
+          (icon) => icon.sizes === "620x620" || icon.sizes === "1024x1024"
         )
         if (mobileScreenshot) {
           manifest.screenshots.push({

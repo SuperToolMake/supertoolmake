@@ -1,6 +1,6 @@
-import { Document } from "../../document"
-import { RenameColumn } from "../../../sdk"
-import { TableSchema } from "./schema"
+import type { RenameColumn } from "../../../sdk"
+import type { Document } from "../../document"
+import type { TableSchema } from "./schema"
 
 export const INTERNAL_TABLE_SOURCE_ID = "bb_internal"
 

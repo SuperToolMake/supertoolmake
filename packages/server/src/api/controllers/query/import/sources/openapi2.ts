@@ -1,24 +1,24 @@
-import { GetQueriesOptions, ImportInfo } from "./base"
 import {
   BodyType,
-  Query,
-  QueryParameter,
-  RestTemplateQueryMetadata,
+  type Query,
+  type QueryParameter,
+  type RestTemplateQueryMetadata,
 } from "@budibase/types"
-import { QueryVerbToHttpMethod } from "../../../../../constants"
 import { OpenAPIV2 } from "openapi-types"
-import { OpenAPISource } from "./base/openapi"
 import { URL } from "url"
+import { QueryVerbToHttpMethod } from "../../../../../constants"
+import type { GetQueriesOptions, ImportInfo } from "./base"
+import { OpenAPISource } from "./base/openapi"
+import { buildEndpointName } from "./utils/endpointName"
 import {
-  GeneratedRequestBody,
+  buildKeyValueRequestBody,
   buildRequestBodyFromFormDataParameters,
   buildSerializableRequestBody,
+  type FormDataParameter,
+  type GeneratedRequestBody,
   generateRequestBodyFromExample,
   generateRequestBodyFromSchema,
-  buildKeyValueRequestBody,
-  type FormDataParameter,
 } from "./utils/requestBody"
-import { buildEndpointName } from "./utils/endpointName"
 
 const parameterNotRef = (
   param: OpenAPIV2.Parameter | OpenAPIV2.ReferenceObject
@@ -37,17 +37,11 @@ const isOpenAPI2 = (document: any): document is OpenAPIV2.Document => {
 
 const methods: string[] = Object.values(OpenAPIV2.HttpMethods)
 
-const isOperation = (
-  key: string,
-  pathItem: any
-): pathItem is OpenAPIV2.OperationObject => {
+const isOperation = (key: string, pathItem: any): pathItem is OpenAPIV2.OperationObject => {
   return methods.includes(key)
 }
 
-const isParameter = (
-  key: string,
-  pathItem: any
-): pathItem is OpenAPIV2.Parameter => {
+const isParameter = (key: string, pathItem: any): pathItem is OpenAPIV2.Parameter => {
   return !isOperation(key, pathItem)
 }
 
@@ -59,9 +53,7 @@ export class OpenAPI2 extends OpenAPISource {
   document!: OpenAPIV2.Document
   private securityHeaders: Map<string, string> = new Map()
 
-  private getDocsUrl = (
-    operation: OpenAPIV2.OperationObject
-  ): string | undefined => {
+  private getDocsUrl = (operation: OpenAPIV2.OperationObject): string | undefined => {
     return (
       operation.externalDocs?.url ||
       this.document.externalDocs?.url ||
@@ -84,9 +76,7 @@ export class OpenAPI2 extends OpenAPISource {
     }
   }
 
-  private getSecuritySchemeHeader(
-    scheme?: OpenAPIV2.SecuritySchemeObject
-  ): string | undefined {
+  private getSecuritySchemeHeader(scheme?: OpenAPIV2.SecuritySchemeObject): string | undefined {
     if (!scheme) {
       return undefined
     }
@@ -131,10 +121,7 @@ export class OpenAPI2 extends OpenAPISource {
       metadata.originalRequestBody = parsedBody
     }
 
-    const defaultBindings = this.buildDefaultBindings(
-      parameters,
-      requestBody?.bindings
-    )
+    const defaultBindings = this.buildDefaultBindings(parameters, requestBody?.bindings)
     if (defaultBindings) {
       metadata.defaultBindings = defaultBindings
     }
@@ -244,19 +231,16 @@ export class OpenAPI2 extends OpenAPISource {
     return "openapi2.0"
   }
 
-  getQueries = async (
-    datasourceId: string,
-    options?: GetQueriesOptions
-  ): Promise<Query[]> => {
+  getQueries = async (datasourceId: string, options?: GetQueriesOptions): Promise<Query[]> => {
     const url = this.getUrl()
     const queries = []
     const filterIds = options?.filterIds
 
-    for (let [path, pathItem] of Object.entries(this.document.paths)) {
+    for (const [path, pathItem] of Object.entries(this.document.paths)) {
       // parameters that apply to every operation in the path
-      let pathParams: OpenAPIV2.Parameter[] = []
+      const pathParams: OpenAPIV2.Parameter[] = []
 
-      for (let [key, opOrParams] of Object.entries(pathItem)) {
+      for (const [key, opOrParams] of Object.entries(pathItem)) {
         if (isParameter(key, opOrParams)) {
           const pathParameters = opOrParams as OpenAPIV2.Parameter[]
           pathParams.push(...pathParameters)
@@ -282,12 +266,12 @@ export class OpenAPI2 extends OpenAPISource {
           }
           const normalized = headerName.toLowerCase()
           const existingKey = Object.keys(headers).find(
-            existing => existing.toLowerCase() === normalized
+            (existing) => existing.toLowerCase() === normalized
           )
           headers[existingKey || headerName] = value
         }
         let primaryMimeType: string | undefined
-        let requestBody: GeneratedRequestBody | undefined = undefined
+        let requestBody: GeneratedRequestBody | undefined
         const parameters: QueryParameter[] = []
 
         if (operation.consumes) {
@@ -301,7 +285,7 @@ export class OpenAPI2 extends OpenAPISource {
         const operationParams = operation.parameters || []
         const allParams = [...pathParams, ...operationParams]
 
-        for (let param of allParams) {
+        for (const param of allParams) {
           if (parameterNotRef(param)) {
             let skipParameterBinding = false
             switch (param.in) {
@@ -330,7 +314,7 @@ export class OpenAPI2 extends OpenAPISource {
                 } as FormDataParameter)
                 break
               case "body": {
-                let bodyParam: OpenAPIV2.InBodyParameterObject =
+                const bodyParam: OpenAPIV2.InBodyParameterObject =
                   param as OpenAPIV2.InBodyParameterObject
                 const schema = bodyParam.schema as OpenAPIV2.SchemaObject
                 if (schema) {
@@ -358,8 +342,7 @@ export class OpenAPI2 extends OpenAPISource {
               !skipParameterBinding &&
               ["query", "header", "path", "formData"].includes(param.in)
             ) {
-              const defaultValue =
-                param.default !== undefined ? String(param.default) : ""
+              const defaultValue = param.default !== undefined ? String(param.default) : ""
               parameters.push({
                 name: param.name,
                 default: defaultValue,
@@ -369,14 +352,11 @@ export class OpenAPI2 extends OpenAPISource {
         }
 
         if (!requestBody && formDataParams.length > 0) {
-          const formDataBody =
-            buildRequestBodyFromFormDataParameters(formDataParams)
+          const formDataBody = buildRequestBodyFromFormDataParameters(formDataParams)
           if (formDataBody) {
             requestBody = formDataBody
             if (!primaryMimeType) {
-              primaryMimeType = formDataParams.some(
-                param => param.type === "file"
-              )
+              primaryMimeType = formDataParams.some((param) => param.type === "file")
                 ? "multipart/form-data"
                 : "application/x-www-form-urlencoded"
             }
@@ -386,9 +366,7 @@ export class OpenAPI2 extends OpenAPISource {
           }
         }
 
-        const bodyType = primaryMimeType
-          ? this.bodyTypeFromMimeType(primaryMimeType)
-          : undefined
+        const bodyType = primaryMimeType ? this.bodyTypeFromMimeType(primaryMimeType) : undefined
 
         const restTemplateMetadata = this.buildRestTemplateMetadata(
           operation,

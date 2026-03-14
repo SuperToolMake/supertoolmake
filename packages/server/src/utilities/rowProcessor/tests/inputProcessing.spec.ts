@@ -1,12 +1,12 @@
-import { inputProcessing } from ".."
 import { generator, structures } from "@budibase/backend-core/tests"
 import {
-  FieldType,
   BBReferenceFieldSubType,
+  FieldType,
   INTERNAL_TABLE_SOURCE_ID,
-  Table,
+  type Table,
   TableSourceType,
 } from "@budibase/types"
+import { inputProcessing } from ".."
 import * as bbReferenceProcessor from "../bbReferenceProcessor"
 
 jest.mock("../bbReferenceProcessor", (): typeof bbReferenceProcessor => ({
@@ -21,10 +21,8 @@ describe("rowProcessor - inputProcessing", () => {
     jest.resetAllMocks()
   })
 
-  const processInputBBReferenceMock =
-    bbReferenceProcessor.processInputBBReference as jest.Mock
-  const processInputBBReferencesMock =
-    bbReferenceProcessor.processInputBBReferences as jest.Mock
+  const processInputBBReferenceMock = bbReferenceProcessor.processInputBBReference as jest.Mock
+  const processInputBBReferencesMock = bbReferenceProcessor.processInputBBReferences as jest.Mock
 
   it("processes single BB references if on the schema and it's populated", async () => {
     const userId = generator.guid()
@@ -67,13 +65,8 @@ describe("rowProcessor - inputProcessing", () => {
 
     const row = await inputProcessing(userId, table, newRow)
 
-    expect(bbReferenceProcessor.processInputBBReference).toHaveBeenCalledTimes(
-      1
-    )
-    expect(bbReferenceProcessor.processInputBBReference).toHaveBeenCalledWith(
-      "123",
-      "user"
-    )
+    expect(bbReferenceProcessor.processInputBBReference).toHaveBeenCalledTimes(1)
+    expect(bbReferenceProcessor.processInputBBReference).toHaveBeenCalledWith("123", "user")
 
     expect(row).toEqual({ ...newRow, user })
   })
@@ -119,13 +112,8 @@ describe("rowProcessor - inputProcessing", () => {
 
     const row = await inputProcessing(userId, table, newRow)
 
-    expect(bbReferenceProcessor.processInputBBReferences).toHaveBeenCalledTimes(
-      1
-    )
-    expect(bbReferenceProcessor.processInputBBReferences).toHaveBeenCalledWith(
-      "123",
-      "user"
-    )
+    expect(bbReferenceProcessor.processInputBBReferences).toHaveBeenCalledTimes(1)
+    expect(bbReferenceProcessor.processInputBBReferences).toHaveBeenCalledWith("123", "user")
 
     expect(row).toEqual({ ...newRow, user })
   })
@@ -170,56 +158,55 @@ describe("rowProcessor - inputProcessing", () => {
     expect(row).toEqual({ ...newRow, user: undefined })
   })
 
-  it.each([undefined, null, ""])(
-    "does not process BB references the field is $%",
-    async userValue => {
-      const userId = generator.guid()
+  it.each([
+    undefined,
+    null,
+    "",
+  ])("does not process BB references the field is $%", async (userValue) => {
+    const userId = generator.guid()
 
-      const table: Table = {
-        _id: generator.guid(),
-        name: "TestTable",
-        type: "table",
-        sourceId: INTERNAL_TABLE_SOURCE_ID,
-        sourceType: TableSourceType.INTERNAL,
-        schema: {
-          name: {
-            type: FieldType.STRING,
-            name: "name",
-            constraints: {
-              presence: true,
-              type: "string",
-            },
-          },
-          user: {
-            type: FieldType.BB_REFERENCE,
-            subtype: BBReferenceFieldSubType.USER,
-            name: "user",
-            constraints: {
-              presence: false,
-              type: "array",
-            },
+    const table: Table = {
+      _id: generator.guid(),
+      name: "TestTable",
+      type: "table",
+      sourceId: INTERNAL_TABLE_SOURCE_ID,
+      sourceType: TableSourceType.INTERNAL,
+      schema: {
+        name: {
+          type: FieldType.STRING,
+          name: "name",
+          constraints: {
+            presence: true,
+            type: "string",
           },
         },
-      }
-
-      const newRow = {
-        name: "Jack",
-        user: userValue,
-      }
-
-      const row = await inputProcessing(userId, table, newRow)
-
-      const expectedUser = userValue === undefined ? undefined : []
-      expect(row).toEqual({
-        name: "Jack",
-        ...(expectedUser !== undefined && { user: expectedUser }),
-      })
-
-      expect(
-        bbReferenceProcessor.processInputBBReferences
-      ).not.toHaveBeenCalled()
+        user: {
+          type: FieldType.BB_REFERENCE,
+          subtype: BBReferenceFieldSubType.USER,
+          name: "user",
+          constraints: {
+            presence: false,
+            type: "array",
+          },
+        },
+      },
     }
-  )
+
+    const newRow = {
+      name: "Jack",
+      user: userValue,
+    }
+
+    const row = await inputProcessing(userId, table, newRow)
+
+    const expectedUser = userValue === undefined ? undefined : []
+    expect(row).toEqual({
+      name: "Jack",
+      ...(expectedUser !== undefined && { user: expectedUser }),
+    })
+
+    expect(bbReferenceProcessor.processInputBBReferences).not.toHaveBeenCalled()
+  })
 
   it("does not process BB references if not in the schema", async () => {
     const userId = generator.guid()

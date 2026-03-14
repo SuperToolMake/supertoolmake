@@ -1,17 +1,17 @@
-import fetch from "node-fetch"
-import * as sso from "./sso"
-import { ssoCallbackUrl } from "../utils"
-import { validEmail } from "../../../utils"
 import {
   ConfigType,
-  OIDCInnerConfig,
-  SSOProfile,
-  OIDCStrategyConfiguration,
-  SSOAuthDetails,
+  type JwtClaims,
+  type OIDCInnerConfig,
+  type OIDCStrategyConfiguration,
+  type SaveSSOUserFunction,
+  type SSOAuthDetails,
+  type SSOProfile,
   SSOProviderType,
-  JwtClaims,
-  SaveSSOUserFunction,
 } from "@budibase/types"
+import fetch from "node-fetch"
+import { validEmail } from "../../../utils"
+import { ssoCallbackUrl } from "../utils"
+import * as sso from "./sso"
 
 const OIDCStrategy = require("@techpass/passport-openidconnect").Strategy
 
@@ -141,9 +141,7 @@ export async function fetchStrategyConfig(
       callbackURL: callbackUrl,
     }
   } catch (err) {
-    throw new Error(
-      `Error constructing OIDC authentication configuration - ${err}`
-    )
+    throw new Error(`Error constructing OIDC authentication configuration - ${err}`)
   }
 }
 

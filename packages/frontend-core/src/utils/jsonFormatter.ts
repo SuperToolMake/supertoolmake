@@ -1,4 +1,4 @@
-import { JSONValue } from "@budibase/types"
+import type { JSONValue } from "@budibase/types"
 
 export type ColorsOptions = {
   keyColor?: string
@@ -29,20 +29,14 @@ const entityMap = {
 }
 
 function escapeHtml(html: string) {
-  return String(html).replace(/[&<>"'`=]/g, function (s) {
-    return entityMap[s as keyof typeof entityMap]
-  })
+  return String(html).replace(/[&<>"'`=]/g, (s) => entityMap[s as keyof typeof entityMap])
 }
 
 export function format(json: JSONValue, colorOptions: ColorsOptions = {}) {
   const valueType = typeof json
-  let jsonString =
-    typeof json === "string" ? json : JSON.stringify(json, null, 2) || valueType
-  let colors = Object.assign({}, defaultColors, colorOptions)
-  jsonString = jsonString
-    .replace(/&/g, "&")
-    .replace(/</g, "<")
-    .replace(/>/g, ">")
+  let jsonString = typeof json === "string" ? json : JSON.stringify(json, null, 2) || valueType
+  const colors = Object.assign({}, defaultColors, colorOptions)
+  jsonString = jsonString.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">")
   return jsonString.replace(
     /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+]?\d+)?)/g,
     (match: string) => {

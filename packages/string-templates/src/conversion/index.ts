@@ -1,7 +1,7 @@
 import { getJsHelperList } from "../helpers"
 
 function getLayers(fullBlock: string): string[] {
-  let layers = []
+  const layers = []
   while (fullBlock.length) {
     const start = fullBlock.lastIndexOf("("),
       end = fullBlock.indexOf(")")
@@ -13,8 +13,7 @@ function getLayers(fullBlock: string): string[] {
       const untrimmed = fullBlock.substring(start, end + 1)
       layer = untrimmed.substring(1, untrimmed.length - 1).trim()
       fullBlock =
-        fullBlock.slice(0, start) +
-        fullBlock.slice(start + untrimmed.length + 1, fullBlock.length)
+        fullBlock.slice(0, start) + fullBlock.slice(start + untrimmed.length + 1, fullBlock.length)
     }
     layers.push(layer)
   }
@@ -28,7 +27,7 @@ function getVariable(variableName: string) {
   // it is an array
   const arrayOrObject = [",", "{", ":"]
   let contains = false
-  arrayOrObject.forEach(char => {
+  arrayOrObject.forEach((char) => {
     if (variableName.includes(char)) {
       contains = true
     }
@@ -50,9 +49,7 @@ function getVariable(variableName: string) {
 function buildList(parts: string[], value: any) {
   function build() {
     return parts
-      .map((part: string) =>
-        part.startsWith("helper") ? part : getVariable(part)
-      )
+      .map((part: string) => (part.startsWith("helper") ? part : getVariable(part)))
       .join(", ")
   }
   if (!value) {
@@ -82,11 +79,7 @@ function splitBySpace(layer: string) {
     if (continuationChars.indexOf(char) !== -1 && started == null) {
       started = index
       endChar = char === "[" ? "]" : char
-    } else if (
-      char === endChar &&
-      started != null &&
-      layer[index + 1] !== "."
-    ) {
+    } else if (char === endChar && started != null && layer[index + 1] !== ".") {
       add(layer.substring(started, index + 1))
       started = null
       endChar = null
@@ -96,10 +89,7 @@ function splitBySpace(layer: string) {
       last = index
     }
   }
-  if (
-    (!layer.startsWith("[") || parts.length === 0) &&
-    last !== layer.length - 1
-  ) {
+  if ((!layer.startsWith("[") || parts.length === 0) && last !== layer.length - 1) {
     add(layer.substring(last, layer.length))
   }
   return parts
@@ -112,7 +102,7 @@ export function convertHBSBlock(block: string, blockNumber: number) {
 
   let value = null
   const list = getJsHelperList()
-  for (let layer of layers) {
+  for (const layer of layers) {
     const parts = splitBySpace(layer)
     if (value || parts.length > 1 || list[parts[0]]) {
       // first of layer should always be the helper

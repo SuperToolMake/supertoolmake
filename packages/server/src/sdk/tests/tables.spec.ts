@@ -1,8 +1,8 @@
-import { Table } from "@budibase/types"
-import sdk from "../"
-import TestConfig from "../../tests/utilities/TestConfiguration"
+import type { Table } from "@budibase/types"
+import { type DatabaseName, getDatasource } from "../../integrations/tests/utils"
 import { basicTable } from "../../tests/utilities/structures"
-import { getDatasource, DatabaseName } from "../../integrations/tests/utils"
+import TestConfig from "../../tests/utilities/TestConfiguration"
+import sdk from "../"
 
 describe("tables", () => {
   const config = new TestConfig()
@@ -10,11 +10,8 @@ describe("tables", () => {
 
   beforeAll(async () => {
     await config.init()
-    const ds =
-      process.env.DATASOURCE === "none" ? "postgres" : process.env.DATASOURCE
-    const rawDatasource = await getDatasource(
-      (ds as DatabaseName) || "postgres"
-    )
+    const ds = process.env.DATASOURCE === "none" ? "postgres" : process.env.DATASOURCE
+    const rawDatasource = await getDatasource((ds as DatabaseName) || "postgres")
     const datasource = await config.api.datasource.create(rawDatasource!)
     table = await config.api.table.save(basicTable(datasource))
   })

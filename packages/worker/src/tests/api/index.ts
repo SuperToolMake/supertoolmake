@@ -1,14 +1,14 @@
-import TestConfiguration from "../TestConfiguration"
+import type TestConfiguration from "../TestConfiguration"
 import { AuthAPI } from "./auth"
 import { ConfigAPI } from "./configs"
 import { EmailAPI } from "./email"
-import { SelfAPI } from "./self"
-import { UserAPI } from "./users"
-import { StatusAPI } from "./status"
 import { RestoreAPI } from "./restore"
-import { TenantAPI } from "./tenants"
 import { RolesAPI } from "./roles"
+import { SelfAPI } from "./self"
+import { StatusAPI } from "./status"
 import { TemplatesAPI } from "./templates"
+import { TenantAPI } from "./tenants"
+import { UserAPI } from "./users"
 
 export default class API {
   auth: AuthAPI

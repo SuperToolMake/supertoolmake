@@ -1,27 +1,23 @@
 import { tenancy, users as usersCore } from "@budibase/backend-core"
 import {
   EmailTemplatePurpose,
-  InviteUserRequest,
-  InviteUsersRequest,
-  InviteUsersResponse,
+  type InviteUserRequest,
+  type InviteUsersRequest,
+  type InviteUsersResponse,
 } from "@budibase/types"
 import { sendEmail } from "../../utilities/email"
 
-export async function invite(
-  users: InviteUsersRequest
-): Promise<InviteUsersResponse> {
+export async function invite(users: InviteUsersRequest): Promise<InviteUsersResponse> {
   const response: InviteUsersResponse = {
     successful: [],
     unsuccessful: [],
   }
 
-  const matchedEmails = await usersCore.searchExistingEmails(
-    users.map(u => u.email)
-  )
+  const matchedEmails = await usersCore.searchExistingEmails(users.map((u) => u.email))
   const newUsers: InviteUserRequest[] = []
 
   // separate duplicates from new users
-  for (let user of users) {
+  for (const user of users) {
     if (matchedEmails.includes(user.email.toLowerCase())) {
       // This "Unavailable" is load bearing. The tests and frontend both check for it
       // specifically
@@ -35,7 +31,7 @@ export async function invite(
 
   // send the emails for new users
   const tenantId = tenancy.getTenantId()
-  for (let user of users) {
+  for (const user of users) {
     try {
       let userInfo = user.userInfo
       if (!userInfo) {

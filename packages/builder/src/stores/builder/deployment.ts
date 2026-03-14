@@ -1,13 +1,13 @@
-import { type Writable, get, type Readable, derived } from "svelte/store"
-import { API } from "@/api"
 import { notifications } from "@budibase/bbui"
-import { DeploymentProgressResponse, DeploymentStatus } from "@budibase/types"
-import { appsStore } from "@/stores/portal/apps"
-import { DerivedBudiStore } from "@/stores/BudiStore"
-import { appStore } from "./app"
 import { processStringSync } from "@budibase/string-templates"
-import { selectedAppUrls } from "./appUrls"
+import { type DeploymentProgressResponse, DeploymentStatus } from "@budibase/types"
+import { derived, get, type Readable, type Writable } from "svelte/store"
+import { API } from "@/api"
+import { DerivedBudiStore } from "@/stores/BudiStore"
 import { workspaceDeploymentStore } from "@/stores/builder/workspaceDeployment"
+import { appsStore } from "@/stores/portal/apps"
+import { appStore } from "./app"
+import { selectedAppUrls } from "./appUrls"
 import { workspaceAppStore } from "./workspaceApps"
 
 interface DeploymentState {
@@ -22,44 +22,33 @@ interface DerivedDeploymentState extends DeploymentState {
   publishCount: number
 }
 
-class DeploymentStore extends DerivedBudiStore<
-  DeploymentState,
-  DerivedDeploymentState
-> {
+class DeploymentStore extends DerivedBudiStore<DeploymentState, DerivedDeploymentState> {
   constructor() {
     const makeDerivedStore = (
       store: Writable<DeploymentState>
     ): Readable<DerivedDeploymentState> => {
-      return derived(
-        [store, appStore, appsStore],
-        ([$store, $appStore, $appsStore]) => {
-          // Determine whether the app is published
-          const app = $appsStore.apps.find(app => app.devId === $appStore.appId)
-          const deployments = $store.deployments.filter(
-            x => x.status === DeploymentStatus.SUCCESS
-          )
-          const isPublished =
-            app?.status === "published" && !!deployments.length
+      return derived([store, appStore, appsStore], ([$store, $appStore, $appsStore]) => {
+        // Determine whether the app is published
+        const app = $appsStore.apps.find((app) => app.devId === $appStore.appId)
+        const deployments = $store.deployments.filter((x) => x.status === DeploymentStatus.SUCCESS)
+        const isPublished = app?.status === "published" && !!deployments.length
 
-          // Generate last published string
-          let lastPublished = undefined
-          if (isPublished) {
-            lastPublished = processStringSync(
-              `Your apps and automations were last published {{ duration time 'millisecond' }} ago`,
-              {
-                time:
-                  new Date().getTime() -
-                  new Date(deployments[0].updatedAt).getTime(),
-              }
-            )
-          }
-          return {
-            ...$store,
-            isPublished,
-            lastPublished,
-          }
+        // Generate last published string
+        let lastPublished
+        if (isPublished) {
+          lastPublished = processStringSync(
+            `Your apps and automations were last published {{ duration time 'millisecond' }} ago`,
+            {
+              time: new Date().getTime() - new Date(deployments[0].updatedAt).getTime(),
+            }
+          )
         }
-      )
+        return {
+          ...$store,
+          isPublished,
+          lastPublished,
+        }
+      })
     }
     super(
       {
@@ -78,7 +67,7 @@ class DeploymentStore extends DerivedBudiStore<
   async load() {
     try {
       const deployments = await API.getAppDeployments()
-      this.update(state => ({
+      this.update((state) => ({
         ...state,
         deployments,
       }))
@@ -89,14 +78,14 @@ class DeploymentStore extends DerivedBudiStore<
 
   async publishApp(opts?: { seedProductionTables: boolean }) {
     try {
-      this.update(state => ({ ...state, isPublishing: true }))
+      this.update((state) => ({ ...state, isPublishing: true }))
       await API.publishAppChanges(get(appStore).appId, opts)
       await this.completePublish()
     } catch (error: any) {
       const message = error?.message ? ` - ${error.message}` : ""
       notifications.error(`Error publishing app${message}`)
     }
-    this.update(state => {
+    this.update((state) => {
       return {
         ...state,
         isPublishing: false,

@@ -1,17 +1,17 @@
+import { utils } from "@budibase/backend-core"
+import { structures } from "@budibase/backend-core/tests"
 import {
-  Datasource,
-  Query,
-  Table,
-  User,
-  WorkspaceApp,
+  type Datasource,
+  type Query,
+  type Table,
+  type User,
+  type WorkspaceApp,
   WorkspaceResource,
 } from "@budibase/types"
-import TestConfiguration from "../../../tests/utilities/TestConfiguration"
+import { type DatabaseName, getDatasource } from "../../../integrations/tests/utils"
 import { basicQuery, basicTable } from "../../../tests/utilities/structures"
+import TestConfiguration from "../../../tests/utilities/TestConfiguration"
 import * as setup from "./utilities"
-import { structures } from "@budibase/backend-core/tests"
-import { utils } from "@budibase/backend-core"
-import { getDatasource, DatabaseName } from "../../../integrations/tests/utils"
 
 describe("/workspace", () => {
   const config = new TestConfiguration()
@@ -32,15 +32,10 @@ describe("/workspace", () => {
 
   beforeEach(async () => {})
 
-  const resourceCreators: Partial<
-    Record<WorkspaceResource, (opts?: any) => Promise<any>>
-  > = {
+  const resourceCreators: Partial<Record<WorkspaceResource, (opts?: any) => Promise<any>>> = {
     [WorkspaceResource.TABLE]: async () => {
-      const ds =
-        process.env.DATASOURCE === "none" ? "postgres" : process.env.DATASOURCE
-      const rawDatasource = await getDatasource(
-        (ds as DatabaseName) || "postgres"
-      )
+      const ds = process.env.DATASOURCE === "none" ? "postgres" : process.env.DATASOURCE
+      const rawDatasource = await getDatasource((ds as DatabaseName) || "postgres")
       const datasource = await config.api.datasource.create(rawDatasource!)
       return await config.api.table.save(basicTable(datasource))
     },
@@ -59,10 +54,7 @@ describe("/workspace", () => {
     },
   } as const
 
-  const createResource = async (
-    resourceType: WorkspaceResource,
-    opts?: any
-  ) => {
+  const createResource = async (resourceType: WorkspaceResource, opts?: any) => {
     const creator = resourceCreators[resourceType]
     if (!creator) {
       throw new Error(`Unsupported resource type: ${resourceType}`)
@@ -70,10 +62,7 @@ describe("/workspace", () => {
     return await creator(opts)
   }
 
-  const favouriteAndVerify = async (
-    resourceId: string,
-    resourceType: WorkspaceResource
-  ) => {
+  const favouriteAndVerify = async (resourceId: string, resourceType: WorkspaceResource) => {
     const resp = await config.api.workspaceFavourites.save({
       resourceType,
       resourceId,
@@ -144,8 +133,8 @@ describe("/workspace", () => {
 
     expect(resp.favourites.length).toBe(3)
 
-    const resourceIds = resources.map(r => r._id)
-    const favouriteResourceIds = resp.favourites.map(r => r.resourceId)
+    const resourceIds = resources.map((r) => r._id)
+    const favouriteResourceIds = resp.favourites.map((r) => r.resourceId)
 
     const mergedSet = new Set([...resourceIds, ...favouriteResourceIds])
 
@@ -172,7 +161,7 @@ describe("/workspace", () => {
     const updated = await config.api.workspaceFavourites.fetchAll()
     expect(updated.favourites.length).toBe(2)
 
-    const found = updated.favourites.find(f => f._id === target._id)
+    const found = updated.favourites.find((f) => f._id === target._id)
     expect(found).toBeUndefined()
   })
 
@@ -199,7 +188,7 @@ describe("/workspace", () => {
       const updated = await config.api.workspaceFavourites.fetchAll()
       expect(updated.favourites.length).toBe(1)
 
-      const found = updated.favourites.find(f => f._id === target._id)
+      const found = updated.favourites.find((f) => f._id === target._id)
       expect(found).toBeUndefined()
     })
   })

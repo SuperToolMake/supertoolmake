@@ -1,4 +1,4 @@
-import {
+import type {
   DeleteRowRequest,
   ExportRowsRequest,
   FindRowResponse,
@@ -8,29 +8,15 @@ import {
   SaveRowRequest,
   SaveRowResponse,
 } from "@budibase/types"
-import { BaseAPIClient } from "./types"
+import type { BaseAPIClient } from "./types"
 
 export interface RowEndpoints {
-  fetchRow: (
-    tableId: string,
-    rowId: string,
-    suppressErrors?: boolean
-  ) => Promise<FindRowResponse>
-  saveRow: (
-    row: SaveRowRequest,
-    suppressErrors?: boolean
-  ) => Promise<SaveRowResponse>
-  patchRow: (
-    row: PatchRowRequest,
-    suppressErrors?: boolean
-  ) => Promise<PatchRowResponse>
+  fetchRow: (tableId: string, rowId: string, suppressErrors?: boolean) => Promise<FindRowResponse>
+  saveRow: (row: SaveRowRequest, suppressErrors?: boolean) => Promise<SaveRowResponse>
+  patchRow: (row: PatchRowRequest, suppressErrors?: boolean) => Promise<PatchRowResponse>
   deleteRow: (sourceId: string, id: string) => Promise<void>
   deleteRows: (sourceId: string, rows: (Row | string)[]) => Promise<void>
-  exportRows: (
-    tableId: string,
-    format: string,
-    data: ExportRowsRequest
-  ) => Promise<string>
+  exportRows: (tableId: string, format: string, data: ExportRowsRequest) => Promise<string>
 }
 
 export const buildRowEndpoints = (API: BaseAPIClient): RowEndpoints => ({
@@ -95,7 +81,7 @@ export const buildRowEndpoints = (API: BaseAPIClient): RowEndpoints => ({
    * @param rows the array of rows to delete
    */
   deleteRows: async (sourceId, rows) => {
-    rows.forEach(row => {
+    rows.forEach((row) => {
       if (typeof row === "object") {
         delete row?._viewId
       }
@@ -118,7 +104,7 @@ export const buildRowEndpoints = (API: BaseAPIClient): RowEndpoints => ({
     return await API.post({
       url: `/api/${tableId}/rows/exportRows?format=${format}`,
       body: data,
-      parseResponse: async response => {
+      parseResponse: async (response) => {
         return await response.text()
       },
     })

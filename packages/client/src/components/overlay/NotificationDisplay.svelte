@@ -1,7 +1,7 @@
 <script>
-  import { notificationStore } from "@/stores"
-  import { Notification } from "@budibase/bbui"
-  import { fly } from "svelte/transition"
+import { Notification } from "@budibase/bbui"
+import { fly } from "svelte/transition"
+import { notificationStore } from "@/stores"
 </script>
 
 <div class="notifications">

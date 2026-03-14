@@ -1,126 +1,116 @@
 <script>
-  import { getContext } from "svelte"
-  import ToggleActionButtonGroup from "@/components/common/ToggleActionButtonGroup.svelte"
-  import { helpers } from "@budibase/shared-core"
-  import { SchemaUtils } from "@budibase/frontend-core"
-  import {
-    Icon,
-    notifications,
-    ActionButton,
-    Popover,
-    Input,
-  } from "@budibase/bbui"
-  import { FieldType } from "@budibase/types"
-  import { FieldPermissions } from "./GridColumnsSettingButton.svelte"
+import { ActionButton, Icon, Input, notifications, Popover } from "@budibase/bbui"
+import { SchemaUtils } from "@budibase/frontend-core"
+import { helpers } from "@budibase/shared-core"
+import { FieldType } from "@budibase/types"
+import { getContext } from "svelte"
+import ToggleActionButtonGroup from "@/components/common/ToggleActionButtonGroup.svelte"
+import { FieldPermissions } from "./GridColumnsSettingButton.svelte"
 
-  export let permissions = [FieldPermissions.WRITABLE, FieldPermissions.HIDDEN]
-  export let disabledPermissions = []
-  export let columns
-  export let fromRelationshipField
+export let permissions = [FieldPermissions.WRITABLE, FieldPermissions.HIDDEN]
+export let disabledPermissions = []
+export let columns
+export let fromRelationshipField
 
-  const { datasource, dispatch } = getContext("grid")
+const { datasource, dispatch } = getContext("grid")
 
-  let relationshipPanelAnchor
-  let relationshipFieldName
+let relationshipPanelAnchor
+let relationshipFieldName
 
-  $: relationshipField = columns.find(
-    c => c.name === relationshipFieldName
-  )?.schema
-  $: permissionsObj = permissions.reduce(
-    (acc, c) => ({
-      ...acc,
-      [c]: {
-        disabled: disabledPermissions.includes(c),
-      },
-    }),
-    {}
-  )
+$: relationshipField = columns.find((c) => c.name === relationshipFieldName)?.schema
+$: permissionsObj = permissions.reduce(
+  (acc, c) => ({
+    ...acc,
+    [c]: {
+      disabled: disabledPermissions.includes(c),
+    },
+  }),
+  {}
+)
 
-  $: displayColumns = columns.map(c => {
-    const isRequired =
-      c.primaryDisplay || helpers.schema.isRequired(c.schema.constraints)
+$: displayColumns = columns.map((c) => {
+  const isRequired = c.primaryDisplay || helpers.schema.isRequired(c.schema.constraints)
 
-    const defaultPermission = permissions[0]
-    const requiredTooltips = {
-      [FieldPermissions.WRITABLE]: (() => {
-        if (defaultPermission === FieldPermissions.WRITABLE) {
-          if (c.primaryDisplay) {
-            return "Display column must be writable"
-          }
-          if (isRequired) {
-            return "Required columns must be writable"
-          }
-        }
-      })(),
-      [FieldPermissions.READONLY]: (() => {
-        if (defaultPermission === FieldPermissions.WRITABLE) {
-          if (c.primaryDisplay) {
-            return "Display column cannot be read-only"
-          }
-          if (isRequired) {
-            return "Required columns cannot be read-only"
-          }
-        }
-        if (defaultPermission === FieldPermissions.READONLY) {
-          if (c.primaryDisplay) {
-            return "Display column must be read-only"
-          }
-          if (isRequired) {
-            return "Required columns must be read-only"
-          }
-        }
-      })(),
-      [FieldPermissions.HIDDEN]: (() => {
+  const defaultPermission = permissions[0]
+  const requiredTooltips = {
+    [FieldPermissions.WRITABLE]: (() => {
+      if (defaultPermission === FieldPermissions.WRITABLE) {
         if (c.primaryDisplay) {
-          return "Display column cannot be hidden"
+          return "Display column must be writable"
         }
         if (isRequired) {
-          return "Required columns cannot be hidden"
+          return "Required columns must be writable"
         }
-      })(),
-    }
+      }
+    })(),
+    [FieldPermissions.READONLY]: (() => {
+      if (defaultPermission === FieldPermissions.WRITABLE) {
+        if (c.primaryDisplay) {
+          return "Display column cannot be read-only"
+        }
+        if (isRequired) {
+          return "Required columns cannot be read-only"
+        }
+      }
+      if (defaultPermission === FieldPermissions.READONLY) {
+        if (c.primaryDisplay) {
+          return "Display column must be read-only"
+        }
+        if (isRequired) {
+          return "Required columns must be read-only"
+        }
+      }
+    })(),
+    [FieldPermissions.HIDDEN]: (() => {
+      if (c.primaryDisplay) {
+        return "Display column cannot be hidden"
+      }
+      if (isRequired) {
+        return "Required columns cannot be hidden"
+      }
+    })(),
+  }
 
-    const options = []
+  const options = []
 
-    let permission
-    if ((permission = permissionsObj[FieldPermissions.WRITABLE])) {
-      const tooltip = requiredTooltips[FieldPermissions.WRITABLE] || "Writable"
-      options.push({
-        icon: "pencil",
-        value: FieldPermissions.WRITABLE,
-        tooltip,
-        disabled: isRequired || permission.disabled,
-      })
-    }
+  let permission
+  if ((permission = permissionsObj[FieldPermissions.WRITABLE])) {
+    const tooltip = requiredTooltips[FieldPermissions.WRITABLE] || "Writable"
+    options.push({
+      icon: "pencil",
+      value: FieldPermissions.WRITABLE,
+      tooltip,
+      disabled: isRequired || permission.disabled,
+    })
+  }
 
-    if ((permission = permissionsObj[FieldPermissions.READONLY])) {
-      const tooltip =
-        (requiredTooltips[FieldPermissions.READONLY] || "Read-only") +
-        (permission.disabled ? " (premium feature)" : "")
-      options.push({
-        icon: "eye",
-        value: FieldPermissions.READONLY,
-        tooltip,
-        disabled: permission.disabled || isRequired,
-      })
-    }
+  if ((permission = permissionsObj[FieldPermissions.READONLY])) {
+    const tooltip =
+      (requiredTooltips[FieldPermissions.READONLY] || "Read-only") +
+      (permission.disabled ? " (premium feature)" : "")
+    options.push({
+      icon: "eye",
+      value: FieldPermissions.READONLY,
+      tooltip,
+      disabled: permission.disabled || isRequired,
+    })
+  }
 
-    if ((permission = permissionsObj[FieldPermissions.HIDDEN])) {
-      const tooltip = requiredTooltips[FieldPermissions.HIDDEN] || "Hidden"
-      options.push({
-        icon: "eye-slash",
-        value: FieldPermissions.HIDDEN,
-        disabled: permission.disabled || isRequired,
-        tooltip,
-      })
-    }
+  if ((permission = permissionsObj[FieldPermissions.HIDDEN])) {
+    const tooltip = requiredTooltips[FieldPermissions.HIDDEN] || "Hidden"
+    options.push({
+      icon: "eye-slash",
+      value: FieldPermissions.HIDDEN,
+      disabled: permission.disabled || isRequired,
+      tooltip,
+    })
+  }
 
-    return { ...c, options }
-  })
+  return { ...c, options }
+})
 
-  $: relationshipPanelColumns = Object.entries(
-    relationshipField?.columns || {}
-  ).map(([name, column]) => {
+$: relationshipPanelColumns = Object.entries(relationshipField?.columns || {}).map(
+  ([name, column]) => {
     return {
       name: name,
       label: name,
@@ -133,73 +123,65 @@
         displayName: column.displayName,
       },
     }
-  })
+  }
+)
 
-  $: hasLinkColumns = columns.some(c => c.schema.type === FieldType.LINK)
+$: hasLinkColumns = columns.some((c) => c.schema.type === FieldType.LINK)
 
-  async function toggleColumn(column, permission) {
-    const visible = permission !== FieldPermissions.HIDDEN
-    const readonly = permission === FieldPermissions.READONLY
+async function toggleColumn(column, permission) {
+  const visible = permission !== FieldPermissions.HIDDEN
+  const readonly = permission === FieldPermissions.READONLY
 
-    if (!fromRelationshipField) {
-      await datasource.actions.addSchemaMutation(column.name, {
-        visible,
-        readonly,
-      })
-    } else {
-      await datasource.actions.addSubSchemaMutation(
-        column.name,
-        fromRelationshipField.name,
-        {
-          visible,
-          readonly,
-        }
-      )
-    }
-    try {
-      await datasource.actions.saveSchemaMutations()
-    } catch (e) {
-      notifications.error(e.message)
-    }
-    dispatch(visible ? "show-column" : "hide-column")
+  if (!fromRelationshipField) {
+    await datasource.actions.addSchemaMutation(column.name, {
+      visible,
+      readonly,
+    })
+  } else {
+    await datasource.actions.addSubSchemaMutation(column.name, fromRelationshipField.name, {
+      visible,
+      readonly,
+    })
+  }
+  try {
+    await datasource.actions.saveSchemaMutations()
+  } catch (e) {
+    notifications.error(e.message)
+  }
+  dispatch(visible ? "show-column" : "hide-column")
+}
+
+function columnToPermissionOptions(column) {
+  if (column.schema.visible === false) {
+    return FieldPermissions.HIDDEN
   }
 
-  function columnToPermissionOptions(column) {
-    if (column.schema.visible === false) {
-      return FieldPermissions.HIDDEN
-    }
-
-    if (column.schema.readonly) {
-      return FieldPermissions.READONLY
-    }
-
-    return FieldPermissions.WRITABLE
+  if (column.schema.readonly) {
+    return FieldPermissions.READONLY
   }
 
-  async function updateDisplayName(column, displayName) {
-    // If the display name is the same as the column name, clear it to avoid redundancy
-    const finalDisplayName =
-      displayName === column.name ? undefined : displayName
+  return FieldPermissions.WRITABLE
+}
 
-    if (!fromRelationshipField) {
-      await datasource.actions.addSchemaMutation(column.name, {
-        displayName: finalDisplayName,
-      })
-    } else {
-      await datasource.actions.addSubSchemaMutation(
-        column.name,
-        fromRelationshipField.name,
-        {
-          displayName: finalDisplayName,
-        }
-      )
-    }
-    try {
-      await datasource.actions.saveSchemaMutations()
-    } catch (e) {
-      notifications.error(e.message)
-    }
+async function updateDisplayName(column, displayName) {
+  // If the display name is the same as the column name, clear it to avoid redundancy
+  const finalDisplayName = displayName === column.name ? undefined : displayName
+
+  if (!fromRelationshipField) {
+    await datasource.actions.addSchemaMutation(column.name, {
+      displayName: finalDisplayName,
+    })
+  } else {
+    await datasource.actions.addSubSchemaMutation(column.name, fromRelationshipField.name, {
+      displayName: finalDisplayName,
+    })
   }
+  try {
+    await datasource.actions.saveSchemaMutations()
+  } catch (e) {
+    notifications.error(e.message)
+  }
+}
 </script>
 
 <div class="content">

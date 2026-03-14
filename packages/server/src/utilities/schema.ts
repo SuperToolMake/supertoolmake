@@ -1,13 +1,13 @@
-import {
-  FieldType,
-  BBReferenceFieldSubType,
-  TableSchema,
-  FieldSchema,
-  Row,
-  Table,
-} from "@budibase/types"
-import { ValidColumnNameRegex, helpers, utils } from "@budibase/shared-core"
 import { db, HTTPError, sql } from "@budibase/backend-core"
+import { helpers, utils, ValidColumnNameRegex } from "@budibase/shared-core"
+import {
+  BBReferenceFieldSubType,
+  type FieldSchema,
+  FieldType,
+  type Row,
+  type Table,
+  type TableSchema,
+} from "@budibase/types"
 
 type Rows = Array<Row>
 
@@ -25,7 +25,7 @@ interface ValidationResults {
 export function isSchema(schema: any): schema is TableSchema {
   return (
     typeof schema === "object" &&
-    Object.values<FieldSchema>(schema).every(column => {
+    Object.values<FieldSchema>(schema).every((column) => {
       return (
         column !== null &&
         typeof column === "object" &&
@@ -37,7 +37,7 @@ export function isSchema(schema: any): schema is TableSchema {
 }
 
 export function isRows(rows: Rows): rows is Rows {
-  return Array.isArray(rows) && rows.every(row => typeof row === "object")
+  return Array.isArray(rows) && rows.every((row) => typeof row === "object")
 }
 
 export function validate(
@@ -52,9 +52,9 @@ export function validate(
     errors: {},
   }
 
-  protectedColumnNames = protectedColumnNames.map(x => x.toLowerCase())
+  protectedColumnNames = protectedColumnNames.map((x) => x.toLowerCase())
 
-  rows.forEach(row => {
+  rows.forEach((row) => {
     Object.entries(row).forEach(([columnName, columnData]) => {
       const {
         type: columnType,
@@ -80,12 +80,8 @@ export function validate(
       } else if (!columnName.match(ValidColumnNameRegex)) {
         // Check for special characters in column names
         results.schemaValidation[columnName] = false
-        results.errors[columnName] =
-          "Column names can't contain special characters"
-      } else if (
-        columnData == null &&
-        !helpers.schema.isRequired(constraints)
-      ) {
+        results.errors[columnName] = "Column names can't contain special characters"
+      } else if (columnData == null && !helpers.schema.isRequired(constraints)) {
         results.schemaValidation[columnName] = true
       } else if (
         // If there's no data for this field don't bother with further checks
@@ -110,8 +106,7 @@ export function validate(
       ) {
         results.schemaValidation[columnName] = false
       } else if (
-        (columnType === FieldType.BB_REFERENCE ||
-          columnType === FieldType.BB_REFERENCE_SINGLE) &&
+        (columnType === FieldType.BB_REFERENCE || columnType === FieldType.BB_REFERENCE_SINGLE) &&
         !isValidBBReference(
           columnData,
           columnType,
@@ -135,7 +130,7 @@ export function validate(
 
   results.allValid =
     Object.values(results.schemaValidation).length > 0 &&
-    Object.values(results.schemaValidation).every(column => column)
+    Object.values(results.schemaValidation).every((column) => column)
 
   // Select unique values
   results.invalidColumns = [...new Set(results.invalidColumns)]
@@ -143,10 +138,10 @@ export function validate(
 }
 
 export function parse(rows: Rows, table: Table): Rows {
-  return rows.map(row => {
+  return rows.map((row) => {
     const parsedRow: Row = {}
 
-    Object.keys(row).forEach(columnName => {
+    Object.keys(row).forEach((columnName) => {
       const columnData = row[columnName]
 
       if (columnName === "_id") {
@@ -161,10 +156,7 @@ export function parse(rows: Rows, table: Table): Rows {
         return
       }
 
-      if (
-        schema[columnName].autocolumn &&
-        !table.primary?.includes(columnName)
-      ) {
+      if (schema[columnName].autocolumn && !table.primary?.includes(columnName)) {
         // Don't want the user specifying values for autocolumns unless they're updating
         // a row through its primary key.
         return
@@ -206,10 +198,7 @@ export function parse(rows: Rows, table: Table): Rows {
           }
         }
         parsedRow[columnName] = columnData
-      } else if (
-        columnType === FieldType.JSON &&
-        typeof columnData === "string"
-      ) {
+      } else if (columnType === FieldType.JSON && typeof columnData === "string") {
         parsedRow[columnName] = parseJsonExport(columnData)
       } else if (columnType === FieldType.BB_REFERENCE) {
         let parsedValues: { _id: string }[] = columnData || []
@@ -217,7 +206,7 @@ export function parse(rows: Rows, table: Table): Rows {
           parsedValues = parseJsonExport<{ _id: string }[]>(columnData)
         }
 
-        parsedRow[columnName] = parsedValues?.map(u => u._id)
+        parsedRow[columnName] = parsedValues?.map((u) => u._id)
       } else if (columnType === FieldType.BB_REFERENCE_SINGLE) {
         let parsedValue = columnData
         if (columnData && typeof columnData === "string") {
@@ -256,9 +245,7 @@ function isValidBBReference(
           return false
         }
 
-        const constainsWrongId = userArray.find(
-          user => !db.isGlobalUserID(user._id)
-        )
+        const constainsWrongId = userArray.find((user) => !db.isGlobalUserID(user._id))
         return !constainsWrongId
       }
       default:
@@ -279,9 +266,7 @@ function parseJsonExport<TReturn = unknown>(value: string): TReturn {
 
     return parsed as TReturn
   } catch (e: any) {
-    if (
-      e.message.startsWith("Expected property name or '}' in JSON at position ")
-    ) {
+    if (e.message.startsWith("Expected property name or '}' in JSON at position ")) {
       // In order to store JSON within CSVs what we used to do is replace double
       // quotes with single quotes. This results in invalid JSON, so the line
       // below is a workaround to parse it. However, this method of storing JSON

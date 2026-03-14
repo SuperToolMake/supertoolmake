@@ -1,75 +1,70 @@
 <script lang="ts">
-  import { Body, ModalContent, Select, notifications } from "@budibase/bbui"
-  import { admin } from "@/stores/portal/admin"
-  import { emailValidator, Constants } from "@budibase/frontend-core"
-  import { parseUserEmailsFromCSV } from "@/helpers"
-  const BYTES_IN_MB = 1000000
-  const FILE_SIZE_LIMIT = BYTES_IN_MB * 5
-  const MAX_USERS_UPLOAD_LIMIT = 1000
+import { Body, ModalContent, notifications, Select } from "@budibase/bbui"
+import { Constants, emailValidator } from "@budibase/frontend-core"
+import { parseUserEmailsFromCSV } from "@/helpers"
+import { admin } from "@/stores/portal/admin"
 
-  export let createUsersFromCsv: (_data: {
-    userEmails: string[]
-    usersRole: string
-  }) => void
+const BYTES_IN_MB = 1000000
+const FILE_SIZE_LIMIT = BYTES_IN_MB * 5
+const MAX_USERS_UPLOAD_LIMIT = 1000
 
-  let files: File[] = []
-  let csvString: string | undefined = undefined
-  let userEmails: string[] = []
-  let usersRole: string = Constants.BudibaseRoles.AppUser
-  let invalidEmails: string[] = []
+export let createUsersFromCsv: (_data: { userEmails: string[]; usersRole: string }) => void
 
-  $: importDisabled =
-    !userEmails.length || !validEmails(userEmails) || !usersRole
+let files: File[] = []
+let csvString: string | undefined
+let userEmails: string[] = []
+let usersRole: string = Constants.BudibaseRoles.AppUser
+let invalidEmails: string[] = []
 
-  const validEmails = (userEmails: string[]): boolean => {
-    invalidEmails = [] // Reset invalid emails
-    if ($admin.cloud && userEmails.length > MAX_USERS_UPLOAD_LIMIT) {
-      notifications.error(
-        `Max limit for upload is 1000 users. Please reduce file size and try again.`
-      )
-      return false
-    }
-    for (const email of userEmails) {
-      if (emailValidator(email) !== true) invalidEmails.push(email)
-    }
+$: importDisabled = !userEmails.length || !validEmails(userEmails) || !usersRole
 
-    if (!invalidEmails.length) return true
-
+const validEmails = (userEmails: string[]): boolean => {
+  invalidEmails = [] // Reset invalid emails
+  if ($admin.cloud && userEmails.length > MAX_USERS_UPLOAD_LIMIT) {
     notifications.error(
-      `Error, please check the following email${
-        invalidEmails.length > 1 ? "s" : ""
-      }: ${invalidEmails.join(", ")}`
+      `Max limit for upload is 1000 users. Please reduce file size and try again.`
     )
-
     return false
   }
-
-  async function handleFile(evt: Event): Promise<void> {
-    const target = evt.target as HTMLInputElement
-    if (!target.files) return
-
-    const fileArray = Array.from(target.files)
-    if (fileArray.some(file => file.size >= FILE_SIZE_LIMIT)) {
-      notifications.error(
-        `Files cannot exceed ${
-          FILE_SIZE_LIMIT / BYTES_IN_MB
-        }MB. Please try again with smaller files.`
-      )
-      return
-    }
-
-    // Read CSV as plain text to upload alongside schema
-    const reader = new FileReader()
-    reader.addEventListener("load", function (e) {
-      const result = e.target?.result
-      if (typeof result === "string") {
-        csvString = result
-        files = fileArray
-        userEmails = parseUserEmailsFromCSV(csvString)
-      }
-    })
-    reader.readAsText(fileArray[0])
+  for (const email of userEmails) {
+    if (emailValidator(email) !== true) invalidEmails.push(email)
   }
+
+  if (!invalidEmails.length) return true
+
+  notifications.error(
+    `Error, please check the following email${
+      invalidEmails.length > 1 ? "s" : ""
+    }: ${invalidEmails.join(", ")}`
+  )
+
+  return false
+}
+
+async function handleFile(evt: Event): Promise<void> {
+  const target = evt.target as HTMLInputElement
+  if (!target.files) return
+
+  const fileArray = Array.from(target.files)
+  if (fileArray.some((file) => file.size >= FILE_SIZE_LIMIT)) {
+    notifications.error(
+      `Files cannot exceed ${FILE_SIZE_LIMIT / BYTES_IN_MB}MB. Please try again with smaller files.`
+    )
+    return
+  }
+
+  // Read CSV as plain text to upload alongside schema
+  const reader = new FileReader()
+  reader.addEventListener("load", (e) => {
+    const result = e.target?.result
+    if (typeof result === "string") {
+      csvString = result
+      files = fileArray
+      userEmails = parseUserEmailsFromCSV(csvString)
+    }
+  })
+  reader.readAsText(fileArray[0])
+}
 </script>
 
 <ModalContent

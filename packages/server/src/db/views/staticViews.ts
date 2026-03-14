@@ -1,5 +1,5 @@
 import { context } from "@budibase/backend-core"
-import { DBView, DocumentType, LinkDocument } from "@budibase/types"
+import { type DBView, DocumentType, type LinkDocument } from "@budibase/types"
 import { SEPARATOR, ViewName } from "../utils"
 
 const SCREEN_PREFIX = DocumentType.SCREEN + SEPARATOR
@@ -25,11 +25,11 @@ export async function createLinkView() {
   const db = context.getWorkspaceDB()
   const designDoc = await db.get<any>("_design/database")
   const view = {
-    map: function (doc: LinkDocument) {
+    map: ((doc: LinkDocument) => {
       // everything in this must remain constant as its going to Pouch, no external variables
       if (doc.type === "link") {
-        let doc1 = doc.doc1
-        let doc2 = doc.doc2
+        const doc1 = doc.doc1
+        const doc2 = doc.doc2
         // @ts-expect-error emit is available in a CouchDB map function
         // eslint-disable-next-line no-undef
         emit([doc1.tableId, doc1.rowId], {
@@ -48,7 +48,7 @@ export async function createLinkView() {
           })
         }
       }
-    }.toString(),
+    }).toString(),
   }
   designDoc.views = {
     ...designDoc.views,

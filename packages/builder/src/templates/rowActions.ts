@@ -1,9 +1,9 @@
+import { Helpers } from "@budibase/bbui"
+import type { Component, Screen } from "@budibase/types"
 import { get } from "svelte/store"
 import { getDatasourceForProvider } from "@/dataBinding"
-import { rowActions, selectedScreen, componentStore } from "@/stores/builder"
-import { Helpers } from "@budibase/bbui"
 import { findComponent } from "@/helpers/components"
-import { Component, Screen } from "@budibase/types"
+import { componentStore, rowActions, selectedScreen } from "@/stores/builder"
 
 export const getRowActionButtonTemplates = async ({
   screen,
@@ -33,8 +33,7 @@ export const getRowActionButtonTemplates = async ({
   // Therefore we need to whitelist this to only function for certain components.
   const type = instance?._component
   const isGridBlock = type?.endsWith("/gridblock")
-  const isFormBlock =
-    type?.endsWith("/formblock") || type?.endsWith("/multistepformblock")
+  const isFormBlock = type?.endsWith("/formblock") || type?.endsWith("/multistepformblock")
   if (!isGridBlock && !isFormBlock) {
     return []
   }
@@ -60,17 +59,14 @@ export const getRowActionButtonTemplates = async ({
   }
 
   // Create templates
-  return enabledActions.map(action => {
+  return enabledActions.map((action) => {
     // Create a button instance
-    const button = componentStore.createInstance(
-      `@budibase/standard-components/button`,
-      {
-        _instanceName: Helpers.uuid(),
-        text: action.name,
-        type: "primary",
-        quiet: true,
-      }
-    )
+    const button = componentStore.createInstance(`@budibase/standard-components/button`, {
+      _instanceName: Helpers.uuid(),
+      text: action.name,
+      type: "primary",
+      quiet: true,
+    })
 
     // Row action button action
     const onClick: {

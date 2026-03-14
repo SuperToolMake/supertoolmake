@@ -1,20 +1,20 @@
+import { dataFilters } from "@budibase/shared-core"
 import {
   EmptyFilterOption,
-  Row,
-  RowSearchParams,
-  SearchResponse,
-  SortOrder,
-  Table,
+  type Row,
+  type RowSearchParams,
+  type SearchResponse,
+  type SortOrder,
+  type Table,
 } from "@budibase/types"
-import { isExternalTableID } from "../../../integrations/utils"
-import * as internal from "./search/internal"
-import * as external from "./search/external"
-import { ExportRowsParams, ExportRowsResult } from "./search/types"
-import { dataFilters } from "@budibase/shared-core"
-import sdk from "../../index"
-import { searchInputMapping } from "./search/utils"
-import { getQueryableFields, validateFilters } from "./queryUtils"
 import { enrichSearchContext } from "../../../api/controllers/row/utils"
+import { isExternalTableID } from "../../../integrations/utils"
+import sdk from "../../index"
+import { getQueryableFields, validateFilters } from "./queryUtils"
+import * as external from "./search/external"
+import * as internal from "./search/internal"
+import type { ExportRowsParams, ExportRowsResult } from "./search/types"
+import { searchInputMapping } from "./search/utils"
 
 export { isValidFilter } from "../../../integrations/utils"
 
@@ -48,7 +48,7 @@ export async function search(
 
   if (options.query) {
     const visibleFields = (options.fields || Object.keys(table.schema)).filter(
-      field => table.schema[field]?.visible !== false
+      (field) => table.schema[field]?.visible !== false
     )
 
     const queryableFields = await getQueryableFields(table, visibleFields)
@@ -89,9 +89,7 @@ export async function search(
   return result
 }
 
-export async function exportRows(
-  options: ExportRowsParams
-): Promise<ExportRowsResult> {
+export async function exportRows(options: ExportRowsParams): Promise<ExportRowsResult> {
   return pickApi(options.tableId).exportRows(options)
 }
 
@@ -99,9 +97,6 @@ export async function fetch(tableId: string): Promise<Row[]> {
   return pickApi(tableId).fetch(tableId)
 }
 
-export async function fetchRaw(
-  tableId: string,
-  limit?: number
-): Promise<Row[]> {
+export async function fetchRaw(tableId: string, limit?: number): Promise<Row[]> {
   return pickApi(tableId).fetchRaw(tableId, limit)
 }

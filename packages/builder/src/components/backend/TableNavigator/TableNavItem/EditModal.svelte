@@ -1,40 +1,40 @@
 <script>
-  import { cloneDeep } from "lodash/fp"
-  import { tables, datasources } from "@/stores/builder"
-  import { Input, Modal, ModalContent, notifications } from "@budibase/bbui"
+import { Input, Modal, ModalContent, notifications } from "@budibase/bbui"
+import { cloneDeep } from "lodash/fp"
+import { datasources, tables } from "@/stores/builder"
 
-  export let table
+export let table
 
-  export const show = () => {
-    editorModal.show()
-  }
+export const show = () => {
+  editorModal.show()
+}
 
-  let editorModal, editTableNameModal
-  let error = ""
+let editorModal, editTableNameModal
+let error = ""
 
-  let originalName
-  let updatedName
+let originalName
+let updatedName
 
-  async function save() {
-    const updatedTable = cloneDeep(table)
-    updatedTable.name = updatedName
-    await tables.save(updatedTable)
-    await datasources.fetch()
-    notifications.success("Table renamed successfully")
-  }
+async function save() {
+  const updatedTable = cloneDeep(table)
+  updatedTable.name = updatedName
+  await tables.save(updatedTable)
+  await datasources.fetch()
+  notifications.success("Table renamed successfully")
+}
 
-  function checkValid(evt) {
-    const tableName = evt.target.value
-    error =
-      originalName === tableName
-        ? `Table with name ${tableName} already exists. Please choose another name.`
-        : ""
-  }
+function checkValid(evt) {
+  const tableName = evt.target.value
+  error =
+    originalName === tableName
+      ? `Table with name ${tableName} already exists. Please choose another name.`
+      : ""
+}
 
-  const initForm = () => {
-    originalName = table.name + ""
-    updatedName = table.name + ""
-  }
+const initForm = () => {
+  originalName = table.name + ""
+  updatedName = table.name + ""
+}
 </script>
 
 <Modal bind:this={editorModal} on:show={initForm}>

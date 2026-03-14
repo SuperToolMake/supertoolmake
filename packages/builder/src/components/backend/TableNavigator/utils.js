@@ -4,11 +4,11 @@ import { FIELDS } from "@/constants/backend"
 const BYTES_IN_MB = 1000000
 const FILE_SIZE_LIMIT = BYTES_IN_MB * 5
 
-const getDefaultSchema = rows => {
+const getDefaultSchema = (rows) => {
   const newSchema = {}
 
-  rows.forEach(row => {
-    Object.keys(row).forEach(column => {
+  rows.forEach((row) => {
+    Object.keys(row).forEach((column) => {
       newSchema[column] = {
         name: column,
         type: "string",
@@ -20,7 +20,7 @@ const getDefaultSchema = rows => {
   return newSchema
 }
 
-export const parseFile = e => {
+export const parseFile = (e) => {
   return new Promise((resolve, reject) => {
     const file = Array.from(e.target.files)[0]
 
@@ -29,7 +29,7 @@ export const parseFile = e => {
       return
     }
 
-    let reader = new FileReader()
+    const reader = new FileReader()
 
     const resolveRows = (rows, schema = null) => {
       resolve({
@@ -40,7 +40,7 @@ export const parseFile = e => {
       })
     }
 
-    reader.addEventListener("load", function (e) {
+    reader.addEventListener("load", (e) => {
       const fileData = e.target.result
       if (file.type?.includes("json")) {
         const parsedFileData = JSON.parse(fileData)
@@ -54,7 +54,7 @@ export const parseFile = e => {
         }
       } else {
         API.csvToJson(fileData)
-          .then(rows => {
+          .then((rows) => {
             resolveRows(rows)
           })
           .catch(() => {

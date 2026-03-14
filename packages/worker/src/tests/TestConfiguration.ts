@@ -4,8 +4,6 @@ import * as controllers from "./controllers"
 
 dbConfig.init()
 
-import supertest from "supertest"
-
 import {
   constants,
   context,
@@ -17,23 +15,23 @@ import {
   utils,
 } from "@budibase/backend-core"
 import {
-  AuthToken,
+  type AuthToken,
   ConfigType,
-  SaveUserResponse,
-  SCIMConfig,
-  SMTPConfig,
-  SMTPInnerConfig,
-  User,
+  type SaveUserResponse,
+  type SCIMConfig,
+  type SMTPConfig,
+  type SMTPInnerConfig,
+  type User,
 } from "@budibase/types"
-import http from "http"
-import jwt, { Secret } from "jsonwebtoken"
+import type http from "http"
+import jwt, { type Secret } from "jsonwebtoken"
+import supertest from "supertest"
 import { Config } from "../constants"
 import API from "./api"
 import structures, { CSRF_TOKEN } from "./structures"
 
 class TestConfiguration {
-  server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse> =
-    undefined!
+  server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse> = undefined!
 
   request: supertest.SuperTest<supertest.Test> = undefined!
 
@@ -164,10 +162,7 @@ class TestConfiguration {
     }
   }
 
-  async doInSpecificTenant<T>(
-    tenantId: string,
-    task: () => Promise<T>
-  ): Promise<T> {
+  async doInSpecificTenant<T>(tenantId: string, task: () => Promise<T>): Promise<T> {
     return await context.doInTenant(tenantId, async () => {
       return await task()
     })
@@ -294,9 +289,7 @@ class TestConfiguration {
 
       const id = dbCore.generateDevInfoID(this.user!._id!)
       // TODO: dry
-      this.apiKey = encryption.encrypt(
-        `${this.tenantId}${dbCore.SEPARATOR}${utils.newid()}`
-      )
+      this.apiKey = encryption.encrypt(`${this.tenantId}${dbCore.SEPARATOR}${utils.newid()}`)
       const devInfo = {
         _id: id,
         userId: this.user!._id,
@@ -352,11 +345,7 @@ class TestConfiguration {
 
   async saveSettingsConfig() {
     await this.deleteConfig(Config.SETTINGS)
-    await this._req(
-      structures.configs.settings(),
-      null,
-      controllers.config.save
-    )
+    await this._req(structures.configs.settings(), null, controllers.config.save)
   }
 
   // CONFIGS - GOOGLE
@@ -396,11 +385,7 @@ class TestConfiguration {
 
   async saveEtherealSmtpConfig() {
     await this.deleteConfig(Config.SMTP)
-    await this._req(
-      structures.configs.smtpEthereal(),
-      null,
-      controllers.config.save
-    )
+    await this._req(structures.configs.smtpEthereal(), null, controllers.config.save)
   }
 
   // CONFIGS - SCIM

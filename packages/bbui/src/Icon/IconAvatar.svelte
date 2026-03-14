@@ -1,15 +1,15 @@
 <script lang="ts">
-  import Icon from "./Icon.svelte"
-  import Tooltip from "../Tooltip/Tooltip.svelte"
-  import { fade } from "svelte/transition"
+import { fade } from "svelte/transition"
+import Tooltip from "../Tooltip/Tooltip.svelte"
+import Icon from "./Icon.svelte"
 
-  export let icon: string | undefined = undefined
-  export let background: string | undefined = undefined
-  export let color: string | undefined = undefined
-  export let size: "XS" | "S" | "M" | "L" = "M"
-  export let tooltip: string | undefined = undefined
+export let icon: string | undefined = undefined
+export let background: string | undefined = undefined
+export let color: string | undefined = undefined
+export let size: "XS" | "S" | "M" | "L" = "M"
+export let tooltip: string | undefined = undefined
 
-  let showTooltip: boolean = false
+let showTooltip: boolean = false
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

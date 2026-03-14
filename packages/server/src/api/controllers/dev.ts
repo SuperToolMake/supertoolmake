@@ -1,5 +1,5 @@
 import { env as envCore } from "@budibase/backend-core"
-import {
+import type {
   ClearDevLockResponse,
   Ctx,
   GetVersionResponse,
@@ -12,17 +12,11 @@ import { checkSlashesInUrl } from "../../utilities"
 import { clearLock as redisClearLock } from "../../utilities/redis"
 import { createRequest } from "../../utilities/workerRequests"
 
-async function redirect(
-  ctx: any,
-  method: "GET" | "POST" | "DELETE",
-  path = "global"
-) {
+async function redirect(ctx: any, method: "GET" | "POST" | "DELETE", path = "global") {
   const { devPath } = ctx.params
   const queryString = ctx.originalUrl.split("?")[1] || ""
   const response = await fetch(
-    checkSlashesInUrl(
-      `${env.WORKER_URL}/api/${path}/${devPath}?${queryString}`
-    ),
+    checkSlashesInUrl(`${env.WORKER_URL}/api/${path}/${devPath}?${queryString}`),
     createRequest({
       ctx,
       method,
@@ -89,10 +83,7 @@ export async function revert(ctx: Ctx<void, RevertWorkspaceResponse>) {
   })
 
   if (!result.success) {
-    ctx.throw(
-      500,
-      "Revert it's taking too long, please refresh or try again later."
-    )
+    ctx.throw(500, "Revert it's taking too long, please refresh or try again later.")
   }
   ctx.body = {
     status: "applied",

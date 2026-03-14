@@ -1,5 +1,5 @@
-import { Document } from "../document"
-import { ContextUser } from "../../sdk"
+import type { ContextUser } from "../../sdk"
+import type { Document } from "../document"
 
 // SSO
 
@@ -78,11 +78,7 @@ export interface UserRoleInfo {
   roles: UserRoles
 }
 
-export interface User
-  extends Document,
-    UserBuilderInfo,
-    UserAdminInfo,
-    UserRoleInfo {
+export interface User extends Document, UserBuilderInfo, UserAdminInfo, UserRoleInfo {
   tenantId: string
   email: string
   userId?: string

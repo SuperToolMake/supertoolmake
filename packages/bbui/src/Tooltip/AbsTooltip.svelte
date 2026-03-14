@@ -1,80 +1,80 @@
 <script lang="ts">
-  import Portal from "svelte-portal"
-  import { fade } from "svelte/transition"
-  import "@spectrum-css/tooltip/dist/index-vars.css"
-  import { onDestroy } from "svelte"
-  import { TooltipPosition, TooltipType } from "../constants"
+import { fade } from "svelte/transition"
+import Portal from "svelte-portal"
+import "@spectrum-css/tooltip/dist/index-vars.css"
+import { onDestroy } from "svelte"
+import { TooltipPosition, TooltipType } from "../constants"
 
-  export let position: TooltipPosition = TooltipPosition.Top
-  export let type: TooltipType = TooltipType.Default
-  export let text: string = ""
-  export let fixed: boolean = false
-  export let color: string | undefined = undefined
-  export let noWrap: boolean = false
+export let position: TooltipPosition = TooltipPosition.Top
+export let type: TooltipType = TooltipType.Default
+export let text: string = ""
+export let fixed: boolean = false
+export let color: string | undefined = undefined
+export let noWrap: boolean = false
 
-  let wrapper: HTMLElement | undefined
-  let hovered = false
-  let left: number | undefined
-  let top: number | undefined
-  let visible = false
-  let timeout: ReturnType<typeof setTimeout> | undefined
-  let interval: ReturnType<typeof setInterval> | undefined
+let wrapper: HTMLElement | undefined
+let hovered = false
+let left: number | undefined
+let top: number | undefined
+let visible = false
+let timeout: ReturnType<typeof setTimeout> | undefined
+let interval: ReturnType<typeof setInterval> | undefined
 
-  $: {
-    if (hovered || fixed) {
-      // Debounce showing by 200ms to avoid flashing tooltip
-      timeout = setTimeout(show, 200)
-    } else {
-      hide()
-    }
+$: {
+  if (hovered || fixed) {
+    // Debounce showing by 200ms to avoid flashing tooltip
+    timeout = setTimeout(show, 200)
+  } else {
+    hide()
   }
-  $: tooltipStyle = color ? `background:${color};` : null
-  $: tipStyle = color ? `border-top-color:${color};` : null
+}
+$: tooltipStyle = color ? `background:${color};` : null
+$: tipStyle = color ? `border-top-color:${color};` : null
 
-  // Computes the position of the tooltip
-  const updateTooltipPosition = () => {
-    const node = wrapper?.children?.[0]
-    if (!node) {
-      left = undefined
-      top = undefined
-      return
-    }
-    const bounds = node.getBoundingClientRect()
-
-    // Determine where to render tooltip based on position prop
-    if (position === TooltipPosition.Top) {
-      left = bounds.left + bounds.width / 2
-      top = bounds.top
-    } else if (position === TooltipPosition.Right) {
-      left = bounds.left + bounds.width
-      top = bounds.top + bounds.height / 2
-    } else if (position === TooltipPosition.Bottom) {
-      left = bounds.left + bounds.width / 2
-      top = bounds.top + bounds.height
-    } else if (position === TooltipPosition.Left) {
-      left = bounds.left
-      top = bounds.top + bounds.height / 2
-    }
+// Computes the position of the tooltip
+const updateTooltipPosition = () => {
+  const node = wrapper?.children?.[0]
+  if (!node) {
+    left = undefined
+    top = undefined
+    return
   }
+  const bounds = node.getBoundingClientRect()
 
-  // Computes the position of the tooltip then shows it.
-  // We set up a poll to frequently update the position of the tooltip in case
-  // the target moves.
-  const show = () => {
-    updateTooltipPosition()
-    interval = setInterval(updateTooltipPosition, 100)
-    visible = true
+  // Determine where to render tooltip based on position prop
+  if (position === TooltipPosition.Top) {
+    left = bounds.left + bounds.width / 2
+    top = bounds.top
+  } else if (position === TooltipPosition.Right) {
+    left = bounds.left + bounds.width
+    top = bounds.top + bounds.height / 2
+  } else if (position === TooltipPosition.Bottom) {
+    left = bounds.left + bounds.width / 2
+    top = bounds.top + bounds.height
+  } else if (position === TooltipPosition.Left) {
+    left = bounds.left
+    top = bounds.top + bounds.height / 2
   }
+}
 
-  // Hides the tooltip
-  const hide = () => {
-    clearTimeout(timeout)
-    clearInterval(interval)
-    visible = false
-  }
+// Computes the position of the tooltip then shows it.
+// We set up a poll to frequently update the position of the tooltip in case
+// the target moves.
+const show = () => {
+  updateTooltipPosition()
+  interval = setInterval(updateTooltipPosition, 100)
+  visible = true
+}
 
-  // Ensure we clean up interval and timeout
-  onDestroy(hide)
+// Hides the tooltip
+const hide = () => {
+  clearTimeout(timeout)
+  clearInterval(interval)
+  visible = false
+}
+
+// Ensure we clean up interval and timeout
+onDestroy(hide)
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

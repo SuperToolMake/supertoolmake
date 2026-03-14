@@ -1,69 +1,69 @@
 <script lang="ts">
-  import {
-    ActionButton,
-    Body,
-    Button,
-    Divider,
-    List,
-    ListItem,
-    PopoverAlignment,
-  } from "@budibase/bbui"
-  import { goto as gotoStore } from "@roxi/routify"
-  import { appStore, oauth2 } from "@/stores/builder"
-  import DetailPopover from "@/components/common/DetailPopover.svelte"
-  import { RestAuthType } from "@budibase/types"
-  import { onMount } from "svelte"
-  import { bb } from "@/stores/bb"
+import {
+  ActionButton,
+  Body,
+  Button,
+  Divider,
+  List,
+  ListItem,
+  PopoverAlignment,
+} from "@budibase/bbui"
+import type { RestAuthType } from "@budibase/types"
+import { goto as gotoStore } from "@roxi/routify"
+import { onMount } from "svelte"
+import type DetailPopover from "@/components/common/DetailPopover.svelte"
+import { bb } from "@/stores/bb"
+import { appStore, oauth2 } from "@/stores/builder"
 
-  $: goto = $gotoStore
+$: goto = $gotoStore
 
-  type Config = { label: string; value: string }
+type Config = { label: string; value: string }
 
-  export let authConfigId: string | undefined
-  export let authConfigType: RestAuthType | undefined
-  export let authConfigs: Config[]
-  export let datasourceId: string
+export let authConfigId: string | undefined
+export let authConfigType: RestAuthType | undefined
+export let authConfigs: Config[]
+export let datasourceId: string
 
-  let popover: DetailPopover
-  let allConfigs: Config[]
+let popover: DetailPopover
+let allConfigs: Config[]
 
-  $: allConfigs = [
-    ...authConfigs,
-    ...$oauth2.configs.map(c => ({
-      label: c.name,
-      value: c._id,
-    })),
-  ]
-  $: authConfig = allConfigs.find(c => c.value === authConfigId)
+$: allConfigs = [
+  ...authConfigs,
+  ...$oauth2.configs.map((c) => ({
+    label: c.name,
+    value: c._id,
+  })),
+]
+$: authConfig = allConfigs.find((c) => c.value === authConfigId)
 
-  function addBasicConfiguration() {
-    goto(`/builder/workspace/[application]/apis/datasource/[datasourceId]`, {
-      application: $appStore.appId,
-      datasourceId,
-      tab: "Authentication",
-    })
-  }
-
-  function addOAuth2Configuration() {
-    bb.settings("/general/oauth2")
-  }
-
-  function selectConfiguration(id: string, type?: RestAuthType) {
-    if (authConfigId === id) {
-      authConfigId = undefined
-      authConfigType = undefined
-    } else {
-      authConfigId = id
-      authConfigType = type
-    }
-    popover.hide()
-  }
-
-  $: title = !authConfig ? "Authentication" : `Auth: ${authConfig.label}`
-
-  onMount(() => {
-    oauth2.fetch()
+function addBasicConfiguration() {
+  goto(`/builder/workspace/[application]/apis/datasource/[datasourceId]`, {
+    application: $appStore.appId,
+    datasourceId,
+    tab: "Authentication",
   })
+}
+
+function addOAuth2Configuration() {
+  bb.settings("/general/oauth2")
+}
+
+function selectConfiguration(id: string, type?: RestAuthType) {
+  if (authConfigId === id) {
+    authConfigId = undefined
+    authConfigType = undefined
+  } else {
+    authConfigId = id
+    authConfigType = type
+  }
+  popover.hide()
+}
+
+$: title = !authConfig ? "Authentication" : `Auth: ${authConfig.label}`
+
+onMount(() => {
+  oauth2.fetch()
+})
 </script>
 
 <DetailPopover bind:this={popover} {title} align={PopoverAlignment.Right}>

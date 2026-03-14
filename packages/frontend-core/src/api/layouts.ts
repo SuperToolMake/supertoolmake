@@ -1,9 +1,5 @@
-import {
-  DeleteLayoutResponse,
-  SaveLayoutRequest,
-  SaveLayoutResponse,
-} from "@budibase/types"
-import { BaseAPIClient } from "./types"
+import type { DeleteLayoutResponse, SaveLayoutRequest, SaveLayoutResponse } from "@budibase/types"
+import type { BaseAPIClient } from "./types"
 
 export interface LayoutEndpoints {
   saveLayout: (layout: SaveLayoutRequest) => Promise<SaveLayoutResponse>
@@ -15,7 +11,7 @@ export const buildLayoutEndpoints = (API: BaseAPIClient): LayoutEndpoints => ({
    * Saves a layout.
    * @param layout the layout to save
    */
-  saveLayout: async layout => {
+  saveLayout: async (layout) => {
     return await API.post({
       url: "/api/layouts",
       body: layout,

@@ -13,8 +13,6 @@ export class UserScriptError extends Error {
   code: string = UserScriptError.code
 
   constructor(readonly userScriptError: Error) {
-    super(
-      `error while running user-supplied JavaScript: ${userScriptError.toString()}`
-    )
+    super(`error while running user-supplied JavaScript: ${userScriptError.toString()}`)
   }
 }

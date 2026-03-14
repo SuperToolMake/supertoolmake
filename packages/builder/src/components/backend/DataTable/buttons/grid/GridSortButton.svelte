@@ -1,65 +1,65 @@
 <script>
-  import { getContext } from "svelte"
-  import { ActionButton, Select } from "@budibase/bbui"
-  import { FieldType, isNumeric } from "@budibase/types"
-  import { canBeSortColumn } from "@budibase/frontend-core"
-  import DetailPopover from "@/components/common/DetailPopover.svelte"
+import { ActionButton, Select } from "@budibase/bbui"
+import { canBeSortColumn } from "@budibase/frontend-core"
+import { FieldType, isNumeric } from "@budibase/types"
+import { getContext } from "svelte"
+import DetailPopover from "@/components/common/DetailPopover.svelte"
 
-  const { sort, columns } = getContext("grid")
+const { sort, columns } = getContext("grid")
 
-  let popover
+let popover
 
-  $: columnOptions = $columns
-    .filter(col => canBeSortColumn(col.schema))
-    .map(col => ({
-      label: col.label || col.name,
-      value: col.name,
-      type: col.schema?.type,
-    }))
-  $: orderOptions = getOrderOptions($sort.column, columnOptions)
+$: columnOptions = $columns
+  .filter((col) => canBeSortColumn(col.schema))
+  .map((col) => ({
+    label: col.label || col.name,
+    value: col.name,
+    type: col.schema?.type,
+  }))
+$: orderOptions = getOrderOptions($sort.column, columnOptions)
 
-  const getOrderOptions = (column, columnOptions) => {
-    const type = columnOptions.find(col => col.value === column)?.type
+const getOrderOptions = (column, columnOptions) => {
+  const type = columnOptions.find((col) => col.value === column)?.type
 
-    // Define labels based on column type
-    let ascendingLabel, descendingLabel
+  // Define labels based on column type
+  let ascendingLabel, descendingLabel
 
-    if (isNumeric(type)) {
-      ascendingLabel = "Low to high"
-      descendingLabel = "High to low"
-    } else if (type === FieldType.DATETIME) {
-      ascendingLabel = "Oldest to newest"
-      descendingLabel = "Newest to oldest"
-    } else {
-      ascendingLabel = "A-Z"
-      descendingLabel = "Z-A"
-    }
-
-    return [
-      {
-        label: ascendingLabel,
-        value: "ascending",
-      },
-      {
-        label: descendingLabel,
-        value: "descending",
-      },
-    ]
+  if (isNumeric(type)) {
+    ascendingLabel = "Low to high"
+    descendingLabel = "High to low"
+  } else if (type === FieldType.DATETIME) {
+    ascendingLabel = "Oldest to newest"
+    descendingLabel = "Newest to oldest"
+  } else {
+    ascendingLabel = "A-Z"
+    descendingLabel = "Z-A"
   }
 
-  const updateSortColumn = e => {
-    sort.update(state => ({
-      column: e.detail,
-      order: e.detail ? state.order : "ascending",
-    }))
-  }
+  return [
+    {
+      label: ascendingLabel,
+      value: "ascending",
+    },
+    {
+      label: descendingLabel,
+      value: "descending",
+    },
+  ]
+}
 
-  const updateSortOrder = e => {
-    sort.update(state => ({
-      ...state,
-      order: e.detail,
-    }))
-  }
+const updateSortColumn = (e) => {
+  sort.update((state) => ({
+    column: e.detail,
+    order: e.detail ? state.order : "ascending",
+  }))
+}
+
+const updateSortOrder = (e) => {
+  sort.update((state) => ({
+    ...state,
+    order: e.detail,
+  }))
+}
 </script>
 
 <DetailPopover bind:this={popover} title="Sorting" width={300}>

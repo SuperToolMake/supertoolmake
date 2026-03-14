@@ -1,5 +1,5 @@
-import controller from "../../controllers/public/queries"
 import { Endpoint } from "@budibase/backend-core"
+import controller from "../../controllers/public/queries"
 import { nameValidator } from "../utils/validators"
 
 const read = [],
@@ -67,10 +67,6 @@ write.push(new Endpoint("post", "/queries/:queryId", controller.execute))
  *               queries:
  *                 $ref: '#/components/examples/queries'
  */
-read.push(
-  new Endpoint("post", "/queries/search", controller.search).addMiddleware(
-    nameValidator()
-  )
-)
+read.push(new Endpoint("post", "/queries/search", controller.search).addMiddleware(nameValidator()))
 
 export default { read, write }

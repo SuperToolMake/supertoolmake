@@ -1,10 +1,5 @@
-import {
-  configs,
-  db as dbCore,
-  platform,
-  tenancy,
-} from "@budibase/backend-core"
-import { ConfigType, LockReason, SettingsConfig } from "@budibase/types"
+import { configs, db as dbCore, platform, tenancy } from "@budibase/backend-core"
+import { ConfigType, type LockReason, type SettingsConfig } from "@budibase/types"
 
 export async function deleteTenant(tenantId: string) {
   await removeTenantUsers(tenantId)
@@ -26,9 +21,7 @@ export async function setActivation(tenantId: string, active: boolean) {
     configs.generateConfigID(ConfigType.SETTINGS)
   )
   if (!settingsConfig?.config) {
-    throw new Error(
-      `Cannot set activation. Settings config not found for tenant ${tenantId}`
-    )
+    throw new Error(`Cannot set activation. Settings config not found for tenant ${tenantId}`)
   }
   settingsConfig.config.active = active
   await db.put(settingsConfig)
@@ -40,9 +33,7 @@ async function setLock(tenantId: string, lockReason?: LockReason) {
     configs.generateConfigID(ConfigType.SETTINGS)
   )
   if (!settingsConfig?.config) {
-    throw new Error(
-      `Cannot lock. Settings config not found for tenant ${tenantId}`
-    )
+    throw new Error(`Cannot lock. Settings config not found for tenant ${tenantId}`)
   }
   settingsConfig.config.lockedBy = lockReason
   await db.put(settingsConfig)
@@ -63,7 +54,7 @@ async function removeTenantApps(tenantId: string) {
     const workspaces = await dbCore.getAllWorkspaces({
       all: true,
     })
-    const destroyPromises = workspaces.map(workspace => {
+    const destroyPromises = workspaces.map((workspace) => {
       const db = dbCore.getDB(workspace.appId)
       return db.destroy()
     })
@@ -88,9 +79,7 @@ async function removeTenantUsers(tenantId: string) {
   try {
     const allUsers = await getTenantUsers(tenantId)
     const allEmails = allUsers.rows.map((row: any) => row.doc.email)
-    const allSsoIds = allUsers.rows
-      .map((row: any) => row.doc.ssoId)
-      .filter(id => !!id)
+    const allSsoIds = allUsers.rows.map((row: any) => row.doc.ssoId).filter((id) => !!id)
 
     // get the id and email doc ids
     let keys = allUsers.rows.map((row: any) => row.id)

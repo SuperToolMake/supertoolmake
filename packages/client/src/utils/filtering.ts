@@ -1,5 +1,5 @@
-import { type Operator } from "@/types"
 import { ArrayOperator } from "@budibase/types"
+import type { Operator } from "@/types"
 
 /**
  * Check if the supplied filter operator is for an array

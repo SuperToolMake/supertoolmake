@@ -1,12 +1,7 @@
-import { API } from "@/api"
 import { DefaultAppTheme, ensureValidTheme } from "@budibase/shared-core"
-import {
-  AppCustomTheme,
-  Theme,
-  UpdateWorkspaceResponse,
-  Workspace,
-} from "@budibase/types"
+import type { AppCustomTheme, Theme, UpdateWorkspaceResponse, Workspace } from "@budibase/types"
 import { get } from "svelte/store"
+import { API } from "@/api"
 import { BudiStore } from "../BudiStore"
 
 interface ThemeState {
@@ -23,7 +18,7 @@ export class ThemeStore extends BudiStore<ThemeState> {
   }
 
   syncAppTheme = (workspace: Workspace) => {
-    this.update(state => {
+    this.update((state) => {
       const theme = ensureValidTheme(workspace.theme, DefaultAppTheme)
       return {
         ...state,
@@ -35,7 +30,7 @@ export class ThemeStore extends BudiStore<ThemeState> {
 
   save = async (theme: Theme, appId: string) => {
     const app = await API.saveAppMetadata(appId, { theme })
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       theme: ensureValidTheme(app.theme, DefaultAppTheme),
     }))
@@ -44,7 +39,7 @@ export class ThemeStore extends BudiStore<ThemeState> {
   saveCustom = async (theme: Partial<AppCustomTheme>, appId: string) => {
     const updated = { ...get(this).customTheme, ...theme }
     const app = await API.saveAppMetadata(appId, { customTheme: updated })
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       customTheme: app.customTheme || {},
     }))
@@ -52,7 +47,7 @@ export class ThemeStore extends BudiStore<ThemeState> {
 
   syncMetadata = (metadata: UpdateWorkspaceResponse) => {
     const { theme, customTheme } = metadata
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       theme: ensureValidTheme(theme, DefaultAppTheme),
       customTheme: customTheme || {},

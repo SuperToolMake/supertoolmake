@@ -1,8 +1,8 @@
-import { writable, get } from "svelte/store"
 import { derivedMemo } from "@budibase/frontend-core"
-import { screenStore, isGridScreen, componentStore } from "@/stores"
+import type { ComponentDefinition } from "@budibase/types"
+import { get, writable } from "svelte/store"
 import { ScreenslotID } from "@/constants"
-import { ComponentDefinition } from "@budibase/types"
+import { componentStore, isGridScreen, screenStore } from "@/stores"
 
 interface DNDSource {
   id?: string
@@ -56,8 +56,8 @@ const createDndStore = () => {
 
   const startDraggingNewComponent = (type: string) => {
     // On grid screens, we already know exactly where to insert the component
-    let target: DNDTarget | undefined = undefined
-    let drop: DNDDrop | undefined = undefined
+    let target: DNDTarget | undefined
+    let drop: DNDDrop | undefined
     if (get(isGridScreen)) {
       const screen = get(screenStore)?.activeScreen
       const id = screen!.props._id
@@ -74,8 +74,7 @@ const createDndStore = () => {
     }
 
     // Get size of new component so we can show a properly sized placeholder
-    const definition: ComponentDefinition =
-      componentStore.actions.getComponentDefinition(type)
+    const definition: ComponentDefinition = componentStore.actions.getComponentDefinition(type)
     const width = definition?.size?.width || 128
     const height = definition?.size?.height || 64
 
@@ -93,14 +92,14 @@ const createDndStore = () => {
   }
 
   const updateTarget = (target: DNDTarget) => {
-    store.update(state => {
+    store.update((state) => {
       state.target = target
       return state
     })
   }
 
   const updateDrop = (drop: DNDDrop) => {
-    store.update(state => {
+    store.update((state) => {
       state.drop = drop
       return state
     })
@@ -111,7 +110,7 @@ const createDndStore = () => {
   }
 
   const updateNewComponentProps = (props: Record<string, any>) => {
-    store.update(state => {
+    store.update((state) => {
       return {
         ...state,
         meta: {
@@ -141,7 +140,7 @@ export const dndStore = createDndStore()
 // performance by deriving any state that needs to be externally observed.
 // By doing this and using primitives, we can avoid invalidating other stores
 // or components which depend on DND state unless values actually change.
-export const dndParent = derivedMemo(dndStore, x => x.drop?.parent)
-export const dndIndex = derivedMemo(dndStore, x => x.drop?.index)
-export const dndSource = derivedMemo(dndStore, x => x.source)
-export const dndIsDragging = derivedMemo(dndStore, x => !!x.source)
+export const dndParent = derivedMemo(dndStore, (x) => x.drop?.parent)
+export const dndIndex = derivedMemo(dndStore, (x) => x.drop?.index)
+export const dndSource = derivedMemo(dndStore, (x) => x.source)
+export const dndIsDragging = derivedMemo(dndStore, (x) => !!x.source)

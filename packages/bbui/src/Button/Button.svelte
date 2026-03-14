@@ -1,35 +1,35 @@
 <script lang="ts">
-  import "@spectrum-css/button/dist/index-vars.css"
-  import AbsTooltip from "../Tooltip/AbsTooltip.svelte"
-  import { TooltipPosition } from "../constants"
-  import { createEventDispatcher } from "svelte"
-  import Icon from "../Icon/Icon.svelte"
+import "@spectrum-css/button/dist/index-vars.css"
+import { createEventDispatcher } from "svelte"
+import { TooltipPosition } from "../constants"
+import Icon from "../Icon/Icon.svelte"
+import AbsTooltip from "../Tooltip/AbsTooltip.svelte"
 
-  type IconSize = "XXS" | "XS" | "S" | "M" | "L" | "XL" | "XXL" | "XXXL"
-  type IconWeight = "regular" | "bold" | "fill"
+type IconSize = "XXS" | "XS" | "S" | "M" | "L" | "XL" | "XXL" | "XXXL"
+type IconWeight = "regular" | "bold" | "fill"
 
-  export let type: "button" | "submit" | "reset" | undefined = undefined
-  export let disabled = false
-  export let size: IconSize = "M"
-  export let cta = false
-  export let primary = false
-  export let secondary = false
-  export let warning = false
-  export let overBackground = false
-  export let quiet = false
-  export let icon: string | undefined = undefined
-  export let iconColor: string | undefined = undefined
-  export let iconWeight: IconWeight = "regular"
-  export let active = false
-  export let tooltip: string | null = ""
-  export let tooltipPosition: TooltipPosition = TooltipPosition.Top
-  export let newStyles = true
-  export let id: string | undefined = undefined
-  export let ref: HTMLButtonElement | undefined = undefined
-  export let reverse = false
+export let type: "button" | "submit" | "reset" | undefined = undefined
+export let disabled = false
+export let size: IconSize = "M"
+export let cta = false
+export let primary = false
+export let secondary = false
+export let warning = false
+export let overBackground = false
+export let quiet = false
+export let icon: string | undefined = undefined
+export let iconColor: string | undefined = undefined
+export let iconWeight: IconWeight = "regular"
+export let active = false
+export let tooltip: string | null = ""
+export let tooltipPosition: TooltipPosition = TooltipPosition.Top
+export let newStyles = true
+export let id: string | undefined = undefined
+export let ref: HTMLButtonElement | undefined = undefined
+export let reverse = false
 
-  const dispatch = createEventDispatcher<{ click: undefined }>()
-  $: tooltipText = tooltip ?? ""
+const dispatch = createEventDispatcher<{ click: undefined }>()
+$: tooltipText = tooltip ?? ""
 </script>
 
 <AbsTooltip text={tooltipText} position={tooltipPosition}>

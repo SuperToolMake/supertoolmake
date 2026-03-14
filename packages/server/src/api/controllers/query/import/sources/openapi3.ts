@@ -1,39 +1,31 @@
-import { GetQueriesOptions, ImportInfo } from "./base"
 import {
   BodyType,
-  Query,
-  QueryParameter,
-  RestTemplateQueryMetadata,
+  type Query,
+  type QueryParameter,
+  type RestTemplateQueryMetadata,
 } from "@budibase/types"
+import { type OpenAPI, OpenAPIV3 } from "openapi-types"
+import type { URL } from "url"
 import { QueryVerbToHttpMethod } from "../../../../../constants"
-import { OpenAPI, OpenAPIV3 } from "openapi-types"
+import type { GetQueriesOptions, ImportInfo } from "./base"
 import { OpenAPISource } from "./base/openapi"
-import { URL } from "url"
+import { buildEndpointName } from "./utils/endpointName"
 import {
-  GeneratedRequestBody,
+  buildKeyValueRequestBody,
   buildSerializableRequestBody,
+  type GeneratedRequestBody,
   generateRequestBodyFromExample,
   generateRequestBodyFromSchema,
-  buildKeyValueRequestBody,
 } from "./utils/requestBody"
-import { buildEndpointName } from "./utils/endpointName"
 
 type ServerObject = OpenAPIV3.ServerObject
 type ServerVariableObject = OpenAPIV3.ServerVariableObject
 
-const isReferenceObject = (
-  value: unknown
-): value is OpenAPIV3.ReferenceObject => {
-  return (
-    value != null &&
-    typeof value === "object" &&
-    Object.prototype.hasOwnProperty.call(value, "$ref")
-  )
+const isReferenceObject = (value: unknown): value is OpenAPIV3.ReferenceObject => {
+  return value != null && typeof value === "object" && Object.hasOwn(value, "$ref")
 }
 
-const isOpenAPI3 = (
-  document: OpenAPI.Document
-): document is OpenAPIV3.Document => {
+const isOpenAPI3 = (document: OpenAPI.Document): document is OpenAPIV3.Document => {
   if (!("openapi" in document)) {
     return false
   }
@@ -43,10 +35,7 @@ const isOpenAPI3 = (
 
 const methods: string[] = Object.values(OpenAPIV3.HttpMethods)
 
-const isOperation = (
-  key: string,
-  pathItem: any
-): pathItem is OpenAPIV3.OperationObject => {
+const isOperation = (key: string, pathItem: any): pathItem is OpenAPIV3.OperationObject => {
   return methods.includes(key)
 }
 
@@ -66,10 +55,10 @@ export class OpenAPI3 extends OpenAPISource {
     const parts = ref
       .slice(2)
       .split("/")
-      .map(part => part.replace(/~1/g, "/").replace(/~0/g, "~"))
+      .map((part) => part.replace(/~1/g, "/").replace(/~0/g, "~"))
 
     let current: any = this.document
-    for (let part of parts) {
+    for (const part of parts) {
       if (current == null || typeof current !== "object") {
         return undefined
       }
@@ -78,9 +67,7 @@ export class OpenAPI3 extends OpenAPISource {
     return current as T | undefined
   }
 
-  private resolveMaybeRef<T>(
-    value: T | OpenAPIV3.ReferenceObject | undefined
-  ): T | undefined {
+  private resolveMaybeRef<T>(value: T | OpenAPIV3.ReferenceObject | undefined): T | undefined {
     if (!value) {
       return undefined
     }
@@ -107,9 +94,7 @@ export class OpenAPI3 extends OpenAPISource {
   }
 
   private getMimeTypes(operation: OpenAPIV3.OperationObject): string[] {
-    const request = this.resolveMaybeRef<OpenAPIV3.RequestBodyObject>(
-      operation.requestBody
-    )
+    const request = this.resolveMaybeRef<OpenAPIV3.RequestBodyObject>(operation.requestBody)
     if (request?.content) {
       return Object.keys(request.content)
     }
@@ -121,9 +106,7 @@ export class OpenAPI3 extends OpenAPISource {
     bindingRoot: string,
     mimeTypeOverride?: string
   ): GeneratedRequestBody | undefined {
-    const request = this.resolveMaybeRef<OpenAPIV3.RequestBodyObject>(
-      operation.requestBody
-    )
+    const request = this.resolveMaybeRef<OpenAPIV3.RequestBodyObject>(operation.requestBody)
     if (!request) {
       return undefined
     }
@@ -149,9 +132,7 @@ export class OpenAPI3 extends OpenAPISource {
     return generateRequestBodyFromSchema(schema, bindingRoot)
   }
 
-  private getDocsUrl = (
-    operation: OpenAPIV3.OperationObject
-  ): string | undefined => {
+  private getDocsUrl = (operation: OpenAPIV3.OperationObject): string | undefined => {
     return (
       operation.externalDocs?.url ||
       this.document.externalDocs?.url ||
@@ -188,10 +169,7 @@ export class OpenAPI3 extends OpenAPISource {
       metadata.originalRequestBody = parsedBody
     }
 
-    const defaultBindings = this.buildDefaultBindings(
-      parameters,
-      requestBody?.bindings
-    )
+    const defaultBindings = this.buildDefaultBindings(parameters, requestBody?.bindings)
     if (defaultBindings) {
       metadata.defaultBindings = defaultBindings
     }
@@ -208,7 +186,7 @@ export class OpenAPI3 extends OpenAPISource {
   private setServerVariableBindings = (server?: ServerObject) => {
     this.serverVariableBindings = {}
     const variables = server?.variables || {}
-    for (let [variableName, variable] of Object.entries(variables)) {
+    for (const [variableName, variable] of Object.entries(variables)) {
       this.serverVariableBindings[variableName] = variable?.default || ""
     }
   }
@@ -220,10 +198,9 @@ export class OpenAPI3 extends OpenAPISource {
       return
     }
     for (const scheme of Object.values(securitySchemes)) {
-      const resolvedScheme =
-        this.resolveMaybeRef<OpenAPIV3.SecuritySchemeObject>(
-          scheme as OpenAPIV3.SecuritySchemeObject | OpenAPIV3.ReferenceObject
-        )
+      const resolvedScheme = this.resolveMaybeRef<OpenAPIV3.SecuritySchemeObject>(
+        scheme as OpenAPIV3.SecuritySchemeObject | OpenAPIV3.ReferenceObject
+      )
       const headerName = this.getSecuritySchemeHeader(resolvedScheme)
       if (headerName) {
         this.securityHeaders.set(headerName.toLowerCase(), headerName)
@@ -231,9 +208,7 @@ export class OpenAPI3 extends OpenAPISource {
     }
   }
 
-  private getSecuritySchemeHeader(
-    scheme?: OpenAPIV3.SecuritySchemeObject
-  ): string | undefined {
+  private getSecuritySchemeHeader(scheme?: OpenAPIV3.SecuritySchemeObject): string | undefined {
     if (!scheme) {
       return undefined
     }
@@ -342,10 +317,7 @@ export class OpenAPI3 extends OpenAPISource {
     return "openapi3.0"
   }
 
-  getQueries = async (
-    datasourceId: string,
-    options?: GetQueriesOptions
-  ): Promise<Query[]> => {
+  getQueries = async (datasourceId: string, options?: GetQueriesOptions): Promise<Query[]> => {
     let url: string | URL | undefined
     let serverVariables: Record<string, ServerVariableObject> = {}
     const primaryServer = this.getPrimaryServer()
@@ -359,14 +331,14 @@ export class OpenAPI3 extends OpenAPISource {
     const filterIds = options?.filterIds
     const staticVariables = options?.staticVariables || {}
 
-    for (let [path, pathItemObject] of Object.entries(this.document.paths)) {
+    for (const [path, pathItemObject] of Object.entries(this.document.paths)) {
       if (!pathItemObject) {
         continue
       }
       const pathItem = pathItemObject as OpenAPIV3.PathItemObject
       const pathParams = this.normalizeParameters(pathItem.parameters)
 
-      for (let [methodName, maybeOperation] of Object.entries(pathItem)) {
+      for (const [methodName, maybeOperation] of Object.entries(pathItem)) {
         if (!isOperation(methodName, maybeOperation)) {
           continue
         }
@@ -387,7 +359,7 @@ export class OpenAPI3 extends OpenAPISource {
           }
           const normalized = headerName.toLowerCase()
           const existingKey = Object.keys(headers).find(
-            existing => existing.toLowerCase() === normalized
+            (existing) => existing.toLowerCase() === normalized
           )
           headers[existingKey || headerName] = value
         }
@@ -395,15 +367,11 @@ export class OpenAPI3 extends OpenAPISource {
         const primaryMimeType = mimeTypes[0]
 
         const requestBody = this.methodHasRequestBody(methodName)
-          ? this.getRequestBody(
-              operation,
-              operation.operationId || path,
-              primaryMimeType
-            )
+          ? this.getRequestBody(operation, operation.operationId || path, primaryMimeType)
           : undefined
         const parameters: QueryParameter[] = []
         const ensureParameter = (paramName: string, defaultValue = "") => {
-          if (!parameters.some(parameter => parameter.name === paramName)) {
+          if (!parameters.some((parameter) => parameter.name === paramName)) {
             parameters.push({
               name: paramName,
               default: defaultValue,
@@ -418,7 +386,7 @@ export class OpenAPI3 extends OpenAPISource {
         const operationParams = this.normalizeParameters(operation.parameters)
         const allParams = [...pathParams, ...operationParams]
 
-        for (let param of allParams) {
+        for (const param of allParams) {
           let skipParameterBinding = false
           switch (param.in) {
             case "query": {
@@ -444,14 +412,9 @@ export class OpenAPI3 extends OpenAPISource {
               break
           }
 
-          if (
-            !skipParameterBinding &&
-            ["query", "header", "path"].includes(param.in)
-          ) {
+          if (!skipParameterBinding && ["query", "header", "path"].includes(param.in)) {
             let defaultValue = ""
-            const schema = this.resolveMaybeRef<OpenAPIV3.SchemaObject>(
-              param.schema
-            )
+            const schema = this.resolveMaybeRef<OpenAPIV3.SchemaObject>(param.schema)
             if (schema?.default !== undefined) {
               defaultValue = String(schema.default)
             }
@@ -459,11 +422,8 @@ export class OpenAPI3 extends OpenAPISource {
           }
         }
 
-        for (let [variableName, variable] of Object.entries(serverVariables)) {
-          const hasStaticVariable = Object.prototype.hasOwnProperty.call(
-            staticVariables,
-            variableName
-          )
+        for (const [variableName, variable] of Object.entries(serverVariables)) {
+          const hasStaticVariable = Object.hasOwn(staticVariables, variableName)
           const defaultValue = hasStaticVariable
             ? `{{ ${variableName} }}`
             : (variable?.default ?? "")
@@ -471,9 +431,7 @@ export class OpenAPI3 extends OpenAPISource {
         }
 
         const bodyType =
-          mimeTypes.length > 0
-            ? this.bodyTypeFromMimeType(primaryMimeType)
-            : undefined
+          mimeTypes.length > 0 ? this.bodyTypeFromMimeType(primaryMimeType) : undefined
 
         const restTemplateMetadata = this.buildRestTemplateMetadata(
           operation,

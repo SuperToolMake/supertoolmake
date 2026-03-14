@@ -1,4 +1,4 @@
-import { LoginMethod, UserCtx } from "@budibase/types"
+import { LoginMethod, type UserCtx } from "@budibase/types"
 
 export function isBrowser(ctx: UserCtx) {
   const browser = ctx.userAgent?.browser

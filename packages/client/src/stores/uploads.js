@@ -1,4 +1,4 @@
-import { writable, get } from "svelte/store"
+import { get, writable } from "svelte/store"
 
 export const createUploadStore = () => {
   const store = writable([])
@@ -9,7 +9,7 @@ export const createUploadStore = () => {
       return
     }
 
-    store.update(state => {
+    store.update((state) => {
       state.push({
         componentId,
         callback,
@@ -19,17 +19,17 @@ export const createUploadStore = () => {
   }
 
   // Unregisters a file upload component
-  const unregisterFileUpload = componentId => {
-    store.update(state => state.filter(c => c.componentId !== componentId))
+  const unregisterFileUpload = (componentId) => {
+    store.update((state) => state.filter((c) => c.componentId !== componentId))
   }
 
   // Processes a file upload for a given component ID
-  const processFileUpload = async componentId => {
+  const processFileUpload = async (componentId) => {
     if (!componentId) {
       return
     }
 
-    const component = get(store).find(c => c.componentId === componentId)
+    const component = get(store).find((c) => c.componentId === componentId)
     return await component?.callback()
   }
 

@@ -1,13 +1,10 @@
-import { getDatasourceForProvider, getSchemaForDatasource } from "@/dataBinding"
-import {
-  findClosestMatchingComponent,
-  getComponentContexts,
-} from "@/helpers/components"
 import type { Component, Screen } from "@budibase/types"
+import { getDatasourceForProvider, getSchemaForDatasource } from "@/dataBinding"
+import { findClosestMatchingComponent, getComponentContexts } from "@/helpers/components"
 
 const hasFormContext = (component: Component) => {
   const contexts = getComponentContexts(component._component)
-  return contexts.some(context => context.type === "form")
+  return contexts.some((context) => context.type === "form")
 }
 
 export const getComponentFieldOptions = (
@@ -36,10 +33,10 @@ export const getComponentFieldOptions = (
       types = [type, "field/string"]
     }
   }
-  types = types.map(type => type.slice(type.indexOf("/") + 1))
+  types = types.map((type) => type.slice(type.indexOf("/") + 1))
 
   // Find fields of valid types
   return Object.entries(schema || {})
-    .filter(entry => types.includes(entry[1].type))
-    .map(entry => entry[0])
+    .filter((entry) => types.includes(entry[1].type))
+    .map((entry) => entry[0])
 }

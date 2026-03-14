@@ -1,4 +1,4 @@
-import { BaseEvent } from "../events"
+import type { BaseEvent } from "../events"
 
 export interface QueryCreatedEvent extends BaseEvent {
   queryId: string

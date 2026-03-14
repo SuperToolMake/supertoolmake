@@ -1,5 +1,5 @@
-import { generator, testContainerUtils } from "@budibase/backend-core/tests"
-import { Datasource, SourceName } from "@budibase/types"
+import { generator, type testContainerUtils } from "@budibase/backend-core/tests"
+import { type Datasource, SourceName } from "@budibase/types"
 import { GenericContainer, Wait } from "testcontainers"
 import { startContainer } from "."
 import { MONGODB_IMAGE } from "./images"
@@ -16,14 +16,12 @@ export async function getDatasource(): Promise<Datasource> {
           MONGO_INITDB_ROOT_PASSWORD: "password",
         })
         .withWaitStrategy(
-          Wait.forSuccessfulCommand(
-            `mongosh --eval "db.version()"`
-          ).withStartupTimeout(20000)
+          Wait.forSuccessfulCommand(`mongosh --eval "db.version()"`).withStartupTimeout(20000)
         )
     )
   }
 
-  const port = (await ports).find(x => x.container === 27017)
+  const port = (await ports).find((x) => x.container === 27017)
   if (!port) {
     throw new Error("MongoDB port not found")
   }

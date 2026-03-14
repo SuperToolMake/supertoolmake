@@ -1,4 +1,4 @@
-import { FieldType, FieldConstraints, type FieldSchema } from "../../"
+import type { FieldConstraints, FieldSchema, FieldType } from "../../"
 
 export interface UIField {
   name: string

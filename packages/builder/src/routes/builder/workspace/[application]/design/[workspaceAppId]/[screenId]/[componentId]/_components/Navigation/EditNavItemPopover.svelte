@@ -1,60 +1,60 @@
 <script>
-  import { Icon, Popover, RadioGroup, PhosphorIconPicker } from "@budibase/bbui"
-  import { createEventDispatcher, getContext } from "svelte"
-  import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
-  import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
-  import DrawerBindableCombobox from "@/components/common/bindings/DrawerBindableCombobox.svelte"
-  import CustomStylesSection from "../Component/CustomStylesSection.svelte"
-  import ConditionalUISection from "../Component/ConditionalUISection.svelte"
-  import RoleSelect from "@/components/common/RoleSelect.svelte"
-  import SubLinksDrawer from "./SubLinksDrawer.svelte"
-  import { screenStore } from "@/stores/builder"
+import { Icon, PhosphorIconPicker, Popover, RadioGroup } from "@budibase/bbui"
+import { createEventDispatcher, getContext } from "svelte"
+import DrawerBindableCombobox from "@/components/common/bindings/DrawerBindableCombobox.svelte"
+import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import RoleSelect from "@/components/common/RoleSelect.svelte"
+import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
+import { screenStore } from "@/stores/builder"
+import ConditionalUISection from "../Component/ConditionalUISection.svelte"
+import CustomStylesSection from "../Component/CustomStylesSection.svelte"
+import SubLinksDrawer from "./SubLinksDrawer.svelte"
 
-  export let anchor
-  export let navItem
-  export let bindings
+export let anchor
+export let navItem
+export let bindings
 
-  let actionOptions = [
-    {
-      label: "Hide component",
-      value: "hide",
-    },
-    {
-      label: "Show component",
-      value: "show",
-    },
-  ]
+let actionOptions = [
+  {
+    label: "Hide component",
+    value: "hide",
+  },
+  {
+    label: "Show component",
+    value: "show",
+  },
+]
 
-  const draggable = getContext("draggable")
-  const dispatch = createEventDispatcher()
-  const typeOptions = [
-    { label: "Inline link", value: "link" },
-    { label: "Open sub links", value: "sublinks" },
-  ]
+const draggable = getContext("draggable")
+const dispatch = createEventDispatcher()
+const typeOptions = [
+  { label: "Inline link", value: "link" },
+  { label: "Open sub links", value: "sublinks" },
+]
 
-  let popover
-  let open = false
-  let drawerCount = 0
+let popover
+let open = false
+let drawerCount = 0
 
-  $: urlOptions = screenStore.routes
+$: urlOptions = screenStore.routes
 
-  // Auto hide the component when another item is selected
-  $: if (open && $draggable.selected !== navItem.id) {
-    popover.hide()
-  }
+// Auto hide the component when another item is selected
+$: if (open && $draggable.selected !== navItem.id) {
+  popover.hide()
+}
 
-  // Open automatically if the component is marked as selected
-  $: if (!open && $draggable.selected === navItem.id && popover) {
-    popover.show()
-    open = true
-  }
+// Open automatically if the component is marked as selected
+$: if (!open && $draggable.selected === navItem.id && popover) {
+  popover.show()
+  open = true
+}
 
-  const update = setting => async value => {
-    dispatch("change", {
-      ...navItem,
-      [setting]: value,
-    })
-  }
+const update = (setting) => async (value) => {
+  dispatch("change", {
+    ...navItem,
+    [setting]: value,
+  })
+}
 </script>
 
 <Icon name={navItem.type === "sublinks" ? "caret-down" : "link"} size="S" />

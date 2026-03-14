@@ -1,5 +1,5 @@
+import type { Event, Identity } from "@budibase/types"
 import { BudibaseQueue, JobQueue } from "../../queue"
-import { Event, Identity } from "@budibase/types"
 
 export interface EventPayload {
   event: Event
@@ -11,16 +11,13 @@ export interface EventPayload {
 export let asyncEventQueue: BudibaseQueue<EventPayload>
 
 export function init() {
-  asyncEventQueue = new BudibaseQueue<EventPayload>(
-    JobQueue.SYSTEM_EVENT_QUEUE,
-    {
-      jobTags: (event: EventPayload) => {
-        return {
-          "event.name": event.event,
-        }
-      },
-    }
-  )
+  asyncEventQueue = new BudibaseQueue<EventPayload>(JobQueue.SYSTEM_EVENT_QUEUE, {
+    jobTags: (event: EventPayload) => {
+      return {
+        "event.name": event.event,
+      }
+    },
+  })
 }
 
 export async function shutdown() {

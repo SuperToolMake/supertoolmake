@@ -1,14 +1,14 @@
 import {
-  Row,
-  SaveRowRequest,
-  SaveTableRequest,
+  type Row,
+  type SaveRowRequest,
+  type SaveTableRequest,
   SortOrder,
-  UIDatasource,
+  type UIDatasource,
 } from "@budibase/types"
 import { get } from "svelte/store"
-import { Store as StoreContext } from ".."
-import { DatasourceTableActions } from "."
-import TableFetch from "../../../../fetch/TableFetch"
+import type TableFetch from "../../../../fetch/TableFetch"
+import type { Store as StoreContext } from ".."
+import type { DatasourceTableActions } from "."
 
 const SuppressErrors = true
 
@@ -63,7 +63,7 @@ export const createActions = (context: StoreContext): TableActions => {
   }
 
   const canUseColumn = (name: string) => {
-    return get(columns).some(col => col.name === name)
+    return get(columns).some((col) => col.name === name)
   }
 
   return {
@@ -100,9 +100,9 @@ export const initialise = (context: StoreContext) => {
   let unsubscribers: any[] = []
 
   // Observe datasource changes and apply logic for table datasources
-  datasource.subscribe($datasource => {
+  datasource.subscribe(($datasource) => {
     // Clear previous subscriptions
-    unsubscribers?.forEach(unsubscribe => unsubscribe())
+    unsubscribers?.forEach((unsubscribe) => unsubscribe())
     unsubscribers = []
     if (!table.actions.isDatasourceValid($datasource)) {
       return
@@ -118,7 +118,7 @@ export const initialise = (context: StoreContext) => {
 
     // Update fetch when filter changes
     unsubscribers.push(
-      allFilters.subscribe($allFilters => {
+      allFilters.subscribe(($allFilters) => {
         // Ensure we're updating the correct fetch
         const $fetch = get(fetch) as TableFetch | null
         if ($fetch?.options?.datasource?.tableId !== $datasource.tableId) {
@@ -132,7 +132,7 @@ export const initialise = (context: StoreContext) => {
 
     // Update fetch when sorting changes
     unsubscribers.push(
-      sort.subscribe($sort => {
+      sort.subscribe(($sort) => {
         // Ensure we're updating the correct fetch
         const $fetch = get(fetch) as TableFetch | null
         if ($fetch?.options?.datasource?.tableId !== $datasource.tableId) {

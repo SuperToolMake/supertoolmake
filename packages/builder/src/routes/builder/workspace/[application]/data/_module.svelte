@@ -1,75 +1,75 @@
 <script>
-  import { Layout } from "@budibase/bbui"
-  import DatasourceNavigator from "@/components/backend/DatasourceNavigator/DatasourceNavigator.svelte"
-  import Panel from "@/components/design/Panel.svelte"
-  import { isActive, goto } from "@roxi/routify"
-  import { builderStore } from "@/stores/builder"
-  import NavHeader from "@/components/common/NavHeader.svelte"
-  import TopBar from "@/components/common/TopBar.svelte"
-  import { getHorizontalResizeActions } from "@/components/common/resizable"
-  import { onMount, onDestroy, setContext } from "svelte"
-  import { IntegrationTypes } from "@/constants/backend"
+import { Layout } from "@budibase/bbui"
+import { goto, isActive } from "@roxi/routify"
+import { onDestroy, onMount, setContext } from "svelte"
+import DatasourceNavigator from "@/components/backend/DatasourceNavigator/DatasourceNavigator.svelte"
+import NavHeader from "@/components/common/NavHeader.svelte"
+import { getHorizontalResizeActions } from "@/components/common/resizable"
+import TopBar from "@/components/common/TopBar.svelte"
+import Panel from "@/components/design/Panel.svelte"
+import { IntegrationTypes } from "@/constants/backend"
+import { builderStore } from "@/stores/builder"
 
-  $goto
-  let searchValue
-  const MIN_PANEL_WIDTH = 260
-  let maxWidth = Math.max(window.innerWidth / 3, MIN_PANEL_WIDTH)
-  let panelWidth = MIN_PANEL_WIDTH
+$goto
+let searchValue
+const MIN_PANEL_WIDTH = 260
+let maxWidth = Math.max(window.innerWidth / 3, MIN_PANEL_WIDTH)
+let panelWidth = MIN_PANEL_WIDTH
 
-  // Load persisted panel width from localStorage
-  const loadPanelWidth = () => {
-    const saved = localStorage.getItem("datasource-panel-width")
-    if (!saved) {
-      return
-    }
-
-    const width = parseInt(saved, 10)
-    if (!Number.isFinite(width)) {
-      return
-    }
-
-    const clamped = Math.max(MIN_PANEL_WIDTH, Math.min(width, maxWidth))
-    panelWidth = clamped
+// Load persisted panel width from localStorage
+const loadPanelWidth = () => {
+  const saved = localStorage.getItem("datasource-panel-width")
+  if (!saved) {
+    return
   }
 
-  const updateMaxWidth = () => {
-    maxWidth = Math.max(window.innerWidth / 3, MIN_PANEL_WIDTH)
+  const width = parseInt(saved, 10)
+  if (!Number.isFinite(width)) {
+    return
   }
 
-  let gridDispatch = null
+  const clamped = Math.max(MIN_PANEL_WIDTH, Math.min(width, maxWidth))
+  panelWidth = clamped
+}
 
-  // Function to be called by child components to register grid dispatch
-  const registerGridDispatch = dispatch => {
-    gridDispatch = dispatch
-  }
+const updateMaxWidth = () => {
+  maxWidth = Math.max(window.innerWidth / 3, MIN_PANEL_WIDTH)
+}
 
-  // Make registerGridDispatch available to child components
-  setContext("data-layout", { registerGridDispatch })
+let gridDispatch = null
 
-  const [resizable, resizableHandle] = getHorizontalResizeActions(
-    panelWidth,
-    width => {
-      if (width) {
-        localStorage.setItem("datasource-panel-width", width.toString())
-        panelWidth = width
-      }
-    },
-    () => {
-      // Callback for when resize starts - close any open popovers
-      if (gridDispatch) {
-        gridDispatch("close-edit-column", {})
-      }
+// Function to be called by child components to register grid dispatch
+const registerGridDispatch = (dispatch) => {
+  gridDispatch = dispatch
+}
+
+// Make registerGridDispatch available to child components
+setContext("data-layout", { registerGridDispatch })
+
+const [resizable, resizableHandle] = getHorizontalResizeActions(
+  panelWidth,
+  (width) => {
+    if (width) {
+      localStorage.setItem("datasource-panel-width", width.toString())
+      panelWidth = width
     }
-  )
+  },
+  () => {
+    // Callback for when resize starts - close any open popovers
+    if (gridDispatch) {
+      gridDispatch("close-edit-column", {})
+    }
+  }
+)
 
-  onMount(() => {
-    loadPanelWidth()
-    window.addEventListener("resize", updateMaxWidth)
-  })
+onMount(() => {
+  loadPanelWidth()
+  window.addEventListener("resize", updateMaxWidth)
+})
 
-  onDestroy(() => {
-    window.removeEventListener("resize", updateMaxWidth)
-  })
+onDestroy(() => {
+  window.removeEventListener("resize", updateMaxWidth)
+})
 </script>
 
 <!-- routify:options index=1 -->

@@ -1,21 +1,17 @@
 import { context, HTTPError } from "@budibase/backend-core"
 import {
   AutoFieldSubType,
-  Database,
-  FieldSchema,
+  type Database,
+  type FieldSchema,
   FieldType,
-  NumberFieldMetadata,
-  RelationshipFieldMetadata,
-  RenameColumn,
-  Row,
-  Table,
+  type NumberFieldMetadata,
+  type RelationshipFieldMetadata,
+  type RenameColumn,
+  type Row,
+  type Table,
 } from "@budibase/types"
 import { cloneDeep } from "lodash/fp"
-import {
-  CanSwitchTypes,
-  SwitchableTypes,
-  USERS_TABLE_SCHEMA,
-} from "../../../constants"
+import { CanSwitchTypes, SwitchableTypes, USERS_TABLE_SCHEMA } from "../../../constants"
 import { generateRowID, getRowParams, InternalTables } from "../../../db/utils"
 import { inputProcessing } from "../../../utilities/rowProcessor"
 import { isRows, isSchema, parse } from "../../../utilities/schema"
@@ -45,7 +41,7 @@ export async function checkForColumnUpdates(
   let deletedColumns: any = []
   if (oldTable && oldTable.schema && updatedTable.schema) {
     deletedColumns = Object.keys(oldTable.schema).filter(
-      colName => updatedTable.schema[colName] == null
+      (colName) => updatedTable.schema[colName] == null
     )
   }
   // check for renaming of columns or deleted columns
@@ -125,7 +121,7 @@ export async function importToRows(
     // the real schema of the table passed in, not the clone used for
     // incrementing auto IDs
     for (const [fieldName, schema] of Object.entries(originalTable.schema)) {
-      if (schema.type === FieldType.LINK && data.find(row => row[fieldName])) {
+      if (schema.type === FieldType.LINK && data.find((row) => row[fieldName])) {
         throw new HTTPError(
           `Can't bulk import relationship fields for internal databases, found value in field "${fieldName}"`,
           400
@@ -133,16 +129,15 @@ export async function importToRows(
       }
 
       if (
-        (schema.type === FieldType.OPTIONS ||
-          schema.type === FieldType.ARRAY) &&
+        (schema.type === FieldType.OPTIONS || schema.type === FieldType.ARRAY) &&
         row[fieldName]
       ) {
         const isArray = Array.isArray(row[fieldName])
 
         // Add option to inclusion constraints
         const rowVal = isArray ? row[fieldName] : [row[fieldName]]
-        let merged = [...schema.constraints!.inclusion!, ...rowVal]
-        let superSet = new Set(merged)
+        const merged = [...schema.constraints!.inclusion!, ...rowVal]
+        const superSet = new Set(merged)
         schema.constraints!.inclusion = Array.from(superSet)
         schema.constraints!.inclusion.sort()
 
@@ -185,7 +180,7 @@ export async function handleDataImport(
       })
     )
     allDocs.rows
-      .map(existingRow => existingRow.doc)
+      .map((existingRow) => existingRow.doc)
       .forEach((doc: any) => {
         finalData.forEach((finalItem: any) => {
           let match = true
@@ -210,7 +205,7 @@ export async function handleDataImport(
 export function checkStaticTables(table: Table) {
   // check user schema has all required elements
   if (table._id === InternalTables.USER_METADATA) {
-    for (let [key, schema] of Object.entries(USERS_TABLE_SCHEMA.schema)) {
+    for (const [key, schema] of Object.entries(USERS_TABLE_SCHEMA.schema)) {
       // check if the schema exists on the table to be created/updated
       if (table.schema[key] == null) {
         table.schema[key] = schema as FieldSchema
@@ -255,11 +250,7 @@ class TableSaveFunctions {
 
   // when confirmed valid
   async mid(table: Table, columnRename?: RenameColumn) {
-    let response = await checkForColumnUpdates(
-      table,
-      this.oldTable,
-      columnRename
-    )
+    const response = await checkForColumnUpdates(table, this.oldTable, columnRename)
     this.rows = this.rows.concat(response.rows)
     return table
   }
@@ -269,19 +260,13 @@ class TableSaveFunctions {
   }
 }
 
-export function mergePendingColumnRenames(
-  existing: RenameColumn[],
-  renaming: RenameColumn
-) {
+export function mergePendingColumnRenames(existing: RenameColumn[], renaming: RenameColumn) {
   const pending = existing ? [...existing] : []
   pending.push(renaming)
   return pending
 }
 
-export function generateForeignKey(
-  column: RelationshipFieldMetadata,
-  relatedTable: Table
-) {
+export function generateForeignKey(column: RelationshipFieldMetadata, relatedTable: Table) {
   return `fk_${relatedTable.name}_${column.fieldName}`
 }
 
@@ -306,13 +291,10 @@ export function foreignKeyStructure(keyName: string, meta?: any) {
 }
 
 export function areSwitchableTypes(type1: FieldType, type2: FieldType) {
-  if (
-    SwitchableTypes.indexOf(type1) === -1 &&
-    SwitchableTypes.indexOf(type2) === -1
-  ) {
+  if (SwitchableTypes.indexOf(type1) === -1 && SwitchableTypes.indexOf(type2) === -1) {
     return false
   }
-  for (let option of CanSwitchTypes) {
+  for (const option of CanSwitchTypes) {
     const index1 = option.indexOf(type1),
       index2 = option.indexOf(type2)
     if (index1 !== -1 && index2 !== -1 && index1 !== index2) {
@@ -326,7 +308,7 @@ export function hasTypeChanged(table: Table, oldTable: Table | undefined) {
   if (!oldTable) {
     return false
   }
-  for (let [key, field] of Object.entries(oldTable.schema)) {
+  for (const [key, field] of Object.entries(oldTable.schema)) {
     if (!table.schema[key]) {
       continue
     }
@@ -340,4 +322,5 @@ export function hasTypeChanged(table: Table, oldTable: Table | undefined) {
 }
 
 const _TableSaveFunctions = TableSaveFunctions
+
 export { _TableSaveFunctions as TableSaveFunctions }

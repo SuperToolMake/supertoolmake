@@ -1,32 +1,25 @@
-import { componentStore } from "@/stores/builder"
-import { get } from "svelte/store"
 import { Helpers } from "@budibase/bbui"
-import {
-  decodeJSBinding,
-  encodeJSBinding,
-  findHBSBlocks,
-} from "@budibase/string-templates"
-import { capitalise } from "@/helpers"
 import { Constants } from "@budibase/frontend-core"
-import { Component, ComponentContext } from "@budibase/types"
+import { decodeJSBinding, encodeJSBinding, findHBSBlocks } from "@budibase/string-templates"
+import type { Component, ComponentContext } from "@budibase/types"
+import { get } from "svelte/store"
+import { capitalise } from "@/helpers"
+import { componentStore } from "@/stores/builder"
 
 const { ContextScopes } = Constants
 
 /**
  * Recursively searches for a specific component ID
  */
-export const findComponent = (
-  rootComponent: Component | undefined,
-  id: string
-) => {
-  return searchComponentTree(rootComponent, comp => comp._id === id)
+export const findComponent = (rootComponent: Component | undefined, id: string) => {
+  return searchComponentTree(rootComponent, (comp) => comp._id === id)
 }
 
 /**
  * Recursively searches for a specific component type
  */
 export const findComponentType = (rootComponent: Component, type: string) => {
-  return searchComponentTree(rootComponent, comp => comp._component === type)
+  return searchComponentTree(rootComponent, (comp) => comp._component === type)
 }
 
 /**
@@ -96,11 +89,8 @@ export const findAllMatchingComponents = (
   }
   let components: Component[] = []
   if (rootComponent._children) {
-    rootComponent._children.forEach(child => {
-      components = [
-        ...components,
-        ...findAllMatchingComponents(child, selector),
-      ]
+    rootComponent._children.forEach((child) => {
+      components = [...components, ...findAllMatchingComponents(child, selector)]
     })
   }
   if (selector(rootComponent)) {
@@ -128,7 +118,7 @@ export const findClosestMatchingComponent = (
     return null
   }
   const componentPath = findComponentPath(rootComponent, componentId).reverse()
-  for (let component of componentPath) {
+  for (const component of componentPath) {
     if (selector(component)) {
       return component
     }
@@ -175,14 +165,11 @@ export const makeComponentUnique = (component: Component) => {
 
   // Generate a full set of component ID replacements in this tree
   const idReplacements: [string, string][] = []
-  const generateIdReplacements = (
-    component: Component,
-    replacements: [string, string][]
-  ) => {
+  const generateIdReplacements = (component: Component, replacements: [string, string][]) => {
     const oldId = component._id!
     const newId = Helpers.uuid()
     replacements.push([oldId, newId])
-    component._children?.forEach(x => generateIdReplacements(x, replacements))
+    component._children?.forEach((x) => generateIdReplacements(x, replacements))
   }
   generateIdReplacements(component, idReplacements)
 
@@ -194,10 +181,10 @@ export const makeComponentUnique = (component: Component) => {
 
   // Replace all instances of this ID in JS bindings
   const bindings = findHBSBlocks(definition)
-  bindings.forEach(binding => {
+  bindings.forEach((binding) => {
     // JSON.stringify will have escaped double quotes, so we need
     // to account for that
-    let sanitizedBinding = binding.replace(/\\"/g, '"')
+    const sanitizedBinding = binding.replace(/\\"/g, '"')
 
     // Check if this is a valid JS binding
     let js = decodeJSBinding(sanitizedBinding)
@@ -233,9 +220,7 @@ export const getComponentText = (component: Component) => {
   if (component?._instanceName) {
     return component._instanceName
   }
-  const type =
-    component._component?.replace("@budibase/standard-components/", "") ||
-    "component"
+  const type = component._component?.replace("@budibase/standard-components/", "") || "component"
   return capitalise(type)
 }
 
@@ -262,7 +247,7 @@ export const getComponentContexts = (component: string) => {
       scope: ContextScopes.Global,
 
       // Ensure all actions are their verbose object versions
-      actions: def.actions.map(x => (typeof x === "string" ? { type: x } : x)),
+      actions: def.actions.map((x) => (typeof x === "string" ? { type: x } : x)),
     })
   }
   return contexts
@@ -288,7 +273,7 @@ const buildContextTree = (
     tree[currentBranch].push(rootComponent._id!)
 
     // If we provide local context, start a new branch for our children
-    if (contexts.some(context => context.scope === ContextScopes.Local)) {
+    if (contexts.some((context) => context.scope === ContextScopes.Local)) {
       currentBranch = rootComponent._id!
       tree[rootComponent._id!] = []
     }
@@ -296,7 +281,7 @@ const buildContextTree = (
 
   // Process children
   if (rootComponent._children) {
-    rootComponent._children.forEach(child => {
+    rootComponent._children.forEach((child) => {
       buildContextTree(child, tree, currentBranch)
     })
   }
@@ -312,7 +297,7 @@ export const buildContextTreeLookupMap = (rootComponent: Component) => {
   const tree = buildContextTree(rootComponent)
   const map: Record<string, string> = {}
   Object.entries(tree).forEach(([branch, ids]) => {
-    ids.forEach(id => {
+    ids.forEach((id) => {
       map[id] = branch
     })
   })
@@ -321,8 +306,5 @@ export const buildContextTreeLookupMap = (rootComponent: Component) => {
 
 // Get a flat list of ids for all descendants of a component
 export const getChildIdsForComponent = (component: Component): string[] => {
-  return [
-    component._id!,
-    ...(component?._children ?? []).map(getChildIdsForComponent).flat(1),
-  ]
+  return [component._id!, ...(component?._children ?? []).flatMap(getChildIdsForComponent)]
 }

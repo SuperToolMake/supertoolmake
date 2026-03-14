@@ -1,11 +1,11 @@
 <script>
-  import { getContext } from "svelte"
+import { getContext } from "svelte"
 
-  const { builderStore } = getContext("sdk")
-  const component = getContext("component")
-  const block = getContext("block")
+const { builderStore } = getContext("sdk")
+const component = getContext("component")
+const block = getContext("block")
 
-  export let text = undefined
+export let text = undefined
 </script>
 
 {#if $builderStore.inBuilder}

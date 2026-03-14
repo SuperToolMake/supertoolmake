@@ -1,19 +1,19 @@
 <script>
-  import { params, goto } from "@roxi/routify"
-  import RestQueryViewer from "@/components/integration/RestQueryViewer.svelte"
-  import { IntegrationTypes } from "@/constants/backend"
-  import { datasources } from "@/stores/builder"
-  import APIEndpointViewer from "@/components/integration/APIEndpointViewer.svelte"
+import { goto, params } from "@roxi/routify"
+import APIEndpointViewer from "@/components/integration/APIEndpointViewer.svelte"
+import RestQueryViewer from "@/components/integration/RestQueryViewer.svelte"
+import { IntegrationTypes } from "@/constants/backend"
+import { datasources } from "@/stores/builder"
 
-  $: datasource = $datasources.list.find(ds => ds._id === $params.datasourceId)
-  $: isRestSource = datasource?.source === IntegrationTypes.REST
-  $: {
-    if (!datasource) {
-      $goto("../../../")
-    } else if (!isRestSource) {
-      $goto(`../../../data/query/new/${$params.datasourceId}`)
-    }
+$: datasource = $datasources.list.find((ds) => ds._id === $params.datasourceId)
+$: isRestSource = datasource?.source === IntegrationTypes.REST
+$: {
+  if (!datasource) {
+    $goto("../../../")
+  } else if (!isRestSource) {
+    $goto(`../../../data/query/new/${$params.datasourceId}`)
   }
+}
 </script>
 
 {#if isRestSource}

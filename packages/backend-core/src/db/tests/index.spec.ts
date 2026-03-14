@@ -1,5 +1,5 @@
-import { doInTenant } from "../../context"
 import { structures } from "../../../tests"
+import { doInTenant } from "../../context"
 import { getDB } from "../db"
 
 interface Doc {

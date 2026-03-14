@@ -1,6 +1,6 @@
+import { notifications } from "@budibase/bbui"
 import { get } from "svelte/store"
 import { componentStore } from "@/stores/builder"
-import { notifications } from "@budibase/bbui"
 
 const getContextMenuItems = (component, showCopy) => {
   const noPaste = !get(componentStore).componentToPaste
@@ -9,7 +9,7 @@ const getContextMenuItems = (component, showCopy) => {
     componentStore.copy(component, cut)
   }
 
-  const pasteComponent = mode => {
+  const pasteComponent = (mode) => {
     try {
       componentStore.paste(component, mode)
     } catch (error) {

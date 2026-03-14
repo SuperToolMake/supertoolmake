@@ -1,8 +1,4 @@
-import {
-  processStringWithLogsSync,
-  encodeJSBinding,
-  defaultJSSetup,
-} from "../src/index"
+import { defaultJSSetup, encodeJSBinding, processStringWithLogsSync } from "../src/index"
 
 const processJS = (js: string, context?: object) => {
   return processStringWithLogsSync(encodeJSBinding(js), context)

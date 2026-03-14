@@ -1,20 +1,17 @@
-import {
+import type {
   DuplicateResourceToWorkspaceRequest,
   DuplicateResourceToWorkspaceResponse,
   ResourceDependenciesResponse,
 } from "@budibase/types"
-import { Expectations, TestAPI } from "./base"
+import { type Expectations, TestAPI } from "./base"
 
 export class ResourceAPI extends TestAPI {
   getResourceDependencies = async (
     expectations?: Expectations
   ): Promise<{ body: ResourceDependenciesResponse }> => {
-    const result = await this._get<ResourceDependenciesResponse>(
-      `/api/resources`,
-      {
-        expectations,
-      }
-    )
+    const result = await this._get<ResourceDependenciesResponse>(`/api/resources`, {
+      expectations,
+    })
     return { body: result }
   }
 

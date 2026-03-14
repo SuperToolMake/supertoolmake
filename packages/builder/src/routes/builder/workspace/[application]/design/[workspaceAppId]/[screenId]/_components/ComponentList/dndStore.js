@@ -1,7 +1,8 @@
-import { writable, get } from "svelte/store"
-import { findComponentParent, findComponentPath } from "@/helpers/components"
-import { selectedScreen, componentStore } from "@/stores/builder"
 import { DropPosition } from "@budibase/types"
+import { get, writable } from "svelte/store"
+import { findComponentParent, findComponentPath } from "@/helpers/components"
+import { componentStore, selectedScreen } from "@/stores/builder"
+
 export { DropPosition } from "@budibase/types"
 
 const initialState = {
@@ -16,7 +17,7 @@ const initialState = {
 const createDNDStore = () => {
   const store = writable(initialState)
   const actions = {
-    dragstart: component => {
+    dragstart: (component) => {
       if (!component) {
         return
       }
@@ -50,8 +51,7 @@ const createDNDStore = () => {
 
       // Otherwise drop either above or below
       else {
-        dropPosition =
-          mousePosition > 0.5 ? DropPosition.BELOW : DropPosition.ABOVE
+        dropPosition = mousePosition > 0.5 ? DropPosition.BELOW : DropPosition.ABOVE
       }
 
       // If hovering over a component with children and attempting to drop
@@ -65,22 +65,16 @@ const createDNDStore = () => {
 
       // If drop position and target are the same then we can skip this update
       const state = get(store)
-      if (
-        dropPosition === state.dropPosition &&
-        target?._id === state.target?._id
-      ) {
+      if (dropPosition === state.dropPosition && target?._id === state.target?._id) {
         return
       }
 
       // Find the parent of the target component
       if (target) {
-        targetParent = findComponentParent(
-          get(selectedScreen).props,
-          target._id
-        )
+        targetParent = findComponentParent(get(selectedScreen).props, target._id)
       }
 
-      store.update(state => {
+      store.update((state) => {
         return {
           ...state,
           dropPosition,

@@ -1,6 +1,6 @@
-import { addFileManagement } from "../utils"
-import { serveBuilderAssets } from "../controllers/assets"
 import Router from "@koa/router"
+import { serveBuilderAssets } from "../controllers/assets"
+import { addFileManagement } from "../utils"
 
 const router: Router = new Router()
 

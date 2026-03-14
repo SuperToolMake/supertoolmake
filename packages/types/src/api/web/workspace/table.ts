@@ -1,4 +1,4 @@
-import { Row, Table, TableRequest, TableSchema } from "../../../documents"
+import type { Row, Table, TableRequest, TableSchema } from "../../../documents"
 
 export interface FindTableResponse extends Table {}
 

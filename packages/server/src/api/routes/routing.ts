@@ -1,5 +1,5 @@
 import * as controller from "../controllers/routing"
-import { publicRoutes, builderRoutes } from "./endpointGroups"
+import { builderRoutes, publicRoutes } from "./endpointGroups"
 
 // gets correct structure for user role
 publicRoutes.get("/api/routing/client", controller.clientFetch)

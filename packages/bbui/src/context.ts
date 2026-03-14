@@ -1,5 +1,5 @@
-import { Readable } from "svelte/store"
-import { ActionMenu, ModalContext, ScrollContext } from "./types"
+import type { Readable } from "svelte/store"
+import type { ActionMenu, ModalContext, ScrollContext } from "./types"
 
 declare module "svelte" {
   export function getContext(key: "actionMenu"): ActionMenu | undefined

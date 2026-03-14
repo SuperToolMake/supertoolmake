@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  type Option = any
+type Option = any
 </script>
 
 <script lang="ts">

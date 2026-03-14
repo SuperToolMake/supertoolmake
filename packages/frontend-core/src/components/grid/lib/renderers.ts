@@ -1,17 +1,16 @@
-import { FieldType, UIColumn } from "@budibase/types"
-
-import OptionsCell from "../cells/OptionsCell.svelte"
-import DateCell from "../cells/DateCell.svelte"
-import MultiSelectCell from "../cells/MultiSelectCell.svelte"
-import NumberCell from "../cells/NumberCell.svelte"
-import RelationshipCell from "../cells/RelationshipCell.svelte"
-import TextCell from "../cells/TextCell.svelte"
-import LongFormCell from "../cells/LongFormCell.svelte"
-import BooleanCell from "../cells/BooleanCell.svelte"
-import JSONCell from "../cells/JSONCell.svelte"
+import { FieldType, type UIColumn } from "@budibase/types"
 import BBReferenceCell from "../cells/BBReferenceCell.svelte"
 import BBReferenceSingleCell from "../cells/BBReferenceSingleCell.svelte"
+import BooleanCell from "../cells/BooleanCell.svelte"
+import DateCell from "../cells/DateCell.svelte"
+import JSONCell from "../cells/JSONCell.svelte"
+import LongFormCell from "../cells/LongFormCell.svelte"
+import MultiSelectCell from "../cells/MultiSelectCell.svelte"
+import NumberCell from "../cells/NumberCell.svelte"
+import OptionsCell from "../cells/OptionsCell.svelte"
+import RelationshipCell from "../cells/RelationshipCell.svelte"
 import RoleCell from "../cells/RoleCell.svelte"
+import TextCell from "../cells/TextCell.svelte"
 
 const TypeComponentMap = {
   [FieldType.STRING]: TextCell,

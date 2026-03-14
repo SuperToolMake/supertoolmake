@@ -1,4 +1,4 @@
-import { Constants } from "@budibase/frontend-core"
+import type { Constants } from "@budibase/frontend-core"
 import type { User as UserDoc } from "@budibase/types"
 
 export interface UserInfo {

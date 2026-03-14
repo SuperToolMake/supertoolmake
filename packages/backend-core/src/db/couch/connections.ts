@@ -62,9 +62,9 @@ export const getUrlInfo = (url: string | null = env.COUCH_DB_URL) => {
     // Extract auth if specified
     if (url.includes("@")) {
       // Split into host and remainder
-      let parts = rest.split("@")
+      const parts = rest.split("@")
       host = parts[parts.length - 1]
-      let auth = parts.slice(0, -1).join("@")
+      const auth = parts.slice(0, -1).join("@")
 
       // Split auth into username and password
       if (auth.includes(":")) {

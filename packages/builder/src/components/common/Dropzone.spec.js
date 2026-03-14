@@ -1,9 +1,9 @@
-import { writable } from "svelte/store"
-import { it, expect, describe, vi } from "vitest"
-import Dropzone from "./Dropzone.svelte"
-import { render, fireEvent } from "@testing-library/svelte"
 import { notifications } from "@budibase/bbui"
+import { fireEvent, render } from "@testing-library/svelte"
+import { writable } from "svelte/store"
+import { describe, expect, it, vi } from "vitest"
 import { admin } from "@/stores/portal"
+import Dropzone from "./Dropzone.svelte"
 
 vi.mock("@/stores/portal", async () => {
   return {
@@ -19,9 +19,7 @@ vi.mock("@/stores/builder", async () => {
   }
 })
 
-const notificationsErrorSpy = vi
-  .spyOn(notifications, "error")
-  .mockImplementation(() => {})
+const notificationsErrorSpy = vi.spyOn(notifications, "error").mockImplementation(() => {})
 
 describe("Dropzone", () => {
   let instance = null

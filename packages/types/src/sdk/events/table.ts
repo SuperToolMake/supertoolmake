@@ -1,4 +1,4 @@
-import { BaseEvent, TableExportFormat } from "../events"
+import type { BaseEvent, TableExportFormat } from "../events"
 
 export interface TableCreatedEvent extends BaseEvent {
   tableId: string

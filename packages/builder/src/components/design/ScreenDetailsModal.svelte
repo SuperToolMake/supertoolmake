@@ -1,64 +1,63 @@
 <script lang="ts">
-  import { ModalContent, Input, keepOpen } from "@budibase/bbui"
-  import sanitizeUrl from "@/helpers/sanitizeUrl"
-  import { get } from "svelte/store"
-  import { screenStore, workspaceAppStore } from "@/stores/builder"
-  import { buildLiveUrl } from "@/helpers/urls"
+import { Input, keepOpen, type ModalContent } from "@budibase/bbui"
+import { get } from "svelte/store"
+import sanitizeUrl from "@/helpers/sanitizeUrl"
+import { buildLiveUrl } from "@/helpers/urls"
+import { screenStore, workspaceAppStore } from "@/stores/builder"
 
-  export let onConfirm: (_data: { route: string }) => Promise<void>
-  export let onCancel: (() => Promise<void>) | undefined = undefined
-  export let route: string = ""
-  export let role: string | undefined = undefined
-  export let confirmText = "Continue"
+export let onConfirm: (_data: { route: string }) => Promise<void>
+export let onCancel: (() => Promise<void>) | undefined = undefined
+export let route: string = ""
+export let role: string | undefined = undefined
+export let confirmText = "Continue"
 
-  let touched = false
-  let error: string | undefined
-  let modal: ModalContent
+let touched = false
+let error: string | undefined
+let modal: ModalContent
 
-  $: selectedWorkspaceApp = $workspaceAppStore.selectedWorkspaceApp
+$: selectedWorkspaceApp = $workspaceAppStore.selectedWorkspaceApp
 
-  $: workspacePrefix = selectedWorkspaceApp ? selectedWorkspaceApp.url : ""
+$: workspacePrefix = selectedWorkspaceApp ? selectedWorkspaceApp.url : ""
 
-  $: liveUrl = buildLiveUrl(workspacePrefix, true)
+$: liveUrl = buildLiveUrl(workspacePrefix, true)
 
-  $: hashRoute = !route ? "" : `#${route}`
+$: hashRoute = !route ? "" : `#${route}`
 
-  $: appUrl = `${liveUrl}${hashRoute}`
+$: appUrl = `${liveUrl}${hashRoute}`
 
-  const routeChanged = (event: { detail: string }) => {
-    if (!event.detail.startsWith("/")) {
-      route = "/" + event.detail
-    }
-    touched = true
-    route = sanitizeUrl(route)
-    if (routeExists(route)) {
-      error = "This URL is already taken for this access role"
-    } else {
-      error = undefined
-    }
+const routeChanged = (event: { detail: string }) => {
+  if (!event.detail.startsWith("/")) {
+    route = "/" + event.detail
+  }
+  touched = true
+  route = sanitizeUrl(route)
+  if (routeExists(route)) {
+    error = "This URL is already taken for this access role"
+  } else {
+    error = undefined
+  }
+}
+
+const routeExists = (url: string) => {
+  if (!role) {
+    return false
+  }
+  return get(screenStore).screens.some(
+    (screen) =>
+      screen.routing.route.toLowerCase() === url.toLowerCase() && screen.routing.roleId === role
+  )
+}
+$: disabled = !route || !!error || !touched
+
+const confirmScreenDetails = async () => {
+  if (disabled) {
+    return keepOpen
   }
 
-  const routeExists = (url: string) => {
-    if (!role) {
-      return false
-    }
-    return get(screenStore).screens.some(
-      screen =>
-        screen.routing.route.toLowerCase() === url.toLowerCase() &&
-        screen.routing.roleId === role
-    )
-  }
-  $: disabled = !route || !!error || !touched
-
-  const confirmScreenDetails = async () => {
-    if (disabled) {
-      return keepOpen
-    }
-
-    await onConfirm({
-      route,
-    })
-  }
+  await onConfirm({
+    route,
+  })
+}
 </script>
 
 <ModalContent

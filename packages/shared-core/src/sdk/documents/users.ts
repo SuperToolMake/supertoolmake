@@ -1,12 +1,12 @@
 import {
-  ContextUser,
+  type ContextUser,
   DocumentType,
   InternalTable,
   SEPARATOR,
-  User,
-  UserAdminInfo,
-  UserBuilderInfo,
-  UserRoleInfo,
+  type User,
+  type UserAdminInfo,
+  type UserBuilderInfo,
+  type UserRoleInfo,
 } from "@budibase/types"
 import { getProdAppID } from "./applications"
 
@@ -24,9 +24,7 @@ export function isBuilder(user?: UserBuilderInfo, appId?: string): boolean {
   return false
 }
 
-export function isGlobalBuilder(
-  user: UserBuilderInfo & UserAdminInfo
-): boolean {
+export function isGlobalBuilder(user: UserBuilderInfo & UserAdminInfo): boolean {
   return (isBuilder(user) && !hasAppBuilderPermissions(user)) || isAdmin(user)
 }
 
@@ -63,16 +61,11 @@ export function isAdminOrWorkspaceBuilder(
   return false
 }
 
-export function isAdminOrBuilder(
-  user: UserBuilderInfo & UserAdminInfo,
-  appId?: string
-): boolean {
+export function isAdminOrBuilder(user: UserBuilderInfo & UserAdminInfo, appId?: string): boolean {
   return isBuilder(user, appId) || isAdmin(user)
 }
 
-export function isAdminOrGlobalBuilder(
-  user: UserBuilderInfo & UserAdminInfo
-): boolean {
+export function isAdminOrGlobalBuilder(user: UserBuilderInfo & UserAdminInfo): boolean {
   return isGlobalBuilder(user) || isAdmin(user)
 }
 
@@ -90,7 +83,7 @@ function hasAppCreatorPermissions(user?: Partial<UserRoleInfo>): boolean {
   if (!user) {
     return false
   }
-  return !!Object.values(user.roles ?? {}).find(x => x === "CREATOR")
+  return !!Object.values(user.roles ?? {}).find((x) => x === "CREATOR")
 }
 
 // checks if a user is capable of building any app
@@ -98,11 +91,7 @@ export function hasBuilderPermissions(user?: UserBuilderInfo): boolean {
   if (!user) {
     return false
   }
-  return (
-    user.builder?.global ||
-    hasAppBuilderPermissions(user) ||
-    hasCreatorPermissions(user)
-  )
+  return user.builder?.global || hasAppBuilderPermissions(user) || hasCreatorPermissions(user)
 }
 
 // checks if a user is capable of being an admin
@@ -120,9 +109,7 @@ export function hasCreatorPermissions(user?: UserBuilderInfo): boolean {
   return !!user.builder?.creator
 }
 
-export function isCreator(
-  user?: UserBuilderInfo & UserAdminInfo & Partial<UserRoleInfo>
-): boolean {
+export function isCreator(user?: UserBuilderInfo & UserAdminInfo & Partial<UserRoleInfo>): boolean {
   if (!user) {
     return false
   }

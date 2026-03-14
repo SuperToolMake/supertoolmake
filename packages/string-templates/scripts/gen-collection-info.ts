@@ -1,13 +1,11 @@
-import {
-  HelperFunctionBuiltin,
-  EXTERNAL_FUNCTION_COLLECTIONS,
-} from "../src/helpers/constants"
 import { readFileSync, writeFileSync } from "fs"
 import { marked } from "marked"
-import { join, dirname } from "path"
+import { dirname, join } from "path"
+import { EXTERNAL_FUNCTION_COLLECTIONS, HelperFunctionBuiltin } from "../src/helpers/constants"
 
 const helpers = require("@budibase/handlebars-helpers")
-import doctrine, { Annotation } from "doctrine"
+
+import doctrine, { type Annotation } from "doctrine"
 
 type BudibaseAnnotation = Annotation & {
   example?: string
@@ -46,8 +44,7 @@ const ADDED_HELPERS = {
     },
     difference: {
       args: ["from", "to", "[unitType=ms]"],
-      example:
-        '{{ difference "2025-09-30" "2025-06-17" "seconds" }} -> 9072000',
+      example: '{{ difference "2025-09-30" "2025-06-17" "seconds" }} -> 9072000',
       description:
         "Gets the difference between two dates, in milliseconds. Pass a third parameter to adjust the unit measurement.",
     },
@@ -118,9 +115,7 @@ function getCommentInfo(file: string, func: string): BudibaseAnnotation {
   docs.description = docs.description.replace(/\n/g, " ")
   docs.description = docs.description.replace(/[ ]{2,}/g, " ")
   docs.description = docs.description.replace(/is is/g, "is")
-  const examples = docs.tags
-    .filter(el => el.title === "example")
-    .map(el => el.description)
+  const examples = docs.tags.filter((el) => el.title === "example").map((el) => el.description)
   const blocks = docs.description.split("```")
   if (examples.length > 0) {
     docs.example = examples.join(" ")
@@ -130,8 +125,8 @@ function getCommentInfo(file: string, func: string): BudibaseAnnotation {
     docs.example = docs.example.replace("product", "multiply")
   }
   docs.description = blocks[0].trim()
-  docs.acceptsBlock = docs.tags.some(el => el.title === "block")
-  docs.acceptsInline = docs.tags.some(el => el.title === "inline")
+  docs.acceptsBlock = docs.tags.some((el) => el.title === "block")
+  docs.acceptsInline = docs.tags.some((el) => el.title === "inline")
   return docs
 }
 
@@ -142,17 +137,15 @@ const excludeFunctions: Record<string, string[]> = { string: ["raw"] }
  */
 function run() {
   const foundNames: string[] = []
-  for (let collection of EXTERNAL_FUNCTION_COLLECTIONS) {
+  for (const collection of EXTERNAL_FUNCTION_COLLECTIONS) {
     const collectionFile = readFileSync(
-      `${dirname(
-        require.resolve("@budibase/handlebars-helpers")
-      )}/lib/${collection}.js`,
+      `${dirname(require.resolve("@budibase/handlebars-helpers"))}/lib/${collection}.js`,
       "utf8"
     )
     const collectionInfo: { [name: string]: Helper } = {}
     // collect information about helper
-    let hbsHelperInfo = helpers[collection]()
-    for (let entry of Object.entries(hbsHelperInfo)) {
+    const hbsHelperInfo = helpers[collection]()
+    for (const entry of Object.entries(hbsHelperInfo)) {
       const name = entry[0]
       // skip built in functions and ones seen already
       if (
@@ -166,10 +159,10 @@ function run() {
       // this is ridiculous, but it parse the function header
       const fnc = entry[1]!.toString()
       const jsDocInfo = getCommentInfo(collectionFile, fnc)
-      let args = jsDocInfo.tags
-        .filter(tag => tag.title === "param")
-        .filter(tag => tag.description)
-        .map(tag => tag.description!.replace(/`/g, "").split(" ")[0].trim())
+      const args = jsDocInfo.tags
+        .filter((tag) => tag.title === "param")
+        .filter((tag) => tag.description)
+        .map((tag) => tag.description!.replace(/`/g, "").split(" ")[0].trim())
       collectionInfo[name] = fixSpecialCases(name, {
         args,
         example: jsDocInfo.example || undefined,
@@ -180,7 +173,7 @@ function run() {
     outputJSON[collection] = collectionInfo
   }
   // add extra helpers
-  for (let [collectionName, collection] of Object.entries(ADDED_HELPERS)) {
+  for (const [collectionName, collection] of Object.entries(ADDED_HELPERS)) {
     let input = collection
     if (outputJSON[collectionName]) {
       input = Object.assign(outputJSON[collectionName], collection)
@@ -189,8 +182,8 @@ function run() {
   }
 
   // convert all markdown to HTML
-  for (let collection of Object.values<any>(outputJSON)) {
-    for (let helper of Object.values<any>(collection)) {
+  for (const collection of Object.values<any>(outputJSON)) {
+    for (const helper of Object.values<any>(collection)) {
       helper.description = marked.parse(helper.description)
     }
   }

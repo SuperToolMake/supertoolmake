@@ -1,39 +1,39 @@
 <script lang="ts">
-  import "@spectrum-css/actionbutton/dist/index-vars.css"
-  import Tooltip from "../Tooltip/Tooltip.svelte"
-  import Icon from "../Icon/Icon.svelte"
-  import { fade } from "svelte/transition"
-  import { hexToRGBA } from "../helpers"
+import "@spectrum-css/actionbutton/dist/index-vars.css"
+import { fade } from "svelte/transition"
+import { hexToRGBA } from "../helpers"
+import Icon from "../Icon/Icon.svelte"
+import Tooltip from "../Tooltip/Tooltip.svelte"
 
-  export let quiet: boolean = false
-  export let selected: boolean = false
-  export let disabled: boolean = false
-  export let icon: string = ""
-  export let size: "S" | "M" | "L" = "M"
-  export let active: boolean = false
-  export let fullWidth: boolean = false
-  export let noPadding: boolean = false
-  export let tooltip: string = ""
-  export let accentColor: string | null = null
+export let quiet: boolean = false
+export let selected: boolean = false
+export let disabled: boolean = false
+export let icon: string = ""
+export let size: "S" | "M" | "L" = "M"
+export let active: boolean = false
+export let fullWidth: boolean = false
+export let noPadding: boolean = false
+export let tooltip: string = ""
+export let accentColor: string | null = null
 
-  let showTooltip = false
+let showTooltip = false
 
-  $: accentStyle = getAccentStyle(accentColor)
+$: accentStyle = getAccentStyle(accentColor)
 
-  const getAccentStyle = (color: string | null) => {
-    if (!color) {
-      return ""
-    }
-    if (!color.startsWith("rgba")) {
-      color = color.startsWith("rgb")
-        ? `${color.substring(0, color.length - 1)}, 0.2)`
-        : hexToRGBA(color, 0.2)
-    }
-    let style = ""
-    style += `--accent-bg-color:${color};`
-    style += `--accent-border-color:${color};`
-    return style
+const getAccentStyle = (color: string | null) => {
+  if (!color) {
+    return ""
   }
+  if (!color.startsWith("rgba")) {
+    color = color.startsWith("rgb")
+      ? `${color.substring(0, color.length - 1)}, 0.2)`
+      : hexToRGBA(color, 0.2)
+  }
+  let style = ""
+  style += `--accent-bg-color:${color};`
+  style += `--accent-border-color:${color};`
+  return style
+}
 </script>
 
 <button

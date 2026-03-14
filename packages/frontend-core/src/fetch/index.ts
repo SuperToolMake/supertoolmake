@@ -1,5 +1,5 @@
-import { DataFetchDatasource, Table } from "@budibase/types"
-import { APIClient } from "../api/types"
+import type { DataFetchDatasource, Table } from "@budibase/types"
+import type { APIClient } from "../api/types"
 import CustomFetch from "./CustomFetch"
 import FieldFetch from "./FieldFetch"
 import JSONArrayFetch from "./JSONArrayFetch"
@@ -63,10 +63,7 @@ export type DataFetchDefinition =
     }
 
 // Constructs a new fetch model for a certain datasource
-export const fetchData = <
-  T extends DataFetchDatasource,
-  Type extends T["type"] = T["type"],
->({
+export const fetchData = <T extends DataFetchDatasource, Type extends T["type"] = T["type"]>({
   API,
   datasource,
   options,
@@ -74,9 +71,7 @@ export const fetchData = <
   API: APIClient
   datasource: T
   options?: any
-}): Type extends keyof DataFetchClassMap
-  ? DataFetchClassMap[Type]
-  : TableFetch => {
+}): Type extends keyof DataFetchClassMap ? DataFetchClassMap[Type] : TableFetch => {
   const Fetch = DataFetchMap[datasource?.type] || TableFetch
   const fetch = new Fetch({ API, datasource, ...options })
 

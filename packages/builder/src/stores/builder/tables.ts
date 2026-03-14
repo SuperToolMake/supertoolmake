@@ -1,16 +1,7 @@
-import {
-  FieldSchema,
-  FieldType,
-  SaveTableRequest,
-  Table,
-} from "@budibase/types"
-import {
-  SWITCHABLE_TYPES,
-  canBeDisplayColumn,
-  isAllowedDisplayField,
-} from "@budibase/shared-core"
-import { get, derived, Writable } from "svelte/store"
+import { canBeDisplayColumn, isAllowedDisplayField, SWITCHABLE_TYPES } from "@budibase/shared-core"
+import { type FieldSchema, FieldType, type SaveTableRequest, type Table } from "@budibase/types"
 import { cloneDeep } from "lodash/fp"
+import { derived, get, type Writable } from "svelte/store"
 import { API } from "@/api"
 import { DerivedBudiStore } from "@/stores/BudiStore"
 
@@ -38,17 +29,12 @@ interface DerivedTableStore extends BuilderTableStore {
   selected?: Table
 }
 
-export class TableStore extends DerivedBudiStore<
-  BuilderTableStore,
-  DerivedTableStore
-> {
+export class TableStore extends DerivedBudiStore<BuilderTableStore, DerivedTableStore> {
   constructor() {
     const makeDerivedStore = (store: Writable<BuilderTableStore>) => {
-      return derived(store, $store => ({
+      return derived(store, ($store) => ({
         ...$store,
-        selected: $store.list?.find(
-          table => table._id === $store.selectedTableId
-        ),
+        selected: $store.list?.find((table) => table._id === $store.selectedTableId),
       }))
     }
 
@@ -69,7 +55,7 @@ export class TableStore extends DerivedBudiStore<
 
   async fetch() {
     const tables = await API.getTables()
-    this.store.update(state => ({
+    this.store.update((state) => ({
       ...state,
       list: tables,
     }))
@@ -77,10 +63,10 @@ export class TableStore extends DerivedBudiStore<
 
   private async singleFetch(tableId: string) {
     const table = await API.getTable(tableId)
-    this.store.update(state => {
+    this.store.update((state) => {
       const list = []
       // update the list, keep order accurate
-      for (let tbl of state.list) {
+      for (const tbl of state.list) {
         if (table._id === tbl._id) {
           list.push(table)
         } else {
@@ -93,7 +79,7 @@ export class TableStore extends DerivedBudiStore<
   }
 
   select(tableId: string | undefined) {
-    this.store.update(state => ({
+    this.store.update((state) => ({
       ...state,
       selectedTableId: tableId,
     }))
@@ -101,11 +87,11 @@ export class TableStore extends DerivedBudiStore<
 
   async save(table: Table) {
     const updatedTable: SaveTableRequest = cloneDeep(table)
-    const oldTable = get(this.store).list.filter(t => t._id === table._id)[0]
+    const oldTable = get(this.store).list.filter((t) => t._id === table._id)[0]
 
     const fieldNames = []
     // Update any renamed schema keys to reflect their names
-    for (let key of Object.keys(updatedTable.schema)) {
+    for (const key of Object.keys(updatedTable.schema)) {
       // If field name has been seen before remove it
       if (fieldNames.indexOf(key.toLowerCase()) !== -1) {
         delete updatedTable.schema[key]
@@ -135,15 +121,15 @@ export class TableStore extends DerivedBudiStore<
     this.replaceTable(savedTable._id, savedTable)
     this.select(savedTable._id)
     // make sure tables up to date (related)
-    let newTableIds = []
-    for (let column of Object.values(updatedTable?.schema || {})) {
+    const newTableIds = []
+    for (const column of Object.values(updatedTable?.schema || {})) {
       if (column.type === FieldType.LINK) {
         newTableIds.push(column.tableId)
       }
     }
 
-    let oldTableIds = []
-    for (let column of Object.values(oldTable?.schema || {})) {
+    const oldTableIds = []
+    for (const column of Object.values(oldTable?.schema || {})) {
       if (column.type === FieldType.LINK) {
         oldTableIds.push(column.tableId)
       }
@@ -154,7 +140,7 @@ export class TableStore extends DerivedBudiStore<
     if (tableIdsToFetch.length > 3) {
       await this.fetch()
     } else {
-      await Promise.all(tableIdsToFetch.map(id => this.singleFetch(id)))
+      await Promise.all(tableIdsToFetch.map((id) => this.singleFetch(id)))
     }
     return savedTable
   }
@@ -215,7 +201,7 @@ export class TableStore extends DerivedBudiStore<
   }
 
   async deleteField(field: { name: string | number }) {
-    let draft = cloneDeep(get(this.derivedStore).selected!)
+    const draft = cloneDeep(get(this.derivedStore).selected!)
     delete draft.schema[field.name]
     await this.save(draft)
   }
@@ -228,17 +214,17 @@ export class TableStore extends DerivedBudiStore<
 
     // Handle deletion
     if (!table) {
-      this.store.update(state => ({
+      this.store.update((state) => ({
         ...state,
-        list: state.list.filter(x => x._id !== tableId),
+        list: state.list.filter((x) => x._id !== tableId),
       }))
       return
     }
 
     // Add new table
-    const index = get(this.store).list.findIndex(x => x._id === table._id)
+    const index = get(this.store).list.findIndex((x) => x._id === table._id)
     if (index === -1) {
-      this.store.update(state => ({
+      this.store.update((state) => ({
         ...state,
         list: [...state.list, table],
       }))
@@ -249,7 +235,7 @@ export class TableStore extends DerivedBudiStore<
       // This function has to merge state as there discrepancies with the table
       // API endpoints. The table list endpoint and get table endpoint use the
       // "type" property to mean different things.
-      this.store.update(state => {
+      this.store.update((state) => {
         state.list[index] = {
           ...table,
           type: state.list[index].type,
@@ -260,9 +246,9 @@ export class TableStore extends DerivedBudiStore<
   }
 
   removeDatasourceTables(datasourceId: string) {
-    this.store.update(state => ({
+    this.store.update((state) => ({
       ...state,
-      list: state.list.filter(table => table.sourceId !== datasourceId),
+      list: state.list.filter((table) => table.sourceId !== datasourceId),
     }))
   }
 }

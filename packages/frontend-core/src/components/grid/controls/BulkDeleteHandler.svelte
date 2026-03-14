@@ -1,82 +1,82 @@
 <script>
-  import { Modal, ModalContent, ProgressBar } from "@budibase/bbui"
-  import { getContext, onMount } from "svelte"
-  import { parseCellID } from "../lib/utils"
-  import { sleep } from "../../../utils/utils"
+import { Modal, ModalContent, ProgressBar } from "@budibase/bbui"
+import { getContext, onMount } from "svelte"
+import { sleep } from "../../../utils/utils"
+import { parseCellID } from "../lib/utils"
 
-  const {
-    selectedRows,
-    rows,
-    subscribe,
-    notifications,
-    menu,
-    selectedCellCount,
-    selectedRowCount,
-    selectedCells,
-    rowLookupMap,
-    config,
-  } = getContext("grid")
-  const duration = 260
+const {
+  selectedRows,
+  rows,
+  subscribe,
+  notifications,
+  menu,
+  selectedCellCount,
+  selectedRowCount,
+  selectedCells,
+  rowLookupMap,
+  config,
+} = getContext("grid")
+const duration = 260
 
-  let rowsModal
-  let cellsModal
-  let processing = false
-  let progressPercentage = 0
-  let promptQuantity = 0
+let rowsModal
+let cellsModal
+let processing = false
+let progressPercentage = 0
+let promptQuantity = 0
 
-  $: rowsToDelete = Object.keys($selectedRows)
-    .map(rowId => $rowLookupMap[rowId])
-    .filter(x => x != null)
+$: rowsToDelete = Object.keys($selectedRows)
+  .map((rowId) => $rowLookupMap[rowId])
+  .filter((x) => x != null)
 
-  const handleBulkDeleteRequest = () => {
-    progressPercentage = 0
-    menu.actions.close()
-    if ($selectedRowCount && $config.canDeleteRows) {
-      if ($selectedRowCount === 1) {
-        bulkDeleteRows()
-      } else {
-        promptQuantity = $selectedRowCount
-        rowsModal?.show()
+const handleBulkDeleteRequest = () => {
+  progressPercentage = 0
+  menu.actions.close()
+  if ($selectedRowCount && $config.canDeleteRows) {
+    if ($selectedRowCount === 1) {
+      bulkDeleteRows()
+    } else {
+      promptQuantity = $selectedRowCount
+      rowsModal?.show()
+    }
+  } else if ($selectedCellCount && $config.canEditRows) {
+    promptQuantity = $selectedCellCount
+    cellsModal?.show()
+  }
+}
+
+const bulkDeleteRows = async () => {
+  processing = true
+  const count = rowsToDelete.length
+  await rows.actions.deleteRows(rowsToDelete)
+  // This is a real bulk delete endpoint so we don't need progress.
+  // We just animate it uo to 100 when we're done for consistency with other
+  // prompts.
+  progressPercentage = 100
+  await sleep(duration)
+  $notifications.success(`Deleted ${count} row${count === 1 ? "" : "s"}`)
+  processing = false
+}
+
+const bulkDeleteCells = async () => {
+  processing = true
+  let changeMap = {}
+  for (let row of $selectedCells) {
+    for (let cellId of row) {
+      const { rowId, field } = parseCellID(cellId)
+      if (!changeMap[rowId]) {
+        changeMap[rowId] = {}
       }
-    } else if ($selectedCellCount && $config.canEditRows) {
-      promptQuantity = $selectedCellCount
-      cellsModal?.show()
+      changeMap[rowId][field] = null
     }
   }
+  await rows.actions.bulkUpdate(changeMap, (progress) => {
+    progressPercentage = progress * 100
+  })
+  await sleep(duration)
+  processing = false
+}
 
-  const bulkDeleteRows = async () => {
-    processing = true
-    const count = rowsToDelete.length
-    await rows.actions.deleteRows(rowsToDelete)
-    // This is a real bulk delete endpoint so we don't need progress.
-    // We just animate it uo to 100 when we're done for consistency with other
-    // prompts.
-    progressPercentage = 100
-    await sleep(duration)
-    $notifications.success(`Deleted ${count} row${count === 1 ? "" : "s"}`)
-    processing = false
-  }
-
-  const bulkDeleteCells = async () => {
-    processing = true
-    let changeMap = {}
-    for (let row of $selectedCells) {
-      for (let cellId of row) {
-        const { rowId, field } = parseCellID(cellId)
-        if (!changeMap[rowId]) {
-          changeMap[rowId] = {}
-        }
-        changeMap[rowId][field] = null
-      }
-    }
-    await rows.actions.bulkUpdate(changeMap, progress => {
-      progressPercentage = progress * 100
-    })
-    await sleep(duration)
-    processing = false
-  }
-
-  onMount(() => subscribe("request-bulk-delete", handleBulkDeleteRequest))
+onMount(() => subscribe("request-bulk-delete", handleBulkDeleteRequest))
 </script>
 
 <Modal bind:this={rowsModal}>

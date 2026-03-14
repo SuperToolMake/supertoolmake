@@ -1,18 +1,13 @@
-import { writable, derived, get, Writable, Readable } from "svelte/store"
-import { DataFetch, DataFetchDefinition, fetchData } from "../../../fetch"
-import { NewRowID, RowPageSize } from "../lib/constants"
-import {
-  generateRowID,
-  getCellID,
-  isGeneratedRowID,
-  parseCellID,
-} from "../lib/utils"
-import { tick } from "svelte"
 import { Helpers } from "@budibase/bbui"
-import { sleep } from "../../../utils/utils"
-import { FieldType, Row, UIRow } from "@budibase/types"
+import { FieldType, type Row, type UIRow } from "@budibase/types"
+import { tick } from "svelte"
+import { derived, get, type Readable, type Writable, writable } from "svelte/store"
+import { type DataFetch, type DataFetchDefinition, fetchData } from "../../../fetch"
 import { getRelatedTableValues } from "../../../utils"
-import { Store as StoreContext } from "."
+import { sleep } from "../../../utils/utils"
+import { NewRowID, RowPageSize } from "../lib/constants"
+import { generateRowID, getCellID, isGeneratedRowID, parseCellID } from "../lib/utils"
+import type { Store as StoreContext } from "."
 
 interface IndexedUIRow extends UIRow {
   __idx: number
@@ -94,7 +89,7 @@ export const createStores = (): RowStore => {
 
   // Mark loaded as true if we've ever stopped loading
   let hasStartedLoading = false
-  loading.subscribe($loading => {
+  loading.subscribe(($loading) => {
     if ($loading) {
       hasStartedLoading = true
     } else if (hasStartedLoading) {
@@ -120,56 +115,47 @@ export const deriveStores = (context: StoreContext): RowDerivedStore => {
   const { rows, enrichedSchema } = context
 
   // Enrich rows with an index property and additional values
-  const enrichedRows = derived(
-    [rows, enrichedSchema],
-    ([$rows, $enrichedSchema]) => {
-      // Find columns which require additional processing
-      const cols = Object.values($enrichedSchema || {})
-      const relatedColumns = cols.filter(col => col.related)
-      const formattedColumns = cols.filter(col => col.format)
+  const enrichedRows = derived([rows, enrichedSchema], ([$rows, $enrichedSchema]) => {
+    // Find columns which require additional processing
+    const cols = Object.values($enrichedSchema || {})
+    const relatedColumns = cols.filter((col) => col.related)
+    const formattedColumns = cols.filter((col) => col.format)
 
-      return $rows.map<IndexedUIRow>((row, idx) => {
-        // Derive any values that need enriched from related rows
-        const relatedValues = relatedColumns.reduce<Record<string, string>>(
-          (map, column) => {
-            const fromField = $enrichedSchema![column.related!.field]
-            map[column.name] = getRelatedTableValues(
-              row,
-              { ...column, related: column.related! },
-              fromField
-            )
-            return map
-          },
-          {}
+    return $rows.map<IndexedUIRow>((row, idx) => {
+      // Derive any values that need enriched from related rows
+      const relatedValues = relatedColumns.reduce<Record<string, string>>((map, column) => {
+        const fromField = $enrichedSchema![column.related!.field]
+        map[column.name] = getRelatedTableValues(
+          row,
+          { ...column, related: column.related! },
+          fromField
         )
-        // Derive any display-only formatted values for this row
-        const formattedValues = formattedColumns.reduce<Record<string, any>>(
-          (map, column) => {
-            map[column.name] = column.format!(row)
-            return map
-          },
-          {}
-        )
-        return {
-          ...row,
-          ...relatedValues,
-          __formatted: formattedValues,
-          __idx: idx,
-        }
-      })
-    }
-  )
+        return map
+      }, {})
+      // Derive any display-only formatted values for this row
+      const formattedValues = formattedColumns.reduce<Record<string, any>>((map, column) => {
+        map[column.name] = column.format!(row)
+        return map
+      }, {})
+      return {
+        ...row,
+        ...relatedValues,
+        __formatted: formattedValues,
+        __idx: idx,
+      }
+    })
+  })
 
   // Generate a lookup map to quick find a row by ID
-  const rowLookupMap = derived(enrichedRows, $enrichedRows => {
-    let map: Record<string, IndexedUIRow> = {}
+  const rowLookupMap = derived(enrichedRows, ($enrichedRows) => {
+    const map: Record<string, IndexedUIRow> = {}
     for (let i = 0; i < $enrichedRows.length; i++) {
       map[$enrichedRows[i]._id] = $enrichedRows[i]
     }
     return map
   })
 
-  const rowCount = derived(rows, $rows => $rows.length)
+  const rowCount = derived(rows, ($rows) => $rows.length)
 
   return {
     rows: {
@@ -214,7 +200,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
   // Reset everything when datasource changes
   let unsubscribe: (() => void) | null = null
   let lastResetKey: string | null = null
-  datasource.subscribe(async $datasource => {
+  datasource.subscribe(async ($datasource) => {
     // Unsub from previous fetch if one exists
     unsubscribe?.()
     unsubscribe = null
@@ -263,7 +249,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
     }
 
     const fetchStore = newFetch as unknown as Readable<GridFetchSnapshot>
-    unsubscribe = fetchStore.subscribe(async $fetch => {
+    unsubscribe = fetchStore.subscribe(async ($fetch) => {
       if ($fetch.error) {
         // Present a helpful error to the user
         let message = "An unknown error occurred"
@@ -309,7 +295,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
           scroll.set({ top: 0, left: 0 })
         } else if (resetRows) {
           // Only reset top scroll position when resetting rows
-          scroll.update(state => ({ ...state, top: 0 }))
+          scroll.update((state) => ({ ...state, top: 0 }))
         }
 
         // Process new rows
@@ -346,11 +332,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
 
     // If the server doesn't reply with a valid error, assume that the source
     // of the error is the focused cell's column
-    if (
-      typeof error !== "string" &&
-      !error?.json?.validationErrors &&
-      errorString
-    ) {
+    if (typeof error !== "string" && !error?.json?.validationErrors && errorString) {
       const { field: focusedColumn } = parseCellID(get(focusedCellId))
       if (focusedColumn) {
         error = {
@@ -368,9 +350,9 @@ export const createActions = (context: StoreContext): RowActionStore => {
       const $columns = get(columns)
 
       // Filter out missing columns from columns that we have
-      let erroredColumns = []
-      let missingColumns = []
-      for (let column of keys) {
+      const erroredColumns = []
+      const missingColumns = []
+      for (const column of keys) {
         if (datasource.actions.canUseColumn(column)) {
           erroredColumns.push(column)
         } else {
@@ -379,7 +361,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
       }
       const { json } = error
       // Process errors for columns that we have
-      for (let column of erroredColumns) {
+      for (const column of erroredColumns) {
         // Ensure we have a valid error to display
         let err = json.validationErrors[column]
         if (Array.isArray(err)) {
@@ -389,14 +371,11 @@ export const createActions = (context: StoreContext): RowActionStore => {
           error = "Something went wrong"
         }
         // Set error against the cell
-        validation.actions.setError(
-          getCellID(rowId, column),
-          Helpers.capitalise(err)
-        )
+        validation.actions.setError(getCellID(rowId, column), Helpers.capitalise(err))
         // Ensure the column is visible
-        const index = $columns.findIndex(x => x.name === column)
+        const index = $columns.findIndex((x) => x.name === column)
         if (index !== -1 && !$columns[index].visible) {
-          columns.update(state => {
+          columns.update((state) => {
             state[index].visible = true
             return state.slice()
           })
@@ -404,7 +383,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
       }
 
       // Notify about missing columns
-      for (let column of missingColumns) {
+      for (const column of missingColumns) {
         get(notifications).error(`${column} is required but is missing`)
       }
     } else {
@@ -430,7 +409,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
       // Update state
       if (idx != null) {
         rowCacheMap[newRow._id] = true
-        rows.update(state => {
+        rows.update((state) => {
           state.splice(idx, 0, newRow)
           return state.slice()
         })
@@ -454,7 +433,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
 
   // Duplicates a row, inserting the duplicate row after the existing one
   const duplicateRow = async (row: UIRow) => {
-    let clone = cleanRow(row)
+    const clone = cleanRow(row)
     delete clone._id
     delete clone._rev
     try {
@@ -479,20 +458,20 @@ export const createActions = (context: StoreContext): RowActionStore => {
   ) => {
     // Find index of last row
     const $rowLookupMap = get(rowLookupMap)
-    const indices = rowsToDupe.map(row => $rowLookupMap[row._id!]?.__idx)
+    const indices = rowsToDupe.map((row) => $rowLookupMap[row._id!]?.__idx)
     const index = Math.max(...indices)
     const count = rowsToDupe.length
 
     // Clone and clean rows
-    const clones = rowsToDupe.map(row => {
-      let clone = cleanRow(row)
+    const clones = rowsToDupe.map((row) => {
+      const clone = cleanRow(row)
       delete clone._id
       delete clone._rev
       return clone
     })
 
     // Create rows
-    let saved: UIRow[] = []
+    const saved: UIRow[] = []
     let failed = 0
     for (let i = 0; i < count; i++) {
       try {
@@ -509,7 +488,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
 
     // Add to state
     if (saved.length) {
-      rows.update(state => {
+      rows.update((state) => {
         return state.toSpliced(index + 1, 0, ...saved)
       })
     }
@@ -535,7 +514,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
     if (row) {
       if (index != null) {
         // An existing row was updated
-        rows.update(state => {
+        rows.update((state) => {
           state[index] = { ...row }
           return state
         })
@@ -572,7 +551,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
     }
 
     // Ensure there is at least 1 column that creates a difference
-    return columns.some(column => row[column] !== changes[column])
+    return columns.some((column) => row[column] !== changes[column])
   }
 
   // Patches a row with some changes in local state, and returns whether a
@@ -583,7 +562,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
     const row = $rowLookupMap[rowId]
 
     // Coerce some values into the correct types
-    for (let column of Object.keys(changes || {})) {
+    for (const column of Object.keys(changes || {})) {
       const type = $columnLookupMap[column]?.schema?.type
 
       // Stringify objects
@@ -600,7 +579,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
     }
 
     // Add change to cache
-    rowChangeCache.update(state => ({
+    rowChangeCache.update((state) => ({
       ...state,
       [rowId]: {
         ...state[rowId],
@@ -628,12 +607,12 @@ export const createActions = (context: StoreContext): RowActionStore => {
     if (row == null) {
       return
     }
-    let savedRow: UIRow | undefined = undefined
+    let savedRow: UIRow | undefined
 
     // Save change
     try {
       // Increment change count for this row
-      inProgressChanges.update(state => ({
+      inProgressChanges.update((state) => ({
         ...state,
         [rowId]: (state[rowId] || 0) + 1,
       }))
@@ -646,7 +625,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
       // Update row state after a successful change
       if (savedRow?._id) {
         if (updateState) {
-          rows.update(state => {
+          rows.update((state) => {
             state[row.__idx] = savedRow!
             return state.slice()
           })
@@ -658,8 +637,8 @@ export const createActions = (context: StoreContext): RowActionStore => {
 
       // Wipe row change cache for any values which have been saved
       const liveChanges = get(rowChangeCache)[rowId]
-      rowChangeCache.update(state => {
-        Object.keys(stashedChanges || {}).forEach(key => {
+      rowChangeCache.update((state) => {
+        Object.keys(stashedChanges || {}).forEach((key) => {
           if (stashedChanges[key] === liveChanges?.[key]) {
             delete state[rowId][key]
           }
@@ -674,7 +653,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
     }
 
     // Decrement change count for this row
-    inProgressChanges.update(state => ({
+    inProgressChanges.update((state) => ({
       ...state,
       [rowId]: (state[rowId] || 1) - 1,
     }))
@@ -711,14 +690,14 @@ export const createActions = (context: StoreContext): RowActionStore => {
 
     // Update rows
     const $columnLookupMap = get(columnLookupMap)
-    let updated: UIRow[] = []
+    const updated: UIRow[] = []
     let failed = 0
     for (let i = 0; i < count; i++) {
       const rowId = rowIds[i]
-      let changes = changeMap[rowId] || {}
+      const changes = changeMap[rowId] || {}
 
       // Strip any readonly fields from the change set
-      for (let field of Object.keys(changes)) {
+      for (const field of Object.keys(changes)) {
         const column = $columnLookupMap[field]
         if (columns.actions.isReadonly(column)) {
           delete changes[field]
@@ -751,8 +730,8 @@ export const createActions = (context: StoreContext): RowActionStore => {
     // Update state
     if (updated.length) {
       const $rowLookupMap = get(rowLookupMap)
-      rows.update(state => {
-        for (let row of updated) {
+      rows.update((state) => {
+        for (const row of updated) {
           const index = $rowLookupMap[row._id].__idx
           state[index] = row
         }
@@ -777,7 +756,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
     }
 
     // Actually delete rows
-    rowsToDelete.forEach(row => delete row.__idx)
+    rowsToDelete.forEach((row) => delete row.__idx)
     await datasource.actions.deleteRows(rowsToDelete)
 
     // Update state
@@ -790,7 +769,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
     if (resetRows) {
       rowCacheMap = {}
     }
-    let rowsToAppend: Row[] = []
+    const rowsToAppend: Row[] = []
     let newRow
     const $hasBudibaseIdentifiers = get(hasBudibaseIdentifiers)
     for (let i = 0; i < newRows.length; i++) {
@@ -811,18 +790,18 @@ export const createActions = (context: StoreContext): RowActionStore => {
     if (resetRows) {
       rows.set(rowsToAppend as UIRow[])
     } else if (rowsToAppend.length) {
-      rows.update(state => [...state, ...(rowsToAppend as UIRow[])])
+      rows.update((state) => [...state, ...(rowsToAppend as UIRow[])])
     }
   }
 
   // Local handler to remove rows from state
   const handleRemoveRows = (rowsToRemove: UIRow[]) => {
-    const deletedIds = rowsToRemove.map(row => row._id)
+    const deletedIds = rowsToRemove.map((row) => row._id)
 
     // We deliberately do not remove IDs from the cache map as the data may
     // still exist inside the fetch, but we don't want to add it again
-    rows.update(state => {
-      return state.filter(row => !deletedIds.includes(row._id))
+    rows.update((state) => {
+      return state.filter((row) => !deletedIds.includes(row._id))
     })
   }
 
@@ -834,7 +813,7 @@ export const createActions = (context: StoreContext): RowActionStore => {
   // Cleans a row by removing any internal grid metadata from it.
   // Call this before passing a row to any sort of external flow.
   const cleanRow = (row: UIRow) => {
-    let clone: Row = { ...row }
+    const clone: Row = { ...row }
     delete clone.__idx
     delete clone.__metadata
     delete clone.__formatted
@@ -876,10 +855,10 @@ export const initialise = (context: StoreContext) => {
   } = context
 
   // Wipe the row change cache when changing row
-  previousFocusedRowId.subscribe(id => {
+  previousFocusedRowId.subscribe((id) => {
     if (id && !get(inProgressChanges)[id]) {
       if (Object.keys(get(rowChangeCache)[id] || {}).length) {
-        rowChangeCache.update(state => {
+        rowChangeCache.update((state) => {
           delete state[id]
           return state
         })
@@ -888,7 +867,7 @@ export const initialise = (context: StoreContext) => {
   })
 
   // Ensure any unsaved changes are saved when changing cell
-  previousFocusedCellId.subscribe(async id => {
+  previousFocusedCellId.subscribe(async (id) => {
     if (!id) {
       return
     }

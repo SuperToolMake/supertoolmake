@@ -1,52 +1,52 @@
 <script>
-  import {
-    initialise,
-    reset,
-    builderStore,
-    previewStore,
-    deploymentStore,
-    appStore,
-  } from "@/stores/builder"
-  import { appsStore, admin } from "@/stores/portal"
-  import { bb } from "@/stores/bb"
-  import { Heading, Layout, Body } from "@budibase/bbui"
-  import { API } from "@/api"
-  import InviteUsersModal from "./_components/InviteUsersModal.svelte"
-  import PreviewOverlay from "./_components/PreviewOverlay.svelte"
-  import SideNav from "./_components/SideNav/SideNav.svelte"
+import { Body, Heading, Layout } from "@budibase/bbui"
+import { API } from "@/api"
+import { bb } from "@/stores/bb"
+import {
+  appStore,
+  builderStore,
+  deploymentStore,
+  initialise,
+  previewStore,
+  reset,
+} from "@/stores/builder"
+import { admin, appsStore } from "@/stores/portal"
+import InviteUsersModal from "./_components/InviteUsersModal.svelte"
+import PreviewOverlay from "./_components/PreviewOverlay.svelte"
+import SideNav from "./_components/SideNav/SideNav.svelte"
 
-  export let application
+export let application
 
-  let sideNav
-  let promise = getPackage(application)
-  let showInviteUsersModal = false
-  $: if ($bb.settings.open && showInviteUsersModal) {
-    showInviteUsersModal = false
-  }
+let sideNav
+let promise = getPackage(application)
+let showInviteUsersModal = false
+$: if ($bb.settings.open && showInviteUsersModal) {
+  showInviteUsersModal = false
+}
 
-  async function getPackage(appId) {
-    try {
-      if ($admin.maintenance.length) {
-        return
-      }
-      if ($builderStore.created) {
-        builderStore.appCreated(false)
-        await appsStore.load()
-      } else {
-        reset()
-        appStore.update(state => ({ ...state, appId }))
-        const pkg = await API.fetchAppPackage(appId)
-
-        await initialise(pkg)
-      }
-      await deploymentStore.load()
-    } catch (error) {
-      console.error(`Error initialising app: ${error?.message}`)
-      sideNav.show()
-
-      throw error
+async function getPackage(appId) {
+  try {
+    if ($admin.maintenance.length) {
+      return
     }
+    if ($builderStore.created) {
+      builderStore.appCreated(false)
+      await appsStore.load()
+    } else {
+      reset()
+      appStore.update((state) => ({ ...state, appId }))
+      const pkg = await API.fetchAppPackage(appId)
+
+      await initialise(pkg)
+    }
+    await deploymentStore.load()
+  } catch (error) {
+    console.error(`Error initialising app: ${error?.message}`)
+    sideNav.show()
+
+    throw error
   }
+}
 </script>
 
 {#if showInviteUsersModal}

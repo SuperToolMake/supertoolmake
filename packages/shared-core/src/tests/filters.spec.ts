@@ -1,11 +1,11 @@
-import { buildQuery } from "../filters"
 import {
   BasicOperator,
   EmptyFilterOption,
   FieldType,
   UILogicalOperator,
-  UISearchFilter,
+  type UISearchFilter,
 } from "@budibase/types"
+import { buildQuery } from "../filters"
 
 describe("filter to query conversion", () => {
   it("handles a filter with 1 group", () => {

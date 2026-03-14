@@ -1,10 +1,10 @@
 <script>
-  import { StatusLight } from "@budibase/bbui"
+import { StatusLight } from "@budibase/bbui"
 
-  export let value
-  export let schema
+export let value
+export let schema
 
-  $: role = schema.roles?.find(x => x._id === value)
+$: role = schema.roles?.find((x) => x._id === value)
 </script>
 
 <div class="role-cell">

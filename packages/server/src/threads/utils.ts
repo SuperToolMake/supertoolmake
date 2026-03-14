@@ -1,8 +1,8 @@
-import { QueryVariable } from "./definitions"
-import env from "../environment"
+import { db as dbCore, redis } from "@budibase/backend-core"
 import * as db from "../db"
-import { redis, db as dbCore } from "@budibase/backend-core"
+import env from "../environment"
 import * as jsRunner from "../jsRunner"
+import type { QueryVariable } from "./definitions"
 
 const VARIABLE_TTL_SECONDS = 3600
 let client: redis.Client | null = null
@@ -42,22 +42,12 @@ export async function getCachedVariable(queryId: string, variable: string) {
 
 export async function invalidateCachedVariable(vars: QueryVariable[]) {
   const cache = await getClient()
-  await Promise.all(
-    vars.map(v => cache.delete(makeVariableKey(v.queryId, v.name)))
-  )
+  await Promise.all(vars.map((v) => cache.delete(makeVariableKey(v.queryId, v.name))))
 }
 
-export async function storeDynamicVariable(
-  queryId: string,
-  variable: string,
-  value: any
-) {
+export async function storeDynamicVariable(queryId: string, variable: string, value: any) {
   const cache = await getClient()
-  await cache.store(
-    makeVariableKey(queryId, variable),
-    value,
-    VARIABLE_TTL_SECONDS
-  )
+  await cache.store(makeVariableKey(queryId, variable), value, VARIABLE_TTL_SECONDS)
 }
 
 export function formatResponse(resp: any) {

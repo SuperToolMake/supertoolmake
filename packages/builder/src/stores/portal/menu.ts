@@ -1,5 +1,5 @@
-import { Readable, readable } from "svelte/store"
 import { BUILDER_URLS } from "@budibase/shared-core"
+import { type Readable, readable } from "svelte/store"
 
 interface MenuItem {
   title: string

@@ -1,49 +1,41 @@
 <script lang="ts">
-  import { API } from "@/api"
-  import { initialise } from "@/stores/builder"
-  import {
-    Body,
-    Dropzone,
-    Input,
-    Layout,
-    ModalContent,
-    notifications,
-    Toggle,
-  } from "@budibase/bbui"
-  import { sdk } from "@budibase/shared-core"
-  import type { ImportToUpdateWorkspaceRequest } from "@budibase/types"
+import { Body, Dropzone, Input, Layout, ModalContent, notifications, Toggle } from "@budibase/bbui"
+import { sdk } from "@budibase/shared-core"
+import type { ImportToUpdateWorkspaceRequest } from "@budibase/types"
+import { API } from "@/api"
+import { initialise } from "@/stores/builder"
 
-  export let app: {
-    appId: string
-    name: string
-  }
+export let app: {
+  appId: string
+  name: string
+}
 
-  let encrypted: boolean = false
-  let password: string
-  let file: File
-  $: disabled = (encrypted && !password) || !file
+let encrypted: boolean = false
+let password: string
+let file: File
+$: disabled = (encrypted && !password) || !file
 
-  async function updateApp() {
-    try {
-      const body: ImportToUpdateWorkspaceRequest = {}
-      if (encrypted) {
-        body.encryptionPassword = password.trim()
-      }
-      const appId = sdk.applications.getDevAppID(app.appId)
-      await API.updateAppFromExport(appId, body, file)
-      const pkg = await API.fetchAppPackage(appId)
-      await initialise(pkg)
-
-      notifications.success("Workspace updated successfully")
-    } catch (err: any) {
-      notifications.error(`Failed to update workspace - ${err.message || err}`)
+async function updateApp() {
+  try {
+    const body: ImportToUpdateWorkspaceRequest = {}
+    if (encrypted) {
+      body.encryptionPassword = password.trim()
     }
-  }
+    const appId = sdk.applications.getDevAppID(app.appId)
+    await API.updateAppFromExport(appId, body, file)
+    const pkg = await API.fetchAppPackage(appId)
+    await initialise(pkg)
 
-  async function onFileChange(e: CustomEvent) {
-    file = e.detail?.[0]
-    encrypted = file?.name?.endsWith(".enc.tar.gz")
+    notifications.success("Workspace updated successfully")
+  } catch (err: any) {
+    notifications.error(`Failed to update workspace - ${err.message || err}`)
   }
+}
+
+async function onFileChange(e: CustomEvent) {
+  file = e.detail?.[0]
+  encrypted = file?.name?.endsWith(".enc.tar.gz")
+}
 </script>
 
 <ModalContent

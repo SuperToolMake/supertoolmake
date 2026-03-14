@@ -1,31 +1,28 @@
 import { FieldTypeToComponentMap } from "@/components/design/settings/controls/FieldConfiguration/utils"
-import { Component } from "./Component"
 import { getSchemaForDatasource } from "@/dataBinding"
+import { Component } from "./Component"
 
 export function makeDatasourceFormComponents(datasource) {
   const { schema } = getSchemaForDatasource(null, datasource, {
     formSchema: true,
   })
-  let components = []
-  let fields = Object.keys(schema || {})
-  fields.forEach(field => {
+  const components = []
+  const fields = Object.keys(schema || {})
+  fields.forEach((field) => {
     const fieldSchema = schema[field]
     // skip autocolumns
     if (fieldSchema.autocolumn || fieldSchema.nestedJSON) {
       return
     }
-    const fieldType =
-      typeof fieldSchema === "object" ? fieldSchema.type : fieldSchema
+    const fieldType = typeof fieldSchema === "object" ? fieldSchema.type : fieldSchema
     const componentType = FieldTypeToComponentMap[fieldType]
     const fullComponentType = `@budibase/standard-components/${componentType}`
     if (componentType) {
-      const component = new Component(fullComponentType)
-        .instanceName(field)
-        .customProps({
-          field,
-          label: field,
-          placeholder: field,
-        })
+      const component = new Component(fullComponentType).instanceName(field).customProps({
+        field,
+        label: field,
+        placeholder: field,
+      })
       if (fieldType === "options") {
         component.customProps({
           placeholder: "Choose an option",
@@ -42,7 +39,7 @@ export function makeDatasourceFormComponents(datasource) {
           optionsSource: "schema",
         })
       } else if (fieldType === "link") {
-        let placeholder =
+        const placeholder =
           fieldSchema.relationshipType === "one-to-many"
             ? "Choose an option"
             : "Choose some options"

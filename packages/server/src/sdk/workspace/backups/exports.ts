@@ -49,17 +49,14 @@ async function tarFilesToTmp(tmpDir: string, files: string[]) {
  * a filter function or the name of the export.
  * @return either a readable stream or a string
  */
-export async function exportDB(
-  dbName: string,
-  opts: DBDumpOpts = {}
-): Promise<string> {
+export async function exportDB(dbName: string, opts: DBDumpOpts = {}): Promise<string> {
   const exportOpts = {
     filter: opts?.filter,
     batch_size: 1000,
     batch_limit: 5,
     style: "main_only",
   } as const
-  return dbCore.doWithDB(dbName, async db => {
+  return dbCore.doWithDB(dbName, async (db) => {
     // Write the dump to file if required
     if (opts?.exportPath) {
       const path = opts?.exportPath
@@ -80,15 +77,10 @@ export async function exportDB(
 }
 
 function defineFilter() {
-  const ids = [
-    USER_METDATA_PREFIX,
-    LINK_USER_METADATA_PREFIX,
-    AUTOMATION_LOG_PREFIX,
-  ]
+  const ids = [USER_METDATA_PREFIX, LINK_USER_METADATA_PREFIX, AUTOMATION_LOG_PREFIX]
   ids.push(TABLE_ROW_PREFIX)
 
-  return (doc: any) =>
-    !ids.map(key => doc._id.includes(key)).reduce((prev, curr) => prev || curr)
+  return (doc: any) => !ids.map((key) => doc._id.includes(key)).reduce((prev, curr) => prev || curr)
 }
 
 /**
@@ -106,16 +98,12 @@ export async function exportApp(appId: string, config?: ExportOpts) {
 
   toExclude.push(/\/attachments\/.*/)
 
-  const tmpPath = await objectStore.retrieveDirectory(
-    ObjectStoreBuckets.APPS,
-    appPath,
-    toExclude
-  )
+  const tmpPath = await objectStore.retrieveDirectory(ObjectStoreBuckets.APPS, appPath, toExclude)
 
   const downloadedPath = join(tmpPath, appPath)
   if (fs.existsSync(downloadedPath)) {
     const allFiles = await fsp.readdir(downloadedPath)
-    for (let file of allFiles) {
+    for (const file of allFiles) {
       const path = join(downloadedPath, file)
       // move out of app directory, simplify structure
       await fsp.rename(path, join(downloadedPath, "..", file))
@@ -132,7 +120,7 @@ export async function exportApp(appId: string, config?: ExportOpts) {
 
   if (config?.encryptPassword) {
     const processDirectory = async (dirPath: string, relativePath = "") => {
-      for (let file of await fsp.readdir(dirPath)) {
+      for (const file of await fsp.readdir(dirPath)) {
         const fullPath = join(dirPath, file)
         const relativeFilePath = relativePath ? join(relativePath, file) : file
 
@@ -140,10 +128,7 @@ export async function exportApp(appId: string, config?: ExportOpts) {
         if (file !== ATTACHMENT_DIRECTORY) {
           const stats = await fsp.lstat(fullPath)
           if (stats.isFile()) {
-            await encryption.encryptFile(
-              { dir: dirPath, filename: file },
-              config.encryptPassword!
-            )
+            await encryption.encryptFile({ dir: dirPath, filename: file }, config.encryptPassword!)
             await fsp.rm(fullPath)
           } else if (stats.isDirectory()) {
             await processDirectory(fullPath, relativeFilePath)

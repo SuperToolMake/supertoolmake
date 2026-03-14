@@ -1,4 +1,4 @@
-import { InternalTable, Table, TableSourceType } from "@budibase/types"
+import { InternalTable, type Table, TableSourceType } from "@budibase/types"
 import { isImportableTable } from "../import"
 
 describe("import", () => {

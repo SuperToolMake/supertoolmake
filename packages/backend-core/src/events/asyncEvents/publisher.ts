@@ -1,5 +1,5 @@
 import { AsyncEvents } from "@budibase/types"
-import { EventPayload, asyncEventQueue, init } from "./queue"
+import { asyncEventQueue, type EventPayload, init } from "./queue"
 
 export async function publishAsyncEvent(payload: EventPayload) {
   if (!asyncEventQueue) {

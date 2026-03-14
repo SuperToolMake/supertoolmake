@@ -1,21 +1,15 @@
-import { authorizedMiddleware as authorized } from "../../../middleware/authorized"
 import { auth, EndpointGroupList, permissions } from "@budibase/backend-core"
+import { authorizedMiddleware as authorized } from "../../../middleware/authorized"
 
 export const endpointGroupList = new EndpointGroupList()
 
-export const globalBuilderRoutes = endpointGroupList.group(
-  authorized(permissions.GLOBAL_BUILDER)
-)
+export const globalBuilderRoutes = endpointGroupList.group(authorized(permissions.GLOBAL_BUILDER))
 globalBuilderRoutes.lockMiddleware()
 
-export const builderRoutes = endpointGroupList.group(
-  authorized(permissions.BUILDER)
-)
+export const builderRoutes = endpointGroupList.group(authorized(permissions.BUILDER))
 builderRoutes.lockMiddleware()
 
-export const creatorRoutes = endpointGroupList.group(
-  authorized(permissions.CREATOR)
-)
+export const creatorRoutes = endpointGroupList.group(authorized(permissions.CREATOR))
 creatorRoutes.lockMiddleware()
 
 export const builderAdminRoutes = endpointGroupList.group(auth.builderOrAdmin)

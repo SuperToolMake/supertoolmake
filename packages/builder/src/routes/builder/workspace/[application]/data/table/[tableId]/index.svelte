@@ -1,286 +1,263 @@
 <script lang="ts">
-  import { Banner, Button, notifications } from "@budibase/bbui"
-  import {
-    datasources,
-    tables,
-    integrations,
-    appStore,
-    roles,
-    dataEnvironmentStore,
-    dataAPI,
-    deploymentStore,
-    workspaceDeploymentStore,
-  } from "@/stores/builder"
-  import { themeStore, admin } from "@/stores/portal"
-  import { TableNames } from "@/constants"
-  import { Grid, gridClipboard } from "@budibase/frontend-core"
-  import type { Store as GridStore } from "@budibase/frontend-core/src/components/grid/stores"
-  import GridAddColumnModal from "@/components/backend/DataTable/modals/grid/GridCreateColumnModal.svelte"
-  import GridCreateEditRowModal from "@/components/backend/DataTable/modals/grid/GridCreateEditRowModal.svelte"
-  import GridEditUserModal from "@/components/backend/DataTable/modals/grid/GridEditUserModal.svelte"
-  import GridImportButton from "@/components/backend/DataTable/buttons/grid/GridImportButton.svelte"
-  import GridExportButton from "@/components/backend/DataTable/buttons/grid/GridExportButton.svelte"
-  import GridManageAccessButton from "@/components/backend/DataTable/buttons/grid/GridManageAccessButton.svelte"
-  import GridRelationshipButton from "@/components/backend/DataTable/buttons/grid/GridRelationshipButton.svelte"
-  import GridEditColumnModal from "@/components/backend/DataTable/modals/grid/GridEditColumnModal.svelte"
-  import GridUsersTableButton from "@/components/backend/DataTable/buttons/grid/GridUsersTableButton.svelte"
-  import GridGenerateButton from "@/components/backend/DataTable/buttons/grid/GridGenerateButton.svelte"
-  import GridScreensButton from "@/components/backend/DataTable/buttons/grid/GridScreensButton.svelte"
-  import GridRowActionsButton from "@/components/backend/DataTable/buttons/grid/GridRowActionsButton.svelte"
-  import ProductionBlankState from "@/components/backend/DataTable/blankstates/ProductionBlankState.svelte"
-  import { DB_TYPE_EXTERNAL } from "@/constants/backend"
-  import { getContext } from "svelte"
-  import { onDestroy } from "svelte"
-  import { productionAPI } from "@/api"
-  import { publishTableToProduction } from "@/utils/publishTableToProduction"
-  import {
-    DataEnvironmentMode,
-    type Table,
-    type Datasource,
-    type UIDatasource,
-    type UIInternalDatasource,
-  } from "@budibase/types"
+import { Banner, Button, notifications } from "@budibase/bbui"
+import { type Grid, gridClipboard } from "@budibase/frontend-core"
+import type { Store as GridStore } from "@budibase/frontend-core/src/components/grid/stores"
+import {
+  DataEnvironmentMode,
+  type Datasource,
+  type Table,
+  type UIDatasource,
+  type UIInternalDatasource,
+} from "@budibase/types"
+import { getContext, onDestroy } from "svelte"
+import { productionAPI } from "@/api"
+import ProductionBlankState from "@/components/backend/DataTable/blankstates/ProductionBlankState.svelte"
+import GridExportButton from "@/components/backend/DataTable/buttons/grid/GridExportButton.svelte"
+import type GridGenerateButton from "@/components/backend/DataTable/buttons/grid/GridGenerateButton.svelte"
+import GridImportButton from "@/components/backend/DataTable/buttons/grid/GridImportButton.svelte"
+import GridManageAccessButton from "@/components/backend/DataTable/buttons/grid/GridManageAccessButton.svelte"
+import GridRelationshipButton from "@/components/backend/DataTable/buttons/grid/GridRelationshipButton.svelte"
+import GridRowActionsButton from "@/components/backend/DataTable/buttons/grid/GridRowActionsButton.svelte"
+import GridScreensButton from "@/components/backend/DataTable/buttons/grid/GridScreensButton.svelte"
+import GridUsersTableButton from "@/components/backend/DataTable/buttons/grid/GridUsersTableButton.svelte"
+import GridAddColumnModal from "@/components/backend/DataTable/modals/grid/GridCreateColumnModal.svelte"
+import GridCreateEditRowModal from "@/components/backend/DataTable/modals/grid/GridCreateEditRowModal.svelte"
+import GridEditColumnModal from "@/components/backend/DataTable/modals/grid/GridEditColumnModal.svelte"
+import GridEditUserModal from "@/components/backend/DataTable/modals/grid/GridEditUserModal.svelte"
+import { TableNames } from "@/constants"
+import { DB_TYPE_EXTERNAL } from "@/constants/backend"
+import {
+  appStore,
+  dataAPI,
+  dataEnvironmentStore,
+  datasources,
+  deploymentStore,
+  integrations,
+  roles,
+  tables,
+  workspaceDeploymentStore,
+} from "@/stores/builder"
+import { admin, themeStore } from "@/stores/portal"
+import { publishTableToProduction } from "@/utils/publishTableToProduction"
 
-  let generateButton: GridGenerateButton
-  let grid: Grid
-  let gridContext: GridStore | undefined
-  let lastPublishCount = 0
-  let missingProductionDefinition = false
-  let previousTableId: string | undefined
-  let tablePublishing = false
-  let prodRefreshKey = 0
-  let productionEmpty = false
-  let productionHasRows = true
-  let productionRowUnsubscribe: (() => void) | null = null
-  let highlightUsersAccessButton = false
+let generateButton: GridGenerateButton
+let grid: Grid
+let gridContext: GridStore | undefined
+let lastPublishCount = 0
+let missingProductionDefinition = false
+let previousTableId: string | undefined
+let tablePublishing = false
+let prodRefreshKey = 0
+let productionEmpty = false
+let productionHasRows = true
+let productionRowUnsubscribe: (() => void) | null = null
+let highlightUsersAccessButton = false
 
-  const dataLayoutContext = getContext("data-layout") as {
-    registerGridDispatch?: Function
-  }
+const dataLayoutContext = getContext("data-layout") as {
+  registerGridDispatch?: Function
+}
 
-  // Register grid dispatch with data layout when grid is ready
-  $: {
-    if (grid) {
-      gridContext = grid.getContext()
-      if (dataLayoutContext?.registerGridDispatch) {
-        dataLayoutContext.registerGridDispatch(gridContext.dispatch)
-      }
+// Register grid dispatch with data layout when grid is ready
+$: {
+  if (grid) {
+    gridContext = grid.getContext()
+    if (dataLayoutContext?.registerGridDispatch) {
+      dataLayoutContext.registerGridDispatch(gridContext.dispatch)
     }
   }
+}
 
-  $: userSchemaOverrides = {
-    firstName: { displayName: "First name", disabled: true },
-    lastName: { displayName: "Last name", disabled: true },
-    email: { displayName: "Email", disabled: true },
-    status: { displayName: "Status", disabled: true },
-    roleId: {
-      displayName: "Role",
-      type: "role",
-      disabled: true,
-      roles: $roles,
-    },
+$: userSchemaOverrides = {
+  firstName: { displayName: "First name", disabled: true },
+  lastName: { displayName: "Last name", disabled: true },
+  email: { displayName: "Email", disabled: true },
+  status: { displayName: "Status", disabled: true },
+  roleId: {
+    displayName: "Role",
+    type: "role",
+    disabled: true,
+    roles: $roles,
+  },
+}
+$: autoColumnStatus = verifyAutocolumns($tables?.selected)
+$: duplicates = Object.values(autoColumnStatus).reduce((acc, status) => {
+  if (status.length > 1) {
+    acc = [...acc, ...status]
   }
-  $: autoColumnStatus = verifyAutocolumns($tables?.selected)
-  $: duplicates = Object.values(autoColumnStatus).reduce((acc, status) => {
-    if (status.length > 1) {
-      acc = [...acc, ...status]
-    }
-    return acc
-  }, [])
-  $: invalidColumnText = duplicates.map((entry: any) => {
-    return `${entry.name} (${entry.subtype})`
-  })
-  $: id = $tables.selected?._id!
-  $: isUsersTable = id === TableNames.USERS
-  $: isInternal = $tables.selected?.sourceType !== DB_TYPE_EXTERNAL
-  $: gridDatasource = {
-    type: "table",
-    tableId: id,
-  }
-  $: tableDatasource = $datasources.list.find(datasource => {
-    return datasource._id === $tables.selected?.sourceId
-  })
-  $: relationshipsEnabled = relationshipSupport(tableDatasource)
-  $: currentTheme = $themeStore?.theme
-  $: darkMode = !currentTheme.includes("light")
-  $: isProductionMode =
-    $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION
-  $: isDeployed =
-    isInternal && id ? $workspaceDeploymentStore.tables[id]?.published : false
-  $: productionUnavailable =
-    isInternal &&
-    isProductionMode &&
-    (!isDeployed || missingProductionDefinition)
-  $: if (!isProductionMode) {
-    missingProductionDefinition = false
-  }
-  $: if (id !== previousTableId) {
-    missingProductionDefinition = false
-    previousTableId = id
-  }
-  $: if (!isUsersTable || !$appStore.features.disableUserMetadata) {
-    highlightUsersAccessButton = false
-  }
-  $: externalClipboardData = {
-    clipboard: gridClipboard,
-    tableId: id,
-    onCopy: (data: any) => {
-      gridClipboard.copy(
-        data.value,
-        data.multiCellCopy,
-        data.tableId,
-        data.viewId
-      )
-    },
-  }
+  return acc
+}, [])
+$: invalidColumnText = duplicates.map((entry: any) => {
+  return `${entry.name} (${entry.subtype})`
+})
+$: id = $tables.selected?._id!
+$: isUsersTable = id === TableNames.USERS
+$: isInternal = $tables.selected?.sourceType !== DB_TYPE_EXTERNAL
+$: gridDatasource = {
+  type: "table",
+  tableId: id,
+}
+$: tableDatasource = $datasources.list.find((datasource) => {
+  return datasource._id === $tables.selected?.sourceId
+})
+$: relationshipsEnabled = relationshipSupport(tableDatasource)
+$: currentTheme = $themeStore?.theme
+$: darkMode = !currentTheme.includes("light")
+$: isProductionMode = $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION
+$: isDeployed = isInternal && id ? $workspaceDeploymentStore.tables[id]?.published : false
+$: productionUnavailable =
+  isInternal && isProductionMode && (!isDeployed || missingProductionDefinition)
+$: if (!isProductionMode) {
+  missingProductionDefinition = false
+}
+$: if (id !== previousTableId) {
+  missingProductionDefinition = false
+  previousTableId = id
+}
+$: if (!isUsersTable || !$appStore.features.disableUserMetadata) {
+  highlightUsersAccessButton = false
+}
+$: externalClipboardData = {
+  clipboard: gridClipboard,
+  tableId: id,
+  onCopy: (data: any) => {
+    gridClipboard.copy(data.value, data.multiCellCopy, data.tableId, data.viewId)
+  },
+}
 
-  const syncProductionRowSubscription = (
-    shouldSubscribe: boolean,
-    context?: GridStore
-  ) => {
-    productionRowUnsubscribe?.()
-    productionRowUnsubscribe = null
-    if (!shouldSubscribe) {
-      productionHasRows = false
-      return
-    }
-    productionHasRows = true
-    if (context?.rowCount?.subscribe) {
-      const triggerCheck = () => {
-        productionHasRows = true
-        checkProductionRowPresence()
-      }
-      productionRowUnsubscribe = context.rowCount.subscribe(triggerCheck)
-    } else {
+const syncProductionRowSubscription = (shouldSubscribe: boolean, context?: GridStore) => {
+  productionRowUnsubscribe?.()
+  productionRowUnsubscribe = null
+  if (!shouldSubscribe) {
+    productionHasRows = false
+    return
+  }
+  productionHasRows = true
+  if (context?.rowCount?.subscribe) {
+    const triggerCheck = () => {
+      productionHasRows = true
       checkProductionRowPresence()
     }
+    productionRowUnsubscribe = context.rowCount.subscribe(triggerCheck)
+  } else {
+    checkProductionRowPresence()
   }
+}
 
-  $: syncProductionRowSubscription(
-    isInternal &&
-      isProductionMode &&
-      isDeployed &&
-      !missingProductionDefinition &&
-      Boolean(id),
-    gridContext
-  )
+$: syncProductionRowSubscription(
+  isInternal && isProductionMode && isDeployed && !missingProductionDefinition && Boolean(id),
+  gridContext
+)
 
-  $: productionEmpty =
-    isInternal &&
-    isProductionMode &&
-    isDeployed &&
-    !productionHasRows &&
-    !missingProductionDefinition
+$: productionEmpty =
+  isInternal && isProductionMode && isDeployed && !productionHasRows && !missingProductionDefinition
 
-  $: {
-    const publishCount = $deploymentStore.publishCount
-    if (publishCount > lastPublishCount) {
-      lastPublishCount = publishCount
-      if (
-        $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION &&
-        gridContext?.rows?.actions?.refreshData
-      ) {
-        gridContext.rows.actions.refreshData().catch(() => {})
-      }
+$: {
+  const publishCount = $deploymentStore.publishCount
+  if (publishCount > lastPublishCount) {
+    lastPublishCount = publishCount
+    if (
+      $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION &&
+      gridContext?.rows?.actions?.refreshData
+    ) {
+      gridContext.rows.actions.refreshData().catch(() => {})
     }
   }
+}
 
-  const relationshipSupport = (
-    datasource?: Datasource | UIDatasource | UIInternalDatasource
-  ) => {
-    if (!datasource || !("source" in datasource)) {
-      return false
-    }
-    const integration = $integrations[datasource?.source]
-    return !isInternal && integration?.relationships !== false
+const relationshipSupport = (datasource?: Datasource | UIDatasource | UIInternalDatasource) => {
+  if (!datasource || !("source" in datasource)) {
+    return false
   }
+  const integration = $integrations[datasource?.source]
+  return !isInternal && integration?.relationships !== false
+}
 
-  const handleGridTableUpdate = async (e: any) => {
-    tables.replaceTable(id, e.detail)
+const handleGridTableUpdate = async (e: any) => {
+  tables.replaceTable(id, e.detail)
 
-    // We need to refresh datasources when an external table changes.
-    if (e.detail?.sourceType === DB_TYPE_EXTERNAL) {
-      await datasources.fetch()
-    }
+  // We need to refresh datasources when an external table changes.
+  if (e.detail?.sourceType === DB_TYPE_EXTERNAL) {
+    await datasources.fetch()
   }
+}
 
-  const verifyAutocolumns = (table?: Table) => {
-    // Check for duplicates
-    return Object.values(table?.schema || {}).reduce(
-      (acc, fieldSchema) => {
-        if (!fieldSchema.autocolumn || !fieldSchema.subtype) {
-          return acc
-        }
-        let fieldKey: string =
-          "tableId" in fieldSchema
-            ? `${fieldSchema.tableId}-${fieldSchema.subtype}`
-            : (fieldSchema.subtype as string)
-        acc[fieldKey] = acc[fieldKey] || []
-        acc[fieldKey].push(fieldSchema)
+const verifyAutocolumns = (table?: Table) => {
+  // Check for duplicates
+  return Object.values(table?.schema || {}).reduce(
+    (acc, fieldSchema) => {
+      if (!fieldSchema.autocolumn || !fieldSchema.subtype) {
         return acc
-      },
-      {} as Record<string, any>
-    )
-  }
-
-  const handleDefinitionMissing = () => {
-    if (isProductionMode) {
-      missingProductionDefinition = true
-    }
-  }
-
-  const handleGridRowClick = () => {
-    if (isUsersTable && $appStore.features.disableUserMetadata) {
-      highlightUsersAccessButton = true
-    }
-  }
-
-  const publishProductionTable = async (seedProductionTables: boolean) => {
-    if (tablePublishing) {
-      return
-    }
-    tablePublishing = true
-    const label = seedProductionTables
-      ? "Error seeding and publishing table"
-      : "Error publishing table"
-    try {
-      await publishTableToProduction(id, seedProductionTables)
-      if (isProductionMode && gridContext?.rows?.actions?.refreshData) {
-        await gridContext.rows.actions.refreshData()
       }
-      prodRefreshKey += 1
-      missingProductionDefinition = false
-      notifications.success("Table published to production")
-    } catch (error: any) {
-      notifications.error(error?.message || label)
-    }
-    tablePublishing = false
-  }
+      let fieldKey: string =
+        "tableId" in fieldSchema
+          ? `${fieldSchema.tableId}-${fieldSchema.subtype}`
+          : (fieldSchema.subtype as string)
+      acc[fieldKey] = acc[fieldKey] || []
+      acc[fieldKey].push(fieldSchema)
+      return acc
+    },
+    {} as Record<string, any>
+  )
+}
 
-  const checkProductionRowPresence = async () => {
-    const tableId = id
-    if (!tableId) {
-      return
+const handleDefinitionMissing = () => {
+  if (isProductionMode) {
+    missingProductionDefinition = true
+  }
+}
+
+const handleGridRowClick = () => {
+  if (isUsersTable && $appStore.features.disableUserMetadata) {
+    highlightUsersAccessButton = true
+  }
+}
+
+const publishProductionTable = async (seedProductionTables: boolean) => {
+  if (tablePublishing) {
+    return
+  }
+  tablePublishing = true
+  const label = seedProductionTables
+    ? "Error seeding and publishing table"
+    : "Error publishing table"
+  try {
+    await publishTableToProduction(id, seedProductionTables)
+    if (isProductionMode && gridContext?.rows?.actions?.refreshData) {
+      await gridContext.rows.actions.refreshData()
     }
-    try {
-      const res = await productionAPI.searchTable(tableId, {
-        query: {},
-        limit: 1,
-        paginate: true,
-      })
-      if (tableId === id) {
-        productionHasRows = Boolean(res?.rows?.length)
-      }
-    } catch (error) {
-      if (tableId === id) {
-        productionHasRows = true
-      }
+    prodRefreshKey += 1
+    missingProductionDefinition = false
+    notifications.success("Table published to production")
+  } catch (error: any) {
+    notifications.error(error?.message || label)
+  }
+  tablePublishing = false
+}
+
+const checkProductionRowPresence = async () => {
+  const tableId = id
+  if (!tableId) {
+    return
+  }
+  try {
+    const res = await productionAPI.searchTable(tableId, {
+      query: {},
+      limit: 1,
+      paginate: true,
+    })
+    if (tableId === id) {
+      productionHasRows = Boolean(res?.rows?.length)
+    }
+  } catch (error) {
+    if (tableId === id) {
+      productionHasRows = true
     }
   }
+}
 
-  onDestroy(() => {
-    productionRowUnsubscribe?.()
-  })
+onDestroy(() => {
+  productionRowUnsubscribe?.()
+})
 </script>
 
 {#if $tables?.selected?.name}

@@ -1,32 +1,28 @@
+import { db, HTTPError } from "@budibase/backend-core"
 import {
-  AddWorkspaceFavouriteRequest,
-  AddWorkspaceFavouriteResponse,
-  Datasource,
-  DeleteWorkspaceFavouriteResponse,
-  Query,
-  Table,
-  UserCtx,
-  WithoutDocMetadata,
-  WorkspaceApp,
-  WorkspaceFavourite,
-  WorkspaceFavouriteResponse,
+  type AddWorkspaceFavouriteRequest,
+  type AddWorkspaceFavouriteResponse,
+  type Datasource,
+  type DeleteWorkspaceFavouriteResponse,
+  type Query,
+  type Table,
+  type UserCtx,
+  type WithoutDocMetadata,
+  type WorkspaceApp,
+  type WorkspaceFavourite,
+  type WorkspaceFavouriteResponse,
   WorkspaceResource,
 } from "@budibase/types"
 import sdk from "../../sdk"
-import { db, HTTPError } from "@budibase/backend-core"
 
 type WorkspaceResourceDoc = Table | WorkspaceApp | Datasource | Query
 
-export type ResourceGetter = (
-  id: string
-) => Promise<WorkspaceResourceDoc | undefined>
+export type ResourceGetter = (id: string) => Promise<WorkspaceResourceDoc | undefined>
 
 export async function fetch(ctx: UserCtx<void, WorkspaceFavouriteResponse>) {
   const createdBy = ctx.user?._id!
 
-  const favourites = await sdk.workspace.fetch(
-    db.getGlobalIDFromUserMetadataID(createdBy)
-  )
+  const favourites = await sdk.workspace.fetch(db.getGlobalIDFromUserMetadataID(createdBy))
   ctx.body = {
     favourites,
   }
@@ -46,14 +42,13 @@ export async function create(
   }
 
   // Check if a favourite has been created for the resource
-  const existing: WithoutDocMetadata<WorkspaceFavourite>[] =
-    await sdk.workspace.findByResourceId(body.resourceId)
+  const existing: WithoutDocMetadata<WorkspaceFavourite>[] = await sdk.workspace.findByResourceId(
+    body.resourceId
+  )
   if (existing.length) {
     const [favourite] = existing
     if (favourite.createdBy === globalId) {
-      const dupeError = new Error(
-        `Workspace favourite failure. Already exists: ${body.resourceId}`
-      )
+      const dupeError = new Error(`Workspace favourite failure. Already exists: ${body.resourceId}`)
       ;(dupeError as any).status = 409
       throw dupeError
     }
@@ -94,9 +89,7 @@ export async function create(
   } as AddWorkspaceFavouriteResponse
 }
 
-export async function destroy(
-  ctx: UserCtx<void, DeleteWorkspaceFavouriteResponse>
-) {
+export async function destroy(ctx: UserCtx<void, DeleteWorkspaceFavouriteResponse>) {
   const favouriteId = ctx.params.id
   const favouriteRev = ctx.params.rev
 

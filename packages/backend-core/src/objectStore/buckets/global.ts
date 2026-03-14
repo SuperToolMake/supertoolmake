@@ -1,15 +1,11 @@
-import env from "../../environment"
 import * as context from "../../context"
-import * as objectStore from "../objectStore"
+import env from "../../environment"
 import * as cloudfront from "../cloudfront"
+import * as objectStore from "../objectStore"
 
 // URLs
 
-export const getGlobalFileUrl = async (
-  type: string,
-  name: string,
-  etag?: string
-) => {
+export const getGlobalFileUrl = async (type: string, name: string, etag?: string) => {
   let file = getGlobalFileS3Key(type, name)
   if (env.CLOUDFRONT_CDN) {
     if (etag) {

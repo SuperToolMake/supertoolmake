@@ -2,7 +2,7 @@ import { context } from "@budibase/backend-core"
 import { processString } from "@budibase/string-templates"
 
 export async function getEnvironmentVariables() {
-  let envVars = context.getEnvironmentVariables()
+  const envVars = context.getEnvironmentVariables()
   return envVars!
 }
 
@@ -25,11 +25,8 @@ export async function processEnvironmentVariable<
     return value
   }
   if (typeof value !== "string") {
-    for (const key of Object.keys(value).filter(k => value[k])) {
-      value[key] = await _processEnvironmentVariable(
-        value[key],
-        getEnvVariables
-      )
+    for (const key of Object.keys(value).filter((k) => value[k])) {
+      value[key] = await _processEnvironmentVariable(value[key], getEnvVariables)
     }
     return value
   }

@@ -1,29 +1,26 @@
 import { QueryUtils } from "@budibase/frontend-core"
-import { EmptyFilterOption } from "@budibase/types"
 import { processStringSync } from "@budibase/string-templates"
+import { EmptyFilterOption } from "@budibase/types"
 
-export const getActiveConditions = conditions => {
+export const getActiveConditions = (conditions) => {
   if (!conditions?.length) {
     return []
   }
 
-  return conditions.filter(condition => {
+  return conditions.filter((condition) => {
     // Parse values into correct types
     if (condition.valueType === "number") {
       condition.referenceValue = parseFloat(condition.referenceValue)
       condition.newValue = parseFloat(condition.newValue)
     } else if (condition.valueType === "datetime") {
       if (condition.referenceValue) {
-        condition.referenceValue = new Date(
-          condition.referenceValue
-        ).toISOString()
+        condition.referenceValue = new Date(condition.referenceValue).toISOString()
       }
       if (condition.newValue) {
         condition.newValue = new Date(condition.newValue).toISOString()
       }
     } else if (condition.valueType === "boolean") {
-      condition.referenceValue =
-        `${condition.referenceValue}`.toLowerCase() === "true"
+      condition.referenceValue = `${condition.referenceValue}`.toLowerCase() === "true"
       condition.newValue = `${condition.newValue}`.toLowerCase() === "true"
     }
 
@@ -35,18 +32,18 @@ export const getActiveConditions = conditions => {
       value: condition.referenceValue,
     }
 
-    let query = QueryUtils.buildQuery([luceneCondition])
+    const query = QueryUtils.buildQuery([luceneCondition])
     query.onEmptyFilter = EmptyFilterOption.RETURN_NONE
     const result = QueryUtils.runQuery([luceneCondition], query)
     return result.length > 0
   })
 }
 
-export const reduceConditionActions = conditions => {
-  let settingUpdates = {}
+export const reduceConditionActions = (conditions) => {
+  const settingUpdates = {}
   let visible = null
 
-  conditions?.forEach(condition => {
+  conditions?.forEach((condition) => {
     if (condition.action === "show") {
       visible = true
     } else if (condition.action === "hide") {
@@ -60,13 +57,10 @@ export const reduceConditionActions = conditions => {
 }
 
 export const enrichGridConditions = (conditions, context) => {
-  return conditions?.map(condition => {
+  return conditions?.map((condition) => {
     return {
       ...condition,
-      referenceValue: processStringSync(
-        condition.referenceValue || "",
-        context
-      ),
+      referenceValue: processStringSync(condition.referenceValue || "", context),
       newValue: processStringSync(condition.newValue || "", context),
     }
   })

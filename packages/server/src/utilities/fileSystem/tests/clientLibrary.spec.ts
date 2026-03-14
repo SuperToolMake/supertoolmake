@@ -43,11 +43,7 @@ import { context, objectStore } from "@budibase/backend-core"
 import fs from "fs"
 import { ObjectStoreBuckets } from "../../../constants"
 import env from "../../../environment"
-import {
-  revertClientLibrary,
-  shouldServeLocally,
-  updateClientLibrary,
-} from "../clientLibrary"
+import { revertClientLibrary, shouldServeLocally, updateClientLibrary } from "../clientLibrary"
 
 const mockedObjectStore = objectStore as jest.Mocked<typeof objectStore>
 const mockedFs = fs as jest.Mocked<typeof fs>
@@ -82,11 +78,7 @@ describe("clientLibrary", () => {
       mockedFs.createReadStream.mockReturnValueOnce("stream3" as any)
       mockedFs.createReadStream.mockReturnValueOnce("stream4" as any)
 
-      mockedFs.readdirSync.mockReturnValueOnce([
-        "chunk1.js",
-        "notJs.txt",
-        "chunk2.js",
-      ] as any)
+      mockedFs.readdirSync.mockReturnValueOnce(["chunk1.js", "notJs.txt", "chunk2.js"] as any)
 
       mockedEnv.isDev.mockReturnValue(isDev)
       mockedObjectStore.listAllObjects.mockReturnValue([] as any)
@@ -126,10 +118,7 @@ describe("clientLibrary", () => {
       mockedFs.createReadStream.mockReturnValueOnce("stream3" as any)
       mockedFs.createReadStream.mockReturnValueOnce("stream4" as any)
 
-      mockedFs.readdirSync.mockReturnValueOnce([
-        "chunk1.js",
-        "chunk2.js",
-      ] as any)
+      mockedFs.readdirSync.mockReturnValueOnce(["chunk1.js", "chunk2.js"] as any)
 
       const existingFiles: ObjectStoreFile[] = [
         { Key: "app_123/manifest.json" },
@@ -146,10 +135,9 @@ describe("clientLibrary", () => {
       await updateClientLibrary(testAppId)
 
       expect(mockedObjectStore.deleteFiles).toHaveBeenCalledTimes(1)
-      expect(mockedObjectStore.deleteFiles).toHaveBeenCalledWith(
-        ObjectStoreBuckets.APPS,
-        ["app_123/chunks/old.js"]
-      )
+      expect(mockedObjectStore.deleteFiles).toHaveBeenCalledWith(ObjectStoreBuckets.APPS, [
+        "app_123/chunks/old.js",
+      ])
     })
   })
 
@@ -157,9 +145,7 @@ describe("clientLibrary", () => {
     const manifestContent = '{"version": "0.9.0"}'
 
     beforeEach(() => {
-      ;(mockedFs.promises.readFile as MockedReadFile).mockResolvedValue(
-        manifestContent as any
-      )
+      ;(mockedFs.promises.readFile as MockedReadFile).mockResolvedValue(manifestContent as any)
     })
 
     it("should restore from .bak folder structure", async () => {
@@ -182,15 +168,13 @@ describe("clientLibrary", () => {
       const result = await revertClientLibrary(testAppId)
 
       expect(mockedObjectStore.upload).toHaveBeenCalledTimes(3)
-      ;["manifest.json", "budibase-client.js", "manifest.json"].forEach(
-        fileName => {
-          expect(mockedObjectStore.upload).toHaveBeenCalledWith({
-            bucket: ObjectStoreBuckets.APPS,
-            filename: `app_123/${fileName}`,
-            path: "/tmp/file",
-          })
-        }
-      )
+      ;["manifest.json", "budibase-client.js", "manifest.json"].forEach((fileName) => {
+        expect(mockedObjectStore.upload).toHaveBeenCalledWith({
+          bucket: ObjectStoreBuckets.APPS,
+          filename: `app_123/${fileName}`,
+          path: "/tmp/file",
+        })
+      })
 
       expect(mockedObjectStore.deleteFile).toHaveBeenCalledTimes(1)
       expect(mockedObjectStore.deleteFile).toHaveBeenCalledWith(
@@ -248,13 +232,9 @@ describe("clientLibrary", () => {
     })
 
     it("should throw error if manifest not found in backup", async () => {
-      const mockBackupFiles: ObjectStoreFile[] = [
-        { Key: "app_123/.bak/budibase-client.js" },
-      ]
+      const mockBackupFiles: ObjectStoreFile[] = [{ Key: "app_123/.bak/budibase-client.js" }]
 
-      mockedObjectStore.listAllObjects.mockReturnValueOnce(
-        mockBackupFiles as any
-      )
+      mockedObjectStore.listAllObjects.mockReturnValueOnce(mockBackupFiles as any)
 
       await expect(revertClientLibrary(testAppId)).rejects.toThrow(
         "No manifest found in backup for app app_123"
@@ -262,13 +242,9 @@ describe("clientLibrary", () => {
     })
 
     it("should handle dev app IDs correctly", async () => {
-      const mockBackupFiles: ObjectStoreFile[] = [
-        { Key: "app_123/.bak/manifest.json" },
-      ]
+      const mockBackupFiles: ObjectStoreFile[] = [{ Key: "app_123/.bak/manifest.json" }]
 
-      mockedObjectStore.listAllObjects.mockReturnValueOnce(
-        mockBackupFiles as any
-      )
+      mockedObjectStore.listAllObjects.mockReturnValueOnce(mockBackupFiles as any)
 
       await revertClientLibrary(testAppIdDev)
 
@@ -286,10 +262,7 @@ describe("clientLibrary", () => {
     })
 
     async function getShouldServeLocally() {
-      return await context.doInTenant(
-        "tenantId",
-        async () => await shouldServeLocally()
-      )
+      return await context.doInTenant("tenantId", async () => await shouldServeLocally())
     }
 
     it("should serve locally in dev mode", async () => {

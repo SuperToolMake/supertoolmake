@@ -1,42 +1,34 @@
 <script lang="ts">
-  import {
-    List,
-    ListItem,
-    ActionButton,
-    PopoverAlignment,
-  } from "@budibase/bbui"
-  import DetailPopover from "@/components/common/DetailPopover.svelte"
-  import { appStore, workspaceAppStore } from "@/stores/builder"
-  import type { ScreenUsage } from "@budibase/types"
+import { ActionButton, List, ListItem, PopoverAlignment } from "@budibase/bbui"
+import type { ScreenUsage } from "@budibase/types"
+import type DetailPopover from "@/components/common/DetailPopover.svelte"
+import { appStore, workspaceAppStore } from "@/stores/builder"
 
-  export let screens: ScreenUsage[] = []
-  export let icon = "desktop"
-  export let accentColor: string | null | undefined = null
-  export let showCount = false
-  export let align = PopoverAlignment.Left
-  export let buttonText = "Screens"
+export let screens: ScreenUsage[] = []
+export let icon = "desktop"
+export let accentColor: string | null | undefined = null
+export let showCount = false
+export let align = PopoverAlignment.Left
+export let buttonText = "Screens"
 
-  let popover: DetailPopover
+let popover: DetailPopover
 
-  $: screensByApp = screens.reduce<Record<string, ScreenUsage[]>>(
-    (acc, screen) => {
-      acc[screen.workspaceAppId] ??= []
-      acc[screen.workspaceAppId].push(screen)
+$: screensByApp = screens.reduce<Record<string, ScreenUsage[]>>((acc, screen) => {
+  acc[screen.workspaceAppId] ??= []
+  acc[screen.workspaceAppId].push(screen)
 
-      return acc
-    },
-    {}
-  )
+  return acc
+}, {})
 
-  $: hasManyWorkspaceApps = $workspaceAppStore.workspaceApps.length > 1
+$: hasManyWorkspaceApps = $workspaceAppStore.workspaceApps.length > 1
 
-  export function show() {
-    popover?.show()
-  }
+export function show() {
+  popover?.show()
+}
 
-  export function hide() {
-    popover?.hide()
-  }
+export function hide() {
+  popover?.hide()
+}
 </script>
 
 <DetailPopover title={buttonText} bind:this={popover} {align}>

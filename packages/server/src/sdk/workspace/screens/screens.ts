@@ -1,27 +1,24 @@
 import { context } from "@budibase/backend-core"
-import { Database, Screen, WithoutDocMetadata } from "@budibase/types"
-import sdk from "../.."
+import type { Database, Screen, WithoutDocMetadata } from "@budibase/types"
 import { generateScreenID, getScreenParams } from "../../../db/utils"
+import sdk from "../.."
 
-export async function fetch(
-  db: Database = context.getWorkspaceDB()
-): Promise<Screen[]> {
+export async function fetch(db: Database = context.getWorkspaceDB()): Promise<Screen[]> {
   const screens = (
     await db.allDocs<Screen>(
       getScreenParams(null, {
         include_docs: true,
       })
     )
-  ).rows.map(el => el.doc!)
+  ).rows.map((el) => el.doc!)
 
   // Handling a bug where some screens have missing workspaceAppId (in this case, they are part of the default workspace app)
-  const screensWithMissingWorkspaceApp = screens.filter(s => !s.workspaceAppId)
+  const screensWithMissingWorkspaceApp = screens.filter((s) => !s.workspaceAppId)
   if (screensWithMissingWorkspaceApp.length) {
     const allWorkspaces = await sdk.workspaceApps.fetch()
-    const defaultWorkspaceApp =
-      allWorkspaces.find(a => a.isDefault) || allWorkspaces[0]
+    const defaultWorkspaceApp = allWorkspaces.find((a) => a.isDefault) || allWorkspaces[0]
     if (defaultWorkspaceApp) {
-      screensWithMissingWorkspaceApp.forEach(a => {
+      screensWithMissingWorkspaceApp.forEach((a) => {
         a.workspaceAppId = defaultWorkspaceApp._id!
       })
     }
@@ -30,9 +27,7 @@ export async function fetch(
   return screens
 }
 
-export async function create(
-  screen: WithoutDocMetadata<Screen>
-): Promise<Screen> {
+export async function create(screen: WithoutDocMetadata<Screen>): Promise<Screen> {
   const db = context.getWorkspaceDB()
 
   const response = await db.put({ ...screen, _id: generateScreenID() })

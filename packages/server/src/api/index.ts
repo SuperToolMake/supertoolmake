@@ -1,9 +1,4 @@
-import {
-  auth,
-  env as coreEnv,
-  env as envCore,
-  middleware,
-} from "@budibase/backend-core"
+import { auth, env as coreEnv, env as envCore, middleware } from "@budibase/backend-core"
 import Router from "@koa/router"
 import zlib from "zlib"
 import { cleanupMiddleware as cleanup } from "../middleware/cleanup"
@@ -12,18 +7,19 @@ import { getState } from "../startup"
 import { assetRoutes, mainRoutes, publicRoutes, staticRoutes } from "./routes"
 
 export { shutdown } from "./routes/public"
+
 const compress = require("koa-compress")
 
 export const router: Router = new Router()
 
-router.get("/health", async ctx => {
+router.get("/health", async (ctx) => {
   if (getState() !== "ready") {
     ctx.status = 503
     return
   }
   ctx.status = 200
 })
-router.get("/version", ctx => (ctx.body = envCore.VERSION))
+router.get("/version", (ctx) => (ctx.body = envCore.VERSION))
 
 router.use(middleware.errorHandling)
 
@@ -72,7 +68,7 @@ if (!coreEnv.DISABLE_CONTENT_SECURITY_POLICY) {
 router.use(cleanup)
 
 // authenticated routes
-for (let route of mainRoutes) {
+for (const route of mainRoutes) {
   router.use(route.routes())
   router.use(route.allowedMethods())
 }

@@ -1,135 +1,129 @@
 <script lang="ts">
-  import { goto } from "@roxi/routify"
-  import {
-    keepOpen,
-    ModalContent,
-    notifications,
-    Body,
-    Layout,
-    Tabs,
-    Tab,
-    Heading,
-    TextArea,
-    Dropzone,
-  } from "@budibase/bbui"
-  import { datasources, queries } from "@/stores/builder"
-  import { writable } from "svelte/store"
-  import type {
-    Datasource,
-    ImportRestQueryRequest,
-    UIFile,
-  } from "@budibase/types"
+import {
+  Body,
+  Dropzone,
+  Heading,
+  keepOpen,
+  Layout,
+  ModalContent,
+  notifications,
+  Tab,
+  Tabs,
+  TextArea,
+} from "@budibase/bbui"
+import type { Datasource, ImportRestQueryRequest, UIFile } from "@budibase/types"
+import { goto } from "@roxi/routify"
+import { writable } from "svelte/store"
+import { datasources, queries } from "@/stores/builder"
 
-  $goto
+$goto
 
-  export let navigateDatasource = false
-  export let datasourceId: string | undefined = undefined
-  export let createDatasource = false
-  export let onCancel: (() => void) | undefined = undefined
+export let navigateDatasource = false
+export let datasourceId: string | undefined = undefined
+export let createDatasource = false
+export let onCancel: (() => void) | undefined = undefined
 
-  interface ImportFormData {
-    url: string
-    raw: string
-    file?: File
+interface ImportFormData {
+  url: string
+  raw: string
+  file?: File
+}
+
+const data = writable<ImportFormData>({
+  url: "",
+  raw: "",
+})
+
+let lastTouched: "url" | "file" | "raw" = "url"
+
+let datasource: Datasource
+$: datasource = $datasources.selected as Datasource
+let dataStringCache: string | undefined
+
+const resetCache = () => {
+  dataStringCache = undefined
+}
+
+const getData = async (): Promise<string> => {
+  if (dataStringCache) {
+    return dataStringCache
   }
 
-  const data = writable<ImportFormData>({
-    url: "",
-    raw: "",
-  })
+  let dataString
 
-  let lastTouched: "url" | "file" | "raw" = "url"
-
-  let datasource: Datasource
-  $: datasource = $datasources.selected as Datasource
-  let dataStringCache: string | undefined
-
-  const resetCache = () => {
-    dataStringCache = undefined
-  }
-
-  const getData = async (): Promise<string> => {
-    if (dataStringCache) {
-      return dataStringCache
-    }
-
-    let dataString
-
-    if (lastTouched === "file") {
-      dataString = await $data.file?.text()
-    } else if (lastTouched === "url") {
-      if (!$data.url) {
-        return ""
-      }
-      const response = await fetch($data.url)
-      dataString = await response.text()
-    } else if (lastTouched === "raw") {
-      dataString = $data.raw
-    }
-
-    if (typeof dataString !== "string") {
+  if (lastTouched === "file") {
+    dataString = await $data.file?.text()
+  } else if (lastTouched === "url") {
+    if (!$data.url) {
       return ""
     }
-
-    const trimmed = dataString.trim()
-    if (!trimmed) {
-      return ""
-    }
-
-    dataStringCache = dataString
-    return dataString
+    const response = await fetch($data.url)
+    dataString = await response.text()
+  } else if (lastTouched === "raw") {
+    dataString = $data.raw
   }
 
-  const onFileChange = async (
-    event: CustomEvent<(File | UIFile | undefined)[]>
-  ) => {
-    const [file] = event.detail ?? []
-    $data.file = file instanceof File ? file : undefined
-    lastTouched = "file"
-    resetCache()
+  if (typeof dataString !== "string") {
+    return ""
   }
 
-  const onRawChange = async () => {
-    lastTouched = "raw"
-    resetCache()
+  const trimmed = dataString.trim()
+  if (!trimmed) {
+    return ""
   }
 
-  async function importQueries() {
-    try {
-      const dataString = await getData()
-      if (!dataString) {
-        notifications.error("Import data is missing")
-        return keepOpen
-      }
+  dataStringCache = dataString
+  return dataString
+}
 
-      if (!datasourceId && !createDatasource) {
-        throw new Error("No datasource id")
-      }
+const onFileChange = async (event: CustomEvent<(File | UIFile | undefined)[]>) => {
+  const [file] = event.detail ?? []
+  $data.file = file instanceof File ? file : undefined
+  lastTouched = "file"
+  resetCache()
+}
 
-      const body: ImportRestQueryRequest = {
-        data: dataString,
-        datasourceId,
-        datasource,
-      }
-      const importResult = await queries.importQueries(body)
-      if (!datasourceId) {
-        datasourceId = importResult.datasourceId
-      }
+const onRawChange = async () => {
+  lastTouched = "raw"
+  resetCache()
+}
 
-      await datasources.fetch()
-      await queries.fetch()
-
-      if (navigateDatasource) {
-        $goto(`./datasource/${datasourceId}`)
-      }
-
-      notifications.success("Imported successfully")
-    } catch (error: any) {
-      notifications.error(`Error importing queries - ${error.message}`)
-
+async function importQueries() {
+  try {
+    const dataString = await getData()
+    if (!dataString) {
+      notifications.error("Import data is missing")
       return keepOpen
     }
+
+    if (!datasourceId && !createDatasource) {
+      throw new Error("No datasource id")
+    }
+
+    const body: ImportRestQueryRequest = {
+      data: dataString,
+      datasourceId,
+      datasource,
+    }
+    const importResult = await queries.importQueries(body)
+    if (!datasourceId) {
+      datasourceId = importResult.datasourceId
+    }
+
+    await datasources.fetch()
+    await queries.fetch()
+
+    if (navigateDatasource) {
+      $goto(`./datasource/${datasourceId}`)
+    }
+
+    notifications.success("Imported successfully")
+  } catch (error: any) {
+    notifications.error(`Error importing queries - ${error.message}`)
+
+    return keepOpen
   }
+}
 </script>
 
 <ModalContent

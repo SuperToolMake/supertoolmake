@@ -1,5 +1,5 @@
-import { DocumentInsertResponse } from "nano"
-import { ContextUserMetadata, UserMetadata } from "../../.."
+import type { DocumentInsertResponse } from "nano"
+import type { ContextUserMetadata, UserMetadata } from "../../.."
 
 export type FetchUserMetadataResponse = ContextUserMetadata[]
 export type FindUserMetadataResponse = ContextUserMetadata

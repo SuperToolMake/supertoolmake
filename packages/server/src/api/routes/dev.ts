@@ -1,5 +1,5 @@
-import * as controller from "../controllers/dev"
 import env from "../../environment"
+import * as controller from "../controllers/dev"
 import { builderRoutes, publicRoutes } from "./endpointGroups"
 
 function redirectPath(path: string) {

@@ -1,7 +1,7 @@
+import type { ComponentType } from "svelte"
+import { get } from "svelte/store"
 import ICONS from "@/components/backend/DatasourceNavigator/icons"
 import { integrations } from "@/stores/builder/integrations"
-import { get } from "svelte/store"
-import type { ComponentType } from "svelte"
 
 type IntegrationIcon = (typeof ICONS)[keyof typeof ICONS]
 
@@ -21,17 +21,13 @@ export const getIntegrationIcon = (
   if (iconUrl) {
     return { url: iconUrl }
   }
-  const integration =
-    integrationList[integrationType as keyof typeof integrationList]
+  const integration = integrationList[integrationType as keyof typeof integrationList]
   if (integration?.iconUrl) {
     return { url: integration.iconUrl }
   }
   const icon = ICONS[integrationType as keyof typeof ICONS]
   const isCustom =
-    typeof schema === "object" &&
-    schema !== null &&
-    "custom" in schema &&
-    schema.custom
+    typeof schema === "object" && schema !== null && "custom" in schema && schema.custom
   if (isCustom || !icon) {
     return { icon: ICONS.CUSTOM }
   }

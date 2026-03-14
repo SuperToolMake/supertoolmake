@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
-  type BasicRelatedRow = { _id: string; primaryDisplay: string }
-  type OptionsMap = Record<string, BasicRelatedRow>
+type BasicRelatedRow = { _id: string; primaryDisplay: string }
+type OptionsMap = Record<string, BasicRelatedRow>
 </script>
 
 <script lang="ts" generics="ValueType extends string | string[]">

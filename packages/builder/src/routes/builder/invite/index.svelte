@@ -1,113 +1,99 @@
 <script>
-  import {
-    Layout,
-    Heading,
-    Body,
-    Button,
-    notifications,
-    FancyForm,
-    FancyInput,
-  } from "@budibase/bbui"
-  import { BUILDER_URLS } from "@budibase/shared-core"
-  import { goto as gotoStore, params } from "@roxi/routify"
-  import { users, organisation, auth, admin } from "@/stores/portal"
-  import Logo from "assets/supertoolmake-emblem.svg"
-  import { onMount } from "svelte"
-  import { handleError, passwordsMatch } from "../auth/_components/utils"
+import { Body, Button, FancyForm, FancyInput, Heading, Layout, notifications } from "@budibase/bbui"
+import { BUILDER_URLS } from "@budibase/shared-core"
+import { goto as gotoStore, params } from "@roxi/routify"
+import Logo from "assets/supertoolmake-emblem.svg"
+import { onMount } from "svelte"
+import { admin, auth, organisation, users } from "@/stores/portal"
+import { handleError, passwordsMatch } from "../auth/_components/utils"
 
-  $params
-  $: goto = $gotoStore
+$params
+$: goto = $gotoStore
 
-  let inviteTenantId
-  const getQueryParam = key => {
-    return new URLSearchParams(window.location.search).get(key) || undefined
+let inviteTenantId
+const getQueryParam = (key) => {
+  return new URLSearchParams(window.location.search).get(key) || undefined
+}
+$: inviteCode = $params["?code"] || getQueryParam("code")
+$: inviteTenantId = $params["?tenantId"] || getQueryParam("tenantId")
+let form
+let formData = {}
+let onboarding = false
+let errors = {}
+let loaded = false
+
+$: company = $organisation.company || "SuperToolMake"
+$: passwordMinLength = $admin.passwordMinLength ?? 12
+
+async function acceptInvite() {
+  form.validate()
+  if (Object.keys(errors).length > 0) {
+    return
   }
-  $: inviteCode = $params["?code"] || getQueryParam("code")
-  $: inviteTenantId = $params["?tenantId"] || getQueryParam("tenantId")
-  let form
-  let formData = {}
-  let onboarding = false
-  let errors = {}
-  let loaded = false
+  onboarding = true
+  try {
+    const { password, firstName, lastName } = formData
+    const resolvedTenantId = inviteTenantId || $auth?.tenantId
+    const user = await users.acceptInvite(
+      inviteCode,
+      password,
+      firstName,
+      lastName,
+      resolvedTenantId
+    )
+    notifications.success("Invitation accepted successfully")
+    auth.setOrg(user.tenantId)
+    await login()
+  } catch (error) {
+    notifications.error(error.message)
+    onboarding = false
+  }
+}
 
-  $: company = $organisation.company || "SuperToolMake"
-  $: passwordMinLength = $admin.passwordMinLength ?? 12
-
-  async function acceptInvite() {
-    form.validate()
-    if (Object.keys(errors).length > 0) {
-      return
+async function getInvite() {
+  try {
+    const resolvedTenantId = inviteTenantId || $auth?.tenantId
+    const invite = await users.fetchInvite(inviteCode, resolvedTenantId)
+    if (invite?.email) {
+      formData.email = invite?.email
     }
-    onboarding = true
-    try {
-      const { password, firstName, lastName } = formData
+    if ($organisation.isSSOEnforced) {
+      // auto accept invite and redirect to login
       const resolvedTenantId = inviteTenantId || $auth?.tenantId
-      const user = await users.acceptInvite(
-        inviteCode,
-        password,
-        firstName,
-        lastName,
-        resolvedTenantId
-      )
-      notifications.success("Invitation accepted successfully")
-      auth.setOrg(user.tenantId)
-      await login()
-    } catch (error) {
-      notifications.error(error.message)
-      onboarding = false
+      await users.acceptInvite(inviteCode, undefined, undefined, undefined, resolvedTenantId)
+      $goto("../../auth")
     }
+  } catch (error) {
+    notifications.error(error.message)
   }
+}
 
-  async function getInvite() {
-    try {
-      const resolvedTenantId = inviteTenantId || $auth?.tenantId
-      const invite = await users.fetchInvite(inviteCode, resolvedTenantId)
-      if (invite?.email) {
-        formData.email = invite?.email
-      }
-      if ($organisation.isSSOEnforced) {
-        // auto accept invite and redirect to login
-        const resolvedTenantId = inviteTenantId || $auth?.tenantId
-        await users.acceptInvite(
-          inviteCode,
-          undefined,
-          undefined,
-          undefined,
-          resolvedTenantId
-        )
-        $goto("../../auth")
-      }
-    } catch (error) {
-      notifications.error(error.message)
-    }
+async function login() {
+  try {
+    await auth.login(formData.email.trim(), formData.password.trim())
+    notifications.success("Logged in successfully")
+    $goto(BUILDER_URLS.WORKSPACES)
+  } catch (err) {
+    notifications.error(err.message ? err.message : "Something went wrong")
   }
+}
 
-  async function login() {
-    try {
-      await auth.login(formData.email.trim(), formData.password.trim())
-      notifications.success("Logged in successfully")
-      $goto(BUILDER_URLS.WORKSPACES)
-    } catch (err) {
-      notifications.error(err.message ? err.message : "Something went wrong")
-    }
+onMount(async () => {
+  try {
+    await auth.checkQueryString()
+    await organisation.init()
+    await getInvite()
+    loaded = true
+  } catch (error) {
+    notifications.error("Error getting invite config")
   }
+})
 
-  onMount(async () => {
-    try {
-      await auth.checkQueryString()
-      await organisation.init()
-      await getInvite()
-      loaded = true
-    } catch (error) {
-      notifications.error("Error getting invite config")
-    }
-  })
-
-  const handleKeydown = evt => {
-    if (evt.key === "Enter") {
-      acceptInvite()
-    }
+const handleKeydown = (evt) => {
+  if (evt.key === "Enter") {
+    acceptInvite()
   }
+}
 </script>
 
 <svelte:window on:keydown={handleKeydown} />

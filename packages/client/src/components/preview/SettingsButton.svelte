@@ -1,21 +1,21 @@
 <script>
-  import { Icon } from "@budibase/bbui"
-  import { builderStore } from "@/stores"
-  import { createEventDispatcher } from "svelte"
+import { Icon } from "@budibase/bbui"
+import { createEventDispatcher } from "svelte"
+import { builderStore } from "@/stores"
 
-  export let prop
-  export let value
-  export let icon
-  export let title
-  export let bool = false
-  export let active = false
-  export let component
-  export let disabled = false
+export let prop
+export let value
+export let icon
+export let title
+export let bool = false
+export let active = false
+export let component
+export let disabled = false
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  $: currentValue = component?.[prop]
-  $: active = prop && (bool ? !!currentValue : currentValue === value)
+$: currentValue = component?.[prop]
+$: active = prop && (bool ? !!currentValue : currentValue === value)
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

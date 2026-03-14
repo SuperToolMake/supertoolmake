@@ -1,8 +1,8 @@
 import { execSync } from "child_process"
 import { cloneDeep } from "lodash"
-import { GenericContainer, StartedTestContainer } from "testcontainers"
+import type { GenericContainer, StartedTestContainer } from "testcontainers"
 
-const IPV4_PORT_REGEX = new RegExp(`0\\.0\\.0\\.0:(\\d+)->(\\d+)/tcp`, "g")
+const IPV4_PORT_REGEX = /0\.0\.0\.0:(\d+)->(\d+)\/tcp/g
 
 interface ContainerInfo {
   Command: string
@@ -28,17 +28,15 @@ function getTestcontainers(): ContainerInfo[] {
   return execSync("docker ps --all --format json --no-trunc")
     .toString()
     .split("\n")
-    .filter(x => x.length > 0)
-    .map(x => JSON.parse(x) as ContainerInfo)
+    .filter((x) => x.length > 0)
+    .map((x) => JSON.parse(x) as ContainerInfo)
     .filter(
-      x =>
-        x.Labels.includes("org.testcontainers=true") &&
-        x.Labels.includes("com.budibase=true")
+      (x) => x.Labels.includes("org.testcontainers=true") && x.Labels.includes("com.budibase=true")
     )
 }
 
 export function getContainerByImage(image: string) {
-  const containers = getTestcontainers().filter(x => x.Image.startsWith(image))
+  const containers = getTestcontainers().filter((x) => x.Image.startsWith(image))
   if (containers.length > 1) {
     let errorMessage = `Multiple containers found starting with image: "${image}"\n\n`
     for (const container of containers) {
@@ -50,7 +48,7 @@ export function getContainerByImage(image: string) {
 }
 
 export function getContainerById(id: string) {
-  return getTestcontainers().find(x => x.ID === id)
+  return getTestcontainers().find((x) => x.ID === id)
 }
 
 export interface Port {
@@ -59,7 +57,7 @@ export interface Port {
 }
 
 export function getExposedV4Ports(container: ContainerInfo): Port[] {
-  let ports: Port[] = []
+  const ports: Port[] = []
   for (const match of container.Ports.matchAll(IPV4_PORT_REGEX)) {
     ports.push({ host: parseInt(match[1]), container: parseInt(match[2]) })
   }
@@ -67,7 +65,7 @@ export function getExposedV4Ports(container: ContainerInfo): Port[] {
 }
 
 export function getExposedV4Port(container: ContainerInfo, port: number) {
-  return getExposedV4Ports(container).find(x => x.container === port)?.host
+  return getExposedV4Ports(container).find((x) => x.container === port)?.host
 }
 
 interface DockerContext {
@@ -131,7 +129,7 @@ export function setupEnv(...envs: any[]) {
     { key: "MINIO_URL", value: `http://127.0.0.1:${minioPort}` },
   ]
 
-  for (const config of configs.filter(x => !!x.value)) {
+  for (const config of configs.filter((x) => !!x.value)) {
     for (const env of envs) {
       env._set(config.key, config.value)
     }
@@ -147,13 +145,10 @@ export async function startContainer(container: GenericContainer) {
   key = key.replace(/\//g, "-").replace(/:/g, "-")
   const name = `${key}_testcontainer`
 
-  container = container
-    .withReuse()
-    .withLabels({ "com.budibase": "true" })
-    .withName(name)
+  container = container.withReuse().withLabels({ "com.budibase": "true" }).withName(name)
 
-  let startedContainer: StartedTestContainer | undefined = undefined
-  let lastError = undefined
+  let startedContainer: StartedTestContainer | undefined
+  let lastError
   for (let i = 0; i < 10; i++) {
     try {
       // container.start() is not an idempotent operation, calling `start`
@@ -167,7 +162,7 @@ export async function startContainer(container: GenericContainer) {
       break
     } catch (e: any) {
       lastError = e
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000))
     }
   }
 

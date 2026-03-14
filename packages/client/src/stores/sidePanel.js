@@ -1,4 +1,4 @@
-import { writable, derived } from "svelte/store"
+import { derived, writable } from "svelte/store"
 
 export const createSidePanelStore = () => {
   const initialState = {
@@ -6,7 +6,7 @@ export const createSidePanelStore = () => {
     ignoreClicksOutside: true,
   }
   const store = writable(initialState)
-  const derivedStore = derived(store, $store => {
+  const derivedStore = derived(store, ($store) => {
     return {
       ...$store,
       open: $store.contentId != null,
@@ -14,9 +14,9 @@ export const createSidePanelStore = () => {
   })
   let timeout
 
-  const open = id => {
+  const open = (id) => {
     clearTimeout(timeout)
-    store.update(state => {
+    store.update((state) => {
       state.contentId = id
       return state
     })
@@ -26,15 +26,15 @@ export const createSidePanelStore = () => {
   // records
   const close = () => {
     timeout = setTimeout(() => {
-      store.update(state => {
+      store.update((state) => {
         state.contentId = null
         return state
       })
     }, 50)
   }
 
-  const setIgnoreClicksOutside = bool => {
-    store.update(state => {
+  const setIgnoreClicksOutside = (bool) => {
+    store.update((state) => {
       state.ignoreClicksOutside = bool
       return state
     })

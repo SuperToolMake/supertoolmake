@@ -1,31 +1,31 @@
 import { context } from "@budibase/backend-core"
 import { dataFilters } from "@budibase/shared-core"
 import {
-  Ctx,
-  DeleteRow,
-  DeleteRowRequest,
-  DeleteRows,
+  type Ctx,
+  type DeleteRow,
+  type DeleteRowRequest,
+  type DeleteRows,
   EventType,
-  ExportRowsRequest,
-  ExportRowsResponse,
-  FetchEnrichedRowResponse,
-  FetchRowsResponse,
-  FindRowResponse,
+  type ExportRowsRequest,
+  type ExportRowsResponse,
+  type FetchEnrichedRowResponse,
+  type FetchRowsResponse,
+  type FindRowResponse,
   isRelationshipField,
-  PatchRowRequest,
-  PatchRowResponse,
-  RequiredKeys,
-  Row,
-  RowSearchParams,
-  SaveRowRequest,
-  SaveRowResponse,
-  SearchFilters,
-  SearchRowRequest,
-  SearchRowResponse,
-  Table,
-  UserCtx,
-  ValidateRowRequest,
-  ValidateRowResponse,
+  type PatchRowRequest,
+  type PatchRowResponse,
+  type RequiredKeys,
+  type Row,
+  type RowSearchParams,
+  type SaveRowRequest,
+  type SaveRowResponse,
+  type SearchFilters,
+  type SearchRowRequest,
+  type SearchRowResponse,
+  type Table,
+  type UserCtx,
+  type ValidateRowRequest,
+  type ValidateRowResponse,
 } from "@budibase/types"
 import { isExternalTableID } from "../../../integrations/utils"
 import sdk from "../../../sdk"
@@ -33,8 +33,8 @@ import { apiFileReturn } from "../../../utilities/fileSystem"
 import { gridSocket } from "../../../websockets"
 import { fixRow } from "../public/rows"
 import { addRev } from "../public/utils"
+import type { Format } from "../table/exporters"
 import * as exporters from "../table/exporters"
-import { Format } from "../table/exporters"
 import * as external from "./external"
 import * as utils from "./utils"
 
@@ -42,9 +42,7 @@ function pickApi() {
   return external
 }
 
-export async function patch(
-  ctx: UserCtx<PatchRowRequest, PatchRowResponse>
-): Promise<any> {
+export async function patch(ctx: UserCtx<PatchRowRequest, PatchRowResponse>): Promise<any> {
   const appId = ctx.appId
   const { tableId } = utils.getSourceId(ctx)
   const body = ctx.request.body
@@ -99,11 +97,7 @@ export const save = async (ctx: UserCtx<SaveRowRequest, SaveRowResponse>) => {
     return patch(ctx as UserCtx<PatchRowRequest, PatchRowResponse>)
   }
   const saveQuery = async () => {
-    const response = await sdk.rows.save(
-      sourceId,
-      ctx.request.body,
-      ctx.user?._id
-    )
+    const response = await sdk.rows.save(sourceId, ctx.request.body, ctx.user?._id)
     return response
   }
   const { row, table } = tableId.includes("datasource_plus")
@@ -147,11 +141,11 @@ function isDeleteRow(input: any): input is DeleteRow {
 }
 
 async function processDeleteRowsRequest(ctx: UserCtx<DeleteRowRequest>) {
-  let request = ctx.request.body as DeleteRows
+  const request = ctx.request.body as DeleteRows
   const { tableId } = utils.getSourceId(ctx)
 
-  const processedRows = request.rows.map(row => {
-    let processedRow: Row = typeof row == "string" ? { _id: row, tableId } : row
+  const processedRows = request.rows.map((row) => {
+    const processedRow: Row = typeof row == "string" ? { _id: row, tableId } : row
     return !processedRow._rev
       ? addRev(fixRow(processedRow, ctx.params), tableId)
       : fixRow(processedRow, ctx.params)
@@ -159,20 +153,20 @@ async function processDeleteRowsRequest(ctx: UserCtx<DeleteRowRequest>) {
 
   const responses = await Promise.allSettled(processedRows)
   return responses
-    .filter(resp => resp.status === "fulfilled")
-    .map(resp => (resp as PromiseFulfilledResult<Row>).value)
+    .filter((resp) => resp.status === "fulfilled")
+    .map((resp) => (resp as PromiseFulfilledResult<Row>).value)
 }
 
 async function deleteRows(ctx: UserCtx<DeleteRowRequest>) {
   const appId = ctx.appId
 
-  let deleteRequest = ctx.request.body as DeleteRows
+  const deleteRequest = ctx.request.body as DeleteRows
 
   deleteRequest.rows = await processDeleteRowsRequest(ctx)
 
   const { rows } = await pickApi().bulkDestroy(ctx)
 
-  for (let row of rows) {
+  for (const row of rows) {
     ctx.eventEmitter?.emitRow({
       eventName: EventType.ROW_DELETE,
       appId,
@@ -231,7 +225,7 @@ export async function search(ctx: Ctx<SearchRowRequest, SearchRowResponse>) {
     query = replaceTableNamesInFilters(tableId, query, allTables)
   }
 
-  let enrichedQuery: SearchFilters = await utils.enrichSearchContext(query, {
+  const enrichedQuery: SearchFilters = await utils.enrichSearchContext(query, {
     user: sdk.users.getUserContextBindings(ctx.user),
   })
 
@@ -273,15 +267,15 @@ function replaceTableNamesInFilters(
         continue
       }
 
-      const table = allTables.find(r => r._id === tableId)
+      const table = allTables.find((r) => r._id === tableId)
       const isColumnName = !!table?.schema[relatedTableName]
       if (!table || isColumnName) {
         continue
       }
 
-      const matchedTable = allTables.find(t => t.name === relatedTableName)
+      const matchedTable = allTables.find((t) => t.name === relatedTableName)
       const relationship = Object.values(table.schema).find(
-        f => isRelationshipField(f) && f.tableId === matchedTable?._id
+        (f) => isRelationshipField(f) && f.tableId === matchedTable?._id
       )
       if (!relationship) {
         continue
@@ -299,9 +293,7 @@ function replaceTableNamesInFilters(
   })
 }
 
-export async function validate(
-  ctx: Ctx<ValidateRowRequest, ValidateRowResponse>
-) {
+export async function validate(ctx: Ctx<ValidateRowRequest, ValidateRowResponse>) {
   const source = await utils.getSource(ctx)
   const table = await utils.getTableFromSource(source)
   // external tables are hard to validate currently
@@ -315,28 +307,18 @@ export async function validate(
   }
 }
 
-export async function fetchEnrichedRow(
-  ctx: UserCtx<void, FetchEnrichedRowResponse>
-) {
+export async function fetchEnrichedRow(ctx: UserCtx<void, FetchEnrichedRowResponse>) {
   ctx.body = await pickApi().fetchEnrichedRow(ctx)
 }
 
-export const exportRows = async (
-  ctx: Ctx<ExportRowsRequest, ExportRowsResponse>
-) => {
+export const exportRows = async (ctx: Ctx<ExportRowsRequest, ExportRowsResponse>) => {
   const { tableId } = utils.getSourceId(ctx)
 
   const format = ctx.query.format
 
-  const { rows, columns, query, sort, sortOrder, delimiter, customHeaders } =
-    ctx.request.body
+  const { rows, columns, query, sort, sortOrder, delimiter, customHeaders } = ctx.request.body
   if (typeof format !== "string" || !exporters.isFormat(format)) {
-    ctx.throw(
-      400,
-      `Format ${format} not valid. Valid values: ${Object.values(
-        exporters.Format
-      )}`
-    )
+    ctx.throw(400, `Format ${format} not valid. Valid values: ${Object.values(exporters.Format)}`)
   }
 
   const { fileName, content } = await sdk.rows.exportRows({

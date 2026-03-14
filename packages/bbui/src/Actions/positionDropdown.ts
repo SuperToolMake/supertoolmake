@@ -127,10 +127,7 @@ export default function positionDropdown(element: HTMLElement, opts: Opts) {
             styles.left = anchorBounds.left - elementBounds.width - offset
             break
           case "MidPoint":
-            styles.left =
-              anchorBounds.left +
-              anchorBounds.width / 2 -
-              elementBounds.width / 2
+            styles.left = anchorBounds.left + anchorBounds.width / 2 - elementBounds.width / 2
             break
           case "ScreenEdge":
             styles.left = winWidth - elementBounds.width - screenOffset
@@ -159,10 +156,7 @@ export default function positionDropdown(element: HTMLElement, opts: Opts) {
             applyMaxHeight(anchorBounds.top - screenOffset)
             break
           case "MidPoint":
-            styles.top =
-              anchorBounds.top +
-              anchorBounds.height / 2 -
-              elementBounds.height / 2
+            styles.top = anchorBounds.top + anchorBounds.height / 2 - elementBounds.height / 2
             break
           case "ScreenEdge":
             styles.top = winHeight - elementBounds.height - screenOffset
@@ -197,10 +191,7 @@ export default function positionDropdown(element: HTMLElement, opts: Opts) {
       }
 
       // Determine Y strategy
-      if (
-        align === PopoverAlignment.RightOutside ||
-        align === PopoverAlignment.LeftOutside
-      ) {
+      if (align === PopoverAlignment.RightOutside || align === PopoverAlignment.LeftOutside) {
         applyYStrategy("MidPoint")
       } else if (
         align === PopoverAlignment.RightContextMenu ||
@@ -241,10 +232,7 @@ export default function positionDropdown(element: HTMLElement, opts: Opts) {
         // Otherwise invert as normal
         else {
           // If using an outside strategy then lock to the bottom of the screen
-          if (
-            align === PopoverAlignment.LeftOutside ||
-            align === PopoverAlignment.RightOutside
-          ) {
+          if (align === PopoverAlignment.LeftOutside || align === PopoverAlignment.RightOutside) {
             applyYStrategy("ScreenEdge")
           }
           // Otherwise flip above
@@ -255,10 +243,7 @@ export default function positionDropdown(element: HTMLElement, opts: Opts) {
       }
       // Handle top overflow for outside alignments
       if (doesYOverflowTop()) {
-        if (
-          align === PopoverAlignment.LeftOutside ||
-          align === PopoverAlignment.RightOutside
-        ) {
+        if (align === PopoverAlignment.LeftOutside || align === PopoverAlignment.RightOutside) {
           applyTopEdgeStick()
         }
       }

@@ -1,41 +1,41 @@
 <script>
-  import { getContext } from "svelte"
-  import Placeholder from "./Placeholder.svelte"
-  import { loadPhosphorIconWeight } from "../../utils/phosphorIconLoader.js"
+import { getContext } from "svelte"
+import { loadPhosphorIconWeight } from "../../utils/phosphorIconLoader.js"
+import Placeholder from "./Placeholder.svelte"
 
-  const { styleable, builderStore } = getContext("sdk")
-  const component = getContext("component")
+const { styleable, builderStore } = getContext("sdk")
+const component = getContext("component")
 
-  export let icon
-  export let size = 24
-  export let weight = "regular"
-  export let color
-  export let onClick
+export let icon
+export let size = 24
+export let weight = "regular"
+export let color
+export let onClick
 
-  $: if (weight && icon) {
-    loadPhosphorIconWeight(weight)
-  }
+$: if (weight && icon) {
+  loadPhosphorIconWeight(weight)
+}
 
-  $: styles = {
-    ...$component.styles,
-    normal: {
-      ...$component.styles.normal,
-      color: color || "var(--spectrum-global-color-gray-900)",
-      "font-size": `${size}px`,
-    },
-  }
+$: styles = {
+  ...$component.styles,
+  normal: {
+    ...$component.styles.normal,
+    color: color || "var(--spectrum-global-color-gray-900)",
+    "font-size": `${size}px`,
+  },
+}
 
-  $: iconClass = icon
-    ? (() => {
-        // Handle both prefixed (ph-star) and clean (star) icon names
-        const iconName = icon.replace(/^ph-/, "")
-        if (weight === "regular") {
-          return `ph ph-${iconName}`
-        } else {
-          return `ph-${weight} ph-${iconName}`
-        }
-      })()
-    : ""
+$: iconClass = icon
+  ? (() => {
+      // Handle both prefixed (ph-star) and clean (star) icon names
+      const iconName = icon.replace(/^ph-/, "")
+      if (weight === "regular") {
+        return `ph ph-${iconName}`
+      } else {
+        return `ph-${weight} ph-${iconName}`
+      }
+    })()
+  : ""
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

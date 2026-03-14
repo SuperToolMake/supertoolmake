@@ -1,27 +1,27 @@
 const sanitize = require("sanitize-s3-objectkey")
 
 import {
-  _Object,
+  type _Object,
   GetObjectCommand,
-  HeadObjectCommandOutput,
-  PutObjectCommandInput,
+  type HeadObjectCommandOutput,
+  type PutObjectCommandInput,
   S3,
-  S3ClientConfig,
-  _Object as S3Object,
+  type S3ClientConfig,
+  type _Object as S3Object,
 } from "@aws-sdk/client-s3"
 import { Upload } from "@aws-sdk/lib-storage"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-import { NodeHttpHandler } from "@smithy/node-http-handler"
 import { utils } from "@budibase/shared-core"
-import { NodeJsClient } from "@smithy/types"
-import fs, { PathLike, ReadStream } from "fs"
+import { NodeHttpHandler } from "@smithy/node-http-handler"
+import type { NodeJsClient } from "@smithy/types"
+import fs, { type PathLike, type ReadStream } from "fs"
 import fsp from "fs/promises"
 import https from "https"
 import fetch from "node-fetch"
 import { join } from "path"
-import stream, { Readable } from "stream"
+import stream, { type Readable } from "stream"
 import { pipeline } from "stream/promises"
-import { ReadableStream } from "stream/web"
+import type { ReadableStream } from "stream/web"
 import tar from "tar-fs"
 import { v4 } from "uuid"
 import zlib from "zlib"
@@ -106,9 +106,7 @@ export function sanitizeBucket(input: string): string {
  * @return an S3 object store object, check S3 Nodejs SDK for usage.
  * @constructor
  */
-export function ObjectStore(
-  opts: { presigning: boolean } = { presigning: false }
-) {
+export function ObjectStore(opts: { presigning: boolean } = { presigning: false }) {
   const config: S3ClientConfig = {
     forcePathStyle: true,
     credentials: {
@@ -167,8 +165,7 @@ export async function createBucketIfNotExists(
     return { created: false, exists: true }
   } catch (err: any) {
     const statusCode = err.statusCode || err.$response?.statusCode
-    const promises: Record<string, Promise<any> | undefined> =
-      STATE.bucketCreationPromises
+    const promises: Record<string, Promise<any> | undefined> = STATE.bucketCreationPromises
     const doesntExist = statusCode === 404,
       noAccess = statusCode === 403
     if (promises[bucketName]) {
@@ -204,21 +201,16 @@ const resolveContentType = (filename: string, type?: string | null) => {
     return type
   }
   const extension = filename.split(".").pop()
-  return extension
-    ? CONTENT_TYPE_MAP[extension.toLowerCase()]
-    : CONTENT_TYPE_MAP.txt
+  return extension ? CONTENT_TYPE_MAP[extension.toLowerCase()] : CONTENT_TYPE_MAP.txt
 }
 
-const initialiseBucket = async (
-  bucketName: string,
-  ttl: number | undefined
-) => {
+const initialiseBucket = async (bucketName: string, ttl: number | undefined) => {
   const bucket = sanitizeBucket(bucketName)
   const client = ObjectStore()
   const bucketCreated = await createBucketIfNotExists(client, bucket)
 
   if (ttl && bucketCreated.created) {
-    let ttlConfig = bucketTTLConfig(bucket, ttl)
+    const ttlConfig = bucketTTLConfig(bucket, ttl)
     await client.putBucketLifecycleConfiguration(ttlConfig)
   }
 
@@ -289,11 +281,11 @@ export async function upload({
   const bucketCreated = await createBucketIfNotExists(objectStore, bucketName)
 
   if (ttl && bucketCreated.created) {
-    let ttlConfig = bucketTTLConfig(bucketName, ttl)
+    const ttlConfig = bucketTTLConfig(bucketName, ttl)
     await objectStore.putBucketLifecycleConfiguration(ttlConfig)
   }
 
-  let contentType = type
+  const contentType = type
   const finalContentType = contentType
     ? contentType
     : extension
@@ -308,7 +300,7 @@ export async function upload({
   }
   if (metadata && typeof metadata === "object") {
     // remove any nullish keys from the metadata object, as these may be considered invalid
-    for (let key of Object.keys(metadata)) {
+    for (const key of Object.keys(metadata)) {
       if (!metadata[key] || typeof metadata[key] !== "string") {
         delete metadata[key]
       }
@@ -355,11 +347,7 @@ export async function streamUpload({
   return { ...details, ContentLength: headDetails.ContentLength }
 }
 
-export async function streamUploadMany({
-  bucket: bucketName,
-  files,
-  ttl,
-}: StreamUploadManyParams) {
+export async function streamUploadMany({ bucket: bucketName, files, ttl }: StreamUploadManyParams) {
   const MAX_CONCURRENCY = 10
   if (!files.length) {
     return []
@@ -371,7 +359,7 @@ export async function streamUploadMany({
 
   await utils.parallelForeach(
     indexedFiles,
-    async file => {
+    async (file) => {
       const { details } = await streamUploadInternal({
         client,
         bucket,
@@ -411,16 +399,12 @@ export async function retrieve(
     // this typecast is required - for some reason the AWS SDK V3 defines its own "ReadableStream"
     // found in the @aws-sdk/types package which is meant to be the Node type, but due to the SDK
     // supporting both the browser and Nodejs it is a polyfill which causes a type clash with Node.
-    const readableStream =
-      response.Body.transformToWebStream() as ReadableStream
+    const readableStream = response.Body.transformToWebStream() as ReadableStream
     return stream.Readable.fromWeb(readableStream)
   }
 }
 
-export async function* listAllObjects(
-  bucketName: string,
-  path: string
-): AsyncGenerator<S3Object> {
+export async function* listAllObjects(bucketName: string, path: string): AsyncGenerator<S3Object> {
   const objectStore = ObjectStore()
   const list = (params: ListParams = {}) => {
     return objectStore.listObjectsV2({
@@ -434,7 +418,7 @@ export async function* listAllObjects(
   let token
 
   do {
-    let params: ListParams = {}
+    const params: ListParams = {}
     if (token) {
       params.ContinuationToken = token
     }
@@ -453,7 +437,7 @@ export async function getAllFiles(bucketName: string, path: string) {
   const objects: Record<string, _Object> = {}
   await utils.parallelForeach(
     listAllObjects(bucketName, path),
-    async file => {
+    async (file) => {
       if (!file.Key) {
         throw new Error("file.Key must be defined")
       }
@@ -468,11 +452,7 @@ export async function getAllFiles(bucketName: string, path: string) {
 /**
  * Generate a presigned url with a default TTL of 1 hour
  */
-export async function getPresignedUrl(
-  bucketName: string,
-  key: string,
-  durationSeconds = 3600
-) {
+export async function getPresignedUrl(bucketName: string, key: string, durationSeconds = 3600) {
   const objectStore = ObjectStore({ presigning: true })
   const params = {
     Bucket: sanitizeBucket(bucketName),
@@ -512,19 +492,15 @@ export async function retrieveToTmp(bucketName: string, filepath: string) {
   return outputPath
 }
 
-export async function retrieveDirectory(
-  bucketName: string,
-  path: string,
-  toExclude?: RegExp[]
-) {
-  let writePath = join(budibaseTempDir(), v4())
+export async function retrieveDirectory(bucketName: string, path: string, toExclude?: RegExp[]) {
+  const writePath = join(budibaseTempDir(), v4())
   await fsp.mkdir(writePath, { recursive: true })
 
   await utils.parallelForeach(
     listAllObjects(bucketName, path),
-    async object => {
+    async (object) => {
       const { Key } = object
-      if (!Key || toExclude?.some(x => x.test(Key))) {
+      if (!Key || toExclude?.some((x) => x.test(Key))) {
         return
       }
 
@@ -573,11 +549,7 @@ export async function deleteFiles(bucketName: string, filepaths: string[]) {
   return objectStore.deleteObjects(params)
 }
 
-export async function uploadDirectory(
-  bucketName: string,
-  localPath: string,
-  bucketPath: string
-) {
+export async function uploadDirectory(bucketName: string, localPath: string, bucketPath: string) {
   bucketName = sanitizeBucket(bucketName)
   const files = await fsp.readdir(localPath, { withFileTypes: true })
   for (const file of files) {
@@ -596,11 +568,7 @@ export async function uploadDirectory(
   return files
 }
 
-export async function downloadTarballDirect(
-  url: string,
-  path: string,
-  headers = {}
-) {
+export async function downloadTarballDirect(url: string, path: string, headers = {}) {
   path = sanitizeKey(path)
   const response = await fetch(url, { headers })
   if (!response.ok) {
@@ -610,11 +578,7 @@ export async function downloadTarballDirect(
   await pipeline(response.body, zlib.createUnzip(), tar.extract(path))
 }
 
-export async function downloadTarball(
-  url: string,
-  bucketName: string,
-  path: string
-) {
+export async function downloadTarball(url: string, bucketName: string, path: string) {
   bucketName = sanitizeBucket(bucketName)
   path = sanitizeKey(path)
   const response = await fetch(url)
@@ -674,10 +638,7 @@ export async function getObjectMetadata(
   }
 }
 
-export async function objectExists(
-  bucket: string,
-  path: string
-): Promise<boolean> {
+export async function objectExists(bucket: string, path: string): Promise<boolean> {
   bucket = sanitizeBucket(bucket)
   path = sanitizeKey(path)
 
@@ -704,14 +665,10 @@ export async function objectExists(
 Given a signed url like '/files/signed/tmp-files-attachments/app_123456/myfile.txt' extract
 the bucket and the path from it
 */
-export function extractBucketAndPath(
-  url: string
-): { bucket: string; path: string } | null {
+export function extractBucketAndPath(url: string): { bucket: string; path: string } | null {
   const baseUrl = url.split("?")[0]
 
-  const regex = new RegExp(
-    `^${SIGNED_FILE_PREFIX}/(?<bucket>[^/]+)/(?<path>.+)$`
-  )
+  const regex = new RegExp(`^${SIGNED_FILE_PREFIX}/(?<bucket>[^/]+)/(?<path>.+)$`)
   const match = baseUrl.match(regex)
 
   if (match && match.groups) {

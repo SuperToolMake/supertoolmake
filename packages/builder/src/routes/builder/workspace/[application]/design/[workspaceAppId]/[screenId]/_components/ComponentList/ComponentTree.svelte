@@ -1,103 +1,95 @@
 <script>
-  import NavItem from "@/components/common/NavItem.svelte"
-  import { Icon, notifications } from "@budibase/bbui"
-  import {
-    selectedScreen,
-    componentStore,
-    userSelectedResourceMap,
-    selectedComponent,
-    hoverStore,
-    componentTreeNodesStore,
-    contextMenuStore,
-  } from "@/stores/builder"
-  import {
-    findComponentPath,
-    getComponentText,
-    getComponentName,
-  } from "@/helpers/components"
-  import { get } from "svelte/store"
-  import { dndStore } from "./dndStore"
-  import getComponentContextMenuItems from "./getComponentContextMenuItems"
+import { Icon, notifications } from "@budibase/bbui"
+import { get } from "svelte/store"
+import NavItem from "@/components/common/NavItem.svelte"
+import { findComponentPath, getComponentName, getComponentText } from "@/helpers/components"
+import {
+  componentStore,
+  componentTreeNodesStore,
+  contextMenuStore,
+  hoverStore,
+  selectedComponent,
+  selectedScreen,
+  userSelectedResourceMap,
+} from "@/stores/builder"
+import { dndStore } from "./dndStore"
+import getComponentContextMenuItems from "./getComponentContextMenuItems"
 
-  export let components = []
-  export let level = 0
+export let components = []
+export let level = 0
 
-  $: openNodes = $componentTreeNodesStore
+$: openNodes = $componentTreeNodesStore
 
-  $: filteredComponents = components?.filter(component => {
-    return (
-      !$componentStore.componentToPaste?.isCut ||
-      component._id !== $componentStore.componentToPaste?._id
-    )
+$: filteredComponents = components?.filter((component) => {
+  return (
+    !$componentStore.componentToPaste?.isCut ||
+    component._id !== $componentStore.componentToPaste?._id
+  )
+})
+
+const dragover = (component, index) => (e) => {
+  const mousePosition = e.offsetY / e.currentTarget.offsetHeight
+  dndStore.actions.dragover({
+    component,
+    index,
+    mousePosition,
   })
+  return false
+}
 
-  const dragover = (component, index) => e => {
-    const mousePosition = e.offsetY / e.currentTarget.offsetHeight
-    dndStore.actions.dragover({
-      component,
-      index,
-      mousePosition,
-    })
+const getComponentIcon = (component) => {
+  const def = componentStore.getDefinition(component?._component)
+  return def?.icon
+}
+
+const componentSupportsChildren = (component) => {
+  const def = componentStore.getDefinition(component?._component)
+  return def?.hasChildren
+}
+
+const componentHasChildren = (component) => {
+  return componentSupportsChildren(component) && component._children?.length
+}
+
+const onDrop = async (e) => {
+  e.stopPropagation()
+  try {
+    await dndStore.actions.drop()
+  } catch (error) {
+    notifications.error(error || "Error saving component")
+  }
+}
+
+const isOpen = (component) => {
+  if (!component?._children?.length) {
     return false
   }
+  return componentTreeNodesStore.isNodeExpanded(component._id)
+}
 
-  const getComponentIcon = component => {
-    const def = componentStore.getDefinition(component?._component)
-    return def?.icon
+const isChildOfSelectedComponent = (component) => {
+  const selectedComponentId = get(selectedComponent)?._id
+  const selectedScreenId = get(selectedScreen)?.props._id
+  if (!selectedComponentId || selectedComponentId === selectedScreenId) {
+    return false
   }
+  return findComponentPath($selectedComponent, component._id)?.length > 0
+}
 
-  const componentSupportsChildren = component => {
-    const def = componentStore.getDefinition(component?._component)
-    return def?.hasChildren
-  }
+const handleIconClick = (componentId) => {
+  componentStore.select(componentId)
+  componentTreeNodesStore.toggleNode(componentId)
+}
 
-  const componentHasChildren = component => {
-    return componentSupportsChildren(component) && component._children?.length
-  }
+const hover = hoverStore.hover
 
-  const onDrop = async e => {
-    e.stopPropagation()
-    try {
-      await dndStore.actions.drop()
-    } catch (error) {
-      notifications.error(error || "Error saving component")
-    }
-  }
+const openContextMenu = (e, component, opened) => {
+  e.preventDefault()
+  e.stopPropagation()
 
-  const isOpen = component => {
-    if (!component?._children?.length) {
-      return false
-    }
-    return componentTreeNodesStore.isNodeExpanded(component._id)
-  }
-
-  const isChildOfSelectedComponent = component => {
-    const selectedComponentId = get(selectedComponent)?._id
-    const selectedScreenId = get(selectedScreen)?.props._id
-    if (!selectedComponentId || selectedComponentId === selectedScreenId) {
-      return false
-    }
-    return findComponentPath($selectedComponent, component._id)?.length > 0
-  }
-
-  const handleIconClick = componentId => {
-    componentStore.select(componentId)
-    componentTreeNodesStore.toggleNode(componentId)
-  }
-
-  const hover = hoverStore.hover
-
-  const openContextMenu = (e, component, opened) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    const items = getComponentContextMenuItems(
-      component,
-      !opened,
-      componentStore
-    )
-    contextMenuStore.open(component._id, items, { x: e.clientX, y: e.clientY })
-  }
+  const items = getComponentContextMenuItems(component, !opened, componentStore)
+  contextMenuStore.open(component._id, items, { x: e.clientX, y: e.clientY })
+}
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions-->

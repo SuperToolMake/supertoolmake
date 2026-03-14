@@ -1,5 +1,5 @@
-import { PublishStatusResource } from "../api"
-import { WorkspaceApp, Screen } from "../documents"
+import type { PublishStatusResource } from "../api"
+import type { Screen, WorkspaceApp } from "../documents"
 
 export interface UIWorkspaceApp extends WorkspaceApp {
   screens: Screen[]

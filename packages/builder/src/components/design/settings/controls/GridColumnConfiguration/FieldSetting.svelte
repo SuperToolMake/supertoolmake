@@ -1,52 +1,52 @@
 <script>
-  import EditComponentPopover from "../EditComponentPopover.svelte"
-  import { Toggle, Icon } from "@budibase/bbui"
-  import { createEventDispatcher } from "svelte"
-  import { cloneDeep } from "lodash/fp"
-  import { FIELDS } from "@/constants/backend"
-  import { Constants } from "@budibase/frontend-core"
-  import { FieldType } from "@budibase/types"
+import { Icon, Toggle } from "@budibase/bbui"
+import { Constants } from "@budibase/frontend-core"
+import { FieldType } from "@budibase/types"
+import { cloneDeep } from "lodash/fp"
+import { createEventDispatcher } from "svelte"
+import { FIELDS } from "@/constants/backend"
+import EditComponentPopover from "../EditComponentPopover.svelte"
 
-  export let item
-  export let anchor
-  export let bindings
+export let item
+export let anchor
+export let bindings
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  $: fieldIconLookupMap = buildFieldIconLookupMap(FIELDS)
+$: fieldIconLookupMap = buildFieldIconLookupMap(FIELDS)
 
-  const buildFieldIconLookupMap = fields => {
-    let map = {}
-    Object.values(fields).forEach(fieldInfo => {
-      map[fieldInfo.type] = fieldInfo.icon
+const buildFieldIconLookupMap = (fields) => {
+  let map = {}
+  Object.values(fields).forEach((fieldInfo) => {
+    map[fieldInfo.type] = fieldInfo.icon
+  })
+  return map
+}
+
+const onToggle = (item) => {
+  return (e) => {
+    item.active = e.detail
+    dispatch("change", { ...cloneDeep(item), active: e.detail })
+  }
+}
+
+const parseSettings = (settings) => {
+  let columnSettings = settings
+    .filter((setting) => setting.key !== "field")
+    .map((setting) => {
+      return { ...setting, nested: true }
     })
-    return map
-  }
 
-  const onToggle = item => {
-    return e => {
-      item.active = e.detail
-      dispatch("change", { ...cloneDeep(item), active: e.detail })
-    }
+  // Filter out conditions for invalid types.
+  // Allow formulas as we have all the data already loaded in the table.
+  if (
+    Constants.BannedSearchTypes.includes(item.columnType) &&
+    item.columnType !== FieldType.FORMULA
+  ) {
+    return columnSettings.filter((x) => x.key !== "conditions")
   }
-
-  const parseSettings = settings => {
-    let columnSettings = settings
-      .filter(setting => setting.key !== "field")
-      .map(setting => {
-        return { ...setting, nested: true }
-      })
-
-    // Filter out conditions for invalid types.
-    // Allow formulas as we have all the data already loaded in the table.
-    if (
-      Constants.BannedSearchTypes.includes(item.columnType) &&
-      item.columnType !== FieldType.FORMULA
-    ) {
-      return columnSettings.filter(x => x.key !== "conditions")
-    }
-    return columnSettings
-  }
+  return columnSettings
+}
 </script>
 
 <div class="list-item-body">

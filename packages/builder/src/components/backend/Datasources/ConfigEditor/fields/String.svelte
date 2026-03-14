@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { Label, Input } from "@budibase/bbui"
+import { Input, Label } from "@budibase/bbui"
 
-  export let type
-  export let name
-  export let value
-  export let error
-  export let placeholder
+export let type
+export let name
+export let value
+export let error
+export let placeholder
 </script>
 
 <div class="form-row">

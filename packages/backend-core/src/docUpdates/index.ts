@@ -1,7 +1,7 @@
 import { asyncEventQueue, init as initQueue } from "../events/asyncEvents"
 import {
-  ProcessorMap,
   default as DocumentUpdateProcessor,
+  type ProcessorMap,
 } from "../events/processors/async/DocumentUpdateProcessor"
 
 let processingPromise: Promise<void>
@@ -16,7 +16,7 @@ export function init(processors: ProcessorMap) {
   }
   // if not processing in this instance, kick it off
   if (!processingPromise) {
-    processingPromise = asyncEventQueue.process(async job => {
+    processingPromise = asyncEventQueue.process(async (job) => {
       const { event, identity, properties } = job.data
       await documentProcessor.processEvent(event, identity, properties)
     })

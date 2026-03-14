@@ -1,110 +1,104 @@
 <script lang="ts">
-  import "@spectrum-css/tabs/dist/index-vars.css"
-  import { writable } from "svelte/store"
-  import { onMount, setContext, createEventDispatcher } from "svelte"
+import "@spectrum-css/tabs/dist/index-vars.css"
+import { createEventDispatcher, onMount, setContext } from "svelte"
+import { writable } from "svelte/store"
 
-  interface TabInfo {
-    width?: number
-    height?: number
-    left?: number
-    top?: number
-  }
+interface TabInfo {
+  width?: number
+  height?: number
+  left?: number
+  top?: number
+}
 
-  interface TabState {
-    title: string
-    id: string
-    emphasized: boolean
-    info?: TabInfo
-  }
+interface TabState {
+  title: string
+  id: string
+  emphasized: boolean
+  info?: TabInfo
+}
 
-  export let selected: string
-  export let vertical: boolean = false
-  export let noPadding: boolean = false
-  // added as a separate option as noPadding is used for vertical padding
-  export let noHorizPadding: boolean = false
-  export let quiet: boolean = false
-  export let emphasized: boolean = false
-  export let onTop: boolean = false
-  export let size: "S" | "M" | "L" = "M"
-  export let disabled: boolean = false
-  export let beforeSwitch: ((_title: string) => boolean) | null = null
-  export let hideTabsList: boolean = false
+export let selected: string
+export let vertical: boolean = false
+export let noPadding: boolean = false
+// added as a separate option as noPadding is used for vertical padding
+export let noHorizPadding: boolean = false
+export let quiet: boolean = false
+export let emphasized: boolean = false
+export let onTop: boolean = false
+export let size: "S" | "M" | "L" = "M"
+export let disabled: boolean = false
+export let beforeSwitch: ((_title: string) => boolean) | null = null
+export let hideTabsList: boolean = false
 
-  let thisSelected: string | undefined = undefined
-  let container: HTMLElement | undefined
+let thisSelected: string | undefined
+let container: HTMLElement | undefined
 
-  let _id = id()
-  const tab = writable<TabState>({ title: selected, id: _id, emphasized })
-  setContext("tab", tab)
+let _id = id()
+const tab = writable<TabState>({ title: selected, id: _id, emphasized })
+setContext("tab", tab)
 
-  let top: string | undefined
-  let left: string | undefined
-  let width: string | undefined
-  let height: string | undefined
+let top: string | undefined
+let left: string | undefined
+let width: string | undefined
+let height: string | undefined
 
-  const dispatch = createEventDispatcher<{
-    select: string
-  }>()
+const dispatch = createEventDispatcher<{
+  select: string
+}>()
 
-  $: {
-    if (thisSelected !== selected) {
-      thisSelected = selected
-      dispatch("select", thisSelected)
-    } else if ($tab.title !== thisSelected && !disabled) {
-      if (typeof beforeSwitch == "function") {
-        const proceed = beforeSwitch($tab.title)
-        if (proceed) {
-          thisSelected = $tab.title
-          selected = $tab.title
-          dispatch("select", thisSelected)
-        }
-      } else {
+$: {
+  if (thisSelected !== selected) {
+    thisSelected = selected
+    dispatch("select", thisSelected)
+  } else if ($tab.title !== thisSelected && !disabled) {
+    if (typeof beforeSwitch == "function") {
+      const proceed = beforeSwitch($tab.title)
+      if (proceed) {
         thisSelected = $tab.title
         selected = $tab.title
         dispatch("select", thisSelected)
       }
-    }
-    if ($tab.title !== thisSelected) {
-      tab.update(state => {
-        state.title = thisSelected as string
-        return state
-      })
-    }
-  }
-
-  $: $tab && !disabled && calculateIndicatorLength()
-  $: $tab && !disabled && calculateIndicatorOffset()
-
-  function calculateIndicatorLength() {
-    if (!vertical) {
-      width = ($tab.info?.width ?? 0) + "px"
     } else {
-      height = ($tab.info?.height ?? 0) + 4 + "px"
+      thisSelected = $tab.title
+      selected = $tab.title
+      dispatch("select", thisSelected)
     }
   }
-
-  function calculateIndicatorOffset() {
-    if (!vertical) {
-      left =
-        ($tab.info?.left ?? 0) -
-        (container?.getBoundingClientRect().left ?? 0) +
-        "px"
-    } else {
-      top =
-        ($tab.info?.top ?? 0) -
-        (container?.getBoundingClientRect().top ?? 0) +
-        "px"
-    }
+  if ($tab.title !== thisSelected) {
+    tab.update((state) => {
+      state.title = thisSelected as string
+      return state
+    })
   }
+}
 
-  onMount(() => {
-    calculateIndicatorLength()
-    calculateIndicatorOffset()
-  })
+$: $tab && !disabled && calculateIndicatorLength()
+$: $tab && !disabled && calculateIndicatorOffset()
 
-  function id(): string {
-    return "_" + Math.random().toString(36).slice(2, 9)
+function calculateIndicatorLength() {
+  if (!vertical) {
+    width = ($tab.info?.width ?? 0) + "px"
+  } else {
+    height = ($tab.info?.height ?? 0) + 4 + "px"
   }
+}
+
+function calculateIndicatorOffset() {
+  if (!vertical) {
+    left = ($tab.info?.left ?? 0) - (container?.getBoundingClientRect().left ?? 0) + "px"
+  } else {
+    top = ($tab.info?.top ?? 0) - (container?.getBoundingClientRect().top ?? 0) + "px"
+  }
+}
+
+onMount(() => {
+  calculateIndicatorLength()
+  calculateIndicatorOffset()
+})
+
+function id(): string {
+  return "_" + Math.random().toString(36).slice(2, 9)
+}
 </script>
 
 <div

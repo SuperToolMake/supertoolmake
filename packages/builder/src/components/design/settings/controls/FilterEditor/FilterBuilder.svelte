@@ -1,22 +1,19 @@
 <script>
-  import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
-  import { CoreFilterBuilder } from "@budibase/frontend-core"
-  import { tables } from "@/stores/builder"
-  import {
-    runtimeToReadableBinding,
-    readableToRuntimeBinding,
-  } from "@/dataBinding"
+import { CoreFilterBuilder } from "@budibase/frontend-core"
+import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
+import { readableToRuntimeBinding, runtimeToReadableBinding } from "@/dataBinding"
+import { tables } from "@/stores/builder"
 
-  export let schemaFields = undefined
-  export let filters = undefined
-  export let bindings = []
-  export let panel = ClientBindingPanel
-  export let allowBindings = true
-  export let allowOnEmpty = undefined
-  export let datasource = undefined
-  export let builderType = undefined
-  export let docsURL = undefined
-  export let evaluationContext = {}
+export let schemaFields = undefined
+export let filters = undefined
+export let bindings = []
+export let panel = ClientBindingPanel
+export let allowBindings = true
+export let allowOnEmpty = undefined
+export let datasource = undefined
+export let builderType = undefined
+export let docsURL = undefined
+export let evaluationContext = {}
 </script>
 
 <CoreFilterBuilder

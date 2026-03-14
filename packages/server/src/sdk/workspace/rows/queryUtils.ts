@@ -1,18 +1,10 @@
 import { db, HTTPError } from "@budibase/backend-core"
-import {
-  FieldType,
-  isLogicalSearchOperator,
-  SearchFilters,
-  Table,
-} from "@budibase/types"
+import { FieldType, isLogicalSearchOperator, type SearchFilters, type Table } from "@budibase/types"
 import sdk from "../.."
 import { isInternal } from "../tables/utils"
 
-export const validateFilters = (
-  filters: SearchFilters,
-  validFields: string[]
-) => {
-  validFields = validFields.map(f => f.toLowerCase())
+export const validateFilters = (filters: SearchFilters, validFields: string[]) => {
+  validFields = validFields.map((f) => f.toLowerCase())
   for (const key of Object.keys(filters || {}) as (keyof SearchFilters)[]) {
     if (isLogicalSearchOperator(key)) {
       const filter = filters[key]
@@ -40,10 +32,7 @@ export const validateFilters = (
   }
 }
 
-export const getQueryableFields = async (
-  table: Table,
-  fields?: string[]
-): Promise<string[]> => {
+export const getQueryableFields = async (table: Table, fields?: string[]): Promise<string[]> => {
   const extractTableFields = async (
     table: Table,
     allowedFields: string[],
@@ -56,15 +45,12 @@ export const getQueryableFields = async (
     }
 
     for (const field of Object.keys(table.schema).filter(
-      f => allowedFields.includes(f) && table.schema[f].visible !== false
+      (f) => allowedFields.includes(f) && table.schema[f].visible !== false
     )) {
       const subSchema = table.schema[field]
       const isRelationship = subSchema.type === FieldType.LINK
       // avoid relationship loops
-      if (
-        isRelationship &&
-        (opts?.noRelationships || fromTables.includes(subSchema.tableId))
-      ) {
+      if (isRelationship && (opts?.noRelationships || fromTables.includes(subSchema.tableId))) {
         continue
       }
       if (isRelationship) {
@@ -79,7 +65,7 @@ export const getQueryableFields = async (
           )
 
           result.push(
-            ...relatedFields.flatMap(f => [
+            ...relatedFields.flatMap((f) => [
               `${subSchema.name}.${f}`,
               // should be able to filter by relationship using table name
               `${relatedTable.name}.${f}`,

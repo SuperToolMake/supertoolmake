@@ -28,31 +28,41 @@ function buildAdminInitValidation() {
 
 function buildInviteValidation() {
   // prettier-ignore
-  return auth.joiValidator.body(Joi.object({
-    email: Joi.string().required(),
-    userInfo: Joi.object().optional(),
-  }).required())
+  return auth.joiValidator.body(
+    Joi.object({
+      email: Joi.string().required(),
+      userInfo: Joi.object().optional(),
+    }).required()
+  )
 }
 
 function buildInviteMultipleValidation() {
   // prettier-ignore
-  return auth.joiValidator.body(Joi.array().required().items(
-    Joi.object({
-      email: Joi.string(),
-      userInfo: Joi.object().optional(),
-    })
-  ))
+  return auth.joiValidator.body(
+    Joi.array()
+      .required()
+      .items(
+        Joi.object({
+          email: Joi.string(),
+          userInfo: Joi.object().optional(),
+        })
+      )
+  )
 }
 
 function buildInviteAcceptValidation() {
   // prettier-ignore
-  return auth.joiValidator.body(Joi.object({
-    inviteCode: Joi.string().required(),
-    password: Joi.string().optional(),
-    firstName: Joi.string().optional(),
-    lastName: Joi.string().optional(),
-    tenantId: Joi.string().optional(),
-  }).required().unknown(true))
+  return auth.joiValidator.body(
+    Joi.object({
+      inviteCode: Joi.string().required(),
+      password: Joi.string().optional(),
+      firstName: Joi.string().optional(),
+      lastName: Joi.string().optional(),
+      tenantId: Joi.string().optional(),
+    })
+      .required()
+      .unknown(true)
+  )
 }
 
 function buildChangeTenantOwnerEmailValidation() {
@@ -66,16 +76,8 @@ function buildChangeTenantOwnerEmailValidation() {
 }
 
 cloudRestrictedRoutes
-  .post(
-    "/api/global/users/sso",
-    users.buildAddSsoSupport(),
-    controller.addSsoSupport
-  )
-  .post(
-    "/api/global/users/init",
-    buildAdminInitValidation(),
-    controller.adminUser
-  )
+  .post("/api/global/users/sso", users.buildAddSsoSupport(), controller.addSsoSupport)
+  .post("/api/global/users/init", buildAdminInitValidation(), controller.adminUser)
   .put(
     "/api/global/users/tenant/owner",
     buildChangeTenantOwnerEmailValidation(),
@@ -83,11 +85,7 @@ cloudRestrictedRoutes
   )
 
 adminRoutes
-  .post(
-    "/api/global/users/bulk",
-    users.buildUserBulkUserValidation(),
-    controller.bulkUpdate
-  )
+  .post("/api/global/users/bulk", users.buildUserBulkUserValidation(), controller.bulkUpdate)
   .delete("/api/global/users/:id", controller.destroy)
 
 builderOrAdminRoutes
@@ -95,27 +93,11 @@ builderOrAdminRoutes
   .get("/api/global/users/count/:appId", controller.countByApp)
   .get("/api/global/users/invites", controller.getUserInvites)
   .get("/api/global/users/:id", controller.find)
-  .post(
-    "/api/global/users/invite/:code/:role",
-    controller.addWorkspaceIdToInvite
-  )
-  .delete(
-    "/api/global/users/invite/:code",
-    controller.removeWorkspaceIdFromInvite
-  )
-  .post(
-    "/api/global/users/onboard",
-    buildInviteMultipleValidation(),
-    controller.onboardUsers
-  )
-  .post(
-    "/api/global/users/:userId/permission/:role",
-    controller.addUserToWorkspace
-  )
-  .delete(
-    "/api/global/users/:userId/permission",
-    controller.removeUserFromWorkspace
-  )
+  .post("/api/global/users/invite/:code/:role", controller.addWorkspaceIdToInvite)
+  .delete("/api/global/users/invite/:code", controller.removeWorkspaceIdFromInvite)
+  .post("/api/global/users/onboard", buildInviteMultipleValidation(), controller.onboardUsers)
+  .post("/api/global/users/:userId/permission/:role", controller.addUserToWorkspace)
+  .delete("/api/global/users/:userId/permission", controller.removeUserFromWorkspace)
 
 adminRoutes
   .post("/api/global/users/invite", buildInviteValidation(), controller.invite)
@@ -124,10 +106,7 @@ adminRoutes
     buildInviteMultipleValidation(),
     controller.inviteMultiple
   )
-  .post(
-    "/api/global/users/multi/invite/delete",
-    controller.removeMultipleInvites
-  )
+  .post("/api/global/users/multi/invite/delete", controller.removeMultipleInvites)
   .post("/api/global/users", users.buildUserSaveValidation(), controller.save)
 
 loggedInRoutes
@@ -135,9 +114,5 @@ loggedInRoutes
   .post("/api/global/users/search", controller.search)
   // non-global endpoints
   .get("/api/global/users/invite/:code", controller.checkInvite)
-  .post(
-    "/api/global/users/invite/accept",
-    buildInviteAcceptValidation(),
-    controller.inviteAccept
-  )
+  .post("/api/global/users/invite/accept", buildInviteAcceptValidation(), controller.inviteAccept)
   .get("/api/global/users/tenant/:id", controller.tenantUserLookup)

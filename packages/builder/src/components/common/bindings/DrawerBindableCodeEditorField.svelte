@@ -1,20 +1,17 @@
 <script>
-  import { createEventDispatcher } from "svelte"
-  import {
-    ClientBindingPanel,
-    DrawerBindableSlot,
-  } from "@/components/common/bindings"
-  import CodeEditorField from "@/components/common/bindings/CodeEditorField.svelte"
+import { createEventDispatcher } from "svelte"
+import { ClientBindingPanel, DrawerBindableSlot } from "@/components/common/bindings"
+import CodeEditorField from "@/components/common/bindings/CodeEditorField.svelte"
 
-  export let value = ""
-  export let panel = ClientBindingPanel
-  export let schema = null
-  export let bindings = []
-  export let context = {}
-  export let height = 180
-  export let dropdown
+export let value = ""
+export let panel = ClientBindingPanel
+export let schema = null
+export let bindings = []
+export let context = {}
+export let height = 180
+export let dropdown
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 </script>
 
 <div class="wrapper">

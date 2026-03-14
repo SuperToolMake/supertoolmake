@@ -1,33 +1,33 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte"
-  import { Button } from "@budibase/bbui"
-  import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
+import { Button } from "@budibase/bbui"
+import { createEventDispatcher } from "svelte"
+import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
 
-  interface ModalRef {
-    show: () => void
-    hide: () => void
-  }
+interface ModalRef {
+  show: () => void
+  hide: () => void
+}
 
-  export let selectedRows: unknown[] = []
-  export let deleteRows: (_rows: unknown[]) => void | Promise<void>
-  export let item: string = "row"
-  export let action: string = "Delete"
+export let selectedRows: unknown[] = []
+export let deleteRows: (_rows: unknown[]) => void | Promise<void>
+export let item: string = "row"
+export let action: string = "Delete"
 
-  const dispatch = createEventDispatcher()
-  let modal: ModalRef | undefined
+const dispatch = createEventDispatcher()
+let modal: ModalRef | undefined
 
-  const showModal = () => {
-    modal?.show()
-  }
+const showModal = () => {
+  modal?.show()
+}
 
-  async function confirmDeletion() {
-    await deleteRows(selectedRows)
-    modal?.hide()
-    dispatch("updaterows")
-  }
+async function confirmDeletion() {
+  await deleteRows(selectedRows)
+  modal?.hide()
+  dispatch("updaterows")
+}
 
-  $: text = `${item}${selectedRows?.length === 1 ? "" : "s"}`
-  $: actionText = action.toLowerCase()
+$: text = `${item}${selectedRows?.length === 1 ? "" : "s"}`
+$: actionText = action.toLowerCase()
 </script>
 
 <Button icon="trash" warning quiet on:click={showModal}>

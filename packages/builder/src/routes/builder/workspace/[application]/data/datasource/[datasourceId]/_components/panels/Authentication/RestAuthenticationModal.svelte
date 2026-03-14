@@ -1,181 +1,175 @@
 <script lang="ts">
-  import { onMount } from "svelte"
-  import { ModalContent, Layout, Select, Body, Input } from "@budibase/bbui"
-  import { AUTH_TYPE_LABELS, AUTH_TYPES } from "./authTypes"
-  import { BindableCombobox } from "@/components/common/bindings"
-  import { getAuthBindings } from "@/dataBinding"
+import { Body, Input, Layout, ModalContent, Select } from "@budibase/bbui"
+import { onMount } from "svelte"
+import { BindableCombobox } from "@/components/common/bindings"
+import { getAuthBindings } from "@/dataBinding"
+import { AUTH_TYPE_LABELS, AUTH_TYPES } from "./authTypes"
 
-  interface FormData {
-    name?: string
-    type?: string
-    basic: {
-      username?: string
-      password?: string
+interface FormData {
+  name?: string
+  type?: string
+  basic: {
+    username?: string
+    password?: string
+  }
+  bearer: {
+    token?: string
+  }
+}
+
+export let configs
+export let currentConfig
+export let onConfirm
+export let onRemove
+
+let form: FormData = {
+  basic: {},
+  bearer: {},
+}
+
+let errors: FormData = {
+  basic: {},
+  bearer: {},
+}
+
+let blurred: {
+  name?: boolean
+  type?: boolean
+  basic: {
+    username?: boolean
+    password?: boolean
+  }
+  bearer: {
+    token?: boolean
+  }
+} = {
+  basic: {},
+  bearer: {},
+}
+
+let hasErrors = false
+let hasChanged = false
+
+onMount(async () => {
+  if (currentConfig) {
+    deconstructConfig()
+  }
+})
+
+/**
+ * map the current config's data into the form by type
+ */
+const deconstructConfig = () => {
+  form.name = currentConfig.name
+  form.type = currentConfig.type
+
+  if (currentConfig.type === AUTH_TYPES.BASIC) {
+    form.basic = {
+      ...currentConfig.config,
     }
-    bearer: {
-      token?: string
+  } else if (currentConfig.type === AUTH_TYPES.BEARER) {
+    form.bearer = {
+      ...currentConfig.config,
+    }
+  }
+}
+
+/**
+ * map the form into a new config to save by type
+ */
+const constructConfig = () => {
+  const newConfig: any = {
+    name: form.name,
+    type: form.type,
+  }
+
+  if (currentConfig) {
+    newConfig._id = currentConfig._id
+  }
+
+  if (form.type === AUTH_TYPES.BASIC) {
+    newConfig.config = {
+      ...form.basic,
+    }
+  } else if (form.type === AUTH_TYPES.BEARER) {
+    newConfig.config = {
+      ...form.bearer,
     }
   }
 
-  export let configs
-  export let currentConfig
-  export let onConfirm
-  export let onRemove
+  return newConfig
+}
 
-  let form: FormData = {
-    basic: {},
-    bearer: {},
+/**
+ * compare the existing config with the new config to see if there are any changes
+ */
+const checkChanged = () => {
+  if (currentConfig) {
+    hasChanged = JSON.stringify(currentConfig) !== JSON.stringify(constructConfig())
+  } else {
+    hasChanged = true
+  }
+}
+
+const checkErrors = () => {
+  hasErrors = false
+
+  // NAME
+  const nameError = () => {
+    // Unique name
+    if (form.name) {
+      errors.name =
+        // check for duplicate excluding the current config
+        configs.find((c: any) => c.name === form.name && c.name !== currentConfig?.name) !==
+        undefined
+          ? "Name must be unique"
+          : undefined
+    }
+    // Name required
+    else {
+      errors.name = "Name is required"
+    }
+    return !!errors.name
   }
 
-  let errors: FormData = {
-    basic: {},
-    bearer: {},
+  // TYPE
+  const typeError = () => {
+    errors.type = form.type ? undefined : "Type is required"
+    return !!errors.type
   }
 
-  let blurred: {
-    name?: boolean
-    type?: boolean
-    basic: {
-      username?: boolean
-      password?: boolean
-    }
-    bearer: {
-      token?: boolean
-    }
-  } = {
-    basic: {},
-    bearer: {},
+  // BASIC AUTH
+  const basicAuthErrors = () => {
+    errors.basic.username = form.basic.username ? undefined : "Username is required"
+    errors.basic.password = form.basic.password ? undefined : "Password is required"
+
+    return !!(errors.basic.username || errors.basic.password || commonError)
   }
 
-  let hasErrors = false
-  let hasChanged = false
-
-  onMount(async () => {
-    if (currentConfig) {
-      deconstructConfig()
-    }
-  })
-
-  /**
-   * map the current config's data into the form by type
-   */
-  const deconstructConfig = () => {
-    form.name = currentConfig.name
-    form.type = currentConfig.type
-
-    if (currentConfig.type === AUTH_TYPES.BASIC) {
-      form.basic = {
-        ...currentConfig.config,
-      }
-    } else if (currentConfig.type === AUTH_TYPES.BEARER) {
-      form.bearer = {
-        ...currentConfig.config,
-      }
-    }
+  // BEARER TOKEN
+  const bearerTokenErrors = () => {
+    errors.bearer.token = form.bearer.token ? undefined : "Token is required"
+    return !!(errors.bearer.token || commonError)
   }
 
-  /**
-   * map the form into a new config to save by type
-   */
-  const constructConfig = () => {
-    const newConfig: any = {
-      name: form.name,
-      type: form.type,
-    }
-
-    if (currentConfig) {
-      newConfig._id = currentConfig._id
-    }
-
-    if (form.type === AUTH_TYPES.BASIC) {
-      newConfig.config = {
-        ...form.basic,
-      }
-    } else if (form.type === AUTH_TYPES.BEARER) {
-      newConfig.config = {
-        ...form.bearer,
-      }
-    }
-
-    return newConfig
+  const commonError = nameError() || typeError()
+  if (form.type === AUTH_TYPES.BASIC) {
+    hasErrors = basicAuthErrors() || commonError
+  } else if (form.type === AUTH_TYPES.BEARER) {
+    hasErrors = bearerTokenErrors() || commonError
+  } else {
+    hasErrors = !!commonError
   }
+}
 
-  /**
-   * compare the existing config with the new config to see if there are any changes
-   */
-  const checkChanged = () => {
-    if (currentConfig) {
-      hasChanged =
-        JSON.stringify(currentConfig) !== JSON.stringify(constructConfig())
-    } else {
-      hasChanged = true
-    }
-  }
+const onFieldChange = () => {
+  checkErrors()
+  checkChanged()
+}
 
-  const checkErrors = () => {
-    hasErrors = false
-
-    // NAME
-    const nameError = () => {
-      // Unique name
-      if (form.name) {
-        errors.name =
-          // check for duplicate excluding the current config
-          configs.find(
-            (c: any) => c.name === form.name && c.name !== currentConfig?.name
-          ) !== undefined
-            ? "Name must be unique"
-            : undefined
-      }
-      // Name required
-      else {
-        errors.name = "Name is required"
-      }
-      return !!errors.name
-    }
-
-    // TYPE
-    const typeError = () => {
-      errors.type = form.type ? undefined : "Type is required"
-      return !!errors.type
-    }
-
-    // BASIC AUTH
-    const basicAuthErrors = () => {
-      errors.basic.username = form.basic.username
-        ? undefined
-        : "Username is required"
-      errors.basic.password = form.basic.password
-        ? undefined
-        : "Password is required"
-
-      return !!(errors.basic.username || errors.basic.password || commonError)
-    }
-
-    // BEARER TOKEN
-    const bearerTokenErrors = () => {
-      errors.bearer.token = form.bearer.token ? undefined : "Token is required"
-      return !!(errors.bearer.token || commonError)
-    }
-
-    const commonError = nameError() || typeError()
-    if (form.type === AUTH_TYPES.BASIC) {
-      hasErrors = basicAuthErrors() || commonError
-    } else if (form.type === AUTH_TYPES.BEARER) {
-      hasErrors = bearerTokenErrors() || commonError
-    } else {
-      hasErrors = !!commonError
-    }
-  }
-
-  const onFieldChange = () => {
-    checkErrors()
-    checkChanged()
-  }
-
-  const onConfirmInternal = () => {
-    onConfirm(constructConfig())
-  }
+const onConfirmInternal = () => {
+  onConfirm(constructConfig())
+}
 </script>
 
 <ModalContent

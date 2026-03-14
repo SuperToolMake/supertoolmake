@@ -1,10 +1,7 @@
-import * as controller from "../controllers/metadata"
-import {
-  middleware as appInfoMiddleware,
-  AppType,
-} from "../../middleware/appInfo"
-import { authorizedMiddleware as authorized } from "../../middleware/authorized"
 import { permissions } from "@budibase/backend-core"
+import { AppType, middleware as appInfoMiddleware } from "../../middleware/appInfo"
+import { authorizedMiddleware as authorized } from "../../middleware/authorized"
+import * as controller from "../controllers/metadata"
 import { endpointGroupList } from "./endpointGroups"
 
 const routes = endpointGroupList.group(

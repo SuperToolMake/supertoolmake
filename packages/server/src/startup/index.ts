@@ -7,9 +7,9 @@ import {
   users,
 } from "@budibase/backend-core"
 import bson from "bson"
-import { Server } from "http"
-import Koa from "koa"
-import { AddressInfo } from "net"
+import type { Server } from "http"
+import type Koa from "koa"
+import type { AddressInfo } from "net"
 import * as api from "../api"
 import env from "../environment"
 import { default as eventEmitter, init as eventInit } from "../events"
@@ -36,9 +36,7 @@ async function initRoutes(app: Koa) {
   app.use(api.router.allowedMethods())
 }
 
-export async function startup(
-  opts: { app?: Koa; server?: Server; force?: boolean } = {}
-) {
+export async function startup(opts: { app?: Koa; server?: Server; force?: boolean } = {}) {
   const { app, server } = opts
   if (STATE !== "uninitialised" && !opts.force) {
     console.log("SuperToolMake already started")
@@ -81,7 +79,7 @@ export async function startup(
   console.log("Initialising queues")
   // get the references to the queue promises, don't await as
   // they will never end, unless the processing stops
-  let queuePromises = []
+  const queuePromises = []
   queuePromises.push(sdk.dev.init())
   if (app) {
     console.log("Initialising routes")
@@ -94,12 +92,7 @@ export async function startup(
   // the app user sync
   const bbAdminEmail = coreEnv.BB_ADMIN_USER_EMAIL,
     bbAdminPassword = coreEnv.BB_ADMIN_USER_PASSWORD
-  if (
-    env.SELF_HOSTED &&
-    !env.MULTI_TENANCY &&
-    bbAdminEmail &&
-    bbAdminPassword
-  ) {
+  if (env.SELF_HOSTED && !env.MULTI_TENANCY && bbAdminEmail && bbAdminPassword) {
     console.log("Initialising admin user")
     const tenantId = tenancy.getTenantId()
     await tenancy.doInTenant(tenantId, async () => {
@@ -107,16 +100,12 @@ export async function startup(
       const checklist = await getChecklist()
       if (!checklist?.adminUser?.checked || !exists) {
         try {
-          const user = await users.UserDB.createAdminUser(
-            bbAdminEmail,
-            tenantId,
-            {
-              password: bbAdminPassword,
-              hashPassword: true,
-              requirePassword: true,
-              skipPasswordValidation: true,
-            }
-          )
+          const user = await users.UserDB.createAdminUser(bbAdminEmail, tenantId, {
+            password: bbAdminPassword,
+            hashPassword: true,
+            requirePassword: true,
+            skipPasswordValidation: true,
+          })
           // Need to set up an API key for automated integration tests
           if (env.isTest()) {
             await generateApiKey(user._id!)

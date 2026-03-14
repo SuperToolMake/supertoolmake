@@ -1,4 +1,4 @@
-import {
+import type {
   Config,
   ConfigChecklistResponse,
   ConfigType,
@@ -11,7 +11,7 @@ import {
   SaveConfigResponse,
   UploadConfigFileResponse,
 } from "@budibase/types"
-import { BaseAPIClient } from "./types"
+import type { BaseAPIClient } from "./types"
 
 export interface ConfigEndpoints {
   getConfig: (type: ConfigType) => Promise<FindConfigResponse>
@@ -31,7 +31,7 @@ export const buildConfigEndpoints = (API: BaseAPIClient): ConfigEndpoints => ({
    * Saves a global config.
    * @param config the config to save
    */
-  saveConfig: async config => {
+  saveConfig: async (config) => {
     return await API.post({
       url: "/api/global/configs",
       body: config,
@@ -42,7 +42,7 @@ export const buildConfigEndpoints = (API: BaseAPIClient): ConfigEndpoints => ({
    * Gets a global config of a certain type.
    * @param type the type to fetch
    */
-  getConfig: async type => {
+  getConfig: async (type) => {
     return await API.get({
       url: `/api/global/configs/${type}`,
     })
@@ -63,7 +63,7 @@ export const buildConfigEndpoints = (API: BaseAPIClient): ConfigEndpoints => ({
    * Gets the config for a certain tenant.
    * @param tenantId the tenant ID to get the config for
    */
-  getTenantConfig: async tenantId => {
+  getTenantConfig: async (tenantId) => {
     return await API.get({
       url: `/api/global/configs/public?tenantId=${tenantId}`,
     })
@@ -73,7 +73,7 @@ export const buildConfigEndpoints = (API: BaseAPIClient): ConfigEndpoints => ({
    * Gets the OIDC config for a certain tenant.
    * @param tenantId the tenant ID to get the config for
    */
-  getOIDCConfigs: async tenantId => {
+  getOIDCConfigs: async (tenantId) => {
     return await API.get({
       url: `/api/global/configs/public/oidc?tenantId=${tenantId}`,
     })
@@ -83,7 +83,7 @@ export const buildConfigEndpoints = (API: BaseAPIClient): ConfigEndpoints => ({
    * Gets the checklist for a specific tenant.
    * @param tenantId the tenant ID to get the checklist for
    */
-  getChecklist: async tenantId => {
+  getChecklist: async (tenantId) => {
     return await API.get({
       url: `/api/global/configs/checklist?tenantId=${tenantId}`,
     })
@@ -93,7 +93,7 @@ export const buildConfigEndpoints = (API: BaseAPIClient): ConfigEndpoints => ({
    * Updates the company logo for the environment.
    * @param data the logo form data
    */
-  uploadLogo: async data => {
+  uploadLogo: async (data) => {
     return await API.post({
       url: "/api/global/configs/upload/settings/logoUrl",
       body: data,
@@ -105,7 +105,7 @@ export const buildConfigEndpoints = (API: BaseAPIClient): ConfigEndpoints => ({
    * Updates the company favicon for the environment.
    * @param data the favicon form data
    */
-  uploadFavicon: async data => {
+  uploadFavicon: async (data) => {
     return await API.post({
       url: "/api/global/configs/upload/settings/faviconUrl",
       body: data,

@@ -1,23 +1,23 @@
 <script>
-  import { onMount } from "svelte"
-  import { fade, fly } from "svelte/transition"
-  import { previewStore, selectedAppUrls, themeStore } from "@/stores/builder"
-  import { ProgressCircle } from "@budibase/bbui"
+import { ProgressCircle } from "@budibase/bbui"
+import { onMount } from "svelte"
+import { fade, fly } from "svelte/transition"
+import { previewStore, selectedAppUrls, themeStore } from "@/stores/builder"
 
-  $: src = $selectedAppUrls.previewUrl
+$: src = $selectedAppUrls.previewUrl
 
-  const close = () => {
+const close = () => {
+  previewStore.showPreview(false)
+}
+
+onMount(() => {
+  window.isBuilder = true
+  window.closePreview = () => {
     previewStore.showPreview(false)
   }
+})
 
-  onMount(() => {
-    window.isBuilder = true
-    window.closePreview = () => {
-      previewStore.showPreview(false)
-    }
-  })
-
-  $: window.previewFullscreenUrl = src
+$: window.previewFullscreenUrl = src
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

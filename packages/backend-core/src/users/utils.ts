@@ -1,5 +1,5 @@
 import { sdk } from "@budibase/shared-core"
-import { ContextUser, User } from "@budibase/types"
+import type { ContextUser, User } from "@budibase/types"
 import env from "../environment"
 import { EmailUnavailableError } from "../errors"
 import { getFirstPlatformUser } from "./lookup"
@@ -15,7 +15,7 @@ export const hasAppBuilderPermissions = sdk.users.hasAppBuilderPermissions
 export const isAdminOrWorkspaceBuilder = sdk.users.isAdminOrWorkspaceBuilder
 
 export async function creatorsInList(users: (User | ContextUser)[]) {
-  return users.map(user => isCreatorSync(user))
+  return users.map((user) => isCreatorSync(user))
 }
 
 // fetches groups if no provided, but is async and shouldn't be looped with

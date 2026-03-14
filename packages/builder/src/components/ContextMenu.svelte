@@ -1,27 +1,21 @@
 <script lang="ts">
-  import { contextMenuStore } from "@/stores/builder"
-  import {
-    AbsTooltip,
-    Menu,
-    MenuItem,
-    Popover,
-    TooltipPosition,
-  } from "@budibase/bbui"
-  import NewPill from "./common/NewPill.svelte"
+import { AbsTooltip, Menu, MenuItem, Popover, TooltipPosition } from "@budibase/bbui"
+import { contextMenuStore } from "@/stores/builder"
+import NewPill from "./common/NewPill.svelte"
 
-  let dropdown
-  let anchor
+let dropdown
+let anchor
 
-  const handleKeyDown = () => {
-    if ($contextMenuStore.visible) {
-      contextMenuStore.close()
-    }
-  }
-
-  const handleItemClick = async (itemCallback: () => void | Promise<void>) => {
-    await itemCallback()
+const handleKeyDown = () => {
+  if ($contextMenuStore.visible) {
     contextMenuStore.close()
   }
+}
+
+const handleItemClick = async (itemCallback: () => void | Promise<void>) => {
+  await itemCallback()
+  contextMenuStore.close()
+}
 </script>
 
 <svelte:window on:keydown={handleKeyDown} />

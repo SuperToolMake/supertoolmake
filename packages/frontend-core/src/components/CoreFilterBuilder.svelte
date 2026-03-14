@@ -1,277 +1,250 @@
 <script>
-  import {
-    Body,
-    Button,
-    Icon,
-    Layout,
-    Select,
-    Helpers,
-    ActionButton,
-  } from "@budibase/bbui"
-  import {
-    FieldType,
-    UILogicalOperator,
-    EmptyFilterOption,
-  } from "@budibase/types"
-  import { QueryUtils, Constants } from "@budibase/frontend-core"
-  import { getContext, createEventDispatcher } from "svelte"
-  import FilterField from "./FilterField.svelte"
-  import ConditionField from "./ConditionField.svelte"
-  import { utils } from "@budibase/shared-core"
+import { ActionButton, Body, Button, Helpers, Icon, Layout, Select } from "@budibase/bbui"
+import { Constants, QueryUtils } from "@budibase/frontend-core"
+import { utils } from "@budibase/shared-core"
+import { EmptyFilterOption, FieldType, UILogicalOperator } from "@budibase/types"
+import { createEventDispatcher, getContext } from "svelte"
+import ConditionField from "./ConditionField.svelte"
+import FilterField from "./FilterField.svelte"
 
-  const dispatch = createEventDispatcher()
-  const { OperatorOptions, FilterOperator, OnEmptyFilter, FilterValueType } =
-    Constants
+const dispatch = createEventDispatcher()
+const { OperatorOptions, FilterOperator, OnEmptyFilter, FilterValueType } = Constants
 
-  export let schemaFields
-  export let filters
-  export let tables = []
-  export let datasource
-  export let behaviourFilters = false
-  export let allowBindings = false
-  export let allowOnEmpty = true
-  export let builderType = "filter"
-  export let docsURL = "https://docs.budibase.com/docs/searchfilter-data"
+export let schemaFields
+export let filters
+export let tables = []
+export let datasource
+export let behaviourFilters = false
+export let allowBindings = false
+export let allowOnEmpty = true
+export let builderType = "filter"
+export let docsURL = "https://docs.budibase.com/docs/searchfilter-data"
 
-  export let bindings
-  export let panel
-  export let toReadable
-  export let toRuntime
-  export let evaluationContext = {}
+export let bindings
+export let panel
+export let toReadable
+export let toRuntime
+export let evaluationContext = {}
 
-  $: editableFilters = migrateFilters(filters)
-  $: {
-    if (
-      tables.find(table => table._id === datasource?.tableId) &&
-      !schemaFields.some(field => field.name === "_id")
-    ) {
-      schemaFields = [...schemaFields, { name: "_id", type: "string" }]
-    }
+$: editableFilters = migrateFilters(filters)
+$: {
+  if (
+    tables.find((table) => table._id === datasource?.tableId) &&
+    !schemaFields.some((field) => field.name === "_id")
+  ) {
+    schemaFields = [...schemaFields, { name: "_id", type: "string" }]
   }
-  $: prefix =
-    builderType === "filter"
-      ? "Show data which matches"
-      : "Run branch when matching"
+}
+$: prefix = builderType === "filter" ? "Show data which matches" : "Run branch when matching"
 
-  // We still may need to migrate this even though the backend does it automatically now
-  // for query definitions. This is because we might be editing saved filter definitions
-  // from old screens, which will still be of type LegacyFilter[].
-  const migrateFilters = filters => {
-    if (Array.isArray(filters)) {
-      return utils.processSearchFilters(filters)
-    }
-    return Helpers.cloneDeep(filters)
+// We still may need to migrate this even though the backend does it automatically now
+// for query definitions. This is because we might be editing saved filter definitions
+// from old screens, which will still be of type LegacyFilter[].
+const migrateFilters = (filters) => {
+  if (Array.isArray(filters)) {
+    return utils.processSearchFilters(filters)
   }
+  return Helpers.cloneDeep(filters)
+}
 
-  const filterOperatorOptions = Object.values(FilterOperator).map(entry => {
-    return { value: entry, label: Helpers.capitalise(entry) }
-  })
+const filterOperatorOptions = Object.values(FilterOperator).map((entry) => {
+  return { value: entry, label: Helpers.capitalise(entry) }
+})
 
-  const onEmptyLabelling = {
-    [OnEmptyFilter.RETURN_ALL]: "All rows",
-    [OnEmptyFilter.RETURN_NONE]: "No rows",
-  }
+const onEmptyLabelling = {
+  [OnEmptyFilter.RETURN_ALL]: "All rows",
+  [OnEmptyFilter.RETURN_NONE]: "No rows",
+}
 
-  const onEmptyOptions = Object.values(OnEmptyFilter).map(entry => {
-    return { value: entry, label: onEmptyLabelling[entry] }
-  })
+const onEmptyOptions = Object.values(OnEmptyFilter).map((entry) => {
+  return { value: entry, label: onEmptyLabelling[entry] }
+})
 
-  const context = getContext("context")
+const context = getContext("context")
 
-  $: fieldOptions = (schemaFields || [])
-    .filter(field => !field.calculationType)
-    .map(field => ({
-      label: field.displayName || field.name,
-      value: field.name,
-    }))
+$: fieldOptions = (schemaFields || [])
+  .filter((field) => !field.calculationType)
+  .map((field) => ({
+    label: field.displayName || field.name,
+    value: field.name,
+  }))
 
-  const onFieldChange = filter => {
-    const previousType = filter.type
-    sanitizeTypes(filter)
-    sanitizeOperator(filter)
-    sanitizeValue(filter, previousType)
+const onFieldChange = (filter) => {
+  const previousType = filter.type
+  sanitizeTypes(filter)
+  sanitizeOperator(filter)
+  sanitizeValue(filter, previousType)
+}
+
+const onOperatorChange = (filter) => {
+  sanitizeOperator(filter)
+  sanitizeValue(filter, filter.type)
+}
+
+const getSchema = (filter) => {
+  return schemaFields.find((field) => field.name === filter.field)
+}
+
+const getValidOperatorsForType = (filter) => {
+  if (builderType === "condition") {
+    return [OperatorOptions.Equals, OperatorOptions.NotEquals]
   }
 
-  const onOperatorChange = filter => {
-    sanitizeOperator(filter)
-    sanitizeValue(filter, filter.type)
+  if (!filter?.field && !filter?.name) {
+    return []
   }
 
-  const getSchema = filter => {
-    return schemaFields.find(field => field.name === filter.field)
+  return QueryUtils.getValidOperatorsForType(filter, filter.field || filter.name, datasource)
+}
+
+const sanitizeTypes = (filter) => {
+  // Update type based on field
+  const fieldSchema = schemaFields.find((x) => x.name === filter.field)
+  filter.type = fieldSchema?.type
+  filter.subtype = fieldSchema?.subtype
+  filter.constraints = fieldSchema?.constraints
+
+  // Update external type based on field
+  filter.externalType = getSchema(filter)?.externalType
+}
+
+const sanitizeOperator = (filter) => {
+  // Ensure a valid operator is selected
+  const operators = getValidOperatorsForType(filter).map((x) => x.value)
+  if (!operators.includes(filter.operator)) {
+    filter.operator = operators[0] ?? OperatorOptions.Equals.value
   }
 
-  const getValidOperatorsForType = filter => {
-    if (builderType === "condition") {
-      return [OperatorOptions.Equals, OperatorOptions.NotEquals]
-    }
+  // Update the noValue flag if the operator does not take a value
+  const noValueOptions = [OperatorOptions.Empty.value, OperatorOptions.NotEmpty.value]
+  filter.noValue = noValueOptions.includes(filter.operator)
+}
 
-    if (!filter?.field && !filter?.name) {
-      return []
-    }
-
-    return QueryUtils.getValidOperatorsForType(
-      filter,
-      filter.field || filter.name,
-      datasource
-    )
+const sanitizeValue = (filter, previousType) => {
+  // Check if the operator allows a value at all
+  if (filter.noValue) {
+    filter.value = null
+    return
   }
-
-  const sanitizeTypes = filter => {
-    // Update type based on field
-    const fieldSchema = schemaFields.find(x => x.name === filter.field)
-    filter.type = fieldSchema?.type
-    filter.subtype = fieldSchema?.subtype
-    filter.constraints = fieldSchema?.constraints
-
-    // Update external type based on field
-    filter.externalType = getSchema(filter)?.externalType
-  }
-
-  const sanitizeOperator = filter => {
-    // Ensure a valid operator is selected
-    const operators = getValidOperatorsForType(filter).map(x => x.value)
-    if (!operators.includes(filter.operator)) {
-      filter.operator = operators[0] ?? OperatorOptions.Equals.value
-    }
-
-    // Update the noValue flag if the operator does not take a value
-    const noValueOptions = [
-      OperatorOptions.Empty.value,
-      OperatorOptions.NotEmpty.value,
-    ]
-    filter.noValue = noValueOptions.includes(filter.operator)
-  }
-
-  const sanitizeValue = (filter, previousType) => {
-    // Check if the operator allows a value at all
-    if (filter.noValue) {
+  // Ensure array values are properly set and cleared
+  if (Array.isArray(filter.value)) {
+    if (filter.valueType !== "Value" || filter.type !== FieldType.ARRAY) {
       filter.value = null
-      return
     }
-    // Ensure array values are properly set and cleared
-    if (Array.isArray(filter.value)) {
-      if (filter.valueType !== "Value" || filter.type !== FieldType.ARRAY) {
-        filter.value = null
-      }
-    } else if (
-      filter.type === FieldType.ARRAY &&
-      filter.valueType === "Value"
-    ) {
-      filter.value = []
-    } else if (
-      previousType !== filter.type &&
-      (previousType === FieldType.BB_REFERENCE ||
-        filter.type === FieldType.BB_REFERENCE)
-    ) {
-      filter.value = filter.type === FieldType.ARRAY ? [] : null
-    }
+  } else if (filter.type === FieldType.ARRAY && filter.valueType === "Value") {
+    filter.value = []
+  } else if (
+    previousType !== filter.type &&
+    (previousType === FieldType.BB_REFERENCE || filter.type === FieldType.BB_REFERENCE)
+  ) {
+    filter.value = filter.type === FieldType.ARRAY ? [] : null
   }
+}
 
-  const getGroupPrefix = groupIdx => {
-    if (groupIdx == 0) {
-      return "When"
-    }
-    const operatorMapping = {
-      [FilterOperator.ANY]: "or",
-      [FilterOperator.ALL]: "and",
-    }
-    return operatorMapping[editableFilters.logicalOperator]
+const getGroupPrefix = (groupIdx) => {
+  if (groupIdx == 0) {
+    return "When"
   }
-
-  const onFilterFieldUpdate = (filter, groupIdx, filterIdx) => {
-    const updated = Helpers.cloneDeep(filter)
-
-    handleFilterChange({
-      groupIdx,
-      filterIdx,
-      filter: { ...updated },
-    })
+  const operatorMapping = {
+    [FilterOperator.ANY]: "or",
+    [FilterOperator.ALL]: "and",
   }
+  return operatorMapping[editableFilters.logicalOperator]
+}
 
-  const handleFilterChange = req => {
-    const {
-      groupIdx,
-      filterIdx,
-      filter,
-      group,
-      addFilter,
-      addGroup,
-      deleteGroup,
-      deleteFilter,
-      logicalOperator,
-      onEmptyFilter,
-    } = req
+const onFilterFieldUpdate = (filter, groupIdx, filterIdx) => {
+  const updated = Helpers.cloneDeep(filter)
 
-    let editable = Helpers.cloneDeep(editableFilters)
-    let targetGroup = editable?.groups?.[groupIdx]
-    let targetFilter = targetGroup?.filters?.[filterIdx]
+  handleFilterChange({
+    groupIdx,
+    filterIdx,
+    filter: { ...updated },
+  })
+}
 
-    if (targetFilter) {
-      if (deleteFilter) {
-        targetGroup.filters.splice(filterIdx, 1)
+const handleFilterChange = (req) => {
+  const {
+    groupIdx,
+    filterIdx,
+    filter,
+    group,
+    addFilter,
+    addGroup,
+    deleteGroup,
+    deleteFilter,
+    logicalOperator,
+    onEmptyFilter,
+  } = req
 
-        // Clear the group entirely if no valid filters remain
-        if (targetGroup.filters.length === 0) {
-          editable.groups.splice(groupIdx, 1)
-        }
-      } else if (filter) {
-        targetGroup.filters[filterIdx] = filter
-      }
-    } else if (targetGroup) {
-      if (deleteGroup) {
+  let editable = Helpers.cloneDeep(editableFilters)
+  let targetGroup = editable?.groups?.[groupIdx]
+  let targetFilter = targetGroup?.filters?.[filterIdx]
+
+  if (targetFilter) {
+    if (deleteFilter) {
+      targetGroup.filters.splice(filterIdx, 1)
+
+      // Clear the group entirely if no valid filters remain
+      if (targetGroup.filters.length === 0) {
         editable.groups.splice(groupIdx, 1)
-      } else if (addFilter) {
-        targetGroup.filters.push({
+      }
+    } else if (filter) {
+      targetGroup.filters[filterIdx] = filter
+    }
+  } else if (targetGroup) {
+    if (deleteGroup) {
+      editable.groups.splice(groupIdx, 1)
+    } else if (addFilter) {
+      targetGroup.filters.push({
+        valueType: FilterValueType.VALUE,
+        ...(builderType === "condition"
+          ? { operator: OperatorOptions.Equals.value, type: FieldType.STRING }
+          : {}),
+      })
+    } else if (group) {
+      editable.groups[groupIdx] = {
+        ...targetGroup,
+        ...group,
+      }
+    }
+  } else if (addGroup) {
+    if (!editable?.groups?.length) {
+      editable = {
+        logicalOperator: UILogicalOperator.ALL,
+        onEmptyFilter: EmptyFilterOption.RETURN_NONE,
+        groups: [],
+      }
+    }
+    editable.groups.push({
+      logicalOperator: Constants.FilterOperator.ANY,
+      filters: [
+        {
           valueType: FilterValueType.VALUE,
           ...(builderType === "condition"
-            ? { operator: OperatorOptions.Equals.value, type: FieldType.STRING }
+            ? {
+                operator: OperatorOptions.Equals.value,
+              }
             : {}),
-        })
-      } else if (group) {
-        editable.groups[groupIdx] = {
-          ...targetGroup,
-          ...group,
-        }
-      }
-    } else if (addGroup) {
-      if (!editable?.groups?.length) {
-        editable = {
-          logicalOperator: UILogicalOperator.ALL,
-          onEmptyFilter: EmptyFilterOption.RETURN_NONE,
-          groups: [],
-        }
-      }
-      editable.groups.push({
-        logicalOperator: Constants.FilterOperator.ANY,
-        filters: [
-          {
-            valueType: FilterValueType.VALUE,
-            ...(builderType === "condition"
-              ? {
-                  operator: OperatorOptions.Equals.value,
-                }
-              : {}),
-          },
-        ],
-      })
-    } else if (logicalOperator) {
-      editable = {
-        ...editable,
-        logicalOperator,
-      }
-    } else if (onEmptyFilter) {
-      editable = {
-        ...editable,
-        onEmptyFilter,
-      }
+        },
+      ],
+    })
+  } else if (logicalOperator) {
+    editable = {
+      ...editable,
+      logicalOperator,
     }
-
-    // Set the request to null if the groups are emptied
-    editable = editable.groups.length ? editable : null
-
-    dispatch("change", editable)
+  } else if (onEmptyFilter) {
+    editable = {
+      ...editable,
+      onEmptyFilter,
+    }
   }
+
+  // Set the request to null if the groups are emptied
+  editable = editable.groups.length ? editable : null
+
+  dispatch("change", editable)
+}
 </script>
 
 <div class="container" class:mobile={$context?.device?.mobile}>

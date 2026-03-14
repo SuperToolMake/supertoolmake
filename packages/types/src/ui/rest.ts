@@ -217,9 +217,7 @@ export interface RestTemplateWithoutIcon<Name> {
   operationsCount: number
 }
 
-export interface RestTemplateGroup<
-  TemplateGroupName extends keyof RestTemplateGroups,
-> {
+export interface RestTemplateGroup<TemplateGroupName extends keyof RestTemplateGroups> {
   name: TemplateGroupName
   description: string
   icon: string
@@ -252,9 +250,7 @@ export type TemplateSelectionDetail = {
   template: RestTemplate
 }
 
-export type TemplateSelectionEventDetail =
-  | TemplateSelectionDetail
-  | GroupTemplateSelectionDetail
+export type TemplateSelectionEventDetail = TemplateSelectionDetail | GroupTemplateSelectionDetail
 
 export type TemplateSelection = TemplateSelectionDetail | GroupTemplateSelection
 

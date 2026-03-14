@@ -1,5 +1,5 @@
+import type { Ctx } from "@budibase/types"
 import Joi from "joi"
-import { Ctx } from "@budibase/types"
 
 function validate(schema: Joi.Schema, property: string) {
   // Return a Koa middleware function

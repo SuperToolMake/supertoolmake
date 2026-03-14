@@ -1,7 +1,7 @@
 import tableInline from "./images/tableInline.svg"
-import tableSidePanel from "./images/tableSidePanel.svg"
 import tableModal from "./images/tableModal.svg"
 import tableNewScreen from "./images/tableNewScreen.svg"
+import tableSidePanel from "./images/tableSidePanel.svg"
 
 const tableTypes = [
   {

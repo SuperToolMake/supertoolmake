@@ -1,9 +1,9 @@
 <script>
-  import Logo from "assets/supertoolmake-emblem.svg"
-  import { goto } from "@roxi/routify"
-  import { organisation } from "@/stores/portal"
+import { goto } from "@roxi/routify"
+import Logo from "assets/supertoolmake-emblem.svg"
+import { organisation } from "@/stores/portal"
 
-  $goto
+$goto
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions-->

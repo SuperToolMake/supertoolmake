@@ -1,34 +1,34 @@
 <script lang="ts">
-  import "@spectrum-css/inlinealert/dist/index-vars.css"
-  import Button from "../Button/Button.svelte"
-  import Icon from "../Icon/Icon.svelte"
+import "@spectrum-css/inlinealert/dist/index-vars.css"
+import Button from "../Button/Button.svelte"
+import Icon from "../Icon/Icon.svelte"
 
-  export let type: "info" | "error" | "success" | "help" | "negative" = "info"
-  export let header: string = ""
-  export let message: string = ""
-  export let onConfirm: (() => void) | undefined = undefined
-  export let buttonText: string = ""
-  export let cta: boolean = false
-  export let link: string = ""
-  export let linkText: string = ""
+export let type: "info" | "error" | "success" | "help" | "negative" = "info"
+export let header: string = ""
+export let message: string = ""
+export let onConfirm: (() => void) | undefined = undefined
+export let buttonText: string = ""
+export let cta: boolean = false
+export let link: string = ""
+export let linkText: string = ""
 
-  $: icon = selectIcon(type)
-  // if newlines used, convert them to different elements
-  $: split = message.split("\n")
+$: icon = selectIcon(type)
+// if newlines used, convert them to different elements
+$: split = message.split("\n")
 
-  function selectIcon(alertType: string): string {
-    switch (alertType) {
-      case "error":
-      case "negative":
-        return "warning"
-      case "success":
-        return "check-circle"
-      case "help":
-        return "question"
-      default:
-        return "info"
-    }
+function selectIcon(alertType: string): string {
+  switch (alertType) {
+    case "error":
+    case "negative":
+      return "warning"
+    case "success":
+      return "check-circle"
+    case "help":
+      return "question"
+    default:
+      return "info"
   }
+}
 </script>
 
 <div class="spectrum-InLineAlert spectrum-InLineAlert--{type}">

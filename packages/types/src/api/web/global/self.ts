@@ -1,5 +1,5 @@
-import { DevInfo, User } from "../../../documents"
-import { LockReason } from "@budibase/types"
+import type { LockReason } from "@budibase/types"
+import type { DevInfo, User } from "../../../documents"
 
 export interface GenerateAPIKeyRequest {
   userId?: string

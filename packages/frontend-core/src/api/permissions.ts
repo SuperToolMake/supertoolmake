@@ -1,15 +1,13 @@
-import {
+import type {
   AddPermissionResponse,
   GetResourcePermsResponse,
   PermissionLevel,
   RemovePermissionResponse,
 } from "@budibase/types"
-import { BaseAPIClient } from "./types"
+import type { BaseAPIClient } from "./types"
 
 export interface PermissionEndpoints {
-  getPermissionForResource: (
-    resourceId: string
-  ) => Promise<GetResourcePermsResponse>
+  getPermissionForResource: (resourceId: string) => Promise<GetResourcePermsResponse>
   updatePermissionForResource: (
     resourceId: string,
     roleId: string,
@@ -22,14 +20,12 @@ export interface PermissionEndpoints {
   ) => Promise<RemovePermissionResponse>
 }
 
-export const buildPermissionsEndpoints = (
-  API: BaseAPIClient
-): PermissionEndpoints => ({
+export const buildPermissionsEndpoints = (API: BaseAPIClient): PermissionEndpoints => ({
   /**
    * Gets the permission required to access a specific resource
    * @param resourceId the resource ID to check
    */
-  getPermissionForResource: async resourceId => {
+  getPermissionForResource: async (resourceId) => {
     return await API.get({
       url: `/api/permission/${resourceId}`,
     })

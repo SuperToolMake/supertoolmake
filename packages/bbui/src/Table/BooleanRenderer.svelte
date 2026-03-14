@@ -1,8 +1,8 @@
 <script lang="ts">
-  import "@spectrum-css/checkbox/dist/index-vars.css"
-  import Icon from "../Icon/Icon.svelte"
+import "@spectrum-css/checkbox/dist/index-vars.css"
+import Icon from "../Icon/Icon.svelte"
 
-  export let value: boolean
+export let value: boolean
 </script>
 
 <label

@@ -1,5 +1,5 @@
-import { Role, RoleUIMetadata } from "../../../documents"
-import { PermissionLevel, BuiltinPermissionID } from "../../../sdk"
+import type { Role, RoleUIMetadata } from "../../../documents"
+import type { BuiltinPermissionID, PermissionLevel } from "../../../sdk"
 
 export interface SaveRoleRequest {
   _id?: string

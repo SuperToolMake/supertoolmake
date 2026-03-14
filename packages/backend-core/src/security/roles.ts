@@ -1,24 +1,18 @@
-import { RoleColor, helpers } from "@budibase/shared-core"
+import { helpers, RoleColor } from "@budibase/shared-core"
 import {
   BuiltinPermissionID,
-  Database,
+  type Database,
   PermissionLevel,
-  Role as RoleDoc,
-  RoleUIMetadata,
-  Screen,
-  Workspace,
+  type Role as RoleDoc,
+  type RoleUIMetadata,
+  type Screen,
+  type Workspace,
 } from "@budibase/types"
 import { uniqBy } from "lodash"
 import cloneDeep from "lodash/fp/cloneDeep"
 import semver from "semver"
 import { getWorkspaceDB } from "../context"
-import {
-  DocumentType,
-  SEPARATOR,
-  doWithDB,
-  getRoleParams,
-  prefixRoleID,
-} from "../db"
+import { DocumentType, doWithDB, getRoleParams, prefixRoleID, SEPARATOR } from "../db"
 import { default as env } from "../environment"
 
 export const BUILTIN_ROLE_IDS = {
@@ -42,7 +36,7 @@ export const RoleIDVersion = {
 
 function rolesInList(roleIds: string[], ids: string | string[]) {
   if (Array.isArray(ids)) {
-    return ids.filter(id => roleIds.includes(id)).length === ids.length
+    return ids.filter((id) => roleIds.includes(id)).length === ids.length
   } else {
     return roleIds.includes(ids)
   }
@@ -103,7 +97,7 @@ export class RoleHierarchyTraversal {
     }
     roleList.push(role)
     if (Array.isArray(role.inherits)) {
-      for (let roleId of role.inherits) {
+      for (const roleId of role.inherits) {
         const foundRole = findRole(roleId, allRoles, opts)
         if (foundRole) {
           roleList = roleList.concat(this.walk(foundRole))
@@ -132,61 +126,36 @@ export class RoleHierarchyTraversal {
         }
       }
     }
-    return uniqBy(roleList, role => role._id)
+    return uniqBy(roleList, (role) => role._id)
   }
 }
 
 const BUILTIN_ROLES = {
-  ADMIN: new Role(
-    BUILTIN_IDS.ADMIN,
-    BUILTIN_IDS.ADMIN,
-    BuiltinPermissionID.ADMIN,
-    {
-      displayName: "Admin user",
-      description: "Can do everything",
-      color: RoleColor.ADMIN,
-    }
-  ).addInheritance(BUILTIN_IDS.POWER),
-  POWER: new Role(
-    BUILTIN_IDS.POWER,
-    BUILTIN_IDS.POWER,
-    BuiltinPermissionID.POWER,
-    {
-      displayName: "App power user",
-      description: "An app user with more access",
-      color: RoleColor.POWER,
-    }
-  ).addInheritance(BUILTIN_IDS.BASIC),
-  BASIC: new Role(
-    BUILTIN_IDS.BASIC,
-    BUILTIN_IDS.BASIC,
-    BuiltinPermissionID.WRITE,
-    {
-      displayName: "Basic user",
-      description: "Any logged in user",
-      color: RoleColor.BASIC,
-    }
-  ).addInheritance(BUILTIN_IDS.PUBLIC),
-  PUBLIC: new Role(
-    BUILTIN_IDS.PUBLIC,
-    BUILTIN_IDS.PUBLIC,
-    BuiltinPermissionID.PUBLIC,
-    {
-      displayName: "Public user",
-      description: "Accessible to anyone",
-      color: RoleColor.PUBLIC,
-    }
-  ),
-  BUILDER: new Role(
-    BUILTIN_IDS.BUILDER,
-    BUILTIN_IDS.BUILDER,
-    BuiltinPermissionID.ADMIN,
-    {
-      displayName: "Builder user",
-      description: "Users that can edit this app",
-      color: RoleColor.BUILDER,
-    }
-  ),
+  ADMIN: new Role(BUILTIN_IDS.ADMIN, BUILTIN_IDS.ADMIN, BuiltinPermissionID.ADMIN, {
+    displayName: "Admin user",
+    description: "Can do everything",
+    color: RoleColor.ADMIN,
+  }).addInheritance(BUILTIN_IDS.POWER),
+  POWER: new Role(BUILTIN_IDS.POWER, BUILTIN_IDS.POWER, BuiltinPermissionID.POWER, {
+    displayName: "App power user",
+    description: "An app user with more access",
+    color: RoleColor.POWER,
+  }).addInheritance(BUILTIN_IDS.BASIC),
+  BASIC: new Role(BUILTIN_IDS.BASIC, BUILTIN_IDS.BASIC, BuiltinPermissionID.WRITE, {
+    displayName: "Basic user",
+    description: "Any logged in user",
+    color: RoleColor.BASIC,
+  }).addInheritance(BUILTIN_IDS.PUBLIC),
+  PUBLIC: new Role(BUILTIN_IDS.PUBLIC, BUILTIN_IDS.PUBLIC, BuiltinPermissionID.PUBLIC, {
+    displayName: "Public user",
+    description: "Accessible to anyone",
+    color: RoleColor.PUBLIC,
+  }),
+  BUILDER: new Role(BUILTIN_IDS.BUILDER, BUILTIN_IDS.BUILDER, BuiltinPermissionID.ADMIN, {
+    displayName: "Builder user",
+    description: "Users that can edit this app",
+    color: RoleColor.BUILDER,
+  }),
 }
 
 export function getBuiltinRoles(): { [key: string]: RoleDoc } {
@@ -206,25 +175,20 @@ export function prefixRoleIDNoBuiltin(roleId: string) {
 }
 
 export function getBuiltinRole(roleId: string): Role | undefined {
-  const role = Object.values(BUILTIN_ROLES).find(role =>
-    roleId.includes(role._id)
-  )
+  const role = Object.values(BUILTIN_ROLES).find((role) => roleId.includes(role._id))
   if (!role) {
     return undefined
   }
   return cloneDeep(role)
 }
 
-export function validInherits(
-  allRoles: RoleDoc[],
-  inherits?: string | string[]
-): boolean {
+export function validInherits(allRoles: RoleDoc[], inherits?: string | string[]): boolean {
   if (!inherits) {
     return false
   }
-  const find = (id: string) => allRoles.find(r => roleIDsAreEqual(r._id!, id))
+  const find = (id: string) => allRoles.find((r) => roleIDsAreEqual(r._id!, id))
   if (Array.isArray(inherits)) {
-    const filtered = inherits.filter(roleId => find(roleId))
+    const filtered = inherits.filter((roleId) => find(roleId))
     return inherits.length !== 0 && filtered.length === inherits.length
   } else {
     return !!find(inherits)
@@ -237,10 +201,7 @@ export function validInherits(
 export function builtinRoleToNumber(id: string) {
   const builtins = getBuiltinRoles()
   const MAX = Object.values(builtins).length + 1
-  if (
-    roleIDsAreEqual(id, BUILTIN_IDS.ADMIN) ||
-    roleIDsAreEqual(id, BUILTIN_IDS.BUILDER)
-  ) {
+  if (roleIDsAreEqual(id, BUILTIN_IDS.ADMIN) || roleIDsAreEqual(id, BUILTIN_IDS.BUILDER)) {
     return MAX
   }
   let role = builtins[id],
@@ -276,15 +237,13 @@ export async function roleToNumber(id: string) {
     if (Array.isArray(role.inherits)) {
       // find the built-in roles, get their number, sort it, then get the last one
       const highestBuiltin: number | undefined = role.inherits
-        .map(roleId => {
-          const foundRole = hierarchy.find(role =>
-            roleIDsAreEqual(role._id!, roleId)
-          )
+        .map((roleId) => {
+          const foundRole = hierarchy.find((role) => roleIDsAreEqual(role._id!, roleId))
           if (foundRole) {
             return findNumber(foundRole) + 1
           }
         })
-        .filter(number => number)
+        .filter((number) => number)
         .sort()
         .pop()
       if (highestBuiltin != undefined) {
@@ -308,9 +267,7 @@ export function lowerBuiltinRoleID(roleId1?: string, roleId2?: string): string {
   if (!roleId2) {
     return roleId1 as string
   }
-  return builtinRoleToNumber(roleId1) > builtinRoleToNumber(roleId2)
-    ? roleId2
-    : roleId1
+  return builtinRoleToNumber(roleId1) > builtinRoleToNumber(roleId2) ? roleId2 : roleId1
 }
 
 export function roleIDsAreEqual(roleId1: string, roleId2: string) {
@@ -345,9 +302,7 @@ export function findRole(
     // make sure has the prefix (if it has it then it won't be added)
     roleId = prefixRoleID(roleId)
   }
-  const dbRole = roles.find(
-    role => role._id && roleIDsAreEqual(role._id, roleId)
-  )
+  const dbRole = roles.find((role) => role._id && roleIDsAreEqual(role._id, roleId))
   if (!dbRole && !isBuiltin(roleId) && opts?.defaultPublic) {
     return cloneDeep(BUILTIN_ROLES.PUBLIC)
   }
@@ -386,8 +341,8 @@ export async function saveRoles(roles: RoleDoc[]) {
   const db = getWorkspaceDB()
   await db.bulkDocs(
     roles
-      .filter(role => role._id)
-      .map(role => ({
+      .filter((role) => role._id)
+      .map((role) => ({
         ...role,
         _id: prefixRoleID(role._id!),
       }))
@@ -417,11 +372,9 @@ async function getAllUserRoles(
   return roles
 }
 
-export async function getUserRoleIdHierarchy(
-  userRoleId: string
-): Promise<string[]> {
+export async function getUserRoleIdHierarchy(userRoleId: string): Promise<string[]> {
   const roles = await getUserRoleHierarchy(userRoleId)
-  return roles.map(role => role._id!)
+  return roles.map((role) => role._id!)
 }
 
 /**
@@ -432,10 +385,7 @@ export async function getUserRoleIdHierarchy(
  * @returns returns an ordered array of the roles, with the first being their
  * highest level of access and the last being the lowest level.
  */
-export async function getUserRoleHierarchy(
-  userRoleId: string,
-  opts?: { defaultPublic?: boolean }
-) {
+export async function getUserRoleHierarchy(userRoleId: string, opts?: { defaultPublic?: boolean }) {
   // special case, if they don't have a role then they are a public user
   return getAllUserRoles(userRoleId, opts)
 }
@@ -459,7 +409,7 @@ export function checkForRoleResourceArray(
 
 export async function getAllRoleIds(appId: string): Promise<string[]> {
   const roles = await getAllRoles(appId)
-  return roles.map(role => role._id!)
+  return roles.map((role) => role._id!)
 }
 
 /**
@@ -487,9 +437,7 @@ export async function getAllRoles(appId?: string): Promise<RoleDoc[]> {
         })
       )
       roles = body.rows.map((row: any) => row.doc)
-      roles.forEach(
-        role => (role._id = getExternalRoleID(role._id!, role.version))
-      )
+      roles.forEach((role) => (role._id = getExternalRoleID(role._id!, role.version)))
     }
     const builtinRoles = getBuiltinRoles()
 
@@ -504,24 +452,18 @@ export async function getAllRoles(appId?: string): Promise<RoleDoc[]> {
         BUILTIN_IDS.PUBLIC,
       ]
     } else {
-      externalBuiltinRoles = [
-        BUILTIN_IDS.ADMIN,
-        BUILTIN_IDS.BASIC,
-        BUILTIN_IDS.PUBLIC,
-      ]
+      externalBuiltinRoles = [BUILTIN_IDS.ADMIN, BUILTIN_IDS.BASIC, BUILTIN_IDS.PUBLIC]
     }
 
     // need to combine builtin with any DB record of them (for sake of permissions)
-    for (let builtinRoleId of externalBuiltinRoles) {
+    for (const builtinRoleId of externalBuiltinRoles) {
       const builtinRole = builtinRoles[builtinRoleId]
-      const dbBuiltin = roles.filter(dbRole =>
-        roleIDsAreEqual(dbRole._id!, builtinRoleId)
-      )[0]
+      const dbBuiltin = roles.filter((dbRole) => roleIDsAreEqual(dbRole._id!, builtinRoleId))[0]
       if (dbBuiltin == null) {
         roles.push(builtinRole || builtinRoles.BASIC)
       } else {
         // remove role and all back after combining with the builtin
-        roles = roles.filter(role => role._id !== dbBuiltin._id)
+        roles = roles.filter((role) => role._id !== dbBuiltin._id)
         dbBuiltin._id = getExternalRoleID(builtinRole._id!, dbBuiltin.version)
         roles.push({
           ...builtinRole,
@@ -536,15 +478,12 @@ export async function getAllRoles(appId?: string): Promise<RoleDoc[]> {
       }
     }
     // check permissions
-    for (let role of roles) {
+    for (const role of roles) {
       if (!role.permissions) {
         continue
       }
-      for (let resourceId of Object.keys(role.permissions)) {
-        role.permissions = checkForRoleResourceArray(
-          role.permissions,
-          resourceId
-        )
+      for (const resourceId of Object.keys(role.permissions)) {
+        role.permissions = checkForRoleResourceArray(role.permissions, resourceId)
       }
     }
     return roles
@@ -559,10 +498,7 @@ async function shouldIncludePowerRole(db: Database) {
     return true
   }
 
-  const isGreaterThan3x = semver.gte(
-    creationVersion,
-    env.MIN_VERSION_WITHOUT_POWER_ROLE
-  )
+  const isGreaterThan3x = semver.gte(creationVersion, env.MIN_VERSION_WITHOUT_POWER_ROLE)
   return !isGreaterThan3x
 }
 
@@ -590,21 +526,15 @@ export class AccessController {
       this.userHierarchies[userRoleId] = roleIds
     }
 
-    return (
-      roleIds?.find(roleId => roleIDsAreEqual(roleId, tryingRoleId)) !==
-      undefined
-    )
+    return roleIds?.find((roleId) => roleIDsAreEqual(roleId, tryingRoleId)) !== undefined
   }
 
-  async checkScreensAccess(
-    screens: Screen[],
-    userRoleId: string
-  ): Promise<Screen[]> {
-    let accessibleScreens = []
+  async checkScreensAccess(screens: Screen[], userRoleId: string): Promise<Screen[]> {
+    const accessibleScreens = []
     // don't want to handle this with Promise.all as this would mean all custom roles would be
     // retrieved at same time, it is likely a custom role will be re-used and therefore want
     // to work in sync for performance save
-    for (let screen of screens) {
+    for (const screen of screens) {
       const accessible = await this.checkScreenAccess(screen, userRoleId)
       if (accessible) {
         accessibleScreens.push(accessible)
@@ -648,15 +578,12 @@ export function getExternalRoleID(roleId: string, version?: string) {
   return roleId
 }
 
-export function getExternalRoleIDs(
-  roleIds: string | string[] | undefined,
-  version?: string
-) {
+export function getExternalRoleIDs(roleIds: string | string[] | undefined, version?: string) {
   if (!roleIds) {
     return roleIds
   } else if (typeof roleIds === "string") {
     return getExternalRoleID(roleIds, version)
   } else {
-    return roleIds.map(roleId => getExternalRoleID(roleId, version))
+    return roleIds.map((roleId) => getExternalRoleID(roleId, version))
   }
 }

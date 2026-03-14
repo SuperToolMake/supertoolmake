@@ -1,24 +1,24 @@
 <script lang="ts">
-  import "@spectrum-css/checkbox/dist/index-vars.css"
-  import "@spectrum-css/fieldgroup/dist/index-vars.css"
-  import { createEventDispatcher } from "svelte"
-  import type { ChangeEventHandler } from "svelte/elements"
-  import Icon from "../../Icon/Icon.svelte"
+import "@spectrum-css/checkbox/dist/index-vars.css"
+import "@spectrum-css/fieldgroup/dist/index-vars.css"
+import { createEventDispatcher } from "svelte"
+import type { ChangeEventHandler } from "svelte/elements"
+import Icon from "../../Icon/Icon.svelte"
 
-  export let value = false
-  export let id: string | undefined = undefined
-  export let text: string | undefined = undefined
-  export let disabled = false
-  export let readonly = false
-  export let size: "S" | "M" | "L" | "XL" = "M"
-  export let indeterminate = false
+export let value = false
+export let id: string | undefined = undefined
+export let text: string | undefined = undefined
+export let disabled = false
+export let readonly = false
+export let size: "S" | "M" | "L" | "XL" = "M"
+export let indeterminate = false
 
-  const dispatch = createEventDispatcher()
-  const onChange: ChangeEventHandler<HTMLInputElement> = event => {
-    dispatch("change", event.currentTarget.checked)
-  }
+const dispatch = createEventDispatcher()
+const onChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+  dispatch("change", event.currentTarget.checked)
+}
 
-  $: sizeClass = `spectrum-Checkbox--size${size}`
+$: sizeClass = `spectrum-Checkbox--size${size}`
 </script>
 
 <label

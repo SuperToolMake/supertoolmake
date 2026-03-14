@@ -1,5 +1,5 @@
-import { it, expect, describe, beforeEach, afterEach, vi } from "vitest"
 import { get } from "svelte/store"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { BannerType } from "@/constants/banners"
 import { BannerStore } from "./banners"
 
@@ -56,9 +56,7 @@ describe("BannerStore", () => {
     it("persists closed banner to localStorage", () => {
       bannerStore.closeBanner(BannerType.APPS)
 
-      expect(localStorage.getItem(STORAGE_KEY)).toEqual(
-        JSON.stringify([BannerType.APPS])
-      )
+      expect(localStorage.getItem(STORAGE_KEY)).toEqual(JSON.stringify([BannerType.APPS]))
     })
 
     it("handles closing multiple different banners", () => {

@@ -1,4 +1,4 @@
-import { FieldType, Table } from "@budibase/types"
+import { FieldType, type Table } from "@budibase/types"
 import { PROTECTED_INTERNAL_COLUMNS } from "./constants"
 
 const allowDisplayColumnByType: Record<FieldType, boolean> = {
@@ -72,21 +72,21 @@ export function findDuplicateInternalColumns(table: Table): string[] {
   // maintains the case of keys
   const casedKeys = Object.keys(table.schema)
   // get the column names
-  const uncasedKeys = casedKeys.map(colName => colName.toLowerCase())
+  const uncasedKeys = casedKeys.map((colName) => colName.toLowerCase())
   // there are duplicates
   const set = new Set(uncasedKeys)
-  let duplicates: string[] = []
+  const duplicates: string[] = []
   if (set.size !== uncasedKeys.length) {
-    for (let key of set.keys()) {
-      const count = uncasedKeys.filter(name => name === key).length
+    for (const key of set.keys()) {
+      const count = uncasedKeys.filter((name) => name === key).length
       if (count > 1) {
         duplicates.push(key)
       }
     }
   }
 
-  for (let internalColumn of PROTECTED_INTERNAL_COLUMNS) {
-    if (casedKeys.find(key => key === internalColumn)) {
+  for (const internalColumn of PROTECTED_INTERNAL_COLUMNS) {
+    if (casedKeys.find((key) => key === internalColumn)) {
       duplicates.push(internalColumn)
     }
   }

@@ -1,34 +1,34 @@
+import { sql } from "@budibase/backend-core"
 import {
-  Integration,
-  DatasourceFieldType,
-  QueryType,
-  SqlQuery,
-  Table,
-  TableSchema,
-  DatasourcePlus,
+  type ConnectionInfo,
   DatasourceFeature,
-  ConnectionInfo,
+  DatasourceFieldType,
+  type DatasourcePlus,
+  type DatasourcePlusQueryResponse,
+  type EnrichedQueryJson,
+  type Integration,
+  QueryType,
+  type Schema,
   SourceName,
-  Schema,
-  TableSourceType,
-  DatasourcePlusQueryResponse,
-  SqlQueryBinding,
   SqlClient,
-  EnrichedQueryJson,
+  type SqlQuery,
+  type SqlQueryBinding,
+  type Table,
+  type TableSchema,
+  TableSourceType,
 } from "@budibase/types"
+import mysql from "mysql2/promise"
+import { isDate, NUMBER_REGEX } from "../utilities"
+import { getReadableErrorMessage } from "./base/errorMapping"
+import type { MySQLColumn } from "./base/types"
 import {
-  getSqlQuery,
   buildExternalTableId,
-  generateColumnDefinition,
-  finaliseExternalTables,
   checkExternalTables,
+  finaliseExternalTables,
+  generateColumnDefinition,
+  getSqlQuery,
   HOST_ADDRESS,
 } from "./utils"
-import { isDate, NUMBER_REGEX } from "../utilities"
-import { MySQLColumn } from "./base/types"
-import { getReadableErrorMessage } from "./base/errorMapping"
-import { sql } from "@budibase/backend-core"
-import mysql from "mysql2/promise"
 
 const Sql = sql.Sql
 
@@ -99,7 +99,7 @@ const SCHEMA: Integration = {
   },
 }
 
-const defaultTypeCasting = function (field: any, next: () => void) {
+const defaultTypeCasting = (field: any, next: () => void) => {
   if (
     field.type == "DATETIME" ||
     field.type === "DATE" ||
@@ -164,7 +164,7 @@ class MySQLIntegration extends Sql implements DatasourcePlus {
     // https://github.com/sidorares/node-mysql2#api-and-configuration
     // https://github.com/mysqljs/mysql#ssl-options
 
-    // @ts-ignore
+    // @ts-expect-error
     delete config.rejectUnauthorized
     this.config = {
       ...config,
@@ -185,7 +185,7 @@ class MySQLIntegration extends Sql implements DatasourcePlus {
       )
       response.connected = result?.checkRes == 2
     } catch (e: any) {
-      let readableMessage = getReadableErrorMessage(SourceName.MYSQL, e.errno)
+      const readableMessage = getReadableErrorMessage(SourceName.MYSQL, e.errno)
       if (readableMessage) {
         response.error = readableMessage
       } else {
@@ -203,13 +203,11 @@ class MySQLIntegration extends Sql implements DatasourcePlus {
     return `concat(${parts.join(", ")})`
   }
 
-  defineTypeCastingFromSchema(schema: {
-    [key: string]: { name: string; type: string }
-  }): void {
+  defineTypeCastingFromSchema(schema: { [key: string]: { name: string; type: string } }): void {
     if (!schema) {
       return
     }
-    this.config.typeCast = function (field: any, next: () => void) {
+    this.config.typeCast = (field: any, next: () => void) => {
       if (schema[field.name]?.name === field.name) {
         if (["LONGLONG", "NEWDECIMAL", "DECIMAL"].includes(field.type)) {
           if (schema[field.name]?.type === "number") {
@@ -220,11 +218,7 @@ class MySQLIntegration extends Sql implements DatasourcePlus {
           }
         }
       }
-      if (
-        field.type == "DATETIME" ||
-        field.type === "DATE" ||
-        field.type === "TIMESTAMP"
-      ) {
+      if (field.type == "DATETIME" || field.type === "DATE" || field.type === "TIMESTAMP") {
         return field.string()
       }
       if (field.type === "BIT" && field.length === 1) {
@@ -267,15 +261,13 @@ class MySQLIntegration extends Sql implements DatasourcePlus {
         await this.connect()
       }
       const baseBindings = query.bindings || []
-      const bindings = opts?.disableCoercion
-        ? baseBindings
-        : bindingTypeCoerce(baseBindings)
+      const bindings = opts?.disableCoercion ? baseBindings : bindingTypeCoerce(baseBindings)
       this.log(query.sql, bindings)
       // Node MySQL is callback based, so we must wrap our call in a promise
       const response = await this.client!.query(query.sql, bindings)
       return response[0]
     } catch (err: any) {
-      let readableMessage = getReadableErrorMessage(SourceName.MYSQL, err.errno)
+      const readableMessage = getReadableErrorMessage(SourceName.MYSQL, err.errno)
       if (readableMessage) {
         throw new Error(readableMessage, { cause: err })
       } else {
@@ -288,24 +280,21 @@ class MySQLIntegration extends Sql implements DatasourcePlus {
     }
   }
 
-  async buildSchema(
-    datasourceId: string,
-    entities: Record<string, Table>
-  ): Promise<Schema> {
+  async buildSchema(datasourceId: string, entities: Record<string, Table>): Promise<Schema> {
     const tables: { [key: string]: Table } = {}
     await this.connect()
 
     try {
       // get the tables first
       const tableNames = await this.queryTableNames()
-      for (let tableName of tableNames) {
+      for (const tableName of tableNames) {
         const primaryKeys = []
         const schema: TableSchema = {}
         const descResp: MySQLColumn[] = await this.internalQuery(
           { sql: `DESCRIBE \`${tableName}\`;` },
           { connect: false }
         )
-        for (let column of descResp) {
+        for (const column of descResp) {
           const columnName = column.Field
           if (column.Key === "PRI" && primaryKeys.indexOf(column.Key) === -1) {
             primaryKeys.push(columnName)
@@ -313,8 +302,7 @@ class MySQLIntegration extends Sql implements DatasourcePlus {
           const hasDefault = column.Default != null
           const isAuto: boolean =
             typeof column.Extra === "string" &&
-            (column.Extra === "auto_increment" ||
-              column.Extra.toLowerCase().includes("generated"))
+            (column.Extra === "auto_increment" || column.Extra.toLowerCase().includes("generated"))
           const required = column.Null !== "YES"
           schema[columnName] = generateColumnDefinition({
             name: columnName,
@@ -342,8 +330,8 @@ class MySQLIntegration extends Sql implements DatasourcePlus {
       await this.disconnect()
     }
 
-    let externalTables = finaliseExternalTables(tables, entities)
-    let errors = checkExternalTables(tables)
+    const externalTables = finaliseExternalTables(tables, entities)
+    const errors = checkExternalTables(tables)
     return { tables: externalTables, errors }
   }
 
@@ -411,11 +399,7 @@ class MySQLIntegration extends Sql implements DatasourcePlus {
         this.internalQuery(query, { connect: false, disableCoercion: true })
       const processFn = (result: any) => {
         if (Array.isArray(result)) {
-          return this.convertJsonStringColumns(
-            json.table,
-            result,
-            json.tableAliases
-          )
+          return this.convertJsonStringColumns(json.table, result, json.tableAliases)
         }
         return result
       }

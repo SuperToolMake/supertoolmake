@@ -1,9 +1,6 @@
+import type { QueryArrayFieldDatasource } from "@budibase/types"
+import { generateQueryArraySchemas, getJSONArrayDatasourceSchema } from "../utils/json"
 import FieldFetch from "./FieldFetch"
-import {
-  getJSONArrayDatasourceSchema,
-  generateQueryArraySchemas,
-} from "../utils/json"
-import { QueryArrayFieldDatasource } from "@budibase/types"
 
 export default class QueryArrayFetch extends FieldFetch<QueryArrayFieldDatasource> {
   async getDefinition() {
@@ -16,10 +13,7 @@ export default class QueryArrayFetch extends FieldFetch<QueryArrayFieldDatasourc
     // We can then extract their schema as a subset of the table schema.
     try {
       const table = await this.API.fetchQueryDefinition(datasource.tableId)
-      const schema = generateQueryArraySchemas(
-        table.schema,
-        table.nestedSchemaFields
-      )
+      const schema = generateQueryArraySchemas(table.schema, table.nestedSchemaFields)
       const result = {
         schema: getJSONArrayDatasourceSchema(schema, datasource),
       }

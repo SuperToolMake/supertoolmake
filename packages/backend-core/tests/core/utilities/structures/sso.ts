@@ -1,20 +1,20 @@
 import {
   ConfigType,
-  GoogleConfig,
-  GoogleInnerConfig,
-  JwtClaims,
-  OAuth2,
-  OIDCInnerConfig,
-  OIDCWellKnownConfig,
-  SSOAuthDetails,
-  SSOProfile,
+  type GoogleConfig,
+  type GoogleInnerConfig,
+  type JwtClaims,
+  type OAuth2,
+  type OIDCInnerConfig,
+  type OIDCWellKnownConfig,
+  type SSOAuthDetails,
+  type SSOProfile,
   SSOProviderType,
-  User,
+  type User,
 } from "@budibase/types"
-import { generator } from "./generator"
-import { email, uuid } from "./common"
-import * as users from "./users"
 import sample from "lodash/sample"
+import { email, uuid } from "./common"
+import { generator } from "./generator"
+import * as users from "./users"
 
 export function OAuth(): OAuth2 {
   return {

@@ -1,15 +1,15 @@
 <script>
-  import { themeStore } from "@/stores"
-  import { setContext } from "svelte"
-  import { Context, Helpers } from "@budibase/bbui"
+import { Context, Helpers } from "@budibase/bbui"
+import { setContext } from "svelte"
+import { themeStore } from "@/stores"
 
-  export let popoverRoot = true
+export let popoverRoot = true
 
-  const id = Helpers.uuid()
+const id = Helpers.uuid()
 
-  if (popoverRoot) {
-    setContext(Context.PopoverRoot, `#${id}`)
-  }
+if (popoverRoot) {
+  setContext(Context.PopoverRoot, `#${id}`)
+}
 </script>
 
 <div style={$themeStore.customThemeCss} {id}>

@@ -1,16 +1,16 @@
 import { cache, context, db as dbCore, errors } from "@budibase/backend-core"
 import {
-  DeploymentDoc,
-  DeploymentProgressResponse,
+  type DeploymentDoc,
+  type DeploymentProgressResponse,
   DeploymentStatus,
-  FetchDeploymentResponse,
-  PublishStatusResponse,
-  PublishTableRequest,
-  PublishTableResponse,
-  PublishWorkspaceRequest,
-  PublishWorkspaceResponse,
-  Table,
-  UserCtx,
+  type FetchDeploymentResponse,
+  type PublishStatusResponse,
+  type PublishTableRequest,
+  type PublishTableResponse,
+  type PublishWorkspaceRequest,
+  type PublishWorkspaceResponse,
+  type Table,
+  type UserCtx,
 } from "@budibase/types"
 import { DocumentType } from "../../../db/utils"
 import sdk from "../../../sdk"
@@ -55,8 +55,7 @@ async function storeDeploymentHistory(deployment: Deployment) {
   const deploymentId = deploymentJSON._id
 
   // first time deployment
-  if (!deploymentDoc.history[deploymentId])
-    deploymentDoc.history[deploymentId] = {}
+  if (!deploymentDoc.history[deploymentId]) deploymentDoc.history[deploymentId] = {}
 
   deploymentDoc.history[deploymentId] = {
     ...deploymentDoc.history[deploymentId],
@@ -69,9 +68,7 @@ async function storeDeploymentHistory(deployment: Deployment) {
   return deployment
 }
 
-async function applyPendingColumnRenames(
-  workspaceId: string
-): Promise<Table[]> {
+async function applyPendingColumnRenames(workspaceId: string): Promise<Table[]> {
   return await context.doInWorkspaceContext(workspaceId, async () => {
     const db = context.getWorkspaceDB()
     const tables = await sdk.tables.getAllInternalTables()
@@ -119,8 +116,7 @@ async function applyPendingColumnRenames(
   })
 }
 
-const getRevisionNumber = (rev?: string) =>
-  parseInt(rev?.split("-")?.[0] || "0", 10)
+const getRevisionNumber = (rev?: string) => parseInt(rev?.split("-")?.[0] || "0", 10)
 
 async function clearPendingColumnRenames(workspaceId: string) {
   await context.doInWorkspaceContext(workspaceId, async () => {
@@ -143,9 +139,7 @@ async function clearPendingColumnRenames(workspaceId: string) {
   })
 }
 
-export async function fetchDeployments(
-  ctx: UserCtx<void, FetchDeploymentResponse>
-) {
+export async function fetchDeployments(ctx: UserCtx<void, FetchDeploymentResponse>) {
   try {
     const db = context.getWorkspaceDB()
     const deploymentDoc = await db.get(DocumentType.DEPLOYMENTS)
@@ -153,17 +147,13 @@ export async function fetchDeployments(
     if (updated) {
       await db.put(deployments)
     }
-    ctx.body = deployments.history
-      ? Object.values(deployments.history).reverse()
-      : []
+    ctx.body = deployments.history ? Object.values(deployments.history).reverse() : []
   } catch (err) {
     ctx.body = []
   }
 }
 
-export async function deploymentProgress(
-  ctx: UserCtx<void, DeploymentProgressResponse>
-) {
+export async function deploymentProgress(ctx: UserCtx<void, DeploymentProgressResponse>) {
   try {
     const db = context.getWorkspaceDB()
     const deploymentDoc = await db.get<DeploymentDoc>(DocumentType.DEPLOYMENTS)
@@ -172,10 +162,7 @@ export async function deploymentProgress(
     }
     ctx.body = deploymentDoc.history?.[ctx.params.deploymentId]
   } catch (err) {
-    ctx.throw(
-      500,
-      `Error fetching data for deployment ${ctx.params.deploymentId}`
-    )
+    ctx.throw(500, `Error fetching data for deployment ${ctx.params.deploymentId}`)
   }
 }
 
@@ -287,9 +274,7 @@ export const publishWorkspaceInternal = async (ctx: PublishContext) => {
           production: false,
         })
         if (!appDoc) {
-          throw new Error(
-            "Unable to publish - cannot retrieve development app metadata"
-          )
+          throw new Error("Unable to publish - cannot retrieve development app metadata")
         }
         const prodAppDoc = await sdk.workspaces.metadata.tryGet({
           production: true,
@@ -307,14 +292,12 @@ export const publishWorkspaceInternal = async (ctx: PublishContext) => {
           sdk.workspaceApps.fetch(),
           sdk.tables.getAllInternalTables(),
         ])
-        const workspaceAppIds = workspaceApps.map(app => app._id!)
-        const tableIds = tables.map(table => table._id!)
+        const workspaceAppIds = workspaceApps.map((app) => app._id!)
+        const tableIds = tables.map((table) => table._id!)
         const fullMap = [...(workspaceAppIds ?? []), ...(tableIds ?? [])]
         appDoc.resourcesPublishedAt = {
           ...prodAppDoc?.resourcesPublishedAt,
-          ...Object.fromEntries(
-            fullMap.map(id => [id, new Date().toISOString()])
-          ),
+          ...Object.fromEntries(fullMap.map((id) => [id, new Date().toISOString()])),
         }
         delete appDoc.automationErrors
         await db.put(appDoc)
@@ -330,11 +313,7 @@ export const publishWorkspaceInternal = async (ctx: PublishContext) => {
     await publish()
   } catch (error: unknown) {
     const message =
-      error instanceof Error
-        ? error.message
-        : typeof error === "string"
-          ? error
-          : "Unknown error"
+      error instanceof Error ? error.message : typeof error === "string" ? error : "Unknown error"
     deployment.setStatus(DeploymentStatus.FAILURE, message)
     await storeDeploymentHistory(deployment)
     throw new Error(`Deployment Failed: ${message}`, { cause: error })
@@ -348,13 +327,11 @@ export const publishWorkspaceInternal = async (ctx: PublishContext) => {
   return deployment
 }
 
-export const publishWorkspace = async function (
+export const publishWorkspace = async (
   ctx: UserCtx<PublishWorkspaceRequest, PublishWorkspaceResponse>
-) {
+) => {
   if (ctx.request.body?.automationIds || ctx.request.body?.workspaceAppIds) {
-    throw new errors.NotImplementedError(
-      "Publishing resources by ID not currently supported"
-    )
+    throw new errors.NotImplementedError("Publishing resources by ID not currently supported")
   }
 
   ctx.body = await publishWorkspaceInternal(ctx)

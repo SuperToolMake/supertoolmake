@@ -1,4 +1,4 @@
-import { Document } from "../document"
+import type { Document } from "../document"
 
 export enum OAuth2CredentialsMethod {
   HEADER = "HEADER",

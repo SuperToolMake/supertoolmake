@@ -12,7 +12,7 @@ import {
 import { bootstrap } from "global-agent"
 import http from "http"
 import gracefulShutdown from "http-graceful-shutdown"
-import Application, { Middleware } from "koa"
+import Application, { type Middleware } from "koa"
 import koaBody, { HttpMethodEnum } from "koa-body"
 import RedisStore from "koa-redis"
 import api from "./api"
@@ -100,9 +100,7 @@ server.requestTimeout = parseInt(env.HTTP_REQUEST_TIMEOUT_MS || "120000")
 server.keepAliveTimeout = parseInt(env.HTTP_KEEPALIVE_TIMEOUT_MS || "15000")
 
 const shutdown = async (signal?: string) => {
-  console.log(
-    `Worker service shutting down gracefully... ${signal ? `Signal: ${signal}` : ""}`
-  )
+  console.log(`Worker service shutting down gracefully... ${signal ? `Signal: ${signal}` : ""}`)
   timers.cleanup()
   await redis.clients.shutdown()
   await queue.shutdown()
@@ -118,7 +116,7 @@ gracefulShutdown(server, {
   },
 })
 
-process.on("uncaughtException", async err => {
+process.on("uncaughtException", async (err) => {
   logging.logAlert("Uncaught exception.", err)
   await shutdown()
   if (!env.isTest()) {
@@ -126,7 +124,7 @@ process.on("uncaughtException", async err => {
   }
 })
 
-process.on("unhandledRejection", async reason => {
+process.on("unhandledRejection", async (reason) => {
   logging.logAlert("Unhandled Promise Rejection", reason as Error)
   await shutdown()
   if (!env.isTest()) {

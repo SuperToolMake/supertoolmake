@@ -1,4 +1,4 @@
-import { ReadStream } from "fs"
+import type { ReadStream } from "fs"
 import type { Layout, Screen, Workspace } from "../../../documents"
 
 export interface SyncWorkspaceResponse {

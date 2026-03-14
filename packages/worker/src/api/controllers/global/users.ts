@@ -10,44 +10,44 @@ import {
 } from "@budibase/backend-core"
 import { dataFilters, utils } from "@budibase/shared-core"
 import {
-  AcceptUserInviteRequest,
-  AcceptUserInviteResponse,
-  AddSSoUserRequest,
-  AddSSoUserResponse,
-  BulkUserRequest,
-  BulkUserResponse,
-  ChangeTenantOwnerEmailRequest,
-  CheckInviteResponse,
-  CountUserResponse,
-  CreateAdminUserRequest,
-  CreateAdminUserResponse,
-  Ctx,
-  DeleteInviteUserRequest,
-  DeleteInviteUsersRequest,
-  DeleteInviteUsersResponse,
-  DeleteUserResponse,
-  EditUserPermissionsResponse,
+  type AcceptUserInviteRequest,
+  type AcceptUserInviteResponse,
+  type AddSSoUserRequest,
+  type AddSSoUserResponse,
   APIWarningCode,
-  FetchUsersResponse,
-  FindUserResponse,
-  GetUserInvitesResponse,
-  InviteUserRequest,
-  InviteUserResponse,
-  InviteUsersRequest,
-  InviteUsersResponse,
+  type BulkUserRequest,
+  type BulkUserResponse,
+  type ChangeTenantOwnerEmailRequest,
+  type CheckInviteResponse,
+  type CountUserResponse,
+  type CreateAdminUserRequest,
+  type CreateAdminUserResponse,
+  type Ctx,
+  type DeleteInviteUserRequest,
+  type DeleteInviteUsersRequest,
+  type DeleteInviteUsersResponse,
+  type DeleteUserResponse,
+  type EditUserPermissionsResponse,
+  type FetchUsersResponse,
+  type FindUserResponse,
+  type GetUserInvitesResponse,
+  type InviteUserRequest,
+  type InviteUserResponse,
+  type InviteUsersRequest,
+  type InviteUsersResponse,
   LockName,
   LockType,
-  LookupTenantUserResponse,
-  OIDCUser,
-  SaveUserResponse,
-  SearchUsersRequest,
-  SearchUsersResponse,
-  StrippedUser,
-  UnsavedUser,
-  UpdateInviteResponse,
-  User,
-  UserCtx,
-  UserIdentifier,
+  type LookupTenantUserResponse,
+  type OIDCUser,
+  type SaveUserResponse,
+  type SearchUsersRequest,
+  type SearchUsersResponse,
+  type StrippedUser,
+  type UnsavedUser,
+  type UpdateInviteResponse,
+  type User,
+  type UserCtx,
+  type UserIdentifier,
 } from "@budibase/types"
 import crypto from "crypto"
 import emailValidator from "email-validator"
@@ -61,13 +61,13 @@ const MAX_USERS_UPLOAD_LIMIT = 1000
 const generatePassword = (length: number) => {
   const array = new Uint8Array(length)
   crypto.getRandomValues(array)
-  return Array.from(array, byte => byte.toString(36).padStart(2, "0"))
+  return Array.from(array, (byte) => byte.toString(36).padStart(2, "0"))
     .join("")
     .slice(0, length)
 }
 
 const stripUsers = (users: (User | StrippedUser)[]): StrippedUser[] => {
-  return users.map(user => ({
+  return users.map((user) => ({
     _id: user._id,
     email: user.email,
     tenantId: user.tenantId,
@@ -92,16 +92,12 @@ export const save = async (ctx: UserCtx<UnsavedUser, SaveUserResponse>) => {
   }
 }
 
-export const changeTenantOwnerEmail = async (
-  ctx: Ctx<ChangeTenantOwnerEmailRequest, void>
-) => {
+export const changeTenantOwnerEmail = async (ctx: Ctx<ChangeTenantOwnerEmailRequest, void>) => {
   const { newAccountEmail, originalEmail, tenantIds } = ctx.request.body
   try {
     for (const tenantId of tenantIds) {
       await tenancy.doInTenant(tenantId, async () => {
-        const tenantUser = (await userSdk.db.getUserByEmail(
-          originalEmail
-        )) as OIDCUser
+        const tenantUser = (await userSdk.db.getUserByEmail(originalEmail)) as OIDCUser
         if (!tenantUser) {
           return
         }
@@ -126,9 +122,7 @@ export const changeTenantOwnerEmail = async (
   }
 }
 
-export const addSsoSupport = async (
-  ctx: Ctx<AddSSoUserRequest, AddSSoUserResponse>
-) => {
+export const addSsoSupport = async (ctx: Ctx<AddSSoUserRequest, AddSSoUserResponse>) => {
   const { email, ssoId } = ctx.request.body
   try {
     const [userByEmail] = await users.getExistingPlatformUsers([email])
@@ -136,12 +130,7 @@ export const addSsoSupport = async (
       ctx.throw(404, "Not Found")
     }
 
-    await platform.users.addSsoUser(
-      ssoId,
-      email,
-      userByEmail.userId,
-      userByEmail.tenantId
-    )
+    await platform.users.addSsoUser(ssoId, email, userByEmail.userId, userByEmail.tenantId)
     // Need to get the _rev of the user doc to update
     const userById = await platform.users.getUserDoc(userByEmail.userId)
     await platform.users.updateUserDoc({
@@ -155,11 +144,8 @@ export const addSsoSupport = async (
   }
 }
 
-const bulkDelete = async (
-  users: Array<UserIdentifier>,
-  currentUserId: string
-) => {
-  if (users.find(u => u.userId === currentUserId)) {
+const bulkDelete = async (users: Array<UserIdentifier>, currentUserId: string) => {
+  if (users.find((u) => u.userId === currentUserId)) {
     throw new Error("Unable to delete self.")
   }
   return await userSdk.db.bulkDelete(users)
@@ -167,23 +153,19 @@ const bulkDelete = async (
 
 const bulkCreate = async (users: User[]) => {
   if (!env.SELF_HOSTED && users.length > MAX_USERS_UPLOAD_LIMIT) {
-    throw new Error(
-      "Max limit for upload is 1000 users. Please reduce file size and try again."
-    )
+    throw new Error("Max limit for upload is 1000 users. Please reduce file size and try again.")
   }
   return await userSdk.db.bulkCreate(users)
 }
 
-export const bulkUpdate = async (
-  ctx: Ctx<BulkUserRequest, BulkUserResponse>
-) => {
+export const bulkUpdate = async (ctx: Ctx<BulkUserRequest, BulkUserResponse>) => {
   const currentUserId = ctx.user._id
   const input = ctx.request.body
   let created, deleted
   try {
     if (input.create) {
       const tenantId = context.getTenantId()
-      const users: User[] = input.create.users.map(user => ({
+      const users: User[] = input.create.users.map((user) => ({
         ...user,
         tenantId,
       }))
@@ -202,11 +184,8 @@ const parseBooleanParam = (param: any) => {
   return !(param && param === "false")
 }
 
-export const adminUser = async (
-  ctx: Ctx<CreateAdminUserRequest, CreateAdminUserResponse>
-) => {
-  const { email, password, tenantId, ssoId, givenName, familyName } =
-    ctx.request.body
+export const adminUser = async (ctx: Ctx<CreateAdminUserRequest, CreateAdminUserResponse>) => {
+  const { email, password, tenantId, ssoId, givenName, familyName } = ctx.request.body
 
   await tenancy.doInTenant(tenantId, async () => {
     const hashPassword = parseBooleanParam(ctx.request.query.hashPassword)
@@ -214,10 +193,7 @@ export const adminUser = async (
 
     const userExists = await checkAnyUserExists()
     if (userExists) {
-      ctx.throw(
-        403,
-        "You cannot initialise once an global user has been created."
-      )
+      ctx.throw(403, "You cannot initialise once an global user has been created.")
     }
 
     try {
@@ -263,9 +239,7 @@ export const destroy = async (ctx: UserCtx<void, DeleteUserResponse>) => {
   }
 }
 
-export const search = async (
-  ctx: UserCtx<SearchUsersRequest, SearchUsersResponse>
-) => {
+export const search = async (ctx: UserCtx<SearchUsersRequest, SearchUsersResponse>) => {
   const body = ctx.request.body
 
   // TODO: for now only two supported search keys; string.email and equal._id
@@ -273,9 +247,9 @@ export const search = async (
     // Clean numeric prefixing. This will overwrite duplicate search fields,
     // but this is fine because we only support a single custom search on
     // email and id
-    for (let filters of Object.values(body.query)) {
+    for (const filters of Object.values(body.query)) {
       if (filters && typeof filters === "object") {
-        for (let [field, value] of Object.entries(filters)) {
+        for (const [field, value] of Object.entries(filters)) {
           delete filters[field]
           const cleanedField = db.removeKeyNumbering(field)
           if (filters[cleanedField] !== undefined) {
@@ -291,11 +265,10 @@ export const search = async (
     }
   }
 
-  const hasWorkspaceId =
-    body && Object.prototype.hasOwnProperty.call(body, "workspaceId")
+  const hasWorkspaceId = body && Object.hasOwn(body, "workspaceId")
 
   if (hasWorkspaceId) {
-    let response = await searchWorkspaceUsers(body)
+    const response = await searchWorkspaceUsers(body)
     if (!users.hasBuilderPermissions(ctx.user)) {
       response.data = stripUsers(response.data)
     }
@@ -313,7 +286,7 @@ export const search = async (
   } else {
     const paginated = await userSdk.core.paginatedUsers(body)
     // user hashed password shouldn't ever be returned
-    for (let user of paginated.data) {
+    for (const user of paginated.data) {
       if (user) {
         delete user.password
       }
@@ -360,9 +333,7 @@ const getGlobalPermissionUsers = async () => {
     }
 
     nextBookmark =
-      response.docs.length === GLOBAL_PERMISSION_USER_PAGE_LIMIT
-        ? response.bookmark
-        : undefined
+      response.docs.length === GLOBAL_PERMISSION_USER_PAGE_LIMIT ? response.bookmark : undefined
     if (!nextBookmark || nextBookmark === bookmark) {
       break
     }
@@ -372,9 +343,7 @@ const getGlobalPermissionUsers = async () => {
   return [...globalPermissionUsers.values()]
 }
 
-const searchWorkspaceUsers = async (
-  body: SearchUsersRequest
-): Promise<SearchUsersResponse> => {
+const searchWorkspaceUsers = async (body: SearchUsersRequest): Promise<SearchUsersResponse> => {
   const workspaceId = body.workspaceId
   if (!workspaceId) {
     return { data: [], hasNextPage: false }
@@ -439,14 +408,14 @@ const searchWorkspaceUsers = async (
 
   const bookmark = body.bookmark
   const pagedUsers = bookmark
-    ? filtered.filter(user => (getBookmarkValue(user) || "") >= bookmark)
+    ? filtered.filter((user) => (getBookmarkValue(user) || "") >= bookmark)
     : filtered
   const pageData = pagedUsers.slice(0, limit + 1)
   const hasNextPage = pageData.length > limit
   const data = hasNextPage ? pageData.slice(0, limit) : pageData
   const nextPage = hasNextPage ? getBookmarkValue(pageData[limit]) : undefined
 
-  for (let user of data) {
+  for (const user of data) {
     if (user) {
       delete user.password
     }
@@ -463,7 +432,7 @@ const searchWorkspaceUsers = async (
 export const fetch = async (ctx: UserCtx<void, FetchUsersResponse>) => {
   const all = await userSdk.db.allUsers()
   // user hashed password shouldn't ever be returned
-  for (let user of all) {
+  for (const user of all) {
     if (user) {
       delete user.password
     }
@@ -476,9 +445,7 @@ export const find = async (ctx: UserCtx<void, FindUserResponse>) => {
   ctx.body = await userSdk.db.getUser(ctx.params.id)
 }
 
-export const tenantUserLookup = async (
-  ctx: UserCtx<void, LookupTenantUserResponse>
-) => {
+export const tenantUserLookup = async (ctx: UserCtx<void, LookupTenantUserResponse>) => {
   const id = ctx.params.id
   // is email, check its valid
   if (id.includes("@") && !emailValidator.validate(id)) {
@@ -495,16 +462,14 @@ export const tenantUserLookup = async (
 /* 
   Encapsulate the app user onboarding flows here.
 */
-export const onboardUsers = async (
-  ctx: Ctx<InviteUsersRequest, InviteUsersResponse>
-) => {
+export const onboardUsers = async (ctx: Ctx<InviteUsersRequest, InviteUsersResponse>) => {
   if (await isEmailConfigured()) {
     await inviteMultiple(ctx)
     return
   }
 
-  let createdPasswords: Record<string, string> = {}
-  const users = ctx.request.body.map<User>(invite => {
+  const createdPasswords: Record<string, string> = {}
+  const users = ctx.request.body.map<User>((invite) => {
     const password = generatePassword(12)
     createdPasswords[invite.email] = password
 
@@ -519,19 +484,17 @@ export const onboardUsers = async (
     }
   })
 
-  let resp = await userSdk.db.bulkCreate(users)
+  const resp = await userSdk.db.bulkCreate(users)
   for (const user of resp.successful) {
     user.password = createdPasswords[user.email]
   }
   ctx.body = { ...resp, created: true }
 }
 
-export const invite = async (
-  ctx: Ctx<InviteUserRequest, InviteUserResponse>
-) => {
+export const invite = async (ctx: Ctx<InviteUserRequest, InviteUserResponse>) => {
   const request = ctx.request.body
 
-  let multiRequest = [request]
+  const multiRequest = [request]
   const response = await userSdk.invite(multiRequest)
 
   // explicitly throw for single user invite
@@ -551,9 +514,7 @@ export const invite = async (
   }
 }
 
-export const inviteMultiple = async (
-  ctx: Ctx<InviteUsersRequest, InviteUsersResponse>
-) => {
+export const inviteMultiple = async (ctx: Ctx<InviteUsersRequest, InviteUsersResponse>) => {
   ctx.body = await userSdk.invite(ctx.request.body)
 }
 
@@ -561,9 +522,7 @@ export const removeMultipleInvites = async (
   ctx: Ctx<DeleteInviteUsersRequest, DeleteInviteUsersResponse>
 ) => {
   const tenantId = context.getTenantId()
-  const inviteCodesToRemove = ctx.request.body.map(
-    (invite: DeleteInviteUserRequest) => invite.code
-  )
+  const inviteCodesToRemove = ctx.request.body.map((invite: DeleteInviteUserRequest) => invite.code)
   for (const code of inviteCodesToRemove) {
     await cache.invite.deleteCode(code, tenantId)
   }
@@ -575,9 +534,7 @@ export const removeMultipleInvites = async (
 export const checkInvite = async (ctx: UserCtx<void, CheckInviteResponse>) => {
   const { code } = ctx.params
   const tenantId =
-    typeof ctx.request.query.tenantId === "string"
-      ? ctx.request.query.tenantId
-      : undefined
+    typeof ctx.request.query.tenantId === "string" ? ctx.request.query.tenantId : undefined
   let invite
   try {
     invite = await cache.invite.getCode(code, tenantId)
@@ -590,9 +547,7 @@ export const checkInvite = async (ctx: UserCtx<void, CheckInviteResponse>) => {
   }
 }
 
-export const getUserInvites = async (
-  ctx: UserCtx<void, GetUserInvitesResponse>
-) => {
+export const getUserInvites = async (ctx: UserCtx<void, GetUserInvitesResponse>) => {
   try {
     // Restricted to the currently authenticated tenant
     ctx.body = await cache.invite.getInviteCodes()
@@ -649,15 +604,10 @@ export const removeWorkspaceIdFromInvite = async (
   }
 }
 
-export const inviteAccept = async (
-  ctx: Ctx<AcceptUserInviteRequest, AcceptUserInviteResponse>
-) => {
-  const { inviteCode, password, firstName, lastName, tenantId } =
-    ctx.request.body
+export const inviteAccept = async (ctx: Ctx<AcceptUserInviteRequest, AcceptUserInviteResponse>) => {
+  const { inviteCode, password, firstName, lastName, tenantId } = ctx.request.body
   const queryTenantId =
-    typeof ctx.request.query.tenantId === "string"
-      ? ctx.request.query.tenantId
-      : undefined
+    typeof ctx.request.query.tenantId === "string" ? ctx.request.query.tenantId : undefined
   const resolvedTenantId = tenantId || queryTenantId
   try {
     await locks.doWithLock(
@@ -669,23 +619,16 @@ export const inviteAccept = async (
       },
       async () => {
         // info is an extension of the user object that was stored by global
-        const { email, info } = await cache.invite.getCode(
-          inviteCode,
-          resolvedTenantId
-        )
+        const { email, info } = await cache.invite.getCode(inviteCode, resolvedTenantId)
         const user = await tenancy.doInTenant(info.tenantId, async () => {
           const appRoles = info.apps || {}
           const creatorAppsFromRoles = Object.keys(appRoles).filter(
-            appId => appRoles[appId] === "CREATOR"
+            (appId) => appRoles[appId] === "CREATOR"
           )
 
-          const builderApps = [
-            ...(info?.builder?.apps || []),
-            ...creatorAppsFromRoles,
-          ]
+          const builderApps = [...(info?.builder?.apps || []), ...creatorAppsFromRoles]
           const uniqueBuilderApps = [...new Set(builderApps)]
-          const hasCreatorPerms =
-            !!info?.builder?.creator || creatorAppsFromRoles.length > 0
+          const hasCreatorPerms = !!info?.builder?.creator || creatorAppsFromRoles.length > 0
 
           let request: any = {
             firstName,
@@ -742,27 +685,16 @@ export const inviteAccept = async (
       ctx.throw(400, err.message)
     }
     console.warn("Error inviting user", err)
-    ctx.throw(
-      400,
-      err.message || "Unable to create new user, invitation invalid."
-    )
+    ctx.throw(400, err.message || "Unable to create new user, invitation invalid.")
   }
 }
 
 export const addUserToWorkspace = async (
-  ctx: UserCtx<
-    EditUserPermissionsResponse,
-    SaveUserResponse,
-    { userId: string; role: string }
-  >
+  ctx: UserCtx<EditUserPermissionsResponse, SaveUserResponse, { userId: string; role: string }>
 ) => handleUserWorkspacePermission(ctx, ctx.params.userId, ctx.params.role)
 
 export const removeUserFromWorkspace = async (
-  ctx: UserCtx<
-    EditUserPermissionsResponse,
-    SaveUserResponse,
-    { userId: string }
-  >
+  ctx: UserCtx<EditUserPermissionsResponse, SaveUserResponse, { userId: string }>
 ) => handleUserWorkspacePermission(ctx, ctx.params.userId, undefined)
 
 async function handleUserWorkspacePermission(
@@ -795,8 +727,7 @@ async function handleUserWorkspacePermission(
     .filter(([_appId, role]) => role === "CREATOR")
     .map(([appId]) => appId)
 
-  const shouldHaveCreatorRole =
-    existingUser.builder?.creator || creatorForApps.length
+  const shouldHaveCreatorRole = existingUser.builder?.creator || creatorForApps.length
   if (!shouldHaveCreatorRole) {
     delete existingUser.builder?.creator
     delete existingUser.builder?.apps

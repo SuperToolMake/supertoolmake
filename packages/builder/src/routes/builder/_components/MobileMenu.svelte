@@ -1,20 +1,20 @@
 <script>
-  import { Layout, ActionButton } from "@budibase/bbui"
-  import { SideNav, SideNavItem } from "@/components/portal/page"
-  import { createEventDispatcher } from "svelte"
-  import { isActive } from "@roxi/routify"
-  import { fade } from "svelte/transition"
-  import Logo from "./Logo.svelte"
-  import { menu } from "@/stores/portal"
-  import { bb } from "@/stores/bb"
+import { ActionButton, Layout } from "@budibase/bbui"
+import { isActive } from "@roxi/routify"
+import { createEventDispatcher } from "svelte"
+import { fade } from "svelte/transition"
+import { SideNav, SideNavItem } from "@/components/portal/page"
+import { bb } from "@/stores/bb"
+import { menu } from "@/stores/portal"
+import Logo from "./Logo.svelte"
 
-  $isActive
+$isActive
 
-  export let visible = false
+export let visible = false
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  const close = () => dispatch("close")
+const close = () => dispatch("close")
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

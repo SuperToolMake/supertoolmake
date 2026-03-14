@@ -1,35 +1,31 @@
 import { roles, utils } from "@budibase/backend-core"
-import { BASE_LAYOUT_PROP_IDS, EMPTY_LAYOUT } from "../../constants/layouts"
-import { cloneDeep } from "lodash/fp"
+import { generator } from "@budibase/backend-core/tests"
 import {
-  Datasource,
+  BuiltinPermissionID,
+  type Datasource,
   FieldType,
   INTERNAL_TABLE_SOURCE_ID,
-  Query,
-  Role,
+  type Query,
+  type Role,
+  type Screen,
   SourceName,
-  Table,
+  type Table,
   TableSourceType,
-  BuiltinPermissionID,
-  Screen,
 } from "@budibase/types"
 import { merge } from "lodash"
-import { generator } from "@budibase/backend-core/tests"
-export { createTableScreen, createQueryScreen } from "./structures/screens"
+import { cloneDeep } from "lodash/fp"
+import { BASE_LAYOUT_PROP_IDS, EMPTY_LAYOUT } from "../../constants/layouts"
+
+export { createQueryScreen, createTableScreen } from "./structures/screens"
 
 const { BUILTIN_ROLE_IDS } = roles
 
-export function tableForDatasource(
-  datasource?: Datasource,
-  ...extra: Partial<Table>[]
-): Table {
+export function tableForDatasource(datasource?: Datasource, ...extra: Partial<Table>[]): Table {
   return merge(
     {
       name: generator.guid().substring(0, 10),
       type: "table",
-      sourceType: datasource
-        ? TableSourceType.EXTERNAL
-        : TableSourceType.INTERNAL,
+      sourceType: datasource ? TableSourceType.EXTERNAL : TableSourceType.INTERNAL,
       sourceId: datasource ? datasource._id! : INTERNAL_TABLE_SOURCE_ID,
       schema: {},
     },
@@ -37,10 +33,7 @@ export function tableForDatasource(
   )
 }
 
-export function basicTable(
-  datasource?: Datasource,
-  ...extra: Partial<Table>[]
-): Table {
+export function basicTable(datasource?: Datasource, ...extra: Partial<Table>[]): Table {
   return tableForDatasource(
     datasource,
     {
@@ -74,11 +67,7 @@ export function basicRow(tableId: string) {
   }
 }
 
-export function basicLinkedRow(
-  tableId: string,
-  linkedRowId: string,
-  linkField = "link"
-) {
+export function basicLinkedRow(tableId: string, linkedRowId: string, linkField = "link") {
   // this is based on the basic linked tables you get from the test configuration
   return {
     ...basicRow(tableId),
@@ -140,10 +129,7 @@ export function basicUser(role: string) {
 export const TEST_WORKSPACEAPPID_PLACEHOLDER = "workspaceAppId"
 
 function createHomeScreen(
-  config: {
-    roleId: string
-    route: string
-  } = {
+  config: { roleId: string; route: string } = {
     roleId: roles.BUILTIN_ROLE_IDS.BASIC,
     route: "/",
   }

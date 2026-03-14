@@ -1,14 +1,3 @@
-import restUtils from "@/helpers/data/utils"
-import {
-  runtimeToReadableMap,
-  readableToRuntimeMap,
-  readableToRuntimeBinding,
-  toBindingsArray,
-  getRestBindings,
-  runtimeToReadableBinding,
-} from "@/dataBinding"
-import { cloneDeep } from "lodash"
-import { queries } from "@/stores/builder/queries"
 import type {
   Datasource,
   EnrichedBinding,
@@ -18,8 +7,19 @@ import type {
   RestAuthConfig,
   UIInternalDatasource,
 } from "@budibase/types"
-import { get } from "svelte/store"
 import { RestAuthType } from "@budibase/types"
+import { cloneDeep } from "lodash"
+import { get } from "svelte/store"
+import {
+  getRestBindings,
+  readableToRuntimeBinding,
+  readableToRuntimeMap,
+  runtimeToReadableBinding,
+  runtimeToReadableMap,
+  toBindingsArray,
+} from "@/dataBinding"
+import restUtils from "@/helpers/data/utils"
+import { queries } from "@/stores/builder/queries"
 
 /**
  * Converts path variables from OpenAPI format {var} to Handlebars format {{var}}
@@ -55,10 +55,7 @@ export function processPath(path: string): string {
  * Mirrors server-side logic from query/import/sources/base/index.ts
  * Note: baseUrl is expected to already be in {{var}} format from the server
  */
-export function constructFullPath(
-  baseUrl: string | undefined,
-  endpointPath: string
-): string {
+export function constructFullPath(baseUrl: string | undefined, endpointPath: string): string {
   let path = processPath(endpointPath)
 
   if (baseUrl) {
@@ -82,9 +79,7 @@ export function buildUrl(
   if (!base) {
     return base || ""
   }
-  const qs = restUtils.buildQueryString(
-    runtimeToReadableMap(bindings, queryParams)
-  )
+  const qs = restUtils.buildQueryString(runtimeToReadableMap(bindings, queryParams))
   let newUrl = base
   if (base.includes("?")) {
     const split = base.split("?")
@@ -93,9 +88,7 @@ export function buildUrl(
   return qs.length === 0 ? newUrl : `${newUrl}?${qs}`
 }
 
-export const getBindingContext = (
-  objects: Record<any, any>[]
-): Record<string, any> => {
+export const getBindingContext = (objects: Record<any, any>[]): Record<string, any> => {
   return objects.reduce((acc, current) => ({ ...acc, ...(current || {}) }), {})
 }
 
@@ -185,11 +178,7 @@ export function buildQueryBindings(
     ...globalDynamicRequestBindings,
   ]
 
-  const contextObjects = [
-    requestBindings,
-    globalDynamicBindings,
-    staticVariables,
-  ]
+  const contextObjects = [requestBindings, globalDynamicBindings, staticVariables]
 
   if (dynamicVariables) {
     contextObjects.push(dynamicVariables)
@@ -207,14 +196,8 @@ export function buildQueryBindings(
   }
 }
 
-export const shouldShowVariables = (
-  dynamicVariables: Record<string, any>,
-  success: boolean
-) => {
-  return !!(
-    dynamicVariables &&
-    (Object.keys(dynamicVariables).length > 0 || success)
-  )
+export const shouldShowVariables = (dynamicVariables: Record<string, any>, success: boolean) => {
+  return !!(dynamicVariables && (Object.keys(dynamicVariables).length > 0 || success))
 }
 
 export function buildQuery(
@@ -280,17 +263,12 @@ export function rebuildVariables(
   }
 
   // remove existing query variables (for changes and deletions)
-  const filtered = existingVariables.filter(
-    variable => variable.queryId !== queryId
-  )
+  const filtered = existingVariables.filter((variable) => variable.queryId !== queryId)
   // re-add the new query variables
   return [...filtered, ...variables]
 }
 
-export function prettifyQueryRequestBody(
-  query: Query,
-  mergedBindings: EnrichedBinding[]
-): any {
+export function prettifyQueryRequestBody(query: Query, mergedBindings: EnrichedBinding[]): any {
   if (query?.fields?.requestBody) {
     return typeof query.fields.requestBody === "object"
       ? runtimeToReadableMap(mergedBindings, query.fields.requestBody)
@@ -327,9 +305,7 @@ const isRestAuthConfig = (value: unknown): value is RestAuthConfig => {
   return typeof value._id === "string" && isRestAuthType(value.type)
 }
 
-export function getDefaultRestAuthConfig(
-  datasource: Datasource | UIInternalDatasource | undefined
-):
+export function getDefaultRestAuthConfig(datasource: Datasource | UIInternalDatasource | undefined):
   | {
       authConfigId: string
       authConfigType: RestAuthType
@@ -352,9 +328,7 @@ export function validateQuery(
   headers: Record<string, string>
 ): void {
   const forbiddenBindings = /{{\s?user(\.(\w|\$)*\s?|\s?)}}/g
-  const bindingError = new Error(
-    "'user' is a protected binding and cannot be used"
-  )
+  const bindingError = new Error("'user' is a protected binding and cannot be used")
 
   if (forbiddenBindings.test(url)) {
     throw bindingError
@@ -364,13 +338,13 @@ export function validateQuery(
     throw bindingError
   }
 
-  Object.values(requestBindings).forEach(bindingValue => {
+  Object.values(requestBindings).forEach((bindingValue) => {
     if (forbiddenBindings.test(bindingValue)) {
       throw bindingError
     }
   })
 
-  Object.values(headers).forEach(headerValue => {
+  Object.values(headers).forEach((headerValue) => {
     if (forbiddenBindings.test(headerValue)) {
       throw bindingError
     }
@@ -399,7 +373,7 @@ export async function runQuery(
 
   const schema = existingSchema || {}
   if (existingSchema) {
-    for (let [name, field] of Object.entries(response.schema)) {
+    for (const [name, field] of Object.entries(response.schema)) {
       if (!schema[name]) {
         schema[name] = field
       }
@@ -437,7 +411,7 @@ export function getSelectedQuery(queryId: string, datasourceId: string) {
     return defaultQuery
   }
 
-  return queryStore.list.find(q => q._id === queryId) || defaultQuery
+  return queryStore.list.find((q) => q._id === queryId) || defaultQuery
 }
 
 export function keyValueArrayToRecord(

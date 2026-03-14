@@ -1,4 +1,4 @@
-import { PWAManifestImage } from "@budibase/types"
+import type { PWAManifestImage } from "@budibase/types"
 import qs from "querystring"
 import { DEFAULT_TENANT_ID, getTenantId } from "../../context"
 import env from "../../environment"
@@ -43,16 +43,14 @@ export async function getAppFileUrl(s3Key: string) {
   }
 }
 
-export async function enrichPWAImages(
-  images: PWAManifestImage[]
-): Promise<PWAManifestImage[]> {
+export async function enrichPWAImages(images: PWAManifestImage[]): Promise<PWAManifestImage[]> {
   if (images.length === 0) {
     return []
   }
 
   try {
     return await Promise.all(
-      images.map(async image => {
+      images.map(async (image) => {
         return {
           ...image,
           src: await getAppFileUrl(image.src),

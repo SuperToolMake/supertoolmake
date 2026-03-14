@@ -1,57 +1,45 @@
 <script lang="ts">
-  import {
-    notifications,
-    Layout,
-    Body,
-    Table,
-    ButtonGroup,
-    Button,
-  } from "@budibase/bbui"
-  import { email } from "@/stores/portal/email"
-  import {
-    type FindConfigResponse,
-    type FetchGlobalTemplateDefinitionResponse,
-  } from "@budibase/types"
-  import { onMount } from "svelte"
-  import { bb } from "@/stores/bb"
-  import { fetchSmtp } from "./utils"
-  import { downloadFile } from "@budibase/frontend-core"
+import { Body, Button, ButtonGroup, Layout, notifications, Table } from "@budibase/bbui"
+import { downloadFile } from "@budibase/frontend-core"
+import type { FetchGlobalTemplateDefinitionResponse, FindConfigResponse } from "@budibase/types"
+import { onMount } from "svelte"
+import { bb } from "@/stores/bb"
+import { email } from "@/stores/portal/email"
+import { fetchSmtp } from "./utils"
 
-  const templateSchema = {
-    name: {
-      displayName: "Name",
-      editable: false,
-    },
-    category: {
-      displayName: "Category",
-      editable: false,
-    },
+const templateSchema = {
+  name: {
+    displayName: "Name",
+    editable: false,
+  },
+  category: {
+    displayName: "Category",
+    editable: false,
+  },
+}
+
+$: emailInfo = getEmailInfo($email.definitions)
+$: hasCustom = ($email.templates || []).find((template) => template._id)
+
+let smtpConfig: FindConfigResponse | null
+let loading = false
+
+function getEmailInfo(definitions: FetchGlobalTemplateDefinitionResponse | undefined) {
+  if (!definitions) {
+    return []
   }
+  const entries = Object.entries(definitions.info)
+  return entries.map(([key, value]) => ({ purpose: key, ...value }))
+}
 
-  $: emailInfo = getEmailInfo($email.definitions)
-  $: hasCustom = ($email.templates || []).find(template => template._id)
-
-  let smtpConfig: FindConfigResponse | null
-  let loading = false
-
-  function getEmailInfo(
-    definitions: FetchGlobalTemplateDefinitionResponse | undefined
-  ) {
-    if (!definitions) {
-      return []
-    }
-    const entries = Object.entries(definitions.info)
-    return entries.map(([key, value]) => ({ purpose: key, ...value }))
+onMount(async () => {
+  try {
+    smtpConfig = await fetchSmtp()
+    await email.fetchTemplates()
+  } catch (error) {
+    notifications.error("Error fetching email templates")
   }
-
-  onMount(async () => {
-    try {
-      smtpConfig = await fetchSmtp()
-      await email.fetchTemplates()
-    } catch (error) {
-      notifications.error("Error fetching email templates")
-    }
-  })
+})
 </script>
 
 <Layout gap="S" noPadding>

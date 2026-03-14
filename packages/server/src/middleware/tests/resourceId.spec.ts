@@ -1,9 +1,9 @@
-import { Ctx } from "@budibase/types"
+import type { Ctx } from "@budibase/types"
 import {
-  paramResource,
-  paramSubResource,
   bodyResource,
   bodySubResource,
+  paramResource,
+  paramSubResource,
   ResourceIdGetter,
 } from "../resourceId"
 

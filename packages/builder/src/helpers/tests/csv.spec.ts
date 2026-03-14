@@ -1,18 +1,13 @@
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import { parseUserEmailsFromCSV } from "../csv"
 
 describe("parseUserEmailsFromCSV", () => {
   it("should filter out empty lines from CSV content", () => {
-    const csvContent =
-      "user1@example.com\n\nuser2@example.com\n\n\nuser3@example.com\n"
+    const csvContent = "user1@example.com\n\nuser2@example.com\n\n\nuser3@example.com\n"
 
     const result = parseUserEmailsFromCSV(csvContent)
 
-    expect(result).toEqual([
-      "user1@example.com",
-      "user2@example.com",
-      "user3@example.com",
-    ])
+    expect(result).toEqual(["user1@example.com", "user2@example.com", "user3@example.com"])
   })
 
   it("should handle CSV with only whitespace lines", () => {
@@ -85,8 +80,7 @@ describe("parseUserEmailsFromCSV", () => {
   })
 
   it("should preserve whitespace within email addresses", () => {
-    const csvContent =
-      "user1@example.com\n user2@example.com \nuser3@example.com"
+    const csvContent = "user1@example.com\n user2@example.com \nuser3@example.com"
 
     const result = parseUserEmailsFromCSV(csvContent)
 

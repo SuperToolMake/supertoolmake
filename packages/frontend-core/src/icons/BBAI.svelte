@@ -1,6 +1,6 @@
 <script lang="ts">
-  export let size = "64px"
-  export let animate: boolean = false
+export let size = "64px"
+export let animate: boolean = false
 </script>
 
 <svg

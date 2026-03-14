@@ -11,8 +11,5 @@ export function emailValidator(value) {
 }
 
 export function requiredValidator(value) {
-  return (
-    (value !== undefined && value !== null && value !== "") ||
-    "This field is required"
-  )
+  return (value !== undefined && value !== null && value !== "") || "This field is required"
 }

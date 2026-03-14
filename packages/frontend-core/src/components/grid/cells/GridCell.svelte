@@ -1,38 +1,38 @@
 <script>
-  export let focused = false
-  export let selected = false
-  export let highlighted = false
-  export let width = ""
-  export let selectedUser = null
-  export let error = null
-  export let rowIdx
-  export let topRow = false
-  export let defaultHeight = false
-  export let center = false
-  export let readonly = false
-  export let hidden = false
-  export let metadata = null
+export let focused = false
+export let selected = false
+export let highlighted = false
+export let width = ""
+export let selectedUser = null
+export let error = null
+export let rowIdx
+export let topRow = false
+export let defaultHeight = false
+export let center = false
+export let readonly = false
+export let hidden = false
+export let metadata = null
 
-  $: style = getStyle(width, selectedUser, metadata)
+$: style = getStyle(width, selectedUser, metadata)
 
-  const getStyle = (width, selectedUser, metadata) => {
-    let style
-    if (width === "auto" || width === "100%") {
-      style = `width: ${width};`
-    } else {
-      style = `flex: 0 0 ${width}px;`
-    }
-    if (selectedUser) {
-      style += `--user-color :${selectedUser.color};`
-    }
-    if (metadata?.backgroundColor) {
-      style += `--cell-background: ${metadata.backgroundColor};`
-    }
-    if (metadata?.textColor) {
-      style += `--cell-font-color: ${metadata.textColor};`
-    }
-    return style
+const getStyle = (width, selectedUser, metadata) => {
+  let style
+  if (width === "auto" || width === "100%") {
+    style = `width: ${width};`
+  } else {
+    style = `flex: 0 0 ${width}px;`
   }
+  if (selectedUser) {
+    style += `--user-color :${selectedUser.color};`
+  }
+  if (metadata?.backgroundColor) {
+    style += `--cell-background: ${metadata.backgroundColor};`
+  }
+  if (metadata?.textColor) {
+    style += `--cell-font-color: ${metadata.textColor};`
+  }
+  return style
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

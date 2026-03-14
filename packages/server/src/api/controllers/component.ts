@@ -1,9 +1,5 @@
 import { context } from "@budibase/backend-core"
-import {
-  FetchComponentDefinitionResponse,
-  UserCtx,
-  Workspace,
-} from "@budibase/types"
+import type { FetchComponentDefinitionResponse, UserCtx, Workspace } from "@budibase/types"
 import { DocumentType } from "../../db/utils"
 import { getComponentLibraryManifest } from "../../utilities/fileSystem"
 
@@ -14,9 +10,9 @@ export async function fetchAppComponentDefinitions(
     const db = context.getWorkspaceDB()
     const app = await db.get<Workspace>(DocumentType.WORKSPACE_METADATA)
 
-    let componentManifests = await Promise.all(
-      app.componentLibraries.map(async library => {
-        let manifest = await getComponentLibraryManifest(library)
+    const componentManifests = await Promise.all(
+      app.componentLibraries.map(async (library) => {
+        const manifest = await getComponentLibraryManifest(library)
         return {
           manifest,
           library,
@@ -24,8 +20,8 @@ export async function fetchAppComponentDefinitions(
       })
     )
     const definitions: { [key: string]: any } = {}
-    for (let { manifest, library } of componentManifests) {
-      for (let key of Object.keys(manifest)) {
+    for (const { manifest, library } of componentManifests) {
+      for (const key of Object.keys(manifest)) {
         // These keys are not components, and should not be preprended with the `@budibase/` prefix
         if (key === "features" || key === "typeSupportPresets") {
           definitions[key] = manifest[key]

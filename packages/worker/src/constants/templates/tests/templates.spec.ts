@@ -1,7 +1,7 @@
-import { TestConfiguration } from "../../../tests"
-import { addBaseTemplates, loadTemplateConfig } from ".."
 import { EmailTemplatePurpose, type Template } from "@budibase/types"
 import { join } from "path"
+import { TestConfiguration } from "../../../tests"
+import { addBaseTemplates, loadTemplateConfig } from ".."
 
 describe("Loading yaml email templates", () => {
   const config = new TestConfiguration()
@@ -15,7 +15,7 @@ describe("Loading yaml email templates", () => {
   beforeAll(async () => {
     addBaseTemplates(templates, "email")
     // Core is not an updatable template and should never be included
-    templates = templates.filter(t => t.purpose !== EmailTemplatePurpose.CORE)
+    templates = templates.filter((t) => t.purpose !== EmailTemplatePurpose.CORE)
 
     await config.beforeAll()
   })
@@ -51,9 +51,7 @@ describe("Loading yaml email templates", () => {
     })
 
     expect(consoleSpy).toHaveBeenCalledTimes(2)
-    expect(consoleSpy).toHaveBeenCalledWith(
-      `No email templates found: ${testPath}`
-    )
+    expect(consoleSpy).toHaveBeenCalledWith(`No email templates found: ${testPath}`)
 
     consoleSpy.mockRestore()
   })
@@ -79,14 +77,11 @@ describe("Loading yaml email templates", () => {
     const testPath = join(__dirname, `./email_templates.yaml`)
 
     const templatesBeforeResp = await config.api.templates.getTemplate()
-    const templatesBefore = templatesBeforeResp.body.reduce(
-      (acc: Record<string, any>, t: any) => {
-        if (t.purpose === EmailTemplatePurpose.CORE) return acc
-        acc[t.purpose] ??= t
-        return acc
-      },
-      {}
-    )
+    const templatesBefore = templatesBeforeResp.body.reduce((acc: Record<string, any>, t: any) => {
+      if (t.purpose === EmailTemplatePurpose.CORE) return acc
+      acc[t.purpose] ??= t
+      return acc
+    }, {})
 
     await config.doInTenant(async () => {
       await loadTemplateConfig(testPath)
@@ -119,9 +114,7 @@ describe("Loading yaml email templates", () => {
 
     // Should notify that the two templates that didn't match were in actually persisted.
     expect(consoleSpy).toHaveBeenCalledTimes(2)
-    expect(consoleSpy).toHaveBeenCalledWith(
-      `Email templates updated: welcome,custom`
-    )
+    expect(consoleSpy).toHaveBeenCalledWith(`Email templates updated: welcome,custom`)
 
     consoleSpy.mockRestore()
   })
@@ -131,14 +124,11 @@ describe("Loading yaml email templates", () => {
     const testPath = join(__dirname, `./email_templates.yaml`)
 
     const templatesBeforeResp = await config.api.templates.getTemplate()
-    const templatesBefore = templatesBeforeResp.body.reduce(
-      (acc: Record<string, any>, t: any) => {
-        if (t.purpose === EmailTemplatePurpose.CORE) return acc
-        acc[t.purpose] ??= t
-        return acc
-      },
-      {}
-    )
+    const templatesBefore = templatesBeforeResp.body.reduce((acc: Record<string, any>, t: any) => {
+      if (t.purpose === EmailTemplatePurpose.CORE) return acc
+      acc[t.purpose] ??= t
+      return acc
+    }, {})
 
     // Update the templates. welcome and custom are persisted to couch
     await config.doInTenant(async () => {

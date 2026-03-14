@@ -1,141 +1,128 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte"
-  import {
-    decodeJSBinding,
-    encodeJSBinding,
-    processObjectSync,
-  } from "@budibase/string-templates"
-  import {
-    runtimeToReadableBinding,
-    readableToRuntimeBinding,
-  } from "@/dataBinding"
-  import CodeEditor, { DropdownPosition } from "../CodeEditor/CodeEditor.svelte"
-  import {
-    getHelperCompletions,
-    jsAutocomplete,
-    snippetAutoComplete,
-    EditorModes,
-    bindingsToCompletions,
-    jsHelperAutocomplete,
-  } from "../CodeEditor"
-  import { JsonFormatter } from "@budibase/frontend-core"
-  import type {
-    EnrichedBinding,
-    Snippet,
-    CaretPositionFn,
-    InsertAtPositionFn,
-    JSONValue,
-  } from "@budibase/types"
-  import type { BindingCompletion, BindingCompletionOption } from "@/types"
-  import { snippets } from "@/stores/builder"
+import { JsonFormatter } from "@budibase/frontend-core"
+import { decodeJSBinding, encodeJSBinding, processObjectSync } from "@budibase/string-templates"
+import type {
+  CaretPositionFn,
+  EnrichedBinding,
+  InsertAtPositionFn,
+  JSONValue,
+  Snippet,
+} from "@budibase/types"
+import { createEventDispatcher } from "svelte"
+import { readableToRuntimeBinding, runtimeToReadableBinding } from "@/dataBinding"
+import { snippets } from "@/stores/builder"
+import type { BindingCompletion, BindingCompletionOption } from "@/types"
+import {
+  bindingsToCompletions,
+  EditorModes,
+  getHelperCompletions,
+  jsAutocomplete,
+  jsHelperAutocomplete,
+  snippetAutoComplete,
+} from "../CodeEditor"
+import CodeEditor, { DropdownPosition } from "../CodeEditor/CodeEditor.svelte"
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  export let bindings: EnrichedBinding[] = []
-  export let value: string = ""
-  export let allowHelpers = true
-  export let allowSnippets = true
-  export let context: Record<any, any> | undefined = undefined
-  export let autofocusEditor = false
-  export let placeholder: string | undefined
-  export let dropdown = DropdownPosition.Absolute
+export let bindings: EnrichedBinding[] = []
+export let value: string = ""
+export let allowHelpers = true
+export let allowSnippets = true
+export let context: Record<any, any> | undefined = undefined
+export let autofocusEditor = false
+export let placeholder: string | undefined
+export let dropdown = DropdownPosition.Absolute
 
-  let getCaretPosition: CaretPositionFn | undefined
-  let insertAtPos: InsertAtPositionFn | undefined
+let getCaretPosition: CaretPositionFn | undefined
+let insertAtPos: InsertAtPositionFn | undefined
 
-  $: readable = runtimeToReadableBinding(bindings, value || "")
-  $: jsValue = decodeJSBinding(readable)
+$: readable = runtimeToReadableBinding(bindings, value || "")
+$: jsValue = decodeJSBinding(readable)
 
-  $: useSnippets = allowSnippets
-  $: enrichedBindings = enrichBindings(bindings, context, $snippets)
-  $: editorMode = EditorModes.JS
-  $: bindingCompletions = bindingsToCompletions(enrichedBindings, editorMode)
-  $: jsCompletions = getJSCompletions(bindingCompletions, $snippets, {
-    useHelpers: allowHelpers,
-    useSnippets,
+$: useSnippets = allowSnippets
+$: enrichedBindings = enrichBindings(bindings, context, $snippets)
+$: editorMode = EditorModes.JS
+$: bindingCompletions = bindingsToCompletions(enrichedBindings, editorMode)
+$: jsCompletions = getJSCompletions(bindingCompletions, $snippets, {
+  useHelpers: allowHelpers,
+  useSnippets,
+})
+
+const getJSCompletions = (
+  bindingCompletions: BindingCompletionOption[],
+  snippets: Snippet[] | null,
+  config: {
+    useHelpers: boolean
+    useSnippets: boolean
+  }
+) => {
+  const completions: BindingCompletion[] = []
+  if (bindingCompletions.length) {
+    completions.push(jsAutocomplete([...bindingCompletions]))
+  }
+  if (config.useHelpers) {
+    completions.push(jsHelperAutocomplete([...getHelperCompletions(EditorModes.JS)]))
+  }
+  if (config.useSnippets && snippets) {
+    completions.push(snippetAutoComplete(snippets))
+  }
+  return completions
+}
+
+const highlightJSON = (json: JSONValue) => {
+  return JsonFormatter.format(json, {
+    keyColor: "#e06c75",
+    numberColor: "#e5c07b",
+    stringColor: "#98c379",
+    trueColor: "#d19a66",
+    falseColor: "#d19a66",
+    nullColor: "#c678dd",
+  })
+}
+
+const enrichBindings = (bindings: EnrichedBinding[], context: any, snippets: Snippet[] | null) => {
+  // Create a single big array to enrich in one go
+  const bindingStrings = bindings.map((binding) => {
+    if (binding.runtimeBinding.startsWith('trim "')) {
+      // Account for nasty hardcoded HBS bindings for roles, for legacy
+      // compatibility
+      return `{{ ${binding.runtimeBinding} }}`
+    } else {
+      return `{{ literal ${binding.runtimeBinding} }}`
+    }
+  })
+  const bindingEvaluations = processObjectSync(bindingStrings, {
+    ...context,
+    snippets,
   })
 
-  const getJSCompletions = (
-    bindingCompletions: BindingCompletionOption[],
-    snippets: Snippet[] | null,
-    config: {
-      useHelpers: boolean
-      useSnippets: boolean
+  // Enrich bindings with evaluations and highlighted HTML
+  return bindings.map((binding, idx) => {
+    if (!context || typeof bindingEvaluations !== "object") {
+      return binding
     }
-  ) => {
-    const completions: BindingCompletion[] = []
-    if (bindingCompletions.length) {
-      completions.push(jsAutocomplete([...bindingCompletions]))
+    const evalObj: Record<any, any> = bindingEvaluations
+    const value = JSON.stringify(evalObj[idx], null, 2)
+    return {
+      ...binding,
+      value,
+      valueHTML: highlightJSON(value),
     }
-    if (config.useHelpers) {
-      completions.push(
-        jsHelperAutocomplete([...getHelperCompletions(EditorModes.JS)])
-      )
-    }
-    if (config.useSnippets && snippets) {
-      completions.push(snippetAutoComplete(snippets))
-    }
-    return completions
-  }
+  })
+}
 
-  const highlightJSON = (json: JSONValue) => {
-    return JsonFormatter.format(json, {
-      keyColor: "#e06c75",
-      numberColor: "#e5c07b",
-      stringColor: "#98c379",
-      trueColor: "#d19a66",
-      falseColor: "#d19a66",
-      nullColor: "#c678dd",
-    })
+const updateValue = (val: any) => {
+  if (!val) {
+    dispatch("change", null)
   }
+  const update = readableToRuntimeBinding(bindings, encodeJSBinding(val))
+  dispatch("change", update)
+}
 
-  const enrichBindings = (
-    bindings: EnrichedBinding[],
-    context: any,
-    snippets: Snippet[] | null
-  ) => {
-    // Create a single big array to enrich in one go
-    const bindingStrings = bindings.map(binding => {
-      if (binding.runtimeBinding.startsWith('trim "')) {
-        // Account for nasty hardcoded HBS bindings for roles, for legacy
-        // compatibility
-        return `{{ ${binding.runtimeBinding} }}`
-      } else {
-        return `{{ literal ${binding.runtimeBinding} }}`
-      }
-    })
-    const bindingEvaluations = processObjectSync(bindingStrings, {
-      ...context,
-      snippets,
-    })
-
-    // Enrich bindings with evaluations and highlighted HTML
-    return bindings.map((binding, idx) => {
-      if (!context || typeof bindingEvaluations !== "object") {
-        return binding
-      }
-      const evalObj: Record<any, any> = bindingEvaluations
-      const value = JSON.stringify(evalObj[idx], null, 2)
-      return {
-        ...binding,
-        value,
-        valueHTML: highlightJSON(value),
-      }
-    })
-  }
-
-  const updateValue = (val: any) => {
-    if (!val) {
-      dispatch("change", null)
-    }
-    const update = readableToRuntimeBinding(bindings, encodeJSBinding(val))
-    dispatch("change", update)
-  }
-
-  const onBlurJSValue = (e: { detail: string }) => {
-    // Don't bother saving empty values as JS
-    updateValue(e.detail?.trim())
-  }
+const onBlurJSValue = (e: { detail: string }) => {
+  // Don't bother saving empty values as JS
+  updateValue(e.detail?.trim())
+}
 </script>
 
 <div class="code-panel">

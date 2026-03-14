@@ -1,9 +1,4 @@
-import {
-  DocumentType,
-  InternalTable,
-  SEPARATOR,
-  WORKSPACE_PREFIX,
-} from "../constants"
+import { DocumentType, InternalTable, SEPARATOR, WORKSPACE_PREFIX } from "../constants"
 import { newid } from "./newid"
 
 /**
@@ -12,10 +7,7 @@ import { newid } from "./newid"
  * @param opts Optionally allow a random workspaceId to be generated, for testing as an example
  * @returns The new workspace ID which the workspace doc can be stored under.
  */
-export const generateWorkspaceID = (opts?: {
-  tenantId?: string
-  random: boolean
-}) => {
+export const generateWorkspaceID = (opts?: { tenantId?: string; random: boolean }) => {
   let id = WORKSPACE_PREFIX
   if (opts?.tenantId) {
     id += `${opts.tenantId}${SEPARATOR}`

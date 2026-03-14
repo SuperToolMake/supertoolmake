@@ -1,6 +1,6 @@
 import { context, roles } from "@budibase/backend-core"
 import env from "../../../../environment"
-import TestConfiguration from "../../../../tests/utilities/TestConfiguration"
+import type TestConfiguration from "../../../../tests/utilities/TestConfiguration"
 import * as rowController from "../../../controllers/row"
 
 class Request {
@@ -30,12 +30,7 @@ export const getAllTableRows = async (config: TestConfiguration) => {
   return req.body
 }
 
-export const createRequest = (
-  request: any,
-  method: any,
-  url: any,
-  body: any
-) => {
+export const createRequest = (request: any, method: any, url: any, body: any) => {
   let req
 
   if (method === "POST") req = request.post(url).send(body)
@@ -63,10 +58,7 @@ export const checkBuilderEndpoint = async ({
     builder: false,
     prodApp: true,
   })
-  await exports
-    .createRequest(config.request, method, url, body)
-    .set(headers)
-    .expect(403)
+  await exports.createRequest(config.request, method, url, body).set(headers).expect(403)
 }
 
 export const checkPermissionsEndpoint = async ({
@@ -82,10 +74,7 @@ export const checkPermissionsEndpoint = async ({
     prodApp: true,
   })
 
-  await exports
-    .createRequest(config.request, method, url, body)
-    .set(passHeader)
-    .expect(200)
+  await exports.createRequest(config.request, method, url, body).set(passHeader).expect(200)
 
   let failHeader
   if (failRole === roles.BUILTIN_ROLE_IDS.PUBLIC) {
@@ -98,21 +87,14 @@ export const checkPermissionsEndpoint = async ({
     })
   }
 
-  await exports
-    .createRequest(config.request, method, url, body)
-    .set(failHeader)
-    .expect(401)
+  await exports.createRequest(config.request, method, url, body).set(failHeader).expect(401)
 }
 
 export const getDB = () => {
   return context.getWorkspaceDB()
 }
 
-export const testAutomation = async (
-  config: any,
-  automation: any,
-  triggerInputs: any
-) => {
+export const testAutomation = async (config: any, automation: any, triggerInputs: any) => {
   return runRequest(automation.appId, async () => {
     return await config.request
       .post(`/api/automations/${automation._id}/test`)

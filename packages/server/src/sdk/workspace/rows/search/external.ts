@@ -3,25 +3,22 @@ import { PROTECTED_EXTERNAL_COLUMNS, utils } from "@budibase/shared-core"
 import {
   IncludeRelationship,
   Operation,
-  PaginationJson,
-  Row,
-  RowSearchParams,
-  SearchFilters,
-  SearchResponse,
-  SortJson,
+  type PaginationJson,
+  type Row,
+  type RowSearchParams,
+  type SearchFilters,
+  type SearchResponse,
+  type SortJson,
   SortOrder,
-  Table,
+  type Table,
 } from "@budibase/types"
 import pick from "lodash/pick"
-import sdk from "../../.."
 import { handleRequest } from "../../../../api/controllers/row/external"
 import * as exporters from "../../../../api/controllers/table/exporters"
-import {
-  breakExternalTableId,
-  breakRowIdField,
-} from "../../../../integrations/utils"
+import { breakExternalTableId, breakRowIdField } from "../../../../integrations/utils"
 import { outputProcessing } from "../../../../utilities/rowProcessor"
-import { ExportRowsParams, ExportRowsResult } from "./types"
+import sdk from "../../.."
+import type { ExportRowsParams, ExportRowsResult } from "./types"
 import { isSearchingByRowID } from "./utils"
 
 function getPaginationAndLimitParameters(
@@ -64,25 +61,16 @@ export async function search(
 ): Promise<SearchResponse<Row>> {
   const { countRows, paginate, query, ...params } = options
   const { limit } = params
-  let bookmark =
-    (params.bookmark && parseInt(params.bookmark as string)) || undefined
+  let bookmark = (params.bookmark && parseInt(params.bookmark as string)) || undefined
   if (paginate && !bookmark) {
     bookmark = 0
   }
 
-  let paginateObj = getPaginationAndLimitParameters(
-    query,
-    paginate,
-    bookmark,
-    limit
-  )
+  const paginateObj = getPaginationAndLimitParameters(query, paginate, bookmark, limit)
 
   let sort: SortJson | undefined
   if (params.sort) {
-    const direction =
-      params.sortOrder === "descending"
-        ? SortOrder.DESCENDING
-        : SortOrder.ASCENDING
+    const direction = params.sortOrder === "descending" ? SortOrder.DESCENDING : SortOrder.ASCENDING
     sort = {
       [params.sort]: { direction },
     }
@@ -106,9 +94,7 @@ export async function search(
     }
     const [{ rows, rawResponseSize }, totalRows] = await Promise.all([
       handleRequest(Operation.READ, source, parameters),
-      countRows
-        ? handleRequest(Operation.COUNT, source, parameters)
-        : Promise.resolve(undefined),
+      countRows ? handleRequest(Operation.COUNT, source, parameters) : Promise.resolve(undefined),
     ])
 
     let processed = await outputProcessing(source, rows, {
@@ -128,11 +114,9 @@ export async function search(
 
     const visibleFields =
       options.fields ||
-      Object.keys(source.schema || {}).filter(
-        key => source.schema?.[key].visible !== false
-      )
+      Object.keys(source.schema || {}).filter((key) => source.schema?.[key].visible !== false)
     const allowedFields = [...visibleFields, ...PROTECTED_EXTERNAL_COLUMNS]
-    processed = processed.map(r => pick(r, allowedFields))
+    processed = processed.map((r) => pick(r, allowedFields))
 
     // need wrapper object for bookmarks etc when paginating
     const response: SearchResponse<Row> = { rows: processed, hasNextPage }
@@ -148,30 +132,16 @@ export async function search(
     return response
   } catch (err: any) {
     if (err.message && err.message.includes("does not exist")) {
-      throw new Error(
-        `Table updated externally, please re-fetch - ${err.message}`,
-        { cause: err }
-      )
+      throw new Error(`Table updated externally, please re-fetch - ${err.message}`, { cause: err })
     } else {
       throw err
     }
   }
 }
 
-export async function exportRows(
-  options: ExportRowsParams
-): Promise<ExportRowsResult> {
-  const {
-    tableId,
-    format,
-    columns,
-    rowIds,
-    query,
-    sort,
-    sortOrder,
-    delimiter,
-    customHeaders,
-  } = options
+export async function exportRows(options: ExportRowsParams): Promise<ExportRowsResult> {
+  const { tableId, format, columns, rowIds, query, sort, sortOrder, delimiter, customHeaders } =
+    options
 
   if (!tableId) {
     throw new HTTPError("No table ID for search provided.", 400)
@@ -201,10 +171,7 @@ export async function exportRows(
     throw new HTTPError("Datasource has not been configured for plus API.", 400)
   }
 
-  let result = await search(
-    { tableId: table._id!, query: requestQuery, sort, sortOrder },
-    table
-  )
+  const result = await search({ tableId: table._id!, query: requestQuery, sort, sortOrder }, table)
   let rows: Row[] = []
   let headers
 
@@ -212,7 +179,7 @@ export async function exportRows(
   if (columns && columns.length) {
     for (let i = 0; i < result.rows.length; i++) {
       rows[i] = {}
-      for (let column of columns) {
+      for (const column of columns) {
         rows[i][column] = result.rows[i][column]
       }
     }
@@ -222,23 +189,12 @@ export async function exportRows(
   }
 
   const schema = datasource.entities[tableName].schema
-  let exportRows = sdk.rows.utils.cleanExportRows(
-    rows,
-    schema,
-    format,
-    columns,
-    customHeaders
-  )
+  const exportRows = sdk.rows.utils.cleanExportRows(rows, schema, format, columns, customHeaders)
 
   let content: string
   switch (format) {
     case exporters.Format.CSV:
-      content = exporters.csv(
-        headers ?? Object.keys(schema),
-        exportRows,
-        delimiter,
-        customHeaders
-      )
+      content = exporters.csv(headers ?? Object.keys(schema), exportRows, delimiter, customHeaders)
       break
     case exporters.Format.JSON:
       content = exporters.json(exportRows)
@@ -268,12 +224,9 @@ export async function fetch(tableId: string): Promise<Row[]> {
   })
 }
 
-export async function fetchRaw(
-  tableId: string,
-  limit?: number
-): Promise<Row[]> {
+export async function fetchRaw(tableId: string, limit?: number): Promise<Row[]> {
   const table = await sdk.tables.getTable(tableId)
-  let pagination: { limit: number } | undefined = undefined
+  let pagination: { limit: number } | undefined
   if (limit) {
     pagination = { limit }
   }

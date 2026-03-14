@@ -1,23 +1,21 @@
-import { API } from "@/api"
 import { RoleUtils } from "@budibase/frontend-core"
-import { Role, UIRole } from "@budibase/types"
+import type { Role, UIRole } from "@budibase/types"
 import { derived, get, type Writable } from "svelte/store"
+import { API } from "@/api"
 import { DerivedBudiStore } from "../BudiStore"
 
 export class RoleStore extends DerivedBudiStore<Role[], UIRole[]> {
   constructor() {
     const makeDerivedStore = (store: Writable<Role[]>) =>
-      derived(store, $store => {
-        return $store.map<UIRole>(role => ({
+      derived(store, ($store) => {
+        return $store.map<UIRole>((role) => ({
           ...role,
           _id: role._id!,
           _rev: role._rev!,
           // Ensure we have new metadata for all roles
           uiMetadata: {
             displayName: role.uiMetadata?.displayName || role.name,
-            color:
-              role.uiMetadata?.color ||
-              "var(--spectrum-global-color-magenta-400)",
+            color: role.uiMetadata?.color || "var(--spectrum-global-color-magenta-400)",
             description: role.uiMetadata?.description || "Custom role",
           },
         }))
@@ -74,18 +72,18 @@ export class RoleStore extends DerivedBudiStore<Role[], UIRole[]> {
 
     // Handle deletion
     if (!role) {
-      this.update(state => state.filter(x => x._id !== roleId))
+      this.update((state) => state.filter((x) => x._id !== roleId))
       return
     }
 
     // Add new role
-    const index = get(this).findIndex(x => x._id === role._id)
+    const index = get(this).findIndex((x) => x._id === role._id)
     if (index === -1) {
-      this.update(state => [...state, role])
+      this.update((state) => [...state, role])
     }
     // Update existing role
     else if (role) {
-      this.update(state => {
+      this.update((state) => {
         state[index] = role
         return [...state]
       })

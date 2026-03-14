@@ -1,70 +1,66 @@
 <script>
-  import { createEventDispatcher } from "svelte"
-  import active from "svelte-spa-router/active"
-  import { Icon, AbsTooltip, TooltipPosition } from "@budibase/bbui"
-  import { builderStore } from "@/stores"
-  import { screenStore } from "@/stores/screens"
+import { AbsTooltip, Icon, TooltipPosition } from "@budibase/bbui"
+import { createEventDispatcher } from "svelte"
+import active from "svelte-spa-router/active"
+import { builderStore } from "@/stores"
+import { screenStore } from "@/stores/screens"
 
-  export let type
-  export let url
-  export let text
-  export let subLinks
-  export let icon
-  export let internalLink
-  export let customStyles
-  export let leftNav = false
-  export let mobile = false
-  export let navStateStore
-  export let collapsed = false
+export let type
+export let url
+export let text
+export let subLinks
+export let icon
+export let internalLink
+export let customStyles
+export let leftNav = false
+export let mobile = false
+export let navStateStore
+export let collapsed = false
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  let renderKey
+let renderKey
 
-  $: isBuilderActive = testUrl => {
-    return (
-      $builderStore.inBuilder &&
-      testUrl &&
-      testUrl === $screenStore.activeScreen?.routing?.route
-    )
-  }
-  $: builderActive = isBuilderActive(url)
-  $: containsActiveLink = (subLinks || []).some(x => isBuilderActive(x.url))
-  $: expanded = !!$navStateStore[text] || containsActiveLink
-  $: renderLeftNav = leftNav || mobile
-  $: caret = !renderLeftNav || expanded ? "caret-down" : "caret-right"
-  $: collapsedText = getShortText(text)
+$: isBuilderActive = (testUrl) => {
+  return $builderStore.inBuilder && testUrl && testUrl === $screenStore.activeScreen?.routing?.route
+}
+$: builderActive = isBuilderActive(url)
+$: containsActiveLink = (subLinks || []).some((x) => isBuilderActive(x.url))
+$: expanded = !!$navStateStore[text] || containsActiveLink
+$: renderLeftNav = leftNav || mobile
+$: caret = !renderLeftNav || expanded ? "caret-down" : "caret-right"
+$: collapsedText = getShortText(text)
 
-  const getShortText = text => {
-    if (!text) {
-      return ""
-    }
-
-    const words = text.trim().split(/\s+/)
-    if (words.length === 1) {
-      return words[0].charAt(0).toUpperCase()
-    } else {
-      return words
-        .slice(0, 2)
-        .map(word => word.charAt(0).toUpperCase())
-        .join("")
-    }
+const getShortText = (text) => {
+  if (!text) {
+    return ""
   }
 
-  const onClickLink = () => {
-    dispatch("clickLink")
-    renderKey = Math.random()
+  const words = text.trim().split(/\s+/)
+  if (words.length === 1) {
+    return words[0].charAt(0).toUpperCase()
+  } else {
+    return words
+      .slice(0, 2)
+      .map((word) => word.charAt(0).toUpperCase())
+      .join("")
   }
+}
 
-  const onClickDropdown = () => {
-    if (!renderLeftNav) {
-      return
-    }
-    navStateStore.update(state => ({
-      ...state,
-      [text]: !state[text],
-    }))
+const onClickLink = () => {
+  dispatch("clickLink")
+  renderKey = Math.random()
+}
+
+const onClickDropdown = () => {
+  if (!renderLeftNav) {
+    return
   }
+  navStateStore.update((state) => ({
+    ...state,
+    [text]: !state[text],
+  }))
+}
 </script>
 
 {#if !type || type === "link"}

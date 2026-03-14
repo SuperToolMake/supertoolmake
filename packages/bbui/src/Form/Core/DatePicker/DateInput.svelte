@@ -1,20 +1,20 @@
 <script>
-  import Icon from "../../../Icon/Icon.svelte"
-  import { getDateDisplayValue } from "../../../helpers"
+import { getDateDisplayValue } from "../../../helpers"
+import Icon from "../../../Icon/Icon.svelte"
 
-  export let anchor
-  export let disabled
-  export let readonly
-  export let error
-  export let focused
-  export let placeholder
-  export let id
-  export let value
-  export let icon
-  export let enableTime
-  export let timeOnly
+export let anchor
+export let disabled
+export let readonly
+export let error
+export let focused
+export let placeholder
+export let id
+export let value
+export let icon
+export let enableTime
+export let timeOnly
 
-  $: displayValue = getDateDisplayValue(value, { enableTime, timeOnly })
+$: displayValue = getDateDisplayValue(value, { enableTime, timeOnly })
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

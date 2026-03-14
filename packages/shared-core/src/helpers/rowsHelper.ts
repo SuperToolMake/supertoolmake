@@ -1,18 +1,14 @@
-import { Row } from "@budibase/types"
+import type { Row } from "@budibase/types"
 
 /**
  * Converts an array of rows to a CSV string.
  * - Uses the provided columns to determine column order
  * - Escapes values appropriately for CSV format
  */
-export function convertRowsToCsv(
-  rows: Row[],
-  columns: string[],
-  delimiter = ","
-): string {
+export function convertRowsToCsv(rows: Row[], columns: string[], delimiter = ","): string {
   const headerLine = columns.join(delimiter)
-  const dataLines = rows.map(row =>
-    columns.map(h => escapeCsvValue(row[h], delimiter)).join(delimiter)
+  const dataLines = rows.map((row) =>
+    columns.map((h) => escapeCsvValue(row[h], delimiter)).join(delimiter)
   )
 
   return [headerLine, ...dataLines].join("\n")
@@ -64,11 +60,11 @@ export function convertDataToExportFormat(
   delimiter = ","
 ): string {
   const schemaKeys = columns?.length
-    ? columns.map(c => c.name)
-    : Array.from(new Set(rows.flatMap(row => Object.keys(row))))
+    ? columns.map((c) => c.name)
+    : Array.from(new Set(rows.flatMap((row) => Object.keys(row))))
 
   // Normalize rows to ensure every row has all schema keys
-  const filteredRows = rows.map(row =>
+  const filteredRows = rows.map((row) =>
     schemaKeys.reduce((acc: Row, key) => {
       acc[key] = key in row ? row[key] : ""
       return acc

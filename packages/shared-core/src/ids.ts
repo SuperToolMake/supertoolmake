@@ -1,4 +1,4 @@
-import { SEPARATOR, DocumentType, VirtualDocumentType } from "@budibase/types"
+import { DocumentType, SEPARATOR, VirtualDocumentType } from "@budibase/types"
 
 // Because DocumentTypes can overlap, we need to make sure that we search
 // longest first to ensure we get the correct type.
@@ -7,9 +7,7 @@ const sortedDocumentTypes = Object.values(DocumentType).sort(
 )
 
 export function getDocumentType(id: string): DocumentType | undefined {
-  return sortedDocumentTypes.find(docType =>
-    id.startsWith(`${docType}${SEPARATOR}`)
-  )
+  return sortedDocumentTypes.find((docType) => id.startsWith(`${docType}${SEPARATOR}`))
 }
 
 // Because VirtualDocumentTypes can overlap, we need to make sure that we search
@@ -17,21 +15,13 @@ export function getDocumentType(id: string): DocumentType | undefined {
 const sortedVirtualDocumentTypes = Object.values(VirtualDocumentType).sort(
   (a, b) => b.length - a.length // descending
 )
-export function getVirtualDocumentType(
-  id: string
-): VirtualDocumentType | undefined {
-  return sortedVirtualDocumentTypes.find(docType =>
-    id.startsWith(`${docType}${SEPARATOR}`)
-  )
+export function getVirtualDocumentType(id: string): VirtualDocumentType | undefined {
+  return sortedVirtualDocumentTypes.find((docType) => id.startsWith(`${docType}${SEPARATOR}`))
 }
 
-const EXTERNAL_TABLE_ID_REGEX = new RegExp(
-  `^${DocumentType.DATASOURCE_PLUS}_(.+)__(.+)$`
-)
+const EXTERNAL_TABLE_ID_REGEX = new RegExp(`^${DocumentType.DATASOURCE_PLUS}_(.+)__(.+)$`)
 
-const idCheckFor = (
-  type: DocumentType | VirtualDocumentType
-): ((id: string) => boolean) => {
+const idCheckFor = (type: DocumentType | VirtualDocumentType): ((id: string) => boolean) => {
   return (id: string): boolean => !!id && id.startsWith(`${type}${SEPARATOR}`)
 }
 
@@ -54,8 +44,6 @@ export const isTableIdOrExternalTableId = (id: string): boolean => {
 
 export const isTableId = idCheckFor(DocumentType.TABLE)
 
-export const isDatasourceOrDatasourcePlusId = idCheckFor(
-  DocumentType.DATASOURCE
-)
+export const isDatasourceOrDatasourcePlusId = idCheckFor(DocumentType.DATASOURCE)
 
 export const isQueryId = idCheckFor(DocumentType.QUERY)

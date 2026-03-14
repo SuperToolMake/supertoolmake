@@ -1,10 +1,10 @@
 <script lang="ts">
-  import Icon from "../../Icon/Icon.svelte"
-  import type { ResolvedIcon } from "../../types/Picker"
+import Icon from "../../Icon/Icon.svelte"
+import type { ResolvedIcon } from "../../types/Picker"
 
-  export let icon: ResolvedIcon | null = null
-  export let useOptionIconImage: boolean = false
-  export let defaultColour: string = "var(--spectrum-global-color-gray-600)"
+export let icon: ResolvedIcon | null = null
+export let useOptionIconImage: boolean = false
+export let defaultColour: string = "var(--spectrum-global-color-gray-600)"
 </script>
 
 {#if icon}

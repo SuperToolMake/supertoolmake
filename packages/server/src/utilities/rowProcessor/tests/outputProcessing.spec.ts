@@ -3,12 +3,11 @@ import {
   BBReferenceFieldSubType,
   FieldType,
   INTERNAL_TABLE_SOURCE_ID,
-  Table,
+  type Table,
   TableSourceType,
 } from "@budibase/types"
-import { outputProcessing } from ".."
-
 import TestConfiguration from "../../../tests/utilities/TestConfiguration"
+import { outputProcessing } from ".."
 import * as bbReferenceProcessor from "../bbReferenceProcessor"
 
 jest.mock("../bbReferenceProcessor", (): typeof bbReferenceProcessor => ({
@@ -33,10 +32,8 @@ describe("rowProcessor - outputProcessing", () => {
     jest.resetAllMocks()
   })
 
-  const processOutputBBReferenceMock =
-    bbReferenceProcessor.processOutputBBReference as jest.Mock
-  const processOutputBBReferencesMock =
-    bbReferenceProcessor.processOutputBBReferences as jest.Mock
+  const processOutputBBReferenceMock = bbReferenceProcessor.processOutputBBReference as jest.Mock
+  const processOutputBBReferencesMock = bbReferenceProcessor.processOutputBBReferences as jest.Mock
 
   it("fetches single user references given a populated field", async () => {
     await config.doInContext(config.getDevWorkspaceId(), async () => {
@@ -79,12 +76,11 @@ describe("rowProcessor - outputProcessing", () => {
 
       expect(result).toEqual({ name: "Jack", user })
 
-      expect(
-        bbReferenceProcessor.processOutputBBReference
-      ).toHaveBeenCalledTimes(1)
-      expect(
-        bbReferenceProcessor.processOutputBBReference
-      ).toHaveBeenCalledWith("123", BBReferenceFieldSubType.USER)
+      expect(bbReferenceProcessor.processOutputBBReference).toHaveBeenCalledTimes(1)
+      expect(bbReferenceProcessor.processOutputBBReference).toHaveBeenCalledWith(
+        "123",
+        BBReferenceFieldSubType.USER
+      )
     })
   })
 
@@ -129,12 +125,11 @@ describe("rowProcessor - outputProcessing", () => {
 
       expect(result).toEqual({ name: "Jack", users })
 
-      expect(
-        bbReferenceProcessor.processOutputBBReferences
-      ).toHaveBeenCalledTimes(1)
-      expect(
-        bbReferenceProcessor.processOutputBBReferences
-      ).toHaveBeenCalledWith("123", BBReferenceFieldSubType.USER)
+      expect(bbReferenceProcessor.processOutputBBReferences).toHaveBeenCalledTimes(1)
+      expect(bbReferenceProcessor.processOutputBBReferences).toHaveBeenCalledWith(
+        "123",
+        BBReferenceFieldSubType.USER
+      )
     })
   })
 
@@ -175,9 +170,7 @@ describe("rowProcessor - outputProcessing", () => {
 
       expect(result).toEqual({ name: "Jack" })
 
-      expect(
-        bbReferenceProcessor.processOutputBBReferences
-      ).toHaveBeenCalledTimes(1)
+      expect(bbReferenceProcessor.processOutputBBReferences).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -218,9 +211,7 @@ describe("rowProcessor - outputProcessing", () => {
 
       expect(result).toEqual({ name: "Jack", user: "123" })
 
-      expect(
-        bbReferenceProcessor.processOutputBBReferences
-      ).not.toHaveBeenCalled()
+      expect(bbReferenceProcessor.processOutputBBReferences).not.toHaveBeenCalled()
     })
   })
 })

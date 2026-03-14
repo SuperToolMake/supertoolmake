@@ -1,10 +1,6 @@
 import { cache, db as dbCore } from "@budibase/backend-core"
 import { utils } from "@budibase/shared-core"
-import {
-  BBReferenceFieldSubType,
-  DocumentType,
-  SEPARATOR,
-} from "@budibase/types"
+import { BBReferenceFieldSubType, DocumentType, SEPARATOR } from "@budibase/types"
 import { InvalidBBRefError } from "./errors"
 
 const ROW_PREFIX = DocumentType.ROW + SEPARATOR
@@ -15,10 +11,7 @@ export async function processInputBBReference(
 ): Promise<string | null> {
   if (value && Array.isArray(value)) {
     if (value.length > 1) {
-      throw new InvalidBBRefError(
-        JSON.stringify(value),
-        BBReferenceFieldSubType.USER
-      )
+      throw new InvalidBBRefError(JSON.stringify(value), BBReferenceFieldSubType.USER)
     }
     value = value[0]
   }
@@ -63,18 +56,16 @@ export async function processInputBBReferences(
   if (typeof value === "string") {
     referenceIds = value
       .split(",")
-      .map(u => u.trim())
-      .filter(u => !!u)
+      .map((u) => u.trim())
+      .filter((u) => !!u)
   } else {
-    referenceIds = value.map(idOrDoc =>
-      typeof idOrDoc === "string" ? idOrDoc : idOrDoc._id
-    )
+    referenceIds = value.map((idOrDoc) => (typeof idOrDoc === "string" ? idOrDoc : idOrDoc._id))
   }
 
   // make sure all reference IDs are correct global user IDs
   // they may be user metadata references (start with row prefix)
   // and these need to be converted to global IDs
-  referenceIds = referenceIds.map(id => {
+  referenceIds = referenceIds.map((id) => {
     if (id?.startsWith(ROW_PREFIX)) {
       return dbCore.getGlobalIDFromUserMetadataID(id)
     } else {
@@ -90,10 +81,7 @@ export async function processInputBBReferences(
       const { notFoundIds } = await cache.user.getUsers(referenceIds)
 
       if (notFoundIds?.length) {
-        throw new InvalidBBRefError(
-          notFoundIds[0],
-          BBReferenceFieldSubType.USER
-        )
+        throw new InvalidBBRefError(notFoundIds[0], BBReferenceFieldSubType.USER)
       }
 
       if (!referenceIds?.length) {
@@ -159,8 +147,7 @@ export async function processOutputBBReferences(
   if (!value || (Array.isArray(value) && value.length === 0)) {
     return undefined
   }
-  const ids =
-    typeof value === "string" ? value.split(",").filter(id => !!id) : value
+  const ids = typeof value === "string" ? value.split(",").filter((id) => !!id) : value
 
   switch (subtype) {
     case BBReferenceFieldSubType.USER:
@@ -170,7 +157,7 @@ export async function processOutputBBReferences(
         return undefined
       }
 
-      return users.map(u => ({
+      return users.map((u) => ({
         _id: u._id!,
         primaryDisplay: u.email,
         email: u.email,

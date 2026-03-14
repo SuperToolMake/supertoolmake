@@ -1,21 +1,15 @@
-import {
-  atob,
-  frontendWrapJS,
-  isBackendService,
-  isJSAllowed,
-} from "../utilities"
-import { LITERAL_MARKER } from "../helpers/constants"
-import { getJsHelperList } from "./list"
-import { iifeWrapper } from "../iife"
-import { JsTimeoutError, UserScriptError } from "../errors"
 import cloneDeep from "lodash/fp/cloneDeep"
-import { Log, LogType } from "../types"
 import { isTest } from "../environment"
+import { JsTimeoutError, UserScriptError } from "../errors"
+import { LITERAL_MARKER } from "../helpers/constants"
+import { iifeWrapper } from "../iife"
+import type { Log, LogType } from "../types"
+import { atob, frontendWrapJS, isBackendService, isJSAllowed } from "../utilities"
+import { getJsHelperList } from "./list"
 
 // The method of executing JS scripts depends on the bundle being built.
 // This setter is used in the entrypoint (either index.js or index.mjs).
-let runJS: ((js: string, context: Record<string, any>) => any) | undefined =
-  undefined
+let runJS: ((js: string, context: Record<string, any>) => any) | undefined
 export const setJSRunner = (runner: typeof runJS) => (runJS = runner)
 
 export const removeJSRunner = () => {
@@ -23,8 +17,7 @@ export const removeJSRunner = () => {
 }
 
 let onErrorLog: (message: Error) => void
-export const setOnErrorLog = (delegate: typeof onErrorLog) =>
-  (onErrorLog = delegate)
+export const setOnErrorLog = (delegate: typeof onErrorLog) => (onErrorLog = delegate)
 
 // Helper utility to strip square brackets from a value
 const removeSquareBrackets = (value: string) => {
@@ -58,7 +51,7 @@ const getContextValue = (path: string, context: any) => {
   if (literalStringRegex.test(path)) {
     return path.substring(1, path.length - 1)
   }
-  path.split(".").forEach(key => {
+  path.split(".").forEach((key) => {
     if (data == null || typeof data !== "object") {
       return null
     }
@@ -80,9 +73,9 @@ export function processJS(handlebars: string, context: any) {
 
     // Transform snippets into an object for faster access, and cache previously
     // evaluated snippets
-    let snippetMap: any = {}
-    let snippetCache: any = {}
-    for (let snippet of context.snippets || []) {
+    const snippetMap: any = {}
+    const snippetCache: any = {}
+    for (const snippet of context.snippets || []) {
       snippetMap[snippet.name] = snippet.code
     }
 
@@ -110,7 +103,7 @@ export function processJS(handlebars: string, context: any) {
       snippets: new Proxy(
         {},
         {
-          get: function (_, name) {
+          get: (_, name) => {
             if (!(name in snippetCache)) {
               snippetCache[name] = eval(iifeWrapper(snippetMap[name]))
             }
@@ -139,9 +132,7 @@ export function processJS(handlebars: string, context: any) {
           // its an anonymous function and we look for the overall length to find the
           // line number we care about (from the users function)
           // JS stack traces are in the format function:line:column
-          const lineNumber = new Error().stack?.match(
-            /<anonymous>:(\d+):\d+/
-          )?.[1]
+          const lineNumber = new Error().stack?.match(/<anonymous>:(\d+):\d+/)?.[1]
           logs.push({
             log: props,
             line: lineNumber ? parseInt(lineNumber) - jsLineCount : undefined,

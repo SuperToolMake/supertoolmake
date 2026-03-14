@@ -1,55 +1,53 @@
 <script>
-  import EditComponentPopover from "../EditComponentPopover.svelte"
-  import { Icon, Toggle } from "@budibase/bbui"
-  import { setContext, createEventDispatcher } from "svelte"
-  import { writable } from "svelte/store"
-  import { FieldTypeToComponentMap } from "../FieldConfiguration/utils"
-  import { componentStore } from "@/stores/builder"
-  import { cloneDeep } from "lodash/fp"
+import { Icon, Toggle } from "@budibase/bbui"
+import { cloneDeep } from "lodash/fp"
+import { createEventDispatcher, setContext } from "svelte"
+import { writable } from "svelte/store"
+import { componentStore } from "@/stores/builder"
+import EditComponentPopover from "../EditComponentPopover.svelte"
+import { FieldTypeToComponentMap } from "../FieldConfiguration/utils"
 
-  export let item
-  export let anchor
-  export let bindings
+export let item
+export let anchor
+export let bindings
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  let draggableStore = writable({
-    selected: null,
-    actions: {
-      select: id => {
-        draggableStore.update(state => ({
-          ...state,
-          selected: id,
-        }))
-      },
+let draggableStore = writable({
+  selected: null,
+  actions: {
+    select: (id) => {
+      draggableStore.update((state) => ({
+        ...state,
+        selected: id,
+      }))
     },
-  })
+  },
+})
 
-  setContext("draggable", draggableStore)
+setContext("draggable", draggableStore)
 
-  const parseSettings = settings => {
-    return settings
-      .filter(setting => setting.key !== "field")
-      .map(setting => {
-        return { ...setting, nested: true }
-      })
+const parseSettings = (settings) => {
+  return settings
+    .filter((setting) => setting.key !== "field")
+    .map((setting) => {
+      return { ...setting, nested: true }
+    })
+}
+
+const getIcon = (item) => {
+  const component = `@budibase/standard-components/${FieldTypeToComponentMap[item.columnType]}`
+  return componentStore.getDefinition(component)?.icon
+}
+
+const onToggle = (item) => {
+  return (e) => {
+    item.active = e.detail
+    dispatch("change", { ...cloneDeep(item), active: e.detail })
   }
+}
 
-  const getIcon = item => {
-    const component = `@budibase/standard-components/${
-      FieldTypeToComponentMap[item.columnType]
-    }`
-    return componentStore.getDefinition(component)?.icon
-  }
-
-  const onToggle = item => {
-    return e => {
-      item.active = e.detail
-      dispatch("change", { ...cloneDeep(item), active: e.detail })
-    }
-  }
-
-  $: icon = getIcon(item)
+$: icon = getIcon(item)
 </script>
 
 <div class="list-item-body">

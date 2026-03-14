@@ -2,14 +2,13 @@ import "./styles"
 
 import Manifest from "manifest.json"
 import { derived, get, writable } from "svelte/store"
+import * as AppComponents from "../components/app/index.ts"
 import Router from "../components/Router.svelte"
+import { ScreenslotID, ScreenslotType } from "../constants"
 import { findComponentById, findComponentPathById } from "../utils/components"
 import { builderStore } from "./builder"
 import { devToolsStore } from "./devTools"
 import { screenStore } from "./screens"
-
-import * as AppComponents from "../components/app/index.ts"
-import { ScreenslotID, ScreenslotType } from "../constants"
 
 export const BudibasePrefix = "@budibase/standard-components/"
 
@@ -36,15 +35,13 @@ const createComponentStore = () => {
       const definition = getComponentDefinition(component?._component)
 
       // Derive the selected component path
-      const selectedPath =
-        findComponentPathById(root, selectedComponentId) || []
+      const selectedPath = findComponentPathById(root, selectedComponentId) || []
 
       return {
-        selectedComponentInstance:
-          $store.mountedComponents[selectedComponentId],
+        selectedComponentInstance: $store.mountedComponents[selectedComponentId],
         selectedComponent: component,
         selectedComponentDefinition: definition,
-        selectedComponentPath: selectedPath?.map(component => component._id),
+        selectedComponentPath: selectedPath?.map((component) => component._id),
         mountedComponentCount: Object.keys($store.mountedComponents).length,
         screenslotInstance: $store.mountedComponents[ScreenslotID],
       }
@@ -55,34 +52,34 @@ const createComponentStore = () => {
     if (!id) {
       return
     }
-    store.update(state => {
+    store.update((state) => {
       // Register to mounted components
       state.mountedComponents[id] = instance
       return state
     })
   }
 
-  const unregisterInstance = id => {
+  const unregisterInstance = (id) => {
     if (!id) {
       return
     }
-    store.update(state => {
+    store.update((state) => {
       // Remove from mounted components
       delete state.mountedComponents[id]
       return state
     })
   }
 
-  const isComponentRegistered = id => {
+  const isComponentRegistered = (id) => {
     return get(store).mountedComponents[id] != null
   }
 
-  const getComponentById = id => {
+  const getComponentById = (id) => {
     const root = get(screenStore).activeScreen?.props
     return findComponentById(root, id)
   }
 
-  const getComponentDefinition = type => {
+  const getComponentDefinition = (type) => {
     if (!type) {
       return null
     }
@@ -97,7 +94,7 @@ const createComponentStore = () => {
     return type ? Manifest[type] : null
   }
 
-  const getComponentConstructor = type => {
+  const getComponentConstructor = (type) => {
     if (!type) {
       return null
     }
@@ -123,7 +120,7 @@ const createComponentStore = () => {
     }
 
     const promise = loader()
-      .then(module => {
+      .then((module) => {
         const Component = module?.default ?? null
         if (Component) {
           builtInComponentCache.set(name, Component)
@@ -131,7 +128,7 @@ const createComponentStore = () => {
         builtInComponentPromises.delete(name)
         return Component
       })
-      .catch(error => {
+      .catch((error) => {
         builtInComponentPromises.delete(name)
         console.error(`Failed to load component ${name}`, error)
         return null
@@ -141,8 +138,8 @@ const createComponentStore = () => {
     return promise
   }
 
-  const getComponentInstance = id => {
-    return derived(store, $store => $store.mountedComponents[id])
+  const getComponentInstance = (id) => {
+    return derived(store, ($store) => $store.mountedComponents[id])
   }
 
   return {

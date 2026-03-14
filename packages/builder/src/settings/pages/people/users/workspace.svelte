@@ -1,5 +1,5 @@
 <script lang="ts">
-  import UsersPage from "./index.svelte"
+import UsersPage from "./index.svelte"
 </script>
 
 <UsersPage />

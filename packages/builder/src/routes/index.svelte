@@ -1,17 +1,17 @@
 <script>
-  import { goto as gotoStore } from "@roxi/routify"
-  import { auth } from "@/stores/portal"
-  import { onMount } from "svelte"
-  import { notifications } from "@budibase/bbui"
+import { notifications } from "@budibase/bbui"
+import { goto as gotoStore } from "@roxi/routify"
+import { onMount } from "svelte"
+import { auth } from "@/stores/portal"
 
-  $: goto = $gotoStore
+$: goto = $gotoStore
 
-  onMount(async () => {
-    try {
-      await auth.checkQueryString()
-    } catch (error) {
-      notifications.error("Error setting org")
-    }
-    goto(`./builder`)
-  })
+onMount(async () => {
+  try {
+    await auth.checkQueryString()
+  } catch (error) {
+    notifications.error("Error setting org")
+  }
+  goto(`./builder`)
+})
 </script>

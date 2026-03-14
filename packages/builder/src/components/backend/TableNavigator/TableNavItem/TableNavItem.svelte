@@ -1,78 +1,77 @@
 <script>
-  import {
-    tables as tablesStore,
-    userSelectedResourceMap,
-    contextMenuStore,
-    workspaceFavouriteStore,
-  } from "@/stores/builder"
-  import { TableNames } from "@/constants"
-  import NavItem from "@/components/common/NavItem.svelte"
-  import { isActive } from "@roxi/routify"
-  import EditModal from "./EditModal.svelte"
-  import DeleteConfirmationModal from "../../modals/DeleteDataConfirmationModal.svelte"
-  import { Icon } from "@budibase/bbui"
-  import { DB_TYPE_EXTERNAL } from "@/constants/backend"
-  import { notifications } from "@budibase/bbui"
-  import FavouriteResourceButton from "@/routes/builder/_components/FavouriteResourceButton.svelte"
-  import { WorkspaceResource } from "@budibase/types"
+import { Icon, notifications } from "@budibase/bbui"
+import { WorkspaceResource } from "@budibase/types"
+import { isActive } from "@roxi/routify"
+import NavItem from "@/components/common/NavItem.svelte"
+import { TableNames } from "@/constants"
+import { DB_TYPE_EXTERNAL } from "@/constants/backend"
+import FavouriteResourceButton from "@/routes/builder/_components/FavouriteResourceButton.svelte"
+import {
+  contextMenuStore,
+  tables as tablesStore,
+  userSelectedResourceMap,
+  workspaceFavouriteStore,
+} from "@/stores/builder"
+import DeleteConfirmationModal from "../../modals/DeleteDataConfirmationModal.svelte"
+import EditModal from "./EditModal.svelte"
 
-  $isActive
+$isActive
 
-  export let table
-  export let idx
+export let table
+export let idx
 
-  const favourites = workspaceFavouriteStore.lookup
+const favourites = workspaceFavouriteStore.lookup
 
-  let editModal
-  let deleteConfirmationModal
+let editModal
+let deleteConfirmationModal
 
-  $: favourite = table?._id ? $favourites[table?._id] : undefined
+$: favourite = table?._id ? $favourites[table?._id] : undefined
 
-  const duplicateTable = async () => {
-    try {
-      await tablesStore.duplicate(table._id)
-      notifications.success("Table duplicated successfully")
-    } catch (error) {
-      notifications.error(`Failed to duplicate table: ${error.message}`)
-    }
+const duplicateTable = async () => {
+  try {
+    await tablesStore.duplicate(table._id)
+    notifications.success("Table duplicated successfully")
+  } catch (error) {
+    notifications.error(`Failed to duplicate table: ${error.message}`)
   }
+}
 
-  const getContextMenuItems = () => {
-    return [
-      {
-        icon: "pencil",
-        name: "Edit",
-        keyBind: null,
-        visible: table?.sourceType !== DB_TYPE_EXTERNAL,
-        disabled: false,
-        callback: editModal.show,
-      },
-      {
-        icon: "copy",
-        name: "Duplicate",
-        keyBind: null,
-        visible: table?.sourceType !== DB_TYPE_EXTERNAL,
-        disabled: false,
-        callback: duplicateTable,
-      },
-      {
-        icon: "trash",
-        name: "Delete",
-        keyBind: null,
-        visible: true,
-        disabled: false,
-        callback: deleteConfirmationModal.show,
-      },
-    ]
-  }
+const getContextMenuItems = () => {
+  return [
+    {
+      icon: "pencil",
+      name: "Edit",
+      keyBind: null,
+      visible: table?.sourceType !== DB_TYPE_EXTERNAL,
+      disabled: false,
+      callback: editModal.show,
+    },
+    {
+      icon: "copy",
+      name: "Duplicate",
+      keyBind: null,
+      visible: table?.sourceType !== DB_TYPE_EXTERNAL,
+      disabled: false,
+      callback: duplicateTable,
+    },
+    {
+      icon: "trash",
+      name: "Delete",
+      keyBind: null,
+      visible: true,
+      disabled: false,
+      callback: deleteConfirmationModal.show,
+    },
+  ]
+}
 
-  const openContextMenu = e => {
-    e.preventDefault()
-    e.stopPropagation()
+const openContextMenu = (e) => {
+  e.preventDefault()
+  e.stopPropagation()
 
-    const items = getContextMenuItems()
-    contextMenuStore.open(table._id, items, { x: e.clientX, y: e.clientY })
-  }
+  const items = getContextMenuItems()
+  contextMenuStore.open(table._id, items, { x: e.clientX, y: e.clientY })
+}
 </script>
 
 <NavItem

@@ -1,13 +1,13 @@
 <script>
-  import WorkspaceLayout from "./_module.workspace.svelte"
+import WorkspaceLayout from "./_module.workspace.svelte"
 
-  export let application
+export let application
 
-  let currentAppId = application
+let currentAppId = application
 
-  $: if (application !== currentAppId) {
-    currentAppId = application
-  }
+$: if (application !== currentAppId) {
+  currentAppId = application
+}
 </script>
 
 <!-- Needs to agressively re-render if the appId has changed -->

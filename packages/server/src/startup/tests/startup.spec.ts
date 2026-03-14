@@ -1,14 +1,9 @@
+import { tenancy, users, utils, withEnv as withCoreEnv } from "@budibase/backend-core"
 import { structures } from "@budibase/backend-core/tests"
+import nock from "nock"
 import { withEnv } from "../../environment"
 import TestConfiguration from "../../tests/utilities/TestConfiguration"
 import { startup } from "../index"
-import {
-  users,
-  utils,
-  tenancy,
-  withEnv as withCoreEnv,
-} from "@budibase/backend-core"
-import nock from "nock"
 
 describe("check BB_ADMIN environment variables", () => {
   const config = new TestConfiguration()
@@ -48,9 +43,7 @@ describe("check BB_ADMIN environment variables", () => {
               })
               expect(user).toBeDefined()
               expect(user?.password).toBeDefined()
-              expect(await utils.compare(PASSWORD, user!.password!)).toEqual(
-                true
-              )
+              expect(await utils.compare(PASSWORD, user!.password!)).toEqual(true)
             }
           )
       )

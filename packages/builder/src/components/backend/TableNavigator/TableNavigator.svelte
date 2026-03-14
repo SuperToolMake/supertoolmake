@@ -1,11 +1,11 @@
 <script>
-  import TableNavItem from "./TableNavItem/TableNavItem.svelte"
-  import { alphabetical } from "./utils"
+import TableNavItem from "./TableNavItem/TableNavItem.svelte"
+import { alphabetical } from "./utils"
 
-  export let tables
-  export let selectTable
+export let tables
+export let selectTable
 
-  $: sortedTables = tables.sort(alphabetical)
+$: sortedTables = tables.sort(alphabetical)
 </script>
 
 <div class="hierarchy-items-container">

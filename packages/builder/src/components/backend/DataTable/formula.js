@@ -1,25 +1,20 @@
 import { FieldType } from "@budibase/types"
-import { FIELDS } from "@/constants/backend"
-import { tables } from "@/stores/builder"
 import { get as svelteGet } from "svelte/store"
+import { FIELDS } from "@/constants/backend"
 import { makeReadableKeyPropSafe } from "@/dataBinding"
+import { tables } from "@/stores/builder"
 
 // currently supported level of relationship depth (server side)
 const MAX_DEPTH = 1
 
 const TYPES_TO_SKIP = [FieldType.LONGFORM]
 
-const shouldSkipFieldSchema = fieldSchema => {
+const shouldSkipFieldSchema = (fieldSchema) => {
   // Skip some types always
   return TYPES_TO_SKIP.includes(fieldSchema.type)
 }
 
-export function getBindings({
-  table,
-  path = null,
-  category = null,
-  depth = 0,
-}) {
+export function getBindings({ table, path = null, category = null, depth = 0 }) {
   let bindings = []
   if (!table) {
     return bindings
@@ -28,17 +23,12 @@ export function getBindings({
     const isRelationship = schema.type === FieldType.LINK
     // skip relationships after a certain depth and types which
     // can't bind to
-    if (
-      shouldSkipFieldSchema(schema) ||
-      (isRelationship && depth >= MAX_DEPTH)
-    ) {
+    if (shouldSkipFieldSchema(schema) || (isRelationship && depth >= MAX_DEPTH)) {
       continue
     }
     category = category == null ? `${table.name} Fields` : category
     if (isRelationship && depth < MAX_DEPTH) {
-      const relatedTable = svelteGet(tables).list.find(
-        table => table._id === schema.tableId
-      )
+      const relatedTable = svelteGet(tables).list.find((table) => table._id === schema.tableId)
       const relatedBindings = bindings.concat(
         getBindings({
           table: relatedTable,
@@ -50,13 +40,11 @@ export function getBindings({
       // remove the ones that have already been found
       bindings = bindings.concat(
         relatedBindings.filter(
-          related => !bindings.find(binding => binding.path === related.path)
+          (related) => !bindings.find((binding) => binding.path === related.path)
         )
       )
     }
-    const field = Object.values(FIELDS).find(
-      field => field.type === schema.type
-    )
+    const field = Object.values(FIELDS).find((field) => field.type === schema.type)
 
     const label = path == null ? column : `${path}.0.${column}`
     const binding = path == null ? `[${column}]` : `[${path}].0.[${column}]`

@@ -1,5 +1,5 @@
 import { context, db } from "@budibase/backend-core"
-import {
+import type {
   ClearBackupErrorRequest,
   ClearBackupErrorResponse,
   Ctx,

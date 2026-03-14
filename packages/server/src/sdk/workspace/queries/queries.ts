@@ -1,6 +1,6 @@
 import { context } from "@budibase/backend-core"
 import { processStringSync } from "@budibase/string-templates"
-import { Query, QuerySchema } from "@budibase/types"
+import type { Query, QuerySchema } from "@budibase/types"
 import { BaseQueryVerbs } from "../../../constants"
 import { getQueryParams, isProdWorkspaceID } from "../../../db/utils"
 import { getEnvironmentVariables } from "../../utils"
@@ -10,7 +10,7 @@ function updateSchema(query: Query): Query {
     return query
   }
   const schema: Record<string, QuerySchema> = {}
-  for (let key of Object.keys(query.schema)) {
+  for (const key of Object.keys(query.schema)) {
     if (typeof query.schema[key] === "string") {
       schema[key] = { type: query.schema[key] as string, name: key }
     } else {
@@ -22,14 +22,14 @@ function updateSchema(query: Query): Query {
 }
 
 function updateSchemas(queries: Query[]): Query[] {
-  return queries.map(query => updateSchema(query))
+  return queries.map((query) => updateSchema(query))
 }
 
 // simple function to append "readable" to all read queries
 function enrichQueries(input: any) {
   const wasArray = Array.isArray(input)
   const queries = wasArray ? input : [input]
-  for (let query of queries) {
+  for (const query of queries) {
     if (query.queryVerb === BaseQueryVerbs.READ) {
       query.readable = true
     }
@@ -65,17 +65,14 @@ export async function fetch(opts: { enrich: boolean } = { enrich: true }) {
   return updateSchemas(queries)
 }
 
-export async function enrichArrayContext(
-  fields: any[],
-  inputs = {}
-): Promise<any[]> {
+export async function enrichArrayContext(fields: any[], inputs = {}): Promise<any[]> {
   const map: Record<string, any> = {}
-  for (let index in fields) {
+  for (const index in fields) {
     map[index] = fields[index]
   }
   const output = await enrichContext(map, inputs)
   const outputArray: any[] = []
-  for (let [key, value] of Object.entries(output)) {
+  for (const [key, value] of Object.entries(output)) {
     outputArray[parseInt(key)] = value
   }
   return outputArray
@@ -95,7 +92,7 @@ export async function enrichContext(
   const env = await getEnvironmentVariables()
   const parameters = { ...inputs, env }
   // enrich the fields with dynamic parameters
-  for (let key of Object.keys(fields)) {
+  for (const key of Object.keys(fields)) {
     if (fields[key] == null) {
       continue
     }
@@ -113,16 +110,10 @@ export async function enrichContext(
       enrichedQuery[key] = fields[key]
     }
   }
-  if (
-    enrichedQuery.json ||
-    enrichedQuery.customData ||
-    enrichedQuery.requestBody
-  ) {
+  if (enrichedQuery.json || enrichedQuery.customData || enrichedQuery.requestBody) {
     try {
       enrichedQuery.json = JSON.parse(
-        enrichedQuery.json ||
-          enrichedQuery.customData ||
-          enrichedQuery.requestBody
+        enrichedQuery.json || enrichedQuery.customData || enrichedQuery.requestBody
       )
     } catch (err) {
       // no json found, ignore

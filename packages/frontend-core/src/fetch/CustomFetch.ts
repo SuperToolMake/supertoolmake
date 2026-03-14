@@ -1,12 +1,9 @@
-import { CustomDatasource } from "@budibase/types"
+import type { CustomDatasource } from "@budibase/types"
 import BaseDataFetch from "./DataFetch"
 
 type CustomDefinition = Record<string, any>
 
-export default class CustomFetch extends BaseDataFetch<
-  CustomDatasource,
-  CustomDefinition
-> {
+export default class CustomFetch extends BaseDataFetch<CustomDatasource, CustomDefinition> {
   // Gets the correct type for a JS value
   getType(value: any) {
     if (value == null) {
@@ -49,11 +46,11 @@ export default class CustomFetch extends BaseDataFetch<
 
       // Try splitting by newlines first
       if (data.includes("\n")) {
-        return data.split("\n").map(x => x.trim())
+        return data.split("\n").map((x) => x.trim())
       }
 
       // Split by commas next
-      return data.split(",").map(x => x.trim())
+      return data.split(",").map((x) => x.trim())
     }
 
     // Other cases we just assume it's a single object and wrap it
@@ -67,17 +64,17 @@ export default class CustomFetch extends BaseDataFetch<
     }
 
     // Filter out any invalid values
-    data = data.filter(x => x != null && x !== "" && !Array.isArray(x))
+    data = data.filter((x) => x != null && x !== "" && !Array.isArray(x))
 
     // Ensure all values are packed into objects
-    return data.map(value => {
+    return data.map((value) => {
       if (typeof value === "object") {
         return value
       }
 
       // Try parsing strings
       if (typeof value === "string") {
-        const split = value.split(",").map(x => x.trim())
+        const split = value.split(",").map((x) => x.trim())
         const obj: Record<string, string> = {}
         for (let i = 0; i < split.length; i++) {
           const suffix = i === 0 ? "" : ` ${i + 1}`
@@ -119,7 +116,7 @@ export default class CustomFetch extends BaseDataFetch<
 
           // Determine whether we should render text columns as options instead
           if (type === "string") {
-            const uniqueValues = [...new Set(data.map(x => x[key]))]
+            const uniqueValues = [...new Set(data.map((x) => x[key]))]
             const uniqueness = uniqueValues.length / data.length
             if (uniqueness <= 0.8 && uniqueValues.length > 1) {
               type = "options"
@@ -129,7 +126,7 @@ export default class CustomFetch extends BaseDataFetch<
 
           // Generate options for array columns
           else if (type === "array") {
-            constraints.inclusion = [...new Set(data.map(x => x[key]).flat())]
+            constraints.inclusion = [...new Set(data.flatMap((x) => x[key]))]
           }
 
           schema[key] = {

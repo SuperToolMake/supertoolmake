@@ -1,6 +1,6 @@
 import { get } from "svelte/store"
-import { BudiStore } from "../BudiStore"
 import { previewStore } from "@/stores/builder"
+import { BudiStore } from "../BudiStore"
 
 interface BuilderHoverStore {
   hoverTimeout?: NodeJS.Timeout
@@ -34,7 +34,7 @@ export class HoverStore extends BudiStore<BuilderHoverStore> {
     if (componentId === get(this.store).componentId) {
       return
     }
-    this.update(state => {
+    this.update((state) => {
       state.componentId = componentId
       return state
     })

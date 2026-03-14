@@ -1,19 +1,10 @@
-function buildUrl({
-  paths,
-  route,
-  fullUrl,
-}: {
-  paths: string[]
-  route: string
-  fullUrl: boolean
-}) {
+function buildUrl({ paths, route, fullUrl }: { paths: string[]; route: string; fullUrl: boolean }) {
   const { host, protocol } = window.location
 
-  const trimSlashes = (value: string) =>
-    value.replace(/^\/*/, "").replace(/^\/$/, "")
+  const trimSlashes = (value: string) => value.replace(/^\/*/, "").replace(/^\/$/, "")
   const parsedPaths = paths
     .map(trimSlashes)
-    .filter(x => x)
+    .filter((x) => x)
     .join("/")
 
   let url = ""

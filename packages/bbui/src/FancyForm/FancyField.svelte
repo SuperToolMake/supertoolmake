@@ -1,39 +1,39 @@
 <script lang="ts" generics="V">
-  import { getContext, onMount } from "svelte"
-  import Icon from "../Icon/Icon.svelte"
-  import ErrorMessage from "./ErrorMessage.svelte"
+import { getContext, onMount } from "svelte"
+import Icon from "../Icon/Icon.svelte"
+import ErrorMessage from "./ErrorMessage.svelte"
 
-  export let disabled: boolean = false
-  export let error: string | null = null
-  export let focused: boolean = false
-  export let clickable: boolean = false
-  export let validate: ((_value: V | undefined) => string | null) | null
-  export let value: V | undefined
-  export let ref: HTMLDivElement | undefined = undefined
-  export let autoHeight: boolean | undefined = undefined
-  export let compact: boolean = false
+export let disabled: boolean = false
+export let error: string | null = null
+export let focused: boolean = false
+export let clickable: boolean = false
+export let validate: ((_value: V | undefined) => string | null) | null
+export let value: V | undefined
+export let ref: HTMLDivElement | undefined = undefined
+export let autoHeight: boolean | undefined = undefined
+export let compact: boolean = false
 
-  const formContext = getContext("fancy-form")
-  const id = Math.random().toString()
-  const API = {
-    validate: () => {
-      if (validate) {
-        error = validate(value)
-      }
-      return !error
-    },
+const formContext = getContext("fancy-form")
+const id = Math.random().toString()
+const API = {
+  validate: () => {
+    if (validate) {
+      error = validate(value)
+    }
+    return !error
+  },
+}
+
+onMount(() => {
+  if (formContext) {
+    formContext.registerField(id, API)
   }
-
-  onMount(() => {
+  return () => {
     if (formContext) {
-      formContext.registerField(id, API)
+      formContext.unregisterField(id)
     }
-    return () => {
-      if (formContext) {
-        formContext.unregisterField(id)
-      }
-    }
-  })
+  }
+})
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

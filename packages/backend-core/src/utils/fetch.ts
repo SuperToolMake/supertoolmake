@@ -8,13 +8,9 @@ import { ProxyAgent } from "undici"
  * @param options Optional configuration for the ProxyAgent
  * @returns ProxyAgent if proxy is configured, undefined otherwise
  */
-function createProxyDispatcher(options?: {
-  rejectUnauthorized?: boolean
-}): ProxyAgent | boolean {
-  const httpProxy =
-    process.env.GLOBAL_AGENT_HTTP_PROXY || process.env.HTTP_PROXY
-  const httpsProxy =
-    process.env.GLOBAL_AGENT_HTTPS_PROXY || process.env.HTTPS_PROXY
+function createProxyDispatcher(options?: { rejectUnauthorized?: boolean }): ProxyAgent | boolean {
+  const httpProxy = process.env.GLOBAL_AGENT_HTTP_PROXY || process.env.HTTP_PROXY
+  const httpsProxy = process.env.GLOBAL_AGENT_HTTPS_PROXY || process.env.HTTPS_PROXY
 
   const proxyUrl = httpsProxy || httpProxy
 
@@ -33,9 +29,7 @@ function createProxyDispatcher(options?: {
   }
 
   const rejectUnauthorized =
-    options?.rejectUnauthorized !== undefined
-      ? options?.rejectUnauthorized
-      : true
+    options?.rejectUnauthorized !== undefined ? options?.rejectUnauthorized : true
 
   console.log("[fetch] Creating ProxyAgent", {
     proxyUrl: trimmedProxyUrl,

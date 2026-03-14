@@ -1,6 +1,6 @@
-import formView from "./images/formView.svg"
-import formUpdate from "./images/formUpdate.svg"
 import formCreate from "./images/formCreate.svg"
+import formUpdate from "./images/formUpdate.svg"
+import formView from "./images/formView.svg"
 
 const tableTypes = [
   {

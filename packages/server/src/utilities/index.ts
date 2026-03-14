@@ -1,7 +1,8 @@
-export * from "./fileUtils"
 export * from "./fetch"
+export * from "./fileUtils"
+
 import { context } from "@budibase/backend-core"
-import { Document } from "@budibase/types"
+import type { Document } from "@budibase/types"
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import { generateMetadataID } from "../db/utils"
@@ -10,7 +11,7 @@ import env from "../environment"
 dayjs.extend(customParseFormat)
 
 export function wait(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 export const isDev = env.isDev

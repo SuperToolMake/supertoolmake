@@ -26,7 +26,7 @@ export function createPaginationStore() {
   const { subscribe, set, update } = writable(defaultValue())
 
   function prevPage() {
-    update(state => {
+    update((state) => {
       state.pageNumber--
       state.nextPage = state.pages.pop()
       state.page = state.pages[state.pages.length - 1]
@@ -36,7 +36,7 @@ export function createPaginationStore() {
   }
 
   function nextPage() {
-    update(state => {
+    update((state) => {
       state.pageNumber++
       state.page = state.nextPage
       state.pages.push(state.page!)
@@ -46,7 +46,7 @@ export function createPaginationStore() {
   }
 
   function fetched(hasNextPage: boolean, nextPage: string) {
-    update(state => {
+    update((state) => {
       state.hasNextPage = hasNextPage
       state.nextPage = nextPage
       state.loading = false
@@ -55,7 +55,7 @@ export function createPaginationStore() {
   }
 
   function loading(loading = true) {
-    update(state => {
+    update((state) => {
       state.loading = loading
       return state
     })

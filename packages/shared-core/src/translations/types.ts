@@ -1,8 +1,4 @@
-export type TranslationCategory =
-  | "userMenu"
-  | "profileModal"
-  | "passwordModal"
-  | "picker"
+export type TranslationCategory = "userMenu" | "profileModal" | "passwordModal" | "picker"
 
 export interface TranslationDefinitionInput {
   key: string
@@ -11,8 +7,7 @@ export interface TranslationDefinitionInput {
   fullKey?: string
 }
 
-export interface TranslationDefinition
-  extends Omit<TranslationDefinitionInput, "fullKey"> {
+export interface TranslationDefinition extends Omit<TranslationDefinitionInput, "fullKey"> {
   category: TranslationCategory
   fullKey: string
 }
@@ -28,12 +23,10 @@ export const createTranslationDefinitions = (
   category: TranslationCategory,
   definitions: ReadonlyArray<TranslationDefinitionInput>
 ): TranslationDefinition[] => {
-  return definitions.map(definition => {
+  return definitions.map((definition) => {
     const fullKey =
       definition.fullKey ??
-      (definition.key.includes(".")
-        ? definition.key
-        : `${category}.${definition.key}`)
+      (definition.key.includes(".") ? definition.key : `${category}.${definition.key}`)
 
     return {
       key: definition.key,

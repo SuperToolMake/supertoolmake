@@ -78,32 +78,26 @@ const environment = {
    * Mock the email service in use - links to ethereal hosted emails are logged instead.
    */
   ENABLE_EMAIL_TEST_MODE: process.env.ENABLE_EMAIL_TEST_MODE,
-  PASSPORT_GOOGLEAUTH_SUCCESS_REDIRECT:
-    process.env.PASSPORT_GOOGLEAUTH_SUCCESS_REDIRECT || "/",
+  PASSPORT_GOOGLEAUTH_SUCCESS_REDIRECT: process.env.PASSPORT_GOOGLEAUTH_SUCCESS_REDIRECT || "/",
   PASSPORT_GOOGLEAUTH_FAILURE_REDIRECT:
     process.env.PASSPORT_GOOGLEAUTH_FAILURE_REDIRECT || "/error",
-  PASSPORT_OIDCAUTH_SUCCESS_REDIRECT:
-    process.env.PASSPORT_OIDCAUTH_SUCCESS_REDIRECT || "/",
-  PASSPORT_OIDCAUTH_FAILURE_REDIRECT:
-    process.env.PASSPORT_OIDCAUTH_FAILURE_REDIRECT || "/error",
+  PASSPORT_OIDCAUTH_SUCCESS_REDIRECT: process.env.PASSPORT_OIDCAUTH_SUCCESS_REDIRECT || "/",
+  PASSPORT_OIDCAUTH_FAILURE_REDIRECT: process.env.PASSPORT_OIDCAUTH_FAILURE_REDIRECT || "/error",
 
-  LOGIN_MAX_FAILED_ATTEMPTS:
-    parseIntSafe(process.env.LOGIN_MAX_FAILED_ATTEMPTS) || 5,
+  LOGIN_MAX_FAILED_ATTEMPTS: parseIntSafe(process.env.LOGIN_MAX_FAILED_ATTEMPTS) || 5,
   LOGIN_LOCKOUT_SECONDS: parseIntSafe(process.env.LOGIN_LOCKOUT_SECONDS) || 900,
 
   // password reset rate limiting
-  PASSWORD_RESET_RATE_EMAIL_LIMIT:
-    parseIntSafe(process.env.PASSWORD_RESET_RATE_EMAIL_LIMIT) || 3,
+  PASSWORD_RESET_RATE_EMAIL_LIMIT: parseIntSafe(process.env.PASSWORD_RESET_RATE_EMAIL_LIMIT) || 3,
   PASSWORD_RESET_RATE_EMAIL_WINDOW_SECONDS:
     parseIntSafe(process.env.PASSWORD_RESET_RATE_EMAIL_WINDOW_SECONDS) || 900,
-  PASSWORD_RESET_RATE_IP_LIMIT:
-    parseIntSafe(process.env.PASSWORD_RESET_RATE_IP_LIMIT) || 20,
+  PASSWORD_RESET_RATE_IP_LIMIT: parseIntSafe(process.env.PASSWORD_RESET_RATE_IP_LIMIT) || 20,
   PASSWORD_RESET_RATE_IP_WINDOW_SECONDS:
     parseIntSafe(process.env.PASSWORD_RESET_RATE_IP_WINDOW_SECONDS) || 900,
 
   _set(key: any, value: any) {
     process.env[key] = value
-    // @ts-ignore
+    // @ts-expect-error
     environment[key] = value
   },
   isDev: coreEnv.isDev,
@@ -115,9 +109,7 @@ const environment = {
 
 // if some var haven't been set, define them
 if (!environment.APPS_URL) {
-  environment.APPS_URL = coreEnv.isDev()
-    ? "http://localhost:4001"
-    : "http://app-service:4002"
+  environment.APPS_URL = coreEnv.isDev() ? "http://localhost:4001" : "http://app-service:4002"
 }
 
 export function setEnv(newEnvVars: Partial<typeof environment>): () => void {
@@ -147,15 +139,15 @@ export function withEnv<T>(envVars: Partial<typeof environment>, f: () => T) {
 }
 
 // clean up any environment variable edge cases
-for (let [key, value] of Object.entries(environment)) {
+for (const [key, value] of Object.entries(environment)) {
   // handle the edge case of "0" to disable an environment variable
   if (value === "0") {
-    // @ts-ignore
+    // @ts-expect-error
     environment[key] = 0
   }
   // handle the edge case of "false" to disable an environment variable
   if (value === "false") {
-    // @ts-ignore
+    // @ts-expect-error
     environment[key] = 0
   }
 }

@@ -1,8 +1,8 @@
 import {
-  ConnectionInfo,
+  type ConnectionInfo,
   DatasourceFeature,
   DatasourceFieldType,
-  Integration,
+  type Integration,
   QueryType,
 } from "@budibase/types"
 import Redis from "ioredis"
@@ -18,8 +18,7 @@ interface RedisConfig {
 
 const SCHEMA: Integration = {
   docs: "https://redis.io/docs/",
-  description:
-    "Redis is a caching tool, providing powerful key-value store capabilities.",
+  description: "Redis is a caching tool, providing powerful key-value store capabilities.",
   friendlyName: "Redis",
   type: "Non-relational",
   features: {
@@ -165,11 +164,11 @@ class RedisIntegration {
     return this.redisContext(async () => {
       // commands split line by line
       const commands = query.json.trim().split("\n")
-      let pipelineCommands = []
+      const pipelineCommands = []
       let tokenised
 
       // process each command separately
-      for (let command of commands) {
+      for (const command of commands) {
         const valueToken = command.trim().match(/".*"/)
         if (valueToken?.[0]) {
           tokenised = [

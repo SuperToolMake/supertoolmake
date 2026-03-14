@@ -1,115 +1,107 @@
 <script lang="ts">
-  import { API } from "@/api"
-  import { appsStore, auth } from "@/stores/portal"
-  import {
-    Input,
-    Layout,
-    ModalContent,
-    keepOpen,
-    notifications,
-  } from "@budibase/bbui"
-  import { createValidationStore } from "@budibase/frontend-core/src/utils/validation/yup"
-  import * as workspaceValidation from "@budibase/frontend-core/src/utils/validation/yup/app"
-  import { sdk } from "@budibase/shared-core"
-  import type { CreateWorkspaceRequest } from "@budibase/types"
-  import { onMount } from "svelte"
-  import { get, writable } from "svelte/store"
+import { Input, keepOpen, Layout, ModalContent, notifications } from "@budibase/bbui"
+import { createValidationStore } from "@budibase/frontend-core/src/utils/validation/yup"
+import * as workspaceValidation from "@budibase/frontend-core/src/utils/validation/yup/app"
+import { sdk } from "@budibase/shared-core"
+import type { CreateWorkspaceRequest } from "@budibase/types"
+import { onMount } from "svelte"
+import { get, writable } from "svelte/store"
+import { API } from "@/api"
+import { appsStore, auth } from "@/stores/portal"
 
-  export let appId: string
-  export let appName: string
-  export let onDuplicateSuccess = () => {}
+export let appId: string
+export let appName: string
+export let onDuplicateSuccess = () => {}
 
-  const validation = createValidationStore()
-  const values = writable<{ name: string; url: string | null }>({
-    name: appName + " copy",
-    url: null,
+const validation = createValidationStore()
+const values = writable<{ name: string; url: string | null }>({
+  name: appName + " copy",
+  url: null,
+})
+const appPrefix = "/app"
+
+let defaultAppName = appName + " copy"
+let duplicating = false
+
+$: {
+  const { url } = $values
+
+  validation.check({
+    ...$values,
+    url: url?.[0] === "/" ? url.substring(1, url.length) : url,
   })
-  const appPrefix = "/app"
+}
 
-  let defaultAppName = appName + " copy"
-  let duplicating = false
+const resolveAppName = (name: string) => {
+  return name ? name.trim() : null
+}
 
-  $: {
-    const { url } = $values
+const resolveAppUrl = (name: string) => {
+  let parsedName
+  const resolvedName = resolveAppName(name)
+  parsedName = resolvedName ? resolvedName.toLowerCase() : ""
+  const parsedUrl = parsedName ? parsedName.replace(/\s+/g, "-") : ""
+  return encodeURI(parsedUrl)
+}
 
-    validation.check({
-      ...$values,
-      url: url?.[0] === "/" ? url.substring(1, url.length) : url,
-    })
+const nameToUrl = (appName: string) => {
+  let resolvedUrl = resolveAppUrl(appName)
+  tidyUrl(resolvedUrl)
+}
+
+const tidyUrl = (url: string | null) => {
+  if (url && !url.startsWith("/")) {
+    url = `/${url}`
+  }
+  $values.url = url === "" ? null : url
+}
+
+const duplicateApp = async () => {
+  duplicating = true
+
+  const data: CreateWorkspaceRequest = {
+    name: $values.name.trim(),
   }
 
-  const resolveAppName = (name: string) => {
-    return name ? name.trim() : null
+  if ($values.url) {
+    data.url = $values.url.trim()
   }
 
-  const resolveAppUrl = (name: string) => {
-    let parsedName
-    const resolvedName = resolveAppName(name)
-    parsedName = resolvedName ? resolvedName.toLowerCase() : ""
-    const parsedUrl = parsedName ? parsedName.replace(/\s+/g, "-") : ""
-    return encodeURI(parsedUrl)
-  }
-
-  const nameToUrl = (appName: string) => {
-    let resolvedUrl = resolveAppUrl(appName)
-    tidyUrl(resolvedUrl)
-  }
-
-  const tidyUrl = (url: string | null) => {
-    if (url && !url.startsWith("/")) {
-      url = `/${url}`
+  try {
+    const app = await API.duplicateApp(appId, data)
+    appsStore.load()
+    if (!sdk.users.isBuilder($auth.user, app?.duplicateAppId)) {
+      // Refresh for access to created applications
+      await auth.getSelf()
     }
-    $values.url = url === "" ? null : url
+    onDuplicateSuccess()
+    notifications.success("App duplicated successfully")
+  } catch (err) {
+    notifications.error("Error duplicating app")
+    duplicating = false
   }
+}
 
-  const duplicateApp = async () => {
-    duplicating = true
+const setupValidation = async () => {
+  const applications = get(appsStore).apps
+  workspaceValidation.name(validation, { workspaces: applications })
+  workspaceValidation.url(validation, { workspaces: applications })
 
-    const data: CreateWorkspaceRequest = {
-      name: $values.name.trim(),
-    }
-
-    if ($values.url) {
-      data.url = $values.url.trim()
-    }
-
-    try {
-      const app = await API.duplicateApp(appId, data)
-      appsStore.load()
-      if (!sdk.users.isBuilder($auth.user, app?.duplicateAppId)) {
-        // Refresh for access to created applications
-        await auth.getSelf()
-      }
-      onDuplicateSuccess()
-      notifications.success("App duplicated successfully")
-    } catch (err) {
-      notifications.error("Error duplicating app")
-      duplicating = false
-    }
-  }
-
-  const setupValidation = async () => {
-    const applications = get(appsStore).apps
-    workspaceValidation.name(validation, { workspaces: applications })
-    workspaceValidation.url(validation, { workspaces: applications })
-
-    const { url } = $values
-    validation.check({
-      ...$values,
-      url: url?.[0] === "/" ? url.substring(1, url.length) : url,
-    })
-  }
-
-  $: appUrl = `${window.location.origin}${
-    $values.url
-      ? `${appPrefix}${$values.url}`
-      : `${appPrefix}${resolveAppUrl($values.name)}`
-  }`
-
-  onMount(async () => {
-    nameToUrl($values.name)
-    await setupValidation()
+  const { url } = $values
+  validation.check({
+    ...$values,
+    url: url?.[0] === "/" ? url.substring(1, url.length) : url,
   })
+}
+
+$: appUrl = `${window.location.origin}${
+  $values.url ? `${appPrefix}${$values.url}` : `${appPrefix}${resolveAppUrl($values.name)}`
+}`
+
+onMount(async () => {
+  nameToUrl($values.name)
+  await setupValidation()
+})
 </script>
 
 <ModalContent

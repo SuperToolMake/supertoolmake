@@ -1,30 +1,23 @@
 <script>
-  import {
-    Layout,
-    Button,
-    Helpers,
-    Icon,
-    notifications,
-    Select,
-  } from "@budibase/bbui"
-  import { AppStatus } from "@/constants"
-  import { appsStore } from "@/stores/portal/apps"
-  import { appStore, workspaceAppStore } from "@/stores/builder"
+import { Button, Helpers, Icon, Layout, notifications, Select } from "@budibase/bbui"
+import { AppStatus } from "@/constants"
+import { appStore, workspaceAppStore } from "@/stores/builder"
+import { appsStore } from "@/stores/portal/apps"
 
-  let selectedApp
+let selectedApp
 
-  $: filteredApps = $appsStore.apps.filter(app => app.devId == $appStore.appId)
-  $: workspace = filteredApps.length ? filteredApps[0] : {}
-  $: workspaceBaseUrl = `${window.origin}/embed${workspace?.url}`
-  $: workspaceUrl =
-    !selectedApp || selectedApp?.isDefault
-      ? workspaceBaseUrl
-      : `${workspaceBaseUrl}${selectedApp.url}`
-  $: appDeployed = workspace?.status === AppStatus.DEPLOYED
-  $: defaultApp = $workspaceAppStore.workspaceApps.find(a => a.isDefault)
-  $: embedTitle = selectedApp?.name || workspace?.name || ""
+$: filteredApps = $appsStore.apps.filter((app) => app.devId == $appStore.appId)
+$: workspace = filteredApps.length ? filteredApps[0] : {}
+$: workspaceBaseUrl = `${window.origin}/embed${workspace?.url}`
+$: workspaceUrl =
+  !selectedApp || selectedApp?.isDefault
+    ? workspaceBaseUrl
+    : `${workspaceBaseUrl}${selectedApp.url}`
+$: appDeployed = workspace?.status === AppStatus.DEPLOYED
+$: defaultApp = $workspaceAppStore.workspaceApps.find((a) => a.isDefault)
+$: embedTitle = selectedApp?.name || workspace?.name || ""
 
-  $: embed = `<iframe title="${embedTitle}" width="800" height="600" frameborder="0" allow="clipboard-write;camera;geolocation;fullscreen" src="${workspaceUrl}"> </iframe>`
+$: embed = `<iframe title="${embedTitle}" width="800" height="600" frameborder="0" allow="clipboard-write;camera;geolocation;fullscreen" src="${workspaceUrl}"> </iframe>`
 </script>
 
 <Layout noPadding>

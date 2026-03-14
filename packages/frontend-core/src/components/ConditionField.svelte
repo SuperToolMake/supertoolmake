@@ -1,52 +1,52 @@
 <script>
-  import { Input, Icon, Drawer, Button } from "@budibase/bbui"
-  import { isJSBinding } from "@budibase/string-templates"
-  import { createEventDispatcher } from "svelte"
+import { Button, Drawer, Icon, Input } from "@budibase/bbui"
+import { isJSBinding } from "@budibase/string-templates"
+import { createEventDispatcher } from "svelte"
 
-  export let filter
-  export let disabled = false
-  export let bindings = []
-  export let panel
-  export let drawerTitle
-  export let toReadable
-  export let toRuntime
-  export let evaluationContext = {}
+export let filter
+export let disabled = false
+export let bindings = []
+export let panel
+export let drawerTitle
+export let toReadable
+export let toRuntime
+export let evaluationContext = {}
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  let bindingDrawer
-  let fieldValue
+let bindingDrawer
+let fieldValue
 
-  $: fieldValue = filter?.field
-  $: readableValue = toReadable ? toReadable(bindings, fieldValue) : fieldValue
-  $: drawerValue = toDrawerValue(fieldValue)
-  $: isJS = isJSBinding(fieldValue)
+$: fieldValue = filter?.field
+$: readableValue = toReadable ? toReadable(bindings, fieldValue) : fieldValue
+$: drawerValue = toDrawerValue(fieldValue)
+$: isJS = isJSBinding(fieldValue)
 
-  const drawerOnChange = e => {
-    drawerValue = e.detail
-  }
+const drawerOnChange = (e) => {
+  drawerValue = e.detail
+}
 
-  const onChange = e => {
-    fieldValue = e.detail
-    dispatch("change", {
-      field: toRuntime ? toRuntime(bindings, fieldValue) : fieldValue,
-    })
-  }
+const onChange = (e) => {
+  fieldValue = e.detail
+  dispatch("change", {
+    field: toRuntime ? toRuntime(bindings, fieldValue) : fieldValue,
+  })
+}
 
-  const onConfirmBinding = () => {
-    dispatch("change", {
-      field: toRuntime ? toRuntime(bindings, drawerValue) : drawerValue,
-    })
-  }
+const onConfirmBinding = () => {
+  dispatch("change", {
+    field: toRuntime ? toRuntime(bindings, drawerValue) : drawerValue,
+  })
+}
 
-  /**
-   * Converts arrays into strings. The CodeEditor expects a string or encoded JS
-   *
-   * @param{string} fieldValue
-   */
-  const toDrawerValue = fieldValue => {
-    return Array.isArray(fieldValue) ? fieldValue.join(",") : readableValue
-  }
+/**
+ * Converts arrays into strings. The CodeEditor expects a string or encoded JS
+ *
+ * @param{string} fieldValue
+ */
+const toDrawerValue = (fieldValue) => {
+  return Array.isArray(fieldValue) ? fieldValue.join(",") : readableValue
+}
 </script>
 
 <div>

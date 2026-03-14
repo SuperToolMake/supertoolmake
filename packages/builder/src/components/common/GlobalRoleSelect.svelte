@@ -1,17 +1,17 @@
 <script lang="ts">
-  import { Select } from "@budibase/bbui"
+import { Select } from "@budibase/bbui"
 
-  interface GlobalRoleOption {
-    label: string
-    value: string
-    subtitle?: string
-  }
+interface GlobalRoleOption {
+  label: string
+  value: string
+  subtitle?: string
+}
 
-  export let value: string | undefined = undefined
-  export let options: GlobalRoleOption[] = []
-  export let label = "Select role"
-  export let size: "S" | "M" | "L" = "M"
-  export let disabled = false
+export let value: string | undefined = undefined
+export let options: GlobalRoleOption[] = []
+export let label = "Select role"
+export let size: "S" | "M" | "L" = "M"
+export let disabled = false
 </script>
 
 <div class="role-select">

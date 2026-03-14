@@ -1,13 +1,9 @@
 import { cache, context, docIds } from "@budibase/backend-core"
-import {
-  Document,
-  OAuth2CredentialsMethod,
-  OAuth2GrantType,
-} from "@budibase/types"
+import { type Document, OAuth2CredentialsMethod, type OAuth2GrantType } from "@budibase/types"
 import { HttpError } from "koa"
-import fetch, { RequestInit } from "node-fetch"
-import { get } from "."
+import fetch, { type RequestInit } from "node-fetch"
 import { processEnvironmentVariable } from "../../utils"
+import { get } from "."
 
 interface OAuth2LogDocument extends Document {
   lastUsage: number
@@ -72,28 +68,25 @@ const trackUsage = async (id: string) => {
 }
 
 export async function getToken(id: string) {
-  const token = await cache.withCacheWithDynamicTTL(
-    cache.CacheKey.OAUTH2_TOKEN(id),
-    async () => {
-      const config = await get(id)
-      if (!config) {
-        throw new HttpError(`oAuth config ${id} count not be found`)
-      }
-
-      const resp = await fetchToken(config)
-
-      const jsonResponse = await resp.json()
-      if (!resp.ok) {
-        const message = jsonResponse.error_description ?? resp.statusText
-
-        throw new Error(`Error fetching oauth2 token: ${message}`)
-      }
-
-      const token = `${jsonResponse.token_type} ${jsonResponse.access_token}`
-      const ttl = jsonResponse.expires_in ?? -1
-      return { value: token, ttl }
+  const token = await cache.withCacheWithDynamicTTL(cache.CacheKey.OAUTH2_TOKEN(id), async () => {
+    const config = await get(id)
+    if (!config) {
+      throw new HttpError(`oAuth config ${id} count not be found`)
     }
-  )
+
+    const resp = await fetchToken(config)
+
+    const jsonResponse = await resp.json()
+    if (!resp.ok) {
+      const message = jsonResponse.error_description ?? resp.statusText
+
+      throw new Error(`Error fetching oauth2 token: ${message}`)
+    }
+
+    const token = `${jsonResponse.token_type} ${jsonResponse.access_token}`
+    const ttl = jsonResponse.expires_in ?? -1
+    return { value: token, ttl }
+  })
 
   await trackUsage(id)
   return token
@@ -136,12 +129,12 @@ export async function getLastUsages(ids: string[]) {
     })
 
   const result = ids.reduce<Record<string, number>>((acc, id) => {
-    const devDoc = devDocs.find(d => d._id === docIds.generateOAuth2LogID(id))
+    const devDoc = devDocs.find((d) => d._id === docIds.generateOAuth2LogID(id))
     if (devDoc) {
       acc[id] = devDoc.lastUsage
     }
 
-    const prodDoc = prodDocs.find(d => d._id === docIds.generateOAuth2LogID(id))
+    const prodDoc = prodDocs.find((d) => d._id === docIds.generateOAuth2LogID(id))
     if (prodDoc && (!acc[id] || acc[id] < prodDoc.lastUsage)) {
       acc[id] = prodDoc.lastUsage
     }

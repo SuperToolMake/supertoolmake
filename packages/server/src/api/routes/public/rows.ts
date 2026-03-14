@@ -1,5 +1,5 @@
-import controller from "../../controllers/public/rows"
 import { Endpoint } from "@budibase/backend-core"
+import controller from "../../controllers/public/rows"
 import { externalSearchValidator } from "../utils/validators"
 
 const read = [],
@@ -73,9 +73,7 @@ write.push(new Endpoint("post", "/tables/:tableId/rows", controller.create))
  *               row:
  *                 $ref: '#/components/examples/row'
  */
-write.push(
-  new Endpoint("put", "/tables/:tableId/rows/:rowId", controller.update)
-)
+write.push(new Endpoint("put", "/tables/:tableId/rows/:rowId", controller.update))
 
 /**
  * @openapi
@@ -101,9 +99,7 @@ write.push(
  *               row:
  *                 $ref: '#/components/examples/row'
  */
-write.push(
-  new Endpoint("delete", "/tables/:tableId/rows/:rowId", controller.destroy)
-)
+write.push(new Endpoint("delete", "/tables/:tableId/rows/:rowId", controller.destroy))
 
 /**
  * @openapi
@@ -161,11 +157,9 @@ read.push(new Endpoint("get", "/tables/:tableId/rows/:rowId", controller.read))
  *                 $ref: '#/components/examples/rows'
  */
 read.push(
-  new Endpoint(
-    "post",
-    "/tables/:tableId/rows/search",
-    controller.search
-  ).addMiddleware(externalSearchValidator())
+  new Endpoint("post", "/tables/:tableId/rows/search", controller.search).addMiddleware(
+    externalSearchValidator()
+  )
 )
 
 export default { read, write }

@@ -1,45 +1,30 @@
 <script lang="ts">
-  import {
-    Body,
-    FancyCheckboxGroup,
-    InlineAlert,
-    Layout,
-    ModalContent,
-  } from "@budibase/bbui"
-  import Spinner from "@/components/common/Spinner.svelte"
-  import { createRelationshipSelectionStore } from "./relationshipSelectionStore"
-  import type {
-    Datasource,
-    DatasourceRelationshipConfig,
-  } from "@budibase/types"
+import { Body, FancyCheckboxGroup, InlineAlert, Layout, ModalContent } from "@budibase/bbui"
+import type { Datasource, DatasourceRelationshipConfig } from "@budibase/types"
+import Spinner from "@/components/common/Spinner.svelte"
+import { createRelationshipSelectionStore } from "./relationshipSelectionStore"
 
-  export let datasource: Datasource
-  export let onComplete: () => void = () => {}
+export let datasource: Datasource
+export let onComplete: () => void = () => {}
 
-  const store = createRelationshipSelectionStore(datasource)
+const store = createRelationshipSelectionStore(datasource)
 
-  function convertLabelsToRelationships(
-    selectedLabels: string[]
-  ): DatasourceRelationshipConfig[] {
-    const selectedIds = selectedLabels
-      .map(label => {
-        const option = $store.relationshipOptions.find(
-          opt => opt.label === label
-        )
-        return option ? option.id : null
-      })
-      .filter((id): id is string => !!id)
-    return $store.relationships.filter(rel => selectedIds.includes(rel._id))
-  }
+function convertLabelsToRelationships(selectedLabels: string[]): DatasourceRelationshipConfig[] {
+  const selectedIds = selectedLabels
+    .map((label) => {
+      const option = $store.relationshipOptions.find((opt) => opt.label === label)
+      return option ? option.id : null
+    })
+    .filter((id): id is string => !!id)
+  return $store.relationships.filter((rel) => selectedIds.includes(rel._id))
+}
 
-  const title = "Choose your relationships"
-  const description = "Choose what relationships you want to sync with Budibase"
-  const selectAllText = "Select all"
+const title = "Choose your relationships"
+const description = "Choose what relationships you want to sync with Budibase"
+const selectAllText = "Select all"
 
-  $: confirmText =
-    $store.loading || $store.hasSelected
-      ? "Import relationships"
-      : "Continue without fetching"
+$: confirmText =
+  $store.loading || $store.hasSelected ? "Import relationships" : "Continue without fetching"
 </script>
 
 <ModalContent

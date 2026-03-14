@@ -1,70 +1,70 @@
 <script>
-  import FavouriteAppButton from "@/routes/builder/portal/workspaces/_components/FavouriteAppButton.svelte"
-  import { contextMenuStore } from "@/stores/builder"
-  import { auth } from "@/stores/portal"
-  import { goto as gotoStore } from "@roxi/routify"
-  import { Body, Button, Icon } from "@budibase/bbui"
-  import { UserAvatars } from "@budibase/frontend-core"
-  import { sdk } from "@budibase/shared-core"
-  import { processStringSync } from "@budibase/string-templates"
-  import AppContextMenuModals from "./AppContextMenuModals.svelte"
-  import getAppContextMenuItems from "./getAppContextMenuItems.js"
+import { Body, Button, Icon } from "@budibase/bbui"
+import { UserAvatars } from "@budibase/frontend-core"
+import { sdk } from "@budibase/shared-core"
+import { processStringSync } from "@budibase/string-templates"
+import { goto as gotoStore } from "@roxi/routify"
+import FavouriteAppButton from "@/routes/builder/portal/workspaces/_components/FavouriteAppButton.svelte"
+import { contextMenuStore } from "@/stores/builder"
+import { auth } from "@/stores/portal"
+import AppContextMenuModals from "./AppContextMenuModals.svelte"
+import getAppContextMenuItems from "./getAppContextMenuItems.js"
 
-  // Initialize Routify store and derive callable function
-  $gotoStore
-  $: goto = $gotoStore
+// Initialize Routify store and derive callable function
+$gotoStore
+$: goto = $gotoStore
 
-  export let app
-  export let lockedAction
+export let app
+export let lockedAction
 
-  let appContextMenuModals
+let appContextMenuModals
 
-  $: contextMenuOpen = `${app.appId}-index` === $contextMenuStore.id
-  $: editing = app.sessions?.length
-  $: isBuilder = sdk.users.isBuilder($auth.user, app?.devId)
-  $: unclickable = !isBuilder && !app.deployed
+$: contextMenuOpen = `${app.appId}-index` === $contextMenuStore.id
+$: editing = app.sessions?.length
+$: isBuilder = sdk.users.isBuilder($auth.user, app?.devId)
+$: unclickable = !isBuilder && !app.deployed
 
-  const handleDefaultClick = () => {
-    if (!isBuilder) {
-      goToApp()
-    } else if (window.innerWidth < 640) {
-      goToOverview()
-    } else {
-      goToBuilder()
-    }
+const handleDefaultClick = () => {
+  if (!isBuilder) {
+    goToApp()
+  } else if (window.innerWidth < 640) {
+    goToOverview()
+  } else {
+    goToBuilder()
   }
+}
 
-  const goToBuilder = () => {
-    goto && goto(`../../workspace/${app.devId}`)
+const goToBuilder = () => {
+  goto && goto(`../../workspace/${app.devId}`)
+}
+
+const goToOverview = () => {
+  goto && goto(`../../workspace/${app.devId}/settings`)
+}
+
+const goToApp = () => {
+  if (app.deployed && app.url) {
+    window.open(`/app${app.url}${app.defaultWorkspaceAppUrl}`, "_blank")
   }
+}
 
-  const goToOverview = () => {
-    goto && goto(`../../workspace/${app.devId}/settings`)
-  }
+const openContextMenu = (e) => {
+  e.preventDefault()
+  e.stopPropagation()
 
-  const goToApp = () => {
-    if (app.deployed && app.url) {
-      window.open(`/app${app.url}${app.defaultWorkspaceAppUrl}`, "_blank")
-    }
-  }
+  const items = getAppContextMenuItems({
+    app,
+    onDuplicate: appContextMenuModals?.showDuplicateModal,
+    onExportDev: appContextMenuModals?.showExportDevModal,
+    onExportProd: appContextMenuModals?.showExportProdModal,
+    onDelete: appContextMenuModals?.showDeleteModal,
+  })
 
-  const openContextMenu = e => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    const items = getAppContextMenuItems({
-      app,
-      onDuplicate: appContextMenuModals?.showDuplicateModal,
-      onExportDev: appContextMenuModals?.showExportDevModal,
-      onExportProd: appContextMenuModals?.showExportProdModal,
-      onDelete: appContextMenuModals?.showDeleteModal,
-    })
-
-    contextMenuStore.open(`${app.appId}-index`, items, {
-      x: e.clientX,
-      y: e.clientY,
-    })
-  }
+  contextMenuStore.open(`${app.appId}-index`, items, {
+    x: e.clientX,
+    y: e.clientY,
+  })
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

@@ -1,32 +1,25 @@
-import { Cookie, Header } from "../constants"
 import {
-  clearCookie,
-  getCookie,
-  isValidInternalAPIKey,
-  openJwt,
-} from "../utils"
-import { getUser } from "../cache/user"
-import { getSession, updateSessionTTL } from "../security/sessions"
-import { buildMatcherRegex, matches } from "./matchers"
-import { queryGlobalView, SEPARATOR, ViewName } from "../db"
-import { doInTenant, getGlobalDB } from "../context"
-import { decrypt } from "../security/encryption"
-import * as identity from "../context/identity"
-import env from "../environment"
-import {
-  Ctx,
-  EndpointMatcher,
   APIWarningCode,
+  type Ctx,
+  type EndpointMatcher,
   LoginMethod,
-  SessionCookie,
-  User,
+  type SessionCookie,
+  type User,
 } from "@budibase/types"
-import { InvalidAPIKeyWarning } from "../warnings"
 import type { Middleware, Next } from "koa"
+import { getUser } from "../cache/user"
+import { Cookie, Header } from "../constants"
+import { doInTenant, getGlobalDB } from "../context"
+import * as identity from "../context/identity"
+import { queryGlobalView, SEPARATOR, ViewName } from "../db"
+import env from "../environment"
+import { decrypt } from "../security/encryption"
+import { getSession, updateSessionTTL } from "../security/sessions"
+import { clearCookie, getCookie, isValidInternalAPIKey, openJwt } from "../utils"
+import { InvalidAPIKeyWarning } from "../warnings"
+import { buildMatcherRegex, matches } from "./matchers"
 
-const ONE_MINUTE = env.SESSION_UPDATE_PERIOD
-  ? parseInt(env.SESSION_UPDATE_PERIOD)
-  : 60 * 1000
+const ONE_MINUTE = env.SESSION_UPDATE_PERIOD ? parseInt(env.SESSION_UPDATE_PERIOD) : 60 * 1000
 
 interface FinaliseOpts {
   authenticated?: boolean
@@ -52,11 +45,7 @@ function finalise(ctx: Ctx, opts: FinaliseOpts = {}) {
 
 async function checkApiKey(
   apiKey: string,
-  populateUser?: (
-    userId: string,
-    tenantId: string,
-    email?: string
-  ) => Promise<User>
+  populateUser?: (userId: string, tenantId: string, email?: string) => Promise<User>
 ) {
   // check both the primary and the fallback internal api keys
   // this allows for rotation
@@ -125,11 +114,10 @@ export function authenticated(
     }
     try {
       // check the actual user is authenticated first, try header or cookie
-      let headerToken = getHeader(ctx, Header.TOKEN)
+      const headerToken = getHeader(ctx, Header.TOKEN)
 
       const authCookie =
-        getCookie<SessionCookie>(ctx, Cookie.Auth) ||
-        openJwt<SessionCookie>(headerToken)
+        getCookie<SessionCookie>(ctx, Cookie.Auth) || openJwt<SessionCookie>(headerToken)
       let apiKey = getHeader(ctx, Header.API_KEY)
 
       if (!apiKey && ctx.request.headers[Header.AUTHORIZATION]) {
@@ -138,9 +126,9 @@ export function authenticated(
 
       const tenantId = getHeader(ctx, Header.TENANT_ID)
       let authenticated = false,
-        user: User | { tenantId: string } | undefined = undefined,
+        user: User | { tenantId: string } | undefined,
         internal = false,
-        loginMethod: LoginMethod | undefined = undefined
+        loginMethod: LoginMethod | undefined
       if (authCookie && !apiKey) {
         const sessionId = authCookie.sessionId
         const userId = authCookie.userId
@@ -162,7 +150,7 @@ export function authenticated(
               email: session.email,
             })
           }
-          // @ts-ignore
+          // @ts-expect-error
           user.csrfToken = session.csrfToken
           loginMethod = LoginMethod.COOKIE
 
@@ -180,15 +168,9 @@ export function authenticated(
       }
       // this is an internal request, no user made it
       if (!authenticated && apiKey) {
-        const populateUser: (
-          userId: string,
-          tenantId: string,
-          email?: string
-        ) => Promise<User> = opts.populateUser ? opts.populateUser(ctx) : null
-        const { valid, user: foundUser } = await checkApiKey(
-          apiKey,
-          populateUser
-        )
+        const populateUser: (userId: string, tenantId: string, email?: string) => Promise<User> =
+          opts.populateUser ? opts.populateUser(ctx) : null
+        const { valid, user: foundUser } = await checkApiKey(apiKey, populateUser)
         if (valid) {
           authenticated = true
           loginMethod = LoginMethod.API_KEY
@@ -206,9 +188,7 @@ export function authenticated(
         authenticated = false
       }
 
-      const isUser = (
-        user: any
-      ): user is User & { budibaseAccess?: string } => {
+      const isUser = (user: any): user is User & { budibaseAccess?: string } => {
         return user && user.email
       }
 

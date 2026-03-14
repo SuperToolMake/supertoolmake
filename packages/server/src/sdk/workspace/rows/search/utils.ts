@@ -4,10 +4,10 @@ import {
   BBReferenceFieldSubType,
   DocumentType,
   FieldType,
-  RowSearchParams,
-  SearchFilters,
+  type RowSearchParams,
   SEPARATOR,
-  Table,
+  type SearchFilters,
+  type Table,
 } from "@budibase/types"
 
 function findColumnInQueries(
@@ -18,11 +18,11 @@ function findColumnInQueries(
   if (!filters) {
     return
   }
-  for (let filterBlock of Object.values(filters)) {
+  for (const filterBlock of Object.values(filters)) {
     if (typeof filterBlock !== "object") {
       continue
     }
-    for (let [key, filter] of Object.entries(filterBlock)) {
+    for (const [key, filter] of Object.entries(filterBlock)) {
       if (key.endsWith(column)) {
         filterBlock[key] = callback(filter)
       }
@@ -48,7 +48,7 @@ function userColumnMapping(column: string, filters: SearchFilters) {
     }
 
     if (isArray) {
-      return filterValue.map(el => {
+      return filterValue.map((el) => {
         if (typeof el === "string") {
           return processString(el)
         } else {
@@ -61,11 +61,8 @@ function userColumnMapping(column: string, filters: SearchFilters) {
   })
 }
 
-export function checkFilters(
-  table: Table,
-  filters: SearchFilters
-): SearchFilters {
-  for (let [key, column] of Object.entries(table.schema || {})) {
+export function checkFilters(table: Table, filters: SearchFilters): SearchFilters {
+  for (const [key, column] of Object.entries(table.schema || {})) {
     switch (column.type) {
       case FieldType.BB_REFERENCE_SINGLE: {
         const subtype = column.subtype
@@ -85,9 +82,7 @@ export function checkFilters(
       }
     }
   }
-  return dataFilters.recurseLogicalOperators(filters, filters =>
-    checkFilters(table, filters)
-  )
+  return dataFilters.recurseLogicalOperators(filters, (filters) => checkFilters(table, filters))
 }
 
 // maps through the search parameters to check if any of the inputs are invalid
@@ -101,12 +96,12 @@ export function searchInputMapping(table: Table, options: RowSearchParams) {
 }
 
 export function isSearchingByRowID(query: SearchFilters): boolean {
-  for (let searchField of Object.values(query)) {
+  for (const searchField of Object.values(query)) {
     if (typeof searchField !== "object") {
       continue
     }
     const hasId = Object.keys(searchField).find(
-      key => dbCore.removeKeyNumbering(key) === "_id" && searchField[key]
+      (key) => dbCore.removeKeyNumbering(key) === "_id" && searchField[key]
     )
     if (hasId) {
       return true

@@ -1,5 +1,5 @@
-import env from "../../src/environment"
 import * as context from "../../src/context"
+import env from "../../src/environment"
 import * as structures from "../core/utilities/structures"
 
 // TENANCY
@@ -75,10 +75,7 @@ const CLOUDFRONT_TEST_KEY =
   "ifMbhZslFThC/osD5ZV7snXZgTWyPexaINJhHmdrAWpmW1h+UFoiMw==\n" +
   "-----END RSA PRIVATE KEY-----\n"
 
-const CLOUDFRONT_TEST_KEY_64 = Buffer.from(
-  CLOUDFRONT_TEST_KEY,
-  "utf-8"
-).toString("base64")
+const CLOUDFRONT_TEST_KEY_64 = Buffer.from(CLOUDFRONT_TEST_KEY, "utf-8").toString("base64")
 
 export function withCloudfront() {
   withS3()

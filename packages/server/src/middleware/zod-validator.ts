@@ -1,4 +1,4 @@
-import { Ctx } from "@budibase/types"
+import type { Ctx } from "@budibase/types"
 import type { ZodType } from "zod"
 import { fromZodError } from "zod-validation-error"
 
@@ -13,13 +13,13 @@ function validate(schema: ZodType, property: "body" | "params") {
     let setClean: ((data: any) => void) | undefined
     if (ctx[property] != null) {
       params = ctx[property]
-      setClean = data => (ctx[property] = data)
+      setClean = (data) => (ctx[property] = data)
     } else if (property === "body" && ctx.request[property] != null) {
       params = ctx.request[property]
-      setClean = data => (ctx.request[property] = data)
+      setClean = (data) => (ctx.request[property] = data)
     } else if (property === "params") {
       params = ctx.request.query
-      setClean = data => (ctx.request.query = data)
+      setClean = (data) => (ctx.request.query = data)
     }
 
     const result = schema.safeParse(params)

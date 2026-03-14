@@ -13,8 +13,7 @@ export const profileModalTranslations = createTranslationDefinitions(category, [
     key: "body",
     fullKey: "profileModalBody",
     name: "Profile modal body",
-    defaultValue:
-      "Personalise the platform by adding your first name and last name.",
+    defaultValue: "Personalise the platform by adding your first name and last name.",
   },
   {
     key: "emailLabel",

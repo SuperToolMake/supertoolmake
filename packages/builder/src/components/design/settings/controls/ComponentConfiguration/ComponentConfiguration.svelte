@@ -1,148 +1,142 @@
 <script lang="ts">
-  import DraggableList from "../DraggableList.svelte"
-  import ComponentSetting from "./ComponentSetting.svelte"
-  import { createEventDispatcher } from "svelte"
-  import { Helpers } from "@budibase/bbui"
-  import { componentStore } from "@/stores/builder"
-  import { getEventContextBindings } from "@/dataBinding"
-  import { cloneDeep, isEqual } from "lodash/fp"
-  import type {
-    Component,
-    ComponentDefinition,
-    UIBinding,
-  } from "@budibase/types"
+import { Helpers } from "@budibase/bbui"
+import type { Component, ComponentDefinition, UIBinding } from "@budibase/types"
+import { cloneDeep, isEqual } from "lodash/fp"
+import { createEventDispatcher } from "svelte"
+import { getEventContextBindings } from "@/dataBinding"
+import { componentStore } from "@/stores/builder"
+import DraggableList from "../DraggableList.svelte"
+import ComponentSetting from "./ComponentSetting.svelte"
 
-  export let componentInstance: Component
-  export let componentBindings: UIBinding[]
-  export let bindings: UIBinding[]
-  export let value: Component[]
-  export let key: string
-  export let nested: boolean
-  export let max: number | null
-  export let componentType: string // The component type to configure (e.g., "dataprovider", "plugin/my-plugin")
+export let componentInstance: Component
+export let componentBindings: UIBinding[]
+export let bindings: UIBinding[]
+export let value: Component[]
+export let key: string
+export let nested: boolean
+export let max: number | null
+export let componentType: string // The component type to configure (e.g., "dataprovider", "plugin/my-plugin")
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  let cachedValue: Component[]
-  let componentDefinition: ComponentDefinition | null
+let cachedValue: Component[]
+let componentDefinition: ComponentDefinition | null
 
-  $: if (!isEqual(value, cachedValue)) {
-    cachedValue = cloneDeep(value)
+$: if (!isEqual(value, cachedValue)) {
+  cachedValue = cloneDeep(value)
+}
+$: componentList = sanitizeValue(cachedValue) || []
+$: componentCount = componentList.length
+$: eventContextBindings = getEventContextBindings({
+  componentInstance,
+  settingKey: key,
+  componentId: componentInstance._id,
+  componentDefinition: undefined,
+  asset: undefined,
+})
+$: allBindings = [...bindings, ...eventContextBindings]
+$: itemProps = {
+  componentBindings: componentBindings || [],
+  bindings: allBindings,
+  removeComponent,
+  nested,
+  showInstanceName: true,
+}
+$: canAddComponents = max == null || componentList.length < max
+$: resolvedComponentType = resolveComponentType(componentType)
+$: componentDefinition = resolvedComponentType
+  ? componentStore.getDefinition(resolvedComponentType)
+  : null
+$: componentFriendlyName =
+  componentDefinition?.friendlyName || componentDefinition?.name || "component"
+
+// Dispatch sanitized value if it differs from input to ensure proper instances
+$: {
+  const sanitized = sanitizeValue(cachedValue)
+  if (sanitized && cachedValue && !isEqual(sanitized, cachedValue)) {
+    dispatch("change", sanitized)
   }
-  $: componentList = sanitizeValue(cachedValue) || []
-  $: componentCount = componentList.length
-  $: eventContextBindings = getEventContextBindings({
-    componentInstance,
-    settingKey: key,
-    componentId: componentInstance._id,
-    componentDefinition: undefined,
-    asset: undefined,
+}
+
+const sanitizeValue = (val: Component[]): Component[] | null => {
+  if (!Array.isArray(val)) {
+    return null
+  }
+  return val
+    ?.map((comp) => {
+      return comp._component ? comp : buildPseudoInstance(comp)
+    })
+    .filter((comp) => comp != null)
+}
+
+const resolveComponentType = (componentType: string): string | null => {
+  if (!componentType) return null
+
+  // If it's already a full component reference, use it
+  if (componentType.startsWith("@")) {
+    return componentType
+  }
+
+  // Otherwise, assume it's a standard component
+  return `@budibase/standard-components/${componentType}`
+}
+
+const processItemUpdate = (e: { detail: Component }) => {
+  const updatedComponent = e.detail
+  const newComponentList = [...componentList]
+  const componentIdx = newComponentList.findIndex((c) => {
+    return c._id === updatedComponent?._id
   })
-  $: allBindings = [...bindings, ...eventContextBindings]
-  $: itemProps = {
-    componentBindings: componentBindings || [],
-    bindings: allBindings,
-    removeComponent,
-    nested,
-    showInstanceName: true,
+  if (componentIdx === -1) {
+    newComponentList.push(updatedComponent)
+  } else {
+    newComponentList[componentIdx] = updatedComponent
   }
-  $: canAddComponents = max == null || componentList.length < max
-  $: resolvedComponentType = resolveComponentType(componentType)
-  $: componentDefinition = resolvedComponentType
-    ? componentStore.getDefinition(resolvedComponentType)
-    : null
-  $: componentFriendlyName =
-    componentDefinition?.friendlyName ||
-    componentDefinition?.name ||
-    "component"
+  cachedValue = cloneDeep(newComponentList)
+  dispatch("change", newComponentList)
+}
 
-  // Dispatch sanitized value if it differs from input to ensure proper instances
-  $: {
-    const sanitized = sanitizeValue(cachedValue)
-    if (sanitized && cachedValue && !isEqual(sanitized, cachedValue)) {
-      dispatch("change", sanitized)
-    }
+const listUpdated = (e: { detail: Component[] }) => {
+  cachedValue = cloneDeep(e.detail)
+  dispatch("change", [...e.detail])
+}
+
+const buildPseudoInstance = (cfg: Partial<Component>) => {
+  const componentType = resolvedComponentType
+  if (!componentType) {
+    return null
   }
 
-  const sanitizeValue = (val: Component[]): Component[] | null => {
-    if (!Array.isArray(val)) {
-      return null
-    }
-    return val
-      ?.map(comp => {
-        return comp._component ? comp : buildPseudoInstance(comp)
-      })
-      .filter(comp => comp != null)
-  }
-
-  const resolveComponentType = (componentType: string): string | null => {
-    if (!componentType) return null
-
-    // If it's already a full component reference, use it
-    if (componentType.startsWith("@")) {
-      return componentType
-    }
-
-    // Otherwise, assume it's a standard component
-    return `@budibase/standard-components/${componentType}`
-  }
-
-  const processItemUpdate = (e: { detail: Component }) => {
-    const updatedComponent = e.detail
-    const newComponentList = [...componentList]
-    const componentIdx = newComponentList.findIndex(c => {
-      return c._id === updatedComponent?._id
+  try {
+    const instance = componentStore.createInstance(componentType, {
+      _instanceName: cfg._instanceName || Helpers.uuid(),
+      ...cfg,
     })
-    if (componentIdx === -1) {
-      newComponentList.push(updatedComponent)
-    } else {
-      newComponentList[componentIdx] = updatedComponent
-    }
-    cachedValue = cloneDeep(newComponentList)
-    dispatch("change", newComponentList)
-  }
-
-  const listUpdated = (e: { detail: Component[] }) => {
-    cachedValue = cloneDeep(e.detail)
-    dispatch("change", [...e.detail])
-  }
-
-  const buildPseudoInstance = (cfg: Partial<Component>) => {
-    const componentType = resolvedComponentType
-    if (!componentType) {
+    if (!instance || !instance._id) {
       return null
     }
-
-    try {
-      const instance = componentStore.createInstance(componentType, {
-        _instanceName: cfg._instanceName || Helpers.uuid(),
-        ...cfg,
-      })
-      if (!instance || !instance._id) {
-        return null
-      }
-      return instance
-    } catch (error) {
-      return null
-    }
+    return instance
+  } catch (error) {
+    return null
   }
+}
 
-  const addComponent = () => {
-    const newComponent = buildPseudoInstance({
-      _instanceName: `${componentFriendlyName} ${componentCount + 1}`,
-    })
-    if (newComponent) {
-      const newList = [...componentList, newComponent]
-      cachedValue = cloneDeep(newList)
-      dispatch("change", newList)
-    }
-  }
-
-  const removeComponent = (id: string) => {
-    const newList = componentList.filter(component => component._id !== id)
+const addComponent = () => {
+  const newComponent = buildPseudoInstance({
+    _instanceName: `${componentFriendlyName} ${componentCount + 1}`,
+  })
+  if (newComponent) {
+    const newList = [...componentList, newComponent]
     cachedValue = cloneDeep(newList)
     dispatch("change", newList)
   }
+}
+
+const removeComponent = (id: string) => {
+  const newList = componentList.filter((component) => component._id !== id)
+  cachedValue = cloneDeep(newList)
+  dispatch("change", newList)
+}
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

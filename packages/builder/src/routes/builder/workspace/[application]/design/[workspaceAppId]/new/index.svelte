@@ -1,22 +1,20 @@
 <script lang="ts">
-  import { onMount } from "svelte"
-  import NewScreen from "../../_components/NewScreen/index.svelte"
-  import { workspaceAppStore } from "@/stores/builder"
-  import TopBar from "@/components/common/TopBar.svelte"
-  import { params } from "@roxi/routify"
+import { params } from "@roxi/routify"
+import { onMount } from "svelte"
+import TopBar from "@/components/common/TopBar.svelte"
+import { workspaceAppStore } from "@/stores/builder"
+import type NewScreen from "../../_components/NewScreen/index.svelte"
 
-  $params
+$params
 
-  let newScreenModal: NewScreen
+let newScreenModal: NewScreen
 
-  $: workspaceAppId = $params.workspaceAppId
-  $: workspaceApp = $workspaceAppStore.workspaceApps.find(
-    a => a._id === workspaceAppId
-  )
+$: workspaceAppId = $params.workspaceAppId
+$: workspaceApp = $workspaceAppStore.workspaceApps.find((a) => a._id === workspaceAppId)
 
-  onMount(() => {
-    newScreenModal.open()
-  })
+onMount(() => {
+  newScreenModal.open()
+})
 </script>
 
 <TopBar

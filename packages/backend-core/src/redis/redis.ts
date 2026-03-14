@@ -1,5 +1,5 @@
+import Redis, { Cluster, type ScanStream } from "ioredis"
 import env from "../environment"
-import Redis, { Cluster, ScanStream } from "ioredis"
 
 // mock-redis doesn't have any typing
 let MockRedis: any | undefined
@@ -12,15 +12,15 @@ if (env.MOCK_REDIS) {
   }
 }
 
+import { zip } from "lodash"
 import {
-  removeDbPrefix,
+  getRedisClusterOptions,
+  getRedisConnectionDetails,
   getRedisOptions,
+  removeDbPrefix,
   SEPARATOR,
   SelectableDatabase,
-  getRedisConnectionDetails,
-  getRedisClusterOptions,
 } from "./utils"
-import { zip } from "lodash"
 
 async function init(db = SelectableDatabase.DEFAULT): Promise<Redis | Cluster> {
   // testing uses a single in memory client
@@ -57,17 +57,14 @@ export interface Entry {
   key: string
   value: any
 }
-function promisifyStream(
-  stream: ScanStream,
-  client: Redis | Cluster
-): Promise<Entry[]> {
+function promisifyStream(stream: ScanStream, client: Redis | Cluster): Promise<Entry[]> {
   return new Promise<Entry[]>((resolve, reject) => {
     const keys = new Set<string>()
-    stream.on("data", (data: string[]) => data.forEach(k => keys.add(k)))
+    stream.on("data", (data: string[]) => data.forEach((k) => keys.add(k)))
     stream.on("error", (err: Error) => reject(err))
     stream.on("end", async () => {
       try {
-        const promises = Array.from(keys).map(async key => {
+        const promises = Array.from(keys).map(async (key) => {
           let value = await client.get(key)
           if (value) {
             value = JSON.parse(value)
@@ -118,7 +115,7 @@ class RedisWrapper {
     key = `${this.db}${SEPARATOR}${key}`
     let stream: ScanStream
     if (isCluster(this.client)) {
-      let node = this.client.nodes("master")
+      const node = this.client.nodes("master")
       stream = node[0].scanStream({ match: key + "*", count: 100 })
     } else {
       stream = (this.client as Redis).scanStream({
@@ -144,7 +141,7 @@ class RedisWrapper {
     // overwrite the prefixed key
     // @ts-expect-error TODO(mel): Why are these types wrong?
     if (response != null && response.key) {
-      // @ts-ignore
+      // @ts-expect-error
       response.key = key
     }
     // if its not an object just return the response
@@ -160,14 +157,12 @@ class RedisWrapper {
       return {}
     }
 
-    const response = await this.client.mget(keys.map(key => this.prefixed(key)))
+    const response = await this.client.mget(keys.map((key) => this.prefixed(key)))
 
     return zip(keys, response).reduce(
       (acc, [key, result]) => {
         if (key === undefined || result === undefined) {
-          throw new Error(
-            `Keys and response length mismatch: ${keys.length} vs ${response.length}`
-          )
+          throw new Error(`Keys and response length mismatch: ${keys.length} vs ${response.length}`)
         }
 
         try {
@@ -194,14 +189,10 @@ class RedisWrapper {
     }
   }
 
-  async bulkStore(
-    data: Record<string, any>,
-    expirySeconds: number | null = null
-  ) {
+  async bulkStore(data: Record<string, any>, expirySeconds: number | null = null) {
     const dataToStore = Object.entries(data).reduce(
       (acc, [key, value]) => {
-        acc[this.prefixed(key)] =
-          typeof value === "object" ? JSON.stringify(value) : value
+        acc[this.prefixed(key)] = typeof value === "object" ? JSON.stringify(value) : value
         return acc
       },
       {} as Record<string, any>
@@ -232,12 +223,12 @@ class RedisWrapper {
   }
 
   async bulkDelete(keys: string[]) {
-    await this.client.del(keys.map(key => this.prefixed(key)))
+    await this.client.del(keys.map((key) => this.prefixed(key)))
   }
 
   async clear() {
-    let items = await this.scan()
-    await Promise.all(items.map(obj => this.delete(obj.key)))
+    const items = await this.scan()
+    await Promise.all(items.map((obj) => this.delete(obj.key)))
   }
 
   async increment(key: string): Promise<number> {

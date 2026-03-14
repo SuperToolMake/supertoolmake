@@ -1,43 +1,43 @@
 <script>
-  import { Body, Icon } from "@budibase/bbui"
-  import { IntegrationTypes } from "@/constants/backend"
+import { Body, Icon } from "@budibase/bbui"
+import { IntegrationTypes } from "@/constants/backend"
 
-  export let datasource
-  const getSubtitle = datasource => {
-    if (datasource.source === IntegrationTypes.REST) {
-      return datasource.name
-    }
-    if (
-      datasource.source === IntegrationTypes.POSTGRES ||
-      datasource.source === IntegrationTypes.MYSQL ||
-      datasource.source === IntegrationTypes.REDIS
-    ) {
-      return `${datasource.config.host}:${datasource.config.port}`
-    }
-    if (datasource.source === IntegrationTypes.SQL_SERVER) {
-      return `${datasource.config.server}:${datasource.config.port}`
-    }
-    if (datasource.source === IntegrationTypes.SNOWFLAKE) {
-      return `${datasource.config.warehouse}:${datasource.config.database}:${datasource.config.schema}`
-    }
-    if (datasource.source === IntegrationTypes.COUCHDB) {
-      return datasource.config.database
-    }
-    if (datasource.source === IntegrationTypes.S3) {
-      return datasource.config.endpoint
-        ? `${datasource.config.endpoint}:${datasource.config.region}`
-        : `s3.${datasource.config.region}.amazonaws.com`
-    }
-    if (datasource.source === IntegrationTypes.FIRESTORE) {
-      return datasource.config.projectId
-    }
-    if (datasource.source === IntegrationTypes.MONGODB) {
-      return datasource.config.db
-    }
-    if (datasource.source === IntegrationTypes.GOOGLE_SHEETS) {
-      return datasource.config.spreadsheetId
-    }
+export let datasource
+const getSubtitle = (datasource) => {
+  if (datasource.source === IntegrationTypes.REST) {
+    return datasource.name
   }
+  if (
+    datasource.source === IntegrationTypes.POSTGRES ||
+    datasource.source === IntegrationTypes.MYSQL ||
+    datasource.source === IntegrationTypes.REDIS
+  ) {
+    return `${datasource.config.host}:${datasource.config.port}`
+  }
+  if (datasource.source === IntegrationTypes.SQL_SERVER) {
+    return `${datasource.config.server}:${datasource.config.port}`
+  }
+  if (datasource.source === IntegrationTypes.SNOWFLAKE) {
+    return `${datasource.config.warehouse}:${datasource.config.database}:${datasource.config.schema}`
+  }
+  if (datasource.source === IntegrationTypes.COUCHDB) {
+    return datasource.config.database
+  }
+  if (datasource.source === IntegrationTypes.S3) {
+    return datasource.config.endpoint
+      ? `${datasource.config.endpoint}:${datasource.config.region}`
+      : `s3.${datasource.config.region}.amazonaws.com`
+  }
+  if (datasource.source === IntegrationTypes.FIRESTORE) {
+    return datasource.config.projectId
+  }
+  if (datasource.source === IntegrationTypes.MONGODB) {
+    return datasource.config.db
+  }
+  if (datasource.source === IntegrationTypes.GOOGLE_SHEETS) {
+    return datasource.config.spreadsheetId
+  }
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

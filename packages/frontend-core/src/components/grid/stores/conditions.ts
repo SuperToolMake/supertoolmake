@@ -1,13 +1,13 @@
-import { writable, get, derived, Writable, Readable } from "svelte/store"
-import { derivedMemo, QueryUtils } from "../../../utils"
 import {
-  FieldType,
   EmptyFilterOption,
-  UIRow,
-  UICondition,
   EXTERNAL_ROW_REV,
+  FieldType,
+  type UICondition,
+  type UIRow,
 } from "@budibase/types"
-import { Store as StoreContext } from "."
+import { derived, get, type Readable, type Writable, writable } from "svelte/store"
+import { derivedMemo, QueryUtils } from "../../../utils"
+import type { Store as StoreContext } from "."
 
 interface ConditionStore {
   metadata: Writable<Record<string, any>>
@@ -33,11 +33,11 @@ export const deriveStores = (context: StoreContext): ConditionDerivedStore => {
   // only recompute condition metadata when absolutely necessary
   const conditions = derivedMemo(
     derived([columns, props], ([$columns, $props]) => {
-      let newConditions: UICondition[] = []
+      const newConditions: UICondition[] = []
 
       // Add column conditions
-      for (let column of $columns) {
-        for (let condition of column.conditions || []) {
+      for (const column of $columns) {
+        for (const condition of column.conditions || []) {
           newConditions.push({
             ...condition,
             column: column.name,
@@ -48,13 +48,9 @@ export const deriveStores = (context: StoreContext): ConditionDerivedStore => {
 
       // Add button conditions
       if ($props.buttons) {
-        for (
-          let buttonIndex = 0;
-          buttonIndex < $props.buttons.length;
-          buttonIndex++
-        ) {
+        for (let buttonIndex = 0; buttonIndex < $props.buttons.length; buttonIndex++) {
           const button = $props.buttons[buttonIndex]
-          for (let condition of button.conditions || []) {
+          for (const condition of button.conditions || []) {
             newConditions.push({
               ...condition,
               target: "button",
@@ -66,7 +62,7 @@ export const deriveStores = (context: StoreContext): ConditionDerivedStore => {
 
       return newConditions
     }),
-    conditions => conditions
+    (conditions) => conditions
   )
 
   return {
@@ -78,10 +74,10 @@ export const initialise = (context: StoreContext) => {
   const { metadata, conditions, rows } = context
 
   // Recompute all metadata if conditions change
-  conditions.subscribe($conditions => {
-    let newMetadata: Record<string, any> = {}
+  conditions.subscribe(($conditions) => {
+    const newMetadata: Record<string, any> = {}
     if ($conditions?.length) {
-      for (let row of get(rows)) {
+      for (const row of get(rows)) {
         newMetadata[row._id] = evaluateConditions(row, $conditions, context)
       }
     }
@@ -89,14 +85,14 @@ export const initialise = (context: StoreContext) => {
   })
 
   // Recompute metadata for specific rows when they change
-  rows.subscribe($rows => {
+  rows.subscribe(($rows) => {
     const $conditions = get(conditions)
     if (!$conditions?.length) {
       return
     }
     const $metadata = get(metadata)
-    let metadataUpdates: Record<string, any> = {}
-    for (let row of $rows) {
+    const metadataUpdates: Record<string, any> = {}
+    for (const row of $rows) {
       const meta = $metadata[row._id]
       const changed =
         // No _rev indicates a new row
@@ -113,7 +109,7 @@ export const initialise = (context: StoreContext) => {
       $metadata[row._id] = evaluateConditions(row, $conditions, context)
     }
     if (Object.keys(metadataUpdates).length) {
-      metadata.update(state => ({
+      metadata.update((state) => ({
         ...state,
         ...metadataUpdates,
       }))
@@ -142,11 +138,7 @@ const TypeCoercionMap: Partial<Record<FieldType, (val: string) => any>> = {
 
 // Evaluates an array of cell conditions against a certain row and returns the
 // resultant metadata
-const evaluateConditions = (
-  row: UIRow,
-  conditions: UICondition[],
-  context: StoreContext
-) => {
+const evaluateConditions = (row: UIRow, conditions: UICondition[], context: StoreContext) => {
   const metadata: {
     version?: string
     row: Record<string, string>
@@ -166,11 +158,7 @@ const evaluateConditions = (
 
   // Add dynamic button conditions from getRowConditions
   if ($props.buttons) {
-    for (
-      let buttonIndex = 0;
-      buttonIndex < $props.buttons.length;
-      buttonIndex++
-    ) {
+    for (let buttonIndex = 0; buttonIndex < $props.buttons.length; buttonIndex++) {
       const button = $props.buttons[buttonIndex]
       if (!button.getRowConditions) {
         continue
@@ -178,14 +166,11 @@ const evaluateConditions = (
 
       const dynamicConditions = button.getRowConditions(row) || []
       if (dynamicConditions.length) {
-        allConditions = allConditions.filter(condition => {
-          return !(
-            condition.target === "button" &&
-            condition.buttonIndex === buttonIndex
-          )
+        allConditions = allConditions.filter((condition) => {
+          return !(condition.target === "button" && condition.buttonIndex === buttonIndex)
         })
 
-        for (let condition of dynamicConditions) {
+        for (const condition of dynamicConditions) {
           allConditions.push({
             ...condition,
             target: "button",
@@ -198,7 +183,7 @@ const evaluateConditions = (
 
   // Pre-process button conditions to set default visibility for show conditions
   const buttonShowConditions = new Set()
-  for (let condition of allConditions) {
+  for (const condition of allConditions) {
     if (
       condition.target === "button" &&
       condition.action === "show" &&
@@ -213,7 +198,7 @@ const evaluateConditions = (
     }
   }
 
-  for (let condition of allConditions) {
+  for (const condition of allConditions) {
     try {
       let {
         column,
@@ -238,7 +223,7 @@ const evaluateConditions = (
       }
 
       // Coerce values into correct types for primitives
-      let coercedType = type
+      const coercedType = type
       const coerce = TypeCoercionMap[coercedType]
       if (coerce) {
         value = coerce(value as string)
@@ -252,7 +237,7 @@ const evaluateConditions = (
         field: "value",
         value: referenceValue,
       }
-      let query = QueryUtils.buildQuery([luceneFilter])
+      const query = QueryUtils.buildQuery([luceneFilter])
       query.onEmptyFilter = EmptyFilterOption.RETURN_NONE
       const result = QueryUtils.runQuery([{ value }], query)
       if (result.length > 0) {

@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  type O = any
+type O = any
 </script>
 
 <script lang="ts" generics="O">

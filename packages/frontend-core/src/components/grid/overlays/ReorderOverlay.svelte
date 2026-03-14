@@ -1,35 +1,28 @@
 <script>
-  import { getContext } from "svelte"
-  import GridScrollWrapper from "../layout/GridScrollWrapper.svelte"
-  import { DefaultRowHeight } from "../lib/constants"
+import { getContext } from "svelte"
+import GridScrollWrapper from "../layout/GridScrollWrapper.svelte"
+import { DefaultRowHeight } from "../lib/constants"
 
-  const {
-    isReordering,
-    reorder,
-    columnLookupMap,
-    rowHeight,
-    renderedRows,
-    scrollLeft,
-    stickyWidth,
-  } = getContext("grid")
+const { isReordering, reorder, columnLookupMap, rowHeight, renderedRows, scrollLeft, stickyWidth } =
+  getContext("grid")
 
-  $: targetColumn = $columnLookupMap[$reorder.targetColumn]
-  $: insertAfter = $reorder.insertAfter
-  $: left = getLeft(targetColumn, insertAfter, $scrollLeft)
-  $: height = $rowHeight * $renderedRows.length + DefaultRowHeight
-  $: style = `left:${left}px; height:${height}px;`
-  $: visible = $isReordering && left >= $stickyWidth
+$: targetColumn = $columnLookupMap[$reorder.targetColumn]
+$: insertAfter = $reorder.insertAfter
+$: left = getLeft(targetColumn, insertAfter, $scrollLeft)
+$: height = $rowHeight * $renderedRows.length + DefaultRowHeight
+$: style = `left:${left}px; height:${height}px;`
+$: visible = $isReordering && left >= $stickyWidth
 
-  const getLeft = (targetColumn, insertAfter, scrollLeft) => {
-    if (!targetColumn) {
-      return 0
-    }
-    let left = targetColumn.__left - scrollLeft
-    if (insertAfter) {
-      left += targetColumn.width
-    }
-    return left
+const getLeft = (targetColumn, insertAfter, scrollLeft) => {
+  if (!targetColumn) {
+    return 0
   }
+  let left = targetColumn.__left - scrollLeft
+  if (insertAfter) {
+    left += targetColumn.width
+  }
+  return left
+}
 </script>
 
 {#if visible}

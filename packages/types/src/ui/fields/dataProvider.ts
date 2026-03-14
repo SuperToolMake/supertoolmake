@@ -1,4 +1,4 @@
-import { TableSchema, UIDatasourceType, Row, JSONValue } from "../../"
+import type { JSONValue, Row, TableSchema, UIDatasourceType } from "../../"
 
 export interface UIFieldDataProviderContext {
   rows: Row[]

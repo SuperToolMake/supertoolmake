@@ -1,11 +1,11 @@
 import { constants } from "@budibase/backend-core"
-import { Datasource, SourceName } from "@budibase/types"
+import { type Datasource, SourceName } from "@budibase/types"
 import { setEnv } from "../../../environment"
 import { afterAll as _afterAll, getConfig, getRequest } from "./utilities"
 
 describe("/static", () => {
-  let request = getRequest()
-  let config = getConfig()
+  const request = getRequest()
+  const config = getConfig()
   let cleanupEnv: () => void
 
   afterAll(() => {
@@ -27,10 +27,7 @@ describe("/static", () => {
       const headers = config.defaultHeaders()
       delete headers[constants.Header.APP_ID]
 
-      const res = await request
-        .get(`/app${config.getProdWorkspace().url}`)
-        .set(headers)
-        .expect(200)
+      const res = await request.get(`/app${config.getProdWorkspace().url}`).set(headers).expect(200)
 
       expect(res.body.appId).toBe(config.prodWorkspaceId)
     })
@@ -73,9 +70,7 @@ describe("/static", () => {
           .expect("Content-Type", /json/)
           .expect(200)
 
-        expect(res.body.signedUrl).toStartWith(
-          "https://foo.s3.eu-west-1.amazonaws.com/bar?"
-        )
+        expect(res.body.signedUrl).toStartWith("https://foo.s3.eu-west-1.amazonaws.com/bar?")
         expect(res.body.signedUrl).toContain("X-Amz-Algorithm=AWS4-HMAC-SHA256")
         expect(res.body.signedUrl).toContain("X-Amz-Credential=bb")
         expect(res.body.signedUrl).toContain("X-Amz-Date=")
@@ -83,9 +78,7 @@ describe("/static", () => {
         expect(res.body.signedUrl).toContain("X-Amz-Expires=900")
         expect(res.body.signedUrl).toContain("X-Amz-SignedHeaders=host")
 
-        expect(res.body.publicUrl).toEqual(
-          `https://${bucket}.s3.eu-west-1.amazonaws.com/${key}`
-        )
+        expect(res.body.publicUrl).toEqual(`https://${bucket}.s3.eu-west-1.amazonaws.com/${key}`)
       })
 
       it("should handle an invalid datasource ID", async () => {
@@ -98,9 +91,7 @@ describe("/static", () => {
           .set(config.defaultHeaders())
           .expect("Content-Type", /json/)
           .expect(400)
-        expect(res.body.message).toEqual(
-          "The specified datasource could not be found"
-        )
+        expect(res.body.message).toEqual("The specified datasource could not be found")
       })
 
       it("should require a bucket parameter", async () => {
@@ -140,9 +131,7 @@ describe("/static", () => {
     it("should not error when trying to get 'apple-touch-icon.png' (public call)", async () => {
       const res = await request.get(`/apple-touch-icon.png`)
       expect(res.status).toEqual(302)
-      expect(res.text).toEqual(
-        `Redirecting to /builder/logo_supertoolmake.png.`
-      )
+      expect(res.text).toEqual(`Redirecting to /builder/logo_supertoolmake.png.`)
     })
   })
 })

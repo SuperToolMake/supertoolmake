@@ -1,13 +1,5 @@
-import {
-  auth,
-  constants,
-  context,
-  roles,
-  tenancy,
-  users,
-  utils,
-} from "@budibase/backend-core"
-import { ContextUser, UserCtx } from "@budibase/types"
+import { auth, constants, context, roles, tenancy, users, utils } from "@budibase/backend-core"
+import type { ContextUser, UserCtx } from "@budibase/types"
 import type { Middleware, Next } from "koa"
 import { generateUserMetadataID, isDevWorkspaceID } from "../db/utils"
 import env from "../environment"
@@ -16,17 +8,14 @@ import { isApiKey, isBrowser } from "./utils"
 
 export const currentWorkspaceMiddleware = (async (ctx: UserCtx, next: Next) => {
   // try to get the workspaceID from the request
-  let requestWorkspaceId = await utils.getWorkspaceIdFromCtx(ctx)
+  const requestWorkspaceId = await utils.getWorkspaceIdFromCtx(ctx)
   if (!requestWorkspaceId) {
     return next()
   }
 
   // deny access to application preview
   if (isBrowser(ctx) && !isApiKey(ctx)) {
-    if (
-      isDevWorkspaceID(requestWorkspaceId) &&
-      !users.isBuilder(ctx.user, requestWorkspaceId)
-    ) {
+    if (isDevWorkspaceID(requestWorkspaceId) && !users.isBuilder(ctx.user, requestWorkspaceId)) {
       return ctx.redirect("/")
     }
   }
@@ -46,9 +35,7 @@ export const currentWorkspaceMiddleware = (async (ctx: UserCtx, next: Next) => {
     // Allow builders to specify their role via a header
     const isBuilder = users.isBuilder(globalUser, workspaceId)
     const isDev = workspaceId && isDevWorkspaceID(workspaceId)
-    const roleHeader =
-      ctx.request &&
-      (ctx.request.headers[constants.Header.PREVIEW_ROLE] as string)
+    const roleHeader = ctx.request && (ctx.request.headers[constants.Header.PREVIEW_ROLE] as string)
     if (isBuilder && isDev && roleHeader) {
       roleId = roleHeader
       // Delete admin and builder flags so that the specified role is honoured

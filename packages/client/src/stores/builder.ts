@@ -1,17 +1,17 @@
-import { writable, get } from "svelte/store"
+import {
+  type AppCustomTheme,
+  type AppNavigation,
+  type ComponentDefinition,
+  DropPosition,
+  type PreviewDevice,
+  type Screen,
+  type Snippet,
+  type Theme,
+  type UIComponentError,
+} from "@budibase/types"
+import { get, writable } from "svelte/store"
 import { devToolsStore } from "./devTools.js"
 import { eventStore } from "./events.js"
-import {
-  ComponentDefinition,
-  DropPosition,
-  PreviewDevice,
-  Screen,
-  Theme,
-  AppCustomTheme,
-  AppNavigation,
-  Snippet,
-  UIComponentError,
-} from "@budibase/types"
 
 interface BuilderStore {
   inBuilder: boolean
@@ -51,7 +51,7 @@ const createBuilderStore = () => {
       if (id === get(store).selectedComponentId) {
         return
       }
-      store.update(state => ({
+      store.update((state) => ({
         ...state,
         editMode: false,
         selectedComponentId: id,
@@ -71,11 +71,7 @@ const createBuilderStore = () => {
     keyDown: (key: string, ctrlKey: boolean) => {
       eventStore.actions.dispatchEvent("key-down", { key, ctrlKey })
     },
-    duplicateComponent: (
-      id: string,
-      mode = DropPosition.BELOW,
-      selectComponent = true
-    ) => {
+    duplicateComponent: (id: string, mode = DropPosition.BELOW, selectComponent = true) => {
       eventStore.actions.dispatchEvent("duplicate-component", {
         id,
         mode,
@@ -116,7 +112,7 @@ const createBuilderStore = () => {
       if (enabled === get(store).editMode) {
         return
       }
-      store.update(state => ({ ...state, editMode: enabled }))
+      store.update((state) => ({ ...state, editMode: enabled }))
     },
     requestAddComponent: () => {
       eventStore.actions.dispatchEvent("request-add-component")
@@ -134,7 +130,7 @@ const createBuilderStore = () => {
       })
     },
     setMetadata: (metadata: { componentId: string; step: number }) => {
-      store.update(state => ({
+      store.update((state) => ({
         ...state,
         metadata,
       }))

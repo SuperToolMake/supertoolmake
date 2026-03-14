@@ -1,15 +1,15 @@
 <script lang="ts">
-  import "@spectrum-css/fieldlabel/dist/index-vars.css"
-  import FieldLabel from "./FieldLabel.svelte"
-  import Icon from "../Icon/Icon.svelte"
-  import type { LabelPosition } from "../types"
+import "@spectrum-css/fieldlabel/dist/index-vars.css"
+import Icon from "../Icon/Icon.svelte"
+import type { LabelPosition } from "../types"
+import FieldLabel from "./FieldLabel.svelte"
 
-  export let id: string | undefined = undefined
-  export let label: string | undefined = undefined
-  export let labelPosition: LabelPosition = "above"
-  export let error: string | undefined | false = undefined
-  export let helpText: string | undefined = undefined
-  export let tooltip: string | undefined = undefined
+export let id: string | undefined = undefined
+export let label: string | undefined = undefined
+export let labelPosition: LabelPosition = "above"
+export let error: string | undefined | false = undefined
+export let helpText: string | undefined = undefined
+export let tooltip: string | undefined = undefined
 </script>
 
 <div class="spectrum-Form-item" class:above={labelPosition === "above"}>

@@ -1,23 +1,18 @@
-import { ssoCallbackUrl } from "../utils"
-import * as sso from "./sso"
 import {
   ConfigType,
-  SSOProfile,
-  SSOAuthDetails,
+  type GoogleInnerConfig,
+  type SaveSSOUserFunction,
+  type SSOAuthDetails,
+  type SSOProfile,
   SSOProviderType,
-  SaveSSOUserFunction,
-  GoogleInnerConfig,
 } from "@budibase/types"
+import { ssoCallbackUrl } from "../utils"
+import * as sso from "./sso"
 
 const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy
 
 export function buildVerifyFn(saveUserFn: SaveSSOUserFunction) {
-  return (
-    accessToken: string,
-    refreshToken: string,
-    profile: SSOProfile,
-    done: Function
-  ) => {
+  return (accessToken: string, refreshToken: string, profile: SSOProfile, done: Function) => {
     const details: SSOAuthDetails = {
       provider: "google",
       providerType: SSOProviderType.GOOGLE,
@@ -53,9 +48,7 @@ export async function strategyFactory(
     const { clientID, clientSecret } = config
 
     if (!clientID || !clientSecret) {
-      throw new Error(
-        "Configuration invalid. Must contain google clientID and clientSecret"
-      )
+      throw new Error("Configuration invalid. Must contain google clientID and clientSecret")
     }
 
     const verify = buildVerifyFn(saveUserFn)

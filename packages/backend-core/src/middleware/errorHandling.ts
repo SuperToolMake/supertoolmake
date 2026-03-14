@@ -1,8 +1,8 @@
-import { APIError } from "@budibase/types"
-import * as errors from "../errors"
+import type { APIError } from "@budibase/types"
+import type { Next, ParameterizedContext } from "koa"
 import environment from "../environment"
+import * as errors from "../errors"
 import { stringContainsSecret } from "../security/secrets"
-import { ParameterizedContext, Next } from "koa"
 
 export async function errorHandling(ctx: ParameterizedContext, next: Next) {
   try {
@@ -37,7 +37,7 @@ export async function errorHandling(ctx: ParameterizedContext, next: Next) {
       while (rootErr.cause) {
         rootErr = rootErr.cause
       }
-      // @ts-ignore
+      // @ts-expect-error
       error.stack = rootErr.stack
     }
 

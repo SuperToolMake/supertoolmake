@@ -1,5 +1,35 @@
-import { Knex, knex } from "knex"
+import { dataFilters, helpers } from "@budibase/shared-core"
+import {
+  type AnySearchFilter,
+  type ArrayFilter,
+  ArrayOperator,
+  BasicOperator,
+  type BBReferenceFieldMetadata,
+  type EnrichedQueryJson,
+  type FieldSchema,
+  FieldType,
+  InternalSearchFilterOperator,
+  type JsonFieldMetadata,
+  JsonTypes,
+  LogicalOperator,
+  Operation,
+  prefixed,
+  type QueryOptions,
+  RangeOperator,
+  type RelationshipsJson,
+  type SearchFilterKey,
+  type SearchFilters,
+  SortOrder,
+  SqlClient,
+  type SqlQuery,
+  type SqlQueryBinding,
+  type Table,
+} from "@budibase/types"
+import { type Knex, knex } from "knex"
+import { cloneDeep } from "lodash"
 import * as dbCore from "../db"
+import environment from "../environment"
+import SqlTableQueryBuilder from "./sqlTable"
 import {
   extractDate,
   getNativeSql,
@@ -11,45 +41,13 @@ import {
   sqlLog,
   validateManyToMany,
 } from "./utils"
-import SqlTableQueryBuilder from "./sqlTable"
-import {
-  AnySearchFilter,
-  ArrayFilter,
-  ArrayOperator,
-  BasicOperator,
-  BBReferenceFieldMetadata,
-  EnrichedQueryJson,
-  FieldSchema,
-  FieldType,
-  InternalSearchFilterOperator,
-  JsonFieldMetadata,
-  JsonTypes,
-  LogicalOperator,
-  Operation,
-  prefixed,
-  QueryOptions,
-  RangeOperator,
-  RelationshipsJson,
-  SearchFilterKey,
-  SearchFilters,
-  SortOrder,
-  SqlClient,
-  SqlQuery,
-  SqlQueryBinding,
-  Table,
-} from "@budibase/types"
-import environment from "../environment"
-import { dataFilters, helpers } from "@budibase/shared-core"
-import { cloneDeep } from "lodash"
 
 type QueryFunction = (query: SqlQuery | SqlQuery[], operation: Operation) => any
 
 export const COUNT_FIELD_NAME = "__bb_total"
 
 function getBaseLimit() {
-  const envLimit = environment.SQL_MAX_ROWS
-    ? parseInt(environment.SQL_MAX_ROWS)
-    : null
+  const envLimit = environment.SQL_MAX_ROWS ? parseInt(environment.SQL_MAX_ROWS) : null
   return envLimit || 5000
 }
 
@@ -62,8 +60,8 @@ function getRelationshipLimit() {
 
 function prioritisedArraySort(toSort: string[], priorities: string[]) {
   return toSort.sort((a, b) => {
-    const aPriority = priorities.find(field => field && a.endsWith(field))
-    const bPriority = priorities.find(field => field && b.endsWith(field))
+    const aPriority = priorities.find((field) => field && a.endsWith(field))
+    const bPriority = priorities.find((field) => field && b.endsWith(field))
     if (aPriority && !bPriority) {
       return -1
     }
@@ -93,7 +91,7 @@ function stringifyArray(value: unknown[], quoteStyle = '"'): string {
 
 function toPgArrayLiteral(value: unknown): string {
   const values = Array.isArray(value) ? value : value == null ? [] : [value]
-  const elements = values.map(entry => {
+  const elements = values.map((entry) => {
     if (typeof entry === "string" && entry.length > 1) {
       const first = entry[0]
       const last = entry[entry.length - 1]
@@ -106,13 +104,8 @@ function toPgArrayLiteral(value: unknown): string {
   return `{${elements.join(",")}}`
 }
 
-function isJsonColumn(
-  field: FieldSchema
-): field is JsonFieldMetadata | BBReferenceFieldMetadata {
-  return (
-    JsonTypes.includes(field.type) &&
-    !helpers.schema.isDeprecatedSingleUserColumn(field)
-  )
+function isJsonColumn(field: FieldSchema): field is JsonFieldMetadata | BBReferenceFieldMetadata {
+  return JsonTypes.includes(field.type) && !helpers.schema.isDeprecatedSingleUserColumn(field)
 }
 
 const allowEmptyRelationships: Record<SearchFilterKey, boolean> = {
@@ -151,16 +144,10 @@ class InternalBuilder {
   // states the various situations in which we need a full mapped select statement
   private readonly SPECIAL_SELECT_CASES = {
     POSTGRES_ARRAY: (field: FieldSchema | undefined) => {
-      return (
-        this.client === SqlClient.POSTGRES &&
-        field?.externalType?.toLowerCase() === "array"
-      )
+      return this.client === SqlClient.POSTGRES && field?.externalType?.toLowerCase() === "array"
     },
     POSTGRES_MONEY: (field: FieldSchema | undefined) => {
-      return (
-        this.client === SqlClient.POSTGRES &&
-        field?.externalType?.includes("money")
-      )
+      return this.client === SqlClient.POSTGRES && field?.externalType?.includes("money")
     },
     POSTGRES_ENUM: (field: FieldSchema | undefined) => {
       return (
@@ -171,9 +158,7 @@ class InternalBuilder {
     },
     MSSQL_DATES: (field: FieldSchema | undefined) => {
       return (
-        this.client === SqlClient.MS_SQL &&
-        field?.type === FieldType.DATETIME &&
-        field.timeOnly
+        this.client === SqlClient.MS_SQL && field?.type === FieldType.DATETIME && field.timeOnly
       )
     },
   }
@@ -192,11 +177,7 @@ class InternalBuilder {
   }
 
   private requiresJsonAsStringClient(): boolean {
-    const requiresJsonAsString = [
-      SqlClient.MS_SQL,
-      SqlClient.MY_SQL,
-      SqlClient.MARIADB,
-    ]
+    const requiresJsonAsString = [SqlClient.MS_SQL, SqlClient.MY_SQL, SqlClient.MARIADB]
     return requiresJsonAsString.includes(this.client)
   }
 
@@ -223,7 +204,7 @@ class InternalBuilder {
     if (!Array.isArray(key)) {
       key = this.splitIdentifier(key)
     }
-    return key.map(part => this.quote(part)).join(".")
+    return key.map((part) => this.quote(part)).join(".")
   }
 
   private castIntToString(identifier: string | Knex.Raw): Knex.Raw {
@@ -289,9 +270,9 @@ class InternalBuilder {
 
     // get just the fields for this table
     const tableFields = resource.fields
-      .map(field => {
+      .map((field) => {
         const parts = field.split(/\./g)
-        let table: string | undefined = undefined
+        let table: string | undefined
         let column = parts[0]
 
         // Just a column name, e.g.: "column"
@@ -341,11 +322,7 @@ class InternalBuilder {
     }
 
     // some database don't allow an object to be passed in
-    if (
-      this.requiresJsonAsStringClient() &&
-      isJsonColumn(schema) &&
-      typeof input === "object"
-    ) {
+    if (this.requiresJsonAsStringClient() && isJsonColumn(schema) && typeof input === "object") {
       return JSON.stringify(input)
     }
 
@@ -384,7 +361,7 @@ class InternalBuilder {
   }
 
   private parseBody(body: Record<string, any>) {
-    for (let [key, value] of Object.entries(body)) {
+    for (const [key, value] of Object.entries(body)) {
       const { column } = this.splitter.run(key)
       const schema = this.table.schema[column]
       if (!schema) {
@@ -427,7 +404,7 @@ class InternalBuilder {
         if (!schema) {
           continue
         }
-        filter[key] = filter[key].map(v => this.parse(v, schema))
+        filter[key] = filter[key].map((v) => this.parse(v, schema))
       }
     }
 
@@ -468,8 +445,7 @@ class InternalBuilder {
   ): Knex.QueryBuilder {
     const { relationships, schema, tableAliases: aliases, table } = this.query
     const fromAlias = aliases?.[table.name] || table.name
-    const matches = (value: string) =>
-      filterKey.match(new RegExp(`^${value}\\.`))
+    const matches = (value: string) => filterKey.match(new RegExp(`^${value}\\.`))
     if (!relationships) {
       return query
     }
@@ -481,14 +457,8 @@ class InternalBuilder {
       const matchesRelationName = matches(relationship.column)
 
       // this is the relationship which is being filtered
-      if (
-        (matchesTableName || matchesRelationName) &&
-        relationship.to &&
-        relationship.tableName
-      ) {
-        const joinTable = this.knex
-          .select(this.knex.raw(1))
-          .from({ [toAlias]: relatedTableName })
+      if ((matchesTableName || matchesRelationName) && relationship.to && relationship.tableName) {
+        const joinTable = this.knex.select(this.knex.raw(1)).from({ [toAlias]: relatedTableName })
         let subQuery = joinTable.clone()
         const manyToMany = validateManyToMany(relationship)
         let updatedKey
@@ -503,20 +473,15 @@ class InternalBuilder {
         }
 
         if (manyToMany) {
-          const throughAlias =
-            aliases?.[manyToMany.through] || relationship.through
-          let throughTable = this.tableNameWithSchema(manyToMany.through, {
+          const throughAlias = aliases?.[manyToMany.through] || relationship.through
+          const throughTable = this.tableNameWithSchema(manyToMany.through, {
             alias: throughAlias,
             schema,
           })
           subQuery = subQuery
             // add a join through the junction table
             .innerJoin(throughTable, function () {
-              this.on(
-                `${toAlias}.${manyToMany.toPrimary}`,
-                "=",
-                `${throughAlias}.${manyToMany.to}`
-              )
+              this.on(`${toAlias}.${manyToMany.toPrimary}`, "=", `${throughAlias}.${manyToMany.to}`)
             })
             // check the document in the junction table points to the main table
             .where(
@@ -525,7 +490,7 @@ class InternalBuilder {
               this.rawQuotedIdentifier(`${fromAlias}.${manyToMany.fromPrimary}`)
             )
 
-          query = query.where(q => {
+          query = query.where((q) => {
             q.whereExists(whereCb(updatedKey, subQuery))
             if (allowEmptyRelationships) {
               q.orWhereNotExists(
@@ -543,13 +508,9 @@ class InternalBuilder {
           const toKey = `${toAlias}.${relationship.to}`
           const foreignKey = `${fromAlias}.${relationship.from}`
           // "join" to the main table, making sure the ID matches that of the main
-          subQuery = subQuery.where(
-            toKey,
-            "=",
-            this.rawQuotedIdentifier(foreignKey)
-          )
+          subQuery = subQuery.where(toKey, "=", this.rawQuotedIdentifier(foreignKey))
 
-          query = query.where(q => {
+          query = query.where((q) => {
             q.whereExists(whereCb(updatedKey, subQuery.clone()))
             if (allowEmptyRelationships) {
               q.orWhereNotExists(subQuery)
@@ -586,26 +547,14 @@ class InternalBuilder {
     function iterate(
       structure: AnySearchFilter,
       operation: SearchFilterKey,
-      fn: (
-        query: Knex.QueryBuilder,
-        key: string,
-        value: any
-      ) => Knex.QueryBuilder,
-      complexKeyFn?: (
-        query: Knex.QueryBuilder,
-        key: string[],
-        value: any
-      ) => Knex.QueryBuilder
+      fn: (query: Knex.QueryBuilder, key: string, value: any) => Knex.QueryBuilder,
+      complexKeyFn?: (query: Knex.QueryBuilder, key: string[], value: any) => Knex.QueryBuilder
     ) {
-      const handleRelationship = (
-        q: Knex.QueryBuilder,
-        key: string,
-        value: any
-      ) => {
+      const handleRelationship = (q: Knex.QueryBuilder, key: string, value: any) => {
         const [filterTableName, ...otherProperties] = key.split(".")
         const property = otherProperties.join(".")
         const alias = getTableAlias(filterTableName)
-        return q.andWhere(subquery =>
+        return q.andWhere((subquery) =>
           fn(subquery, alias ? `${alias}.${property}` : property, value)
         )
       }
@@ -614,8 +563,7 @@ class InternalBuilder {
         const value = structure[key]
         const updatedKey = dbCore.removeKeyNumbering(key)
         const isRelationshipField = updatedKey.includes(".")
-        const shouldProcessRelationship =
-          opts?.relationship && isRelationshipField
+        const shouldProcessRelationship = opts?.relationship && isRelationshipField
 
         let castedTypeValue
         if (
@@ -626,18 +574,12 @@ class InternalBuilder {
           const alias = getTableAlias(tableName)
           query = complexKeyFn(
             query,
-            castedTypeValue.id.map((x: string) =>
-              alias ? `${alias}.${x}` : x
-            ),
+            castedTypeValue.id.map((x: string) => (alias ? `${alias}.${x}` : x)),
             castedTypeValue.values
           )
         } else if (!isRelationshipField) {
           const alias = getTableAlias(tableName)
-          query = fn(
-            query,
-            alias ? `${alias}.${updatedKey}` : updatedKey,
-            value
-          )
+          query = fn(query, alias ? `${alias}.${updatedKey}` : updatedKey, value)
         } else if (shouldProcessRelationship) {
           if (shouldOr) {
             query = query.or
@@ -706,10 +648,7 @@ class InternalBuilder {
             stringifyArray(filterValues),
           ])
         })
-      } else if (
-        this.client === SqlClient.MY_SQL ||
-        this.client === SqlClient.MARIADB
-      ) {
+      } else if (this.client === SqlClient.MY_SQL || this.client === SqlClient.MARIADB) {
         iterate(mode, ArrayOperator.CONTAINS, (q, key, value) => {
           const jsonSearch = Array.isArray(value) ? value : [value]
           return addModifiers(q).whereRaw(`COALESCE(?(??, ?), FALSE)`, [
@@ -724,12 +663,12 @@ class InternalBuilder {
             return q
           }
 
-          q = q.where(subQuery => {
+          q = q.where((subQuery) => {
             if (mode === filters?.notContains) {
               subQuery = subQuery.not
             }
 
-            subQuery = subQuery.where(subSubQuery => {
+            subQuery = subQuery.where((subSubQuery) => {
               for (const elem of value) {
                 if (mode === filters?.containsAny) {
                   subSubQuery = subSubQuery.or
@@ -737,14 +676,11 @@ class InternalBuilder {
                   subSubQuery = subSubQuery.and
                 }
 
-                const lower =
-                  typeof elem === "string" ? `"${elem.toLowerCase()}"` : elem
+                const lower = typeof elem === "string" ? `"${elem.toLowerCase()}"` : elem
 
                 subSubQuery = subSubQuery.whereLike(
                   // @ts-expect-error knex types are wrong, raw is fine here
-                  this.knex.raw(`COALESCE(LOWER(??), '')`, [
-                    this.rawQuotedIdentifier(key),
-                  ]),
+                  this.knex.raw(`COALESCE(LOWER(??), '')`, [this.rawQuotedIdentifier(key)]),
                   `%${lower}%`
                 )
               }
@@ -765,7 +701,7 @@ class InternalBuilder {
     if (filters.$and) {
       const { $and } = filters
       for (const condition of $and.conditions) {
-        query = query.where(b => {
+        query = query.where((b) => {
           this.addFilters(b, condition, opts)
         })
       }
@@ -773,11 +709,9 @@ class InternalBuilder {
 
     if (filters.$or) {
       const { $or } = filters
-      query = query.where(b => {
+      query = query.where((b) => {
         for (const condition of $or.conditions) {
-          b.orWhere(c =>
-            this.addFilters(c, { ...condition, allOr: true }, opts)
-          )
+          b.orWhere((c) => this.addFilters(c, { ...condition, allOr: true }, opts))
         }
       })
     }
@@ -824,9 +758,7 @@ class InternalBuilder {
       iterate(filters.range, RangeOperator.RANGE, (q, key, value) => {
         const isEmptyObject = (val: any) => {
           return (
-            val &&
-            Object.keys(val).length === 0 &&
-            Object.getPrototypeOf(val) === Object.prototype
+            val && Object.keys(val).length === 0 && Object.getPrototypeOf(val) === Object.prototype
           )
         }
         if (isEmptyObject(value.low)) {
@@ -838,9 +770,9 @@ class InternalBuilder {
         const lowValid = isValidFilter(value.low),
           highValid = isValidFilter(value.high)
 
-        let rawKey: string | Knex.Raw = key
-        let high = value.high
-        let low = value.low
+        const rawKey: string | Knex.Raw = key
+        const high = value.high
+        const low = value.low
 
         if (shouldOr) {
           q = q.or
@@ -867,10 +799,7 @@ class InternalBuilder {
             value,
           ])
         } else {
-          return q.whereRaw(`COALESCE(?? = ?, FALSE)`, [
-            this.rawQuotedIdentifier(key),
-            value,
-          ])
+          return q.whereRaw(`COALESCE(?? = ?, FALSE)`, [this.rawQuotedIdentifier(key), value])
         }
       })
     }
@@ -885,10 +814,7 @@ class InternalBuilder {
             value,
           ])
         } else {
-          return q.whereRaw(`COALESCE(?? != ?, TRUE)`, [
-            this.rawQuotedIdentifier(key),
-            value,
-          ])
+          return q.whereRaw(`COALESCE(?? != ?, TRUE)`, [this.rawQuotedIdentifier(key), value])
         }
       })
     }
@@ -922,10 +848,7 @@ class InternalBuilder {
     // when searching internal tables make sure long looking for rows
     if (filters.documentType && !isExternalTable(this.table) && tableRef) {
       // has to be its own option, must always be AND onto the search
-      query.andWhereLike(
-        `${tableRef}._id`,
-        `${prefixed(filters.documentType)}%`
-      )
+      query.andWhereLike(`${tableRef}._id`, `${prefixed(filters.documentType)}%`)
     }
 
     return query
@@ -935,7 +858,7 @@ class InternalBuilder {
     if (!table) {
       table = this.table
     }
-    let name = table.name
+    const name = table.name
     const aliases = this.query.tableAliases || {}
     return aliases[name] ? aliases[name] : name
   }
@@ -950,24 +873,23 @@ class InternalBuilder {
   }
 
   addSorting(query: Knex.QueryBuilder): Knex.QueryBuilder {
-    let { sort } = this.query
+    const { sort } = this.query
     const primaryKey = this.table.primary
     const aliased = this.getTableName()
     if (!Array.isArray(primaryKey)) {
       throw new Error("Sorting requires primary key to be specified for table")
     }
     if (sort && Object.keys(sort || {}).length > 0) {
-      for (let [key, value] of Object.entries(sort)) {
+      for (const [key, value] of Object.entries(sort)) {
         const fieldSchema = this.getFieldSchema(key)
         if (this.isUnsortableField(fieldSchema)) {
           continue
         }
-        const direction =
-          value.direction === SortOrder.ASCENDING ? "asc" : "desc"
+        const direction = value.direction === SortOrder.ASCENDING ? "asc" : "desc"
 
         // TODO: figure out a way to remove this conditional, not relying on
         // the defaults of each datastore.
-        let nulls: "first" | "last" | undefined = undefined
+        let nulls: "first" | "last" | undefined
         if (this.client === SqlClient.POSTGRES) {
           nulls = value.direction === SortOrder.ASCENDING ? "first" : "last"
         }
@@ -999,10 +921,8 @@ class InternalBuilder {
     return false
   }
 
-  private findSortablePrimaryKey(
-    primaryKey: Array<string | undefined>
-  ): string | undefined {
-    return primaryKey.find(key => {
+  private findSortablePrimaryKey(primaryKey: Array<string | undefined>): string | undefined {
+    return primaryKey.find((key) => {
       if (key == null) {
         return false
       }
@@ -1011,10 +931,7 @@ class InternalBuilder {
     })
   }
 
-  tableNameWithSchema(
-    tableName: string,
-    opts?: { alias?: string; schema?: string }
-  ) {
+  tableNameWithSchema(tableName: string, opts?: { alias?: string; schema?: string }) {
     let withSchema = opts?.schema ? `${opts.schema}.${tableName}` : tableName
     if (opts?.alias) {
       withSchema += ` as ${opts.alias}`
@@ -1075,7 +992,7 @@ class InternalBuilder {
     const knex = this.knex
     const { resource, tableAliases: aliases, schema, tables } = this.query
     const fields = resource?.fields || []
-    for (let relationship of relationships) {
+    for (const relationship of relationships) {
       const {
         tableName: toTable,
         through: throughTable,
@@ -1096,33 +1013,28 @@ class InternalBuilder {
       const toAlias = aliases?.[toTable] || toTable,
         fromAlias = aliases?.[fromTable] || fromTable,
         throughAlias = (throughTable && aliases?.[throughTable]) || throughTable
-      let toTableWithSchema = this.tableNameWithSchema(toTable, {
+      const toTableWithSchema = this.tableNameWithSchema(toTable, {
         alias: toAlias,
         schema,
       })
       const requiredFields = [
         ...(relatedTable?.primary || []),
         relatedTable?.primaryDisplay,
-      ].filter(field => field) as string[]
+      ].filter((field) => field) as string[]
       // sort the required fields to first in the list, so they don't get sliced out
       let relationshipFields = prioritisedArraySort(
-        fields.filter(field => field.split(".")[0] === toAlias),
+        fields.filter((field) => field.split(".")[0] === toAlias),
         requiredFields
       )
 
-      relationshipFields = relationshipFields.slice(
-        0,
-        Math.floor(this.maxFunctionParameters() / 2)
-      )
-      const fieldList = relationshipFields.map(field =>
-        this.buildJsonField(relatedTable, field)
-      )
+      relationshipFields = relationshipFields.slice(0, Math.floor(this.maxFunctionParameters() / 2))
+      const fieldList = relationshipFields.map((field) => this.buildJsonField(relatedTable, field))
       if (!fieldList.length) {
         continue
       }
 
       const fieldListFormatted = fieldList
-        .map(f => {
+        .map((f) => {
           const separator = ","
           return this.knex.raw(`?${separator}??`, [f[0], f[1]]).toString()
         })
@@ -1136,15 +1048,11 @@ class InternalBuilder {
         .orderBy(primaryKey)
 
       const isManyToMany = throughTable && toPrimary && fromPrimary
-      let correlatedTo = isManyToMany
-          ? `${throughAlias}.${fromKey}`
-          : `${toAlias}.${toKey}`,
-        correlatedFrom = isManyToMany
-          ? `${fromAlias}.${fromPrimary}`
-          : `${fromAlias}.${fromKey}`
+      const correlatedTo = isManyToMany ? `${throughAlias}.${fromKey}` : `${toAlias}.${toKey}`,
+        correlatedFrom = isManyToMany ? `${fromAlias}.${fromPrimary}` : `${fromAlias}.${fromKey}`
       // many-to-many relationship needs junction table join
       if (isManyToMany) {
-        let throughTableWithSchema = this.tableNameWithSchema(throughTable, {
+        const throughTableWithSchema = this.tableNameWithSchema(throughTable, {
           alias: throughAlias,
           schema,
         })
@@ -1162,11 +1070,9 @@ class InternalBuilder {
 
       const standardWrap = (select: Knex.Raw): Knex.QueryBuilder => {
         subQuery = subQuery
-          .select(
-            relationshipFields.map(field => this.rawQuotedIdentifier(field))
-          )
+          .select(relationshipFields.map((field) => this.rawQuotedIdentifier(field)))
           .limit(getRelationshipLimit())
-        // @ts-ignore - the from alias syntax isn't in Knex typing
+        // @ts-expect-error - the from alias syntax isn't in Knex typing
         return knex.select(select).from({
           [toAlias]: subQuery,
         })
@@ -1194,11 +1100,11 @@ class InternalBuilder {
         case SqlClient.MS_SQL: {
           const comparatorQuery = knex
             .select(`*`)
-            // @ts-ignore - from alias syntax not TS supported
+            // @ts-expect-error - from alias syntax not TS supported
             .from({
               [fromAlias]: subQuery
                 .select(
-                  fieldList.map(f => {
+                  fieldList.map((f) => {
                     // @ts-expect-error raw is fine here, knex types are wrong
                     return knex.ref(f[1]).as(f[0])
                   })
@@ -1206,10 +1112,9 @@ class InternalBuilder {
                 .limit(getRelationshipLimit()),
             })
 
-          wrapperQuery = knex.raw(
-            `(SELECT ?? = (${comparatorQuery} FOR JSON PATH))`,
-            [this.rawQuotedIdentifier(toAlias)]
-          )
+          wrapperQuery = knex.raw(`(SELECT ?? = (${comparatorQuery} FOR JSON PATH))`, [
+            this.rawQuotedIdentifier(toAlias),
+          ])
           break
         }
         default:
@@ -1238,11 +1143,11 @@ class InternalBuilder {
     const toAlias = aliases?.[toTable] || toTable,
       throughAlias = (throughTable && aliases?.[throughTable]) || throughTable,
       fromAlias = aliases?.[fromTable] || fromTable
-    let toTableWithSchema = this.tableNameWithSchema(toTable, {
+    const toTableWithSchema = this.tableNameWithSchema(toTable, {
       alias: toAlias,
       schema,
     })
-    let throughTableWithSchema = throughTable
+    const throughTableWithSchema = throughTable
       ? this.tableNameWithSchema(throughTable, {
           alias: throughAlias,
           schema,
@@ -1250,7 +1155,7 @@ class InternalBuilder {
       : undefined
     if (!throughTable) {
       query = query.leftJoin(toTableWithSchema, function () {
-        for (let relationship of columns) {
+        for (const relationship of columns) {
           const from = relationship.from,
             to = relationship.to
           this.orOn(`${fromAlias}.${from}`, "=", `${toAlias}.${to}`)
@@ -1258,20 +1163,16 @@ class InternalBuilder {
       })
     } else {
       query = query
-        // @ts-ignore
+        // @ts-expect-error
         .leftJoin(throughTableWithSchema, function () {
-          for (let relationship of columns) {
+          for (const relationship of columns) {
             const fromPrimary = relationship.fromPrimary
             const from = relationship.from
-            this.orOn(
-              `${fromAlias}.${fromPrimary}`,
-              "=",
-              `${throughAlias}.${from}`
-            )
+            this.orOn(`${fromAlias}.${fromPrimary}`, "=", `${throughAlias}.${from}`)
           }
         })
         .leftJoin(toTableWithSchema, function () {
-          for (let relationship of columns) {
+          for (const relationship of columns) {
             const toPrimary = relationship.toPrimary
             const to = relationship.to
             this.orOn(`${toAlias}.${toPrimary}`, `${throughAlias}.${to}`)
@@ -1302,11 +1203,11 @@ class InternalBuilder {
       throw new Error("Cannot create without row body")
     }
 
-    let query = this.qualifiedKnex({ alias: false })
+    const query = this.qualifiedKnex({ alias: false })
     const parsedBody = this.parseBody(body)
 
     // make sure no null values in body for creation
-    for (let [key, value] of Object.entries(parsedBody)) {
+    for (const [key, value] of Object.entries(parsedBody)) {
       if (value == null) {
         delete parsedBody[key]
       }
@@ -1322,21 +1223,21 @@ class InternalBuilder {
 
   bulkCreate(): Knex.QueryBuilder {
     const { body } = this.query
-    let query = this.qualifiedKnex({ alias: false })
+    const query = this.qualifiedKnex({ alias: false })
     if (!Array.isArray(body)) {
       return query
     }
-    const parsedBody = body.map(row => this.parseBody(row))
+    const parsedBody = body.map((row) => this.parseBody(row))
     return query.insert(parsedBody)
   }
 
   bulkUpsert(): Knex.QueryBuilder {
     const { body } = this.query
-    let query = this.qualifiedKnex({ alias: false })
+    const query = this.qualifiedKnex({ alias: false })
     if (!Array.isArray(body)) {
       return query
     }
-    const parsedBody = body.map(row => this.parseBody(row))
+    const parsedBody = body.map((row) => this.parseBody(row))
     if (
       this.client === SqlClient.POSTGRES ||
       this.client === SqlClient.MY_SQL ||
@@ -1355,11 +1256,7 @@ class InternalBuilder {
     return query.upsert(parsedBody)
   }
 
-  read(
-    opts: {
-      limits?: { base: number; query: number }
-    } = {}
-  ): Knex.QueryBuilder {
+  read(opts: { limits?: { base: number; query: number } } = {}): Knex.QueryBuilder {
     const { operation, filters, paginate, relationships, table } = this.query
     const { limits } = opts
 
@@ -1370,7 +1267,7 @@ class InternalBuilder {
     let foundOffset: number | null = null
     let foundLimit = limits?.query || limits?.base
     if (paginate && paginate.page && paginate.limit) {
-      // @ts-ignore
+      // @ts-expect-error
       const page = paginate.page <= 1 ? 0 : paginate.page - 1
       const offset = page * paginate.limit
       foundLimit = paginate.limit
@@ -1466,7 +1363,7 @@ class SqlQueryBuilder extends SqlTableQueryBuilder {
     if (opts?.disableBindings) {
       return { sql: query.toString() }
     } else {
-      let native = getNativeSql(query)
+      const native = getNativeSql(query)
       return native
     }
   }
@@ -1477,10 +1374,7 @@ class SqlQueryBuilder extends SqlTableQueryBuilder {
    * which for the sake of mySQL stops adding the returning statement to inserts, updates and deletes.
    * @return the query ready to be passed to the driver.
    */
-  _query(
-    json: EnrichedQueryJson,
-    opts: QueryOptions = {}
-  ): SqlQuery | SqlQuery[] {
+  _query(json: EnrichedQueryJson, opts: QueryOptions = {}): SqlQuery | SqlQuery[] {
     const sqlClient = this.getSqlClient()
     const config: Knex.Config = {
       client: this.getBaseSqlClient(),
@@ -1572,7 +1466,7 @@ class SqlQueryBuilder extends SqlTableQueryBuilder {
     const input = this._query(json, { disableReturning: true })
     if (Array.isArray(input)) {
       const responses = []
-      for (let query of input) {
+      for (const query of input) {
         responses.push(await queryFn(query, operation))
       }
       return responses
@@ -1589,15 +1483,10 @@ class SqlQueryBuilder extends SqlTableQueryBuilder {
       let id
       if (sqlClient === SqlClient.MS_SQL) {
         id = results?.[0].id
-      } else if (
-        sqlClient === SqlClient.MY_SQL ||
-        sqlClient === SqlClient.MARIADB
-      ) {
+      } else if (sqlClient === SqlClient.MY_SQL || sqlClient === SqlClient.MARIADB) {
         id = results?.insertId
       }
-      row = processFn(
-        await this.getReturningRow(queryFn, this.checkLookupKeys(id, json))
-      )
+      row = processFn(await this.getReturningRow(queryFn, this.checkLookupKeys(id, json)))
     }
     if (operation === Operation.COUNT) {
       return results
@@ -1608,11 +1497,8 @@ class SqlQueryBuilder extends SqlTableQueryBuilder {
     return results.length ? results : [{ [operation.toLowerCase()]: true }]
   }
 
-  private getTableName(
-    table: Table,
-    aliases?: Record<string, string>
-  ): string | undefined {
-    let name = table.name
+  private getTableName(table: Table, aliases?: Record<string, string>): string | undefined {
+    const name = table.name
     return aliases?.[name] || name
   }
 
@@ -1627,7 +1513,7 @@ class SqlQueryBuilder extends SqlTableQueryBuilder {
         continue
       }
       const fullName = `${tableName}.${name}` as keyof T
-      for (let row of results) {
+      for (const row of results) {
         if (typeof row[fullName] === "string") {
           row[fullName] = JSON.parse(row[fullName])
         }

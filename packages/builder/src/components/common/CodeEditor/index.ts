@@ -1,15 +1,10 @@
 import { getManifest } from "@budibase/string-templates"
-import sanitizeHtml from "sanitize-html"
+import type { EditorModesMap, EnrichedBinding, Helper, Snippet } from "@budibase/types"
+import type { CompletionContext } from "@codemirror/autocomplete"
+import type { EditorView } from "@codemirror/view"
 import { groupBy } from "lodash"
-import {
-  EditorModesMap,
-  EnrichedBinding,
-  Helper,
-  Snippet,
-} from "@budibase/types"
-import { CompletionContext } from "@codemirror/autocomplete"
-import { EditorView } from "@codemirror/view"
-import { BindingCompletion, BindingCompletionOption } from "@/types"
+import sanitizeHtml from "sanitize-html"
+import type { BindingCompletion, BindingCompletionOption } from "@/types"
 
 export const EditorModes: EditorModesMap = {
   JS: {
@@ -87,7 +82,7 @@ const helpersToCompletion = (
 ): BindingCompletionOption[] => {
   const helperSection = buildSectionHeader("helper", "Helpers", "Code", 99)
 
-  return Object.keys(helpers).flatMap(helperName => {
+  return Object.keys(helpers).flatMap((helperName) => {
     const helper = helpers[helperName]
     return {
       label: helperName,
@@ -97,12 +92,7 @@ const helpersToCompletion = (
       type: "helper",
       section: helperSection,
       detail: "Function",
-      apply: (
-        view: EditorView,
-        _completion: BindingCompletionOption,
-        from: number,
-        to: number
-      ) => {
+      apply: (view: EditorView, _completion: BindingCompletionOption, from: number, to: number) => {
         insertBinding(view, from, to, helperName, mode, AutocompleteType.HELPER)
       },
     }
@@ -114,14 +104,14 @@ export const getHelperCompletions = (mode: {
 }): BindingCompletionOption[] => {
   // TODO: manifest needs to be properly typed
   const manifest: any = getManifest()
-  return Object.keys(manifest).flatMap(key => {
+  return Object.keys(manifest).flatMap((key) => {
     return helpersToCompletion(manifest[key], mode)
   })
 }
 
 export const snippetAutoComplete = (snippets: Snippet[]): BindingCompletion => {
   return setAutocomplete(
-    snippets.map(snippet => ({
+    snippets.map((snippet) => ({
       section: buildSectionHeader("snippets", "Snippets", "Code", 100),
       label: `snippets.${snippet.name}`,
       displayLabel: snippet.name,
@@ -130,21 +120,16 @@ export const snippetAutoComplete = (snippets: Snippet[]): BindingCompletion => {
 }
 
 const bindingFilter = (options: BindingCompletionOption[], query: string) => {
-  return options.filter(completion => {
+  return options.filter((completion) => {
     const section_parsed = completion.section?.toString().toLowerCase()
     const label_parsed = completion.label.toLowerCase()
     const query_parsed = query.toLowerCase()
 
-    return (
-      section_parsed?.includes(query_parsed) ||
-      label_parsed.includes(query_parsed)
-    )
+    return section_parsed?.includes(query_parsed) || label_parsed.includes(query_parsed)
   })
 }
 
-export const hbAutocomplete = (
-  baseCompletions: BindingCompletionOption[]
-): BindingCompletion => {
+export const hbAutocomplete = (baseCompletions: BindingCompletionOption[]): BindingCompletion => {
   function coreCompletion(context: CompletionContext) {
     if (!baseCompletions.length) {
       return null
@@ -179,9 +164,7 @@ function wrappedAutocompleteMatch(context: CompletionContext) {
   return context.matchBefore(/\$\("[\s\w]*/)
 }
 
-export const jsAutocomplete = (
-  baseCompletions: BindingCompletionOption[]
-): BindingCompletion => {
+export const jsAutocomplete = (baseCompletions: BindingCompletionOption[]): BindingCompletion => {
   function coreCompletion(context: CompletionContext) {
     if (!baseCompletions.length) {
       return null
@@ -197,7 +180,7 @@ export const jsAutocomplete = (
         return null
       }
       const query = jsBinding.text.replace(match[0], "")
-      let filtered = bindingFilter(options, query)
+      const filtered = bindingFilter(options, query)
       return {
         from: jsBinding.from + match[0].length,
         filter: false,
@@ -215,7 +198,7 @@ export const jsHelperAutocomplete = (
   baseCompletions: BindingCompletionOption[]
 ): BindingCompletion => {
   return setAutocomplete(
-    baseCompletions.map(helper => ({
+    baseCompletions.map((helper) => ({
       ...helper,
       displayLabel: helper.label,
       label: `helpers.${helper.label}()`,
@@ -223,10 +206,8 @@ export const jsHelperAutocomplete = (
   )
 }
 
-function setAutocomplete(
-  options: BindingCompletionOption[]
-): BindingCompletion {
-  return function (context: CompletionContext) {
+function setAutocomplete(options: BindingCompletionOption[]): BindingCompletion {
+  return (context: CompletionContext) => {
     if (!options.length) {
       return null
     }
@@ -289,22 +270,12 @@ const getWrapperState = (
   }
 }
 
-export const hbInsert = (
-  value: string | undefined,
-  from: number,
-  to: number,
-  text: string
-) => {
+export const hbInsert = (value: string | undefined, from: number, to: number, text: string) => {
   const { inside } = getWrapperState(value, from, to, "{{", "}}")
   return inside ? ` ${text} ` : `{{ ${text} }}`
 }
 
-export const htmlInsert = (
-  value: string | undefined,
-  from: number,
-  to: number,
-  text: string
-) => {
+export const htmlInsert = (value: string | undefined, from: number, to: number, text: string) => {
   const state = getWrapperState(value, from, to, "{{", "}}")
   const leftPrefix = state.hasOpen ? "" : "{{"
   const rightPrefix = state.hasOpen && state.hasClose ? "" : "}}"
@@ -317,10 +288,7 @@ export function jsInsert(
   from: number,
   to: number,
   text: string,
-  {
-    helper,
-    disableWrapping,
-  }: { helper?: boolean; disableWrapping?: boolean } = {}
+  { helper, disableWrapping }: { helper?: boolean; disableWrapping?: boolean } = {}
 ) {
   let parsedInsert = ""
 
@@ -337,7 +305,7 @@ export function jsInsert(
   return parsedInsert
 }
 
-const enum AutocompleteType {
+enum AutocompleteType {
   BINDING,
   HELPER,
   TEXT,
@@ -368,8 +336,8 @@ const insertBinding = (
     return
   }
 
-  let bindingClosePattern = mode.name == "javascript" ? /[\s]*"\)/ : /[\s]*}}/
-  let sliced = view.state.doc?.toString().slice(to)
+  const bindingClosePattern = mode.name == "javascript" ? /[\s]*"\)/ : /[\s]*}}/
+  const sliced = view.state.doc?.toString().slice(to)
 
   const rightBrace = sliced.match(bindingClosePattern)
   let cursorPos = from + parsedInsert.length
@@ -407,25 +375,22 @@ export const bindingsToCompletions = (
     return acc
   }, {})
 
-  const completions = Object.keys(bindingByCategory).reduce<
-    BindingCompletionOption[]
-  >((comps, catKey) => {
-    const { icon, rank } = categoryMeta[catKey] || {}
+  const completions = Object.keys(bindingByCategory).reduce<BindingCompletionOption[]>(
+    (comps, catKey) => {
+      const { icon, rank } = categoryMeta[catKey] || {}
 
-    const bindingSectionHeader = buildSectionHeader(
-      null,
-      catKey,
-      icon || "",
-      typeof rank == "number" ? rank : 1
-    )
+      const bindingSectionHeader = buildSectionHeader(
+        null,
+        catKey,
+        icon || "",
+        typeof rank == "number" ? rank : 1
+      )
 
-    comps.push(
-      ...bindingByCategory[catKey].reduce<BindingCompletionOption[]>(
-        (acc, binding) => {
-          let displayType = binding.fieldSchema?.type || binding.display?.type
+      comps.push(
+        ...bindingByCategory[catKey].reduce<BindingCompletionOption[]>((acc, binding) => {
+          const displayType = binding.fieldSchema?.type || binding.display?.type
           acc.push({
-            label:
-              binding.display?.name || binding.readableBinding || "NO NAME",
+            label: binding.display?.name || binding.readableBinding || "NO NAME",
             info: () => buildBindingInfoNode(binding),
             type: "binding",
             detail: displayType,
@@ -436,24 +401,17 @@ export const bindingsToCompletions = (
               from: number,
               to: number
             ) => {
-              insertBinding(
-                view,
-                from,
-                to,
-                binding.readableBinding,
-                mode,
-                AutocompleteType.BINDING
-              )
+              insertBinding(view, from, to, binding.readableBinding, mode, AutocompleteType.BINDING)
             },
           })
           return acc
-        },
-        []
+        }, [])
       )
-    )
 
-    return comps
-  }, [])
+      return comps
+    },
+    []
+  )
 
   return completions
 }

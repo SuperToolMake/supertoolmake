@@ -1,6 +1,6 @@
 import { HTTPError } from "@budibase/backend-core"
+import type { AppNavigation } from "@budibase/types"
 import sdk from "../.."
-import { AppNavigation } from "@budibase/types"
 
 export async function addLink({
   label,
@@ -33,14 +33,12 @@ export async function deleteLink(route: string, workspaceAppId: string) {
   workspaceApp.navigation.links ??= []
 
   // Filter out top level links pointing to these URLs
-  const updatedLinks = workspaceApp.navigation.links.filter(
-    link => link.url !== route
-  )
+  const updatedLinks = workspaceApp.navigation.links.filter((link) => link.url !== route)
 
   // Filter out nested links pointing to these URLs
-  updatedLinks.forEach(link => {
+  updatedLinks.forEach((link) => {
     if (link.type === "sublinks" && link.subLinks?.length) {
-      link.subLinks = link.subLinks.filter(subLink => subLink.url !== route)
+      link.subLinks = link.subLinks.filter((subLink) => subLink.url !== route)
     }
   })
 
@@ -50,10 +48,7 @@ export async function deleteLink(route: string, workspaceAppId: string) {
   })
 }
 
-export async function update(
-  workspaceAppId: string,
-  navigation: AppNavigation
-) {
+export async function update(workspaceAppId: string, navigation: AppNavigation) {
   const workspaceApp = await sdk.workspaceApps.get(workspaceAppId)
   if (!workspaceApp) {
     throw new HTTPError("Workspace app not found", 400)

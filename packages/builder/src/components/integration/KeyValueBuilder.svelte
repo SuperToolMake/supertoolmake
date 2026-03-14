@@ -1,119 +1,116 @@
 <script lang="ts" generics="O">
-  import {
-    Icon,
-    ActionButton,
-    Input,
-    Label,
-    Toggle,
-    Select,
-    ActionMenu,
-    MenuItem,
-  } from "@budibase/bbui"
-  import { createEventDispatcher } from "svelte"
-  import { lowercase } from "@/helpers"
-  import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import {
+  ActionButton,
+  ActionMenu,
+  Icon,
+  Input,
+  Label,
+  MenuItem,
+  Select,
+  Toggle,
+} from "@budibase/bbui"
+import { createEventDispatcher } from "svelte"
+import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import { lowercase } from "@/helpers"
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  export let defaults: Record<string, unknown> | undefined = undefined
-  export let object: Record<string, unknown> = defaults || {}
-  export let activity: Record<string, boolean> = {}
-  export let readOnly: boolean = false
-  export let noAddButton: boolean = false
-  export let name: string = ""
-  export let headings: boolean = false
-  export let options: O[] | undefined = undefined
-  export let toggle: boolean = false
-  export let keyPlaceholder: string = "Key"
-  export let valuePlaceholder: string = "Value"
-  export let valueHeading: string = ""
-  export let keyHeading: string = ""
-  export let tooltip: string = ""
-  export let menuItems: any[] = []
-  export let showMenu: boolean = false
-  export let bindings: any[] = []
-  export let allowHelpers: boolean = true
-  export let customButtonText = null
-  export let keyBindings: boolean = false
-  export let allowJS: boolean = false
-  export let actionButtonDisabled: boolean = false
-  export let compare = (option: O, value: O) => option === value
-  export let context: any = null
-  export let lockedKeys: string[] = []
+export let defaults: Record<string, unknown> | undefined = undefined
+export let object: Record<string, unknown> = defaults || {}
+export let activity: Record<string, boolean> = {}
+export let readOnly: boolean = false
+export let noAddButton: boolean = false
+export let name: string = ""
+export let headings: boolean = false
+export let options: O[] | undefined = undefined
+export let toggle: boolean = false
+export let keyPlaceholder: string = "Key"
+export let valuePlaceholder: string = "Value"
+export let valueHeading: string = ""
+export let keyHeading: string = ""
+export let tooltip: string = ""
+export let menuItems: any[] = []
+export let showMenu: boolean = false
+export let bindings: any[] = []
+export let allowHelpers: boolean = true
+export let customButtonText = null
+export let keyBindings: boolean = false
+export let allowJS: boolean = false
+export let actionButtonDisabled: boolean = false
+export let compare = (option: O, value: O) => option === value
+export let context: any = null
+export let lockedKeys: string[] = []
 
-  let fields = Object.entries(object || {}).map(([name, value]) => ({
-    name,
-    value,
-  }))
-  let fieldActivity = buildFieldActivity(activity)
-  $: lockedKeySet = new Set((lockedKeys || []).filter(Boolean))
-  const isLocked = (name?: string) => (name ? lockedKeySet.has(name) : false)
+let fields = Object.entries(object || {}).map(([name, value]) => ({
+  name,
+  value,
+}))
+let fieldActivity = buildFieldActivity(activity)
+$: lockedKeySet = new Set((lockedKeys || []).filter(Boolean))
+const isLocked = (name?: string) => (name ? lockedKeySet.has(name) : false)
 
-  $: fullObject = fields.reduce<Record<string, unknown>>((acc, next) => {
-    acc[next.name] = next.value
-    return acc
-  }, {})
+$: fullObject = fields.reduce<Record<string, unknown>>((acc, next) => {
+  acc[next.name] = next.value
+  return acc
+}, {})
 
-  $: object = Object.entries(fullObject).reduce<Record<string, unknown>>(
-    (acc, [key, next]) => {
-      if (key) {
-        acc[key] = next
-      }
-      return acc
-    },
-    {}
-  )
-
-  function buildFieldActivity(obj: Record<string, boolean>) {
-    if (!obj || typeof obj !== "object") {
-      return []
-    }
-    const array: boolean[] = Array(fields.length)
-    for (let [key, value] of Object.entries(obj)) {
-      const field = fields.find(el => el.name === key)
-      if (field) {
-        const idx = fields.indexOf(field)
-        array[idx] = idx !== -1 ? value : true
-      }
-    }
-    return array
+$: object = Object.entries(fullObject).reduce<Record<string, unknown>>((acc, [key, next]) => {
+  if (key) {
+    acc[key] = next
   }
+  return acc
+}, {})
 
-  export function addEntry() {
-    fields = [...fields, { name: "", value: "" }]
-    fieldActivity = [...fieldActivity, true]
-    changed()
+function buildFieldActivity(obj: Record<string, boolean>) {
+  if (!obj || typeof obj !== "object") {
+    return []
   }
-
-  function deleteEntry(idx: number) {
-    fields.splice(idx, 1)
-    fieldActivity.splice(idx, 1)
-    changed()
-  }
-
-  function changed() {
-    // Required for reactivity
-    fields = fields
-    const newActivity: Record<string, boolean> = {}
-    for (let idx = 0; idx < fields.length; idx++) {
-      const fieldName = fields[idx].name
-      if (fieldName) {
-        newActivity[fieldName] = fieldActivity[idx]
-      }
+  const array: boolean[] = Array(fields.length)
+  for (let [key, value] of Object.entries(obj)) {
+    const field = fields.find((el) => el.name === key)
+    if (field) {
+      const idx = fields.indexOf(field)
+      array[idx] = idx !== -1 ? value : true
     }
-    activity = newActivity
-    dispatch("change", fields)
   }
+  return array
+}
 
-  function isJsonArray(value: any) {
-    if (!value || typeof value === "string") {
-      return false
+export function addEntry() {
+  fields = [...fields, { name: "", value: "" }]
+  fieldActivity = [...fieldActivity, true]
+  changed()
+}
+
+function deleteEntry(idx: number) {
+  fields.splice(idx, 1)
+  fieldActivity.splice(idx, 1)
+  changed()
+}
+
+function changed() {
+  // Required for reactivity
+  fields = fields
+  const newActivity: Record<string, boolean> = {}
+  for (let idx = 0; idx < fields.length; idx++) {
+    const fieldName = fields[idx].name
+    if (fieldName) {
+      newActivity[fieldName] = fieldActivity[idx]
     }
-    if (value.type === "array") {
-      return true
-    }
-    return value.type === "json" && value.subtype === "array"
   }
+  activity = newActivity
+  dispatch("change", fields)
+}
+
+function isJsonArray(value: any) {
+  if (!value || typeof value === "string") {
+    return false
+  }
+  if (value.type === "array") {
+    return true
+  }
+  return value.type === "json" && value.subtype === "array"
+}
 </script>
 
 <!-- Builds Objects with Key Value Pairs. Useful for building things like Request Headers. -->

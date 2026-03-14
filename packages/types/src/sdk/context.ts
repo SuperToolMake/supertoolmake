@@ -1,5 +1,5 @@
-import { User } from "../documents"
-import { IdentityType, HostInfo } from "./events"
+import type { User } from "../documents"
+import type { HostInfo, IdentityType } from "./events"
 
 export interface BaseContext {
   _id: string

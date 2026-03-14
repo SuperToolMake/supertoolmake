@@ -1,4 +1,4 @@
-import { OAuth2CredentialsMethod, OAuth2GrantType } from "@budibase/types"
+import type { OAuth2CredentialsMethod, OAuth2GrantType } from "@budibase/types"
 
 export interface OAuth2ConfigResponse {
   _id: string

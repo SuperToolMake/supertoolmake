@@ -1,13 +1,13 @@
 <script>
-  import { ModalContent, Body, Layout, Link } from "@budibase/bbui"
-  import { organisation } from "@/stores/portal"
-  import GoogleButton from "./GoogleButton.svelte"
-  import { bb } from "@/stores/bb"
-  import { createEventDispatcher } from "svelte"
+import { Body, Layout, Link, ModalContent } from "@budibase/bbui"
+import { createEventDispatcher } from "svelte"
+import { bb } from "@/stores/bb"
+import { organisation } from "@/stores/portal"
+import GoogleButton from "./GoogleButton.svelte"
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  $: isGoogleConfigured = !!$organisation.googleDatasourceConfigured
+$: isGoogleConfigured = !!$organisation.googleDatasourceConfigured
 </script>
 
 <ModalContent

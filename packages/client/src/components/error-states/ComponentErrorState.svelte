@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { getContext } from "svelte"
-  import { Icon } from "@budibase/bbui"
-  import type { UIComponentError } from "@budibase/types"
-  import ComponentErrorStateCta from "./ComponentErrorStateCTA.svelte"
+import { Icon } from "@budibase/bbui"
+import type { UIComponentError } from "@budibase/types"
+import { getContext } from "svelte"
+import ComponentErrorStateCta from "./ComponentErrorStateCTA.svelte"
 
-  export let componentErrors: UIComponentError[] | undefined
+export let componentErrors: UIComponentError[] | undefined
 
-  const component = getContext("component")
-  const { styleable, builderStore } = getContext("sdk")
+const component = getContext("component")
+const { styleable, builderStore } = getContext("sdk")
 
-  $: styles = { ...$component.styles, normal: {}, custom: null, empty: true }
-  $: errorMessage = componentErrors?.[0]
+$: styles = { ...$component.styles, normal: {}, custom: null, empty: true }
+$: errorMessage = componentErrors?.[0]
 </script>
 
 {#if $builderStore.inBuilder}

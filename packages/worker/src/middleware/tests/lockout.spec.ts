@@ -1,7 +1,7 @@
-import lockout from "../lockout"
 import { cache } from "@budibase/backend-core"
-import * as userSdk from "../../sdk/users"
 import env from "../../environment"
+import * as userSdk from "../../sdk/users"
+import lockout from "../lockout"
 
 jest.mock("@budibase/backend-core", () => ({
   cache: {
@@ -77,19 +77,11 @@ describe("lockout middleware", () => {
       throw error
     })
 
-    await expect(lockout(ctx, next)).rejects.toThrow(
-      "Account temporarily locked. Try again later."
-    )
+    await expect(lockout(ctx, next)).rejects.toThrow("Account temporarily locked. Try again later.")
 
     expect(next).not.toHaveBeenCalled()
     expect(ctx.set).toHaveBeenCalledWith("X-Account-Locked", "1")
-    expect(ctx.set).toHaveBeenCalledWith(
-      "Retry-After",
-      String(env.LOGIN_LOCKOUT_SECONDS)
-    )
-    expect(ctx.throw).toHaveBeenCalledWith(
-      403,
-      "Account temporarily locked. Try again later."
-    )
+    expect(ctx.set).toHaveBeenCalledWith("Retry-After", String(env.LOGIN_LOCKOUT_SECONDS))
+    expect(ctx.throw).toHaveBeenCalledWith(403, "Account temporarily locked. Try again later.")
   })
 })

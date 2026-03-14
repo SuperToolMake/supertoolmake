@@ -11,13 +11,13 @@
  * Repl
  */
 export const duplicateName = (name: string, allNames: string[]) => {
-  const duplicatePattern = new RegExp(`\\s(\\d+)$`)
+  const duplicatePattern = /\s(\d+)$/
   const baseName = name.split(duplicatePattern)[0]
   const isDuplicate = new RegExp(`${baseName}\\s(\\d+)$`)
 
   // get the sequence from matched names
   const sequence: number[] = []
-  allNames.filter(n => {
+  allNames.filter((n) => {
     if (n === baseName) {
       return true
     }
@@ -70,7 +70,7 @@ export const duplicateName = (name: string, allNames: string[]) => {
  * @param getName optional function to extract the name for an item, if not a
  *  flat array of strings
  */
-export const getSequentialName = <T extends any>(
+export const getSequentialName = <T>(
   items: T[] | null,
   prefix: string | null,
   {
@@ -92,7 +92,7 @@ export const getSequentialName = <T extends any>(
     return firstName
   }
   let max = 0
-  items.forEach(item => {
+  items.forEach((item) => {
     const name = getName?.(item) ?? item
     if (typeof name !== "string" || !name.startsWith(trimmedPrefix)) {
       return

@@ -1,6 +1,6 @@
 import workerFarm from "worker-farm"
 import env from "../environment"
-import { QueryEvent } from "./definitions"
+import type { QueryEvent } from "./definitions"
 
 export const ThreadType = {
   QUERY: "query",
@@ -34,9 +34,7 @@ export class Thread {
     this.count = opts.count ? opts.count : 1
     this.disableThreading = this.shouldDisableThreading()
     if (!this.disableThreading) {
-      console.debug(
-        `[${env.FORKED_PROCESS_NAME}] initialising worker farm type=${type}`
-      )
+      console.debug(`[${env.FORKED_PROCESS_NAME}] initialising worker farm type=${type}`)
       const workerOpts: any = {
         autoStart: true,
         maxConcurrentWorkers: this.count,
@@ -55,19 +53,12 @@ export class Thread {
       this.workers = workerFarm(workerOpts, typeToFile(type), ["execute"])
       Thread.workerRefs.push(this.workers)
     } else {
-      console.debug(
-        `[${env.FORKED_PROCESS_NAME}] skipping worker farm type=${type}`
-      )
+      console.debug(`[${env.FORKED_PROCESS_NAME}] skipping worker farm type=${type}`)
     }
   }
 
   shouldDisableThreading(): boolean {
-    return !!(
-      env.isTest() ||
-      env.DISABLE_THREADING ||
-      this.count === 0 ||
-      env.isInThread()
-    )
+    return !!(env.isTest() || env.DISABLE_THREADING || this.count === 0 || env.isInThread())
   }
 
   run<T>(job: QueryEvent): Promise<T> {
@@ -96,7 +87,7 @@ export class Thread {
   }
 
   static stopThreads() {
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       if (Thread.workerRefs.length === 0) {
         resolve()
       }
@@ -107,7 +98,7 @@ export class Thread {
           resolve()
         }
       }
-      for (let worker of Thread.workerRefs) {
+      for (const worker of Thread.workerRefs) {
         workerFarm.end(worker, complete)
       }
       Thread.workerRefs = []

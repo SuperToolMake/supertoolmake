@@ -1,19 +1,13 @@
-import { generateGlobalUserID } from "../../../db"
-import { authError } from "../utils"
-import * as users from "../../../users"
+import type { SaveSSOUserFunction, SSOAuthDetails, SSOUser, User } from "@budibase/types"
 import * as context from "../../../context"
-import {
-  SaveSSOUserFunction,
-  SSOAuthDetails,
-  SSOUser,
-  User,
-} from "@budibase/types"
+import { generateGlobalUserID } from "../../../db"
+import * as users from "../../../users"
+import { authError } from "../utils"
 
 // no-op function for user save
 // - this allows datasource auth and access token refresh to work correctly
 // - prefer no-op over an optional argument to ensure function is provided to login flows
-export const ssoSaveUserNoOp: SaveSSOUserFunction = (user: SSOUser) =>
-  Promise.resolve(user)
+export const ssoSaveUserNoOp: SaveSSOUserFunction = (user: SSOUser) => Promise.resolve(user)
 
 /**
  * Common authentication logic for third parties. e.g. OAuth, OIDC.
@@ -45,11 +39,7 @@ export async function authenticate(
   } catch (err: any) {
     // abort when not 404 error
     if (!err.status || err.status !== 404) {
-      return authError(
-        done,
-        "Unexpected error when retrieving existing user",
-        err
-      )
+      return authError(done, "Unexpected error when retrieving existing user", err)
     }
   }
 
@@ -60,10 +50,7 @@ export async function authenticate(
 
   // exit early if there is still no user and auto creation is disabled
   if (!dbUser && requireLocalAccount) {
-    return authError(
-      done,
-      "Email does not yet exist. You must set up your local account first."
-    )
+    return authError(done, "Email does not yet exist. You must set up your local account first.")
   }
 
   // first time creation

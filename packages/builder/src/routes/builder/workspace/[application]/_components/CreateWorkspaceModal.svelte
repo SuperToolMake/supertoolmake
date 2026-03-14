@@ -1,229 +1,220 @@
 <script lang="ts">
-  import { writable, get } from "svelte/store"
-  import {
-    notifications,
-    keepOpen,
-    Input,
-    ModalContent,
-    Dropzone,
-    Button,
-  } from "@budibase/bbui"
-  import { initialise, builderStore, reset } from "@/stores/builder"
-  import { API } from "@/api"
-  import { appsStore, auth } from "@/stores/portal"
-  import { onMount, createEventDispatcher } from "svelte"
-  import { goto } from "@roxi/routify"
-  import { createValidationStore } from "@budibase/frontend-core/src/utils/validation/yup"
-  import * as workspaceValidation from "@budibase/frontend-core/src/utils/validation/yup/app"
-  import { lowercase } from "@/helpers"
-  import { sdk } from "@budibase/shared-core"
-  import type { AppTemplate } from "@/types"
+import { Button, Dropzone, Input, keepOpen, ModalContent, notifications } from "@budibase/bbui"
+import { createValidationStore } from "@budibase/frontend-core/src/utils/validation/yup"
+import * as workspaceValidation from "@budibase/frontend-core/src/utils/validation/yup/app"
+import { sdk } from "@budibase/shared-core"
+import { goto } from "@roxi/routify"
+import { createEventDispatcher, onMount } from "svelte"
+import { get, writable } from "svelte/store"
+import { API } from "@/api"
+import { lowercase } from "@/helpers"
+import { builderStore, initialise, reset } from "@/stores/builder"
+import { appsStore, auth } from "@/stores/portal"
+import type { AppTemplate } from "@/types"
 
-  $goto
+$goto
 
-  export let redirectOnCreate = true
+export let redirectOnCreate = true
 
-  const dispatch = createEventDispatcher()
-  const values = writable<{
-    name: string
-    url: string | null
-    file?: File
-    encryptionPassword?: string
-  }>({
-    name: "",
-    url: null,
+const dispatch = createEventDispatcher()
+const values = writable<{
+  name: string
+  url: string | null
+  file?: File
+  encryptionPassword?: string
+}>({
+  name: "",
+  url: null,
+})
+const validation = createValidationStore()
+const encryptionValidation = createValidationStore()
+const isEncryptedRegex = /^.*\.enc.*\.tar\.gz$/gm
+
+let creating = false
+let defaultAppName: string
+let template: AppTemplate | null = null
+
+$: {
+  const { url } = $values
+
+  validation.check({
+    ...$values,
+    url: url?.[0] === "/" ? url.substring(1, url.length) : url,
   })
-  const validation = createValidationStore()
-  const encryptionValidation = createValidationStore()
-  const isEncryptedRegex = /^.*\.enc.*\.tar\.gz$/gm
+  encryptionValidation.check({ ...$values })
+}
 
-  let creating = false
-  let defaultAppName: string
-  let template: AppTemplate | null = null
+// filename should be separated to avoid updates everytime any other form element changes
+$: filename = $values.file?.name
+$: encryptedFile = !!filename && isEncryptedRegex.test(filename)
 
-  $: {
-    const { url } = $values
-
-    validation.check({
-      ...$values,
-      url: url?.[0] === "/" ? url.substring(1, url.length) : url,
-    })
-    encryptionValidation.check({ ...$values })
+onMount(async () => {
+  if ($auth.user?.firstName) {
+    const lastChar = $auth.user?.firstName
+      ? $auth.user?.firstName[$auth.user?.firstName.length - 1]
+      : null
+    defaultAppName =
+      lastChar && lastChar.toLowerCase() == "s"
+        ? `${$auth.user.firstName} workspace`
+        : `${$auth.user.firstName}s workspace`
+  } else {
+    defaultAppName = `My workspace`
   }
 
-  // filename should be separated to avoid updates everytime any other form element changes
-  $: filename = $values.file?.name
-  $: encryptedFile = !!filename && isEncryptedRegex.test(filename)
+  $values.name = resolveAppName(template, defaultAppName)
+  nameToUrl($values.name)
+  await setupValidation()
+})
 
-  onMount(async () => {
-    if ($auth.user?.firstName) {
-      const lastChar = $auth.user?.firstName
-        ? $auth.user?.firstName[$auth.user?.firstName.length - 1]
-        : null
-      defaultAppName =
-        lastChar && lastChar.toLowerCase() == "s"
-          ? `${$auth.user.firstName} workspace`
-          : `${$auth.user.firstName}s workspace`
-    } else {
-      defaultAppName = `My workspace`
-    }
+$: workspacePrefix = `/workspace`
 
-    $values.name = resolveAppName(template, defaultAppName)
-    nameToUrl($values.name)
-    await setupValidation()
+$: appUrl = `${window.location.origin}${
+  $values.url
+    ? `${workspacePrefix}${$values.url}`
+    : `${workspacePrefix}${resolveAppUrl(template, $values.name)}`
+}`
+
+const resolveAppUrl = (template: AppTemplate | null, name: string) => {
+  let parsedName
+  const resolvedName = resolveAppName(template, name)
+  parsedName = resolvedName ? resolvedName.toLowerCase() : ""
+  const parsedUrl = parsedName ? parsedName.replace(/\s+/g, "-") : ""
+  return encodeURI(parsedUrl)
+}
+
+const resolveAppName = (template: AppTemplate | null, name: string) => {
+  if (template && !template.fromFile) {
+    return template.name
+  }
+  return name ? name.trim() : ""
+}
+
+const tidyUrl = (url: string | null) => {
+  if (url && !url.startsWith("/")) {
+    url = `/${url}`
+  }
+  $values.url = url === "" ? null : url
+}
+
+const nameToUrl = (appName: string) => {
+  let resolvedUrl = resolveAppUrl(template, appName)
+  tidyUrl(resolvedUrl)
+}
+
+const setupValidation = async () => {
+  const applications = get(appsStore).apps
+  workspaceValidation.name(validation, { workspaces: applications })
+  workspaceValidation.url(validation, { workspaces: applications })
+  workspaceValidation.file(validation, { template })
+
+  encryptionValidation.addValidatorType("encryptionPassword", "text", true)
+
+  // init validation
+  const { url } = $values
+  validation.check({
+    ...$values,
+    url: url?.[0] === "/" ? url.substring(1, url.length) : url,
   })
+}
+async function createNewApp() {
+  creating = true
 
-  $: workspacePrefix = `/workspace`
-
-  $: appUrl = `${window.location.origin}${
-    $values.url
-      ? `${workspacePrefix}${$values.url}`
-      : `${workspacePrefix}${resolveAppUrl(template, $values.name)}`
-  }`
-
-  const resolveAppUrl = (template: AppTemplate | null, name: string) => {
-    let parsedName
-    const resolvedName = resolveAppName(template, name)
-    parsedName = resolvedName ? resolvedName.toLowerCase() : ""
-    const parsedUrl = parsedName ? parsedName.replace(/\s+/g, "-") : ""
-    return encodeURI(parsedUrl)
-  }
-
-  const resolveAppName = (template: AppTemplate | null, name: string) => {
-    if (template && !template.fromFile) {
-      return template.name
+  try {
+    // Create form data to create app
+    let data = new FormData()
+    data.append("name", $values.name.trim())
+    if ($values.url) {
+      data.append("url", $values.url.trim())
     }
-    return name ? name.trim() : ""
-  }
 
-  const tidyUrl = (url: string | null) => {
-    if (url && !url.startsWith("/")) {
-      url = `/${url}`
+    if (template?.fromFile) {
+      data.append("useTemplate", "true")
+      data.append("fileToImport", $values.file!)
+      if ($values.encryptionPassword?.trim()) {
+        data.append("encryptionPassword", $values.encryptionPassword.trim())
+      }
     }
-    $values.url = url === "" ? null : url
-  }
 
-  const nameToUrl = (appName: string) => {
-    let resolvedUrl = resolveAppUrl(template, appName)
-    tidyUrl(resolvedUrl)
-  }
+    // Create App
+    const createdApp = await API.createApp(data)
 
-  const setupValidation = async () => {
-    const applications = get(appsStore).apps
-    workspaceValidation.name(validation, { workspaces: applications })
-    workspaceValidation.url(validation, { workspaces: applications })
-    workspaceValidation.file(validation, { template })
+    if (!redirectOnCreate) {
+      dispatch("created", createdApp)
+      return
+    }
 
-    encryptionValidation.addValidatorType("encryptionPassword", "text", true)
+    // Clear out the app context in the bulder
+    reset()
 
-    // init validation
-    const { url } = $values
-    validation.check({
-      ...$values,
-      url: url?.[0] === "/" ? url.substring(1, url.length) : url,
+    // Select Correct Application/DB in prep for creating user
+    const pkg = await API.fetchAppPackage(createdApp.instance._id)
+
+    // Set the builder state to know that a new app has been created
+    builderStore.appCreated(true)
+
+    await initialise(pkg)
+
+    if (!sdk.users.isBuilder($auth.user, createdApp?.appId)) {
+      // Refresh for access to created applications
+      await auth.getSelf()
+    }
+    $goto(`/builder/workspace/[application]`, {
+      application: createdApp.instance._id,
     })
+  } catch (error) {
+    creating = false
+    builderStore.appCreated(false)
+    throw error
   }
-  async function createNewApp() {
-    creating = true
+}
 
-    try {
-      // Create form data to create app
-      let data = new FormData()
-      data.append("name", $values.name.trim())
-      if ($values.url) {
-        data.append("url", $values.url.trim())
-      }
+const Step = { CONFIG: "config", SET_PASSWORD: "set_password" }
+let currentStep = Step.CONFIG
 
-      if (template?.fromFile) {
-        data.append("useTemplate", "true")
-        data.append("fileToImport", $values.file!)
-        if ($values.encryptionPassword?.trim()) {
-          data.append("encryptionPassword", $values.encryptionPassword.trim())
-        }
-      }
+// Check if create button should be enabled
+$: isCreateValid = template?.fromFile ? $validation.valid && !!$values.file : $validation.valid
 
-      // Create App
-      const createdApp = await API.createApp(data)
-
-      if (!redirectOnCreate) {
-        dispatch("created", createdApp)
-        return
-      }
-
-      // Clear out the app context in the bulder
-      reset()
-
-      // Select Correct Application/DB in prep for creating user
-      const pkg = await API.fetchAppPackage(createdApp.instance._id)
-
-      // Set the builder state to know that a new app has been created
-      builderStore.appCreated(true)
-
-      await initialise(pkg)
-
-      if (!sdk.users.isBuilder($auth.user, createdApp?.appId)) {
-        // Refresh for access to created applications
-        await auth.getSelf()
-      }
-      $goto(`/builder/workspace/[application]`, {
-        application: createdApp.instance._id,
-      })
-    } catch (error) {
-      creating = false
-      builderStore.appCreated(false)
-      throw error
-    }
-  }
-
-  const Step = { CONFIG: "config", SET_PASSWORD: "set_password" }
-  let currentStep = Step.CONFIG
-
-  // Check if create button should be enabled
-  $: isCreateValid = template?.fromFile
-    ? $validation.valid && !!$values.file
-    : $validation.valid
-
-  $: stepConfig = {
-    [Step.CONFIG]: {
-      title: `Create your workspace`,
-      confirmText: `Create workspace`,
-      onConfirm: async () => {
-        if (encryptedFile) {
-          currentStep = Step.SET_PASSWORD
-          return keepOpen
-        } else {
-          try {
-            await createNewApp()
-          } catch (error: any) {
-            notifications.error(`Error creating workspace - ${error.message}`)
-          }
-        }
-      },
-      isValid: isCreateValid,
-    },
-    [Step.SET_PASSWORD]: {
-      title: "Provide the export password",
-      confirmText: `Import workspace`,
-      onConfirm: async () => {
+$: stepConfig = {
+  [Step.CONFIG]: {
+    title: `Create your workspace`,
+    confirmText: `Create workspace`,
+    onConfirm: async () => {
+      if (encryptedFile) {
+        currentStep = Step.SET_PASSWORD
+        return keepOpen
+      } else {
         try {
           await createNewApp()
-        } catch (e: any) {
-          let message = `Error creating workspace`
-          if (e.message) {
-            message += `: ${lowercase(e.message)}`
-          }
-          notifications.error(message)
-          return keepOpen
+        } catch (error: any) {
+          notifications.error(`Error creating workspace - ${error.message}`)
         }
-      },
-      isValid: $encryptionValidation.valid,
+      }
     },
-  }
+    isValid: isCreateValid,
+  },
+  [Step.SET_PASSWORD]: {
+    title: "Provide the export password",
+    confirmText: `Import workspace`,
+    onConfirm: async () => {
+      try {
+        await createNewApp()
+      } catch (e: any) {
+        let message = `Error creating workspace`
+        if (e.message) {
+          message += `: ${lowercase(e.message)}`
+        }
+        notifications.error(message)
+        return keepOpen
+      }
+    },
+    isValid: $encryptionValidation.valid,
+  },
+}
 
-  function onDropFile(e: CustomEvent<any[]>) {
-    $values.file = e.detail?.[0]
-    $validation.touched.file = true
-  }
+function onDropFile(e: CustomEvent<any[]>) {
+  $values.file = e.detail?.[0]
+  $validation.touched.file = true
+}
 </script>
 
 <ModalContent

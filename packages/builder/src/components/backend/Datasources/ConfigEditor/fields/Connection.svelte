@@ -1,76 +1,76 @@
 <script lang="ts">
-  import { Label, Icon } from "@budibase/bbui"
-  import { createEventDispatcher } from "svelte"
+import { Icon, Label } from "@budibase/bbui"
+import { createEventDispatcher } from "svelte"
 
-  export let name
-  export let value
-  export let error
-  export let placeholder
-  export let defaultHideConnectionUrl: boolean | undefined = false
-  export let size: "S" | "M" | "L" | "XL" = "L"
+export let name
+export let value
+export let error
+export let placeholder
+export let defaultHideConnectionUrl: boolean | undefined = false
+export let size: "S" | "M" | "L" | "XL" = "L"
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  let isFocused = false
-  let isHidden = defaultHideConnectionUrl
-  let inputValue = ""
+let isFocused = false
+let isHidden = defaultHideConnectionUrl
+let inputValue = ""
 
-  $: {
-    if (isHidden && value) {
-      inputValue = "••••••••••••"
-    } else {
-      inputValue = value || ""
+$: {
+  if (isHidden && value) {
+    inputValue = "••••••••••••"
+  } else {
+    inputValue = value || ""
+  }
+}
+
+const parseConnectionString = (connStr: string) => {
+  try {
+    const url = new URL(connStr)
+    return {
+      host: url.hostname || "",
+      port: url.port ? parseInt(url.port) : 5432,
+      database: url.pathname.replace("/", "") || "postgres",
+      user: url.username || "",
+      password: url.password || "",
     }
+  } catch {
+    return null
+  }
+}
+
+const handleInput = (e: Event) => {
+  const target = e.target as HTMLTextAreaElement
+  const connStr = target.value
+
+  if (!isHidden && connStr === "••••••••••••") {
+    return
   }
 
-  const parseConnectionString = (connStr: string) => {
-    try {
-      const url = new URL(connStr)
-      return {
-        host: url.hostname || "",
-        port: url.port ? parseInt(url.port) : 5432,
-        database: url.pathname.replace("/", "") || "postgres",
-        user: url.username || "",
-        password: url.password || "",
-      }
-    } catch {
-      return null
-    }
+  dispatch("change", connStr)
+
+  const parsed = parseConnectionString(connStr)
+  if (parsed) {
+    dispatch("parsed", parsed)
   }
+}
 
-  const handleInput = (e: Event) => {
-    const target = e.target as HTMLTextAreaElement
-    const connStr = target.value
+const handleFocus = () => {
+  isFocused = true
+}
 
-    if (!isHidden && connStr === "••••••••••••") {
-      return
-    }
+const handleBlur = () => {
+  isFocused = false
+  dispatch("blur")
+}
 
-    dispatch("change", connStr)
-
-    const parsed = parseConnectionString(connStr)
-    if (parsed) {
-      dispatch("parsed", parsed)
-    }
+const toggleVisibility = () => {
+  isHidden = !isHidden
+  if (!isHidden && value) {
+    inputValue = value
+  } else if (isHidden && value) {
+    inputValue = "••••••••••••"
   }
-
-  const handleFocus = () => {
-    isFocused = true
-  }
-
-  const handleBlur = () => {
-    isFocused = false
-    dispatch("blur")
-  }
-
-  const toggleVisibility = () => {
-    isHidden = !isHidden
-    if (!isHidden && value) {
-      inputValue = value
-    } else if (isHidden && value) {
-      inputValue = "••••••••••••"
-    }
-  }
+}
 </script>
 
 <div class="connection-field">

@@ -1,29 +1,24 @@
-import * as utils from "../../../../db/utils"
-
 import { sql } from "@budibase/backend-core"
-import {
-  Ctx,
-  DatasourcePlusQueryResponse,
-  FieldType,
-  RelationshipsJson,
-  Row,
-  Table,
-} from "@budibase/types"
-import { processDates } from "../../../../utilities/rowProcessor"
-import { isKnexRows } from "./sqlUtils"
-import { basicProcessing, generateIdForRow } from "./basic"
-import sdk from "../../../../sdk"
 import { processStringSync } from "@budibase/string-templates"
+import {
+  type Ctx,
+  type DatasourcePlusQueryResponse,
+  FieldType,
+  type RelationshipsJson,
+  type Row,
+  type Table,
+} from "@budibase/types"
 import validateJs from "validate.js"
+import * as utils from "../../../../db/utils"
+import sdk from "../../../../sdk"
+import { processDates } from "../../../../utilities/rowProcessor"
+import { basicProcessing, generateIdForRow } from "./basic"
+import { isKnexRows } from "./sqlUtils"
 
 validateJs.extend(validateJs.validators.datetime, {
-  parse: function (value: string) {
-    return new Date(value).getTime()
-  },
+  parse: (value: string) => new Date(value).getTime(),
   // Input is a unix timestamp
-  format: function (value: string) {
-    return new Date(value).toISOString()
-  },
+  format: (value: string) => new Date(value).toISOString(),
 })
 
 export async function processRelationshipFields(
@@ -32,15 +27,15 @@ export async function processRelationshipFields(
   row: Row,
   relationships: RelationshipsJson[]
 ): Promise<Row> {
-  for (let relationship of relationships) {
+  for (const relationship of relationships) {
     const linkedTable = tables[relationship.tableName]
     if (!linkedTable || !row[relationship.column]) {
       continue
     }
-    for (let key of Object.keys(row[relationship.column])) {
+    for (const key of Object.keys(row[relationship.column])) {
       let relatedRow: Row = row[relationship.column][key]
       // add this row as context for the relationship
-      for (let col of Object.values(linkedTable.schema)) {
+      for (const col of Object.values(linkedTable.schema)) {
         if (col.type === FieldType.LINK && col.tableId === table._id) {
           relatedRow[col.name] = [row]
         }
@@ -79,7 +74,7 @@ export async function getTableFromSource(source: Table) {
 }
 
 function fixBooleanFields(row: Row, table: Table) {
-  for (let col of Object.values(table.schema)) {
+  for (const col of Object.values(table.schema)) {
     if (col.type === FieldType.BOOLEAN) {
       if (row[col.name] === 1) {
         row[col.name] = true
@@ -108,10 +103,10 @@ export async function sqlOutputProcessing(
     return []
   }
 
-  let table: Table = source
-  let isCalculationView = false
+  const table: Table = source
+  const isCalculationView = false
 
-  let processedRows: Row[] = []
+  const processedRows: Row[] = []
   for (let row of rows) {
     if (row._id == null && !isCalculationView) {
       row._id = generateIdForRow(row, table)
@@ -141,12 +136,12 @@ export async function enrichArrayContext(
   helpers = true
 ): Promise<Record<string, any>[]> {
   const map: Record<string, any> = {}
-  for (let index in fields) {
+  for (const index in fields) {
     map[index] = fields[index]
   }
   const output = await enrichSearchContext(map, inputs, helpers)
   const outputArray = []
-  for (let [key, value] of Object.entries(output)) {
+  for (const [key, value] of Object.entries(output)) {
     outputArray[parseInt(key)] = value
   }
   return outputArray
@@ -168,18 +163,14 @@ export async function enrichSearchContext(
   }
 
   // enrich the fields with dynamic parameters
-  for (let key of Object.keys(fields)) {
+  for (const key of Object.keys(fields)) {
     if (fields[key] == null) {
       enrichedQuery[key] = null
       continue
     }
     if (typeof fields[key] === "object") {
       // enrich nested fields object
-      enrichedQuery[key] = await enrichSearchContext(
-        fields[key],
-        parameters,
-        helpers
-      )
+      enrichedQuery[key] = await enrichSearchContext(fields[key], parameters, helpers)
     } else if (typeof fields[key] === "string") {
       // enrich string value as normal
       enrichedQuery[key] = processStringSync(fields[key], parameters, {

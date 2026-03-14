@@ -1,107 +1,103 @@
 <script lang="ts">
-  import { MarkdownViewer } from "@budibase/bbui"
-  // @ts-expect-error
-  import LICENSE from "../../../../../LICENSE?raw"
+import { MarkdownViewer } from "@budibase/bbui"
+// @ts-expect-error
+import LICENSE from "../../../../../LICENSE?raw"
 
-  export let baseUrl: string | undefined = undefined
+export let baseUrl: string | undefined = undefined
 
-  let contentEl: HTMLDivElement | null = null
+let contentEl: HTMLDivElement | null = null
 
-  const resolveBaseUrl = (value: string | undefined) => {
-    const url = (value || "").trim()
-    if (!url) {
-      return undefined
-    }
-    try {
-      return new URL(url).toString()
-    } catch (_error) {
-      return undefined
-    }
+const resolveBaseUrl = (value: string | undefined) => {
+  const url = (value || "").trim()
+  if (!url) {
+    return undefined
   }
+  try {
+    return new URL(url).toString()
+  } catch (_error) {
+    return undefined
+  }
+}
 
-  const toAbsoluteUrl = (
-    href: string | null | undefined,
-    resolvedBase?: string
-  ) => {
-    if (!href) {
-      return undefined
+const toAbsoluteUrl = (href: string | null | undefined, resolvedBase?: string) => {
+  if (!href) {
+    return undefined
+  }
+  try {
+    if (resolvedBase) {
+      return new URL(href, resolvedBase).toString()
     }
-    try {
-      if (resolvedBase) {
+    return new URL(href).toString()
+  } catch (_error) {
+    if (resolvedBase) {
+      try {
         return new URL(href, resolvedBase).toString()
+      } catch (_err) {
+        return undefined
       }
-      return new URL(href).toString()
-    } catch (_error) {
+    }
+    return undefined
+  }
+}
+
+interface LinkEnhancerParams {
+  baseUrl?: string
+  contentKey?: string
+  onMutate?: () => void
+}
+
+const replaceWithSpan = (anchor: HTMLAnchorElement) => {
+  const span = anchor.ownerDocument?.createElement("span")
+  if (!span) {
+    return
+  }
+  while (anchor.firstChild) {
+    span.appendChild(anchor.firstChild)
+  }
+  anchor.replaceWith(span)
+}
+
+const isHashLink = (href?: string | null) => typeof href === "string" && href.trim().startsWith("#")
+
+const enhanceLinks = (node: HTMLElement, params: LinkEnhancerParams = {}) => {
+  let { baseUrl: currentBase, onMutate } = params
+
+  const apply = () => {
+    const resolvedBase = resolveBaseUrl(currentBase)
+    node.querySelectorAll("a").forEach((anchor) => {
+      const href = anchor.getAttribute("href") || undefined
+      if (isHashLink(href)) {
+        replaceWithSpan(anchor)
+        return
+      }
       if (resolvedBase) {
-        try {
-          return new URL(href, resolvedBase).toString()
-        } catch (_err) {
-          return undefined
+        const absolute = toAbsoluteUrl(href, resolvedBase)
+        if (absolute) {
+          anchor.setAttribute("href", absolute)
         }
       }
-      return undefined
-    }
+      anchor.setAttribute("target", "_blank")
+      anchor.setAttribute("rel", "noopener noreferrer")
+      anchor.classList.add("spectrum-Link", "spectrum-Link--sizeM")
+    })
+    onMutate?.()
   }
 
-  interface LinkEnhancerParams {
-    baseUrl?: string
-    contentKey?: string
-    onMutate?: () => void
+  const observer = new MutationObserver(apply)
+  observer.observe(node, { childList: true, subtree: true })
+  apply()
+
+  return {
+    update(newParams?: LinkEnhancerParams) {
+      currentBase = newParams?.baseUrl
+      onMutate = newParams?.onMutate
+      apply()
+    },
+    destroy() {
+      observer.disconnect()
+    },
   }
-
-  const replaceWithSpan = (anchor: HTMLAnchorElement) => {
-    const span = anchor.ownerDocument?.createElement("span")
-    if (!span) {
-      return
-    }
-    while (anchor.firstChild) {
-      span.appendChild(anchor.firstChild)
-    }
-    anchor.replaceWith(span)
-  }
-
-  const isHashLink = (href?: string | null) =>
-    typeof href === "string" && href.trim().startsWith("#")
-
-  const enhanceLinks = (node: HTMLElement, params: LinkEnhancerParams = {}) => {
-    let { baseUrl: currentBase, onMutate } = params
-
-    const apply = () => {
-      const resolvedBase = resolveBaseUrl(currentBase)
-      node.querySelectorAll("a").forEach(anchor => {
-        const href = anchor.getAttribute("href") || undefined
-        if (isHashLink(href)) {
-          replaceWithSpan(anchor)
-          return
-        }
-        if (resolvedBase) {
-          const absolute = toAbsoluteUrl(href, resolvedBase)
-          if (absolute) {
-            anchor.setAttribute("href", absolute)
-          }
-        }
-        anchor.setAttribute("target", "_blank")
-        anchor.setAttribute("rel", "noopener noreferrer")
-        anchor.classList.add("spectrum-Link", "spectrum-Link--sizeM")
-      })
-      onMutate?.()
-    }
-
-    const observer = new MutationObserver(apply)
-    observer.observe(node, { childList: true, subtree: true })
-    apply()
-
-    return {
-      update(newParams?: LinkEnhancerParams) {
-        currentBase = newParams?.baseUrl
-        onMutate = newParams?.onMutate
-        apply()
-      },
-      destroy() {
-        observer.disconnect()
-      },
-    }
-  }
+}
 </script>
 
 <div>

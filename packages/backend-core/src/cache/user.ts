@@ -1,9 +1,9 @@
-import * as redis from "../redis/init"
-import * as tenancy from "../tenancy"
+import type { SSOUser, User, UserMetadata } from "@budibase/types"
 import * as context from "../context"
 import * as platform from "../platform"
+import * as redis from "../redis/init"
+import * as tenancy from "../tenancy"
 import { UserDB } from "../users"
-import { User, SSOUser, UserMetadata } from "@budibase/types"
 
 const EXPIRY_SECONDS = 3600
 
@@ -25,7 +25,7 @@ async function populateUsersFromDB(
   // Handle missed user ids
   const notFoundIds = userIds.filter((uid, i) => !getUsersResponse[i])
 
-  const users = getUsersResponse.filter(x => x)
+  const users = getUsersResponse.filter((x) => x)
 
   await Promise.all(
     users.map(async (user: any) => {
@@ -58,11 +58,7 @@ export async function getUser({
   userId: string
   email?: string
   tenantId?: string
-  populateUser?: (
-    userId: string,
-    tenantId: string,
-    email?: string
-  ) => Promise<User>
+  populateUser?: (userId: string, tenantId: string, email?: string) => Promise<User>
 }) {
   if (!populateUser) {
     populateUser = populateFromDB
@@ -102,9 +98,9 @@ export async function getUsers(
   const client = await redis.getUserClient()
 
   const usersFromCache = await client.bulkGet<User>(userIds)
-  const missingUsersFromCache = userIds.filter(uid => !usersFromCache[uid])
+  const missingUsersFromCache = userIds.filter((uid) => !usersFromCache[uid])
 
-  const users = Object.values(usersFromCache).filter(user => !!user)
+  const users = Object.values(usersFromCache).filter((user) => !!user)
   let notFoundIds
   if (missingUsersFromCache.length) {
     const usersFromDb = await populateUsersFromDB(missingUsersFromCache)

@@ -1,11 +1,11 @@
 <script lang="ts">
-  import Icon from "../Icon/Icon.svelte"
+import Icon from "../Icon/Icon.svelte"
 
-  export let selected: boolean = false
-  export let open: boolean = false
-  export let href: string | null = null
-  export let title: string
-  export let icon: string | undefined
+export let selected: boolean = false
+export let open: boolean = false
+export let href: string | null = null
+export let title: string
+export let icon: string | undefined
 </script>
 
 <li

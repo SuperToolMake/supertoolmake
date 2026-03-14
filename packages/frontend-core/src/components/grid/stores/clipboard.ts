@@ -1,9 +1,9 @@
-import { derived, writable, get, Writable, Readable } from "svelte/store"
 import { Helpers } from "@budibase/bbui"
-import { parseCellID, getCellID } from "../lib/utils"
+import { derived, get, type Readable, type Writable, writable } from "svelte/store"
+import type { ExternalClipboardData } from "../../../stores/gridClipboard"
 import { NewRowID } from "../lib/constants"
-import { Store as StoreContext } from "."
-import { ExternalClipboardData } from "../../../stores/gridClipboard"
+import { getCellID, parseCellID } from "../lib/utils"
+import type { Store as StoreContext } from "."
 
 type ClipboardStoreData =
   | {
@@ -68,31 +68,17 @@ export const createStores = (context?: {
 }
 
 export const deriveStores = (context: StoreContext): ClipboardDerivedStore => {
-  const {
-    clipboard,
-    focusedCellAPI,
-    selectedCellCount,
-    config,
-    focusedRowId,
-    props,
-  } = context
+  const { clipboard, focusedCellAPI, selectedCellCount, config, focusedRowId, props } = context
 
   // Derive whether or not we're able to copy
-  const copyAllowed = derived(focusedCellAPI, $focusedCellAPI => {
+  const copyAllowed = derived(focusedCellAPI, ($focusedCellAPI) => {
     return $focusedCellAPI != null
   })
 
   // Derive whether or not we're able to paste
   const pasteAllowed = derived(
     [clipboard, focusedCellAPI, selectedCellCount, config, focusedRowId, props],
-    ([
-      $clipboard,
-      $focusedCellAPI,
-      $selectedCellCount,
-      $config,
-      $focusedRowId,
-      $props,
-    ]) => {
+    ([$clipboard, $focusedCellAPI, $selectedCellCount, $config, $focusedRowId, $props]) => {
       // Check if we have clipboard data (internal or external)
       let hasClipboardData = $clipboard.value != null
       if (!hasClipboardData && $props.externalClipboard?.clipboard) {
@@ -111,11 +97,7 @@ export const deriveStores = (context: StoreContext): ClipboardDerivedStore => {
 
       // Prevent single-single pasting if the cell is readonly
       const multiCellPaste = $selectedCellCount > 1
-      if (
-        !$clipboard.multiCellCopy &&
-        !multiCellPaste &&
-        $focusedCellAPI.isReadonly()
-      ) {
+      if (!$clipboard.multiCellCopy && !multiCellPaste && $focusedCellAPI.isReadonly()) {
         return false
       }
       return true
@@ -311,7 +293,7 @@ export const createActions = (context: StoreContext): ClipboardActions => {
     } else {
       if (multiCellPaste) {
         // Single to multi - duplicate value to all selected cells
-        const newValue = get(selectedCells).map(row => row.map(() => value!))
+        const newValue = get(selectedCells).map((row) => row.map(() => value!))
         await pasteIntoSelectedCells(newValue, progressCallback)
       } else {
         // Single to single - just update the cell's value
@@ -321,10 +303,7 @@ export const createActions = (context: StoreContext): ClipboardActions => {
   }
 
   // Paste the specified value into the currently selected cells
-  const pasteIntoSelectedCells = async (
-    value: string[][],
-    progressCallback: () => any
-  ) => {
+  const pasteIntoSelectedCells = async (value: string[][], progressCallback: () => any) => {
     const $selectedCells = get(selectedCells)
 
     // Find the extent at which we can paste
@@ -332,7 +311,7 @@ export const createActions = (context: StoreContext): ClipboardActions => {
     const colExtent = Math.min(value[0].length, $selectedCells[0].length)
 
     // Build change map
-    let changeMap: Record<string, Record<string, string>> = {}
+    const changeMap: Record<string, Record<string, string>> = {}
     for (let rowIdx = 0; rowIdx < rowExtent; rowIdx++) {
       for (let colIdx = 0; colIdx < colExtent; colIdx++) {
         const cellId = $selectedCells[rowIdx][colIdx]

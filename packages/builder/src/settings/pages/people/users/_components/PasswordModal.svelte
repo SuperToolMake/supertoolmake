@@ -1,120 +1,115 @@
 <script lang="ts">
-  import { Body, ModalContent, Table, Icon } from "@budibase/bbui"
-  import PasswordCopyTableRenderer from "./PasswordCopyTableRenderer.svelte"
-  import { parseToCsv } from "@/helpers/data/utils"
-  import { onMount } from "svelte"
-  import InviteResponseRenderer from "./InviteResponseRenderer.svelte"
-  import type { BulkUserCreated } from "@budibase/types"
+import { Body, Icon, ModalContent, Table } from "@budibase/bbui"
+import type { BulkUserCreated } from "@budibase/types"
+import { onMount } from "svelte"
+import { parseToCsv } from "@/helpers/data/utils"
+import InviteResponseRenderer from "./InviteResponseRenderer.svelte"
+import PasswordCopyTableRenderer from "./PasswordCopyTableRenderer.svelte"
 
-  export let userData: { email: string; password: string }[]
-  export let createUsersResponse: BulkUserCreated
-  export let addedToWorkspaceEmails: string[] = []
-  const MAX_VISIBLE_PASSWORD_ROWS = 10
-  const MAX_VISIBLE_FAILURE_ROWS = 10
+export let userData: { email: string; password: string }[]
+export let createUsersResponse: BulkUserCreated
+export let addedToWorkspaceEmails: string[] = []
+const MAX_VISIBLE_PASSWORD_ROWS = 10
+const MAX_VISIBLE_FAILURE_ROWS = 10
 
-  let hasSuccess: boolean
-  let hasFailure: boolean
-  let title: string
-  let failureMessage: string
-  let shouldShowPasswordsTable: boolean
-  let shouldShowFailuresTable: boolean
+let hasSuccess: boolean
+let hasFailure: boolean
+let title: string
+let failureMessage: string
+let shouldShowPasswordsTable: boolean
+let shouldShowFailuresTable: boolean
 
-  let userDataIndex: Record<string, { password: string }>
-  let successfulUsers: { email: string; password: string }[]
-  let unsuccessfulUsers: { email: string; reason: string }[]
-  let addedToWorkspaceUsers: { email: string }[] = []
+let userDataIndex: Record<string, { password: string }>
+let successfulUsers: { email: string; password: string }[]
+let unsuccessfulUsers: { email: string; reason: string }[]
+let addedToWorkspaceUsers: { email: string }[] = []
 
-  const setTitle = () => {
-    if (hasSuccess) {
-      title = "Users created!"
-    } else if (hasFailure) {
-      title = "Oops!"
+const setTitle = () => {
+  if (hasSuccess) {
+    title = "Users created!"
+  } else if (hasFailure) {
+    title = "Oops!"
+  }
+}
+
+const setFailureMessage = () => {
+  const failureCount = createUsersResponse.unsuccessful.length
+  const includeFailureCount = failureCount > MAX_VISIBLE_FAILURE_ROWS
+  const countSuffix = includeFailureCount ? ` (${failureCount}).` : "."
+
+  if (hasSuccess) {
+    failureMessage = `However there was a problem creating some users${countSuffix}`
+  } else {
+    failureMessage = `There was a problem creating some users${countSuffix}`
+  }
+}
+
+const setUsers = () => {
+  userDataIndex = userData.reduce<typeof userDataIndex>((prev, current) => {
+    prev[current.email] = current
+    return prev
+  }, {})
+
+  successfulUsers = createUsersResponse.successful.map((user) => {
+    return {
+      email: user.email,
+      password: userDataIndex[user.email].password,
     }
-  }
-
-  const setFailureMessage = () => {
-    const failureCount = createUsersResponse.unsuccessful.length
-    const includeFailureCount = failureCount > MAX_VISIBLE_FAILURE_ROWS
-    const countSuffix = includeFailureCount ? ` (${failureCount}).` : "."
-
-    if (hasSuccess) {
-      failureMessage = `However there was a problem creating some users${countSuffix}`
-    } else {
-      failureMessage = `There was a problem creating some users${countSuffix}`
-    }
-  }
-
-  const setUsers = () => {
-    userDataIndex = userData.reduce<typeof userDataIndex>((prev, current) => {
-      prev[current.email] = current
-      return prev
-    }, {})
-
-    successfulUsers = createUsersResponse.successful.map(user => {
-      return {
-        email: user.email,
-        password: userDataIndex[user.email].password,
-      }
-    })
-
-    unsuccessfulUsers = createUsersResponse.unsuccessful.map(user => {
-      return {
-        email: user.email,
-        reason: user.reason,
-      }
-    })
-
-    addedToWorkspaceUsers = addedToWorkspaceEmails.map(email => ({ email }))
-  }
-
-  onMount(() => {
-    hasSuccess = createUsersResponse.successful.length > 0
-    hasFailure = createUsersResponse.unsuccessful.length > 0
-    shouldShowPasswordsTable =
-      createUsersResponse.successful.length <= MAX_VISIBLE_PASSWORD_ROWS
-    shouldShowFailuresTable =
-      createUsersResponse.unsuccessful.length <= MAX_VISIBLE_FAILURE_ROWS
-    setTitle()
-    setFailureMessage()
-    setUsers()
   })
 
-  const successSchema = {
-    email: {},
-    password: {},
-  }
+  unsuccessfulUsers = createUsersResponse.unsuccessful.map((user) => {
+    return {
+      email: user.email,
+      reason: user.reason,
+    }
+  })
 
-  const failedSchema = {
-    email: {},
-    reason: {},
-  }
+  addedToWorkspaceUsers = addedToWorkspaceEmails.map((email) => ({ email }))
+}
 
-  const workspaceAddedSchema = {
-    email: {},
-  }
+onMount(() => {
+  hasSuccess = createUsersResponse.successful.length > 0
+  hasFailure = createUsersResponse.unsuccessful.length > 0
+  shouldShowPasswordsTable = createUsersResponse.successful.length <= MAX_VISIBLE_PASSWORD_ROWS
+  shouldShowFailuresTable = createUsersResponse.unsuccessful.length <= MAX_VISIBLE_FAILURE_ROWS
+  setTitle()
+  setFailureMessage()
+  setUsers()
+})
 
-  const downloadCsvFile = () => {
-    const fileName = "passwords.csv"
-    const content = parseToCsv(["email", "password"], successfulUsers)
+const successSchema = {
+  email: {},
+  password: {},
+}
 
-    download(fileName, content)
-  }
+const failedSchema = {
+  email: {},
+  reason: {},
+}
 
-  const download = (filename: string, text: string) => {
-    const element = document.createElement("a")
-    element.setAttribute(
-      "href",
-      "data:text/csv;charset=utf-8," + encodeURIComponent(text)
-    )
-    element.setAttribute("download", filename)
+const workspaceAddedSchema = {
+  email: {},
+}
 
-    element.style.display = "none"
-    document.body.appendChild(element)
+const downloadCsvFile = () => {
+  const fileName = "passwords.csv"
+  const content = parseToCsv(["email", "password"], successfulUsers)
 
-    element.click()
+  download(fileName, content)
+}
 
-    document.body.removeChild(element)
-  }
+const download = (filename: string, text: string) => {
+  const element = document.createElement("a")
+  element.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURIComponent(text))
+  element.setAttribute("download", filename)
+
+  element.style.display = "none"
+  document.body.appendChild(element)
+
+  element.click()
+
+  document.body.removeChild(element)
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

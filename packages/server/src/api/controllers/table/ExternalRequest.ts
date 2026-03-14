@@ -1,10 +1,4 @@
-import {
-  Datasource,
-  Operation,
-  QueryJson,
-  RenameColumn,
-  Table,
-} from "@budibase/types"
+import type { Datasource, Operation, QueryJson, RenameColumn, Table } from "@budibase/types"
 import { makeExternalQuery } from "../../../integrations/base/query"
 
 export async function makeTableRequest(

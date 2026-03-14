@@ -13,9 +13,9 @@ export const getOptions = (
 
   // Extract options from data provider
   if (optionsSource === "provider" && valueColumn) {
-    let valueCache = {}
-    let options = []
-    dataProvider?.rows?.forEach(row => {
+    const valueCache = {}
+    const options = []
+    dataProvider?.rows?.forEach((row) => {
       const value = row?.[valueColumn]
       if (value != null && !valueCache[value]) {
         valueCache[value] = true
@@ -28,7 +28,7 @@ export const getOptions = (
 
   // Extract custom options
   if (optionsSource === "custom" && customOptions) {
-    customOptions.forEach(option => {
+    customOptions.forEach((option) => {
       if (typeof option.value === "string") {
         if (option.value.toLowerCase() === "true") {
           option.value = true

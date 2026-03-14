@@ -1,9 +1,9 @@
-import * as google from "../sso/google"
-import { Cookie } from "../../../constants"
-import * as configs from "../../../configs"
+import type { SSOProfile, UserCtx } from "@budibase/types"
 import * as cache from "../../../cache"
+import * as configs from "../../../configs"
+import { Cookie } from "../../../constants"
 import * as utils from "../../../utils"
-import { UserCtx, SSOProfile } from "@budibase/types"
+import * as google from "../sso/google"
 import { ssoSaveUserNoOp } from "../sso/sso"
 
 const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy
@@ -13,7 +13,7 @@ type Passport = {
 }
 
 async function fetchGoogleCreds() {
-  let config = await configs.getGoogleDatasourceConfig()
+  const config = await configs.getGoogleDatasourceConfig()
 
   if (!config) {
     throw new Error("No google configuration found")
@@ -21,21 +21,13 @@ async function fetchGoogleCreds() {
   return config
 }
 
-export async function preAuth(
-  passport: Passport,
-  ctx: UserCtx,
-  next: Function
-) {
+export async function preAuth(passport: Passport, ctx: UserCtx, next: Function) {
   // get the relevant config
   const googleConfig = await fetchGoogleCreds()
   const platformUrl = await configs.getPlatformUrl({ tenantAware: false })
 
-  let callbackUrl = `${platformUrl}/api/global/auth/datasource/google/callback`
-  const strategy = await google.strategyFactory(
-    googleConfig,
-    callbackUrl,
-    ssoSaveUserNoOp
-  )
+  const callbackUrl = `${platformUrl}/api/global/auth/datasource/google/callback`
+  const strategy = await google.strategyFactory(googleConfig, callbackUrl, ssoSaveUserNoOp)
 
   if (!ctx.query.appId) {
     ctx.throw(400, "appId query param not present.")
@@ -48,20 +40,13 @@ export async function preAuth(
   })(ctx, next)
 }
 
-export async function postAuth(
-  passport: Passport,
-  ctx: UserCtx,
-  next: Function
-) {
+export async function postAuth(passport: Passport, ctx: UserCtx, next: Function) {
   // get the relevant config
   const config = await fetchGoogleCreds()
   const platformUrl = await configs.getPlatformUrl({ tenantAware: false })
 
-  let callbackUrl = `${platformUrl}/api/global/auth/datasource/google/callback`
-  const authStateCookie = utils.getCookie<{ appId: string }>(
-    ctx,
-    Cookie.DatasourceAuth
-  )
+  const callbackUrl = `${platformUrl}/api/global/auth/datasource/google/callback`
+  const authStateCookie = utils.getCookie<{ appId: string }>(ctx, Cookie.DatasourceAuth)
 
   if (!authStateCookie) {
     throw new Error("Unable to fetch datasource auth cookie")
@@ -74,12 +59,7 @@ export async function postAuth(
         clientSecret: config.clientSecret,
         callbackURL: callbackUrl,
       },
-      (
-        accessToken: string,
-        refreshToken: string,
-        _profile: SSOProfile,
-        done: Function
-      ) => {
+      (accessToken: string, refreshToken: string, _profile: SSOProfile, done: Function) => {
         utils.clearCookie(ctx, Cookie.DatasourceAuth)
         done(null, { accessToken, refreshToken })
       }
@@ -89,12 +69,9 @@ export async function postAuth(
       const baseUrl = `/builder/workspace/${authStateCookie.appId}/data`
 
       const id = utils.newid()
-      await cache.store(
-        `datasource:creation:${authStateCookie.appId}:google:${id}`,
-        {
-          tokens,
-        }
-      )
+      await cache.store(`datasource:creation:${authStateCookie.appId}:google:${id}`, {
+        tokens,
+      })
 
       ctx.redirect(`${baseUrl}/new?continue_google_setup=${id}`)
     }

@@ -1,4 +1,4 @@
-import { Datasource, Table, UITable } from "@budibase/types"
+import type { Datasource, Table, UITable } from "@budibase/types"
 
 export type UIDatasource = UITable
 

@@ -1,12 +1,12 @@
 <script>
-  export let logoUrl
-  export let logoLinkUrl
-  export let openLogoLinkInNewTab
-  export let hideLogo = false
-  export let title
-  export let isInternal
-  export let getSanitizedUrl
-  export let linkable
+export let logoUrl
+export let logoLinkUrl
+export let openLogoLinkInNewTab
+export let hideLogo = false
+export let title
+export let isInternal
+export let getSanitizedUrl
+export let linkable
 </script>
 
 {#if !hideLogo}

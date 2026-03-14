@@ -1,5 +1,5 @@
-import { Table } from "./types"
-import { RequiredKeys } from "@budibase/types"
+import type { RequiredKeys } from "@budibase/types"
+import type { Table } from "./types"
 
 function table(body: any): RequiredKeys<Table> {
   return {

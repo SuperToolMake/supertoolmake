@@ -1,6 +1,6 @@
 import { permissions } from "@budibase/backend-core"
 import { BuilderSocketEvent } from "@budibase/shared-core"
-import {
+import type {
   ContextUser,
   Ctx,
   Datasource,
@@ -11,13 +11,13 @@ import {
   Workspace,
   WorkspaceApp,
 } from "@budibase/types"
-import http from "http"
-import Koa from "koa"
-import { Socket } from "socket.io"
+import type http from "http"
+import type Koa from "koa"
+import type { Socket } from "socket.io"
 import { authorizedMiddleware as authorized } from "../middleware/authorized"
 import { clearLock, updateLock } from "../utilities/redis"
 import { gridSocket } from "./index"
-import { BaseSocket, EmitOptions } from "./websocket"
+import { BaseSocket, type EmitOptions } from "./websocket"
 
 export default class BuilderSocket extends BaseSocket {
   constructor(app: Koa, server: http.Server) {
@@ -31,8 +31,8 @@ export default class BuilderSocket extends BaseSocket {
       const sessions = await this.getRoomSessions(appId)
 
       // Track collaboration usage by unique users
-      let userIdMap: Record<string, boolean> = {}
-      sessions?.forEach(session => {
+      const userIdMap: Record<string, boolean> = {}
+      sessions?.forEach((session) => {
         if (session._id) {
           userIdMap[session._id] = true
         }
@@ -52,28 +52,28 @@ export default class BuilderSocket extends BaseSocket {
     // Remove app lock from this user if they have no other connections,
     // and transfer it to someone else if possible
     try {
-      // @ts-ignore
+      // @ts-expect-error
       const session: SocketSession = socket.data
       const { _id, sessionId, room } = session
       const sessions = await this.getRoomSessions(room)
-      const hasOtherSession = sessions.some(otherSession => {
+      const hasOtherSession = sessions.some((otherSession) => {
         return _id === otherSession._id && sessionId !== otherSession.sessionId
       })
       if (!hasOtherSession && room) {
         // Clear the lock from this user since they had no other sessions
-        // @ts-ignore
+        // @ts-expect-error
         const user: ContextUser = { _id: socket.data._id }
         await clearLock(room, user)
 
         // Transfer lock ownership to the next oldest user
-        let otherSessions = sessions.filter(x => x._id !== _id).slice()
+        const otherSessions = sessions.filter((x) => x._id !== _id).slice()
         otherSessions.sort((a, b) => {
           return a.connectedAt < b.connectedAt ? -1 : 1
         })
         const nextSession = otherSessions[0]
         if (nextSession) {
           const { _id, email, firstName, lastName } = nextSession
-          // @ts-ignore
+          // @ts-expect-error
           const nextUser: ContextUser = { _id, email, firstName, lastName }
           await updateLock(room, nextUser)
           this.io.to(room).emit(BuilderSocketEvent.LockTransfer, {
@@ -109,11 +109,7 @@ export default class BuilderSocket extends BaseSocket {
     })
   }
 
-  emitWorkspaceAppUpdate(
-    ctx: Ctx,
-    workspaceApp: WorkspaceApp,
-    options?: EmitOptions
-  ) {
+  emitWorkspaceAppUpdate(ctx: Ctx, workspaceApp: WorkspaceApp, options?: EmitOptions) {
     this.emitToRoom(
       ctx,
       ctx.appId,

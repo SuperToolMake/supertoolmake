@@ -1,19 +1,19 @@
-import { derived, get, Writable } from "svelte/store"
-import { datasources } from "./datasources"
-import { integrations } from "./integrations"
+import type {
+  ImportRestQueryInfoRequest,
+  ImportRestQueryInfoResponse,
+  ImportRestQueryRequest,
+  PreviewQueryResponse,
+  Query,
+  QueryPreview,
+  QuerySchema,
+  SaveQueryRequest,
+} from "@budibase/types"
+import { derived, get, type Writable } from "svelte/store"
 import { API } from "@/api"
 import { duplicateName } from "@/helpers/duplicate"
 import { DerivedBudiStore } from "@/stores/BudiStore"
-import {
-  Query,
-  QueryPreview,
-  PreviewQueryResponse,
-  SaveQueryRequest,
-  ImportRestQueryRequest,
-  ImportRestQueryInfoRequest,
-  ImportRestQueryInfoResponse,
-  QuerySchema,
-} from "@budibase/types"
+import { datasources } from "./datasources"
+import { integrations } from "./integrations"
 
 const sortQueries = (queryList: Query[]) => {
   queryList.sort((q1, q2) => {
@@ -32,17 +32,14 @@ interface DerivedQueryStore extends BuilderQueryStore {
   selected?: Query
 }
 
-export class QueryStore extends DerivedBudiStore<
-  BuilderQueryStore,
-  DerivedQueryStore
-> {
+export class QueryStore extends DerivedBudiStore<BuilderQueryStore, DerivedQueryStore> {
   constructor() {
     const makeDerivedStore = (store: Writable<BuilderQueryStore>) => {
       return derived(store, ($store): DerivedQueryStore => {
         return {
           list: $store.list,
           selectedQueryId: $store.selectedQueryId,
-          selected: $store.list?.find(q => q._id === $store.selectedQueryId),
+          selected: $store.list?.find((q) => q._id === $store.selectedQueryId),
         }
       })
     }
@@ -61,7 +58,7 @@ export class QueryStore extends DerivedBudiStore<
   async fetch() {
     const queries = await API.getQueries()
     sortQueries(queries)
-    this.store.update(state => ({
+    this.store.update((state) => ({
       ...state,
       list: queries,
     }))
@@ -69,9 +66,7 @@ export class QueryStore extends DerivedBudiStore<
 
   async save(datasourceId: string, query: SaveQueryRequest) {
     const _integrations = get(integrations)
-    const dataSource = get(datasources).list.filter(
-      ds => ds._id === datasourceId
-    )
+    const dataSource = get(datasources).list.filter((ds) => ds._id === datasourceId)
     // Check if readable attribute is found
     if (dataSource.length !== 0) {
       const integration = _integrations[dataSource[0].source]
@@ -82,8 +77,8 @@ export class QueryStore extends DerivedBudiStore<
     }
     query.datasourceId = datasourceId
     const savedQuery = await API.saveQuery(query)
-    this.store.update(state => {
-      const idx = state.list.findIndex(query => query._id === savedQuery._id)
+    this.store.update((state) => {
+      const idx = state.list.findIndex((query) => query._id === savedQuery._id)
       const queries = state.list
       if (idx >= 0) {
         queries.splice(idx, 1, savedQuery)
@@ -104,14 +99,12 @@ export class QueryStore extends DerivedBudiStore<
     return await API.importQueries(data)
   }
 
-  async fetchImportInfo(
-    data: ImportRestQueryInfoRequest
-  ): Promise<ImportRestQueryInfoResponse> {
+  async fetchImportInfo(data: ImportRestQueryInfoRequest): Promise<ImportRestQueryInfoResponse> {
     return await API.getImportInfo(data)
   }
 
   select(id: string | null) {
-    this.store.update(state => ({
+    this.store.update((state) => ({
       ...state,
       selectedQueryId: id,
     }))
@@ -122,7 +115,7 @@ export class QueryStore extends DerivedBudiStore<
     // Assume all the fields are strings and create a basic schema from the
     // unique fields returned by the server
     const schema: Record<string, QuerySchema> = {}
-    for (let [field, metadata] of Object.entries(result.schema)) {
+    for (const [field, metadata] of Object.entries(result.schema)) {
       schema[field] = (metadata as QuerySchema) || { type: "string" }
     }
     return { ...result, schema, rows: result.rows || [] }
@@ -133,15 +126,15 @@ export class QueryStore extends DerivedBudiStore<
       throw new Error("Query ID or Revision is missing")
     }
     await API.deleteQuery(query._id, query._rev)
-    this.store.update(state => ({
+    this.store.update((state) => ({
       ...state,
-      list: state.list.filter(existing => existing._id !== query._id),
+      list: state.list.filter((existing) => existing._id !== query._id),
     }))
     skipUnsavedPromptIds.delete(query._id)
   }
 
   async duplicate(query: Query) {
-    let list = get(this.store).list
+    const list = get(this.store).list
     const newQuery = { ...query }
     const datasourceId = query.datasourceId
 
@@ -149,24 +142,24 @@ export class QueryStore extends DerivedBudiStore<
     delete newQuery._rev
     newQuery.name = duplicateName(
       query.name,
-      list.map(q => q.name)
+      list.map((q) => q.name)
     )
 
     return await this.save(datasourceId, newQuery)
   }
 
   removeDatasourceQueries(datasourceId: string) {
-    this.store.update(state => {
+    this.store.update((state) => {
       state.list
-        .filter(query => query.datasourceId === datasourceId)
-        .forEach(query => {
+        .filter((query) => query.datasourceId === datasourceId)
+        .forEach((query) => {
           if (query._id) {
             skipUnsavedPromptIds.delete(query._id)
           }
         })
       return {
         ...state,
-        list: state.list.filter(table => table.datasourceId !== datasourceId),
+        list: state.list.filter((table) => table.datasourceId !== datasourceId),
       }
     })
   }

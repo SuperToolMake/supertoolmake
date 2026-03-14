@@ -1,6 +1,6 @@
 export * from "./configs"
-export * from "./oldMigration"
 export * from "./email"
+export * from "./oldMigration"
 export * from "./role"
 export * from "./self"
 export * from "./template"

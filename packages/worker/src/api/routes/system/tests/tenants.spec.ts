@@ -1,7 +1,7 @@
-import { TestConfiguration } from "../../../../tests"
 import { tenancy } from "@budibase/backend-core"
 import { LockReason } from "@budibase/types"
 import * as tenantSdk from "../../../../sdk/tenants"
+import { TestConfiguration } from "../../../../tests"
 
 jest.mock("../../../../sdk/tenants", () => ({
   lockTenant: jest.fn(),
@@ -82,10 +82,7 @@ describe("/api/global/tenants", () => {
         }
       )
 
-      expect(tenantSdk.lockTenant).toHaveBeenCalledWith(
-        user.tenantId,
-        LockReason.FREE_TIER
-      )
+      expect(tenantSdk.lockTenant).toHaveBeenCalledWith(user.tenantId, LockReason.FREE_TIER)
       expect(tenantSdk.unlockTenant).not.toHaveBeenCalled()
     })
 

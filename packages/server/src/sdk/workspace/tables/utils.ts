@@ -1,6 +1,6 @@
-import { Table, TableSourceType } from "@budibase/types"
-import { isExternalTableID } from "../../../integrations/utils"
 import { isTableIdOrExternalTableId } from "@budibase/shared-core"
+import { type Table, TableSourceType } from "@budibase/types"
+import { isExternalTableID } from "../../../integrations/utils"
 
 export function isExternal(opts: { table?: Table; tableId?: string }): boolean {
   if (opts.table && opts.table.sourceType === TableSourceType.EXTERNAL) {

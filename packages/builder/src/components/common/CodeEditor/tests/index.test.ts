@@ -36,12 +36,7 @@ describe("htmlInsert", () => {
     const doc = "<div>{{ user.email }}</div>"
     const insertionPoint = doc.indexOf("user.email")
 
-    const result = htmlInsert(
-      doc,
-      insertionPoint,
-      insertionPoint,
-      "user.roleId"
-    )
+    const result = htmlInsert(doc, insertionPoint, insertionPoint, "user.roleId")
 
     expect(result).toBe(" user.roleId ")
   })
@@ -52,12 +47,7 @@ describe("jsInsert", () => {
     const doc = '$("first") plain $("second")'
     const insertionPoint = doc.indexOf("plain ") + "plain ".length
 
-    const result = jsInsert(
-      doc,
-      insertionPoint,
-      insertionPoint,
-      "binding.value"
-    )
+    const result = jsInsert(doc, insertionPoint, insertionPoint, "binding.value")
 
     expect(result).toBe('$("binding.value")')
   })

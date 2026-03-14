@@ -1,7 +1,7 @@
-import { structures } from "../../../tests"
-import { lockTenant, unlockTenant, setActivation } from "../tenants"
 import { configs, tenancy } from "@budibase/backend-core"
-import { LockReason, ConfigType, SettingsConfig } from "@budibase/types"
+import { ConfigType, LockReason, type SettingsConfig } from "@budibase/types"
+import { structures } from "../../../tests"
+import { lockTenant, setActivation, unlockTenant } from "../tenants"
 
 // Mock the backend-core modules
 jest.mock("@budibase/backend-core", () => {
@@ -63,9 +63,7 @@ describe("tenants", () => {
 
       await lockTenant(tenantId, lockReason)
 
-      expect(mockDb.tryGet).toHaveBeenCalledWith(
-        configs.generateConfigID(ConfigType.SETTINGS)
-      )
+      expect(mockDb.tryGet).toHaveBeenCalledWith(configs.generateConfigID(ConfigType.SETTINGS))
       expect(mockDb.put).toHaveBeenCalledWith({
         ...settingsConfig,
         config: {
@@ -119,9 +117,7 @@ describe("tenants", () => {
 
       await unlockTenant(tenantId)
 
-      expect(mockDb.tryGet).toHaveBeenCalledWith(
-        configs.generateConfigID(ConfigType.SETTINGS)
-      )
+      expect(mockDb.tryGet).toHaveBeenCalledWith(configs.generateConfigID(ConfigType.SETTINGS))
       expect(mockDb.put).toHaveBeenCalledWith({
         ...settingsConfig,
         config: {
@@ -156,9 +152,7 @@ describe("tenants", () => {
 
       await setActivation(tenantId, true)
 
-      expect(mockDb.tryGet).toHaveBeenCalledWith(
-        configs.generateConfigID(ConfigType.SETTINGS)
-      )
+      expect(mockDb.tryGet).toHaveBeenCalledWith(configs.generateConfigID(ConfigType.SETTINGS))
       expect(mockDb.put).toHaveBeenCalledWith({
         ...settingsConfig,
         config: {
@@ -183,9 +177,7 @@ describe("tenants", () => {
 
       await setActivation(tenantId, false)
 
-      expect(mockDb.tryGet).toHaveBeenCalledWith(
-        configs.generateConfigID(ConfigType.SETTINGS)
-      )
+      expect(mockDb.tryGet).toHaveBeenCalledWith(configs.generateConfigID(ConfigType.SETTINGS))
       expect(mockDb.put).toHaveBeenCalledWith({
         ...settingsConfig,
         config: {

@@ -1,6 +1,6 @@
-import { builderStore, environmentStore } from "@/stores"
-import { get } from "svelte/store"
 import { createWebsocket } from "@budibase/frontend-core"
+import { get } from "svelte/store"
+import { builderStore, environmentStore } from "@/stores"
 
 let socket
 

@@ -1,22 +1,20 @@
 import {
   DocumentType,
-  ManyToManyRelationshipJson,
-  RelationshipsJson,
-  SqlQuery,
-  Table,
-  TableSourceType,
+  type ManyToManyRelationshipJson,
+  type RelationshipsJson,
   SEPARATOR,
+  type SqlQuery,
+  type Table,
+  TableSourceType,
 } from "@budibase/types"
-import { Knex } from "knex"
+import type { Knex } from "knex"
 import environment from "../environment"
 
 const DOUBLE_SEPARATOR = `${SEPARATOR}${SEPARATOR}`
 const ROW_ID_REGEX = /^\[.*]$/g
 const ENCODED_SPACE = encodeURIComponent(" ")
-const ISO_DATE_REGEX =
-  /^\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}:\d{2}(?:.\d{3})?Z)?$/
-const ISO_DATE_REGEX_NO_TIMEZONE =
-  /^\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}:\d{2}(?:.\d{3})?)?$/
+const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}:\d{2}(?:.\d{3})?Z)?$/
+const ISO_DATE_REGEX_NO_TIMEZONE = /^\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}:\d{2}(?:.\d{3})?)?$/
 const DATE_REGEX = /(\d{4}-\d{2}-\d{2})/
 const TIME_REGEX = /^\d{1,2}:\d{2}(?:\.\d{1,6}|:\d{2}(?:\.\d{1,6})?)?$/
 
@@ -28,10 +26,8 @@ export function isInternalTableID(tableId: string) {
   return !isExternalTableID(tableId)
 }
 
-export function getNativeSql(
-  query: Knex.SchemaBuilder | Knex.QueryBuilder
-): SqlQuery | SqlQuery[] {
-  let sql = query.toSQL()
+export function getNativeSql(query: Knex.SchemaBuilder | Knex.QueryBuilder): SqlQuery | SqlQuery[] {
+  const sql = query.toSQL()
 
   if (Array.isArray(sql)) {
     return sql as SqlQuery[]
@@ -47,10 +43,7 @@ export function getNativeSql(
 }
 
 export function isExternalTable(table: Table) {
-  if (
-    table?.sourceId &&
-    table.sourceId.includes(DocumentType.DATASOURCE + SEPARATOR)
-  ) {
+  if (table?.sourceId && table.sourceId.includes(DocumentType.DATASOURCE + SEPARATOR)) {
     return true
   } else if (table?.sourceType === TableSourceType.EXTERNAL) {
     return true
@@ -78,7 +71,7 @@ export function encodeViewId(viewId: string) {
 
 export function breakExternalTableId(tableId: string) {
   const parts = tableId.split(DOUBLE_SEPARATOR)
-  let datasourceId = parts.shift()
+  const datasourceId = parts.shift()
   // if they need joined
   let tableName = parts.join(DOUBLE_SEPARATOR)
   // if contains encoded spaces, decode it
@@ -95,7 +88,7 @@ export function generateRowIdField(keyProps: any[] = []) {
   if (!Array.isArray(keyProps)) {
     keyProps = [keyProps]
   }
-  for (let index in keyProps) {
+  for (const index in keyProps) {
     if (keyProps[index] instanceof Buffer) {
       keyProps[index] = keyProps[index].toString()
     }
@@ -107,10 +100,7 @@ export function generateRowIdField(keyProps: any[] = []) {
 }
 
 export function isRowId(field: any) {
-  return (
-    Array.isArray(field) ||
-    (typeof field === "string" && field.match(ROW_ID_REGEX) != null)
-  )
+  return Array.isArray(field) || (typeof field === "string" && field.match(ROW_ID_REGEX) != null)
 }
 
 export function convertRowId(field: any) {

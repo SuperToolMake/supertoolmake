@@ -7,10 +7,7 @@ tk.freeze(frozenDate)
 describe("date helper", () => {
   describe("difference", () => {
     it("should return the difference between two dates", () => {
-      const result = date.difference(
-        "2021-01-02T12:34:56.789Z",
-        "2021-01-01T01:00:00.000Z"
-      )
+      const result = date.difference("2021-01-02T12:34:56.789Z", "2021-01-01T01:00:00.000Z")
       const expected =
         1 * 24 * 60 * 60 * 1000 + // 1 day
         11 * 60 * 60 * 1000 + // 11 hours
@@ -21,11 +18,7 @@ describe("date helper", () => {
     })
 
     it("should be able to set the time unit", () => {
-      const result = date.difference(
-        "2021-01-02T12:34:56",
-        "2021-01-01T01:00:00",
-        "days"
-      )
+      const result = date.difference("2021-01-02T12:34:56", "2021-01-01T01:00:00", "days")
       expect(result).toEqual(1)
     })
   })

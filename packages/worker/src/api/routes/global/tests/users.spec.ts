@@ -1,8 +1,7 @@
-import { InviteUsersResponse, OIDCUser, User } from "@budibase/types"
-
 import { tenancy } from "@budibase/backend-core"
+import type { InviteUsersResponse, OIDCUser, User } from "@budibase/types"
 import * as userSdk from "../../../../sdk/users"
-import { TestConfiguration, mocks, structures } from "../../../../tests"
+import { mocks, structures, TestConfiguration } from "../../../../tests"
 
 jest.mock("nodemailer")
 const sendMailMock = mocks.email.mock()
@@ -23,10 +22,7 @@ describe("/api/global/users", () => {
   })
 
   async function createBuilderUser() {
-    const saveResponse = await config.api.users.saveUser(
-      structures.users.builderUser(),
-      200
-    )
+    const saveResponse = await config.api.users.saveUser(structures.users.builderUser(), 200)
     const { body: user } = await config.api.users.getUser(saveResponse.body._id)
     await config.login(user)
     return user
@@ -35,10 +31,7 @@ describe("/api/global/users", () => {
   describe("POST /api/global/users/invite", () => {
     it("should be able to generate an invitation", async () => {
       const email = structures.users.newEmail()
-      const { code, res } = await config.api.users.sendUserInvite(
-        sendMailMock,
-        email
-      )
+      const { code, res } = await config.api.users.sendUserInvite(sendMailMock, email)
 
       expect(res.body?.message).toBe("Invitation has been sent.")
       expect(res.body?.unsuccessful.length).toBe(0)
@@ -67,11 +60,7 @@ describe("/api/global/users", () => {
 
       jest.clearAllMocks()
 
-      const { code, res } = await config.api.users.sendUserInvite(
-        sendMailMock,
-        email,
-        400
-      )
+      const { code, res } = await config.api.users.sendUserInvite(sendMailMock, email, 400)
 
       expect(res.body.message).toBe(`Unavailable`)
       expect(sendMailMock).toHaveBeenCalledTimes(0)
@@ -99,21 +88,14 @@ describe("/api/global/users", () => {
       const user = await createBuilderUser()
 
       const { res } = await config.withUser(user, () =>
-        config.api.users.sendUserInvite(
-          sendMailMock,
-          structures.users.newEmail(),
-          403
-        )
+        config.api.users.sendUserInvite(sendMailMock, structures.users.newEmail(), 403)
       )
       expect(res.body.message).toBe("Admin user only endpoint.")
     })
 
     it("should be able to create new user from invite", async () => {
       const email = structures.users.newEmail()
-      const { code } = await config.api.users.sendUserInvite(
-        sendMailMock,
-        email
-      )
+      const { code } = await config.api.users.sendUserInvite(sendMailMock, email)
 
       const res = await config.api.users.acceptInvite(code)
 
@@ -127,10 +109,7 @@ describe("/api/global/users", () => {
   describe("POST /api/global/users/invite/:code/:role", () => {
     it("should be able to add workspace id to invite", async () => {
       const email = structures.users.newEmail()
-      const { code } = await config.api.users.sendUserInvite(
-        sendMailMock,
-        email
-      )
+      const { code } = await config.api.users.sendUserInvite(sendMailMock, email)
       const appId = "app_123456789"
       const role = "BASIC"
 
@@ -194,9 +173,7 @@ describe("/api/global/users", () => {
 
       await config.login(builderUser)
       const res = await config.withUser(builderUser, () =>
-        config.withApp(appId, () =>
-          config.api.users.addWorkspaceIdToInvite(code, role, 200)
-        )
+        config.withApp(appId, () => config.api.users.addWorkspaceIdToInvite(code, role, 200))
       )
       expect(res.body.info.apps[appId]).toBe(role)
     })
@@ -220,9 +197,7 @@ describe("/api/global/users", () => {
 
       await config.login(builderUser)
       await config.withUser(builderUser, async () =>
-        config.withApp(appId, () =>
-          config.api.users.addWorkspaceIdToInvite(code, role, 403)
-        )
+        config.withApp(appId, () => config.api.users.addWorkspaceIdToInvite(code, role, 403))
       )
     })
   })
@@ -230,17 +205,12 @@ describe("/api/global/users", () => {
   describe("DELETE /api/global/users/invite/:code", () => {
     it("should be able to remove workspace id from invite", async () => {
       const email = structures.users.newEmail()
-      const { code } = await config.api.users.sendUserInvite(
-        sendMailMock,
-        email
-      )
+      const { code } = await config.api.users.sendUserInvite(sendMailMock, email)
       const appId = "app_123456789"
       const role = "BASIC"
 
       // First add the workspace
-      await config.withApp(appId, () =>
-        config.api.users.addWorkspaceIdToInvite(code, role)
-      )
+      await config.withApp(appId, () => config.api.users.addWorkspaceIdToInvite(code, role))
 
       // Then remove it
       const res = await config.withApp(appId, () =>
@@ -253,10 +223,7 @@ describe("/api/global/users", () => {
 
     it("should handle removing non-existent workspace id", async () => {
       const email = structures.users.newEmail()
-      const { code } = await config.api.users.sendUserInvite(
-        sendMailMock,
-        email
-      )
+      const { code } = await config.api.users.sendUserInvite(sendMailMock, email)
       const appId = "app_nonexistent"
 
       const res = await config.withApp(appId, () =>
@@ -284,9 +251,7 @@ describe("/api/global/users", () => {
       const role = "BASIC"
 
       // First add the workspace as admin
-      await config.withApp(appId, () =>
-        config.api.users.addWorkspaceIdToInvite(code, role)
-      )
+      await config.withApp(appId, () => config.api.users.addWorkspaceIdToInvite(code, role))
 
       // Create a builder user with specific app access
       const builderUser = await config.createUser({
@@ -300,9 +265,7 @@ describe("/api/global/users", () => {
 
       await config.login(builderUser)
       await config.withUser(builderUser, () =>
-        config.withApp(appId, () =>
-          config.api.users.removeWorkspaceIdFromInvite(code, 403)
-        )
+        config.withApp(appId, () => config.api.users.removeWorkspaceIdFromInvite(code, 403))
       )
     })
 
@@ -315,9 +278,7 @@ describe("/api/global/users", () => {
       const role = "BASIC"
 
       // First add the workspace as admin
-      await config.withApp(appId, () =>
-        config.api.users.addWorkspaceIdToInvite(code, role)
-      )
+      await config.withApp(appId, () => config.api.users.addWorkspaceIdToInvite(code, role))
 
       // Create a builder user with access to the specific app
       const builderUser = await config.createUser({
@@ -331,9 +292,7 @@ describe("/api/global/users", () => {
 
       await config.login(builderUser)
       const res = await config.withUser(builderUser, () =>
-        config.withApp(appId, () =>
-          config.api.users.removeWorkspaceIdFromInvite(code, 200)
-        )
+        config.withApp(appId, () => config.api.users.removeWorkspaceIdFromInvite(code, 200))
       )
       expect(res.body.info.apps[appId]).toBeUndefined()
     })
@@ -460,11 +419,7 @@ describe("/api/global/users", () => {
       const admin = structures.users.adminUser()
       const user = structures.users.user()
 
-      const response = await config.api.users.bulkCreateUsers([
-        builder,
-        admin,
-        user,
-      ])
+      const response = await config.api.users.bulkCreateUsers([builder, admin, user])
 
       expect(response.created?.successful.length).toBe(3)
       expect(response.created?.successful[0].email).toBe(builder.email)
@@ -511,9 +466,7 @@ describe("/api/global/users", () => {
 
       const response = await config.api.users.saveUser(user, 400)
 
-      expect(response.body.message).toBe(
-        `Email already in use: '${user.email}'`
-      )
+      expect(response.body.message).toBe(`Email already in use: '${user.email}'`)
     })
 
     it("should not be able to create user that exists in other tenant", async () => {
@@ -524,9 +477,7 @@ describe("/api/global/users", () => {
         delete user._id
         const response = await config.api.users.saveUser(user, 400)
 
-        expect(response.body.message).toBe(
-          `Email already in use: '${user.email}'`
-        )
+        expect(response.body.message).toBe(`Email already in use: '${user.email}'`)
       })
     })
 
@@ -551,11 +502,7 @@ describe("/api/global/users", () => {
       await config.createSession(nonAdmin)
 
       const newUser = structures.users.user()
-      await config.api.users.saveUser(
-        newUser,
-        403,
-        config.authHeaders(nonAdmin)
-      )
+      await config.api.users.saveUser(newUser, 403, config.authHeaders(nonAdmin))
     })
   })
 
@@ -568,8 +515,7 @@ describe("/api/global/users", () => {
     })
 
     it("should not allow a user to update their own admin/builder status", async () => {
-      const user = (await config.api.users.getUser(config.user!._id!))
-        .body as User
+      const user = (await config.api.users.getUser(config.user!._id!)).body as User
       await config.api.users.saveUser({
         ...user,
         admin: {
@@ -679,16 +625,10 @@ describe("/api/global/users", () => {
 
     it("should not allow a builder users to update an existing user", async () => {
       const existingUser = await config.createUser(structures.users.user())
-      const builderUser = await config.createUser(
-        structures.users.builderUser()
-      )
+      const builderUser = await config.createUser(structures.users.builderUser())
       await config.createSession(builderUser)
 
-      await config.api.users.saveUser(
-        existingUser,
-        403,
-        config.authHeaders(builderUser)
-      )
+      await config.api.users.saveUser(existingUser, 403, config.authHeaders(builderUser))
     })
 
     describe("sso users", () => {
@@ -732,17 +672,13 @@ describe("/api/global/users", () => {
       it("if user email exist, SSO support is added", async () => {
         const user = await createPasswordUser()
         const ssoId = "fakessoId"
-        await config.api.users
-          .addSsoSupportInternalAPIAuth(ssoId, user.email)
-          .expect(200)
+        await config.api.users.addSsoSupportInternalAPIAuth(ssoId, user.email).expect(200)
       })
 
       it("if user ssoId is already assigned, no change will be applied", async () => {
         const user = await createSSOUser()
         user.ssoId = "testssoId"
-        await config.api.users
-          .addSsoSupportInternalAPIAuth(user.ssoId, user.email)
-          .expect(200)
+        await config.api.users.addSsoSupportInternalAPIAuth(user.ssoId, user.email).expect(200)
       })
     })
   })
@@ -848,9 +784,7 @@ describe("/api/global/users", () => {
           })
         )
       )
-      const globalAdminIds = globalAdminUsers
-        .map(user => user._id)
-        .filter(Boolean) as string[]
+      const globalAdminIds = globalAdminUsers.map((user) => user._id).filter(Boolean) as string[]
 
       const response = await config.api.users.searchUsers({
         workspaceId,
@@ -858,9 +792,7 @@ describe("/api/global/users", () => {
         limit: 100,
       })
 
-      const returnedIds = response.body.data
-        .map((user: User) => user._id)
-        .filter(Boolean)
+      const returnedIds = response.body.data.map((user: User) => user._id).filter(Boolean)
       expect(returnedIds).toHaveLength(globalAdminIds.length)
       expect(returnedIds).toEqual(expect.arrayContaining(globalAdminIds))
     })
@@ -909,9 +841,7 @@ describe("/api/global/users", () => {
       const foundUserIds = response.body.data.map((user: User) => user._id)
       expect(foundUserIds).toContain(user._id)
       expect(foundUserIds).toContain(user2._id)
-      expect(
-        response.body.data.find((user: User) => user._id === user3._id)
-      ).toBeUndefined()
+      expect(response.body.data.find((user: User) => user._id === user3._id)).toBeUndefined()
     })
 
     it("should be able to search by _id with numeric prefixing", async () => {
@@ -997,7 +927,7 @@ describe("/api/global/users", () => {
         },
         { useHeaders: await config.login(user) }
       )
-      for (let user of response.body.data) {
+      for (const user of response.body.data) {
         expect(user.roles).toBeUndefined()
         expect(user.builder).toBeUndefined()
         expect(user.admin).toBeUndefined()
@@ -1028,11 +958,7 @@ describe("/api/global/users", () => {
       const workspaceId = "app_creator_preserve"
 
       const res = await config.withApp(workspaceId, () =>
-        config.api.users.addUserToWorkspace(
-          builderUser._id!,
-          builderUser._rev!,
-          "BASIC"
-        )
+        config.api.users.addUserToWorkspace(builderUser._id!, builderUser._rev!, "BASIC")
       )
       builderUser._rev = res.body._rev
 
@@ -1050,11 +976,7 @@ describe("/api/global/users", () => {
       const workspaceId = "app_creator_preserve"
 
       const res = await config.withApp(workspaceId, () =>
-        config.api.users.addUserToWorkspace(
-          builderUser._id!,
-          builderUser._rev!,
-          "CREATOR"
-        )
+        config.api.users.addUserToWorkspace(builderUser._id!, builderUser._rev!, "CREATOR")
       )
       builderUser._rev = res.body._rev
 
@@ -1123,17 +1045,10 @@ describe("/api/global/users", () => {
 
       const res = await config.withUser(regularUser, () =>
         config.withApp(workspaceId, () =>
-          config.api.users.addUserToWorkspace(
-            targetUser._id!,
-            targetUser._rev!,
-            "CREATOR",
-            403
-          )
+          config.api.users.addUserToWorkspace(targetUser._id!, targetUser._rev!, "CREATOR", 403)
         )
       )
-      expect(res.body.message).toBe(
-        "Workspace Admin/Builder user only endpoint."
-      )
+      expect(res.body.message).toBe("Workspace Admin/Builder user only endpoint.")
     })
   })
 
@@ -1173,9 +1088,7 @@ describe("/api/global/users", () => {
       const email = structures.users.newEmail()
       await config.api.users.sendUserInvite(sendMailMock, email)
 
-      const response = await config.api.users.onboardUser([
-        { email, userInfo: {} },
-      ])
+      const response = await config.api.users.onboardUser([{ email, userInfo: {} }])
       expect(response.successful.length).toBe(0)
       expect(response.unsuccessful.length).toBe(1)
     })
@@ -1197,9 +1110,7 @@ describe("/api/global/users", () => {
         )
       })
 
-      await config.api.users.changeTenantOwnerEmail(newEmail, originalEmail, [
-        tenantId,
-      ])
+      await config.api.users.changeTenantOwnerEmail(newEmail, originalEmail, [tenantId])
 
       const updatedUser = await config.doInTenant(async () => {
         return await userSdk.db.getUser(user._id!)
@@ -1235,21 +1146,15 @@ describe("/api/global/users", () => {
         )
       })
 
-      await config.api.users.changeTenantOwnerEmail(newEmail, originalEmail, [
-        tenant1,
-        tenant2,
-      ])
+      await config.api.users.changeTenantOwnerEmail(newEmail, originalEmail, [tenant1, tenant2])
 
       const updatedUser1 = await config.doInTenant(async () => {
         return await userSdk.db.getUser(user1._id!)
       })
 
-      const updatedUser2 = await config.doInSpecificTenant(
-        tenant2,
-        async () => {
-          return await userSdk.db.getUser(user2._id!)
-        }
-      )
+      const updatedUser2 = await config.doInSpecificTenant(tenant2, async () => {
+        return await userSdk.db.getUser(user2._id!)
+      })
 
       expect(updatedUser1).toBeDefined()
       expect(updatedUser1!.email).toBe(newEmail)
@@ -1262,9 +1167,7 @@ describe("/api/global/users", () => {
       const newEmail = `new-${structures.uuid()}@example.com`
       const tenantId = config.getTenantId()
 
-      await config.api.users.changeTenantOwnerEmail(newEmail, originalEmail, [
-        tenantId,
-      ])
+      await config.api.users.changeTenantOwnerEmail(newEmail, originalEmail, [tenantId])
 
       const user = await config.doInTenant(async () => {
         return await userSdk.db.getUserByEmail(newEmail)
@@ -1305,9 +1208,7 @@ describe("/api/global/users", () => {
         )
       })
 
-      await config.api.users.changeTenantOwnerEmail(newEmail, originalEmail, [
-        tenantId,
-      ])
+      await config.api.users.changeTenantOwnerEmail(newEmail, originalEmail, [tenantId])
 
       const updatedUser = (await config.doInTenant(async () => {
         return await userSdk.db.getUserByEmail(newEmail)

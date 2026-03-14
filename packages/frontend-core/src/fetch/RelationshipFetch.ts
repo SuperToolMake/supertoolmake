@@ -1,10 +1,7 @@
-import { RelationshipDatasource, Table } from "@budibase/types"
+import type { RelationshipDatasource, Table } from "@budibase/types"
 import BaseDataFetch from "./DataFetch"
 
-export default class RelationshipFetch extends BaseDataFetch<
-  RelationshipDatasource,
-  Table
-> {
+export default class RelationshipFetch extends BaseDataFetch<RelationshipDatasource, Table> {
   async getDefinition() {
     const { datasource } = this.options
 
@@ -14,7 +11,7 @@ export default class RelationshipFetch extends BaseDataFetch<
     try {
       return await this.API.fetchTableDefinition(datasource.tableId)
     } catch (error: any) {
-      this.store.update(state => ({
+      this.store.update((state) => ({
         ...state,
         error,
       }))

@@ -1,10 +1,10 @@
-import { derived, get, writable } from "svelte/store"
-import { getValidatorFields } from "./validation"
-import { capitalise } from "@/helpers/helpers"
 import { notifications } from "@budibase/bbui"
-import { object } from "yup"
-import { DatasourceFieldType, SourceName, UIIntegration } from "@budibase/types"
 import { processStringSync } from "@budibase/string-templates"
+import { DatasourceFieldType, SourceName, type UIIntegration } from "@budibase/types"
+import { derived, get, writable } from "svelte/store"
+import { object } from "yup"
+import { capitalise } from "@/helpers/helpers"
+import { getValidatorFields } from "./validation"
 
 interface ValidatedConfigItem {
   key: string
@@ -59,9 +59,7 @@ export const createValidatedConfigStore = (
         },
         {} as typeof allValidators
       )
-      await object()
-        .shape(validatorsToApply)
-        .validate(config, { abortEarly: false })
+      await object().shape(validatorsToApply).validate(config, { abortEarly: false })
 
       errorsStore.set({})
 
@@ -72,7 +70,7 @@ export const createValidatedConfigStore = (
         const errors: Record<string, string> = {}
 
         const inner: { path: string; message: string }[] = error.inner
-        inner.forEach(innerError => {
+        inner.forEach((innerError) => {
           errors[innerError.path] = capitalise(innerError.message)
         })
 
@@ -87,21 +85,19 @@ export const createValidatedConfigStore = (
   }
 
   const updateFieldValue = async (key: string, value: any) => {
-    configStore.update($configStore => {
+    configStore.update(($configStore) => {
       const newStore = { ...$configStore }
 
-      if (
-        integration.datasource?.[key]?.type === DatasourceFieldType.FIELD_GROUP
-      ) {
+      if (integration.datasource?.[key]?.type === DatasourceFieldType.FIELD_GROUP) {
         const arrayValue = value as any[]
-        arrayValue.forEach(field => {
+        arrayValue.forEach((field) => {
           newStore[field.key] = field.value
         })
         if (
           !("config" in integration.datasource[key]) ||
           !integration.datasource[key].config?.nestedFields
         ) {
-          arrayValue.forEach(field => {
+          arrayValue.forEach((field) => {
             newStore[field.key] = field.value
           })
         } else {
@@ -129,7 +125,7 @@ export const createValidatedConfigStore = (
   }
 
   const markFieldActive = async (key: string) => {
-    selectedValidatorsStore.update($validatorsStore => ({
+    selectedValidatorsStore.update(($validatorsStore) => ({
       ...$validatorsStore,
       [key]: allValidators[key],
     }))
@@ -143,50 +139,40 @@ export const createValidatedConfigStore = (
 
       const config: Record<string, any> = {}
       const allowedRestKeys = ["rejectUnauthorized", "downloadImages"]
-      Object.entries(integration.datasource || {}).forEach(
-        ([key, properties]) => {
-          if (
-            integration.name === SourceName.REST &&
-            !allowedRestKeys.includes(key)
-          ) {
-            return
-          }
-
-          const getValue = () => {
-            if (properties.type === DatasourceFieldType.FIELD_GROUP) {
-              return Object.entries(properties.fields || {}).map(
-                ([fieldKey, fieldProperties]) => {
-                  return {
-                    key: fieldKey,
-                    value: $configStore[key]?.[fieldKey],
-                    error: $errorsStore[`${key}.${fieldKey}`],
-                    name: capitalise(fieldProperties.display || fieldKey),
-                    type: fieldProperties.type,
-                  }
-                }
-              )
-            }
-
-            return $configStore[key]
-          }
-
-          if (
-            !properties.hidden ||
-            !eval(processStringSync(properties.hidden, $configStore))
-          ) {
-            validatedConfig.push({
-              key,
-              value: getValue(),
-              error: $errorsStore[key],
-              name: capitalise(properties.display || key),
-              placeholder: properties.placeholder,
-              type: properties.type,
-              config: (properties as any).config,
-            })
-            config[key] = $configStore[key]
-          }
+      Object.entries(integration.datasource || {}).forEach(([key, properties]) => {
+        if (integration.name === SourceName.REST && !allowedRestKeys.includes(key)) {
+          return
         }
-      )
+
+        const getValue = () => {
+          if (properties.type === DatasourceFieldType.FIELD_GROUP) {
+            return Object.entries(properties.fields || {}).map(([fieldKey, fieldProperties]) => {
+              return {
+                key: fieldKey,
+                value: $configStore[key]?.[fieldKey],
+                error: $errorsStore[`${key}.${fieldKey}`],
+                name: capitalise(fieldProperties.display || fieldKey),
+                type: fieldProperties.type,
+              }
+            })
+          }
+
+          return $configStore[key]
+        }
+
+        if (!properties.hidden || !eval(processStringSync(properties.hidden, $configStore))) {
+          validatedConfig.push({
+            key,
+            value: getValue(),
+            error: $errorsStore[key],
+            name: capitalise(properties.display || key),
+            placeholder: properties.placeholder,
+            type: properties.type,
+            config: (properties as any).config,
+          })
+          config[key] = $configStore[key]
+        }
+      })
 
       const hasErrors = Object.keys($errorsStore).length > 0
 

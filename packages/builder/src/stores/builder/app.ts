@@ -1,5 +1,5 @@
-import { API } from "@/api"
-import {
+import { resolveWorkspaceTranslations } from "@budibase/shared-core"
+import type {
   AppScript,
   AutomationSettings,
   PWAManifest,
@@ -10,9 +10,9 @@ import {
   WorkspaceIcon,
 } from "@budibase/types"
 import { get } from "svelte/store"
-import { initialise, navigationStore, workspaceAppStore } from "."
+import { API } from "@/api"
 import { BudiStore } from "../BudiStore"
-import { resolveWorkspaceTranslations } from "@budibase/shared-core"
+import { initialise, navigationStore, workspaceAppStore } from "."
 
 interface ClientFeatures {
   spectrumThemes: boolean
@@ -111,11 +111,9 @@ export class AppMetaStore extends BudiStore<AppMetaState> {
   }
 
   syncApp(workspace: Workspace) {
-    const translationOverrides = resolveWorkspaceTranslations(
-      workspace.translationOverrides
-    )
+    const translationOverrides = resolveWorkspaceTranslations(workspace.translationOverrides)
 
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       name: workspace.name,
       appId: workspace.appId,
@@ -139,13 +137,9 @@ export class AppMetaStore extends BudiStore<AppMetaState> {
     }))
   }
 
-  syncAppPackage(pkg: {
-    application: Workspace
-    clientLibPath: string
-    hasLock: boolean
-  }) {
+  syncAppPackage(pkg: { application: Workspace; clientLibPath: string; hasLock: boolean }) {
     const { application, clientLibPath, hasLock } = pkg
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       hasLock,
       clientLibPath,
@@ -154,7 +148,7 @@ export class AppMetaStore extends BudiStore<AppMetaState> {
   }
 
   syncClientFeatures(features: Partial<ClientFeatures>) {
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       clientFeatures: {
         ...INITIAL_APP_META_STATE.clientFeatures,
@@ -164,7 +158,7 @@ export class AppMetaStore extends BudiStore<AppMetaState> {
   }
 
   syncClientTypeSupportPresets(typeSupportPresets: TypeSupportPresets) {
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       typeSupportPresets,
     }))
@@ -172,7 +166,7 @@ export class AppMetaStore extends BudiStore<AppMetaState> {
 
   async syncAppRoutes() {
     const resp = await API.fetchAppRoutes()
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       routes: resp.routes,
     }))
@@ -186,7 +180,7 @@ export class AppMetaStore extends BudiStore<AppMetaState> {
   // Returned from socket
   syncMetadata(metadata: { name: string; url: string; icon?: WorkspaceIcon }) {
     const { name, url, icon } = metadata
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       name,
       url,
@@ -218,9 +212,7 @@ export class AppMetaStore extends BudiStore<AppMetaState> {
       return
     }
 
-    const { navigation } = await API.workspaceApp.find(
-      selectedWorkspaceApp._id!
-    )
+    const { navigation } = await API.workspaceApp.find(selectedWorkspaceApp._id!)
     navigationStore.syncAppNavigation(navigation)
   }
 }

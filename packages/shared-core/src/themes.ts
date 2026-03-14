@@ -1,5 +1,5 @@
-import { ThemeOptions, ThemeClassPrefix } from "./constants/themes"
 import { Theme } from "@budibase/types"
+import { ThemeClassPrefix, ThemeOptions } from "./constants/themes"
 
 // Gets the CSS class names for the specified theme
 export const getThemeClassNames = (theme?: Theme): string => {
@@ -7,7 +7,7 @@ export const getThemeClassNames = (theme?: Theme): string => {
   let classNames = `${ThemeClassPrefix}${theme}`
 
   // Prefix with base class if required
-  const base = ThemeOptions.find(x => x.id === theme)?.base
+  const base = ThemeOptions.find((x) => x.id === theme)?.base
   if (base) {
     classNames = `${ThemeClassPrefix}${base} ${classNames}`
   }
@@ -16,10 +16,7 @@ export const getThemeClassNames = (theme?: Theme): string => {
 }
 
 // Ensures a theme value is a valid option
-export const ensureValidTheme = (
-  theme?: Theme,
-  fallback: Theme = Theme.DARKEST
-): Theme => {
+export const ensureValidTheme = (theme?: Theme, fallback: Theme = Theme.DARKEST): Theme => {
   if (!theme) {
     return fallback
   }
@@ -31,7 +28,7 @@ export const ensureValidTheme = (
 
   // Check we aren't using a deprecated theme, and migrate
   // to the nearest valid theme if we are
-  if (!ThemeOptions.some(x => x.id === theme)) {
+  if (!ThemeOptions.some((x) => x.id === theme)) {
     if (theme === Theme.LIGHTEST) {
       return Theme.LIGHT
     } else if (theme === Theme.DARK) {

@@ -1,12 +1,12 @@
-import { derived, Writable } from "svelte/store"
 import {
   DefaultBuilderTheme,
   ensureValidTheme,
   getThemeClassNames,
-  ThemeOptions,
   ThemeClassPrefix,
+  ThemeOptions,
 } from "@budibase/shared-core"
-import { Theme } from "@budibase/types"
+import type { Theme } from "@budibase/types"
+import { derived, type Writable } from "svelte/store"
 import { DerivedBudiStore, PersistenceType } from "../BudiStore"
 
 interface ThemeState {
@@ -16,7 +16,7 @@ interface ThemeState {
 class ThemeStore extends DerivedBudiStore<ThemeState, ThemeState> {
   constructor() {
     const makeDerivedStore = (store: Writable<ThemeState>) => {
-      return derived(store, $store => ({
+      return derived(store, ($store) => ({
         ...$store,
         theme: ensureValidTheme($store.theme, DefaultBuilderTheme),
       }))
@@ -31,12 +31,9 @@ class ThemeStore extends DerivedBudiStore<ThemeState, ThemeState> {
     // Update theme class when store changes
     this.subscribe(({ theme }) => {
       const classNames = getThemeClassNames(theme).split(" ")
-      ThemeOptions.forEach(option => {
+      ThemeOptions.forEach((option) => {
         const className = `${ThemeClassPrefix}${option.id}`
-        document.documentElement.classList.toggle(
-          className,
-          classNames.includes(className)
-        )
+        document.documentElement.classList.toggle(className, classNames.includes(className))
       })
     })
   }

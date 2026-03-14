@@ -1,8 +1,8 @@
+import type { PublicOIDCConfig } from "@budibase/types"
 import { get } from "svelte/store"
 import { API } from "@/api"
 import { auth } from "@/stores/portal"
 import { BudiStore } from "../BudiStore"
-import { PublicOIDCConfig } from "@budibase/types"
 
 class OIDCStore extends BudiStore<PublicOIDCConfig> {
   constructor() {

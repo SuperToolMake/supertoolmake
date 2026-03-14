@@ -1,8 +1,8 @@
-import { integrations } from "./integrations"
+import type { Integration, SourceName, UIIntegration } from "@budibase/types"
 import { derived } from "svelte/store"
 import { DatasourceTypes } from "@/constants/backend"
-import { UIIntegration, Integration, SourceName } from "@budibase/types"
 import { BudiStore } from "@/stores/BudiStore"
+import { integrations } from "./integrations"
 
 const getIntegrationOrder = (type: string | undefined) => {
   // if type is not known, sort to end
@@ -24,11 +24,8 @@ export class SortedIntegrationStore extends BudiStore<UIIntegration[]> {
 
     const derivedStore = derived<typeof integrations, UIIntegration[]>(
       integrations,
-      $integrations => {
-        const entries = Object.entries($integrations) as [
-          SourceName,
-          Integration,
-        ][]
+      ($integrations) => {
+        const entries = Object.entries($integrations) as [SourceName, Integration][]
         const integrationsAsArray = entries.map(([name, integration]) => ({
           name,
           ...integration,
@@ -38,9 +35,7 @@ export class SortedIntegrationStore extends BudiStore<UIIntegration[]> {
           const integrationASortOrder = getIntegrationOrder(integrationA.type)
           const integrationBSortOrder = getIntegrationOrder(integrationB.type)
           if (integrationASortOrder === integrationBSortOrder) {
-            return integrationA.friendlyName.localeCompare(
-              integrationB.friendlyName
-            )
+            return integrationA.friendlyName.localeCompare(integrationB.friendlyName)
           }
 
           return integrationASortOrder < integrationBSortOrder ? -1 : 1

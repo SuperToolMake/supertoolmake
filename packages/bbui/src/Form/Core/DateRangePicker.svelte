@@ -1,72 +1,64 @@
 <script lang="ts">
-  import dayjs, { type Dayjs } from "dayjs"
-  import { createEventDispatcher } from "svelte"
-  import CoreDatePicker from "./DatePicker/DatePicker.svelte"
-  import Icon from "../../Icon/Icon.svelte"
-  import { parseDate } from "../../helpers"
-  import { writable } from "svelte/store"
-  import { getLocaleStartDayOfWeek, type Weekday } from "./DatePicker/utils"
+import dayjs, { type Dayjs } from "dayjs"
+import { createEventDispatcher } from "svelte"
+import { writable } from "svelte/store"
+import { parseDate } from "../../helpers"
+import Icon from "../../Icon/Icon.svelte"
+import CoreDatePicker from "./DatePicker/DatePicker.svelte"
+import { getLocaleStartDayOfWeek, type Weekday } from "./DatePicker/utils"
 
-  export let enableTime: boolean | undefined = false
-  export let timeOnly: boolean | undefined = false
-  export let ignoreTimezones: boolean | undefined = false
-  const browserStartDayOfWeek = getLocaleStartDayOfWeek()
-  export let startDayOfWeek: Weekday | undefined = undefined
-  export let value: string[] | undefined = []
+export let enableTime: boolean | undefined = false
+export let timeOnly: boolean | undefined = false
+export let ignoreTimezones: boolean | undefined = false
+const browserStartDayOfWeek = getLocaleStartDayOfWeek()
+export let startDayOfWeek: Weekday | undefined = undefined
+export let value: string[] | undefined = []
 
-  const dispatch = createEventDispatcher()
-  const valueStore = writable<string[]>()
+const dispatch = createEventDispatcher()
+const valueStore = writable<string[]>()
 
-  let fromDate: Dayjs | null
-  let toDate: Dayjs | null
+let fromDate: Dayjs | null
+let toDate: Dayjs | null
 
-  $: valueStore.set(value || [])
-  $: parseValue($valueStore)
-  $: resolvedStartDayOfWeek = startDayOfWeek ?? browserStartDayOfWeek
+$: valueStore.set(value || [])
+$: parseValue($valueStore)
+$: resolvedStartDayOfWeek = startDayOfWeek ?? browserStartDayOfWeek
 
-  $: parsedFrom = fromDate ? parseDate(fromDate, { enableTime }) : undefined
-  $: parsedTo = toDate ? parseDate(toDate, { enableTime }) : undefined
+$: parsedFrom = fromDate ? parseDate(fromDate, { enableTime }) : undefined
+$: parsedTo = toDate ? parseDate(toDate, { enableTime }) : undefined
 
-  const parseValue = (value: string[]) => {
-    if (!Array.isArray(value) || !value[0] || !value[1]) {
-      fromDate = null
-      toDate = null
-    } else {
-      fromDate = dayjs(value[0])
-      toDate = dayjs(value[1])
-    }
+const parseValue = (value: string[]) => {
+  if (!Array.isArray(value) || !value[0] || !value[1]) {
+    fromDate = null
+    toDate = null
+  } else {
+    fromDate = dayjs(value[0])
+    toDate = dayjs(value[1])
+  }
+}
+
+const onChangeFrom = (utc: string) => {
+  // Preserve the time if its editable
+  const fromDate = utc ? (enableTime ? dayjs(utc) : dayjs(utc).startOf("day")) : null
+  if (fromDate && (!toDate || fromDate.isAfter(toDate))) {
+    toDate = !enableTime ? fromDate.endOf("day") : fromDate
+  } else if (!fromDate) {
+    toDate = null
   }
 
-  const onChangeFrom = (utc: string) => {
-    // Preserve the time if its editable
-    const fromDate = utc
-      ? enableTime
-        ? dayjs(utc)
-        : dayjs(utc).startOf("day")
-      : null
-    if (fromDate && (!toDate || fromDate.isAfter(toDate))) {
-      toDate = !enableTime ? fromDate.endOf("day") : fromDate
-    } else if (!fromDate) {
-      toDate = null
-    }
+  dispatch("change", [fromDate, toDate])
+}
 
-    dispatch("change", [fromDate, toDate])
+const onChangeTo = (utc: string) => {
+  // Preserve the time if its editable
+  const toDate = utc ? (enableTime ? dayjs(utc) : dayjs(utc).startOf("day")) : null
+  if (toDate && (!fromDate || toDate.isBefore(fromDate))) {
+    fromDate = !enableTime ? toDate.startOf("day") : toDate
+  } else if (!toDate) {
+    fromDate = null
   }
-
-  const onChangeTo = (utc: string) => {
-    // Preserve the time if its editable
-    const toDate = utc
-      ? enableTime
-        ? dayjs(utc)
-        : dayjs(utc).startOf("day")
-      : null
-    if (toDate && (!fromDate || toDate.isBefore(fromDate))) {
-      fromDate = !enableTime ? toDate.startOf("day") : toDate
-    } else if (!toDate) {
-      fromDate = null
-    }
-    dispatch("change", [fromDate, toDate])
-  }
+  dispatch("change", [fromDate, toDate])
+}
 </script>
 
 <div class="date-range">

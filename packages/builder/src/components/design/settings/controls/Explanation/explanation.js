@@ -21,7 +21,7 @@ const getSupport = (type, explanation) => {
 
   if (
     explanation?.typeSupport?.supported?.find(
-      mapping => mapping === type || mapping?.type === type
+      (mapping) => mapping === type || mapping?.type === type
     )
   ) {
     return support.supported
@@ -29,7 +29,7 @@ const getSupport = (type, explanation) => {
 
   if (
     explanation?.typeSupport?.partialSupport?.find(
-      mapping => mapping === type || mapping?.type === type
+      (mapping) => mapping === type || mapping?.type === type
     )
   ) {
     return support.partialSupport
@@ -43,22 +43,20 @@ const getSupportMessage = (type, explanation) => {
     return null
   }
 
-  const supported = explanation?.typeSupport?.supported?.find(
-    mapping => mapping?.type === type
-  )
+  const supported = explanation?.typeSupport?.supported?.find((mapping) => mapping?.type === type)
   if (supported) {
     return messages[supported?.message]
   }
 
   const partialSupport = explanation?.typeSupport?.partialSupport?.find(
-    mapping => mapping?.type === type
+    (mapping) => mapping?.type === type
   )
   if (partialSupport) {
     return messages[partialSupport?.message]
   }
 
   const unsupported = explanation?.typeSupport?.unsupported?.find(
-    mapping => mapping?.type === type
+    (mapping) => mapping?.type === type
   )
   if (unsupported) {
     return messages[unsupported?.message]

@@ -1,52 +1,43 @@
 <script lang="ts">
-  import EditComponentPopover from "../EditComponentPopover.svelte"
-  import { Icon } from "@budibase/bbui"
-  import { componentStore } from "@/stores/builder"
-  import type { ComponentSetting } from "@budibase/types"
+import { Icon } from "@budibase/bbui"
+import type { ComponentSetting } from "@budibase/types"
+import { componentStore } from "@/stores/builder"
+import EditComponentPopover from "../EditComponentPopover.svelte"
 
-  export let item
-  export let bindings
-  export let anchor
-  export let removeComponent
-  export let nested
-  export let showInstanceName = false
-  export let settings
+export let item
+export let bindings
+export let anchor
+export let removeComponent
+export let nested
+export let showInstanceName = false
+export let settings
 
-  $: componentDef = componentStore.getDefinition(item._component)
-  $: displayName = getDisplayName(showInstanceName, item, componentDef)
+$: componentDef = componentStore.getDefinition(item._component)
+$: displayName = getDisplayName(showInstanceName, item, componentDef)
 
-  function getDisplayName(
-    showInstanceName: boolean,
-    item: any,
-    componentDef: any
-  ) {
-    if (showInstanceName && item._instanceName) {
-      return item._instanceName
-    }
-    return (
-      componentDef?.friendlyName ||
-      componentDef?.name ||
-      item._instanceName ||
-      "Component"
-    )
+function getDisplayName(showInstanceName: boolean, item: any, componentDef: any) {
+  if (showInstanceName && item._instanceName) {
+    return item._instanceName
   }
+  return componentDef?.friendlyName || componentDef?.name || item._instanceName || "Component"
+}
 
-  // If this is a nested setting (for example inside a grid or form block) then
-  // we need to mark all the settings of the actual components as nested too, to
-  // allow us to reference context provided by the block.
-  // We will need to update this in future if the component gets broken into
-  // multiple settings sections, as we assume a flat array.
-  const updatedNestedFlags = (originalSettings: ComponentSetting[]) => {
-    const effectiveSettings = settings || originalSettings
-    if (!nested || !effectiveSettings?.length) {
-      return effectiveSettings
-    }
-    let newSettings = effectiveSettings.map((setting: ComponentSetting) => ({
-      ...setting,
-      nested: true,
-    }))
-    return newSettings
+// If this is a nested setting (for example inside a grid or form block) then
+// we need to mark all the settings of the actual components as nested too, to
+// allow us to reference context provided by the block.
+// We will need to update this in future if the component gets broken into
+// multiple settings sections, as we assume a flat array.
+const updatedNestedFlags = (originalSettings: ComponentSetting[]) => {
+  const effectiveSettings = settings || originalSettings
+  if (!nested || !effectiveSettings?.length) {
+    return effectiveSettings
   }
+  let newSettings = effectiveSettings.map((setting: ComponentSetting) => ({
+    ...setting,
+    nested: true,
+  }))
+  return newSettings
+}
 </script>
 
 <div class="list-item-body">

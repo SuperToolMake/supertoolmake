@@ -1,18 +1,18 @@
 <script lang="ts">
-  import "@spectrum-css/switch/dist/index-vars.css"
-  import { createEventDispatcher } from "svelte"
+import "@spectrum-css/switch/dist/index-vars.css"
+import { createEventDispatcher } from "svelte"
 
-  export let value: boolean = false
-  export let id: string | null = null
-  export let text: string | null = null
-  export let disabled: boolean = false
-  export let noPadding: boolean = false
+export let value: boolean = false
+export let id: string | null = null
+export let text: string | null = null
+export let disabled: boolean = false
+export let noPadding: boolean = false
 
-  const dispatch = createEventDispatcher()
-  const onChange = (event: Event) => {
-    const target = event.target as HTMLInputElement
-    dispatch("change", target.checked)
-  }
+const dispatch = createEventDispatcher()
+const onChange = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  dispatch("change", target.checked)
+}
 </script>
 
 <div class="spectrum-Switch spectrum-Switch--emphasized" class:noPadding>

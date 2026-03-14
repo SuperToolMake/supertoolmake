@@ -1,17 +1,11 @@
-import {
-  cache,
-  context,
-  docIds,
-  HTTPError,
-  utils,
-} from "@budibase/backend-core"
+import { cache, context, docIds, HTTPError, utils } from "@budibase/backend-core"
 import {
   DocumentType,
-  OAuth2Config,
+  type OAuth2Config,
   PASSWORD_REPLACEMENT,
   SEPARATOR,
-  WithoutDocMetadata,
-  WithRequired,
+  type WithoutDocMetadata,
+  type WithRequired,
 } from "@budibase/types"
 
 type CreatedOAuthConfig = WithRequired<OAuth2Config, "_id" | "_rev">
@@ -19,11 +13,8 @@ type CreatedOAuthConfig = WithRequired<OAuth2Config, "_id" | "_rev">
 async function guardName(name: string, id?: string) {
   const existingConfigs = await fetch()
 
-  if (existingConfigs.find(c => c.name === name && c._id !== id)) {
-    throw new HTTPError(
-      `OAuth2 config with name '${name}' is already taken.`,
-      400
-    )
+  if (existingConfigs.find((c) => c.name === name && c._id !== id)) {
+    throw new HTTPError(`OAuth2 config with name '${name}' is already taken.`, 400)
   }
 }
 
@@ -32,7 +23,7 @@ export async function fetch(): Promise<CreatedOAuthConfig[]> {
   const docs = await db.allDocs<OAuth2Config>(
     docIds.getOAuth2ConfigParams(null, { include_docs: true })
   )
-  const result = docs.rows.map(r => ({
+  const result = docs.rows.map((r) => ({
     ...r.doc!,
     _id: r.doc!._id!,
     _rev: r.doc!._rev!,
@@ -63,9 +54,7 @@ export async function get(id: string): Promise<OAuth2Config | undefined> {
   return await db.tryGet(id)
 }
 
-export async function update(
-  config: CreatedOAuthConfig
-): Promise<CreatedOAuthConfig> {
+export async function update(config: CreatedOAuthConfig): Promise<CreatedOAuthConfig> {
   const db = context.getWorkspaceDB()
   await guardName(config.name, config._id)
 
@@ -77,9 +66,7 @@ export async function update(
   const toUpdate = {
     ...config,
     clientSecret:
-      config.clientSecret === PASSWORD_REPLACEMENT
-        ? existing.clientSecret
-        : config.clientSecret,
+      config.clientSecret === PASSWORD_REPLACEMENT ? existing.clientSecret : config.clientSecret,
   }
 
   const result = await db.put(toUpdate)

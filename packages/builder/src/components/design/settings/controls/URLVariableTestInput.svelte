@@ -1,72 +1,66 @@
 <script lang="ts">
-  import { onMount } from "svelte"
-  import { Input, Label } from "@budibase/bbui"
-  import { previewStore, selectedScreen } from "@/stores/builder"
-  import type { AppContext } from "@budibase/types"
+import { Input, Label } from "@budibase/bbui"
+import type { AppContext } from "@budibase/types"
+import { onMount } from "svelte"
+import { previewStore, selectedScreen } from "@/stores/builder"
 
-  export let baseRoute = ""
+export let baseRoute = ""
 
-  let testValue: string | undefined
+let testValue: string | undefined
 
-  $: routeParams = baseRoute.match(/:[a-zA-Z]+/g) || []
-  $: hasUrlParams = routeParams.length > 0
-  $: placeholder = getPlaceholder(baseRoute)
-  $: baseInput = createBaseInput(baseRoute)
-  $: updateTestValueFromContext($previewStore.selectedComponentContext)
-  $: if ($selectedScreen) {
-    testValue = ""
+$: routeParams = baseRoute.match(/:[a-zA-Z]+/g) || []
+$: hasUrlParams = routeParams.length > 0
+$: placeholder = getPlaceholder(baseRoute)
+$: baseInput = createBaseInput(baseRoute)
+$: updateTestValueFromContext($previewStore.selectedComponentContext)
+$: if ($selectedScreen) {
+  testValue = ""
+}
+
+const getPlaceholder = (route: string) => {
+  const trimmed = route.replace(/\/$/, "")
+  if (trimmed.startsWith("/:")) {
+    return "1"
   }
+  const segments = trimmed.split("/").slice(2)
+  let count = 1
+  return segments.map((segment) => (segment.startsWith(":") ? count++ : segment)).join("/")
+}
 
-  const getPlaceholder = (route: string) => {
-    const trimmed = route.replace(/\/$/, "")
-    if (trimmed.startsWith("/:")) {
-      return "1"
-    }
-    const segments = trimmed.split("/").slice(2)
-    let count = 1
-    return segments
-      .map(segment => (segment.startsWith(":") ? count++ : segment))
-      .join("/")
-  }
-
-  // This function is needed to repopulate the test value from componentContext
-  // when a user navigates to another component and then back again
-  const updateTestValueFromContext = (context: AppContext | null) => {
-    if (context?.url && !testValue) {
-      const { wild, ...urlParams } = context.url
-      const queryParams = context.query
-      if (Object.values(urlParams).some(v => Boolean(v))) {
-        let value = baseRoute
-          .split("/")
-          .slice(2)
-          .map(segment =>
-            segment.startsWith(":")
-              ? urlParams[segment.slice(1)] || ""
-              : segment
-          )
-          .join("/")
-        const qs = new URLSearchParams(queryParams).toString()
-        if (qs) {
-          value += `?${qs}`
-        }
-        testValue = value
+// This function is needed to repopulate the test value from componentContext
+// when a user navigates to another component and then back again
+const updateTestValueFromContext = (context: AppContext | null) => {
+  if (context?.url && !testValue) {
+    const { wild, ...urlParams } = context.url
+    const queryParams = context.query
+    if (Object.values(urlParams).some((v) => Boolean(v))) {
+      let value = baseRoute
+        .split("/")
+        .slice(2)
+        .map((segment) => (segment.startsWith(":") ? urlParams[segment.slice(1)] || "" : segment))
+        .join("/")
+      const qs = new URLSearchParams(queryParams).toString()
+      if (qs) {
+        value += `?${qs}`
       }
+      testValue = value
     }
   }
+}
 
-  const createBaseInput = (baseRoute: string) => {
-    return baseRoute === "/" || baseRoute.split("/")[1]?.startsWith(":")
-      ? "/"
-      : `/${baseRoute.split("/")[1]}/`
-  }
+const createBaseInput = (baseRoute: string) => {
+  return baseRoute === "/" || baseRoute.split("/")[1]?.startsWith(":")
+    ? "/"
+    : `/${baseRoute.split("/")[1]}/`
+}
 
-  const onVariableChange = (e: CustomEvent) => {
-    previewStore.setUrlTestData({ route: baseRoute, testValue: e.detail })
-  }
+const onVariableChange = (e: CustomEvent) => {
+  previewStore.setUrlTestData({ route: baseRoute, testValue: e.detail })
+}
 
-  onMount(() => {
-    previewStore.requestComponentContext()
-  })
+onMount(() => {
+  previewStore.requestComponentContext()
+})
 </script>
 
 {#if hasUrlParams}

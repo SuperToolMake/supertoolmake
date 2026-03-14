@@ -1,165 +1,161 @@
 <script lang="ts">
-  import { writable, get } from "svelte/store"
-  import { setContext, onMount } from "svelte"
-  import { Layout, Heading, Body } from "@budibase/bbui"
-  //@ts-expect-error TODO(mel): fix?
-  import ErrorSVG from "@budibase/frontend-core/assets/error.svg?raw"
-  import {
-    Constants,
-    CookieUtils,
-    invalidationMessage,
-    popNumSessionsInvalidated,
-  } from "@budibase/frontend-core"
-  import { getThemeClassNames } from "@budibase/shared-core"
-  import Component from "./Component.svelte"
-  import SDK from "@/sdk"
-  import {
-    createContextStore,
-    initialise,
-    screenStore,
-    authStore,
-    routeStore,
-    builderStore,
-    themeStore,
-    appStore,
-    devToolsStore,
-    devToolsEnabled,
-    sidePanelStore,
-    modalStore,
-    dataSourceStore,
-    notificationStore,
-  } from "@/stores"
-  import NotificationDisplay from "./overlay/NotificationDisplay.svelte"
-  import ConfirmationDisplay from "./overlay/ConfirmationDisplay.svelte"
-  import PeekScreenDisplay from "./overlay/PeekScreenDisplay.svelte"
-  import UserBindingsProvider from "./context/UserBindingsProvider.svelte"
-  import DeviceBindingsProvider from "./context/DeviceBindingsProvider.svelte"
-  import StateBindingsProvider from "./context/StateBindingsProvider.svelte"
-  import TestUrlBindingsProvider from "./context/TestUrlBindingsProvider.svelte"
-  import RowSelectionProvider from "./context/RowSelectionProvider.svelte"
-  import QueryParamsProvider from "./context/QueryParamsProvider.svelte"
-  import SettingsBar from "./preview/SettingsBar.svelte"
-  import SelectionIndicator from "./preview/SelectionIndicator.svelte"
-  import HoverIndicator from "./preview/HoverIndicator.svelte"
-  import CustomThemeWrapper from "./CustomThemeWrapper.svelte"
-  import DNDHandler from "./preview/DNDHandler.svelte"
-  import GridDNDHandler from "./preview/GridDNDHandler.svelte"
-  import KeyboardManager from "./preview/KeyboardManager.svelte"
-  import DevToolsHeader from "./devtools/DevToolsHeader.svelte"
-  import DevTools from "./devtools/DevTools.svelte"
-  import SnippetsProvider from "./context/SnippetsProvider.svelte"
-  import FreeFooter from "./FreeFooter.svelte"
-  import EmbedProvider from "./context/EmbedProvider.svelte"
-  import DNDSelectionIndicators from "./preview/DNDSelectionIndicators.svelte"
-  import { ActionTypes } from "@/constants"
+import { Body, Heading, Layout } from "@budibase/bbui"
+import {
+  Constants,
+  CookieUtils,
+  invalidationMessage,
+  popNumSessionsInvalidated,
+} from "@budibase/frontend-core"
+//@ts-expect-error TODO(mel): fix?
+import ErrorSVG from "@budibase/frontend-core/assets/error.svg?raw"
+import { getThemeClassNames } from "@budibase/shared-core"
+import { onMount, setContext } from "svelte"
+import { get, writable } from "svelte/store"
+import { ActionTypes } from "@/constants"
+import SDK from "@/sdk"
+import {
+  appStore,
+  authStore,
+  builderStore,
+  createContextStore,
+  dataSourceStore,
+  devToolsEnabled,
+  devToolsStore,
+  initialise,
+  modalStore,
+  notificationStore,
+  routeStore,
+  screenStore,
+  sidePanelStore,
+  themeStore,
+} from "@/stores"
+import Component from "./Component.svelte"
+import CustomThemeWrapper from "./CustomThemeWrapper.svelte"
+import DeviceBindingsProvider from "./context/DeviceBindingsProvider.svelte"
+import EmbedProvider from "./context/EmbedProvider.svelte"
+import QueryParamsProvider from "./context/QueryParamsProvider.svelte"
+import RowSelectionProvider from "./context/RowSelectionProvider.svelte"
+import SnippetsProvider from "./context/SnippetsProvider.svelte"
+import StateBindingsProvider from "./context/StateBindingsProvider.svelte"
+import TestUrlBindingsProvider from "./context/TestUrlBindingsProvider.svelte"
+import UserBindingsProvider from "./context/UserBindingsProvider.svelte"
+import DevTools from "./devtools/DevTools.svelte"
+import DevToolsHeader from "./devtools/DevToolsHeader.svelte"
+import FreeFooter from "./FreeFooter.svelte"
+import ConfirmationDisplay from "./overlay/ConfirmationDisplay.svelte"
+import NotificationDisplay from "./overlay/NotificationDisplay.svelte"
+import PeekScreenDisplay from "./overlay/PeekScreenDisplay.svelte"
+import DNDHandler from "./preview/DNDHandler.svelte"
+import DNDSelectionIndicators from "./preview/DNDSelectionIndicators.svelte"
+import GridDNDHandler from "./preview/GridDNDHandler.svelte"
+import HoverIndicator from "./preview/HoverIndicator.svelte"
+import KeyboardManager from "./preview/KeyboardManager.svelte"
+import SelectionIndicator from "./preview/SelectionIndicator.svelte"
+import SettingsBar from "./preview/SettingsBar.svelte"
 
-  // Provide contexts
-  const context = createContextStore()
-  setContext("sdk", SDK)
-  setContext("component", writable({ id: null, ancestors: [] }))
-  setContext("context", context)
+// Provide contexts
+const context = createContextStore()
+setContext("sdk", SDK)
+setContext("component", writable({ id: null, ancestors: [] }))
+setContext("context", context)
 
-  // Seed context with an action to refresh all datasources
-  context.actions.provideAction("all", ActionTypes.RefreshDatasource, () => {
-    dataSourceStore.actions.refreshAll()
-  })
+// Seed context with an action to refresh all datasources
+context.actions.provideAction("all", ActionTypes.RefreshDatasource, () => {
+  dataSourceStore.actions.refreshAll()
+})
 
-  let dataLoaded = false
-  let permissionError = false
-  let embedNoScreens = false
+let dataLoaded = false
+let permissionError = false
+let embedNoScreens = false
 
-  // Determine if we should show devtools or not
-  $: showDevTools = $devToolsEnabled && !$routeStore.queryParams?.peek
+// Determine if we should show devtools or not
+$: showDevTools = $devToolsEnabled && !$routeStore.queryParams?.peek
 
-  // Handle no matching route
-  $: {
-    if (dataLoaded && $routeStore.routerLoaded && !$routeStore.activeRoute) {
-      if ($screenStore.screens.length) {
-        // If we have some available screens, use the first screen which
-        // represents the best route based on rank
-        const route = $screenStore.screens[0].routing?.route
-        if (!route) {
-          permissionError = true
-          console.error("No route found but screens exist")
-        } else {
-          permissionError = false
-          routeStore.actions.navigate(route, false, false)
-        }
-      } else if ($authStore) {
-        // If the user is logged in but has no screens, they don't have
-        // permission to use the app
+// Handle no matching route
+$: {
+  if (dataLoaded && $routeStore.routerLoaded && !$routeStore.activeRoute) {
+    if ($screenStore.screens.length) {
+      // If we have some available screens, use the first screen which
+      // represents the best route based on rank
+      const route = $screenStore.screens[0].routing?.route
+      if (!route) {
         permissionError = true
-      } else if ($appStore.embedded) {
-        embedNoScreens = true
+        console.error("No route found but screens exist")
       } else {
-        // If they have no screens and are not logged in, it probably means
-        // they should log in to gain access
-        CookieUtils.setCookie(Constants.Cookies.ReturnUrl, window.location.href)
-        window.location.href = "/builder/auth/login"
+        permissionError = false
+        routeStore.actions.navigate(route, false, false)
       }
+    } else if ($authStore) {
+      // If the user is logged in but has no screens, they don't have
+      // permission to use the app
+      permissionError = true
+    } else if ($appStore.embedded) {
+      embedNoScreens = true
+    } else {
+      // If they have no screens and are not logged in, it probably means
+      // they should log in to gain access
+      CookieUtils.setCookie(Constants.Cookies.ReturnUrl, window.location.href)
+      window.location.href = "/builder/auth/login"
     }
   }
+}
 
-  let fontsLoaded = false
+let fontsLoaded = false
 
-  // Load app config
-  // @ts-expect-error TODO(mel): Idk fix?
-  onMount(async () => {
-    document.fonts.ready.then(() => {
-      fontsLoaded = true
-    })
-
-    await initialise()
-    await authStore.actions.fetchUser()
-    dataLoaded = true
-
-    const invalidated = popNumSessionsInvalidated()
-    if (invalidated > 0) {
-      notificationStore.actions.info(
-        invalidationMessage(invalidated),
-        true,
-        5000
-      )
-    }
-
-    if (get(builderStore).inBuilder) {
-      builderStore.actions.notifyLoaded()
-    }
-    const handleHashChange = () => {
-      const { open: sidePanelOpen } = $sidePanelStore
-      // only close if the sidepanel is open and theres no onload side panel actions on the screen.
-      if (
-        sidePanelOpen &&
-        !$screenStore.activeScreen?.onLoad?.some(
-          item => item["##eventHandlerType"] === "Open Side Panel"
-        )
-      ) {
-        sidePanelStore.actions.close()
-      }
-
-      // @ts-expect-error - TODO(mel): Fix?
-      const { open: modalOpen } = $modalStore
-      // only close if the modal is open and theres onload modals actions on the screen.
-      if (
-        modalOpen &&
-        !$screenStore.activeScreen?.onLoad?.some(
-          item => item["##eventHandlerType"] === "Open Modal"
-        )
-      ) {
-        modalStore.actions.close()
-      }
-    }
-    window.addEventListener("hashchange", handleHashChange)
-    return () => {
-      window.removeEventListener("hashchange", handleHashChange)
-    }
+// Load app config
+// @ts-expect-error TODO(mel): Idk fix?
+onMount(async () => {
+  document.fonts.ready.then(() => {
+    fontsLoaded = true
   })
 
-  $: {
-    if (dataLoaded && fontsLoaded) {
-      document.getElementById("clientAppSkeletonLoader")?.remove()
+  await initialise()
+  await authStore.actions.fetchUser()
+  dataLoaded = true
+
+  const invalidated = popNumSessionsInvalidated()
+  if (invalidated > 0) {
+    notificationStore.actions.info(invalidationMessage(invalidated), true, 5000)
+  }
+
+  if (get(builderStore).inBuilder) {
+    builderStore.actions.notifyLoaded()
+  }
+  const handleHashChange = () => {
+    const { open: sidePanelOpen } = $sidePanelStore
+    // only close if the sidepanel is open and theres no onload side panel actions on the screen.
+    if (
+      sidePanelOpen &&
+      !$screenStore.activeScreen?.onLoad?.some(
+        (item) => item["##eventHandlerType"] === "Open Side Panel"
+      )
+    ) {
+      sidePanelStore.actions.close()
+    }
+
+    // @ts-expect-error - TODO(mel): Fix?
+    const { open: modalOpen } = $modalStore
+    // only close if the modal is open and theres onload modals actions on the screen.
+    if (
+      modalOpen &&
+      !$screenStore.activeScreen?.onLoad?.some(
+        (item) => item["##eventHandlerType"] === "Open Modal"
+      )
+    ) {
+      modalStore.actions.close()
     }
   }
+  window.addEventListener("hashchange", handleHashChange)
+  return () => {
+    window.removeEventListener("hashchange", handleHashChange)
+  }
+})
+
+$: {
+  if (dataLoaded && fontsLoaded) {
+    document.getElementById("clientAppSkeletonLoader")?.remove()
+  }
+}
 </script>
 
 {#if dataLoaded}

@@ -1,4 +1,4 @@
-import { derived, Readable, Writable, writable } from "svelte/store"
+import { derived, type Readable, type Writable, writable } from "svelte/store"
 
 interface BoundsStore {
   bounds: Writable<{
@@ -22,8 +22,8 @@ export const createStores = (): BoundsStore => {
   })
 
   // Derive height and width as primitives to avoid wasted computation
-  const width = derived(bounds, $bounds => $bounds.width, 0)
-  const height = derived(bounds, $bounds => $bounds.height, 0)
+  const width = derived(bounds, ($bounds) => $bounds.width, 0)
+  const height = derived(bounds, ($bounds) => $bounds.height, 0)
 
   return { bounds, height, width }
 }

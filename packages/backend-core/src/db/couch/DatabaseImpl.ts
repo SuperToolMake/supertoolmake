@@ -1,26 +1,26 @@
-import Nano, { DocumentListParams } from "nano"
 import {
-  AllDocsResponse,
-  AnyDocument,
-  Database,
-  DatabaseCreateIndexOpts,
-  DatabaseDeleteIndexOpts,
-  DatabaseOpts,
-  DatabasePutOpts,
-  DatabaseQueryOpts,
-  DBError,
-  Document,
+  type AllDocsResponse,
+  type AnyDocument,
+  type Database,
+  type DatabaseCreateIndexOpts,
+  type DatabaseDeleteIndexOpts,
+  type DatabaseOpts,
+  type DatabasePutOpts,
+  type DatabaseQueryOpts,
+  type DBError,
+  type Document,
   isDocument,
-  RowResponse,
-  RowValue,
+  type RowResponse,
+  type RowValue,
 } from "@budibase/types"
-import { getCouchInfo } from "./connections"
-import { directCouchUrlCall } from "./utils"
-import { getPouchDB } from "./pouchDB"
-import { ReadStream, WriteStream } from "fs"
+import type { ReadStream, WriteStream } from "fs"
+import Nano, { type DocumentListParams } from "nano"
 import { newid } from "../../docIds/newid"
-import { DDInstrumentedDatabase } from "../instrumentation"
 import { checkSlashesInUrl } from "../../helpers"
+import { DDInstrumentedDatabase } from "../instrumentation"
+import { getCouchInfo } from "./connections"
+import { getPouchDB } from "./pouchDB"
+import { directCouchUrlCall } from "./utils"
 
 const DATABASE_NOT_FOUND = "Database does not exist."
 
@@ -34,9 +34,7 @@ function buildNano(couchInfo: { url: string; cookie: string }) {
 }
 
 type DBCall<T> = () => Promise<T>
-type DBCallback<T> = (
-  db: Nano.DocumentScope<any>
-) => Promise<DBCall<T>> | DBCall<T>
+type DBCallback<T> = (db: Nano.DocumentScope<any>) => Promise<DBCall<T>> | DBCall<T>
 
 class CouchDBError extends Error implements DBError {
   status: number
@@ -71,15 +69,9 @@ class CouchDBError extends Error implements DBError {
   }
 }
 
-export function DatabaseWithConnection(
-  dbName: string,
-  connection: string,
-  opts?: DatabaseOpts
-) {
+export function DatabaseWithConnection(dbName: string, connection: string, opts?: DatabaseOpts) {
   if (!dbName || !connection) {
-    throw new Error(
-      "Unable to create database without database name or connection"
-    )
+    throw new Error("Unable to create database without database name or connection")
   }
   const db = new CouchDatabase(dbName, opts, connection)
   return new DDInstrumentedDatabase(db)
@@ -129,7 +121,7 @@ export class CouchDatabase implements Database {
 
   private async docExists(id: string): Promise<boolean> {
     try {
-      await this.performCall(db => () => db.head(id))
+      await this.performCall((db) => () => db.head(id))
       return true
     } catch {
       return false
@@ -145,9 +137,9 @@ export class CouchDatabase implements Database {
   }
 
   private async checkAndCreateDb() {
-    let shouldCreate = !this.pouchOpts?.skip_setup
+    const shouldCreate = !this.pouchOpts?.skip_setup
     // check exists in a lightweight fashion
-    let exists = await this.exists()
+    const exists = await this.exists()
     if (!shouldCreate && !exists) {
       throw new Error("DB does not exist")
     }
@@ -165,9 +157,7 @@ export class CouchDatabase implements Database {
   }
 
   // this function fetches the DB and handles if DB creation is needed
-  private async performCallWithDBCreation<T>(
-    call: DBCallback<T>
-  ): Promise<any> {
+  private async performCallWithDBCreation<T>(call: DBCallback<T>): Promise<any> {
     const db = this.getDb()
     const fnc = await call(db)
     try {
@@ -194,7 +184,7 @@ export class CouchDatabase implements Database {
   }
 
   async get<T extends Document>(id?: string): Promise<T> {
-    return this.performCall(db => {
+    return this.performCall((db) => {
       if (!id) {
         throw new Error("Unable to get doc without a valid _id.")
       }
@@ -238,20 +228,20 @@ export class CouchDatabase implements Database {
       return row.error === "not_found"
     }
 
-    const rows = response.rows.filter(row => !rowUnavailable(row))
+    const rows = response.rows.filter((row) => !rowUnavailable(row))
     const someMissing = rows.length !== response.rows.length
     // some were filtered out - means some missing
     if (!opts?.allowMissing && someMissing) {
-      const missing = response.rows.filter(row => rowUnavailable(row))
-      const missingIds = missing.map(row => row.key).join(", ")
+      const missing = response.rows.filter((row) => rowUnavailable(row))
+      const missingIds = missing.map((row) => row.key).join(", ")
       throw new Error(`Unable to get bulk documents: ${missingIds}`)
     }
-    return rows.map(row => (includeDocs ? row.doc! : row.value))
+    return rows.map((row) => (includeDocs ? row.doc! : row.value))
   }
 
   async remove(idOrDoc: string | Document, rev?: string) {
     // not a read call - but don't create a DB to delete a document
-    return this.performCall(db => {
+    return this.performCall((db) => {
       let _id: string
       let _rev: string
 
@@ -271,10 +261,10 @@ export class CouchDatabase implements Database {
   }
 
   async bulkRemove(documents: Document[], opts?: { silenceErrors?: boolean }) {
-    const response: Nano.DocumentBulkResponse[] = await this.performCall(db => {
+    const response: Nano.DocumentBulkResponse[] = await this.performCall((db) => {
       return () =>
         db.bulk({
-          docs: documents.map(doc => ({
+          docs: documents.map((doc) => ({
             ...doc,
             _deleted: true,
           })),
@@ -285,7 +275,7 @@ export class CouchDatabase implements Database {
     }
     let errorFound = false
     let errorMessage = "Unable to bulk remove documents: "
-    for (let res of response) {
+    for (const res of response) {
       if (res.error) {
         errorFound = true
         errorMessage += res.error
@@ -310,7 +300,7 @@ export class CouchDatabase implements Database {
     if (!document._id) {
       throw new Error("Cannot store document without _id field.")
     }
-    return this.performCallWithDBCreation(async db => {
+    return this.performCallWithDBCreation(async (db) => {
       if (!document.createdAt) {
         document.createdAt = new Date().toISOString()
       }
@@ -339,18 +329,16 @@ export class CouchDatabase implements Database {
 
   async bulkDocs(documents: AnyDocument[]) {
     const now = new Date().toISOString()
-    return this.performCallWithDBCreation(db => {
+    return this.performCallWithDBCreation((db) => {
       return () =>
         db.bulk({
-          docs: documents.map(d => ({ createdAt: now, ...d, updatedAt: now })),
+          docs: documents.map((d) => ({ createdAt: now, ...d, updatedAt: now })),
         })
     })
   }
 
-  async find<T extends Document>(
-    params: Nano.MangoQuery
-  ): Promise<Nano.MangoResponse<T>> {
-    return this.performCall(db => {
+  async find<T extends Document>(params: Nano.MangoQuery): Promise<Nano.MangoResponse<T>> {
+    return this.performCall((db) => {
       return async () => {
         return db.find(params)
       }
@@ -360,7 +348,7 @@ export class CouchDatabase implements Database {
   async allDocs<T extends Document | RowValue>(
     params: DocumentListParams
   ): Promise<AllDocsResponse<T>> {
-    return this.performCall(db => {
+    return this.performCall((db) => {
       return async () => {
         try {
           return (await db.list(params)) as AllDocsResponse<T>
@@ -379,11 +367,7 @@ export class CouchDatabase implements Database {
     })
   }
 
-  async _query<T>(
-    url: string,
-    method: "POST" | "GET",
-    body?: Record<string, any>
-  ): Promise<T> {
+  async _query<T>(url: string, method: "POST" | "GET", body?: Record<string, any>): Promise<T> {
     url = checkSlashesInUrl(`${this.couchInfo.sqlUrl}/${url}`)
     const args: { url: string; method: string; cookie: string; body?: any } = {
       url,
@@ -403,10 +387,10 @@ export class CouchDatabase implements Database {
             json = JSON.parse(text)
           } catch (err) {
             console.error(`error: ${text}`)
-            throw new CouchDBError(
-              "error while running query, please try again later",
-              { name: "error", status: response.status }
-            )
+            throw new CouchDBError("error while running query, please try again later", {
+              name: "error",
+              status: response.status,
+            })
           }
           throw json
         }
@@ -429,7 +413,7 @@ export class CouchDatabase implements Database {
     viewName: string,
     params: DatabaseQueryOpts
   ): Promise<AllDocsResponse<T>> {
-    return this.performCall(db => {
+    return this.performCall((db) => {
       const [database, view] = viewName.split("/")
       return () => db.view(database, view, params)
     })
@@ -449,7 +433,7 @@ export class CouchDatabase implements Database {
   }
 
   async compact() {
-    return this.performCall(db => {
+    return this.performCall((db) => {
       return () => db.compact()
     })
   }
@@ -458,13 +442,13 @@ export class CouchDatabase implements Database {
   // for them as it implements them better than we can
   async dump(stream: WriteStream, opts?: { filter?: any }) {
     const pouch = getPouchDB(this.name)
-    // @ts-ignore
+    // @ts-expect-error
     return pouch.dump(stream, opts)
   }
 
   async load(stream: ReadStream) {
     const pouch = getPouchDB(this.name)
-    // @ts-ignore
+    // @ts-expect-error
     return pouch.load(stream)
   }
 

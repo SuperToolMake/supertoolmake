@@ -1,6 +1,6 @@
-import { getTenantId, isMultiTenant } from "../../context"
+import type { ConfigType, GoogleInnerConfig } from "@budibase/types"
 import * as configs from "../../configs"
-import { ConfigType, GoogleInnerConfig } from "@budibase/types"
+import { getTenantId, isMultiTenant } from "../../context"
 
 /**
  * Utility to handle authentication errors.
@@ -18,10 +18,7 @@ export function authError(done: Function, message: string, err?: any) {
   )
 }
 
-export async function ssoCallbackUrl(
-  type: ConfigType,
-  config?: GoogleInnerConfig
-) {
+export async function ssoCallbackUrl(type: ConfigType, config?: GoogleInnerConfig) {
   // incase there is a callback URL from before
   if (config && (config as GoogleInnerConfig).callbackURL) {
     return (config as GoogleInnerConfig).callbackURL as string

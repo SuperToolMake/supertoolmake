@@ -32,8 +32,8 @@ export async function updateClientLibrary(appId: string) {
     const chunksDir = join(distFolder, "chunks")
     dependencies = fs
       .readdirSync(chunksDir)
-      .filter(f => f.endsWith(".js"))
-      .map(f => join(chunksDir, f))
+      .filter((f) => f.endsWith(".js"))
+      .map((f) => join(chunksDir, f))
   } else {
     // Load the bundled version in prod
     manifest = resolve(TOP_LEVEL_PATH, "client", "manifest.json")
@@ -41,8 +41,8 @@ export async function updateClientLibrary(appId: string) {
     const chunksDir = join(resolve(TOP_LEVEL_PATH, "client"), "chunks")
     dependencies = fs
       .readdirSync(chunksDir)
-      .filter(f => f.endsWith(".js"))
-      .map(f => join(chunksDir, f))
+      .filter((f) => f.endsWith(".js"))
+      .map((f) => join(chunksDir, f))
   }
 
   // Upload latest manifest and client library
@@ -55,7 +55,7 @@ export async function updateClientLibrary(appId: string) {
       filename: join(appId, "budibase-client.js"),
       stream: fs.createReadStream(client),
     },
-    ...dependencies.map(dependency => ({
+    ...dependencies.map((dependency) => ({
       filename: join(appId, "chunks", path.basename(dependency)),
       stream: fs.createReadStream(dependency),
     })),
@@ -70,11 +70,11 @@ export async function updateClientLibrary(appId: string) {
     manifestSrc,
   ])
 
-  const uploadedFiles = files.map(file => file.filename)
+  const uploadedFiles = files.map((file) => file.filename)
   const filesToDelete: string[] = []
   await utils.parallelForeach(
     objectStore.listAllObjects(objectStore.ObjectStoreBuckets.APPS, appId),
-    async file => {
+    async (file) => {
       const key = file.Key
       if (!key) {
         return
@@ -90,10 +90,7 @@ export async function updateClientLibrary(appId: string) {
   )
 
   if (filesToDelete.length) {
-    await objectStore.deleteFiles(
-      objectStore.ObjectStoreBuckets.APPS,
-      filesToDelete
-    )
+    await objectStore.deleteFiles(objectStore.ObjectStoreBuckets.APPS, filesToDelete)
   }
 
   return JSON.parse(await manifestSrc)
@@ -113,14 +110,11 @@ export async function revertClientLibrary(appId: string) {
   const restoredFiles = new Set<string>()
 
   // First, restore all files from the backup folder
-  await forEachObject(`${appId}/.bak`, async filePath => {
+  await forEachObject(`${appId}/.bak`, async (filePath) => {
     hasBackup = true
 
     // Download the backup file to temp
-    const tmpPath = await objectStore.retrieveToTmp(
-      ObjectStoreBuckets.APPS,
-      filePath
-    )
+    const tmpPath = await objectStore.retrieveToTmp(ObjectStoreBuckets.APPS, filePath)
 
     // Restore to original location
     const restoreKey = filePath.replace(`${appId}/.bak`, appId)
@@ -140,7 +134,7 @@ export async function revertClientLibrary(appId: string) {
 
   // After successful restore, clean up any extra files that weren't in backup
   if (hasBackup) {
-    await forEachObject(appId, async filePath => {
+    await forEachObject(appId, async (filePath) => {
       if (
         !filePath.includes("/.bak/") &&
         !filePath.endsWith(".bak") &&
@@ -153,7 +147,7 @@ export async function revertClientLibrary(appId: string) {
 
   // If no backup folder found, try to find old .bak files
   if (!hasBackup) {
-    await forEachObject(appId, async filePath => {
+    await forEachObject(appId, async (filePath) => {
       if (!filePath.endsWith(".bak")) {
         return
       }
@@ -166,18 +160,12 @@ export async function revertClientLibrary(appId: string) {
       // For manifest file, we need to read the content to return it
 
       if (restoreKey.endsWith("manifest.json")) {
-        const tmpPath = await objectStore.retrieveToTmp(
-          ObjectStoreBuckets.APPS,
-          filePath
-        )
+        const tmpPath = await objectStore.retrieveToTmp(ObjectStoreBuckets.APPS, filePath)
         manifestContent = await fs.promises.readFile(tmpPath, "utf8")
       }
 
       // For all other files, use streaming
-      const { stream } = await objectStore.getReadStream(
-        ObjectStoreBuckets.APPS,
-        filePath
-      )
+      const { stream } = await objectStore.getReadStream(ObjectStoreBuckets.APPS, filePath)
 
       await objectStore.streamUpload({
         bucket: ObjectStoreBuckets.APPS,
@@ -198,13 +186,10 @@ export async function revertClientLibrary(appId: string) {
   return JSON.parse(manifestContent)
 }
 
-const forEachObject = (
-  path: string,
-  task: (fileKey: string) => Promise<void>
-) =>
+const forEachObject = (path: string, task: (fileKey: string) => Promise<void>) =>
   utils.parallelForeach(
     objectStore.listAllObjects(ObjectStoreBuckets.APPS, path),
-    async file => {
+    async (file) => {
       if (!file.Key) {
         throw new Error("file.Key must be defined")
       }

@@ -1,12 +1,11 @@
-import { sdk } from "@budibase/shared-core"
-import { GetGlobalSelfResponse } from "@budibase/types"
 import { UserAvatar } from "@budibase/frontend-core"
-
-import { type Route } from "@/types/routing"
+import { sdk } from "@budibase/shared-core"
+import type { GetGlobalSelfResponse } from "@budibase/types"
+import type { AppMetaState } from "@/stores/builder/app"
+import type { AdminState } from "@/stores/portal/admin"
+import type { PortalAppsStore } from "@/stores/portal/apps"
+import type { Route } from "@/types/routing"
 import { Pages } from "./pages"
-import { AdminState } from "@/stores/portal/admin"
-import { AppMetaState } from "@/stores/builder/app"
-import { PortalAppsStore } from "@/stores/portal/apps"
 
 export const globalRoutes = (user: GetGlobalSelfResponse) => {
   return [
@@ -22,10 +21,7 @@ export const globalRoutes = (user: GetGlobalSelfResponse) => {
   ]
 }
 
-export const orgRoutes = (
-  user: GetGlobalSelfResponse,
-  admin: AdminState
-): Route[] => {
+export const orgRoutes = (user: GetGlobalSelfResponse, admin: AdminState): Route[] => {
   const isAdmin = user != null && sdk.users.isAdmin(user)
   const isGlobalBuilder = user != null && sdk.users.isGlobalBuilder(user)
   const cloud = admin?.cloud
@@ -138,10 +134,7 @@ export const orgRoutes = (
   }))
 }
 
-export const appRoutes = (
-  appStore: AppMetaState,
-  _appsStore: PortalAppsStore
-): Route[] => {
+export const appRoutes = (appStore: AppMetaState, _appsStore: PortalAppsStore): Route[] => {
   if (!appStore?.appId) {
     return []
   }
@@ -151,9 +144,7 @@ export const appRoutes = (
       section: "General",
       icon: "sliders-horizontal",
       path: "general",
-      routes: [
-        { path: "info", comp: Pages.get("general_info"), title: "Info" },
-      ],
+      routes: [{ path: "info", comp: Pages.get("general_info"), title: "Info" }],
     },
     {
       section: "Apps",
@@ -171,16 +162,12 @@ export const appRoutes = (
 // doesn't have permission or the install does not require/allow it
 export const filterRoutes = (routes: Route[]): Route[] =>
   routes
-    .filter(e => (typeof e.access === "function" ? e.access() : true))
-    .map(route => {
-      const filteredChildRoutes = route?.routes
-        ? filterRoutes(route.routes)
-        : []
+    .filter((e) => (typeof e.access === "function" ? e.access() : true))
+    .map((route) => {
+      const filteredChildRoutes = route?.routes ? filterRoutes(route.routes) : []
 
       // Check if any child has an error
-      const hasChildError = filteredChildRoutes.some(
-        child => child.error?.() || false
-      )
+      const hasChildError = filteredChildRoutes.some((child) => child.error?.() || false)
 
       // Check if this route itself has an error
       const hasOwnError = route.error?.() || false

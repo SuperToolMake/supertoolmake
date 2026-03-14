@@ -1,8 +1,8 @@
-import { it, expect, describe, beforeEach, vi } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import { getColumns } from "./getColumns"
 
 describe("getColumns", () => {
-  beforeEach(ctx => {
+  beforeEach((ctx) => {
     ctx.schema = {
       one: { name: "one", visible: false, order: 0, type: "foo" },
       two: { name: "two", visible: true, order: 1, type: "foo" },
@@ -25,7 +25,7 @@ describe("getColumns", () => {
   })
 
   describe("nested json fields", () => {
-    beforeEach(ctx => {
+    beforeEach((ctx) => {
       ctx.columns = getColumns({
         columns: null,
         schema: ctx.schema,
@@ -36,7 +36,7 @@ describe("getColumns", () => {
       })
     })
 
-    it("does not return nested json fields, as the grid cannot display them", ctx => {
+    it("does not return nested json fields, as the grid cannot display them", (ctx) => {
       expect(ctx.columns.sortable).not.toContainEqual({
         name: "excluded",
         visible: true,
@@ -48,7 +48,7 @@ describe("getColumns", () => {
   })
 
   describe("using the old grid column format", () => {
-    beforeEach(ctx => {
+    beforeEach((ctx) => {
       const oldGridFormatColumns = [
         { displayName: "three label", name: "three" },
         { displayName: "two label", name: "two" },
@@ -64,7 +64,7 @@ describe("getColumns", () => {
       })
     })
 
-    it("returns the selected and unselected fields in the modern format, respecting the original order", ctx => {
+    it("returns the selected and unselected fields in the modern format, respecting the original order", (ctx) => {
       expect(ctx.columns.sortable).toEqual([
         {
           _id: "three",
@@ -116,7 +116,7 @@ describe("getColumns", () => {
   })
 
   describe("default columns", () => {
-    beforeEach(ctx => {
+    beforeEach((ctx) => {
       ctx.columns = getColumns({
         columns: undefined,
         schema: ctx.schema,
@@ -127,7 +127,7 @@ describe("getColumns", () => {
       })
     })
 
-    it("returns all columns, with non-hidden columns automatically selected", ctx => {
+    it("returns all columns, with non-hidden columns automatically selected", (ctx) => {
       expect(ctx.columns.sortable).toEqual([
         {
           _id: "two",
@@ -177,16 +177,14 @@ describe("getColumns", () => {
       })
     })
 
-    it("Unselected columns should be placed at the end", ctx => {
+    it("Unselected columns should be placed at the end", (ctx) => {
       expect(ctx.columns.sortable[2].field).toEqual("one")
     })
   })
 
   describe("missing columns", () => {
-    beforeEach(ctx => {
-      const gridFormatColumns = [
-        { label: "three label", field: "three", active: true },
-      ]
+    beforeEach((ctx) => {
+      const gridFormatColumns = [{ label: "three label", field: "three", active: true }]
 
       ctx.columns = getColumns({
         columns: gridFormatColumns,
@@ -198,7 +196,7 @@ describe("getColumns", () => {
       })
     })
 
-    it("returns all columns, including those missing from the initial data", ctx => {
+    it("returns all columns, including those missing from the initial data", (ctx) => {
       expect(ctx.columns.sortable).toEqual([
         {
           _id: "three",
@@ -250,7 +248,7 @@ describe("getColumns", () => {
   })
 
   describe("invalid columns", () => {
-    beforeEach(ctx => {
+    beforeEach((ctx) => {
       const gridFormatColumns = [
         { label: "three label", field: "three", active: true },
         { label: "some nonsense", field: "some nonsense", active: true },
@@ -266,7 +264,7 @@ describe("getColumns", () => {
       })
     })
 
-    it("returns all valid columns, excluding those that aren't valid for the schema", ctx => {
+    it("returns all valid columns, excluding those that aren't valid for the schema", (ctx) => {
       expect(ctx.columns.sortable).toEqual([
         {
           _id: "three",
@@ -318,7 +316,7 @@ describe("getColumns", () => {
   })
 
   describe("displayName for viewV2 datasources", () => {
-    beforeEach(ctx => {
+    beforeEach((ctx) => {
       ctx.schemaWithDisplayNames = {
         one: {
           name: "one",
@@ -338,7 +336,7 @@ describe("getColumns", () => {
       }
     })
 
-    it("uses displayName as label when datasource is viewV2", ctx => {
+    it("uses displayName as label when datasource is viewV2", (ctx) => {
       const columns = getColumns({
         columns: undefined,
         schema: ctx.schemaWithDisplayNames,
@@ -355,7 +353,7 @@ describe("getColumns", () => {
   })
 
   describe("methods", () => {
-    beforeEach(ctx => {
+    beforeEach((ctx) => {
       const { update, updateSortable } = getColumns({
         columns: [],
         schema: ctx.schema,
@@ -370,7 +368,7 @@ describe("getColumns", () => {
     })
 
     describe("update", () => {
-      beforeEach(ctx => {
+      beforeEach((ctx) => {
         ctx.update({
           field: "one",
           label: "a new label",
@@ -378,7 +376,7 @@ describe("getColumns", () => {
         })
       })
 
-      it("calls the callback with the updated columns", ctx => {
+      it("calls the callback with the updated columns", (ctx) => {
         expect(ctx.onChange).toHaveBeenCalledTimes(1)
         expect(ctx.onChange).toHaveBeenCalledWith([
           {
@@ -406,7 +404,7 @@ describe("getColumns", () => {
     })
 
     describe("updateSortable", () => {
-      beforeEach(ctx => {
+      beforeEach((ctx) => {
         ctx.updateSortable([
           {
             _id: "three",
@@ -438,7 +436,7 @@ describe("getColumns", () => {
         ])
       })
 
-      it("calls the callback with the updated columns", ctx => {
+      it("calls the callback with the updated columns", (ctx) => {
         expect(ctx.onChange).toHaveBeenCalledTimes(1)
         expect(ctx.onChange).toHaveBeenCalledWith([
           {

@@ -1,16 +1,16 @@
-import { populateExternalTableSchemas } from "../validation"
-import { cloneDeep } from "lodash/fp"
 import {
   AutoReason,
-  Datasource,
+  type Datasource,
   FieldType,
   RelationshipType,
   SourceName,
-  Table,
+  type Table,
   TableSourceType,
 } from "@budibase/types"
 import { isEqual } from "lodash"
+import { cloneDeep } from "lodash/fp"
 import { generateDatasourceID } from "../../../../db/utils"
+import { populateExternalTableSchemas } from "../validation"
 
 const datasourceId = generateDatasourceID()
 
@@ -99,12 +99,8 @@ describe("validation and update of external table schemas", () => {
     return datasource.entities!["project"].schema.idC
   }
 
-  function checkOtherColumns(
-    table: Table,
-    compareTable: Table,
-    columnsToCheck: string[]
-  ) {
-    for (let columnName of columnsToCheck) {
+  function checkOtherColumns(table: Table, compareTable: Table, columnsToCheck: string[]) {
+    for (const columnName of columnsToCheck) {
       const columnA = table.schema[columnName]
       const columnB = table.schema[columnName]
       expect(isEqual(columnA, columnB)).toBe(true)
@@ -112,16 +108,8 @@ describe("validation and update of external table schemas", () => {
   }
 
   function noOtherTableChanges(response: any) {
-    checkOtherColumns(
-      response.entities!.client!,
-      SCHEMA.entities!.client,
-      OTHER_CLIENT_COLS
-    )
-    checkOtherColumns(
-      response.entities!.project!,
-      SCHEMA.entities!.project,
-      OTHER_PROJECT_COLS
-    )
+    checkOtherColumns(response.entities!.client!, SCHEMA.entities!.client, OTHER_CLIENT_COLS)
+    checkOtherColumns(response.entities!.project!, SCHEMA.entities!.project, OTHER_PROJECT_COLS)
   }
 
   it("should correctly set utilised foreign keys to autocolumns", () => {

@@ -1,4 +1,4 @@
-import { Expectations, TestAPI } from "./base"
+import { type Expectations, TestAPI } from "./base"
 
 export class MiscAPI extends TestAPI {
   health = async (expectations?: Expectations) => {

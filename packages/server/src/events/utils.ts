@@ -1,5 +1,5 @@
-import { Table, Row, UserBindings } from "@budibase/types"
-import BudibaseEmitter from "./BudibaseEmitter"
+import type { Row, Table, UserBindings } from "@budibase/types"
+import type BudibaseEmitter from "./BudibaseEmitter"
 
 type BBEventOpts = {
   emitter: BudibaseEmitter
@@ -38,7 +38,7 @@ export function rowEmission({
   oldRow,
   user,
 }: BBEventOpts) {
-  let event: BBEvent = {
+  const event: BBEvent = {
     row,
     oldRow,
     appId,
@@ -58,19 +58,13 @@ export function rowEmission({
   emitter.emit(eventName, event)
 }
 
-export function tableEmission({
-  emitter,
-  eventName,
-  appId,
-  table,
-  metadata,
-}: BBEventOpts) {
+export function tableEmission({ emitter, eventName, appId, table, metadata }: BBEventOpts) {
   const tableId = table?._id
   const inputTable: BBEventTable | undefined = table
   if (inputTable) {
     inputTable.tableId = tableId
   }
-  let event: BBEvent = {
+  const event: BBEvent = {
     table: inputTable,
     appId,
     tableId: tableId,

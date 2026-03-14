@@ -1,8 +1,14 @@
 import browserVM from "@budibase/vm-browserify"
+import { create, type TemplateDelegate } from "handlebars"
 import vm from "vm"
-import { create, TemplateDelegate } from "handlebars"
+import { convertHBSBlock } from "./conversion"
+import { isTest } from "./environment"
+import { UserScriptError } from "./errors"
 import { registerAll, registerMinimum } from "./helpers/index"
+import { removeJSRunner, setJSRunner } from "./helpers/javascript"
+import manifest from "./manifest.json"
 import { postprocess, postprocessWithLogs, preprocess } from "./processors"
+import type { Log, ProcessOptions } from "./types"
 import {
   atob,
   btoa,
@@ -13,19 +19,13 @@ import {
   isBackendService,
   prefixStrings,
 } from "./utilities"
-import { convertHBSBlock } from "./conversion"
-import { removeJSRunner, setJSRunner } from "./helpers/javascript"
-import manifest from "./manifest.json"
-import { Log, ProcessOptions } from "./types"
-import { UserScriptError } from "./errors"
-import { isTest } from "./environment"
 
-export type { Log, LogType } from "./types"
 export { setTestingBackendJS } from "./environment"
-export { helpersToRemoveForJs, getJsHelperList } from "./helpers/list"
-export { FIND_ANY_HBS_REGEX } from "./utilities"
 export { setJSRunner, setOnErrorLog } from "./helpers/javascript"
+export { getJsHelperList, helpersToRemoveForJs } from "./helpers/list"
 export { iifeWrapper } from "./iife"
+export type { Log, LogType } from "./types"
+export { FIND_ANY_HBS_REGEX } from "./utilities"
 
 const hbsInstance = create()
 registerAll(hbsInstance)
@@ -57,18 +57,14 @@ function findOverlappingHelpers(context?: object) {
     return []
   }
   const contextKeys = Object.keys(context)
-  return contextKeys.filter(key => helperNames.includes(key))
+  return contextKeys.filter((key) => helperNames.includes(key))
 }
 
 /**
  * Creates a HBS template function for a given string, and optionally caches it.
  */
 const templateCache: Record<string, TemplateDelegate<any>> = {}
-function createTemplate(
-  string: string,
-  opts?: ProcessOptions,
-  context?: object
-) {
+function createTemplate(string: string, opts?: ProcessOptions, context?: object) {
   opts = { ...defaultOpts, ...opts }
   const helpersEnabled = !opts?.noHelpers
 
@@ -80,9 +76,7 @@ function createTemplate(
     return templateCache[key]
   }
 
-  const overlappingHelpers = helpersEnabled
-    ? findOverlappingHelpers(context)
-    : []
+  const overlappingHelpers = helpersEnabled ? findOverlappingHelpers(context) : []
 
   string = preprocess(string, {
     ...opts,
@@ -92,10 +86,7 @@ function createTemplate(
   if (context && helpersEnabled) {
     if (overlappingHelpers.length > 0) {
       for (const block of findHBSBlocks(string)) {
-        string = string.replace(
-          block,
-          prefixStrings(block, overlappingHelpers, "./")
-        )
+        string = string.replace(block, prefixStrings(block, overlappingHelpers, "./"))
       }
     }
   }
@@ -141,7 +132,7 @@ export async function processObject<T extends Record<string, any>>(
         parsedValue = await processObject(object[key], context, opts)
       }
 
-      // @ts-ignore
+      // @ts-expect-error
       object[key] = parsedValue
     }
   }
@@ -180,8 +171,8 @@ export function processObjectSync(
   opts?: ProcessOptions
 ): object | Array<any> {
   testObject(object)
-  for (let key of Object.keys(object || {})) {
-    let val = object[key]
+  for (const key of Object.keys(object || {})) {
+    const val = object[key]
     if (typeof val === "string") {
       object[key] = processStringSync(object[key], context, opts)
     } else if (typeof val === "object") {
@@ -225,15 +216,13 @@ function processStringSyncInternal(
       },
       ...context,
     })
-    return opts?.logging
-      ? postprocessWithLogs(processedString)
-      : postprocess(processedString)
+    return opts?.logging ? postprocessWithLogs(processedString) : postprocess(processedString)
   }
   try {
     if (opts && opts.onlyFound) {
       let logs: Log[] = []
       const blocks = findHBSBlocks(string)
-      for (let block of blocks) {
+      for (const block of blocks) {
         const outcome = process(block)
         if (typeof outcome === "object" && "result" in outcome) {
           logs = logs.concat(outcome.logs || [])
@@ -263,11 +252,7 @@ function processStringSyncInternal(
  * @param {object|undefined} [opts] optional - specify some options for processing.
  * @returns {string} The enriched string, all templates should have been replaced if they can be.
  */
-export function processStringSync(
-  string: string,
-  context?: object,
-  opts?: ProcessOptions
-): string {
+export function processStringSync(string: string, context?: object, opts?: ProcessOptions): string {
   return processStringSyncInternal(string, context, {
     ...opts,
     logging: false,
@@ -305,7 +290,7 @@ export function disableEscaping(string: string) {
 
   // find the unique set
   const unique = [...new Set(matches)]
-  for (let match of unique) {
+  for (const match of unique) {
     // add a negative lookahead to exclude any already
     const regex = new RegExp(`${match}(?!})`, "g")
     string = string.replace(regex, `{${match}}`)
@@ -354,12 +339,8 @@ export function isValid(string: any, opts?: any): boolean {
     if (!msg) {
       return false
     }
-    const invalidCase = invalidCases.some(invalidCase =>
-      msg.toLowerCase().includes(invalidCase)
-    )
-    const validCase = validCases.some(validCase =>
-      msg.toLowerCase().includes(validCase)
-    )
+    const invalidCase = invalidCases.some((invalidCase) => msg.toLowerCase().includes(invalidCase))
+    const validCase = validCases.some((validCase) => msg.toLowerCase().includes(validCase))
     // special case for maths functions - don't have inputs yet
     return validCase && !invalidCase
   }
@@ -423,18 +404,18 @@ export function decodeJSBinding(handlebars: string): string | null {
  * @returns {boolean} Will return true if all strings found in HBS statement.
  */
 export function doesContainStrings(template: string, strings: any[]): boolean {
-  let regexp = new RegExp(FIND_HBS_REGEX)
-  let matches = template.match(regexp)
+  const regexp = new RegExp(FIND_HBS_REGEX)
+  const matches = template.match(regexp)
   if (matches == null) {
     return false
   }
-  for (let match of matches) {
+  for (const match of matches) {
     let hbs = match
     if (isJSBinding(match)) {
       hbs = decodeJSBinding(match)!
     }
     let allFound = true
-    for (let string of strings) {
+    for (const string of strings) {
       if (!hbs.includes(string)) {
         allFound = false
       }
@@ -456,8 +437,8 @@ export function findHBSBlocks(string: string): string[] {
   if (!string || typeof string !== "string") {
     return []
   }
-  let regexp = new RegExp(FIND_ANY_HBS_REGEX)
-  let matches = string.match(regexp)
+  const regexp = new RegExp(FIND_ANY_HBS_REGEX)
+  const matches = string.match(regexp)
   if (matches == null) {
     return []
   }
@@ -486,7 +467,7 @@ export function convertToJS(hbs: string) {
     js += hbs
   }
   let count = 1
-  for (let block of blocks) {
+  for (const block of blocks) {
     let stringPart = hbs
     if (prevBlock) {
       stringPart = stringPart.split(prevBlock)[1]
@@ -498,7 +479,7 @@ export function convertToJS(hbs: string) {
     js += `${[stringPart]}\${${variable}}`
   }
   let varBlock = ""
-  for (let [variable, value] of Object.entries(variables)) {
+  for (const [variable, value] of Object.entries(variables)) {
     varBlock += `const ${variable} = ${value};\n`
   }
   js += "`;"

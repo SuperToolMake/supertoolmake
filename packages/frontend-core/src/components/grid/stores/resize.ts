@@ -1,8 +1,8 @@
-import { writable, get, derived, Writable, Readable } from "svelte/store"
-import { MinColumnWidth, DefaultColumnWidth } from "../lib/constants"
+import type { UIColumn } from "@budibase/types"
+import { derived, get, type Readable, type Writable, writable } from "svelte/store"
+import { DefaultColumnWidth, MinColumnWidth } from "../lib/constants"
 import { parseEventLocation } from "../lib/utils"
-import { Store as StoreContext } from "."
-import { UIColumn } from "@budibase/types"
+import type { Store as StoreContext } from "."
 
 interface ResizeInitialStoreData {
   initialMouseX: number | null
@@ -30,7 +30,7 @@ export type Store = ResizeInitialStore
 
 export const createStores = (): ResizeInitialStore => {
   const resize = writable(initialState)
-  const isResizing = derived(resize, $resize => $resize.column != null, false)
+  const isResizing = derived(resize, ($resize) => $resize.column != null, false)
   return {
     resize,
     isResizing,
@@ -89,7 +89,7 @@ export const createActions = (context: StoreContext) => {
     }
 
     // Update state
-    resize.update(state => ({
+    resize.update((state) => ({
       ...state,
       width: newWidth,
     }))

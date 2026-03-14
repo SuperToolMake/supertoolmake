@@ -68,7 +68,7 @@ export const convertJSONSchemaToTableSchema = (jsonSchema, options) => {
   const keys = extractJSONSchemaKeys(jsonSchema, options.squashObjects)
 
   // Form a full schema from all the deep schema keys
-  let schema = {}
+  const schema = {}
   keys.forEach(({ key, type }) => {
     schema[key] = { type, name: key, prefixKeys: options.prefixKeys }
   })
@@ -88,21 +88,18 @@ const extractJSONSchemaKeys = (jsonSchema, squashObjects = false) => {
 
   // Iterate through every schema key
   let keys = []
-  Object.keys(jsonSchema).forEach(key => {
+  Object.keys(jsonSchema).forEach((key) => {
     const type = jsonSchema[key].type
 
     // If we encounter an object, then only go deeper if we want to squash
     // object paths
     if (type === "json" && squashObjects) {
       // Find all keys within this objects schema
-      const childKeys = extractJSONSchemaKeys(
-        jsonSchema[key].schema,
-        squashObjects
-      )
+      const childKeys = extractJSONSchemaKeys(jsonSchema[key].schema, squashObjects)
 
       // Append child paths onto the current path to build the full path
       keys = keys.concat(
-        childKeys.map(childKey => ({
+        childKeys.map((childKey) => ({
           key: `${key}.${childKey.key}`,
           type: childKey.type,
         }))
@@ -123,7 +120,7 @@ const extractJSONSchemaKeys = (jsonSchema, squashObjects = false) => {
 }
 
 export const generateQueryArraySchemas = (schema, nestedSchemaFields) => {
-  for (let key in schema) {
+  for (const key in schema) {
     if (
       schema[key]?.type === "json" &&
       schema[key]?.subtype === "array" &&

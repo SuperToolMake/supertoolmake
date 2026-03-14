@@ -1,13 +1,7 @@
-import { DatabaseQueryOpts } from "@budibase/types"
-import {
-  DocumentType,
-  InternalTable,
-  SEPARATOR,
-  UNICODE_MAX,
-  ViewName,
-} from "../constants"
+import type { DatabaseQueryOpts } from "@budibase/types"
+import type { DocumentListParams } from "nano"
+import { DocumentType, InternalTable, SEPARATOR, UNICODE_MAX, type ViewName } from "../constants"
 import { getProdWorkspaceID } from "./conversions"
-import { DocumentListParams } from "nano"
 
 /**
  * If creating DB allDocs/query params with only a single top level ID this can be used, this
@@ -81,9 +75,7 @@ export function getGlobalUserParams(
   return {
     ...otherProps,
     // need to include this incase pagination
-    startkey: startkey
-      ? startkey
-      : `${DocumentType.USER}${SEPARATOR}${globalId}`,
+    startkey: startkey ? startkey : `${DocumentType.USER}${SEPARATOR}${globalId}`,
     endkey: `${DocumentType.USER}${SEPARATOR}${globalId}${UNICODE_MAX}`,
   }
 }
@@ -113,11 +105,7 @@ export function getUsersByWorkspaceParams(
 /**
  * Gets parameters for retrieving templates. Owner ID must be specified, either global or a workspace level.
  */
-export function getTemplateParams(
-  ownerId: any,
-  templateId: any,
-  otherProps = {}
-) {
+export function getTemplateParams(ownerId: any, templateId: any, otherProps = {}) {
   if (!templateId) {
     templateId = ""
   }
@@ -173,9 +161,5 @@ export const getWorkspaceFavouriteParams = (
   workspaceFavouriteId?: string | null,
   otherProps: Partial<DocumentListParams> = {}
 ) => {
-  return getDocParams(
-    DocumentType.WORKSPACE_FAVOURITE,
-    workspaceFavouriteId,
-    otherProps
-  )
+  return getDocParams(DocumentType.WORKSPACE_FAVOURITE, workspaceFavouriteId, otherProps)
 }

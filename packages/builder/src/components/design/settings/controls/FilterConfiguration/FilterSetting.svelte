@@ -1,93 +1,86 @@
 <script>
-  import EditFilterPopover from "./EditFilterPopover.svelte"
-  import { Toggle, Icon } from "@budibase/bbui"
-  import { createEventDispatcher } from "svelte"
-  import { cloneDeep } from "lodash/fp"
-  import { FIELDS } from "@/constants/backend"
-  import { Constants, QueryUtils } from "@budibase/frontend-core"
-  import { FieldType } from "@budibase/types"
-  import { componentStore } from "@/stores/builder"
+import { Icon, Toggle } from "@budibase/bbui"
+import { Constants, QueryUtils } from "@budibase/frontend-core"
+import { FieldType } from "@budibase/types"
+import { cloneDeep } from "lodash/fp"
+import { createEventDispatcher } from "svelte"
+import { FIELDS } from "@/constants/backend"
+import { componentStore } from "@/stores/builder"
+import EditFilterPopover from "./EditFilterPopover.svelte"
 
-  export let item
-  export let anchor
-  export let bindings
-  export let schema
-  export let datasource
+export let item
+export let anchor
+export let bindings
+export let schema
+export let datasource
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  $: fieldIconLookupMap = buildFieldIconLookupMap(FIELDS)
+$: fieldIconLookupMap = buildFieldIconLookupMap(FIELDS)
 
-  const buildFieldIconLookupMap = fields => {
-    let map = {}
-    Object.values(fields).forEach(fieldInfo => {
-      map[fieldInfo.type] = fieldInfo.icon
+const buildFieldIconLookupMap = (fields) => {
+  let map = {}
+  Object.values(fields).forEach((fieldInfo) => {
+    map[fieldInfo.type] = fieldInfo.icon
+  })
+  return map
+}
+
+const onToggle = (item) => {
+  return (e) => {
+    item.active = e.detail
+    dispatch("change", { ...cloneDeep(item), active: e.detail })
+  }
+}
+
+const getOperatorOptions = () => {
+  if (!item?.field || !schema?.[item.field]) {
+    return []
+  }
+  const schemaField = schema[item.field]
+  return QueryUtils.getValidOperatorsForType(schemaField, item.field, datasource)
+}
+
+const parseSettings = (settings) => {
+  let columnSettings = settings
+    .filter((setting) => setting.key !== "field")
+    .map((setting) => {
+      return { ...setting, nested: true }
     })
-    return map
+
+  // Filter out conditions for invalid types.
+  // Allow formulas as we have all the data already loaded in the table.
+  if (
+    Constants.BannedSearchTypes.includes(item.columnType) &&
+    item.columnType !== FieldType.FORMULA
+  ) {
+    return columnSettings.filter((x) => x.key !== "conditions")
   }
-
-  const onToggle = item => {
-    return e => {
-      item.active = e.detail
-      dispatch("change", { ...cloneDeep(item), active: e.detail })
-    }
-  }
-
-  const getOperatorOptions = () => {
-    if (!item?.field || !schema?.[item.field]) {
-      return []
-    }
-    const schemaField = schema[item.field]
-    return QueryUtils.getValidOperatorsForType(
-      schemaField,
-      item.field,
-      datasource
-    )
-  }
-
-  const parseSettings = settings => {
-    let columnSettings = settings
-      .filter(setting => setting.key !== "field")
-      .map(setting => {
-        return { ...setting, nested: true }
-      })
-
-    // Filter out conditions for invalid types.
-    // Allow formulas as we have all the data already loaded in the table.
-    if (
-      Constants.BannedSearchTypes.includes(item.columnType) &&
-      item.columnType !== FieldType.FORMULA
-    ) {
-      return columnSettings.filter(x => x.key !== "conditions")
-    }
-    const operatorOptions = getOperatorOptions()
-    if (operatorOptions.length) {
-      columnSettings = [
-        ...columnSettings,
-        {
-          type: "select",
-          label: "Default filter type",
-          key: "defaultOperator",
-          options: operatorOptions,
-          defaultValue: operatorOptions[0]?.value,
-          nested: true,
-        },
-      ]
-    }
-    return columnSettings
-  }
-
-  const itemToComponent = item => {
-    return componentStore.createInstance(
-      "@budibase/standard-components/filterconfig",
+  const operatorOptions = getOperatorOptions()
+  if (operatorOptions.length) {
+    columnSettings = [
+      ...columnSettings,
       {
-        _id: item._id,
-        _instanceName: item.field,
-        label: item.label,
-        defaultOperator: item.defaultOperator,
-      }
-    )
+        type: "select",
+        label: "Default filter type",
+        key: "defaultOperator",
+        options: operatorOptions,
+        defaultValue: operatorOptions[0]?.value,
+        nested: true,
+      },
+    ]
   }
+  return columnSettings
+}
+
+const itemToComponent = (item) => {
+  return componentStore.createInstance("@budibase/standard-components/filterconfig", {
+    _id: item._id,
+    _instanceName: item.field,
+    label: item.label,
+    defaultOperator: item.defaultOperator,
+  })
+}
 </script>
 
 <div class="list-item-body">

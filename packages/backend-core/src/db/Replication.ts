@@ -1,4 +1,4 @@
-import { Document, DocumentType } from "@budibase/types"
+import { type Document, DocumentType } from "@budibase/types"
 import PouchDB from "pouchdb"
 import { DesignDocuments, SEPARATOR, USER_METADATA_PREFIX } from "../constants"
 import { closePouchDB, getPouchDB } from "./couch"
@@ -38,17 +38,15 @@ class Replication {
   }
 
   replicate(opts: PouchDB.Replication.ReplicateOptions = {}) {
-    return new Promise<PouchDB.Replication.ReplicationResult<{}>>(resolve => {
+    return new Promise<PouchDB.Replication.ReplicationResult<{}>>((resolve) => {
       this.source.replicate
         .to(this.target, opts)
-        .on("denied", function (err) {
+        .on("denied", (err) => {
           // a document failed to replicate (e.g. due to permissions)
           throw new Error(`Denied: Document failed to replicate ${err}`)
         })
-        .on("complete", function (info) {
-          return resolve(info)
-        })
-        .on("error", function (err) {
+        .on("complete", (info) => resolve(info))
+        .on("error", (err) => {
           throw err
         })
     })
@@ -70,7 +68,7 @@ class Replication {
     delete opts.filter
 
     const isCreation = opts.isCreation
-    let tablesToSync = opts.tablesToSync
+    const tablesToSync = opts.tablesToSync
     delete opts.isCreation
     delete opts.tablesToSync
 
@@ -87,8 +85,7 @@ class Replication {
     }
 
     const isData = (_id: string) =>
-      startsWithID(_id, DocumentType.ROW) ||
-      startsWithID(_id, DocumentType.LINK)
+      startsWithID(_id, DocumentType.ROW) || startsWithID(_id, DocumentType.LINK)
 
     return {
       ...opts,
@@ -116,9 +113,7 @@ class Replication {
           return false
         }
         if (isData(doc._id)) {
-          return (
-            !!tableSyncList?.find(id => doc._id.includes(id)) || syncAllTables
-          )
+          return !!tableSyncList?.find((id) => doc._id.includes(id)) || syncAllTables
         }
         if (startsWithID(doc._id, DocumentType.AUTOMATION_LOG)) {
           return false

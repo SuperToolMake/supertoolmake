@@ -1,17 +1,17 @@
 <script lang="ts">
-  import { getContext } from "svelte"
-  import Context from "../context"
+import { getContext } from "svelte"
+import Context from "../context"
 
-  const { hide } = getContext(Context.Modal)
+const { hide } = getContext(Context.Modal)
 
-  let count: number = 0
-  const clicks: number = 5
-  $: if (count === clicks) hide()
-  $: remaining = clicks - count
+let count: number = 0
+const clicks: number = 5
+$: if (count === clicks) hide()
+$: remaining = clicks - count
 
-  function increment() {
-    count++
-  }
+function increment() {
+  count++
+}
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

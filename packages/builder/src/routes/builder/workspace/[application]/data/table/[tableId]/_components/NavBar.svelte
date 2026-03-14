@@ -1,78 +1,74 @@
 <script>
-  import {
-    tables,
-    datasources,
-    userSelectedResourceMap,
-    contextMenuStore,
-    appStore,
-    dataEnvironmentStore,
-  } from "@/stores/builder"
-  import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
-  import { Icon, AbsTooltip } from "@budibase/bbui"
-  import { params, url } from "@roxi/routify"
-  import EditTableModal from "@/components/backend/TableNavigator/TableNavItem/EditModal.svelte"
-  import DeleteConfirmationModal from "@/components/backend/modals/DeleteDataConfirmationModal.svelte"
-  import { UserAvatars } from "@budibase/frontend-core"
-  import { DB_TYPE_EXTERNAL } from "@/constants/backend"
-  import { TableNames } from "@/constants"
-  import { derived } from "svelte/store"
-  import { DataEnvironmentMode } from "@budibase/types"
+import { AbsTooltip, Icon } from "@budibase/bbui"
+import { UserAvatars } from "@budibase/frontend-core"
+import { DataEnvironmentMode } from "@budibase/types"
+import { params, url } from "@roxi/routify"
+import { derived } from "svelte/store"
+import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
+import DeleteConfirmationModal from "@/components/backend/modals/DeleteDataConfirmationModal.svelte"
+import EditTableModal from "@/components/backend/TableNavigator/TableNavItem/EditModal.svelte"
+import { TableNames } from "@/constants"
+import { DB_TYPE_EXTERNAL } from "@/constants/backend"
+import {
+  appStore,
+  contextMenuStore,
+  dataEnvironmentStore,
+  datasources,
+  tables,
+  userSelectedResourceMap,
+} from "@/stores/builder"
 
-  $params
-  $url
+$params
+$url
 
-  // Editing table
-  let editTableModal
-  let deleteTableModal
+// Editing table
+let editTableModal
+let deleteTableModal
 
-  $: tableId = $params.tableId
-  $: isUsersTable = tableId === TableNames.USERS
-  $: table = $tables.list.find(table => table._id === tableId)
-  $: datasource = $datasources.list.find(ds => ds._id === table?.sourceId)
-  $: tableSelectedBy = $userSelectedResourceMap[table?._id]
-  $: isDevMode = $dataEnvironmentStore.mode === DataEnvironmentMode.DEVELOPMENT
-  $: tableEditable = table?._id !== TableNames.USERS && isDevMode
-  $: activeId = decodeURIComponent($params.tableId)
-  $: tableName =
-    table?._id === TableNames.USERS ? "App users" : table?.name || ""
+$: tableId = $params.tableId
+$: isUsersTable = tableId === TableNames.USERS
+$: table = $tables.list.find((table) => table._id === tableId)
+$: datasource = $datasources.list.find((ds) => ds._id === table?.sourceId)
+$: tableSelectedBy = $userSelectedResourceMap[table?._id]
+$: isDevMode = $dataEnvironmentStore.mode === DataEnvironmentMode.DEVELOPMENT
+$: tableEditable = table?._id !== TableNames.USERS && isDevMode
+$: activeId = decodeURIComponent($params.tableId)
+$: tableName = table?._id === TableNames.USERS ? "App users" : table?.name || ""
 
-  const tableUrl = derived(
-    url,
-    $url => tableId => $url(`../[tableId]`, { tableId })
-  )
+const tableUrl = derived(url, ($url) => (tableId) => $url(`../[tableId]`, { tableId }))
 
-  const openTableContextMenu = e => {
-    if (!tableEditable) {
-      return
-    }
-    e.preventDefault()
-    e.stopPropagation()
-    contextMenuStore.open(
-      table._id,
-      [
-        {
-          icon: "pencil",
-          name: "Edit",
-          keyBind: null,
-          visible: table?.sourceType !== DB_TYPE_EXTERNAL,
-          disabled: false,
-          callback: editTableModal?.show,
-        },
-        {
-          icon: "trash",
-          name: "Delete",
-          keyBind: null,
-          visible: true,
-          disabled: false,
-          callback: deleteTableModal?.show,
-        },
-      ],
-      {
-        x: e.clientX,
-        y: e.clientY,
-      }
-    )
+const openTableContextMenu = (e) => {
+  if (!tableEditable) {
+    return
   }
+  e.preventDefault()
+  e.stopPropagation()
+  contextMenuStore.open(
+    table._id,
+    [
+      {
+        icon: "pencil",
+        name: "Edit",
+        keyBind: null,
+        visible: table?.sourceType !== DB_TYPE_EXTERNAL,
+        disabled: false,
+        callback: editTableModal?.show,
+      },
+      {
+        icon: "trash",
+        name: "Delete",
+        keyBind: null,
+        visible: true,
+        disabled: false,
+        callback: deleteTableModal?.show,
+      },
+    ],
+    {
+      x: e.clientX,
+      y: e.clientY,
+    }
+  )
+}
 </script>
 
 <div class="nav">

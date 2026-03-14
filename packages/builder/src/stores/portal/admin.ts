@@ -1,10 +1,10 @@
-import { API } from "@/api"
-import {
+import type {
   ConfigChecklistResponse,
   GetEnvironmentResponse,
   SystemStatusResponse,
 } from "@budibase/types"
 import { get } from "svelte/store"
+import { API } from "@/api"
 import { BudiStore } from "../BudiStore"
 import { auth } from "./auth"
 
@@ -34,7 +34,7 @@ export class AdminStore extends BudiStore<AdminState> {
       // in cloud allow this
       await this.getSystemStatus()
     }
-    this.update(store => {
+    this.update((store) => {
       store.loaded = true
       return store
     })
@@ -42,7 +42,7 @@ export class AdminStore extends BudiStore<AdminState> {
 
   async getEnvironment() {
     const environment = await API.getEnvironment()
-    this.update(store => {
+    this.update((store) => {
       store.isDev = environment.isDev
       store.multiTenancy = environment.multiTenancy
       store.cloud = environment.cloud
@@ -57,7 +57,7 @@ export class AdminStore extends BudiStore<AdminState> {
 
   async getSystemStatus() {
     const status = await API.getSystemStatus()
-    this.update(store => {
+    this.update((store) => {
       store.status = status
       return store
     })
@@ -66,14 +66,14 @@ export class AdminStore extends BudiStore<AdminState> {
   async getChecklist() {
     const tenantId = get(auth).tenantId
     const checklist = await API.getChecklist(tenantId)
-    this.update(store => {
+    this.update((store) => {
       store.checklist = checklist
       return store
     })
   }
 
   unload() {
-    this.update(store => {
+    this.update((store) => {
       store.loaded = false
       return store
     })

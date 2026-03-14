@@ -27,7 +27,7 @@ export function createBannerStore() {
   const banner = writable<DefaultConfig>(DEFAULT_CONFIG)
 
   const show = async (config: BannerConfig = {}) => {
-    banner.update(store => {
+    banner.update((store) => {
       return {
         ...store,
         ...config,
@@ -41,16 +41,14 @@ export function createBannerStore() {
       [BANNER_TYPES.WARNING]: 1,
       [BANNER_TYPES.INFO]: 2,
     }
-    banner.update(store => {
+    banner.update((store) => {
       const sorted = [...store.messages, ...entries].sort((a, b) => {
         if (
-          priority[a.type as keyof typeof priority] ===
-          priority[b.type as keyof typeof priority]
+          priority[a.type as keyof typeof priority] === priority[b.type as keyof typeof priority]
         ) {
           return 0
         }
-        return priority[a.type as keyof typeof priority] <
-          priority[b.type as keyof typeof priority]
+        return priority[a.type as keyof typeof priority] < priority[b.type as keyof typeof priority]
           ? -1
           : 1
       })

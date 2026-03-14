@@ -1,6 +1,6 @@
-import { Document } from "../document"
+import type { Document } from "../document"
 
-export interface GlobalInfo {}
+export type GlobalInfo = {}
 
 export interface Installation extends Document {
   _id: string

@@ -12,47 +12,47 @@ import {
   utils,
 } from "@budibase/backend-core"
 import { DefaultAppTheme, sdk as sharedCoreSDK } from "@budibase/shared-core"
-import type { File, Files } from "formidable"
 import {
   BBReferenceFieldSubType,
-  CreateWorkspaceRequest,
-  CreateWorkspaceResponse,
-  Database,
-  DuplicateWorkspaceRequest,
-  DuplicateWorkspaceResponse,
-  FetchAppDefinitionResponse,
-  FetchAppPackageResponse,
-  FetchPublishedAppsResponse,
-  FetchWorkspacesResponse,
+  type CreateWorkspaceRequest,
+  type CreateWorkspaceResponse,
+  type Database,
+  type DuplicateWorkspaceRequest,
+  type DuplicateWorkspaceResponse,
+  type FetchAppDefinitionResponse,
+  type FetchAppPackageResponse,
+  type FetchPublishedAppsResponse,
+  type FetchWorkspacesResponse,
   FieldType,
-  ImportToUpdateWorkspaceRequest,
-  ImportToUpdateWorkspaceResponse,
-  Layout,
-  RevertAppClientResponse,
-  Row,
-  Screen,
-  SyncWorkspaceResponse,
-  UnpublishWorkspaceResponse,
-  UpdateAppClientResponse,
-  UpdateWorkspaceRequest,
-  UpdateWorkspaceResponse,
-  UserCtx,
-  Workspace,
-  OnboardingWorkspaceRequest,
+  type ImportToUpdateWorkspaceRequest,
+  type ImportToUpdateWorkspaceResponse,
+  type Layout,
+  type OnboardingWorkspaceRequest,
+  type RevertAppClientResponse,
+  type Row,
+  type Screen,
+  type SyncWorkspaceResponse,
+  type UnpublishWorkspaceResponse,
+  type UpdateAppClientResponse,
+  type UpdateWorkspaceRequest,
+  type UpdateWorkspaceResponse,
+  type UserCtx,
+  type Workspace,
 } from "@budibase/types"
+import type { File, Files } from "formidable"
 import { USERS_TABLE_SCHEMA } from "../../constants"
 import { defaultAppNavigator } from "../../constants/definitions"
 import { BASE_LAYOUT_PROP_IDS } from "../../constants/layouts"
 import { createOnboardingWelcomeScreen } from "../../constants/screens"
 import {
   DocumentType,
-  InternalTables,
-  USER_METDATA_PREFIX,
   generateUserMetadataID,
   generateWorkspaceID,
   getDevWorkspaceID,
   getLayoutParams,
+  InternalTables,
   isDevWorkspaceID,
+  USER_METDATA_PREFIX,
   WorkspaceStatus,
 } from "../../db/utils"
 import { createLinkView, createRoutingView } from "../../db/views/staticViews"
@@ -63,9 +63,9 @@ import {
   updateClientLibrary,
   uploadAppFiles,
 } from "../../utilities/fileSystem"
+import { getGlobalUser } from "../../utilities/global"
 import { doesUserHaveLock } from "../../utilities/redis"
 import { builderSocket } from "../../websockets"
-import { getGlobalUser } from "../../utilities/global"
 
 const DEFAULT_WORKSPACE_NAME = "Workspace"
 
@@ -78,25 +78,18 @@ async function getLayouts() {
         include_docs: true,
       })
     )
-  ).rows.map(row => row.doc!)
+  ).rows.map((row) => row.doc!)
 }
 
 function getUserRoleId(ctx: UserCtx) {
-  return !ctx.user?.role || !ctx.user.role._id
-    ? roles.BUILTIN_ROLE_IDS.PUBLIC
-    : ctx.user.role._id
+  return !ctx.user?.role || !ctx.user.role._id ? roles.BUILTIN_ROLE_IDS.PUBLIC : ctx.user.role._id
 }
 
-function checkWorkspaceUrl(
-  ctx: UserCtx,
-  apps: Workspace[],
-  url: string,
-  currentAppId?: string
-) {
+function checkWorkspaceUrl(ctx: UserCtx, apps: Workspace[], url: string, currentAppId?: string) {
   if (currentAppId) {
-    apps = apps.filter(app => app.appId !== currentAppId)
+    apps = apps.filter((app) => app.appId !== currentAppId)
   }
-  if (apps.some(app => app.url === url)) {
+  if (apps.some((app) => app.url === url)) {
     ctx.throw(400, "App URL is already in use.")
   }
 }
@@ -112,9 +105,7 @@ function checkWorkspaceName(
     ctx.throw(400, "Name is required")
   }
   if (currentWorkspaceId) {
-    workspaces = workspaces.filter(
-      (ws: Workspace) => ws.appId !== currentWorkspaceId
-    )
+    workspaces = workspaces.filter((ws: Workspace) => ws.appId !== currentWorkspaceId)
   }
   if (workspaces.some((app: Workspace) => app.name === name)) {
     ctx.throw(400, "Workspace name is already in use.")
@@ -122,16 +113,12 @@ function checkWorkspaceName(
 }
 
 function getOnboardingWorkspaceName(workspaces: Workspace[]) {
-  if (
-    !workspaces.some(workspace => workspace.name === DEFAULT_WORKSPACE_NAME)
-  ) {
+  if (!workspaces.some((workspace) => workspace.name === DEFAULT_WORKSPACE_NAME)) {
     return DEFAULT_WORKSPACE_NAME
   }
 
   let suffix = 2
-  while (
-    workspaces.some(workspace => workspace.name === `Workspace ${suffix}`)
-  ) {
+  while (workspaces.some((workspace) => workspace.name === `Workspace ${suffix}`)) {
     suffix++
   }
   return `Workspace ${suffix}`
@@ -222,9 +209,7 @@ async function addCreatorToUsersTable(ctx: UserCtx) {
   await db.put(metadata)
 }
 
-async function createOnboardingDefaultWorkspaceApp(
-  name: string
-): Promise<string> {
+async function createOnboardingDefaultWorkspaceApp(name: string): Promise<string> {
   const workspaceApp = await sdk.workspaceApps.create({
     name: name,
     url: "/welcome",
@@ -241,7 +226,7 @@ async function createOnboardingDefaultWorkspaceApp(
 
 async function addOnboardingWelcomeScreen() {
   const workspaceApps = await sdk.workspaceApps.fetch(context.getWorkspaceDB())
-  const workspaceApp = workspaceApps.find(wa => wa.isDefault)
+  const workspaceApp = workspaceApps.find((wa) => wa.isDefault)
 
   if (!workspaceApp) {
     throw new Error("Default workspace app not found")
@@ -252,26 +237,16 @@ async function addOnboardingWelcomeScreen() {
 }
 
 export async function fetch(ctx: UserCtx<void, FetchWorkspacesResponse>) {
-  const apps = await sdk.workspaces.fetch(
-    ctx.query.status as WorkspaceStatus,
-    ctx.user
-  )
+  const apps = await sdk.workspaces.fetch(ctx.query.status as WorkspaceStatus, ctx.user)
 
   ctx.body = await sdk.workspaces.enrichWithDefaultWorkspaceAppUrl(apps)
 }
-export async function fetchClientApps(
-  ctx: UserCtx<void, FetchPublishedAppsResponse>
-) {
-  const workspaces = await sdk.workspaces.fetch(
-    WorkspaceStatus.DEPLOYED,
-    ctx.user
-  )
+export async function fetchClientApps(ctx: UserCtx<void, FetchPublishedAppsResponse>) {
+  const workspaces = await sdk.workspaces.fetch(WorkspaceStatus.DEPLOYED, ctx.user)
 
   const result: FetchPublishedAppsResponse["apps"] = []
   for (const workspace of workspaces) {
-    const workspaceApps = await db.doWithDB(workspace.appId, db =>
-      sdk.workspaceApps.fetch(db)
-    )
+    const workspaceApps = await db.doWithDB(workspace.appId, (db) => sdk.workspaceApps.fetch(db))
     for (const workspaceApp of workspaceApps) {
       // don't return disabled workspace apps
       if (workspaceApp.disabled) {
@@ -292,16 +267,11 @@ export async function fetchClientApps(
   ctx.body = { apps: result }
 }
 
-export async function fetchAppDefinition(
-  ctx: UserCtx<void, FetchAppDefinitionResponse>
-) {
+export async function fetchAppDefinition(ctx: UserCtx<void, FetchAppDefinitionResponse>) {
   const layouts = await getLayouts()
   const userRoleId = getUserRoleId(ctx)
   const accessController = new roles.AccessController()
-  const screens = await accessController.checkScreensAccess(
-    await sdk.screens.fetch(),
-    userRoleId
-  )
+  const screens = await accessController.checkScreensAccess(await sdk.screens.fetch(), userRoleId)
   ctx.body = {
     layouts,
     screens,
@@ -309,9 +279,7 @@ export async function fetchAppDefinition(
   }
 }
 
-export async function fetchAppPackage(
-  ctx: UserCtx<void, FetchAppPackageResponse>
-) {
+export async function fetchAppPackage(ctx: UserCtx<void, FetchAppPackageResponse>) {
   const appId = context.getWorkspaceId()
   let [application, layouts, screens] = await Promise.all([
     sdk.workspaces.metadata.get(),
@@ -328,35 +296,25 @@ export async function fetchAppPackage(
     const accessController = new roles.AccessController()
     screens = await accessController.checkScreensAccess(screens, userRoleId)
 
-    const embedPath: string | undefined = ctx.request.get(
-      "x-budibase-embed-location"
-    )
+    const embedPath: string | undefined = ctx.request.get("x-budibase-embed-location")
 
-    const urlPath =
-      embedPath ||
-      (ctx.headers.referer ? new URL(ctx.headers.referer).pathname : "")
+    const urlPath = embedPath || (ctx.headers.referer ? new URL(ctx.headers.referer).pathname : "")
 
-    const matchedWorkspaceApp =
-      await sdk.workspaceApps.getMatchedWorkspaceApp(urlPath)
+    const matchedWorkspaceApp = await sdk.workspaceApps.getMatchedWorkspaceApp(urlPath)
 
     // disabled workspace apps should appear to not exist
     // if the dev workspace is being served, allow the request regardless
     if (!matchedWorkspaceApp || (matchedWorkspaceApp.disabled && !isDev)) {
       ctx.throw(404, "No matching workspace app found for URL path: " + urlPath)
     }
-    screens = screens.filter(s => s.workspaceAppId === matchedWorkspaceApp._id)
+    screens = screens.filter((s) => s.workspaceAppId === matchedWorkspaceApp._id)
 
     application.navigation = matchedWorkspaceApp.navigation
   }
 
-  const clientLibPath = await objectStore.clientLibraryUrl(
-    ctx.params.appId,
-    application.version
-  )
+  const clientLibPath = await objectStore.clientLibraryUrl(ctx.params.appId, application.version)
 
-  const clientCacheKey = await objectStore.getClientCacheKey(
-    application.version
-  )
+  const clientCacheKey = await objectStore.getClientCacheKey(application.version)
 
   ctx.body = {
     application: { ...application, upgradableVersion: envCore.VERSION },
@@ -369,10 +327,7 @@ export async function fetchAppPackage(
 }
 
 async function performWorkspaceCreate(
-  ctx: UserCtx<
-    CreateWorkspaceRequest | OnboardingWorkspaceRequest,
-    CreateWorkspaceResponse
-  >
+  ctx: UserCtx<CreateWorkspaceRequest | OnboardingWorkspaceRequest, CreateWorkspaceResponse>
 ) {
   const workspaces = await dbCore.getAllWorkspaces({
     dev: true,
@@ -383,9 +338,7 @@ async function performWorkspaceCreate(
   const isOnboarding = body.isOnboarding === "true"
   const useTemplate = body.useTemplate === "true"
 
-  const workspaceName = isOnboarding
-    ? getOnboardingWorkspaceName(workspaces)
-    : body.name
+  const workspaceName = isOnboarding ? getOnboardingWorkspaceName(workspaces) : body.name
 
   checkWorkspaceName(ctx, workspaces, workspaceName)
   const appUrl = sdk.workspaces.getAppUrl({ name: workspaceName, url })
@@ -398,18 +351,10 @@ async function performWorkspaceCreate(
   if (ctx.request.files && ctx.request.files.fileToImport) {
     const importFile = ctx.request.files.fileToImport
     const fileToImport = Array.isArray(importFile) ? importFile[0] : importFile
-    const legacyPath = isLegacyUploadedFile(fileToImport)
-      ? fileToImport.path
-      : undefined
-    const legacyType = isLegacyUploadedFile(fileToImport)
-      ? fileToImport.type
-      : undefined
-    const filePath =
-      fileToImport.filepath ||
-      (typeof legacyPath === "string" ? legacyPath : "")
-    const fileType =
-      fileToImport.mimetype ||
-      (typeof legacyType === "string" ? legacyType : "")
+    const legacyPath = isLegacyUploadedFile(fileToImport) ? fileToImport.path : undefined
+    const legacyType = isLegacyUploadedFile(fileToImport) ? fileToImport.type : undefined
+    const filePath = fileToImport.filepath || (typeof legacyPath === "string" ? legacyPath : "")
+    const fileType = fileToImport.mimetype || (typeof legacyType === "string" ? legacyType : "")
 
     if (!filePath) {
       ctx.throw(400, "Invalid import file path")
@@ -434,8 +379,7 @@ async function performWorkspaceCreate(
     const instance = await createInstance(workspaceId)
     const db = context.getWorkspaceDB()
     const shouldImportTemplate =
-      !!instanceConfig.file ||
-      (!!instanceConfig.useTemplate && !!instanceConfig.key)
+      !!instanceConfig.file || (!!instanceConfig.useTemplate && !!instanceConfig.key)
     const isImport = !!instanceConfig.file
 
     if (shouldImportTemplate) {
@@ -503,9 +447,9 @@ async function performWorkspaceCreate(
         "scripts",
         "creationVersion",
       ]
-      keys.forEach(key => {
+      keys.forEach((key) => {
         if (existing[key]) {
-          // @ts-ignore
+          // @ts-expect-error
           newWorkspace[key] = existing[key]
         }
       })
@@ -554,24 +498,19 @@ async function performWorkspaceCreate(
 
 async function disableAllApps() {
   const workspaceApps = await sdk.workspaceApps.fetch()
-  for (const workspaceApp of workspaceApps.filter(a => !a.disabled)) {
+  for (const workspaceApp of workspaceApps.filter((a) => !a.disabled)) {
     await sdk.workspaceApps.update({ ...workspaceApp, disabled: true })
   }
 }
 
-async function updateUserColumns(
-  appId: string,
-  db: Database,
-  toUserId: string
-) {
+async function updateUserColumns(appId: string, db: Database, toUserId: string) {
   await context.doInWorkspaceContext(appId, async () => {
     const allTables = await sdk.tables.getAllTables()
     const tablesWithUserColumns = []
     for (const table of allTables) {
       const userColumns = Object.values(table.schema).filter(
-        f =>
-          (f.type === FieldType.BB_REFERENCE ||
-            f.type === FieldType.BB_REFERENCE_SINGLE) &&
+        (f) =>
+          (f.type === FieldType.BB_REFERENCE || f.type === FieldType.BB_REFERENCE_SINGLE) &&
           f.subtype === BBReferenceFieldSubType.USER
       )
       if (!userColumns.length) {
@@ -580,17 +519,15 @@ async function updateUserColumns(
 
       tablesWithUserColumns.push({
         tableId: table._id!,
-        columns: userColumns.map(c => c.name),
+        columns: userColumns.map((c) => c.name),
       })
     }
 
     const docsToUpdate = []
 
     for (const { tableId, columns } of tablesWithUserColumns) {
-      const docs = await db.allDocs<Row>(
-        docIds.getRowParams(tableId, null, { include_docs: true })
-      )
-      const rows = docs.rows.map(d => d.doc!)
+      const docs = await db.allDocs<Row>(docIds.getRowParams(tableId, null, { include_docs: true }))
+      const rows = docs.rows.map((d) => d.doc!)
 
       for (const row of rows) {
         let shouldUpdate = false
@@ -631,9 +568,7 @@ async function workspacePostCreate(
   }
 }
 
-export async function create(
-  ctx: UserCtx<CreateWorkspaceRequest, CreateWorkspaceResponse>
-) {
+export async function create(ctx: UserCtx<CreateWorkspaceRequest, CreateWorkspaceResponse>) {
   const newApplication = await performWorkspaceCreate(ctx)
   await workspacePostCreate(ctx, newApplication)
   await cache.bustCache(cache.CacheKey.CHECKLIST)
@@ -646,9 +581,7 @@ export async function find(ctx: UserCtx) {
 
 // This endpoint currently operates as a PATCH rather than a PUT
 // Thus name and url fields are handled only if present
-export async function update(
-  ctx: UserCtx<UpdateWorkspaceRequest, UpdateWorkspaceResponse>
-) {
+export async function update(ctx: UserCtx<UpdateWorkspaceRequest, UpdateWorkspaceResponse>) {
   const workspaces = await dbCore.getAllWorkspaces({
     dev: true,
   })
@@ -679,9 +612,7 @@ export async function update(
   })
 }
 
-export async function updateClient(
-  ctx: UserCtx<void, UpdateAppClientResponse>
-) {
+export async function updateClient(ctx: UserCtx<void, UpdateAppClientResponse>) {
   // Get current workspace version
   const workspace = await sdk.workspaces.metadata.get()
   const currentVersion = workspace.version
@@ -702,16 +633,11 @@ export async function updateClient(
       skeletonLoader: manifest?.features?.skeletonLoader ?? false,
     },
   }
-  const updatedWorkspace = await updateWorkspacePackage(
-    workspacePackageUpdates,
-    ctx.params.appId
-  )
+  const updatedWorkspace = await updateWorkspacePackage(workspacePackageUpdates, ctx.params.appId)
   ctx.body = updatedWorkspace
 }
 
-export async function revertClient(
-  ctx: UserCtx<void, RevertAppClientResponse>
-) {
+export async function revertClient(ctx: UserCtx<void, RevertAppClientResponse>) {
   // Check app can be reverted
   const workspace = await sdk.workspaces.metadata.get()
   if (!workspace.revertableVersion) {
@@ -734,10 +660,7 @@ export async function revertClient(
       skeletonLoader: manifest?.features?.skeletonLoader ?? false,
     },
   }
-  const updatedWorkspace = await updateWorkspacePackage(
-    workspacePackageUpdates,
-    ctx.params.appId
-  )
+  const updatedWorkspace = await updateWorkspacePackage(workspacePackageUpdates, ctx.params.appId)
   ctx.body = updatedWorkspace
 }
 
@@ -764,9 +687,7 @@ async function unpublishWorkspace() {
   await cache.workspace.invalidateWorkspaceMetadata(prodWorkspaceId)
 }
 
-export async function unpublish(
-  ctx: UserCtx<void, UnpublishWorkspaceResponse>
-) {
+export async function unpublish(ctx: UserCtx<void, UnpublishWorkspaceResponse>) {
   const prodWorkspaceId = dbCore.getProdWorkspaceID(ctx.params.appId)
   const isPublished = await sdk.workspaces.isWorkspacePublished(prodWorkspaceId)
 
@@ -813,10 +734,7 @@ export async function importToWorkspace(
   try {
     await sdk.workspaces.updateWithExport(workspaceId, fileAttributes, password)
   } catch (err: any) {
-    ctx.throw(
-      500,
-      `Unable to perform update, please retry - ${err?.message || err}`
-    )
+    ctx.throw(500, `Unable to perform update, please retry - ${err?.message || err}`)
   }
   ctx.body = { message: "workspace updated" }
 }
@@ -899,12 +817,10 @@ export async function updateWorkspacePackage(
     // Make sure that when saving down pwa settings, we don't override the keys with the enriched url
     if (workspacePackage.pwa && application.pwa) {
       if (workspacePackage.pwa.icons) {
-        workspacePackage.pwa.icons = workspacePackage.pwa.icons.map(
-          (icon, i) =>
-            icon.src.startsWith(objectStore.SIGNED_FILE_PREFIX) &&
-            application?.pwa?.icons?.[i]
-              ? { ...icon, src: application?.pwa?.icons?.[i].src }
-              : icon
+        workspacePackage.pwa.icons = workspacePackage.pwa.icons.map((icon, i) =>
+          icon.src.startsWith(objectStore.SIGNED_FILE_PREFIX) && application?.pwa?.icons?.[i]
+            ? { ...icon, src: application?.pwa?.icons?.[i].src }
+            : icon
         )
       }
     }
@@ -927,11 +843,11 @@ async function migrateAppNavigation() {
   const screens: Screen[] = await sdk.screens.fetch()
 
   // Migrate all screens, removing custom layouts
-  for (let screen of screens) {
+  for (const screen of screens) {
     if (!screen.layoutId) {
       continue
     }
-    const layout = layouts.find(layout => layout._id === screen.layoutId)
+    const layout = layouts.find((layout) => layout._id === screen.layoutId)
     screen.layoutId = undefined
     screen.showNavigation = layout?.props.navigation !== "None"
     screen.width = layout?.props.width || "Large"
@@ -940,18 +856,14 @@ async function migrateAppNavigation() {
 
   // Migrate layout navigation settings
   const { name, customTheme } = existing
-  const layout = layouts?.find(
-    (layout: Layout) => layout._id === BASE_LAYOUT_PROP_IDS.PRIVATE
-  )
+  const layout = layouts?.find((layout: Layout) => layout._id === BASE_LAYOUT_PROP_IDS.PRIVATE)
   if (layout && !existing.navigation) {
-    let navigationSettings: any = {
+    const navigationSettings: any = {
       navigation: "Top",
       title: name,
       navWidth: "Large",
-      navBackground:
-        customTheme?.navBackground || "var(--spectrum-global-color-gray-50)",
-      navTextColor:
-        customTheme?.navTextColor || "var(--spectrum-global-color-gray-800)",
+      navBackground: customTheme?.navBackground || "var(--spectrum-global-color-gray-50)",
+      navTextColor: customTheme?.navTextColor || "var(--spectrum-global-color-gray-800)",
     }
     if (layout) {
       navigationSettings.hideLogo = layout.props.hideLogo

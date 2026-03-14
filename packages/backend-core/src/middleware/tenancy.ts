@@ -1,14 +1,14 @@
+import {
+  type Ctx,
+  type EndpointMatcher,
+  type GetTenantIdOptions,
+  TenantResolutionStrategy,
+} from "@budibase/types"
+import type { Middleware, Next } from "koa"
+import { Header } from "../constants"
 import { doInTenant } from "../context"
 import { getTenantIDFromCtx } from "../tenancy"
 import { buildMatcherRegex, matches } from "./matchers"
-import { Header } from "../constants"
-import {
-  Ctx,
-  EndpointMatcher,
-  GetTenantIdOptions,
-  TenantResolutionStrategy,
-} from "@budibase/types"
-import type { Next, Middleware } from "koa"
 
 export function tenancy(
   allowQueryStringPatterns: EndpointMatcher[],
@@ -18,9 +18,8 @@ export function tenancy(
   const allowQsOptions = buildMatcherRegex(allowQueryStringPatterns)
   const noTenancyOptions = buildMatcherRegex(noTenancyPatterns)
 
-  return async function (ctx: Ctx, next: Next) {
-    const allowNoTenant =
-      opts.noTenancyRequired || !!matches(ctx, noTenancyOptions)
+  return (async (ctx: Ctx, next: Next) => {
+    const allowNoTenant = opts.noTenancyRequired || !!matches(ctx, noTenancyOptions)
     const tenantOpts: GetTenantIdOptions = {
       allowNoTenant,
     }
@@ -35,5 +34,5 @@ export function tenancy(
       ctx.set(Header.TENANT_ID, tenantId)
     }
     return doInTenant(tenantId, next)
-  } as Middleware
+  }) as Middleware
 }

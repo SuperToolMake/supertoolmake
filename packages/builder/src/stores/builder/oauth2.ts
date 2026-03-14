@@ -1,11 +1,11 @@
-import { API } from "@/api"
-import { BudiStore } from "@/stores/BudiStore"
-import { OAuth2Config } from "@/types"
-import {
+import type {
   InsertOAuth2ConfigRequest,
   UpdateOAuth2ConfigRequest,
   ValidateConfigRequest,
 } from "@budibase/types"
+import { API } from "@/api"
+import { BudiStore } from "@/stores/BudiStore"
+import type { OAuth2Config } from "@/types"
 
 interface OAuth2StoreState {
   configs: OAuth2Config[]
@@ -22,15 +22,15 @@ export class OAuth2Store extends BudiStore<OAuth2StoreState> {
   }
 
   async fetch() {
-    this.store.update(store => ({
+    this.store.update((store) => ({
       ...store,
       loading: true,
     }))
     try {
       const configs = await API.oauth2.fetch()
-      this.store.update(store => ({
+      this.store.update((store) => ({
         ...store,
-        configs: configs.map(c => ({
+        configs: configs.map((c) => ({
           _id: c._id,
           _rev: c._rev,
           name: c.name,
@@ -45,7 +45,7 @@ export class OAuth2Store extends BudiStore<OAuth2StoreState> {
         loading: false,
       }))
     } catch (e: any) {
-      this.store.update(store => ({
+      this.store.update((store) => ({
         ...store,
         loading: false,
         error: e.message,

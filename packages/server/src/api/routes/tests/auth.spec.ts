@@ -1,15 +1,15 @@
-import * as setup from "./utilities"
+import { roles } from "@budibase/backend-core"
+import { BuiltinPermissionID, PermissionLevel } from "@budibase/types"
 import {
   generateUserMetadataID,
   getGlobalIDFromUserMetadataID,
   InternalTables,
 } from "../../../db/utils"
-import { roles } from "@budibase/backend-core"
-import { PermissionLevel, BuiltinPermissionID } from "@budibase/types"
+import * as setup from "./utilities"
 
 describe("/authenticate", () => {
-  let request = setup.getRequest()
-  let config = setup.getConfig()
+  const request = setup.getRequest()
+  const config = setup.getConfig()
 
   afterAll(setup.afterAll)
 
@@ -33,9 +33,7 @@ describe("/authenticate", () => {
         .set(config.defaultHeaders())
         .expect("Content-Type", /json/)
         .expect(200)
-      expect(res.body.globalId).toEqual(
-        getGlobalIDFromUserMetadataID(config.getUser()._id)
-      )
+      expect(res.body.globalId).toEqual(getGlobalIDFromUserMetadataID(config.getUser()._id))
     })
 
     it("should return correct roleId for custom role user when Users table has higher permissions", async () => {

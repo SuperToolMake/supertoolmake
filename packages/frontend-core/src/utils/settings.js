@@ -15,10 +15,10 @@ export const shouldDisplaySetting = (instance, setting) => {
   }
 
   // Ensure all conditions are met
-  return dependsOn.every(condition => {
+  return dependsOn.every((condition) => {
     let dependantSetting = condition
     let dependantValues = null
-    let invert = !!condition.invert
+    const invert = !!condition.invert
     if (typeof condition === "object") {
       dependantSetting = condition.setting
       dependantValues = condition.value
@@ -35,7 +35,7 @@ export const shouldDisplaySetting = (instance, setting) => {
     // If inverting, we want to ensure that we don't have any matches.
     // If not inverting, we want to ensure that we do have any matches.
     const currentVal = helpers.deepGet(instance, dependantSetting)
-    const anyMatches = dependantValues.some(dependantVal => {
+    const anyMatches = dependantValues.some((dependantVal) => {
       if (dependantVal == null) {
         return currentVal != null && currentVal !== false && currentVal !== ""
       }

@@ -1,5 +1,5 @@
 import { context } from "@budibase/backend-core"
-import { Row } from "@budibase/types"
+import type { Row } from "@budibase/types"
 import { DocumentType, WORKSPACE_PREFIX } from "../../../db/utils"
 import { isExternalTableID } from "../../../integrations/utils"
 
@@ -33,7 +33,7 @@ export function search(docs: any[], value: any, key = "name") {
   }
   value = value.toLowerCase()
   const filtered = []
-  for (let doc of docs) {
+  for (const doc of docs) {
     if (typeof doc[key] !== "string") {
       continue
     }

@@ -1,11 +1,11 @@
 import { db as dbCore, tenancy } from "@budibase/backend-core"
-import {
-  Document,
-  UserCtx,
+import type {
   ApiKeyDoc,
   ApiKeyFetchResponse,
+  Document,
   UpdateApiKeyRequest,
   UpdateApiKeyResponse,
+  UserCtx,
 } from "@budibase/types"
 
 const KEYS_DOC = dbCore.StaticDatabases.GLOBAL.docs.apiKeys
@@ -39,9 +39,7 @@ export async function fetch(ctx: UserCtx<void, ApiKeyFetchResponse>) {
   }
 }
 
-export async function update(
-  ctx: UserCtx<UpdateApiKeyRequest, UpdateApiKeyResponse>
-) {
+export async function update(ctx: UserCtx<UpdateApiKeyRequest, UpdateApiKeyResponse>) {
   const key = ctx.params.key
   const value = ctx.request.body.value
 

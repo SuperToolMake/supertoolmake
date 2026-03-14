@@ -1,4 +1,4 @@
-import { UserCtx } from "@budibase/types"
+import type { UserCtx } from "@budibase/types"
 import env from "../environment"
 import { hasBuilderPermissions, isBuilder } from "../users"
 import { getWorkspaceIdFromCtx } from "../utils"

@@ -1,6 +1,6 @@
-import { Workspace } from "@budibase/types"
-import { generator } from "."
+import type { Workspace } from "@budibase/types"
 import { DEFAULT_TENANT_ID, DocumentType } from "../../../../src/constants"
+import { generator } from "."
 
 export function app(id: string): Workspace {
   return {

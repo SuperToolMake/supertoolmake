@@ -1,23 +1,23 @@
 <script lang="ts">
-  import "@spectrum-css/tags/dist/index-vars.css"
-  import Avatar from "../Avatar/Avatar.svelte"
-  import ClearButton from "../ClearButton/ClearButton.svelte"
-  import Icon from "../Icon/Icon.svelte"
-  import { createEventDispatcher } from "svelte"
+import "@spectrum-css/tags/dist/index-vars.css"
+import { createEventDispatcher } from "svelte"
+import Avatar from "../Avatar/Avatar.svelte"
+import ClearButton from "../ClearButton/ClearButton.svelte"
+import Icon from "../Icon/Icon.svelte"
 
-  export let icon: string = ""
-  export let avatar: string = ""
-  export let invalid: boolean = false
-  export let disabled: boolean = false
-  export let closable: boolean = false
-  export let emphasized: boolean = false
+export let icon: string = ""
+export let avatar: string = ""
+export let invalid: boolean = false
+export let disabled: boolean = false
+export let closable: boolean = false
+export let emphasized: boolean = false
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  const onRemove = (event: MouseEvent) => {
-    event.stopPropagation()
-    dispatch("remove")
-  }
+const onRemove = (event: MouseEvent) => {
+  event.stopPropagation()
+  dispatch("remove")
+}
 </script>
 
 <div

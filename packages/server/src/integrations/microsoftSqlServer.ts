@@ -1,21 +1,28 @@
+import { ConfidentialClientApplication } from "@azure/msal-node"
+import { sql } from "@budibase/backend-core"
+import { utils } from "@budibase/shared-core"
 import {
-  ConnectionInfo,
+  type ConnectionInfo,
   DatasourceFeature,
   DatasourceFieldType,
-  DatasourcePlus,
-  DatasourcePlusQueryResponse,
-  EnrichedQueryJson,
-  Integration,
+  type DatasourcePlus,
+  type DatasourcePlusQueryResponse,
+  type EnrichedQueryJson,
+  type Integration,
   Operation,
   QueryType,
-  Schema,
+  type Schema,
   SourceName,
   SqlClient,
-  SqlQuery,
-  Table,
-  TableSchema,
+  type SqlQuery,
+  type Table,
+  type TableSchema,
   TableSourceType,
 } from "@budibase/types"
+import sqlServer from "mssql"
+import env from "../environment"
+import { getReadableErrorMessage } from "./base/errorMapping"
+import type { MSSQLColumn, MSSQLTablesResponse } from "./base/types"
 import {
   buildExternalTableId,
   checkExternalTables,
@@ -24,14 +31,6 @@ import {
   getSqlQuery,
   HOST_ADDRESS,
 } from "./utils"
-import { MSSQLColumn, MSSQLTablesResponse } from "./base/types"
-import { getReadableErrorMessage } from "./base/errorMapping"
-import sqlServer from "mssql"
-import { sql } from "@budibase/backend-core"
-import { ConfidentialClientApplication } from "@azure/msal-node"
-import env from "../environment"
-
-import { utils } from "@budibase/shared-core"
 
 const Sql = sql.Sql
 
@@ -120,10 +119,7 @@ const SCHEMA: Integration = {
       type: DatasourceFieldType.SELECT,
       display: "Advanced auth",
       config: {
-        options: [
-          MSSQLConfigAuthType.AZURE_ACTIVE_DIRECTORY,
-          MSSQLConfigAuthType.NTLM,
-        ],
+        options: [MSSQLConfigAuthType.AZURE_ACTIVE_DIRECTORY, MSSQLConfigAuthType.NTLM],
       },
     },
     adConfig: {
@@ -232,8 +228,7 @@ class SqlServerIntegration extends Sql implements DatasourcePlus {
     "spt_monitor",
     "MSreplication_options",
   ]
-  TABLES_SQL =
-    "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'"
+  TABLES_SQL = "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'"
 
   constructor(config: MSSQLConfig) {
     super(SqlClient.MS_SQL)
@@ -284,8 +279,7 @@ class SqlServerIntegration extends Sql implements DatasourcePlus {
 
       switch (this.config.authType) {
         case MSSQLConfigAuthType.AZURE_ACTIVE_DIRECTORY: {
-          const { clientId, tenantId, clientSecret } =
-            this.config.adConfig || {}
+          const { clientId, tenantId, clientSecret } = this.config.adConfig || {}
           const clientApp = new ConfidentialClientApplication({
             auth: {
               clientId,
@@ -307,8 +301,7 @@ class SqlServerIntegration extends Sql implements DatasourcePlus {
           break
         }
         case MSSQLConfigAuthType.NTLM: {
-          const { domain, trustServerCertificate } =
-            this.config.ntlmConfig || {}
+          const { domain, trustServerCertificate } = this.config.ntlmConfig || {}
 
           if (!domain) {
             throw Error("Domain must be provided for NTLM config")
@@ -349,33 +342,25 @@ class SqlServerIntegration extends Sql implements DatasourcePlus {
     }
   }
 
-  async internalQuery(
-    query: SqlQuery,
-    operation: string | undefined = undefined
-  ) {
+  async internalQuery(query: SqlQuery, operation: string | undefined = undefined) {
     const client = this.client!
     const request = client.request()
     this.index = 0
     try {
       if (Array.isArray(query.bindings)) {
         let count = 0
-        for (let binding of query.bindings) {
+        for (const binding of query.bindings) {
           request.input(`p${count++}`, binding)
         }
       }
       // this is a hack to get the inserted ID back,
       //  no way to do this with Knex nicely
       const sql =
-        operation === Operation.CREATE
-          ? `${query.sql}; SELECT SCOPE_IDENTITY() AS id;`
-          : query.sql
+        operation === Operation.CREATE ? `${query.sql}; SELECT SCOPE_IDENTITY() AS id;` : query.sql
       this.log(sql, query.bindings)
       return await request.query(sql)
     } catch (err: any) {
-      let readableMessage = getReadableErrorMessage(
-        SourceName.SQL_SERVER,
-        err.number
-      )
+      const readableMessage = getReadableErrorMessage(SourceName.SQL_SERVER, err.number)
       if (readableMessage) {
         throw new Error(readableMessage, { cause: err })
       } else {
@@ -421,12 +406,9 @@ class SqlServerIntegration extends Sql implements DatasourcePlus {
    * @param datasourceId - datasourceId to fetch
    * @param entities - the tables that are to be built
    */
-  async buildSchema(
-    datasourceId: string,
-    entities: Record<string, Table>
-  ): Promise<Schema> {
+  async buildSchema(datasourceId: string, entities: Record<string, Table>): Promise<Schema> {
     await this.connect()
-    let tableInfo: MSSQLTablesResponse[] = await this.runSQL(this.TABLES_SQL)
+    const tableInfo: MSSQLTablesResponse[] = await this.runSQL(this.TABLES_SQL)
     if (tableInfo == null || !Array.isArray(tableInfo)) {
       throw "Unable to get list of tables in database"
     }
@@ -438,38 +420,32 @@ class SqlServerIntegration extends Sql implements DatasourcePlus {
       .filter((name: string) => this.MASTER_TABLES.indexOf(name) === -1)
 
     const tables: Record<string, Table> = {}
-    for (let tableName of tableNames) {
+    for (const tableName of tableNames) {
       // get the column definition (type)
-      const definition = await this.runSQL(
-        this.getDefinitionSQL(tableName, schemaName)
-      )
+      const definition = await this.runSQL(this.getDefinitionSQL(tableName, schemaName))
       // find primary key constraints
       const constraints = await this.runSQL(this.getConstraintsSQL(tableName))
       // find the computed and identity columns (auto columns)
-      const columns: MSSQLColumn[] = await this.runSQL(
-        this.getAutoColumnsSQL(tableName)
-      )
+      const columns: MSSQLColumn[] = await this.runSQL(this.getAutoColumnsSQL(tableName))
       const primaryKeys = constraints
-        .filter(
-          (constraint: any) => constraint.CONSTRAINT_TYPE === "PRIMARY KEY"
-        )
+        .filter((constraint: any) => constraint.CONSTRAINT_TYPE === "PRIMARY KEY")
         .map((constraint: any) => constraint.COLUMN_NAME)
       const autoColumns = columns
-        .filter(col => col.IS_COMPUTED || col.IS_IDENTITY)
-        .map(col => col.COLUMN_NAME)
+        .filter((col) => col.IS_COMPUTED || col.IS_IDENTITY)
+        .map((col) => col.COLUMN_NAME)
       const requiredColumns = columns
-        .filter(col => col.IS_NULLABLE === "NO")
-        .map(col => col.COLUMN_NAME)
+        .filter((col) => col.IS_NULLABLE === "NO")
+        .map((col) => col.COLUMN_NAME)
 
-      let schema: TableSchema = {}
-      for (let def of definition) {
+      const schema: TableSchema = {}
+      for (const def of definition) {
         const name = def.COLUMN_NAME
         if (typeof name !== "string") {
           continue
         }
         const hasDefault = def.COLUMN_DEFAULT
-        const isAuto = !!autoColumns.find(col => col === name)
-        const required = !!requiredColumns.find(col => col === name)
+        const isAuto = !!autoColumns.find((col) => col === name)
+        const required = !!requiredColumns.find((col) => col === name)
         schema[name] = generateColumnDefinition({
           autocolumn: isAuto,
           name,
@@ -487,8 +463,8 @@ class SqlServerIntegration extends Sql implements DatasourcePlus {
         schema,
       }
     }
-    let externalTables = finaliseExternalTables(tables, entities)
-    let errors = checkExternalTables(externalTables)
+    const externalTables = finaliseExternalTables(tables, entities)
+    const errors = checkExternalTables(externalTables)
     return {
       tables: externalTables,
       errors,
@@ -496,7 +472,7 @@ class SqlServerIntegration extends Sql implements DatasourcePlus {
   }
 
   async queryTableNames() {
-    let tableInfo: MSSQLTablesResponse[] = await this.runSQL(this.TABLES_SQL)
+    const tableInfo: MSSQLTablesResponse[] = await this.runSQL(this.TABLES_SQL)
     const schema = this.config.schema || DEFAULT_SCHEMA
     return tableInfo
       .filter((record: any) => record.TABLE_SCHEMA === schema)
@@ -543,11 +519,7 @@ class SqlServerIntegration extends Sql implements DatasourcePlus {
     const queryFn = (query: any, op: string) => this.internalQuery(query, op)
     const processFn = (result: any) => {
       if (result.recordset) {
-        return this.convertJsonStringColumns(
-          json.table,
-          result.recordset,
-          json.tableAliases
-        )
+        return this.convertJsonStringColumns(json.table, result.recordset, json.tableAliases)
       }
       return [{ [operation]: true }]
     }

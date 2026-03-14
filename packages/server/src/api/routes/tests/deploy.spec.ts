@@ -1,10 +1,10 @@
 import { db as dbCore } from "@budibase/backend-core"
 import { structures } from "@budibase/backend-core/tests"
-import { PublishResourceState, WorkspaceApp } from "@budibase/types"
+import { PublishResourceState, type WorkspaceApp } from "@budibase/types"
 import * as setup from "./utilities"
 
 describe("/api/deploy", () => {
-  let config = setup.getConfig()
+  const config = setup.getConfig()
 
   afterAll(() => {
     setup.afterAll()
@@ -79,13 +79,8 @@ describe("/api/deploy", () => {
 
     function expectApp(workspace: WorkspaceApp) {
       return {
-        disabled: async (
-          disabled: boolean | undefined,
-          state: PublishResourceState
-        ) => {
-          expect(
-            (await config.api.workspaceApp.find(workspace._id!)).disabled
-          ).toBe(disabled)
+        disabled: async (disabled: boolean | undefined, state: PublishResourceState) => {
+          expect((await config.api.workspaceApp.find(workspace._id!)).disabled).toBe(disabled)
 
           const status = await config.api.deploy.publishStatus()
           expect(status.workspaceApps[workspace._id!]).toEqual(
@@ -103,25 +98,22 @@ describe("/api/deploy", () => {
     }
 
     it("should define the disable value for all workspace apps when publishing for the first time", async () => {
-      const { workspaceApp: publishedApp } =
-        await config.api.workspaceApp.create({
-          name: "Test App 1",
-          url: "/app1",
-          disabled: false,
+      const { workspaceApp: publishedApp } = await config.api.workspaceApp.create({
+        name: "Test App 1",
+        url: "/app1",
+        disabled: false,
+      })
+      const { workspaceApp: appWithoutInfo } = await config.api.workspaceApp.create({
+        name: "Test App 2",
+        url: "/app2",
+      })
+      const { workspaceApp: disabledApp } = await config.api.workspaceApp.create(
+        structures.workspaceApps.createRequest({
+          name: "Disabled App",
+          url: "/disabled",
+          disabled: true,
         })
-      const { workspaceApp: appWithoutInfo } =
-        await config.api.workspaceApp.create({
-          name: "Test App 2",
-          url: "/app2",
-        })
-      const { workspaceApp: disabledApp } =
-        await config.api.workspaceApp.create(
-          structures.workspaceApps.createRequest({
-            name: "Disabled App",
-            url: "/disabled",
-            disabled: true,
-          })
-        )
+      )
 
       expect(publishedApp.disabled).toBe(false)
       expect(appWithoutInfo.disabled).toBeUndefined()
@@ -130,25 +122,17 @@ describe("/api/deploy", () => {
       // Publish the app for the first time
       await publishProdApp()
 
-      await expectApp(publishedApp).disabled(
-        false,
-        PublishResourceState.PUBLISHED
-      )
-      await expectApp(appWithoutInfo).disabled(
-        true,
-        PublishResourceState.DISABLED
-      )
+      await expectApp(publishedApp).disabled(false, PublishResourceState.PUBLISHED)
+      await expectApp(appWithoutInfo).disabled(true, PublishResourceState.DISABLED)
       await expectApp(disabledApp).disabled(true, PublishResourceState.DISABLED)
     })
 
     it("should not disable workspace apps on subsequent publishes", async () => {
-      const { workspaceApp: initialApp } = await config.api.workspaceApp.create(
-        {
-          name: "Test App 1",
-          url: "/app1",
-          disabled: undefined,
-        }
-      )
+      const { workspaceApp: initialApp } = await config.api.workspaceApp.create({
+        name: "Test App 1",
+        url: "/app1",
+        disabled: undefined,
+      })
       await publishProdApp()
 
       // Remove disabled flag, simulating old apps
@@ -165,10 +149,7 @@ describe("/api/deploy", () => {
       })
       await publishProdApp()
 
-      await expectApp(initialApp).disabled(
-        undefined,
-        PublishResourceState.PUBLISHED
-      )
+      await expectApp(initialApp).disabled(undefined, PublishResourceState.PUBLISHED)
       await expectApp(secondApp).disabled(true, PublishResourceState.DISABLED)
     })
   })

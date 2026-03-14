@@ -1,4 +1,4 @@
-import { Datasource, Row, Query, ContextUser, SSOUser } from "@budibase/types"
+import type { ContextUser, Datasource, Query, Row, SSOUser } from "@budibase/types"
 
 export type WorkerCallback = (error: any, response?: any) => void
 
@@ -11,10 +11,7 @@ export interface QueryEventCtx {
 }
 
 export interface QueryEvent
-  extends Omit<
-    Query,
-    "datasourceId" | "name" | "parameters" | "readable" | "nestedSchemaFields"
-  > {
+  extends Omit<Query, "datasourceId" | "name" | "parameters" | "readable" | "nestedSchemaFields"> {
   appId?: string
   datasource: Datasource
   pagination?: any

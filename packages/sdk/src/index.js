@@ -8,7 +8,7 @@ export default class SDK {
   users = new BudibaseApi.UsersApi()
 
   constructor({ apiKey, host }) {
-    let ApiClient = new BudibaseApi.ApiClient()
+    const ApiClient = new BudibaseApi.ApiClient()
 
     // Default to current host
     ApiClient.basePath = `${host || ""}/api/public/v1`

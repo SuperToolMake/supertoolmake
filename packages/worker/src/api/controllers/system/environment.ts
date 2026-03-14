@@ -1,5 +1,5 @@
 import { env as coreEnv } from "@budibase/backend-core"
-import { Ctx, GetEnvironmentResponse } from "@budibase/types"
+import type { Ctx, GetEnvironmentResponse } from "@budibase/types"
 import env from "../../../environment"
 
 export const fetch = async (ctx: Ctx<void, GetEnvironmentResponse>) => {

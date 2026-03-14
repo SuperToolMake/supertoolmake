@@ -1,8 +1,6 @@
 if (typeof btoa !== "function") {
   var chars = {
-    ascii: function () {
-      return "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
-    },
+    ascii: () => "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
     indices: function () {
       if (!this.cache) {
         this.cache = {}
@@ -32,11 +30,7 @@ if (typeof btoa !== "function") {
         (indices[b64[++i]] << 6) |
         indices[b64[++i]]
       if (code !== 0) {
-        data += String.fromCharCode(
-          (code >>> 16) & 255,
-          (code >>> 8) & 255,
-          code & 255
-        )
+        data += String.fromCharCode((code >>> 16) & 255, (code >>> 8) & 255, code & 255)
       }
     }
 
@@ -54,10 +48,7 @@ if (typeof btoa !== "function") {
       b64 = ""
 
     while (i < len) {
-      var code =
-        (data.charCodeAt(++i) << 16) |
-        (data.charCodeAt(++i) << 8) |
-        data.charCodeAt(++i)
+      var code = (data.charCodeAt(++i) << 16) | (data.charCodeAt(++i) << 8) | data.charCodeAt(++i)
       b64 +=
         ascii[(code >>> 18) & 63] +
         ascii[(code >>> 12) & 63] +
@@ -82,9 +73,7 @@ if (typeof TextDecoder === "undefined") {
   globalThis.TextDecoder = class {
     constructor(encoding = "utf8") {
       if (encoding !== "utf8") {
-        throw new Error(
-          `Only UTF-8 is supported in this polyfill. Recieved: ${encoding}`
-        )
+        throw new Error(`Only UTF-8 is supported in this polyfill. Recieved: ${encoding}`)
       }
     }
     decode(buffer) {

@@ -1,5 +1,5 @@
-import { refreshBlacklist, isBlacklisted } from ".."
 import { setEnv } from "../../environment"
+import { isBlacklisted, refreshBlacklist } from ".."
 
 describe("blacklist", () => {
   describe("default ranges", () => {
@@ -70,9 +70,7 @@ describe("blacklist", () => {
     })
 
     it("should handle a complex domain", async () => {
-      expect(
-        await isBlacklisted("https://www.google.com/derp/?something=1")
-      ).toBe(true)
+      expect(await isBlacklisted("https://www.google.com/derp/?something=1")).toBe(true)
     })
 
     it("should allow www.microsoft.com", async () => {

@@ -1,5 +1,5 @@
-import { Query, ExecuteQuery } from "./types"
-import { RequiredKeys } from "@budibase/types"
+import type { RequiredKeys } from "@budibase/types"
+import type { ExecuteQuery, Query } from "./types"
 
 function query(body: any): RequiredKeys<Query> {
   return {

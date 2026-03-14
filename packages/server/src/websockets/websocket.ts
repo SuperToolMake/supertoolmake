@@ -1,13 +1,13 @@
-import { Server, Socket } from "socket.io"
-import http from "http"
-import Koa from "koa"
-import { userAgent } from "koa-useragent"
 import { auth, Header, redis } from "@budibase/backend-core"
-import { createAdapter } from "@socket.io/redis-adapter"
-import { getSocketPubSubClients } from "../utilities/redis"
 import { SocketEvent, SocketSessionTTL } from "@budibase/shared-core"
-import { Ctx, SocketSession } from "@budibase/types"
+import type { Ctx, SocketSession } from "@budibase/types"
+import { createAdapter } from "@socket.io/redis-adapter"
+import type http from "http"
+import type Koa from "koa"
+import { userAgent } from "koa-useragent"
+import { Server, type Socket } from "socket.io"
 import { v4 as uuid } from "uuid"
+import { getSocketPubSubClients } from "../utilities/redis"
 import { createContext, runMiddlewares } from "./middleware"
 
 export interface EmitOptions {
@@ -30,12 +30,7 @@ export class BaseSocket {
   path: string
   redisClient?: redis.Client
 
-  constructor(
-    app: Koa,
-    server: http.Server,
-    path = "/",
-    additionalMiddlewares?: any[]
-  ) {
+  constructor(app: Koa, server: http.Server, path = "/", additionalMiddlewares?: any[]) {
     this.app = app
     this.path = path
     this.io = new Server(server, {
@@ -46,11 +41,7 @@ export class BaseSocket {
     const authenticate = auth.buildAuthMiddleware([], {
       publicAllowed: true,
     })
-    const middlewares = [
-      userAgent,
-      authenticate,
-      ...(additionalMiddlewares || []),
-    ]
+    const middlewares = [userAgent, authenticate, ...(additionalMiddlewares || [])]
 
     // Apply middlewares
     this.io.use(async (socket, next) => {
@@ -80,7 +71,7 @@ export class BaseSocket {
 
     // Initialise redis before handling connections
     this.initialise().then(() => {
-      this.io.on("connection", async socket => {
+      this.io.on("connection", async (socket) => {
         // Add built in handler for heartbeats
         socket.on(SocketEvent.Heartbeat, async () => {
           await this.extendSessionTTL(socket.data.sessionId)
@@ -137,7 +128,7 @@ export class BaseSocket {
       const roomKeys = room.map(this.getRoomKey.bind(this))
       const roomSessionIdMap = await this.redisClient?.bulkGet(roomKeys)
       let sessionIds: any[] = []
-      Object.values(roomSessionIdMap || {}).forEach(roomSessionIds => {
+      Object.values(roomSessionIdMap || {}).forEach((roomSessionIds) => {
         sessionIds = sessionIds.concat(roomSessionIds)
       })
       return sessionIds
@@ -158,7 +149,7 @@ export class BaseSocket {
       const sessionIds = await this.getRoomSessionIds(room)
       const keys = sessionIds.map(this.getSessionKey.bind(this))
       const sessions = await this.redisClient?.bulkGet<SocketSession>(keys)
-      return Object.values(sessions || {}).filter(session => session !== null)
+      return Object.values(sessions || {}).filter((session) => session !== null)
     } else {
       return []
     }
@@ -169,7 +160,7 @@ export class BaseSocket {
   async pruneRoom(room: string) {
     const sessionIds = await this.getRoomSessionIds(room)
     const sessionsExist = await Promise.all(
-      sessionIds.map(id => this.redisClient?.exists(this.getSessionKey(id)))
+      sessionIds.map((id) => this.redisClient?.exists(this.getSessionKey(id)))
     )
     const prunedSessionIds = sessionIds.filter((id, idx) => {
       if (!sessionsExist[idx]) {
@@ -207,8 +198,8 @@ export class BaseSocket {
     }
 
     // Store in redis
-    // @ts-ignore
-    let user: SocketSession = socket.data
+    // @ts-expect-error
+    const user: SocketSession = socket.data
     const { sessionId } = user
     const key = this.getSessionKey(sessionId)
     await this.redisClient?.store(key, user, SocketSessionTTL)
@@ -225,8 +216,8 @@ export class BaseSocket {
 
   // Disconnects a socket from its current room
   async leaveRoom(socket: Socket) {
-    // @ts-ignore
-    let user: SocketSession = socket.data
+    // @ts-expect-error
+    const user: SocketSession = socket.data
     const { room, sessionId } = user
     if (!room) {
       return
@@ -242,7 +233,7 @@ export class BaseSocket {
     const sessionIds = await this.getRoomSessionIds(room)
     await this.setRoomSessionIds(
       room,
-      sessionIds.filter(id => id !== sessionId)
+      sessionIds.filter((id) => id !== sessionId)
     )
 
     // Notify other users
@@ -284,7 +275,7 @@ export class BaseSocket {
     payload: any,
     options?: EmitOptions
   ) {
-    let emitPayload = { ...payload }
+    const emitPayload = { ...payload }
     if (!options?.includeOriginator) {
       emitPayload.apiSessionId = ctx.headers?.[Header.SESSION_ID]
     }

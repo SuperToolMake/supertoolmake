@@ -5,8 +5,8 @@ const HOST = "http://localhost:10000"
 const TENANT_ID = "default"
 const RATE_MS = 500
 
-let API_KEY = process.argv[2]
-let STATS = {
+const API_KEY = process.argv[2]
+const STATS = {
   iterations: 0,
   error: 0,
   success: 0,
@@ -56,7 +56,7 @@ const REQUESTS = [
 ]
 
 function timeout() {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(() => {
       resolve()
     }, MAX_RUNTIME_SEC * 1000)
@@ -75,8 +75,8 @@ async function preTest() {
     throw new Error("Unable to retrieve users")
   }
   const users = await response.json()
-  for (let user of USERS) {
-    if (users.find(u => u.email === user.email)) {
+  for (const user of USERS) {
+    if (users.find((u) => u.email === user.email)) {
       continue
     }
     const response = await fetch(`${HOST}/api/global/users`, {
@@ -92,15 +92,13 @@ async function preTest() {
       }),
     })
     if (response.status !== 200) {
-      throw new Error(
-        `Unable to create user ${user.email}, reason: ${await response.text()}`
-      )
+      throw new Error(`Unable to create user ${user.email}, reason: ${await response.text()}`)
     }
   }
 }
 
 async function requests(user) {
-  let response = await fetch(`${HOST}/api/global/auth/${TENANT_ID}/login`, {
+  const response = await fetch(`${HOST}/api/global/auth/${TENANT_ID}/login`, {
     method: "POST",
     body: JSON.stringify({
       username: user.email,
@@ -118,8 +116,8 @@ async function requests(user) {
     STATS.success++
   }
   const cookie = response.headers.get("set-cookie")
-  let promises = []
-  for (let request of REQUESTS) {
+  const promises = []
+  for (const request of REQUESTS) {
     const headers = {
       cookie,
     }
@@ -136,7 +134,7 @@ async function requests(user) {
     )
   }
   const responses = await Promise.all(promises)
-  for (let resp of responses) {
+  for (const resp of responses) {
     if (resp.status !== 200) {
       console.error(await resp.text())
       STATS.error++
@@ -149,24 +147,20 @@ async function requests(user) {
 async function run() {
   await preTest()
   setInterval(async () => {
-    let promises = []
-    for (let user of USERS) {
+    const promises = []
+    for (const user of USERS) {
       promises.push(requests(user))
     }
     await Promise.all(promises)
     console.log(
-      `Iteration ${STATS.iterations++} - errors: ${STATS.error}, success: ${
-        STATS.success
-      }`
+      `Iteration ${STATS.iterations++} - errors: ${STATS.error}, success: ${STATS.success}`
     )
   }, RATE_MS)
   await timeout()
-  console.log(
-    `Max runtime of ${MAX_RUNTIME_SEC} seconds has been reached - stopping.`
-  )
+  console.log(`Max runtime of ${MAX_RUNTIME_SEC} seconds has been reached - stopping.`)
   process.exit(0)
 }
 
-run().catch(err => {
+run().catch((err) => {
   console.error("Failed to run - ", err)
 })

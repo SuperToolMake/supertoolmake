@@ -1,19 +1,19 @@
+import { sql } from "@budibase/backend-core"
+import { PROTECTED_INTERNAL_COLUMNS } from "@budibase/shared-core"
 import {
-  DatasourcePlusQueryResponse,
+  type DatasourcePlusQueryResponse,
   DSPlusOperation,
   FieldType,
   isManyToOne,
   isOneToMany,
-  ManyToManyRelationshipFieldMetadata,
-  RelationshipFieldMetadata,
-  RelationshipsJson,
-  Row,
-  Table,
+  type ManyToManyRelationshipFieldMetadata,
+  type RelationshipFieldMetadata,
+  type RelationshipsJson,
+  type Row,
+  type Table,
 } from "@budibase/types"
-import { breakExternalTableId } from "../../../../integrations/utils"
 import { generateJunctionTableID } from "../../../../db/utils"
-import { PROTECTED_INTERNAL_COLUMNS } from "@budibase/shared-core"
-import { sql } from "@budibase/backend-core"
+import { breakExternalTableId } from "../../../../integrations/utils"
 
 type TableMap = Record<string, Table>
 
@@ -28,12 +28,9 @@ export function isManyToMany(
  * this will be used by the underlying library to build whatever relationship mechanism
  * it has (e.g. SQL joins).
  */
-export function buildExternalRelationships(
-  table: Table,
-  tables: TableMap
-): RelationshipsJson[] {
+export function buildExternalRelationships(table: Table, tables: TableMap): RelationshipsJson[] {
   const relationships = []
-  for (let [fieldName, field] of Object.entries(table.schema)) {
+  for (const [fieldName, field] of Object.entries(table.schema)) {
     if (field.type !== FieldType.LINK || !field.tableId) {
       continue
     }
@@ -52,9 +49,7 @@ export function buildExternalRelationships(
       column: fieldName,
     }
     if (isManyToMany(field) && field.through) {
-      const { tableName: throughTableName } = breakExternalTableId(
-        field.through
-      )
+      const { tableName: throughTableName } = breakExternalTableId(field.through)
       definition.through = throughTableName
       // don't support composite keys for relationships
       definition.from = field.throughTo || table.primary[0]
@@ -71,16 +66,11 @@ export function buildExternalRelationships(
   return relationships
 }
 
-export function buildInternalRelationships(
-  table: Table,
-  allTables: Table[]
-): RelationshipsJson[] {
+export function buildInternalRelationships(table: Table, allTables: Table[]): RelationshipsJson[] {
   const relationships: RelationshipsJson[] = []
-  const links = Object.values(table.schema).filter(
-    column => column.type === FieldType.LINK
-  )
+  const links = Object.values(table.schema).filter((column) => column.type === FieldType.LINK)
   const tableId = table._id!
-  for (let link of links) {
+  for (const link of links) {
     if (link.type !== FieldType.LINK) {
       continue
     }
@@ -88,7 +78,7 @@ export function buildInternalRelationships(
     const junctionTableId = generateJunctionTableID(tableId, linkTableId)
     const isFirstTable = tableId > linkTableId
     // skip relationships with missing table definitions
-    if (!allTables.find(table => table._id === linkTableId)) {
+    if (!allTables.find((table) => table._id === linkTableId)) {
       continue
     }
     relationships.push({
@@ -144,7 +134,7 @@ export async function buildSqlFieldList(
     }
 
     return requiredFields.filter(
-      column =>
+      (column) =>
         !existing.find((field: string) => field === column) &&
         table.schema[column] &&
         !nonMappedColumns.includes(table.schema[column].type)
@@ -155,9 +145,7 @@ export async function buildSqlFieldList(
 
   let table: Table
   table = source
-  fields = extractRealFields(source).filter(
-    f => table.schema[f].visible !== false
-  )
+  fields = extractRealFields(source).filter((f) => table.schema[f].visible !== false)
 
   fields.push(
     ...getRequiredFields(
@@ -169,7 +157,7 @@ export async function buildSqlFieldList(
     )
   )
 
-  fields = fields.map(c => `${table.name}.${c}`)
+  fields = fields.map((c) => `${table.name}.${c}`)
 
   for (const field of Object.values(table.schema)) {
     if (field.type !== FieldType.LINK || !relationships || !field.tableId) {
@@ -183,15 +171,15 @@ export async function buildSqlFieldList(
     }
 
     const viewFields = new Set<string>()
-    relatedTable.primary?.forEach(f => viewFields.add(f))
+    relatedTable.primary?.forEach((f) => viewFields.add(f))
     if (relatedTable.primaryDisplay) {
       viewFields.add(relatedTable.primaryDisplay)
     }
 
     const fieldsToAdd = Array.from(viewFields)
-      .filter(f => !nonMappedColumns.includes(relatedTable.schema[f].type))
-      .map(f => `${relatedTable.name}.${f}`)
-      .filter(f => !fields.includes(f))
+      .filter((f) => !nonMappedColumns.includes(relatedTable.schema[f].type))
+      .map((f) => `${relatedTable.name}.${f}`)
+      .filter((f) => !fields.includes(f))
     fields.push(...fieldsToAdd)
   }
 

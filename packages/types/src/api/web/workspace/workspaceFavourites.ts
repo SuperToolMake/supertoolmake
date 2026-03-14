@@ -1,5 +1,5 @@
-import { DocumentDestroyResponse } from "nano"
-import { WorkspaceFavourite } from "../../../documents"
+import type { DocumentDestroyResponse } from "nano"
+import type { WorkspaceFavourite } from "../../../documents"
 
 export enum WorkspaceResource {
   DATASOURCE = "datasource",
@@ -24,5 +24,4 @@ export interface WorkspaceFavouriteResponse {
   favourites: WorkspaceFavourite[]
 }
 
-export interface DeleteWorkspaceFavouriteResponse
-  extends DocumentDestroyResponse {}
+export interface DeleteWorkspaceFavouriteResponse extends DocumentDestroyResponse {}

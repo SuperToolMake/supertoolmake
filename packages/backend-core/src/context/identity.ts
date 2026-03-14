@@ -1,9 +1,9 @@
 import {
-  IdentityContext,
+  type Ctx,
+  type IdentityContext,
   IdentityType,
-  User,
-  UserContext,
-  Ctx,
+  type User,
+  type UserContext,
 } from "@budibase/types"
 import * as context from "."
 

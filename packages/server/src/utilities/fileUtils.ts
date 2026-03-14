@@ -1,12 +1,11 @@
+import { context, objectStore } from "@budibase/backend-core"
+import type { Upload } from "@budibase/types"
 import fs from "fs"
 import fetch from "node-fetch"
 import path from "path"
 import { pipeline } from "stream"
 import { promisify } from "util"
 import * as uuid from "uuid"
-
-import { context, objectStore } from "@budibase/backend-core"
-import { Upload } from "@budibase/types"
 import { ObjectStoreBuckets } from "../constants"
 
 function getTmpPath() {
@@ -58,10 +57,7 @@ export async function uploadFile(file: {
   extension: string
   content: string
 }): Promise<Upload> {
-  const destination = path.resolve(
-    getTmpPath(),
-    `${file.fileName}${file.extension}`
-  )
+  const destination = path.resolve(getTmpPath(), `${file.fileName}${file.extension}`)
 
   fs.writeFileSync(destination, file.content)
 

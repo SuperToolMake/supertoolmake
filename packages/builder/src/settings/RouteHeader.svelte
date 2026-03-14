@@ -1,11 +1,11 @@
 <script>
-  import { Divider, Layout, StatusLight } from "@budibase/bbui"
-  import { Breadcrumbs, Breadcrumb } from "@/components/portal/page"
-  import { bb } from "@/stores/bb"
-  import NewPill from "@/components/common/NewPill.svelte"
+import { Divider, Layout, StatusLight } from "@budibase/bbui"
+import NewPill from "@/components/common/NewPill.svelte"
+import { Breadcrumb, Breadcrumbs } from "@/components/portal/page"
+import { bb } from "@/stores/bb"
 
-  $: matched = $bb.settings.route
-  $: route = matched?.entry
+$: matched = $bb.settings.route
+$: route = matched?.entry
 </script>
 
 <div class="route-header">

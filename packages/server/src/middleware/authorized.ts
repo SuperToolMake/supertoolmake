@@ -1,11 +1,5 @@
-import {
-  auth,
-  context,
-  permissions,
-  roles,
-  users,
-} from "@budibase/backend-core"
-import { PermissionLevel, PermissionType, UserCtx } from "@budibase/types"
+import { auth, context, permissions, roles, users } from "@budibase/backend-core"
+import { PermissionLevel, PermissionType, type UserCtx } from "@budibase/types"
 import sdk from "../sdk"
 import { builderMiddleware } from "./builder"
 import { paramResource } from "./resourceId"
@@ -34,9 +28,7 @@ const checkAuthorized = async (
   const isBuilderApi = permType === PermissionType.BUILDER
   const isGlobalBuilder = users.isGlobalBuilder(ctx.user)
   const isCreator = await users.isCreatorAsync(ctx.user)
-  const isBuilder = appId
-    ? users.isBuilder(ctx.user, appId)
-    : users.hasBuilderPermissions(ctx.user)
+  const isBuilder = appId ? users.isBuilder(ctx.user, appId) : users.hasBuilderPermissions(ctx.user)
 
   // check api permission type against user
   if (
@@ -66,16 +58,12 @@ const checkAuthorizedResource = async (
   // check if the user has the required role
   if (resourceRoles.length > 0) {
     // deny access if the user doesn't have the required resource role
-    const found = userRoles.find(
-      (role: any) => resourceRoles.indexOf(role._id) !== -1
-    )
+    const found = userRoles.find((role: any) => resourceRoles.indexOf(role._id) !== -1)
     if (!found) {
       ctx.throw(403, permError)
     }
     // fallback to the base permissions when no resource roles are found
-  } else if (
-    !permissions.doesHaveBasePermission(permType, permLevel, userRoles)
-  ) {
+  } else if (!permissions.doesHaveBasePermission(permType, permLevel, userRoles)) {
     ctx.throw(403, permError)
   }
 }
@@ -96,9 +84,7 @@ const authorized =
     let resourceRoles: string[] = []
     let otherLevelRoles: string[] = []
     const otherLevel =
-      permLevel === PermissionLevel.READ
-        ? PermissionLevel.WRITE
-        : PermissionLevel.READ
+      permLevel === PermissionLevel.READ ? PermissionLevel.WRITE : PermissionLevel.READ
 
     if (resourcePath) {
       // Reusing the existing middleware to extract the value
@@ -110,11 +96,10 @@ const authorized =
 
       const permissions = await sdk.permissions.getResourcePerms(resourceId)
       const subPermissions =
-        !!subResourceId &&
-        (await sdk.permissions.getResourcePerms(subResourceId))
+        !!subResourceId && (await sdk.permissions.getResourcePerms(subResourceId))
 
       const getPermLevel = (permLevel: string) => {
-        let result: string[] = []
+        const result: string[] = []
         if (permissions[permLevel]) {
           result.push(permissions[permLevel].role)
         }
@@ -133,8 +118,7 @@ const authorized =
     // if the resource is public, proceed
     if (
       resourceRoles.includes(roles.BUILTIN_ROLE_IDS.PUBLIC) ||
-      (otherLevelRoles &&
-        otherLevelRoles.includes(roles.BUILTIN_ROLE_IDS.PUBLIC))
+      (otherLevelRoles && otherLevelRoles.includes(roles.BUILTIN_ROLE_IDS.PUBLIC))
     ) {
       return next()
     }

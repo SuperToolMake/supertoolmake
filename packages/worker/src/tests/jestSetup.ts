@@ -1,19 +1,14 @@
-import { mocks, testContainerUtils } from "@budibase/backend-core/tests"
-import env from "../environment"
 import { env as coreEnv, timers } from "@budibase/backend-core"
+import { mocks, testContainerUtils } from "@budibase/backend-core/tests"
 import nock from "nock"
-
 // mock all dates to 2020-01-01T00:00:00.000Z
 // use tk.reset() to use real dates in individual tests
 import tk from "timekeeper"
+import env from "../environment"
 
 nock.disableNetConnect()
-nock.enableNetConnect(host => {
-  return (
-    host.includes("localhost") ||
-    host.includes("127.0.0.1") ||
-    host.includes("::1")
-  )
+nock.enableNetConnect((host) => {
+  return host.includes("localhost") || host.includes("127.0.0.1") || host.includes("::1")
 })
 
 tk.freeze(mocks.date.MOCK_DATE)

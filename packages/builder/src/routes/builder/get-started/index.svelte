@@ -1,32 +1,32 @@
 <script lang="ts">
-  import ExampleApp from "./_components/ExampleApp.svelte"
-  import { Body, Button, Heading, Layout, Modal } from "@budibase/bbui"
-  import { SplitPage } from "@budibase/frontend-core"
-  import { goto } from "@roxi/routify"
-  import { appsStore } from "@/stores/portal/apps"
-  import { auth } from "@/stores/portal/auth"
-  import BBLogo from "assets/BBLogo.svelte"
-  import CreateWorkspaceModal from "../workspace/[application]/_components/CreateWorkspaceModal.svelte"
-  import type { CreateWorkspaceResponse } from "@budibase/types"
-  import { sdk } from "@budibase/shared-core"
+import { Body, Button, Heading, Layout, type Modal } from "@budibase/bbui"
+import { SplitPage } from "@budibase/frontend-core"
+import { sdk } from "@budibase/shared-core"
+import type { CreateWorkspaceResponse } from "@budibase/types"
+import { goto } from "@roxi/routify"
+import BBLogo from "assets/BBLogo.svelte"
+import { appsStore } from "@/stores/portal/apps"
+import { auth } from "@/stores/portal/auth"
+import CreateWorkspaceModal from "../workspace/[application]/_components/CreateWorkspaceModal.svelte"
+import ExampleApp from "./_components/ExampleApp.svelte"
 
-  let createWorkspaceModal: Modal
-  let loading = false
+let createWorkspaceModal: Modal
+let loading = false
 
-  $goto
+$goto
 
-  const initialise = async (event: CustomEvent<CreateWorkspaceResponse>) => {
-    // Refresh auth if user is not yet a builder for the created app
-    if (!sdk.users.isBuilder($auth.user, event.detail?.appId)) {
-      await auth.getSelf()
-    }
-    // Refresh the apps list to include the newly created app
-    await appsStore.load()
-    // Redirect to the newly created workspace
-    $goto(`/builder/workspace/[application]`, {
-      application: event.detail.instance._id,
-    })
+const initialise = async (event: CustomEvent<CreateWorkspaceResponse>) => {
+  // Refresh auth if user is not yet a builder for the created app
+  if (!sdk.users.isBuilder($auth.user, event.detail?.appId)) {
+    await auth.getSelf()
   }
+  // Refresh the apps list to include the newly created app
+  await appsStore.load()
+  // Redirect to the newly created workspace
+  $goto(`/builder/workspace/[application]`, {
+    application: event.detail.instance._id,
+  })
+}
 </script>
 
 <Modal

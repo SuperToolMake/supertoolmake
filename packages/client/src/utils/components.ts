@@ -1,4 +1,4 @@
-import { Component } from "@budibase/types"
+import type { Component } from "@budibase/types"
 
 /**
  * Finds a component instance by ID
@@ -16,7 +16,7 @@ export const findComponentById = (
   if (!component._children?.length) {
     return null
   }
-  for (let child of component._children) {
+  for (const child of component._children) {
     const result = findComponentById(child, componentId)
     if (result) {
       return result
@@ -43,7 +43,7 @@ export const findComponentPathById = (
   if (!component._children?.length) {
     return null
   }
-  for (let child of component._children) {
+  for (const child of component._children) {
     const result = findComponentPathById(child, componentId, path)
     if (result) {
       return result
@@ -69,7 +69,7 @@ export const findChildrenByType = (
   if (!component._children?.length) {
     return
   }
-  component._children.forEach(child => {
+  component._children.forEach((child) => {
     findChildrenByType(child, type, children)
   })
 }

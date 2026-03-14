@@ -1,8 +1,5 @@
-import { writable, Writable, Readable } from "svelte/store"
-import {
-  createLocalStorageStore,
-  createSessionStorageStore,
-} from "@budibase/frontend-core"
+import { createLocalStorageStore, createSessionStorageStore } from "@budibase/frontend-core"
+import { type Readable, type Writable, writable } from "svelte/store"
 
 export enum PersistenceType {
   NONE = "none",
@@ -46,7 +43,7 @@ export class BudiStore<T> {
 
     // Optional debug mode to output the store updates to console
     if (opts?.debug) {
-      this.subscribe(state => {
+      this.subscribe((state) => {
         console.warn(`${this.constructor.name}`, state)
       })
     }

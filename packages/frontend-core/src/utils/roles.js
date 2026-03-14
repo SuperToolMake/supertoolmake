@@ -8,6 +8,6 @@ const RolePriorities = {
   [Roles.PUBLIC]: 1,
 }
 
-export const getRolePriority = role => {
+export const getRolePriority = (role) => {
   return RolePriorities[role] ?? 0
 }

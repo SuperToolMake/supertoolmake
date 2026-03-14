@@ -1,41 +1,25 @@
-import { derived } from "svelte/store"
-import { routeStore } from "./routes"
-import { builderStore } from "./builder"
-import { appStore } from "./app"
-import { orgStore } from "./org"
-import { dndIndex, dndParent, dndSource } from "./dnd"
-import { RoleUtils } from "@budibase/frontend-core"
-import { findComponentById, findComponentParent } from "../utils/components.js"
 import { Helpers } from "@budibase/bbui"
-import { DNDPlaceholderID, ScreenslotID, ScreenslotType } from "@/constants"
+import { RoleUtils } from "@budibase/frontend-core"
 import {
-  Screen,
-  ScreenProps,
+  type Component,
+  type Layout,
+  type Screen,
+  type ScreenProps,
   ScreenVariant,
-  Layout,
-  Component,
 } from "@budibase/types"
+import { derived } from "svelte/store"
+import { DNDPlaceholderID, ScreenslotID, ScreenslotType } from "@/constants"
+import { findComponentById, findComponentParent } from "../utils/components.js"
+import { appStore } from "./app"
+import { builderStore } from "./builder"
+import { dndIndex, dndParent, dndSource } from "./dnd"
+import { orgStore } from "./org"
+import { routeStore } from "./routes"
 
 const createScreenStore = () => {
   const store = derived(
-    [
-      appStore,
-      routeStore,
-      builderStore,
-      orgStore,
-      dndParent,
-      dndIndex,
-      dndSource,
-    ],
-    ([
-      $appStore,
-      $routeStore,
-      $builderStore,
-      $orgStore,
-      $dndParent,
-      $dndIndex,
-      $dndSource,
-    ]) => {
+    [appStore, routeStore, builderStore, orgStore, dndParent, dndIndex, dndSource],
+    ([$appStore, $routeStore, $builderStore, $orgStore, $dndParent, $dndIndex, $dndSource]) => {
       let activeLayout: Layout | undefined, activeScreen: Screen | undefined
       let screens: Screen[]
       if ($builderStore.inBuilder) {
@@ -56,14 +40,14 @@ const createScreenStore = () => {
         const { activeRoute } = $routeStore
         if (activeRoute) {
           activeScreen = Helpers.cloneDeep(
-            screens.find(screen => screen._id === activeRoute.screenId)
+            screens.find((screen) => screen._id === activeRoute.screenId)
           )
         }
 
         // Legacy - find the custom layout for the selected screen
         if (activeScreen) {
           const screenLayout = $appStore.layouts?.find(
-            layout => layout._id === activeScreen!.layoutId
+            (layout) => layout._id === activeScreen!.layoutId
           )
           if (screenLayout) {
             activeLayout = screenLayout
@@ -77,16 +61,13 @@ const createScreenStore = () => {
 
         // Extract and save the selected component as we need a reference to it
         // later, and we may be removing it
-        let selectedParent = findComponentParent(
-          activeScreen.props,
-          selectedComponentId
-        )
+        const selectedParent = findComponentParent(activeScreen.props, selectedComponentId)
 
         // Remove selected component from tree if we are moving an existing
         // component
         if (!$dndSource!.isNew && selectedParent) {
           selectedParent._children = selectedParent._children?.filter(
-            x => x._id !== selectedComponentId
+            (x) => x._id !== selectedComponentId
           )
         }
 
@@ -106,7 +87,7 @@ const createScreenStore = () => {
           },
           static: true,
         }
-        let parent = findComponentById(activeScreen.props, $dndParent)
+        const parent = findComponentById(activeScreen.props, $dndParent)
         if (parent) {
           if (!parent._children?.length) {
             parent._children = [componentToInsert]
@@ -121,7 +102,7 @@ const createScreenStore = () => {
       }
 
       // Assign ranks to screens, preferring higher roles and home screens
-      screens.forEach(screen => {
+      screens.forEach((screen) => {
         const roleId = screen.routing.roleId
         let rank = RoleUtils.getRolePriority(roleId)
         if (screen.routing.homeScreen) {
@@ -203,7 +184,7 @@ const createScreenStore = () => {
 
 export const screenStore = createScreenStore()
 
-export const isGridScreen = derived(screenStore, $screenStore => {
+export const isGridScreen = derived(screenStore, ($screenStore) => {
   return (
     $screenStore.activeScreen?.props?.layout === "grid" ||
     $screenStore.activeScreen?.variant === ScreenVariant.PDF

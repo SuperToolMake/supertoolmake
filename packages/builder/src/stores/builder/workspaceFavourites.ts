@@ -1,7 +1,7 @@
-import { WorkspaceFavourite, WorkspaceFavouriteResponse } from "@budibase/types"
-import { BudiStore } from "../BudiStore"
+import type { WorkspaceFavourite, WorkspaceFavouriteResponse } from "@budibase/types"
+import { derived, type Readable } from "svelte/store"
 import { API } from "@/api"
-import { derived, Readable } from "svelte/store"
+import { BudiStore } from "../BudiStore"
 
 export type WorkspaceFavouriteLookupState = Record<string, WorkspaceFavourite>
 
@@ -17,13 +17,10 @@ export class WorkspaceFavouriteStore extends BudiStore<WorkspaceFavourite[]> {
 
   generateLookup() {
     return derived([this.store], ([$fav]): WorkspaceFavouriteLookupState => {
-      return $fav.reduce(
-        (acc: WorkspaceFavouriteLookupState, f: WorkspaceFavourite) => {
-          acc[f.resourceId] = f
-          return acc
-        },
-        {} as WorkspaceFavouriteLookupState
-      )
+      return $fav.reduce((acc: WorkspaceFavouriteLookupState, f: WorkspaceFavourite) => {
+        acc[f.resourceId] = f
+        return acc
+      }, {} as WorkspaceFavouriteLookupState)
     })
   }
 

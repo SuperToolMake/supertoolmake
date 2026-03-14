@@ -1,24 +1,24 @@
 <script lang="ts">
-  import { Select, Label } from "@budibase/bbui"
-  import { onMount } from "svelte"
-  import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
-  import type { EnrichedBinding } from "@budibase/types"
+import { Label, Select } from "@budibase/bbui"
+import type { EnrichedBinding } from "@budibase/types"
+import { onMount } from "svelte"
+import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
 
-  export let parameters
-  export let bindings: EnrichedBinding[] = []
+export let parameters
+export let bindings: EnrichedBinding[] = []
 
-  const fileOptions = [
-    {
-      label: "URL",
-      value: "url",
-    },
-  ]
+const fileOptions = [
+  {
+    label: "URL",
+    value: "url",
+  },
+]
 
-  onMount(() => {
-    if (!parameters.type) {
-      parameters.type = "url"
-    }
-  })
+onMount(() => {
+  if (!parameters.type) {
+    parameters.type = "url"
+  }
+})
 </script>
 
 <div class="root">

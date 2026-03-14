@@ -119,8 +119,7 @@ class TestConfiguration {
     // import as late as possible for mocks
     jest.resetModules()
     require("../../db").init()
-    const currentWorkspaceMiddleware =
-      require("../currentWorkspace").currentWorkspaceMiddleware
+    const currentWorkspaceMiddleware = require("../currentWorkspace").currentWorkspaceMiddleware
     return currentWorkspaceMiddleware(this.ctx, this.next)
   }
 }

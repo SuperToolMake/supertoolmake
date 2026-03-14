@@ -1,17 +1,13 @@
-import { Database, Workspace } from "@budibase/types"
+import type { Database, Workspace } from "@budibase/types"
 import {
-  DeletedWorkspace,
+  type DeletedWorkspace,
   getWorkspaceMetadata,
   WorkspaceState,
 } from "../cache/workspaceMetadata"
 import { DEFAULT_TENANT_ID, DocumentType, SEPARATOR } from "../constants"
 import { getGlobalDBName, getTenantId } from "../context"
 import { getStartEndKeyURL } from "../docIds"
-import {
-  getProdWorkspaceID,
-  isDevWorkspace,
-  isDevWorkspaceID,
-} from "../docIds/conversions"
+import { getProdWorkspaceID, isDevWorkspace, isDevWorkspaceID } from "../docIds/conversions"
 import env from "../environment"
 import { directCouchAllDbs, doWithDB } from "./db"
 
@@ -31,7 +27,7 @@ export async function getAllDbs(opts = { efficient: false }) {
     const json = await directCouchAllDbs(queryString)
     dbs = dbs.concat(json)
   }
-  let tenantId = getTenantId()
+  const tenantId = getTenantId()
   if (!env.MULTI_TENANCY || (!efficient && tenantId === DEFAULT_TENANT_ID)) {
     // just get all DBs when:
     // - single tenancy
@@ -83,7 +79,7 @@ export async function getAllWorkspaces({
   if (!env.MULTI_TENANCY && !tenantId) {
     tenantId = DEFAULT_TENANT_ID
   }
-  let dbs = await getAllDbs({ efficient: efficient || false })
+  const dbs = await getAllDbs({ efficient: efficient || false })
   const workspaceDbNames = dbs.filter((dbName: any) => {
     if (env.isTest() && !dbName) {
       return false
@@ -95,22 +91,16 @@ export async function getAllWorkspaces({
       // tenantId is always right before the UUID
       const possibleTenantId = split[split.length - 2]
 
-      const noTenantId =
-        split.length === 2 || possibleTenantId === DocumentType.DEV
+      const noTenantId = split.length === 2 || possibleTenantId === DocumentType.DEV
 
-      return (
-        (tenantId === DEFAULT_TENANT_ID && noTenantId) ||
-        possibleTenantId === tenantId
-      )
+      return (tenantId === DEFAULT_TENANT_ID && noTenantId) || possibleTenantId === tenantId
     }
     return false
   })
   if (idsOnly) {
-    const devWorkspaceIds = workspaceDbNames.filter(workspaceId =>
-      isDevWorkspaceID(workspaceId)
-    )
+    const devWorkspaceIds = workspaceDbNames.filter((workspaceId) => isDevWorkspaceID(workspaceId))
     const prodWorkspaceIds = workspaceDbNames.filter(
-      workspaceId => !isDevWorkspaceID(workspaceId)
+      (workspaceId) => !isDevWorkspaceID(workspaceId)
     )
     switch (dev) {
       case true:
@@ -121,7 +111,7 @@ export async function getAllWorkspaces({
         return workspaceDbNames
     }
   }
-  const workspacePromises = workspaceDbNames.map(workspace =>
+  const workspacePromises = workspaceDbNames.map((workspace) =>
     // skip setup otherwise databases could be re-created
     getWorkspaceMetadata(workspace)
   )
@@ -132,8 +122,7 @@ export async function getAllWorkspaces({
     const workspaces = response
       .filter(
         (result: any) =>
-          result.status === "fulfilled" &&
-          result.value?.state !== WorkspaceState.INVALID
+          result.status === "fulfilled" && result.value?.state !== WorkspaceState.INVALID
       )
       .map(({ value }: any) => value)
     if (!all) {
@@ -154,16 +143,16 @@ export async function getAllWorkspaces({
 
 export async function getWorkspacesByIDs(workspaceIds: string[]) {
   const settled = await Promise.allSettled(
-    workspaceIds.map(workspaceId => getWorkspaceMetadata(workspaceId))
+    workspaceIds.map((workspaceId) => getWorkspaceMetadata(workspaceId))
   )
   // have to list the workspaces which exist, some may have been deleted
   return settled
     .filter(
-      promise =>
+      (promise) =>
         promise.status === "fulfilled" &&
         (promise.value as DeletedWorkspace).state !== WorkspaceState.INVALID
     )
-    .map(promise => (promise as PromiseFulfilledResult<Workspace>).value)
+    .map((promise) => (promise as PromiseFulfilledResult<Workspace>).value)
 }
 
 /**
@@ -171,7 +160,7 @@ export async function getWorkspacesByIDs(workspaceIds: string[]) {
  */
 export async function getProdWorkpaceIDs() {
   const workspaceIds = await getAllWorkspaces({ idsOnly: true })
-  return workspaceIds.filter(id => !isDevWorkspaceID(id))
+  return workspaceIds.filter((id) => !isDevWorkspaceID(id))
 }
 
 /**
@@ -179,7 +168,7 @@ export async function getProdWorkpaceIDs() {
  */
 export async function getDevWorkspaceIDs() {
   const workspaceIds = await getAllWorkspaces({ idsOnly: true })
-  return workspaceIds.filter(id => isDevWorkspaceID(id))
+  return workspaceIds.filter((id) => isDevWorkspaceID(id))
 }
 
 export function isSameWorkspaceID(
@@ -222,7 +211,7 @@ export function pagination<T>(
     return { data, hasNextPage: false }
   }
   const hasNextPage = data.length > pageSize
-  let nextPage = undefined
+  let nextPage
   if (!getKey) {
     getKey = (doc: any) => (property ? doc?.[property] : doc?._id)
   }

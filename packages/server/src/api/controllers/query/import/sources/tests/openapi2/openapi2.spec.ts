@@ -1,14 +1,11 @@
-import { OpenAPI2 } from "../../openapi2"
+import { BodyType, type Query } from "@budibase/types"
 import { readFileSync } from "fs"
-import { join } from "path"
 import { groupBy, mapValues } from "lodash"
-import { BodyType, Query } from "@budibase/types"
+import { join } from "path"
+import { OpenAPI2 } from "../../openapi2"
 
 const getData = (file: string, extension: string) => {
-  return readFileSync(
-    join(__dirname, `./data/${file}/${file}.${extension}`),
-    "utf8"
-  )
+  return readFileSync(join(__dirname, `./data/${file}/${file}.${extension}`), "utf8")
 }
 
 describe("OpenAPI2 Import", () => {
@@ -23,7 +20,7 @@ describe("OpenAPI2 Import", () => {
     expect(await openapi2.isSupported("")).toBe(false)
   })
 
-  describe.each(["json", "yaml"])("%s", extension => {
+  describe.each(["json", "yaml"])("%s", (extension) => {
     describe("petstore", () => {
       beforeEach(async () => {
         await openapi2.isSupported(getData("petstore", extension))
@@ -41,7 +38,7 @@ describe("OpenAPI2 Import", () => {
         await openapi2.isSupported(getData("crud", extension))
 
         const raw = await openapi2.getQueries("fake_datasource_id")
-        queries = mapValues(groupBy(raw, "name"), group => group[0])
+        queries = mapValues(groupBy(raw, "name"), (group) => group[0])
       })
 
       it("should have 6 queries", () => {
@@ -88,12 +85,9 @@ describe("OpenAPI2 Import", () => {
         ["updateEntity", ""],
         ["patchEntity", ""],
         ["deleteEntity", ""],
-      ])(
-        `should have correct query string for %s`,
-        (operationId, queryString) => {
-          expect(queries[operationId].fields.queryString).toBe(queryString)
-        }
-      )
+      ])(`should have correct query string for %s`, (operationId, queryString) => {
+        expect(queries[operationId].fields.queryString).toBe(queryString)
+      })
 
       it.each([
         [
@@ -245,9 +239,7 @@ describe("OpenAPI2 Import", () => {
 
       const [query] = await openapi2.getQueries("datasourceId")
       expect(query.fields.bodyType).toBe(BodyType.ENCODED)
-      expect(query.fields.headers?.["Content-Type"]).toBe(
-        "application/x-www-form-urlencoded"
-      )
+      expect(query.fields.headers?.["Content-Type"]).toBe("application/x-www-form-urlencoded")
       expect(query.fields.requestBody).toEqual({
         name: "{{ name }}",
         "address[city]": "{{ address_city }}",
@@ -323,9 +315,7 @@ describe("OpenAPI2 Import", () => {
 
       const [query] = await openapi2.getQueries("datasourceId")
       expect(query.fields.bodyType).toBe(BodyType.ENCODED)
-      expect(query.fields.headers?.["Content-Type"]).toBe(
-        "application/x-www-form-urlencoded"
-      )
+      expect(query.fields.headers?.["Content-Type"]).toBe("application/x-www-form-urlencoded")
       expect(query.fields.requestBody).toEqual({
         channel: "{{ channel }}",
         file: "{{ file }}",

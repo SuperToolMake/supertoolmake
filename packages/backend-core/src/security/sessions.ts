@@ -1,15 +1,10 @@
-import * as redis from "../redis/init"
-import { v4 as uuidv4 } from "uuid"
-import { logWarn } from "../logging"
-import env from "../environment"
-import { Duration } from "../utils"
-import {
-  Session,
-  ScannedSession,
-  SessionKey,
-  CreateSession,
-} from "@budibase/types"
 import { MAX_SESSIONS_PER_USER } from "@budibase/shared-core"
+import type { CreateSession, ScannedSession, Session, SessionKey } from "@budibase/types"
+import { v4 as uuidv4 } from "uuid"
+import env from "../environment"
+import { logWarn } from "../logging"
+import * as redis from "../redis/init"
+import { Duration } from "../utils"
 
 // a week expiry is the default
 const EXPIRY_SECONDS = env.SESSION_EXPIRY_SECONDS
@@ -27,7 +22,7 @@ export async function getSessionsForUser(userId: string): Promise<Session[]> {
   }
   const client = await redis.getSessionClient()
   const sessions: ScannedSession[] = await client.scan(userId)
-  return sessions.map(session => session.value)
+  return sessions.map((session) => session.value)
 }
 
 export async function invalidateSessions(
@@ -42,13 +37,13 @@ export async function invalidateSessions(
     // If no sessionIds, get all the sessions for the user
     if (sessionIds.length === 0) {
       const sessions = await getSessionsForUser(userId)
-      sessionKeys = sessions.map(session => ({
+      sessionKeys = sessions.map((session) => ({
         key: makeSessionID(session.userId, session.sessionId),
       }))
     } else {
       // use the passed array of sessionIds
       sessionIds = Array.isArray(sessionIds) ? sessionIds : [sessionIds]
-      sessionKeys = sessionIds.map(sessionId => ({
+      sessionKeys = sessionIds.map((sessionId) => ({
         key: makeSessionID(userId, sessionId),
       }))
     }
@@ -56,13 +51,13 @@ export async function invalidateSessions(
     if (sessionKeys && sessionKeys.length > 0) {
       const client = await redis.getSessionClient()
       const promises = []
-      for (let sessionKey of sessionKeys) {
+      for (const sessionKey of sessionKeys) {
         promises.push(client.delete(sessionKey.key))
       }
       if (!env.isTest()) {
         logWarn(
           `Invalidating sessions for ${userId} (reason: ${reason}) - ${sessionKeys
-            .map(sessionKey => sessionKey.key)
+            .map((sessionKey) => sessionKey.key)
             .join(", ")}`
         )
       }
@@ -73,23 +68,19 @@ export async function invalidateSessions(
   }
 }
 
-export async function createASession(
-  userId: string,
-  createSession: CreateSession
-) {
+export async function createASession(userId: string, createSession: CreateSession) {
   const existingSessions = await getSessionsForUser(userId)
   let invalidatedSessionCount = 0
 
   if (existingSessions.length >= MAX_SESSIONS_PER_USER) {
     const sortedSessions = existingSessions.sort(
-      (a, b) =>
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     )
 
     const sessionsToRemove = existingSessions.length - MAX_SESSIONS_PER_USER + 1
     const sessionIdsToInvalidate = sortedSessions
       .slice(0, sessionsToRemove)
-      .map(session => session.sessionId)
+      .map((session) => session.sessionId)
 
     invalidatedSessionCount = sessionIdsToInvalidate.length
 
@@ -131,10 +122,7 @@ export async function endSession(userId: string, sessionId: string) {
   await client.delete(makeSessionID(userId, sessionId))
 }
 
-export async function getSession(
-  userId: string,
-  sessionId: string
-): Promise<Session> {
+export async function getSession(userId: string, sessionId: string): Promise<Session> {
   if (!userId || !sessionId) {
     throw new Error(`Invalid session details - ${userId} - ${sessionId}`)
   }

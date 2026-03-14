@@ -1,8 +1,8 @@
-import { Datasource, SourceName } from "@budibase/types"
+import { generator, type testContainerUtils } from "@budibase/backend-core/tests"
+import { type Datasource, SourceName } from "@budibase/types"
+import knex, { type Knex } from "knex"
 import { GenericContainer, Wait } from "testcontainers"
-import { generator, testContainerUtils } from "@budibase/backend-core/tests"
 import { startContainer } from "."
-import knex, { Knex } from "knex"
 import { POSTGRES_IMAGE, POSTGRES_LEGACY_IMAGE } from "./images"
 
 let ports: Promise<testContainerUtils.Port[]>
@@ -16,14 +16,12 @@ async function datasourceWithImage(image: string): Promise<Datasource> {
         .withWaitStrategy(
           // Legacy Postgres images can be slow to initialize on CI/arm64
           // Increase startup timeout to reduce flakiness
-          Wait.forSuccessfulCommand(
-            "pg_isready -h localhost -p 5432"
-          ).withStartupTimeout(20000)
+          Wait.forSuccessfulCommand("pg_isready -h localhost -p 5432").withStartupTimeout(20000)
         )
     )
   }
 
-  const port = (await ports).find(x => x.container === 5432)?.host
+  const port = (await ports).find((x) => x.container === 5432)?.host
   if (!port) {
     throw new Error("Postgres port not found")
   }
@@ -61,10 +59,7 @@ export async function getLegacyDatasource(): Promise<Datasource> {
   return datasourceWithImage(POSTGRES_LEGACY_IMAGE)
 }
 
-export async function knexClient(
-  ds: Datasource,
-  opts?: Knex.Config
-): Promise<Knex> {
+export async function knexClient(ds: Datasource, opts?: Knex.Config): Promise<Knex> {
   if (!ds.config) {
     throw new Error("Datasource config is missing")
   }

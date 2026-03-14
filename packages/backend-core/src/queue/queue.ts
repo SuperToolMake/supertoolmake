@@ -1,19 +1,19 @@
+import BullQueue, {
+  type DoneCallback,
+  type Job,
+  type JobOptions,
+  type Queue,
+  type QueueOptions,
+} from "bull"
 import env from "../environment"
 import { getRedisOptions } from "../redis/utils"
-import { JobQueue } from "./constants"
-import InMemoryQueue from "./inMemoryQueue"
-import BullQueue, {
-  Queue,
-  QueueOptions,
-  JobOptions,
-  Job,
-  DoneCallback,
-} from "bull"
-import { addListeners, StalledFn } from "./listeners"
-import { Duration } from "../utils"
 import * as timers from "../timers"
+import { Duration } from "../utils"
+import type { JobQueue } from "./constants"
+import InMemoryQueue from "./inMemoryQueue"
+import { addListeners, type StalledFn } from "./listeners"
 
-export type { QueueOptions, Queue, JobOptions } from "bull"
+export type { JobOptions, Queue, QueueOptions } from "bull"
 
 // the queue lock is held for 5 minutes
 const QUEUE_LOCK_MS = Duration.fromMinutes(5).toMs()
@@ -25,7 +25,7 @@ let QUEUES: Queue[] = []
 let cleanupInterval: NodeJS.Timeout
 
 async function cleanup() {
-  for (let queue of QUEUES) {
+  for (const queue of QUEUES) {
     await queue.clean(CLEANUP_PERIOD_MS, "completed")
     await queue.clean(CLEANUP_PERIOD_MS, "failed")
   }
@@ -58,9 +58,7 @@ export class BudibaseQueue<T> {
     const queueConfig: QueueOptions = {
       redis: redisOpts,
       settings: {
-        maxStalledCount: this.opts.maxStalledCount
-          ? this.opts.maxStalledCount
-          : 0,
+        maxStalledCount: this.opts.maxStalledCount ? this.opts.maxStalledCount : 0,
         lockDuration: QUEUE_LOCK_MS,
         lockRenewTime: QUEUE_LOCK_RENEW_INTERNAL_MS,
       },
@@ -71,10 +69,7 @@ export class BudibaseQueue<T> {
     let queue: Queue<T>
     if (!env.isTest()) {
       queue = new BullQueue(this.jobQueue, queueConfig)
-    } else if (
-      process.env.BULL_TEST_REDIS_PORT &&
-      !isNaN(+process.env.BULL_TEST_REDIS_PORT)
-    ) {
+    } else if (process.env.BULL_TEST_REDIS_PORT && !isNaN(+process.env.BULL_TEST_REDIS_PORT)) {
       queue = new BullQueue(this.jobQueue, {
         ...queueConfig,
         redis: { host: "localhost", port: +process.env.BULL_TEST_REDIS_PORT },
@@ -88,7 +83,7 @@ export class BudibaseQueue<T> {
     if (!cleanupInterval && !env.isTest()) {
       cleanupInterval = timers.set(cleanup, CLEANUP_PERIOD_MS)
       // fire off an initial cleanup
-      cleanup().catch(err => {
+      cleanup().catch((err) => {
         console.error(`Unable to cleanup ${this.jobQueue} initially - ${err}`)
       })
     }
@@ -103,11 +98,9 @@ export class BudibaseQueue<T> {
     concurrency: number,
     cb: (job: Job<T>, done?: DoneCallback) => Promise<void>
   ): Promise<void>
-  process(
-    cb: (job: Job<T>, done?: DoneCallback) => Promise<void>
-  ): Promise<void>
+  process(cb: (job: Job<T>, done?: DoneCallback) => Promise<void>): Promise<void>
   process(...args: any[]) {
-    let concurrency: number | undefined = undefined
+    let concurrency: number | undefined
     let cb: (job: Job<T>, done?: DoneCallback) => Promise<void>
     if (args.length === 2) {
       concurrency = args[0]

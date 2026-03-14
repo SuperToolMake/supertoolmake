@@ -1,14 +1,12 @@
-import { getThemeClassNames, ensureValidTheme } from "../themes"
 import { Theme } from "@budibase/types"
+import { ensureValidTheme, getThemeClassNames } from "../themes"
 
 describe("theme class names", () => {
   it("generates class names for a theme without base theme", () => {
     expect(getThemeClassNames(Theme.LIGHT)).toStrictEqual("spectrum--light")
   })
   it("generates class names for a theme with base theme", () => {
-    expect(getThemeClassNames(Theme.NORD)).toStrictEqual(
-      "spectrum--darkest spectrum--nord"
-    )
+    expect(getThemeClassNames(Theme.NORD)).toStrictEqual("spectrum--darkest spectrum--nord")
   })
 })
 

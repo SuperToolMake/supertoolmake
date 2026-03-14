@@ -1,9 +1,9 @@
-import {
+import type {
   CreateWorkspaceBackupResponse,
   ExportWorkspaceDumpRequest,
   ImportWorkspaceBackupResponse,
 } from "@budibase/types"
-import { Expectations, TestAPI } from "./base"
+import { type Expectations, TestAPI } from "./base"
 
 export class BackupAPI extends TestAPI {
   exportBasicBackup = async (
@@ -26,19 +26,15 @@ export class BackupAPI extends TestAPI {
   }
 
   createBackup = async (appId: string, expectations?: Expectations) => {
-    return await this._post<CreateWorkspaceBackupResponse>(
-      `/api/apps/${appId}/backups`,
-      { expectations }
-    )
+    return await this._post<CreateWorkspaceBackupResponse>(`/api/apps/${appId}/backups`, {
+      expectations,
+    })
   }
 
   waitForBackupToComplete = async (appId: string, backupId: string) => {
     for (let i = 0; i < 10; i++) {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      const response = await this._requestRaw(
-        "get",
-        `/api/apps/${appId}/backups/${backupId}/file`
-      )
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const response = await this._requestRaw("get", `/api/apps/${appId}/backups/${backupId}/file`)
       if (response.status === 200) {
         return
       }
@@ -57,11 +53,7 @@ export class BackupAPI extends TestAPI {
     )
   }
 
-  clearBackupErrors = async (
-    appId: string,
-    backupId?: string,
-    expectations?: Expectations
-  ) => {
+  clearBackupErrors = async (appId: string, backupId?: string, expectations?: Expectations) => {
     return await this._delete<{ message: string }>(`/api/backups/logs`, {
       body: { appId, backupId },
       expectations,

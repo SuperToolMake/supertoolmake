@@ -1,8 +1,8 @@
-import { GenericContainer, StartedTestContainer } from "testcontainers"
-import { generator, structures } from "../../../tests"
-import RedisWrapper from "../redis"
-import env from "../../environment"
 import { randomUUID } from "crypto"
+import { GenericContainer, type StartedTestContainer } from "testcontainers"
+import { generator, structures } from "../../../tests"
+import env from "../../environment"
+import RedisWrapper from "../redis"
 
 jest.setTimeout(30000)
 
@@ -11,14 +11,9 @@ describe("redis", () => {
   let container: StartedTestContainer
 
   beforeAll(async () => {
-    container = await new GenericContainer("redis")
-      .withExposedPorts(6379)
-      .start()
+    container = await new GenericContainer("redis").withExposedPorts(6379).start()
 
-    env._set(
-      "REDIS_URL",
-      `${container.getHost()}:${container.getMappedPort(6379)}`
-    )
+    env._set("REDIS_URL", `${container.getHost()}:${container.getMappedPort(6379)}`)
     env._set("MOCK_REDIS", 0)
     env._set("REDIS_PASSWORD", 0)
   })
@@ -58,10 +53,7 @@ describe("redis", () => {
   })
 
   describe("bulkStore", () => {
-    function createRandomObject(
-      keyLength: number,
-      valueGenerator: () => any = () => randomUUID()
-    ) {
+    function createRandomObject(keyLength: number, valueGenerator: () => any = () => randomUUID()) {
       return generator
         .unique(() => randomUUID(), keyLength)
         .reduce(
@@ -160,9 +152,7 @@ describe("redis", () => {
 
     it("can increment multiple times in parallel", async () => {
       const key = structures.uuid()
-      const results = await Promise.all(
-        Array.from({ length: 100 }).map(() => redis.increment(key))
-      )
+      const results = await Promise.all(Array.from({ length: 100 }).map(() => redis.increment(key)))
       expect(results).toHaveLength(100)
       expect(results).toEqual(Array.from({ length: 100 }).map((_, i) => i + 1))
     })
@@ -180,7 +170,7 @@ describe("redis", () => {
       generator.word(),
       generator.bool(),
       { [generator.word()]: generator.word() },
-    ])("cannot increment if the store value is not a number", async value => {
+    ])("cannot increment if the store value is not a number", async (value) => {
       const key = structures.uuid()
       await redis.store(key, value)
 

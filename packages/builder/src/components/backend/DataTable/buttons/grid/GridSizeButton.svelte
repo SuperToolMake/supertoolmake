@@ -1,69 +1,62 @@
 <script>
-  import { getContext } from "svelte"
-  import { ActionButton, Label } from "@budibase/bbui"
-  import DetailPopover from "@/components/common/DetailPopover.svelte"
+import { ActionButton, Label } from "@budibase/bbui"
+import { getContext } from "svelte"
+import DetailPopover from "@/components/common/DetailPopover.svelte"
 
-  const {
-    Constants,
-    columns,
-    rowHeight,
-    definition,
-    fixedRowHeight,
-    datasource,
-  } = getContext("grid")
+const { Constants, columns, rowHeight, definition, fixedRowHeight, datasource } = getContext("grid")
 
-  // Some constants for column width options
-  const smallColSize = 120
-  const mediumColSize = Constants.DefaultColumnWidth
-  const largeColSize = Constants.DefaultColumnWidth * 1.5
+// Some constants for column width options
+const smallColSize = 120
+const mediumColSize = Constants.DefaultColumnWidth
+const largeColSize = Constants.DefaultColumnWidth * 1.5
 
-  // Row height sizes
-  const rowSizeOptions = [
-    {
-      label: "Small",
-      size: Constants.SmallRowHeight,
-    },
-    {
-      label: "Medium",
-      size: Constants.MediumRowHeight,
-    },
-    {
-      label: "Large",
-      size: Constants.LargeRowHeight,
-    },
-  ]
+// Row height sizes
+const rowSizeOptions = [
+  {
+    label: "Small",
+    size: Constants.SmallRowHeight,
+  },
+  {
+    label: "Medium",
+    size: Constants.MediumRowHeight,
+  },
+  {
+    label: "Large",
+    size: Constants.LargeRowHeight,
+  },
+]
 
-  let popover
+let popover
 
-  // Column width sizes
-  $: allSmall = $columns.every(col => col.width === smallColSize)
-  $: allMedium = $columns.every(col => col.width === mediumColSize)
-  $: allLarge = $columns.every(col => col.width === largeColSize)
-  $: custom = !allSmall && !allMedium && !allLarge
-  $: columnSizeOptions = [
-    {
-      label: "Small",
-      size: smallColSize,
-      selected: allSmall,
-    },
-    {
-      label: "Medium",
-      size: mediumColSize,
-      selected: allMedium,
-    },
-    {
-      label: "Large",
-      size: largeColSize,
-      selected: allLarge,
-    },
-  ]
+// Column width sizes
+$: allSmall = $columns.every((col) => col.width === smallColSize)
+$: allMedium = $columns.every((col) => col.width === mediumColSize)
+$: allLarge = $columns.every((col) => col.width === largeColSize)
+$: custom = !allSmall && !allMedium && !allLarge
+$: columnSizeOptions = [
+  {
+    label: "Small",
+    size: smallColSize,
+    selected: allSmall,
+  },
+  {
+    label: "Medium",
+    size: mediumColSize,
+    selected: allMedium,
+  },
+  {
+    label: "Large",
+    size: largeColSize,
+    selected: allLarge,
+  },
+]
 
-  const changeRowHeight = height => {
-    datasource.actions.saveDefinition({
-      ...$definition,
-      rowHeight: height,
-    })
-  }
+const changeRowHeight = (height) => {
+  datasource.actions.saveDefinition({
+    ...$definition,
+    rowHeight: height,
+  })
+}
 </script>
 
 <DetailPopover bind:this={popover} title="Column and row size" width={300}>

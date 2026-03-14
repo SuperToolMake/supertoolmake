@@ -1,10 +1,6 @@
-import {
-  processStringSync,
-  encodeJSBinding,
-  defaultJSSetup,
-} from "../src/index"
-import { UUID_REGEX } from "./constants"
 import tk from "timekeeper"
+import { defaultJSSetup, encodeJSBinding, processStringSync } from "../src/index"
+import { UUID_REGEX } from "./constants"
 
 const DATE = "2021-01-21T12:00:00"
 tk.freeze(DATE)
@@ -126,17 +122,13 @@ describe("Javascript", () => {
     })
 
     it("should prevent access to the process global", async () => {
-      expect(processJS(`return process`)).toEqual(
-        "ReferenceError: process is not defined"
-      )
+      expect(processJS(`return process`)).toEqual("ReferenceError: process is not defined")
     })
   })
 
   describe("check JS helpers", () => {
     it("should error if using the format helper. not helpers.", () => {
-      expect(processJS(`return helper.toInt(4.3)`)).toEqual(
-        "ReferenceError: helper is not defined"
-      )
+      expect(processJS(`return helper.toInt(4.3)`)).toEqual("ReferenceError: helper is not defined")
     })
 
     it("should be able to use toInt", () => {
@@ -175,17 +167,11 @@ describe("Javascript", () => {
 
   describe("malice", () => {
     it("should not be able to call JS functions", () => {
-      expect(processJS(`return alert("hello")`)).toEqual(
-        "ReferenceError: alert is not defined"
-      )
+      expect(processJS(`return alert("hello")`)).toEqual("ReferenceError: alert is not defined")
 
-      expect(processJS(`return prompt("hello")`)).toEqual(
-        "ReferenceError: prompt is not defined"
-      )
+      expect(processJS(`return prompt("hello")`)).toEqual("ReferenceError: prompt is not defined")
 
-      expect(processJS(`return confirm("hello")`)).toEqual(
-        "ReferenceError: confirm is not defined"
-      )
+      expect(processJS(`return confirm("hello")`)).toEqual("ReferenceError: confirm is not defined")
 
       expect(processJS(`return setTimeout(() => {}, 1000)`)).toEqual(
         "ReferenceError: setTimeout is not defined"

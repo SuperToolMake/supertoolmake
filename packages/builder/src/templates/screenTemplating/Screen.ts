@@ -1,6 +1,6 @@
-import { BaseStructure } from "../BaseStructure"
 import { Helpers } from "@budibase/bbui"
-import { ScreenVariant, Screen as ScreenDoc } from "@budibase/types"
+import { type Screen as ScreenDoc, ScreenVariant } from "@budibase/types"
+import { BaseStructure } from "../BaseStructure"
 
 export class Screen extends BaseStructure<ScreenDoc> {
   constructor(workspaceAppId: string) {
@@ -76,7 +76,7 @@ export class Screen extends BaseStructure<ScreenDoc> {
   }
 
   customProps(props: Record<string, string>) {
-    for (let key of Object.keys(props)) {
+    for (const key of Object.keys(props)) {
       this._json.props[key] = props[key]
     }
     return this

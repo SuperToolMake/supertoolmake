@@ -1,90 +1,87 @@
 <script>
-  import { getContext, onMount } from "svelte"
-  import { Button, CollapsedButtonGroup } from "@budibase/bbui"
-  import GridCell from "../cells/GridCell.svelte"
-  import GridScrollWrapper from "./GridScrollWrapper.svelte"
-  import { BlankRowID } from "../lib/constants"
+import { Button, CollapsedButtonGroup } from "@budibase/bbui"
+import { getContext, onMount } from "svelte"
+import GridCell from "../cells/GridCell.svelte"
+import { BlankRowID } from "../lib/constants"
+import GridScrollWrapper from "./GridScrollWrapper.svelte"
 
-  const {
-    renderedRows,
-    hoveredRowId,
-    gridProps,
-    width,
-    rows,
-    focusedRow,
-    selectedRows,
-    scrollableColumns,
-    scrollLeft,
-    isDragging,
-    buttonColumnWidth,
-    showVScrollbar,
-    showHScrollbar,
-    dispatch,
-    config,
-    metadata,
-  } = getContext("grid")
+const {
+  renderedRows,
+  hoveredRowId,
+  gridProps,
+  width,
+  rows,
+  focusedRow,
+  selectedRows,
+  scrollableColumns,
+  scrollLeft,
+  isDragging,
+  buttonColumnWidth,
+  showVScrollbar,
+  showHScrollbar,
+  dispatch,
+  config,
+  metadata,
+} = getContext("grid")
 
-  let container
+let container
 
-  $: buttons = getButtons($gridProps)
-  $: columnsWidth = $scrollableColumns.reduce(
-    (total, col) => (total += col.width),
-    0
-  )
-  $: columnEnd = columnsWidth - $scrollLeft - 1
-  $: gridEnd = $width - $buttonColumnWidth - 1
-  $: left = Math.min(columnEnd, gridEnd)
+$: buttons = getButtons($gridProps)
+$: columnsWidth = $scrollableColumns.reduce((total, col) => (total += col.width), 0)
+$: columnEnd = columnsWidth - $scrollLeft - 1
+$: gridEnd = $width - $buttonColumnWidth - 1
+$: left = Math.min(columnEnd, gridEnd)
 
-  const getButtons = ({ buttons, buttonsCollapsed }) => {
-    let gridButtons = buttons || []
-    if (!buttonsCollapsed) {
-      return gridButtons.slice(0, 3)
-    }
-    return gridButtons
+const getButtons = ({ buttons, buttonsCollapsed }) => {
+  let gridButtons = buttons || []
+  if (!buttonsCollapsed) {
+    return gridButtons.slice(0, 3)
   }
+  return gridButtons
+}
 
-  // Apply button conditions and return filtered/modified buttons for a specific row
-  const getButtonsForRow = (buttons, row) => {
-    if (!buttons || !row) return buttons
+// Apply button conditions and return filtered/modified buttons for a specific row
+const getButtonsForRow = (buttons, row) => {
+  if (!buttons || !row) return buttons
 
-    const rowMetadata = $metadata?.[row._id]?.button || {}
+  const rowMetadata = $metadata?.[row._id]?.button || {}
 
-    return buttons
-      .map((button, index) => {
-        const buttonMetadata = rowMetadata[index]
-        if (!buttonMetadata) return button
+  return buttons
+    .map((button, index) => {
+      const buttonMetadata = rowMetadata[index]
+      if (!buttonMetadata) return button
 
-        // Skip hidden buttons
-        if (buttonMetadata.hidden) return null
+      // Skip hidden buttons
+      if (buttonMetadata.hidden) return null
 
-        // Apply any setting updates
-        return {
-          ...button,
-          ...buttonMetadata,
-        }
-      })
-      .filter(button => button !== null)
-  }
-
-  const handleClick = async (button, row) => {
-    await button.onClick?.(rows.actions.cleanRow(row))
-    await rows.actions.refreshRow(row._id)
-  }
-
-  const makeCollapsedButtons = (buttons, row) => {
-    return buttons.map(button => ({
-      ...button,
-      onClick: () => handleClick(button, row),
-    }))
-  }
-
-  onMount(() => {
-    const observer = new ResizeObserver(entries => {
-      const width = entries?.[0]?.contentRect?.width ?? 0
-      buttonColumnWidth.set(width - 1)
+      // Apply any setting updates
+      return {
+        ...button,
+        ...buttonMetadata,
+      }
     })
-    observer.observe(container)
+    .filter((button) => button !== null)
+}
+
+const handleClick = async (button, row) => {
+  await button.onClick?.(rows.actions.cleanRow(row))
+  await rows.actions.refreshRow(row._id)
+}
+
+const makeCollapsedButtons = (buttons, row) => {
+  return buttons.map((button) => ({
+    ...button,
+    onClick: () => handleClick(button, row),
+  }))
+}
+
+onMount(() => {
+  const observer = new ResizeObserver((entries) => {
+    const width = entries?.[0]?.contentRect?.width ?? 0
+    buttonColumnWidth.set(width - 1)
   })
+  observer.observe(container)
+})
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

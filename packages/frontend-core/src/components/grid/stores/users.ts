@@ -1,7 +1,7 @@
-import { writable, get, derived, Writable, Readable } from "svelte/store"
 import { helpers } from "@budibase/shared-core"
-import { Store as StoreContext } from "."
-import { UIUser } from "@budibase/types"
+import type { UIUser } from "@budibase/types"
+import { derived, get, type Readable, type Writable, writable } from "svelte/store"
+import type { Store as StoreContext } from "."
 
 interface UIEnrichedUser extends UIUser {
   color: string
@@ -31,8 +31,8 @@ export type Store = DerivedUsersStore & ActionUserStore
 export const createStores = (): UsersStore => {
   const users = writable<UIUser[]>([])
 
-  const enrichedUsers = derived(users, $users => {
-    return $users.map<UIEnrichedUser>(user => ({
+  const enrichedUsers = derived(users, ($users) => {
+    return $users.map<UIEnrichedUser>((user) => ({
       ...user,
       color: helpers.getUserColor(user),
       label: helpers.getUserLabel(user),
@@ -52,19 +52,16 @@ export const deriveStores = (context: StoreContext): DerivedUsersStore => {
 
   // Generate a lookup map of cell ID to the user that has it selected, to make
   // lookups inside cells extremely fast
-  const userCellMap = derived(
-    [users, focusedCellId],
-    ([$users, $focusedCellId]) => {
-      let map: Record<string, UIUser> = {}
-      $users.forEach(user => {
-        const cellId = user.gridMetadata?.focusedCellId
-        if (cellId && cellId !== $focusedCellId) {
-          map[cellId] = user
-        }
-      })
-      return map
-    }
-  )
+  const userCellMap = derived([users, focusedCellId], ([$users, $focusedCellId]) => {
+    const map: Record<string, UIUser> = {}
+    $users.forEach((user) => {
+      const cellId = user.gridMetadata?.focusedCellId
+      if (cellId && cellId !== $focusedCellId) {
+        map[cellId] = user
+      }
+    })
+    return map
+  })
 
   return {
     userCellMap,
@@ -76,11 +73,11 @@ export const createActions = (context: StoreContext): ActionUserStore => {
 
   const updateUser = (user: UIUser) => {
     const $users = get(users)
-    if (!$users.some(x => x.sessionId === user.sessionId)) {
+    if (!$users.some((x) => x.sessionId === user.sessionId)) {
       users.set([...$users, user])
     } else {
-      users.update(state => {
-        const index = state.findIndex(x => x.sessionId === user.sessionId)
+      users.update((state) => {
+        const index = state.findIndex((x) => x.sessionId === user.sessionId)
         state[index] = user
         return state.slice()
       })
@@ -88,8 +85,8 @@ export const createActions = (context: StoreContext): ActionUserStore => {
   }
 
   const removeUser = (sessionId: string) => {
-    users.update(state => {
-      return state.filter(x => x.sessionId !== sessionId)
+    users.update((state) => {
+      return state.filter((x) => x.sessionId !== sessionId)
     })
   }
 

@@ -1,11 +1,11 @@
-import {
+import type {
   AccessibleRolesResponse,
   DeleteRoleResponse,
   FetchRolesResponse,
   SaveRoleRequest,
   SaveRoleResponse,
 } from "@budibase/types"
-import { BaseAPIClient } from "./types"
+import type { BaseAPIClient } from "./types"
 
 export interface RoleEndpoints {
   deleteRole: (id: string, rev: string) => Promise<DeleteRoleResponse>
@@ -31,7 +31,7 @@ export const buildRoleEndpoints = (API: BaseAPIClient): RoleEndpoints => ({
    * Saves a role.
    * @param role the role to save
    */
-  saveRole: async role => {
+  saveRole: async (role) => {
     return await API.post({
       url: "/api/roles",
       body: role,
@@ -50,7 +50,7 @@ export const buildRoleEndpoints = (API: BaseAPIClient): RoleEndpoints => ({
   /**
    * Gets a list of roles within a specified app.
    */
-  getRolesForApp: async appId => {
+  getRolesForApp: async (appId) => {
     return await API.get({
       url: `/api/global/roles/${appId}`,
     })

@@ -1,64 +1,51 @@
 <script>
-  import Panel from "@/components/design/Panel.svelte"
-  import {
-    selectedScreen,
-    componentStore,
-    selectedComponent,
-  } from "@/stores/builder"
-  import ComponentSettingsSection from "./ComponentSettingsSection.svelte"
-  import DesignSection from "./DesignSection.svelte"
-  import CustomStylesSection from "./CustomStylesSection.svelte"
-  import ConditionalUISection from "./ConditionalUISection.svelte"
-  import { getComponentName } from "@/helpers/components"
-  import {
-    getBindableProperties,
-    getComponentBindableProperties,
-  } from "@/dataBinding"
-  import { ActionButton, notifications } from "@budibase/bbui"
-  import { capitalise } from "@/helpers"
-  import { builderStore } from "@/stores/builder"
+import { ActionButton, notifications } from "@budibase/bbui"
+import Panel from "@/components/design/Panel.svelte"
+import { getBindableProperties, getComponentBindableProperties } from "@/dataBinding"
+import { capitalise } from "@/helpers"
+import { getComponentName } from "@/helpers/components"
+import { builderStore, componentStore, selectedComponent, selectedScreen } from "@/stores/builder"
+import ComponentSettingsSection from "./ComponentSettingsSection.svelte"
+import ConditionalUISection from "./ConditionalUISection.svelte"
+import CustomStylesSection from "./CustomStylesSection.svelte"
+import DesignSection from "./DesignSection.svelte"
 
-  const onUpdateName = async value => {
-    try {
-      await componentStore.updateSetting("_instanceName", value)
-    } catch (error) {
-      notifications.error("Error updating component name")
-    }
+const onUpdateName = async (value) => {
+  try {
+    await componentStore.updateSetting("_instanceName", value)
+  } catch (error) {
+    notifications.error("Error updating component name")
   }
+}
 
-  $: componentInstance = $selectedComponent
-  $: componentDefinition = componentStore.getDefinition(
-    $selectedComponent?._component
-  )
-  $: bindings = getBindableProperties(
-    $selectedScreen,
-    $componentStore.selectedComponentId
-  )
+$: componentInstance = $selectedComponent
+$: componentDefinition = componentStore.getDefinition($selectedComponent?._component)
+$: bindings = getBindableProperties($selectedScreen, $componentStore.selectedComponentId)
 
-  $: componentBindings = getComponentBindableProperties(
-    $selectedScreen,
-    $componentStore.selectedComponentId
-  )
-  $: isScreen = $selectedComponent?._id === $selectedScreen?.props._id
-  $: title = isScreen ? "Screen" : $selectedComponent?._instanceName
+$: componentBindings = getComponentBindableProperties(
+  $selectedScreen,
+  $componentStore.selectedComponentId
+)
+$: isScreen = $selectedComponent?._id === $selectedScreen?.props._id
+$: title = isScreen ? "Screen" : $selectedComponent?._instanceName
 
-  let section = "settings"
-  const tabs = ["settings", "styles", "conditions"]
+let section = "settings"
+const tabs = ["settings", "styles", "conditions"]
 
-  $: id = $selectedComponent?._id
-  $: id, (section = tabs[0])
-  $: componentName = getComponentName(componentInstance)
+$: id = $selectedComponent?._id
+$: id, (section = tabs[0])
+$: componentName = getComponentName(componentInstance)
 
-  $: highlightedSetting = $builderStore.highlightedSetting
-  $: if (highlightedSetting) {
-    if (highlightedSetting.key === "_conditions") {
-      section = "conditions"
-    } else if (highlightedSetting.key === "_styles") {
-      section = "styles"
-    } else {
-      section = "settings"
-    }
+$: highlightedSetting = $builderStore.highlightedSetting
+$: if (highlightedSetting) {
+  if (highlightedSetting.key === "_conditions") {
+    section = "conditions"
+  } else if (highlightedSetting.key === "_styles") {
+    section = "styles"
+  } else {
+    section = "settings"
   }
+}
 </script>
 
 {#if $selectedComponent}

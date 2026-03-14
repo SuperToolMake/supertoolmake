@@ -1,17 +1,17 @@
 <script>
-  import { ActionButton } from "@budibase/bbui"
-  import { createEventDispatcher, tick } from "svelte"
-  import { bb } from "@/stores/bb"
+import { ActionButton } from "@budibase/bbui"
+import { createEventDispatcher, tick } from "svelte"
+import { bb } from "@/stores/bb"
 
-  export let highlighted = false
-  const dispatch = createEventDispatcher()
+export let highlighted = false
+const dispatch = createEventDispatcher()
 
-  const openUserSettings = async () => {
-    dispatch("manage")
-    bb.settings()
-    await tick()
-    bb.settings("/people/workspace")
-  }
+const openUserSettings = async () => {
+  dispatch("manage")
+  bb.settings()
+  await tick()
+  bb.settings("/people/workspace")
+}
 </script>
 
 <div class="manage-access-button" class:highlighted>

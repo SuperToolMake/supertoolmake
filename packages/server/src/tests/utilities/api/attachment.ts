@@ -1,6 +1,6 @@
-import { ProcessAttachmentResponse } from "@budibase/types"
-import { Expectations, TestAPI } from "./base"
-import fs from "fs"
+import type { ProcessAttachmentResponse } from "@budibase/types"
+import type fs from "fs"
+import { type Expectations, TestAPI } from "./base"
 
 export class AttachmentAPI extends TestAPI {
   process = async (

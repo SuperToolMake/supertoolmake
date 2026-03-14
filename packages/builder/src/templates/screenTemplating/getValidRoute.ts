@@ -1,5 +1,5 @@
+import type { Screen } from "@budibase/types"
 import sanitizeUrl from "@/helpers/sanitizeUrl"
-import { Screen } from "@budibase/types"
 
 const arbitraryMax = 10000
 
@@ -10,7 +10,7 @@ const isScreenUrlValid = (
   workspaceAppId: string | undefined
 ) => {
   return !screens.some(
-    screen =>
+    (screen) =>
       screen.routing?.route === url &&
       screen.routing?.roleId === role &&
       screen.workspaceAppId === workspaceAppId
@@ -25,10 +25,9 @@ const getValidScreenUrl = (
 ): string => {
   const [firstPathSegment = "", ...restPathSegments] = url
     .split("/")
-    .filter(segment => segment !== "")
+    .filter((segment) => segment !== "")
 
-  const restOfPath =
-    restPathSegments.length > 0 ? `/${restPathSegments.join("/")}` : ""
+  const restOfPath = restPathSegments.length > 0 ? `/${restPathSegments.join("/")}` : ""
 
   const naiveUrl = sanitizeUrl(`/${firstPathSegment}${restOfPath}`)
   if (isScreenUrlValid(screens, naiveUrl, role, workspaceAppId)) {
@@ -36,9 +35,7 @@ const getValidScreenUrl = (
   }
 
   for (let suffix = 2; suffix < arbitraryMax; suffix++) {
-    const suffixedUrl = sanitizeUrl(
-      `/${firstPathSegment}-${suffix}${restOfPath}`
-    )
+    const suffixedUrl = sanitizeUrl(`/${firstPathSegment}-${suffix}${restOfPath}`)
 
     if (isScreenUrlValid(screens, suffixedUrl, role, workspaceAppId)) {
       return suffixedUrl

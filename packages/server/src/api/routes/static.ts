@@ -13,7 +13,7 @@ const router: Router = new Router()
 addFileManagement(router)
 
 router
-  .get("/apple-touch-icon.png", async ctx => {
+  .get("/apple-touch-icon.png", async (ctx) => {
     ctx.redirect("/builder/logo_supertoolmake.png")
   })
   .get("/api/assets/:appId/client", controller.serveClientLibrary)
@@ -27,11 +27,7 @@ router
     authorized(PermissionType.TABLE, PermissionLevel.WRITE),
     controller.uploadFile
   )
-  .get(
-    `/app/:appId/preview`,
-    authorized(BUILDER),
-    controller.serveBuilderPreview
-  )
+  .get(`/app/:appId/preview`, authorized(BUILDER), controller.serveBuilderPreview)
   .get("/app/service-worker.js", controller.serveServiceWorker)
   .get("/app/:appUrl/:path*", controller.serveApp)
   .get(`/${devAppIdPath}/:path*`, controller.serveApp)

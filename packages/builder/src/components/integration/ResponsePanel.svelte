@@ -1,108 +1,101 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte"
-  import { Layout, Tabs, Tab, Label, Body, Select } from "@budibase/bbui"
-  import type {
-    Datasource,
-    PreviewQueryResponse,
-    QuerySchema,
-    UIInternalDatasource,
-  } from "@budibase/types"
-  import { shouldShowVariables, keyValueArrayToRecord } from "./query"
-  import KeyValueBuilder from "./KeyValueBuilder.svelte"
-  import { SchemaTypeOptionsExpanded } from "@/constants/backend"
-  import DynamicVariableModal from "./DynamicVariableModal.svelte"
-  import CodeEditor from "../common/CodeEditor/CodeEditor.svelte"
-  import { EditorModes } from "../common/CodeEditor"
+import { Body, Label, Layout, Select, Tab, Tabs } from "@budibase/bbui"
+import type {
+  Datasource,
+  PreviewQueryResponse,
+  QuerySchema,
+  UIInternalDatasource,
+} from "@budibase/types"
+import { createEventDispatcher } from "svelte"
+import { SchemaTypeOptionsExpanded } from "@/constants/backend"
+import { EditorModes } from "../common/CodeEditor"
+import CodeEditor from "../common/CodeEditor/CodeEditor.svelte"
+import type DynamicVariableModal from "./DynamicVariableModal.svelte"
+import KeyValueBuilder from "./KeyValueBuilder.svelte"
+import { keyValueArrayToRecord, shouldShowVariables } from "./query"
 
-  export let response: PreviewQueryResponse | undefined = undefined
-  export let schema: Record<string, QuerySchema | string> | undefined =
-    undefined
-  export let datasource: Datasource | UIInternalDatasource | undefined
-  export let dynamicVariables: Record<string, string>
-  export let fullscreen = false
+export let response: PreviewQueryResponse | undefined = undefined
+export let schema: Record<string, QuerySchema | string> | undefined = undefined
+export let datasource: Datasource | UIInternalDatasource | undefined
+export let dynamicVariables: Record<string, string>
+export let fullscreen = false
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  let varBinding: string
-  let addVariableModal: DynamicVariableModal
-  let selectedTab: string | undefined
+let varBinding: string
+let addVariableModal: DynamicVariableModal
+let selectedTab: string | undefined
 
-  // Build tab options dynamically
-  $: tabOptions = (() => {
-    const options = []
-    if (response) {
-      options.push({ label: "JSON", value: "JSON" })
-      options.push({ label: "Headers", value: "Headers" })
-    }
-    if (schema || response) {
-      options.push({ label: "Schema", value: "Schema" })
-    }
-    if (showVariables) {
-      options.push({ label: "Dynamic Variables", value: "Dynamic Variables" })
-    }
-    return options
-  })()
-
-  // RESPONSE
-  $: responseSuccess =
-    !!response && response.info.code >= 200 && response.info.code < 400
-  $: showVariables = shouldShowVariables(dynamicVariables, responseSuccess)
-
-  // Set default selected tab
-  $: if (selectedTab === undefined && tabOptions.length > 0) {
-    selectedTab = response ? "JSON" : "Schema"
+// Build tab options dynamically
+$: tabOptions = (() => {
+  const options = []
+  if (response) {
+    options.push({ label: "JSON", value: "JSON" })
+    options.push({ label: "Headers", value: "Headers" })
   }
-
-  // Switch to JSON tab whenever response changes
-  $: if (response) {
-    selectedTab = "JSON"
+  if (schema || response) {
+    options.push({ label: "Schema", value: "Schema" })
   }
-
-  const handleTabChange = (e: CustomEvent<string>) => {
-    selectedTab = e.detail
+  if (showVariables) {
+    options.push({ label: "Dynamic Variables", value: "Dynamic Variables" })
   }
+  return options
+})()
 
-  const schemaMenuItems = [
-    {
-      text: "Create dynamic variable",
-      onClick: (input: { name: string; value: string }) => {
-        varBinding = `{{ data.0.[${input.name}] }}`
-        addVariableModal.show()
-      },
+// RESPONSE
+$: responseSuccess = !!response && response.info.code >= 200 && response.info.code < 400
+$: showVariables = shouldShowVariables(dynamicVariables, responseSuccess)
+
+// Set default selected tab
+$: if (selectedTab === undefined && tabOptions.length > 0) {
+  selectedTab = response ? "JSON" : "Schema"
+}
+
+// Switch to JSON tab whenever response changes
+$: if (response) {
+  selectedTab = "JSON"
+}
+
+const handleTabChange = (e: CustomEvent<string>) => {
+  selectedTab = e.detail
+}
+
+const schemaMenuItems = [
+  {
+    text: "Create dynamic variable",
+    onClick: (input: { name: string; value: string }) => {
+      varBinding = `{{ data.0.[${input.name}] }}`
+      addVariableModal.show()
     },
-  ]
+  },
+]
 
-  const responseHeadersMenuItems = [
-    {
-      text: "Create dynamic variable",
-      onClick: (input: { name: string; value: string }) => {
-        varBinding = `{{ info.headers.[${input.name}] }}`
-        addVariableModal.show()
-      },
+const responseHeadersMenuItems = [
+  {
+    text: "Create dynamic variable",
+    onClick: (input: { name: string; value: string }) => {
+      varBinding = `{{ info.headers.[${input.name}] }}`
+      addVariableModal.show()
     },
-  ]
+  },
+]
 
-  const compareResponseType = (option: any, value: any) =>
-    option.type === value?.type
+const compareResponseType = (option: any, value: any) => option.type === value?.type
 
-  const handleSchemaChange = (
-    e: CustomEvent<Array<{ name: string; value: any }>>
-  ) => {
-    schema = keyValueArrayToRecord(e.detail)
-    dispatch("change", { schema })
-  }
+const handleSchemaChange = (e: CustomEvent<Array<{ name: string; value: any }>>) => {
+  schema = keyValueArrayToRecord(e.detail)
+  dispatch("change", { schema })
+}
 
-  const handleDynamicVariableChange = (e: CustomEvent<Record<string, any>>) => {
-    dynamicVariables = e.detail
-    dispatch("change", { dynamicVariables })
-  }
+const handleDynamicVariableChange = (e: CustomEvent<Record<string, any>>) => {
+  dynamicVariables = e.detail
+  dispatch("change", { dynamicVariables })
+}
 
-  const handleDynamicVariablesUpdate = (
-    e: CustomEvent<Array<{ name: string; value: any }>>
-  ) => {
-    dynamicVariables = keyValueArrayToRecord(e.detail)
-    dispatch("change", { dynamicVariables })
-  }
+const handleDynamicVariablesUpdate = (e: CustomEvent<Array<{ name: string; value: any }>>) => {
+  dynamicVariables = keyValueArrayToRecord(e.detail)
+  dispatch("change", { dynamicVariables })
+}
 </script>
 
 <DynamicVariableModal

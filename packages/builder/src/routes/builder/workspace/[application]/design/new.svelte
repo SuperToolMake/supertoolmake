@@ -1,16 +1,15 @@
 <script lang="ts">
-  import { onMount } from "svelte"
-  import NewScreen from "./_components/NewScreen/index.svelte"
-  import { workspaceAppStore } from "@/stores/builder"
+import { onMount } from "svelte"
+import { workspaceAppStore } from "@/stores/builder"
+import type NewScreen from "./_components/NewScreen/index.svelte"
 
-  let newScreenModal: NewScreen
-  $: workspaceAppId =
-    $workspaceAppStore.selectedWorkspaceApp?._id ||
-    $workspaceAppStore.workspaceApps[0]?._id
+let newScreenModal: NewScreen
+$: workspaceAppId =
+  $workspaceAppStore.selectedWorkspaceApp?._id || $workspaceAppStore.workspaceApps[0]?._id
 
-  onMount(() => {
-    newScreenModal.open()
-  })
+onMount(() => {
+  newScreenModal.open()
+})
 </script>
 
 <div class="new-screen-picker">

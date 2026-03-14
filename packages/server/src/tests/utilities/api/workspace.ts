@@ -1,6 +1,10 @@
 import { constants, db as dbCore } from "@budibase/backend-core"
-import {
+import type {
+  CreateWorkspaceRequest,
   DuplicateWorkspaceResponse,
+  FetchAppDefinitionResponse,
+  FetchAppPackageResponse,
+  FetchPublishedAppsResponse,
   OnboardingWorkspaceRequest,
   PublishWorkspaceRequest,
   PublishWorkspaceResponse,
@@ -8,13 +12,9 @@ import {
   UpdateWorkspaceResponse,
   WithRequired,
   Workspace,
-  type CreateWorkspaceRequest,
-  type FetchAppDefinitionResponse,
-  type FetchAppPackageResponse,
-  type FetchPublishedAppsResponse,
 } from "@budibase/types"
-import { WorkspaceStatus } from "../../../db/utils"
-import { Expectations, RequestOpts, TestAPI } from "./base"
+import type { WorkspaceStatus } from "../../../db/utils"
+import { type Expectations, type RequestOpts, TestAPI } from "./base"
 
 export class WorkspaceAPI extends TestAPI {
   create = async (
@@ -33,10 +33,7 @@ export class WorkspaceAPI extends TestAPI {
     })
   }
   createFromImport = async (
-    app: Omit<
-      WithRequired<CreateWorkspaceRequest, "fileToImport">,
-      "file" | "useTemplate"
-    >,
+    app: Omit<WithRequired<CreateWorkspaceRequest, "fileToImport">, "file" | "useTemplate">,
     expectations?: Expectations
   ): Promise<Workspace> => {
     const res = this.request
@@ -50,10 +47,7 @@ export class WorkspaceAPI extends TestAPI {
     return this._checkResponse(await res, expectations).body
   }
 
-  delete = async (
-    appId: string,
-    expectations?: Expectations
-  ): Promise<void> => {
+  delete = async (appId: string, expectations?: Expectations): Promise<void> => {
     await this._delete(`/api/applications/${appId}`, { expectations })
   }
 
@@ -90,27 +84,17 @@ export class WorkspaceAPI extends TestAPI {
     return response
   }
 
-  unpublish = async (
-    appId: string,
-    expectations?: Expectations
-  ): Promise<void> => {
+  unpublish = async (appId: string, expectations?: Expectations): Promise<void> => {
     await this._post(`/api/applications/${appId}/unpublish`, { expectations })
   }
 
-  sync = async (
-    appId: string,
-    expectations?: Expectations
-  ): Promise<{ message: string }> => {
-    return await this._post<{ message: string }>(
-      `/api/applications/${appId}/sync`,
-      { expectations }
-    )
+  sync = async (appId: string, expectations?: Expectations): Promise<{ message: string }> => {
+    return await this._post<{ message: string }>(`/api/applications/${appId}/sync`, {
+      expectations,
+    })
   }
 
-  get = async (
-    appId: string,
-    expectations?: Expectations
-  ): Promise<Workspace> => {
+  get = async (appId: string, expectations?: Expectations): Promise<Workspace> => {
     return await this._get<Workspace>(`/api/applications/${appId}`, {
       // While the get endpoint does take an :appId parameter, it doesn't use
       // it. It uses the appId from the context.
@@ -141,7 +125,7 @@ export class WorkspaceAPI extends TestAPI {
     fields: object,
     expectations?: Expectations
   ): Promise<DuplicateWorkspaceResponse> => {
-    let headers = {
+    const headers = {
       ...this.config.defaultHeaders(),
       [constants.Header.APP_ID]: workspaceId,
     }
@@ -156,20 +140,13 @@ export class WorkspaceAPI extends TestAPI {
     appId: string,
     expectations?: Expectations
   ): Promise<FetchAppDefinitionResponse> => {
-    return await this._get<FetchAppDefinitionResponse>(
-      `/api/applications/${appId}/definition`,
-      { expectations }
-    )
+    return await this._get<FetchAppDefinitionResponse>(`/api/applications/${appId}/definition`, {
+      expectations,
+    })
   }
 
-  getAppPackage = async (
-    appId: string,
-    opts?: RequestOpts
-  ): Promise<FetchAppPackageResponse> => {
-    return await this._get<FetchAppPackageResponse>(
-      `/api/applications/${appId}/appPackage`,
-      opts
-    )
+  getAppPackage = async (appId: string, opts?: RequestOpts): Promise<FetchAppPackageResponse> => {
+    return await this._get<FetchAppPackageResponse>(`/api/applications/${appId}/appPackage`, opts)
   }
 
   update = async (
@@ -183,10 +160,7 @@ export class WorkspaceAPI extends TestAPI {
     })
   }
 
-  updateClient = async (
-    appId: string,
-    expectations?: Expectations
-  ): Promise<void> => {
+  updateClient = async (appId: string, expectations?: Expectations): Promise<void> => {
     await this._post(`/api/applications/${appId}/client/update`, {
       // While the updateClient endpoint does take an :appId parameter, it doesn't
       // use it. It uses the appId from the context.
@@ -217,14 +191,9 @@ export class WorkspaceAPI extends TestAPI {
     })
   }
 
-  fetchClientApps = async (
-    expectations?: Expectations
-  ): Promise<FetchPublishedAppsResponse> => {
-    return await this._get<FetchPublishedAppsResponse>(
-      "/api/client/applications",
-      {
-        expectations,
-      }
-    )
+  fetchClientApps = async (expectations?: Expectations): Promise<FetchPublishedAppsResponse> => {
+    return await this._get<FetchPublishedAppsResponse>("/api/client/applications", {
+      expectations,
+    })
   }
 }

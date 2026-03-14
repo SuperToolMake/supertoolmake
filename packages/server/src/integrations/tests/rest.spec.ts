@@ -18,8 +18,8 @@ jest.mock("../../sdk/workspace/oauth2", () => {
 
 import { generator } from "@budibase/backend-core/tests"
 import {
-  BasicRestAuthConfig,
-  BearerRestAuthConfig,
+  type BasicRestAuthConfig,
+  type BearerRestAuthConfig,
   BodyType,
   OAuth2CredentialsMethod,
   OAuth2GrantType,
@@ -27,16 +27,15 @@ import {
 } from "@budibase/types"
 import * as undici from "undici"
 import {
-  RequestInit as UndiciRequestInit,
-  Response as UndiciResponse,
   FormData as UndiciFormData,
+  type RequestInit as UndiciRequestInit,
+  type Response as UndiciResponse,
 } from "undici"
 import TestConfiguration from "../../../src/tests/utilities/TestConfiguration"
 import sdk from "../../sdk"
 import { RestIntegration } from "../rest"
 
-const UUID_REGEX =
-  "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
+const UUID_REGEX = "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
 const HEADERS = {
   Accept: "application/json",
   "Content-Type": "application/json",
@@ -61,11 +60,7 @@ const getFormDataBuffer = (body: any): string | undefined => {
         return result.toString("utf8")
       }
       if (ArrayBuffer.isView(result)) {
-        return Buffer.from(
-          result.buffer,
-          result.byteOffset,
-          result.byteLength
-        ).toString("utf8")
+        return Buffer.from(result.buffer, result.byteOffset, result.byteLength).toString("utf8")
       }
     } catch (_err) {
       // fall through to other strategies
@@ -99,10 +94,7 @@ const extractFormEntries = (body: any): Record<string, string> | undefined => {
   return undefined
 }
 
-const expectFormDataToMatch = (
-  body: unknown,
-  expected: Record<string, string>
-) => {
+const expectFormDataToMatch = (body: unknown, expected: Record<string, string>) => {
   const entries = extractFormEntries(body)
   if (entries) {
     expect(entries).toMatchObject(expected)
@@ -119,9 +111,8 @@ const expectFormDataToMatch = (
 
 describe("REST Integration", () => {
   let integration: RestIntegration
-  const pendingFetches: Array<
-    (url: string, init?: UndiciRequestInit) => Promise<UndiciResponse>
-  > = []
+  const pendingFetches: Array<(url: string, init?: UndiciRequestInit) => Promise<UndiciResponse>> =
+    []
 
   const queueResponse = (
     handler: (url: string, init?: UndiciRequestInit) => Promise<UndiciResponse>
@@ -308,8 +299,7 @@ describe("REST Integration", () => {
           expect(options?.body).toBeInstanceOf(UndiciFormData)
 
           const headers = options?.headers as Record<string, any>
-          const contentTypeHeader =
-            headers["Content-Type"] || headers["content-type"]
+          const contentTypeHeader = headers["Content-Type"] || headers["content-type"]
           // The original Content-Type inserted in the test data below should be stripped so that
           // undici can automatically insert the correct multipart/form-data header with boundary
           expect(contentTypeHeader).toBeUndefined()
@@ -330,12 +320,8 @@ describe("REST Integration", () => {
 
       // Assert that the non-Content-Type header was kept
       const lastFetchOptions = fetchMock.mock.calls[0][1]
-      expect((lastFetchOptions!.headers! as any)["X-Custom-Header"]).toEqual(
-        "KeepMe"
-      )
-      expect(
-        (lastFetchOptions!.headers! as any)["Content-Type"]
-      ).toBeUndefined()
+      expect((lastFetchOptions!.headers! as any)["X-Custom-Header"]).toEqual("KeepMe")
+      expect((lastFetchOptions!.headers! as any)["Content-Type"]).toBeUndefined()
 
       expect(data).toEqual({ success: true })
     })
@@ -352,9 +338,7 @@ describe("REST Integration", () => {
     it("should allow JSON", () => {
       const output = integration.addBody("json", input, {})
       expect(output.body).toEqual(JSON.stringify(input))
-      expect((output.headers! as any)["Content-Type"]).toEqual(
-        "application/json"
-      )
+      expect((output.headers! as any)["Content-Type"]).toEqual("application/json")
     })
 
     it("should allow raw XML", () => {
@@ -362,9 +346,7 @@ describe("REST Integration", () => {
       const body = output.body?.toString()
       expect(body!.includes("<a>1</a>")).toEqual(true)
       expect(body!.includes("<b>2</b>")).toEqual(true)
-      expect((output.headers! as any)["Content-Type"]).toEqual(
-        "application/xml"
-      )
+      expect((output.headers! as any)["Content-Type"]).toEqual("application/xml")
     })
 
     it("should allow a valid js object and parse the contents to xml", () => {
@@ -372,9 +354,7 @@ describe("REST Integration", () => {
       const body = output.body?.toString()
       expect(body!.includes("<a>1</a>")).toEqual(true)
       expect(body!.includes("<b>2</b>")).toEqual(true)
-      expect((output.headers! as any)["Content-Type"]).toEqual(
-        "application/xml"
-      )
+      expect((output.headers! as any)["Content-Type"]).toEqual("application/xml")
     })
 
     it("should allow a valid json string and parse the contents to xml", () => {
@@ -382,9 +362,7 @@ describe("REST Integration", () => {
       const body = output.body?.toString()
       expect(body!.includes("<a>1</a>")).toEqual(true)
       expect(body!.includes("<b>2</b>")).toEqual(true)
-      expect((output.headers! as any)["Content-Type"]).toEqual(
-        "application/xml"
-      )
+      expect((output.headers! as any)["Content-Type"]).toEqual("application/xml")
     })
   })
 
@@ -421,27 +399,26 @@ describe("REST Integration", () => {
       expect(output.data).toEqual({ a: "1", b: "2" })
     })
 
-    test.each(["application/json", "text/plain", "application/xml", undefined])(
-      "should not throw an error on 204 no content for content type: %s",
-      async contentType => {
-        const output = await integration.parseResponse(
-          new Response(undefined, {
-            headers: { "content-type": contentType! },
-            status: 204,
-          })
-        )
-        expect(output.data).toEqual([])
-        expect(output.info.code).toEqual(204)
-      }
-    )
+    test.each([
+      "application/json",
+      "text/plain",
+      "application/xml",
+      undefined,
+    ])("should not throw an error on 204 no content for content type: %s", async (contentType) => {
+      const output = await integration.parseResponse(
+        new Response(undefined, {
+          headers: { "content-type": contentType! },
+          status: 204,
+        })
+      )
+      expect(output.data).toEqual([])
+      expect(output.info.code).toEqual(204)
+    })
   })
 
   describe("authentication", () => {
-    const getTokenMock = sdk.oauth2.getToken as jest.MockedFunction<
-      typeof sdk.oauth2.getToken
-    >
-    const cleanStoredTokenMock = sdk.oauth2
-      .cleanStoredToken as jest.MockedFunction<
+    const getTokenMock = sdk.oauth2.getToken as jest.MockedFunction<typeof sdk.oauth2.getToken>
+    const cleanStoredTokenMock = sdk.oauth2.cleanStoredToken as jest.MockedFunction<
       typeof sdk.oauth2.cleanStoredToken
     >
     const basicAuth: BasicRestAuthConfig = {
@@ -466,9 +443,7 @@ describe("REST Integration", () => {
     beforeEach(() => {
       getTokenMock.mockReset()
       cleanStoredTokenMock.mockReset()
-      getTokenMock.mockRejectedValue(
-        new Error("Unexpected oauth2.getToken call")
-      )
+      getTokenMock.mockRejectedValue(new Error("Unexpected oauth2.getToken call"))
       cleanStoredTokenMock.mockResolvedValue(undefined)
       integration = new RestIntegration({
         url: "https://example.com",
@@ -898,9 +873,7 @@ describe("REST Integration", () => {
     it("should remove empty query parameters", async () => {
       queueJsonResponse(
         (url, options) => {
-          expect(url).toEqual(
-            "https://example.com/api?param2=value&param3=another"
-          )
+          expect(url).toEqual("https://example.com/api?param2=value&param3=another")
           expect(options?.method).toEqual("GET")
         },
         { success: true }
@@ -1123,14 +1096,10 @@ describe("REST Integration", () => {
           size: content.length,
           name: expect.stringMatching(new RegExp(`^${UUID_REGEX}.tar.gz$`)),
           url: expect.stringMatching(
-            new RegExp(
-              `^/files/signed/tmp-file-attachments/app.*?/${UUID_REGEX}.tar.gz.*$`
-            )
+            new RegExp(`^/files/signed/tmp-file-attachments/app.*?/${UUID_REGEX}.tar.gz.*$`)
           ),
           extension: "tar.gz",
-          key: expect.stringMatching(
-            new RegExp(`^app.*?/${UUID_REGEX}.tar.gz$`)
-          ),
+          key: expect.stringMatching(new RegExp(`^app.*?/${UUID_REGEX}.tar.gz$`)),
         })
       })
     })
@@ -1145,7 +1114,7 @@ describe("REST Integration", () => {
             status: 200,
             headers: {
               // eslint-disable-next-line no-useless-escape
-              "content-disposition": `attachment; filename="£ and ? rates.pdf"; filename*=UTF-8'\'%C2%A3%20and%20%E2%82%AC%20rates.pdf`,
+              "content-disposition": `attachment; filename="£ and ? rates.pdf"; filename*=UTF-8''%C2%A3%20and%20%E2%82%AC%20rates.pdf`,
               "content-type": "text/plain",
               "content-length": `${content.length}`,
             },
@@ -1157,9 +1126,7 @@ describe("REST Integration", () => {
           size: content.length,
           name: expect.stringMatching(new RegExp(`^${UUID_REGEX}.pdf$`)),
           url: expect.stringMatching(
-            new RegExp(
-              `^/files/signed/tmp-file-attachments/app.*?/${UUID_REGEX}.pdf.*$`
-            )
+            new RegExp(`^/files/signed/tmp-file-attachments/app.*?/${UUID_REGEX}.pdf.*$`)
           ),
           extension: "pdf",
           key: expect.stringMatching(new RegExp(`^app.*?/${UUID_REGEX}.pdf$`)),

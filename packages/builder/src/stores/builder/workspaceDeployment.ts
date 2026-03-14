@@ -1,6 +1,6 @@
-import { BudiStore } from "@/stores/BudiStore"
-import { PublishStatusResponse } from "@budibase/types"
+import type { PublishStatusResponse } from "@budibase/types"
 import { API } from "@/api"
+import { BudiStore } from "@/stores/BudiStore"
 
 interface WorkspaceDeploymentStoreState extends PublishStatusResponse {}
 
@@ -14,7 +14,7 @@ export class WorkspaceDeploymentStore extends BudiStore<WorkspaceDeploymentStore
 
   async fetch() {
     const { workspaceApps, tables } = await API.deployment.getPublishStatus()
-    this.store.update(state => {
+    this.store.update((state) => {
       state.workspaceApps = workspaceApps
       state.tables = tables
       return state

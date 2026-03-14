@@ -1,15 +1,13 @@
-import { activeTenant } from "../activation"
 import { ConfigType } from "@budibase/types"
 import * as configs from "../../configs"
+import { activeTenant } from "../activation"
 
 // Mock the configs module
 jest.mock("../../configs", () => ({
   getConfig: jest.fn(),
 }))
 
-const mockGetConfig = configs.getConfig as jest.MockedFunction<
-  typeof configs.getConfig
->
+const mockGetConfig = configs.getConfig as jest.MockedFunction<typeof configs.getConfig>
 
 describe("activeTenant middleware", () => {
   let ctx: any

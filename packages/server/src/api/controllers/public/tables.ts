@@ -1,7 +1,7 @@
-import { search as stringSearch, addRev } from "./utils"
+import type { Table, UserCtx } from "@budibase/types"
+import type { Next } from "koa"
 import * as controller from "../table"
-import { Table, UserCtx } from "@budibase/types"
-import { Next } from "koa"
+import { addRev, search as stringSearch } from "./utils"
 
 function fixTable(table: Table, params: any) {
   if (!params || !table) {
@@ -34,10 +34,7 @@ export async function read(ctx: UserCtx, next: Next) {
 }
 
 export async function update(ctx: UserCtx, next: Next) {
-  ctx.request.body = await addRev(
-    fixTable(ctx.request.body, ctx.params),
-    ctx.params.tableId
-  )
+  ctx.request.body = await addRev(fixTable(ctx.request.body, ctx.params), ctx.params.tableId)
   await controller.save(ctx)
   await next()
 }

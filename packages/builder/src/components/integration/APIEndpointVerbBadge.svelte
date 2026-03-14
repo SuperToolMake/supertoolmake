@@ -1,8 +1,8 @@
 <script lang="ts">
-  export let verb: string | undefined
-  export let color: string | undefined
+export let verb: string | undefined
+export let color: string | undefined
 
-  $: displayVerb = verb ? verb.toUpperCase() : undefined
+$: displayVerb = verb ? verb.toUpperCase() : undefined
 </script>
 
 {#if displayVerb}

@@ -2,8 +2,8 @@ import * as setup from "./utilities"
 import { checkBuilderEndpoint } from "./utilities/TestFunctions"
 
 describe("/component", () => {
-  let request = setup.getRequest()
-  let config = setup.getConfig()
+  const request = setup.getRequest()
+  const config = setup.getConfig()
 
   afterAll(setup.afterAll)
 
@@ -27,9 +27,7 @@ describe("/component", () => {
         nodeVersion: expect.stringMatching(/^v\d+\.\d+\.\d+$/),
         platform: expect.any(String),
         totalMemory: expect.stringMatching(/^[0-9\\.]+GB$/),
-        uptime: expect.stringMatching(
-          /^\d+ day\(s\), \d+ hour\(s\), \d+ minute\(s\)$/
-        ),
+        uptime: expect.stringMatching(/^\d+ day\(s\), \d+ hour\(s\), \d+ minute\(s\)$/),
       })
     })
 

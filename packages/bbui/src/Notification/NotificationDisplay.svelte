@@ -1,9 +1,9 @@
 <script lang="ts">
-  import "@spectrum-css/toast/dist/index-vars.css"
-  import Portal from "svelte-portal"
-  import { notifications } from "../Stores/notifications"
-  import Notification from "./Notification.svelte"
-  import { fly } from "svelte/transition"
+import "@spectrum-css/toast/dist/index-vars.css"
+import { fly } from "svelte/transition"
+import Portal from "svelte-portal"
+import { notifications } from "../Stores/notifications"
+import Notification from "./Notification.svelte"
 </script>
 
 <Portal target=".modal-container">

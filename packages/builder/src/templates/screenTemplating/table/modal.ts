@@ -1,10 +1,10 @@
-import { capitalise } from "@/helpers"
-import { SourceOption } from "@/routes/builder/workspace/[application]/design/_components/NewScreen/utils"
-import { getRowActionButtonTemplates } from "@/templates/rowActions"
 import { Utils } from "@budibase/frontend-core"
 import { makePropSafe as safe } from "@budibase/string-templates"
-import { Screen as ScreenDoc, UIPermissions } from "@budibase/types"
+import type { Screen as ScreenDoc, UIPermissions } from "@budibase/types"
 import { generate } from "shortid"
+import { capitalise } from "@/helpers"
+import type { SourceOption } from "@/routes/builder/workspace/[application]/design/_components/NewScreen/utils"
+import { getRowActionButtonTemplates } from "@/templates/rowActions"
 import { Component } from "../../Component"
 import getValidRoute from "../getValidRoute"
 import { Screen } from "../Screen"
@@ -63,9 +63,7 @@ const modal = async ({
     .gridDesktopColSpan(1, 7)
     .gridDesktopRowSpan(1, 3)
 
-  const createFormBlock = new Component(
-    "@budibase/standard-components/formblock"
-  )
+  const createFormBlock = new Component("@budibase/standard-components/formblock")
   createFormBlock.instanceName("Create row form block").customProps({
     dataSource: tableOrView.tableSelectFormat,
     labelPosition: "left",
@@ -158,14 +156,7 @@ const modal = async ({
     .gridDesktopRowSpan(3, 21)
 
   const template = new Screen(workspaceAppId)
-    .route(
-      getValidRoute(
-        screens,
-        tableOrView.name,
-        permissions.write,
-        workspaceAppId
-      )
-    )
+    .route(getValidRoute(screens, tableOrView.name, permissions.write, workspaceAppId))
     .instanceName(`${tableOrView.name} - List and details`)
     .customProps({ layout: "grid" })
     .role(permissions.write)

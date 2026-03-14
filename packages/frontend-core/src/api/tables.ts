@@ -1,35 +1,32 @@
-import {
+import type {
   BulkImportRequest,
   BulkImportResponse,
   CsvToJsonRequest,
   CsvToJsonResponse,
+  DeleteTableResponse,
+  FetchRowsResponse,
   FetchTablesResponse,
+  FindTableResponse,
+  MigrateTableRequest,
+  MigrateTableResponse,
+  PaginatedSearchRowResponse,
+  PublishTableRequest,
+  PublishTableResponse,
   Row,
   SaveTableRequest,
   SaveTableResponse,
   SearchRowRequest,
-  PaginatedSearchRowResponse,
   TableSchema,
   ValidateNewTableImportRequest,
   ValidateTableImportRequest,
   ValidateTableImportResponse,
-  FindTableResponse,
-  FetchRowsResponse,
-  MigrateTableResponse,
-  MigrateTableRequest,
-  DeleteTableResponse,
-  PublishTableRequest,
-  PublishTableResponse,
 } from "@budibase/types"
-import { BaseAPIClient } from "./types"
+import type { BaseAPIClient } from "./types"
 
 export interface TableEndpoints {
   fetchTableDefinition: (tableId: string) => Promise<FindTableResponse>
   fetchTableData: (tableId: string) => Promise<FetchRowsResponse>
-  searchTable: (
-    sourceId: string,
-    opts: SearchRowRequest
-  ) => Promise<PaginatedSearchRowResponse>
+  searchTable: (sourceId: string, opts: SearchRowRequest) => Promise<PaginatedSearchRowResponse>
   importTableData: (
     tableId: string,
     rows: Row[],
@@ -41,10 +38,7 @@ export interface TableEndpoints {
   saveTable: (table: SaveTableRequest) => Promise<SaveTableResponse>
   deleteTable: (id: string, rev: string) => Promise<DeleteTableResponse>
   duplicateTable: (tableId: string) => Promise<SaveTableResponse>
-  validateNewTableImport: (
-    rows: Row[],
-    schema: TableSchema
-  ) => Promise<ValidateTableImportResponse>
+  validateNewTableImport: (rows: Row[], schema: TableSchema) => Promise<ValidateTableImportResponse>
   validateExistingTableImport: (
     rows: Row[],
     tableId?: string
@@ -54,10 +48,7 @@ export interface TableEndpoints {
     oldColumn: string,
     newColumn: string
   ) => Promise<MigrateTableResponse>
-  publishTable: (
-    tableId: string,
-    opts?: PublishTableRequest
-  ) => Promise<PublishTableResponse>
+  publishTable: (tableId: string, opts?: PublishTableRequest) => Promise<PublishTableResponse>
 }
 
 export const buildTableEndpoints = (API: BaseAPIClient): TableEndpoints => ({
@@ -66,7 +57,7 @@ export const buildTableEndpoints = (API: BaseAPIClient): TableEndpoints => ({
    * Since definitions cannot change at runtime, the result is cached.
    * @param tableId the ID of the table to fetch
    */
-  fetchTableDefinition: async tableId => {
+  fetchTableDefinition: async (tableId) => {
     return await API.get({
       url: `/api/tables/${tableId}`,
       cache: true,
@@ -77,7 +68,7 @@ export const buildTableEndpoints = (API: BaseAPIClient): TableEndpoints => ({
    * Fetches all rows from a table.
    * @param sourceId the ID of the table to fetch
    */
-  fetchTableData: async sourceId => {
+  fetchTableData: async (sourceId) => {
     return await API.get({ url: `/api/${sourceId}/rows` })
   },
 
@@ -113,7 +104,7 @@ export const buildTableEndpoints = (API: BaseAPIClient): TableEndpoints => ({
    * Converts a CSV string to JSON
    * @param csvString the CSV string
    */
-  csvToJson: async csvString => {
+  csvToJson: async (csvString) => {
     return await API.post<CsvToJsonRequest, CsvToJsonResponse>({
       url: "/api/convert/csvToJson",
       body: {
@@ -135,7 +126,7 @@ export const buildTableEndpoints = (API: BaseAPIClient): TableEndpoints => ({
    * Get a single table based on table ID.
    * Dupe of fetchTableDefinition but not cached?
    */
-  getTable: async tableId => {
+  getTable: async (tableId) => {
     return await API.get({
       url: `/api/tables/${tableId}`,
     })
@@ -145,7 +136,7 @@ export const buildTableEndpoints = (API: BaseAPIClient): TableEndpoints => ({
    * Saves a table.
    * @param table the table to save
    */
-  saveTable: async table => {
+  saveTable: async (table) => {
     return await API.post({
       url: "/api/tables",
       body: table,
@@ -164,10 +155,7 @@ export const buildTableEndpoints = (API: BaseAPIClient): TableEndpoints => ({
   },
 
   validateNewTableImport: async (rows, schema) => {
-    return await API.post<
-      ValidateNewTableImportRequest,
-      ValidateTableImportResponse
-    >({
+    return await API.post<ValidateNewTableImportRequest, ValidateTableImportResponse>({
       url: "/api/tables/validateNewTableImport",
       body: {
         rows,
@@ -176,10 +164,7 @@ export const buildTableEndpoints = (API: BaseAPIClient): TableEndpoints => ({
     })
   },
   validateExistingTableImport: async (rows, tableId) => {
-    return await API.post<
-      ValidateTableImportRequest,
-      ValidateTableImportResponse
-    >({
+    return await API.post<ValidateTableImportRequest, ValidateTableImportResponse>({
       url: "/api/tables/validateExistingTableImport",
       body: {
         rows,
@@ -208,7 +193,7 @@ export const buildTableEndpoints = (API: BaseAPIClient): TableEndpoints => ({
    * Duplicates a table without its data.
    * @param tableId the ID of the table to duplicate
    */
-  duplicateTable: async tableId => {
+  duplicateTable: async (tableId) => {
     return await API.post({
       url: `/api/tables/${tableId}/duplicate`,
     })

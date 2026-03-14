@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { Icon } from "@budibase/bbui"
+import { Icon } from "@budibase/bbui"
 
-  export let url: string | undefined = undefined
-  export let text: string | undefined = undefined
-  export let onClick: Function | undefined = undefined
+export let url: string | undefined = undefined
+export let text: string | undefined = undefined
+export let onClick: Function | undefined = undefined
 </script>
 
 <div class="crumb">

@@ -1,4 +1,4 @@
-import { BackupTrigger, BackupType } from "../../../documents"
+import type { BackupTrigger, BackupType } from "../../../documents"
 
 export interface SearchWorkspaceBackupsRequest {
   trigger: BackupTrigger

@@ -1,15 +1,15 @@
 import {
-  Config,
+  type Config,
   ConfigType,
-  GoogleConfig,
-  GoogleInnerConfig,
-  OIDCConfig,
-  OIDCInnerConfig,
-  OIDCLogosConfig,
-  SettingsConfig,
-  SettingsInnerConfig,
-  SMTPConfig,
-  SMTPInnerConfig,
+  type GoogleConfig,
+  type GoogleInnerConfig,
+  type OIDCConfig,
+  type OIDCInnerConfig,
+  type OIDCLogosConfig,
+  type SettingsConfig,
+  type SettingsInnerConfig,
+  type SMTPConfig,
+  type SMTPInnerConfig,
 } from "@budibase/types"
 import { DocumentType, SEPARATOR } from "../constants"
 import * as context from "../context"
@@ -25,9 +25,7 @@ export function generateConfigID(type: ConfigType) {
   return `${DocumentType.CONFIG}${SEPARATOR}${type}`
 }
 
-export async function getConfig<T extends Config>(
-  type: ConfigType
-): Promise<T | undefined> {
+export async function getConfig<T extends Config>(type: ConfigType): Promise<T | undefined> {
   const db = context.getGlobalDB()
   try {
     // await to catch error
@@ -40,9 +38,7 @@ export async function getConfig<T extends Config>(
   }
 }
 
-export async function save(
-  config: Config
-): Promise<{ id: string; rev: string }> {
+export async function save(config: Config): Promise<{ id: string; rev: string }> {
   if (!config._id) {
     config._id = generateConfigID(config.type)
   }
@@ -108,16 +104,12 @@ async function getGoogleConfigDoc(): Promise<GoogleConfig | undefined> {
   return await getConfig<GoogleConfig>(ConfigType.GOOGLE)
 }
 
-export async function getGoogleConfig(): Promise<
-  GoogleInnerConfig | undefined
-> {
+export async function getGoogleConfig(): Promise<GoogleInnerConfig | undefined> {
   const config = await getGoogleConfigDoc()
   return config?.config
 }
 
-export async function getGoogleDatasourceConfig(): Promise<
-  GoogleInnerConfig | undefined
-> {
+export async function getGoogleDatasourceConfig(): Promise<GoogleInnerConfig | undefined> {
   if (!env.SELF_HOSTED) {
     // always use the env vars in cloud
     return getDefaultGoogleConfig()
@@ -163,9 +155,7 @@ export async function getOIDCConfig(): Promise<OIDCInnerConfig | undefined> {
 /**
  * @param configId The config id of the inner config to retrieve
  */
-export async function getOIDCConfigById(
-  configId: string
-): Promise<OIDCInnerConfig | undefined> {
+export async function getOIDCConfigById(configId: string): Promise<OIDCInnerConfig | undefined> {
   const config = (await getConfig<OIDCConfig>(ConfigType.OIDC))?.config
   return config && config.configs.filter((c: any) => c.uuid === configId)[0]
 }

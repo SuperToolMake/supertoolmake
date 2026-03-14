@@ -1,68 +1,61 @@
 <script>
-  import { Handle, Position } from "@xyflow/svelte"
-  import {
-    Icon,
-    Input,
-    ColorPicker,
-    Modal,
-    ModalContent,
-    FieldLabel,
-  } from "@budibase/bbui"
-  import { NodeWidth, NodeHeight } from "./constants"
-  import { getContext } from "svelte"
-  import { roles } from "@/stores/builder"
-  import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
+import { ColorPicker, FieldLabel, Icon, Input, Modal, ModalContent } from "@budibase/bbui"
+import { Handle, Position } from "@xyflow/svelte"
+import { getContext } from "svelte"
+import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
+import { roles } from "@/stores/builder"
+import { NodeHeight, NodeWidth } from "./constants"
 
-  export let data
-  export let id
-  export let selected
-  export let isConnectable
+export let data
+export let id
+export let selected
+export let isConnectable
 
-  const { dragging, updateRole, deleteRole } = getContext("flow")
+const { dragging, updateRole, deleteRole } = getContext("flow")
 
-  let anchor
-  let modal
-  let tempDisplayName
-  let tempDescription
-  let tempColor
-  let deleteModal
+let anchor
+let modal
+let tempDisplayName
+let tempDescription
+let tempColor
+let deleteModal
 
-  $: nameError = validateName(tempDisplayName, $roles)
-  $: descriptionError = validateDescription(tempDescription)
-  $: invalid = nameError || descriptionError
+$: nameError = validateName(tempDisplayName, $roles)
+$: descriptionError = validateDescription(tempDescription)
+$: invalid = nameError || descriptionError
 
-  const validateName = (name, roles) => {
-    if (!name?.length) {
-      return "Please enter a name"
-    }
-    if (roles.some(x => x.uiMetadata.displayName === name && x._id !== id)) {
-      return "That name is already used by another role"
-    }
-    return null
+const validateName = (name, roles) => {
+  if (!name?.length) {
+    return "Please enter a name"
   }
-
-  const validateDescription = description => {
-    if (!description?.length) {
-      return "Please enter a description"
-    }
-    return null
+  if (roles.some((x) => x.uiMetadata.displayName === name && x._id !== id)) {
+    return "That name is already used by another role"
   }
+  return null
+}
 
-  const openPopover = e => {
-    e.stopPropagation()
-    tempDisplayName = data.displayName
-    tempDescription = data.description
-    tempColor = data.color
-    modal.show()
+const validateDescription = (description) => {
+  if (!description?.length) {
+    return "Please enter a description"
   }
+  return null
+}
 
-  const saveChanges = () => {
-    updateRole(id, {
-      displayName: tempDisplayName,
-      description: tempDescription,
-      color: tempColor,
-    })
-  }
+const openPopover = (e) => {
+  e.stopPropagation()
+  tempDisplayName = data.displayName
+  tempDescription = data.description
+  tempColor = data.color
+  modal.show()
+}
+
+const saveChanges = () => {
+  updateRole(id, {
+    displayName: tempDisplayName,
+    description: tempDescription,
+    color: tempColor,
+  })
+}
 </script>
 
 <div

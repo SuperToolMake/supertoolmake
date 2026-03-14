@@ -1,36 +1,36 @@
 <script>
-  import { Icon, ActionButton } from "@budibase/bbui"
-  import { onMount } from "svelte"
-  import { isBuilderInputFocused } from "@/helpers"
+import { ActionButton, Icon } from "@budibase/bbui"
+import { onMount } from "svelte"
+import { isBuilderInputFocused } from "@/helpers"
 
-  export let store
-  export let showButtonGroup = false
+export let store
+export let showButtonGroup = false
 
-  const handleKeyPress = e => {
-    if (!(e.ctrlKey || e.metaKey)) {
-      return
-    }
-
-    let keyLowerCase = e.key.toLowerCase()
-
-    // Ignore events when typing
-    if (isBuilderInputFocused(e)) {
-      return
-    }
-    if (e.shiftKey && keyLowerCase === "z") {
-      store.redo()
-    } else if (keyLowerCase === "z") {
-      store.undo()
-    }
+const handleKeyPress = (e) => {
+  if (!(e.ctrlKey || e.metaKey)) {
+    return
   }
 
-  onMount(() => {
-    document.addEventListener("keydown", handleKeyPress)
+  let keyLowerCase = e.key.toLowerCase()
 
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress)
-    }
-  })
+  // Ignore events when typing
+  if (isBuilderInputFocused(e)) {
+    return
+  }
+  if (e.shiftKey && keyLowerCase === "z") {
+    store.redo()
+  } else if (keyLowerCase === "z") {
+    store.undo()
+  }
+}
+
+onMount(() => {
+  document.addEventListener("keydown", handleKeyPress)
+
+  return () => {
+    document.removeEventListener("keydown", handleKeyPress)
+  }
+})
 </script>
 
 <div class="undo-redo" class:buttons={showButtonGroup}>

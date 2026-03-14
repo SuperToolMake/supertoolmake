@@ -1,9 +1,4 @@
-import {
-  DocUpdateEvent,
-  Event,
-  EventProcessor,
-  Identity,
-} from "@budibase/types"
+import type { DocUpdateEvent, Event, EventProcessor, Identity } from "@budibase/types"
 import { doInTenant } from "../../../context"
 import { shutdown } from "../../asyncEvents"
 import { getDocumentId } from "../../documentId"
@@ -24,7 +19,7 @@ export default class DocumentUpdateProcessor implements EventProcessor {
     if (!tenantId || !docId) {
       return
     }
-    for (let { events, processor } of this.processors) {
+    for (const { events, processor } of this.processors) {
       if (events.includes(event)) {
         await doInTenant(tenantId, async () => {
           await processor({

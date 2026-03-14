@@ -1,8 +1,8 @@
+import type { Layout } from "@budibase/types"
 import { derived, get } from "svelte/store"
-import { componentStore } from "@/stores/builder"
 import { API } from "@/api"
+import { componentStore } from "@/stores/builder"
 import { BudiStore } from "../BudiStore"
-import { Layout } from "@budibase/types"
 
 interface LayoutState {
   layouts: Layout[]
@@ -29,7 +29,7 @@ export class LayoutStore extends BudiStore<LayoutState> {
   }
 
   syncAppLayouts(pkg: { layouts: Layout[] }) {
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       layouts: [...pkg.layouts],
     }))
@@ -39,7 +39,7 @@ export class LayoutStore extends BudiStore<LayoutState> {
     // Check this layout exists
     const state = get(this.store)
     const componentState = get(componentStore)
-    const layout = state.layouts.find(layout => layout._id === layoutId)
+    const layout = state.layouts.find((layout) => layout._id === layoutId)
     if (!layout) {
       return
     }
@@ -53,7 +53,7 @@ export class LayoutStore extends BudiStore<LayoutState> {
     }
 
     // Select new layout
-    this.update(state => {
+    this.update((state) => {
       state.selectedLayoutId = layout._id!
       return state
     })
@@ -66,8 +66,8 @@ export class LayoutStore extends BudiStore<LayoutState> {
       return
     }
     await API.deleteLayout(layout._id, layout._rev)
-    this.update(state => {
-      state.layouts = state.layouts.filter(x => x._id !== layout._id)
+    this.update((state) => {
+      state.layouts = state.layouts.filter((x) => x._id !== layout._id)
       return state
     })
   }
@@ -75,6 +75,6 @@ export class LayoutStore extends BudiStore<LayoutState> {
 
 export const layoutStore = new LayoutStore()
 
-export const selectedLayout = derived(layoutStore, $store => {
-  return $store.layouts?.find(layout => layout._id === $store.selectedLayoutId)
+export const selectedLayout = derived(layoutStore, ($store) => {
+  return $store.layouts?.find((layout) => layout._id === $store.selectedLayoutId)
 })

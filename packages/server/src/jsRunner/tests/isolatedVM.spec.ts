@@ -1,7 +1,7 @@
+import { iifeWrapper } from "@budibase/string-templates"
 import fs from "fs"
 import path from "path"
 import { IsolatedVM } from "../vm"
-import { iifeWrapper } from "@budibase/string-templates"
 
 function runJSWithIsolatedVM(script: string, context: Record<string, any>) {
   const runner = new IsolatedVM()
@@ -12,10 +12,7 @@ function runJSWithIsolatedVM(script: string, context: Record<string, any>) {
 
 describe("Test isolated vm directly", () => {
   it("should handle a very large file", () => {
-    const marked = fs.readFileSync(
-      path.join(__dirname, "largeJSExample.txt"),
-      "utf-8"
-    )
+    const marked = fs.readFileSync(path.join(__dirname, "largeJSExample.txt"), "utf-8")
     const result = runJSWithIsolatedVM(marked, {
       trigger: { row: { Message: "dddd" } },
     })

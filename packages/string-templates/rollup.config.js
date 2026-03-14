@@ -1,9 +1,9 @@
 import commonjs from "@rollup/plugin-commonjs"
-import resolve from "@rollup/plugin-node-resolve"
+import inject from "@rollup/plugin-inject"
 import json from "@rollup/plugin-json"
+import resolve from "@rollup/plugin-node-resolve"
 import typescript from "@rollup/plugin-typescript"
 import polyfillNode from "rollup-plugin-polyfill-node"
-import inject from "@rollup/plugin-inject"
 import { terser } from "rollup-plugin-terser"
 
 const production = !process.env.ROLLUP_WATCH

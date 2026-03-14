@@ -1,6 +1,6 @@
-import TestConfiguration from "../TestConfiguration"
-import { AttachmentAPI } from "./attachment"
+import type TestConfiguration from "../TestConfiguration"
 import { AssetsAPI } from "./assets"
+import { AttachmentAPI } from "./attachment"
 import { BackupAPI } from "./backup"
 import { DatasourceAPI } from "./datasource"
 import { DeployAPI } from "./deploy"

@@ -1,20 +1,20 @@
 <script lang="ts">
-  import { tables } from "@/stores/builder"
-  import { Block, Subject, JSONValue, Property, Section } from "./components"
+import { tables } from "@/stores/builder"
+import { Block, JSONValue, Property, Section, Subject } from "./components"
 
-  export let schema
-  export let columnName
+export let schema
+export let columnName
 
-  const parseDate = (isoString: string) => {
-    if ([null, undefined, ""].includes(isoString)) {
-      return "None"
-    }
-
-    const unixTime = Date.parse(isoString)
-    const date = new Date(unixTime)
-
-    return date.toLocaleString()
+const parseDate = (isoString: string) => {
+  if ([null, undefined, ""].includes(isoString)) {
+    return "None"
   }
+
+  const unixTime = Date.parse(isoString)
+  const date = new Date(unixTime)
+
+  return date.toLocaleString()
+}
 </script>
 
 <Subject>

@@ -1,38 +1,30 @@
 import {
+  type DatasourceDeletedEvent,
   Event,
-  UserCreatedEvent,
-  UserUpdatedEvent,
-  UserDeletedEvent,
-  UserPermissionAssignedEvent,
-  UserPermissionRemovedEvent,
-  DatasourceDeletedEvent,
-  TableDeletedEvent,
-  QueryDeletedEvent,
-  WorkspaceAppDeletedEvent,
-  ViewDeletedEvent,
+  type QueryDeletedEvent,
+  type TableDeletedEvent,
+  type UserCreatedEvent,
+  type UserDeletedEvent,
+  type UserPermissionAssignedEvent,
+  type UserPermissionRemovedEvent,
+  type UserUpdatedEvent,
+  type ViewDeletedEvent,
+  type WorkspaceAppDeletedEvent,
 } from "@budibase/types"
 
-const getEventProperties: Record<
-  string,
-  (properties: any) => string | undefined
-> = {
+const getEventProperties: Record<string, (properties: any) => string | undefined> = {
   [Event.USER_CREATED]: (properties: UserCreatedEvent) => properties.userId,
   [Event.USER_UPDATED]: (properties: UserUpdatedEvent) => properties.userId,
   [Event.USER_DELETED]: (properties: UserDeletedEvent) => properties.userId,
-  [Event.USER_PERMISSION_ADMIN_ASSIGNED]: (
-    properties: UserPermissionAssignedEvent
-  ) => properties.userId,
-  [Event.USER_PERMISSION_ADMIN_REMOVED]: (
-    properties: UserPermissionRemovedEvent
-  ) => properties.userId,
-  [Event.USER_PERMISSION_BUILDER_ASSIGNED]: (
-    properties: UserPermissionAssignedEvent
-  ) => properties.userId,
-  [Event.USER_PERMISSION_BUILDER_REMOVED]: (
-    properties: UserPermissionRemovedEvent
-  ) => properties.userId,
-  [Event.DATASOURCE_DELETED]: (properties: DatasourceDeletedEvent) =>
-    properties.datasourceId,
+  [Event.USER_PERMISSION_ADMIN_ASSIGNED]: (properties: UserPermissionAssignedEvent) =>
+    properties.userId,
+  [Event.USER_PERMISSION_ADMIN_REMOVED]: (properties: UserPermissionRemovedEvent) =>
+    properties.userId,
+  [Event.USER_PERMISSION_BUILDER_ASSIGNED]: (properties: UserPermissionAssignedEvent) =>
+    properties.userId,
+  [Event.USER_PERMISSION_BUILDER_REMOVED]: (properties: UserPermissionRemovedEvent) =>
+    properties.userId,
+  [Event.DATASOURCE_DELETED]: (properties: DatasourceDeletedEvent) => properties.datasourceId,
   [Event.TABLE_DELETED]: (properties: TableDeletedEvent) => properties.tableId,
   [Event.QUERY_DELETED]: (properties: QueryDeletedEvent) => properties.queryId,
   [Event.WORKSPACE_APP_DELETED]: (properties: WorkspaceAppDeletedEvent) =>

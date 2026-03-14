@@ -1,20 +1,20 @@
-import { derived, get, Readable, Writable } from "svelte/store"
-import {
-  DataFetchDefinition,
-  getDatasourceDefinition,
-  getDatasourceSchema,
-} from "../../../fetch"
-import { enrichSchemaWithRelColumns, memo } from "../../../utils"
-import cloneDeep from "lodash/cloneDeep"
-import {
+import type {
   SaveRowRequest,
   UIDatasource,
   UIFieldMutation,
   UIFieldSchema,
   UIRow,
 } from "@budibase/types"
-import { Store as StoreContext, BaseStoreProps } from "."
-import { DatasourceActions } from "./datasources"
+import cloneDeep from "lodash/cloneDeep"
+import { derived, get, type Readable, type Writable } from "svelte/store"
+import {
+  type DataFetchDefinition,
+  getDatasourceDefinition,
+  getDatasourceSchema,
+} from "../../../fetch"
+import { enrichSchemaWithRelColumns, memo } from "../../../utils"
+import type { BaseStoreProps, Store as StoreContext } from "."
+import type { DatasourceActions } from "./datasources"
 
 interface DatasourceStore {
   definition: Writable<DataFetchDefinition | null>
@@ -34,20 +34,14 @@ interface ActionDatasourceStore {
       refreshDefinition: () => Promise<void>
       changePrimaryDisplay: (column: string) => Promise<void>
       addSchemaMutation: (field: string, mutation: UIFieldMutation) => void
-      addSubSchemaMutation: (
-        field: string,
-        fromField: string,
-        mutation: UIFieldMutation
-      ) => void
+      addSubSchemaMutation: (field: string, fromField: string, mutation: UIFieldMutation) => void
       saveSchemaMutations: () => Promise<void>
       resetSchemaMutations: () => void
     }
   }
 }
 
-export type Store = DatasourceStore &
-  DerivedDatasourceStore &
-  ActionDatasourceStore
+export type Store = DatasourceStore & DerivedDatasourceStore & ActionDatasourceStore
 
 export const createStores = (): DatasourceStore => {
   const definition = memo(null)
@@ -62,16 +56,10 @@ export const createStores = (): DatasourceStore => {
 }
 
 export const deriveStores = (context: StoreContext): DerivedDatasourceStore => {
-  const {
-    API,
-    definition,
-    schemaOverrides,
-    datasource,
-    schemaMutations,
-    subSchemaMutations,
-  } = context
+  const { API, definition, schemaOverrides, datasource, schemaMutations, subSchemaMutations } =
+    context
 
-  const schema = derived(definition, $definition => {
+  const schema = derived(definition, ($definition) => {
     const schema: Record<string, any> | undefined = getDatasourceSchema({
       API,
       datasource: get(datasource),
@@ -83,7 +71,7 @@ export const deriveStores = (context: StoreContext): DerivedDatasourceStore => {
 
     // Ensure schema is configured as objects.
     // Certain datasources like queries use primitives.
-    Object.keys(schema).forEach(key => {
+    Object.keys(schema).forEach((key) => {
       if (typeof schema[key] !== "object") {
         schema[key] = { name: key, type: schema[key] }
       }
@@ -104,7 +92,7 @@ export const deriveStores = (context: StoreContext): DerivedDatasourceStore => {
       const schemaWithRelatedColumns = enrichSchemaWithRelColumns($schema)
 
       const enrichedSchema: Record<string, UIFieldSchema> = {}
-      Object.keys(schemaWithRelatedColumns || {}).forEach(field => {
+      Object.keys(schemaWithRelatedColumns || {}).forEach((field) => {
         enrichedSchema[field] = {
           ...schemaWithRelatedColumns?.[field],
           ...$schemaOverrides?.[field],
@@ -127,7 +115,7 @@ export const deriveStores = (context: StoreContext): DerivedDatasourceStore => {
   )
 
   const hasBudibaseIdentifiers = derived([datasource], ([$datasource]) => {
-    let type = $datasource?.type
+    const type = $datasource?.type
     return !!type && ["table", "link"].includes(type)
   })
 
@@ -204,7 +192,7 @@ export const createActions = (context: StoreContext): ActionDatasourceStore => {
 
   // Updates the datasources primary display column
   const changePrimaryDisplay = async (column: string) => {
-    let newDefinition = cloneDeep(get(definition)!)
+    const newDefinition = cloneDeep(get(definition)!)
 
     // Update primary display
     newDefinition.primaryDisplay = column
@@ -227,7 +215,7 @@ export const createActions = (context: StoreContext): ActionDatasourceStore => {
     if (!field || !mutation) {
       return
     }
-    schemaMutations.update($schemaMutations => {
+    schemaMutations.update(($schemaMutations) => {
       return {
         ...$schemaMutations,
         [field]: {
@@ -239,15 +227,11 @@ export const createActions = (context: StoreContext): ActionDatasourceStore => {
   }
 
   // Adds a nested schema mutation for a single field
-  const addSubSchemaMutation = (
-    field: string,
-    fromField: string,
-    mutation: UIFieldMutation
-  ) => {
+  const addSubSchemaMutation = (field: string, fromField: string, mutation: UIFieldMutation) => {
     if (!field || !fromField || !mutation) {
       return
     }
-    subSchemaMutations.update($subSchemaMutations => {
+    subSchemaMutations.update(($subSchemaMutations) => {
       return {
         ...$subSchemaMutations,
         [fromField]: {
@@ -271,10 +255,10 @@ export const createActions = (context: StoreContext): ActionDatasourceStore => {
     const $schemaMutations = get(schemaMutations)
     const $subSchemaMutations = get(subSchemaMutations)
     const $schema = get(schema) || {}
-    let newSchema: Record<string, UIFieldSchema> = {}
+    const newSchema: Record<string, UIFieldSchema> = {}
 
     // Build new updated datasource schema
-    Object.keys($schema).forEach(column => {
+    Object.keys($schema).forEach((column) => {
       newSchema[column] = {
         ...$schema[column],
         ...$schemaMutations[column],

@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { Select } from "@budibase/bbui"
-  import { roles } from "@/stores/builder"
+import { Select } from "@budibase/bbui"
+import { roles } from "@/stores/builder"
 
-  export let value: string
-  export let error: string | undefined = undefined
-  export let placeholder: string | undefined = undefined
-  export let autoWidth: boolean = false
+export let value: string
+export let error: string | undefined = undefined
+export let placeholder: string | undefined = undefined
+export let autoWidth: boolean = false
 </script>
 
 <Select

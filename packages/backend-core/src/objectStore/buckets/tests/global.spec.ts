@@ -1,5 +1,5 @@
-import * as global from "../global"
 import { testEnv } from "../../../../tests/extra"
+import * as global from "../global"
 
 describe("global", () => {
   describe("getGlobalFileUrl", () => {
@@ -28,9 +28,7 @@ describe("global", () => {
         testEnv.withCloudfront()
         const url = await getGlobalFileUrl()
         // omit rest of signed params
-        expect(
-          url.includes("http://cf.example.com/settings/logoUrl?etag=etag&")
-        ).toBe(true)
+        expect(url.includes("http://cf.example.com/settings/logoUrl?etag=etag&")).toBe(true)
       })
     })
 
@@ -41,7 +39,7 @@ describe("global", () => {
 
       it("gets url with embedded minio", async () => {
         testEnv.withMinio()
-        await testEnv.withTenant(async tenantId => {
+        await testEnv.withTenant(async (tenantId) => {
           const url = await getGlobalFileUrl()
           expect(url).toBe(`/files/signed/global/${tenantId}/settings/logoUrl`)
         })
@@ -49,23 +47,19 @@ describe("global", () => {
 
       it("gets url with custom S3", async () => {
         testEnv.withS3()
-        await testEnv.withTenant(async tenantId => {
+        await testEnv.withTenant(async (tenantId) => {
           const url = await getGlobalFileUrl()
-          expect(url).toBe(
-            `http://s3.example.com/global/${tenantId}/settings/logoUrl`
-          )
+          expect(url).toBe(`http://s3.example.com/global/${tenantId}/settings/logoUrl`)
         })
       })
 
       it("gets url with cloudfront + s3", async () => {
         testEnv.withCloudfront()
-        await testEnv.withTenant(async tenantId => {
+        await testEnv.withTenant(async (tenantId) => {
           const url = await getGlobalFileUrl()
           // omit rest of signed params
           expect(
-            url.includes(
-              `http://cf.example.com/${tenantId}/settings/logoUrl?etag=etag&`
-            )
+            url.includes(`http://cf.example.com/${tenantId}/settings/logoUrl?etag=etag&`)
           ).toBe(true)
         })
       })

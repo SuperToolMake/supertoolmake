@@ -1,14 +1,14 @@
+import { helpers } from "@budibase/shared-core"
+import type { DoneCallback, Job, JobId, JobInformation } from "bull"
 import events from "events"
 import { newid, timeout } from "../utils"
-import { Queue, QueueOptions, JobOptions } from "./queue"
-import { helpers } from "@budibase/shared-core"
-import { Job, JobId, JobInformation, DoneCallback } from "bull"
+import type { JobOptions, Queue, QueueOptions } from "./queue"
 
 function jobToJobInformation(job: Job): JobInformation {
   let cron = ""
   let every = -1
-  let tz: string | undefined = undefined
-  let endDate: number | undefined = undefined
+  let tz: string | undefined
+  let endDate: number | undefined
 
   const repeat = job.opts?.repeat
   if (repeat) {
@@ -34,10 +34,7 @@ function jobToJobInformation(job: Job): JobInformation {
 }
 
 export interface TestQueueMessage<T = any>
-  extends Pick<
-    Job<T>,
-    "id" | "timestamp" | "queue" | "data" | "opts" | "discard"
-  > {
+  extends Pick<Job<T>, "id" | "timestamp" | "queue" | "data" | "opts" | "discard"> {
   manualTrigger?: boolean
   _isDiscarded?: boolean
 }
@@ -90,7 +87,7 @@ export class InMemoryQueue<T = any> implements Partial<Queue<T>> {
    */
   async process(concurrencyOrFunc: number | any, func?: any) {
     func = typeof concurrencyOrFunc === "number" ? func : concurrencyOrFunc
-    this._emitter.on("message", async message => {
+    this._emitter.on("message", async (message) => {
       // For the purpose of testing, don't trigger cron jobs immediately.
       // Require the test to trigger them manually with timestamps.
       if (!message.manualTrigger && message.opts?.repeat != null) {
@@ -306,8 +303,8 @@ export class InMemoryQueue<T = any> implements Partial<Queue<T>> {
 
   async getRepeatableJobs() {
     return this._messages
-      .filter(job => job.opts?.repeat != null)
-      .map(job => jobToJobInformation(job as Job))
+      .filter((job) => job.opts?.repeat != null)
+      .map((job) => jobToJobInformation(job as Job))
   }
 
   async whenCurrentJobsFinished() {

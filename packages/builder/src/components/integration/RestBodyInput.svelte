@@ -1,67 +1,63 @@
 <script>
-  import { Body } from "@budibase/bbui"
-  import { RawRestBodyTypes } from "@/constants/backend"
-  import KeyValueBuilder from "@/components/integration/KeyValueBuilder.svelte"
-  import { EditorModes } from "@/components/common/CodeMirrorEditor.svelte"
-  import { createEventDispatcher } from "svelte"
-  import CodeEditor from "../common/CodeEditor/CodeEditor.svelte"
-  import { keyValueArrayToRecord } from "./query"
+import { Body } from "@budibase/bbui"
+import { createEventDispatcher } from "svelte"
+import { EditorModes } from "@/components/common/CodeMirrorEditor.svelte"
+import KeyValueBuilder from "@/components/integration/KeyValueBuilder.svelte"
+import { RawRestBodyTypes } from "@/constants/backend"
+import CodeEditor from "../common/CodeEditor/CodeEditor.svelte"
+import { keyValueArrayToRecord } from "./query"
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  const objectTypes = [RawRestBodyTypes.FORM, RawRestBodyTypes.ENCODED]
-  const textTypes = [
-    RawRestBodyTypes.JSON,
-    RawRestBodyTypes.XML,
-    RawRestBodyTypes.TEXT,
-  ]
+const objectTypes = [RawRestBodyTypes.FORM, RawRestBodyTypes.ENCODED]
+const textTypes = [RawRestBodyTypes.JSON, RawRestBodyTypes.XML, RawRestBodyTypes.TEXT]
 
-  export let requestBody
-  export let bodyType
+export let requestBody
+export let bodyType
 
-  let text = ""
-  let json = ""
+let text = ""
+let json = ""
 
-  $: checkRequestBody(bodyType)
-  $: updateRequestBody(bodyType, text, json)
+$: checkRequestBody(bodyType)
+$: updateRequestBody(bodyType, text, json)
 
-  function checkRequestBody(type) {
-    if (!bodyType || requestBody === undefined) {
-      return
-    }
-    const currentType = typeof requestBody
-    const isObject = objectTypes.includes(type)
-    const isText = textTypes.includes(type)
-    if (isText && currentType === "string") {
-      text = requestBody
-    } else if (isObject && currentType === "object") {
-      json = requestBody
-    }
+function checkRequestBody(type) {
+  if (!bodyType || requestBody === undefined) {
+    return
+  }
+  const currentType = typeof requestBody
+  const isObject = objectTypes.includes(type)
+  const isText = textTypes.includes(type)
+  if (isText && currentType === "string") {
+    text = requestBody
+  } else if (isObject && currentType === "object") {
+    json = requestBody
+  }
+}
+
+function updateRequestBody(type, text, json) {
+  if (requestBody === undefined) {
+    return
   }
 
-  function updateRequestBody(type, text, json) {
-    if (requestBody === undefined) {
-      return
+  if (type === RawRestBodyTypes.NONE) {
+    if (requestBody != null) {
+      dispatch("change", { requestBody: null })
     }
-
-    if (type === RawRestBodyTypes.NONE) {
-      if (requestBody != null) {
-        dispatch("change", { requestBody: null })
-      }
-      return
-    }
-
-    if (objectTypes.includes(type)) {
-      if (requestBody !== json) {
-        dispatch("change", { requestBody: json })
-      }
-      return
-    }
-
-    if (requestBody !== text) {
-      dispatch("change", { requestBody: text })
-    }
+    return
   }
+
+  if (objectTypes.includes(type)) {
+    if (requestBody !== json) {
+      dispatch("change", { requestBody: json })
+    }
+    return
+  }
+
+  if (requestBody !== text) {
+    dispatch("change", { requestBody: text })
+  }
+}
 </script>
 
 <div class="margin">

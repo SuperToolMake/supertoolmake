@@ -1,6 +1,6 @@
-import { ImportSource, ImportInfo, GetQueriesOptions } from "./base"
-import { Query } from "../../../../../definitions/common"
 import { URL } from "url"
+import type { Query } from "../../../../../definitions/common"
+import { type GetQueriesOptions, type ImportInfo, ImportSource } from "./base"
 
 const curlconverter = require("curlconverter")
 
@@ -89,10 +89,7 @@ export class Curl extends ImportSource {
     return "curl"
   }
 
-  getQueries = async (
-    datasourceId: string,
-    options?: GetQueriesOptions
-  ): Promise<Query[]> => {
+  getQueries = async (datasourceId: string, options?: GetQueriesOptions): Promise<Query[]> => {
     const url = this.getUrl()
     const name = url.pathname
     const path = url.origin + url.pathname

@@ -18,6 +18,4 @@ interface UIAncestorComponentError extends BaseUIComponentError {
   }
 }
 
-export type UIComponentError =
-  | UISettingComponentError
-  | UIAncestorComponentError
+export type UIComponentError = UISettingComponentError | UIAncestorComponentError

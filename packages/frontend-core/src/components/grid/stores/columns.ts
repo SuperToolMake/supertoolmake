@@ -1,7 +1,7 @@
-import { derived, get, Readable, Writable, writable } from "svelte/store"
+import type { UIColumn } from "@budibase/types"
+import { derived, get, type Readable, type Writable, writable } from "svelte/store"
 import { DefaultColumnWidth, GutterWidth } from "../lib/constants"
-import { UIColumn } from "@budibase/types"
-import { Store as StoreContext } from "."
+import type { Store as StoreContext } from "."
 
 interface ColumnStore {
   columns: Writable<UIColumn[]>
@@ -31,10 +31,10 @@ export const createStores = (): ColumnStore => {
   const columns = writable<UIColumn[]>([])
 
   // Enrich columns with metadata about their display position
-  const enrichedColumns = derived(columns, $columns => {
+  const enrichedColumns = derived(columns, ($columns) => {
     let offset = GutterWidth
     let idx = 0
-    return $columns.map(col => {
+    return $columns.map((col) => {
       const enriched = {
         ...col,
         __idx: idx,
@@ -60,35 +60,35 @@ export const deriveStores = (context: StoreContext): DerivedColumnStore => {
   const { columns } = context
 
   // Derive a lookup map for all columns by name
-  const columnLookupMap = derived(columns, $columns => {
-    let map: Record<string, UIColumn> = {}
-    $columns.forEach(column => {
+  const columnLookupMap = derived(columns, ($columns) => {
+    const map: Record<string, UIColumn> = {}
+    $columns.forEach((column) => {
       map[column.name] = column
     })
     return map
   })
 
   // Derived list of columns which are direct part of the table
-  const tableColumns = derived(columns, $columns => {
-    return $columns.filter(col => !col.related)
+  const tableColumns = derived(columns, ($columns) => {
+    return $columns.filter((col) => !col.related)
   })
 
   // Derived list of columns which have not been explicitly hidden
-  const visibleColumns = derived(columns, $columns => {
-    return $columns.filter(col => col.visible)
+  const visibleColumns = derived(columns, ($columns) => {
+    return $columns.filter((col) => col.visible)
   })
 
   // Split visible columns into their discrete types
-  const displayColumn = derived(visibleColumns, $visibleColumns => {
-    return $visibleColumns.find(col => col.primaryDisplay)
+  const displayColumn = derived(visibleColumns, ($visibleColumns) => {
+    return $visibleColumns.find((col) => col.primaryDisplay)
   })
-  const scrollableColumns = derived(visibleColumns, $visibleColumns => {
-    return $visibleColumns.filter(col => !col.primaryDisplay)
+  const scrollableColumns = derived(visibleColumns, ($visibleColumns) => {
+    return $visibleColumns.filter((col) => !col.primaryDisplay)
   })
 
   // Derive if we have any normal columns
-  const hasNonAutoColumn = derived(columns, $columns => {
-    const normalCols = $columns.filter(column => {
+  const hasNonAutoColumn = derived(columns, ($columns) => {
+    const normalCols = $columns.filter((column) => {
       return !column.schema?.autocolumn
     })
     return normalCols.length > 0
@@ -110,17 +110,13 @@ export const createActions = (context: StoreContext): ColumnActions => {
   // Updates the width of all columns
   const changeAllColumnWidths = async (width: number) => {
     const $columns = get(columns)
-    $columns.forEach(column => {
+    $columns.forEach((column) => {
       const { related } = column
       const mutation = { width }
       if (!related) {
         datasource.actions.addSchemaMutation(column.name, mutation)
       } else {
-        datasource.actions.addSubSchemaMutation(
-          related.subField,
-          related.field,
-          mutation
-        )
+        datasource.actions.addSubSchemaMutation(related.subField, related.field, mutation)
       }
     })
     await datasource.actions.saveSchemaMutations()
@@ -131,11 +127,7 @@ export const createActions = (context: StoreContext): ColumnActions => {
     if (!column?.schema) {
       return false
     }
-    return (
-      column.schema.autocolumn ||
-      column.schema.disabled ||
-      column.schema.readonly
-    )
+    return column.schema.autocolumn || column.schema.disabled || column.schema.readonly
   }
 
   return {
@@ -172,7 +164,7 @@ export const initialise = (context: StoreContext) => {
     // Update columns, removing extraneous columns and adding missing ones
     columns.set(
       Object.keys($enrichedSchema)
-        .map(field => {
+        .map((field) => {
           const fieldSchema = $enrichedSchema[field]
           const column: UIColumn = {
             type: fieldSchema.type,

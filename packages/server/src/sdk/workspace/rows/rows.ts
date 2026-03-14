@@ -1,5 +1,5 @@
 import { context, db as dbCore } from "@budibase/backend-core"
-import { Database, Row } from "@budibase/types"
+import type { Database, Row } from "@budibase/types"
 import { getRowParams } from "../../../db/utils"
 import * as external from "./external"
 
@@ -15,18 +15,14 @@ export async function getAllInternalRows(appId?: string) {
       include_docs: true,
     })
   )
-  return response.rows.map(row => row.doc) as Row[]
+  return response.rows.map((row) => row.doc) as Row[]
 }
 
 function pickApi() {
   return external
 }
 
-export async function save(
-  sourceId: string,
-  row: Row,
-  userId: string | undefined
-) {
+export async function save(sourceId: string, row: Row, userId: string | undefined) {
   return pickApi().save(sourceId, row, userId)
 }
 

@@ -1,16 +1,15 @@
 <script>
-  import { getContext } from "svelte"
+import { getContext } from "svelte"
 
-  const { resize, visibleColumns, isReordering, scrollLeft } =
-    getContext("grid")
+const { resize, visibleColumns, isReordering, scrollLeft } = getContext("grid")
 
-  const getStyle = (column, scrollLeft) => {
-    let left = column.__left + column.width
-    if (!column.primaryDisplay) {
-      left -= scrollLeft
-    }
-    return `left:${left}px;`
+const getStyle = (column, scrollLeft) => {
+  let left = column.__left + column.width
+  if (!column.primaryDisplay) {
+    left -= scrollLeft
   }
+  return `left:${left}px;`
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

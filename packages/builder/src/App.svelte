@@ -1,13 +1,13 @@
 <script>
-  import { Router } from "@roxi/routify"
-  import routes from "../.routify/routes.default.js"
-  import { NotificationDisplay, BannerDisplay, Context } from "@budibase/bbui"
-  import { parse, stringify } from "qs"
-  import { setContext } from "svelte"
+import { BannerDisplay, Context, NotificationDisplay } from "@budibase/bbui"
+import { Router } from "@roxi/routify"
+import { parse, stringify } from "qs"
+import { setContext } from "svelte"
+import routes from "../.routify/routes.default.js"
 
-  const queryHandler = { parse, stringify }
+const queryHandler = { parse, stringify }
 
-  setContext(Context.PopoverRoot, "body")
+setContext(Context.PopoverRoot, "body")
 </script>
 
 <div class="banner-container"></div>

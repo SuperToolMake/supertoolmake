@@ -1,16 +1,9 @@
-import { sendEmail as sendEmailFn } from "../../../utilities/email"
 import { tenancy } from "@budibase/backend-core"
-import {
-  UserCtx,
-  User,
-  SendEmailRequest,
-  SendEmailResponse,
-} from "@budibase/types"
+import type { SendEmailRequest, SendEmailResponse, User, UserCtx } from "@budibase/types"
+import { sendEmail as sendEmailFn } from "../../../utilities/email"
 
-export async function sendEmail(
-  ctx: UserCtx<SendEmailRequest, SendEmailResponse>
-) {
-  let {
+export async function sendEmail(ctx: UserCtx<SendEmailRequest, SendEmailResponse>) {
+  const {
     email,
     userId,
     purpose,
@@ -23,7 +16,7 @@ export async function sendEmail(
     invite,
     attachments,
   } = ctx.request.body
-  let user: User | undefined = undefined
+  let user: User | undefined
   if (userId) {
     const db = tenancy.getGlobalDB()
     user = await db.tryGet<User>(userId)

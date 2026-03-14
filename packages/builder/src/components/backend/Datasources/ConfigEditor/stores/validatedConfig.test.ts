@@ -1,7 +1,7 @@
-import { it, expect, describe } from "vitest"
-import { createValidatedConfigStore } from "./validatedConfig"
 import { DatasourceFieldType, SourceName } from "@budibase/types"
 import { get } from "svelte/store"
+import { describe, expect, it } from "vitest"
+import { createValidatedConfigStore } from "./validatedConfig"
 
 describe("validatedConfig store", () => {
   const mockIntegration = {
@@ -92,19 +92,13 @@ describe("validatedConfig store", () => {
       const store = createValidatedConfigStore(mockIntegration, mockConfig)
       const storeValue = get(store)
 
-      const adConfigField = storeValue.validatedConfig.find(
-        field => field.key === "adConfig"
-      )
+      const adConfigField = storeValue.validatedConfig.find((field) => field.key === "adConfig")
       expect(adConfigField).toBeDefined()
       expect(adConfigField?.type).toBe(DatasourceFieldType.FIELD_GROUP)
 
       const adConfigValue = adConfigField?.value as any[]
       expect(adConfigValue).toHaveLength(3)
-      expect(adConfigValue.map(f => f.key)).toEqual([
-        "clientId",
-        "clientSecret",
-        "tenantId",
-      ])
+      expect(adConfigValue.map((f) => f.key)).toEqual(["clientId", "clientSecret", "tenantId"])
       expect(adConfigValue[0].value).toBe("test-client-id")
       expect(adConfigValue[1].value).toBe("test-client-secret")
       expect(adConfigValue[2].value).toBe("test-tenant-id")
@@ -117,19 +111,14 @@ describe("validatedConfig store", () => {
         authType: "Azure Active Directory",
       }
 
-      const store = createValidatedConfigStore(
-        mockIntegration,
-        configWithoutNested
-      )
+      const store = createValidatedConfigStore(mockIntegration, configWithoutNested)
       const storeValue = get(store)
 
-      const adConfigField = storeValue.validatedConfig.find(
-        field => field.key === "adConfig"
-      )
+      const adConfigField = storeValue.validatedConfig.find((field) => field.key === "adConfig")
       const adConfigValue = adConfigField?.value as any[]
 
       expect(adConfigValue).toHaveLength(3)
-      expect(adConfigValue.every(f => f.value === undefined)).toBe(true)
+      expect(adConfigValue.every((f) => f.value === undefined)).toBe(true)
     })
   })
 
@@ -138,9 +127,7 @@ describe("validatedConfig store", () => {
       const store = createValidatedConfigStore(mockIntegration, mockConfig)
       const storeValue = get(store)
 
-      const adConfigField = storeValue.validatedConfig.find(
-        field => field.key === "adConfig"
-      )
+      const adConfigField = storeValue.validatedConfig.find((field) => field.key === "adConfig")
       expect(adConfigField).toBeDefined()
     })
 
@@ -150,15 +137,10 @@ describe("validatedConfig store", () => {
         authType: "NTLM",
       }
 
-      const store = createValidatedConfigStore(
-        mockIntegration,
-        configWithDifferentAuth
-      )
+      const store = createValidatedConfigStore(mockIntegration, configWithDifferentAuth)
       const storeValue = get(store)
 
-      const adConfigField = storeValue.validatedConfig.find(
-        field => field.key === "adConfig"
-      )
+      const adConfigField = storeValue.validatedConfig.find((field) => field.key === "adConfig")
       expect(adConfigField).toBeUndefined()
     })
   })

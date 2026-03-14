@@ -1,4 +1,4 @@
-import { Document } from "../document"
+import type { Document } from "../document"
 
 export enum ScheduleType {
   WORKSPACE_BACKUP = "app_backup",

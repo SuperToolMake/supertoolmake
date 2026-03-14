@@ -1,8 +1,4 @@
-import type {
-  ImportEndpoint,
-  ImportRestQueryInfoRequest,
-  RestTemplateSpec,
-} from "@budibase/types"
+import type { ImportEndpoint, ImportRestQueryInfoRequest, RestTemplateSpec } from "@budibase/types"
 
 const normalizeEndpointLabel = (value?: string) =>
   (value || "").toLowerCase().replace(/[^a-z0-9]/g, "")

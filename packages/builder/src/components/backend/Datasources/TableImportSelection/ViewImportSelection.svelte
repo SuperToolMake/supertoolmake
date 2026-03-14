@@ -1,27 +1,18 @@
 <script lang="ts">
-  import {
-    Body,
-    FancyCheckboxGroup,
-    InlineAlert,
-    Layout,
-    ModalContent,
-  } from "@budibase/bbui"
-  import Spinner from "@/components/common/Spinner.svelte"
-  import { createViewSelectionStore } from "./viewSelectionStore"
-  import type { Datasource } from "@budibase/types"
+import { Body, FancyCheckboxGroup, InlineAlert, Layout, ModalContent } from "@budibase/bbui"
+import type { Datasource } from "@budibase/types"
+import Spinner from "@/components/common/Spinner.svelte"
+import { createViewSelectionStore } from "./viewSelectionStore"
 
-  export let datasource: Datasource
-  export let onComplete: () => void = () => {}
+export let datasource: Datasource
+export let onComplete: () => void = () => {}
 
-  $: store = createViewSelectionStore(datasource)
+$: store = createViewSelectionStore(datasource)
 
-  $: title = "Choose your views"
-  $: confirmText =
-    $store.loading || $store.hasSelected
-      ? "Fetch views"
-      : "Continue without fetching"
-  $: description = "Choose what views you want to sync with SuperToolMake"
-  $: selectAllText = "Select all"
+$: title = "Choose your views"
+$: confirmText = $store.loading || $store.hasSelected ? "Fetch views" : "Continue without fetching"
+$: description = "Choose what views you want to sync with SuperToolMake"
+$: selectAllText = "Select all"
 </script>
 
 <ModalContent

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Icon from "../Icon/Icon.svelte"
+import Icon from "../Icon/Icon.svelte"
 
-  export let small: boolean = false
-  export let disabled: boolean = false
+export let small: boolean = false
+export let disabled: boolean = false
 </script>
 
 <button

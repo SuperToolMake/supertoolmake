@@ -1,19 +1,15 @@
-import { userMenuTranslations } from "./userMenu"
-import { profileModalTranslations } from "./profileModal"
 import { passwordModalTranslations } from "./passwordModal"
 import { pickerTranslations } from "./picker"
-import type {
-  TranslationCategory,
-  TranslationDefinition,
-  TranslationOverrides,
-} from "./types"
+import { profileModalTranslations } from "./profileModal"
+import type { TranslationCategory, TranslationDefinition, TranslationOverrides } from "./types"
+import { userMenuTranslations } from "./userMenu"
 
 export * from "./types"
 export {
-  userMenuTranslations,
-  profileModalTranslations,
   passwordModalTranslations,
   pickerTranslations,
+  profileModalTranslations,
+  userMenuTranslations,
 }
 
 // Central export of all translation definitions across modules.

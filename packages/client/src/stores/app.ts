@@ -1,6 +1,6 @@
-import { API } from "@/api"
-import { Layout, Screen, Workspace } from "@budibase/types"
+import type { Layout, Screen, Workspace } from "@budibase/types"
 import { derived, get, writable } from "svelte/store"
+import { API } from "@/api"
 
 interface AppStoreState {
   appId: string | null
@@ -25,7 +25,7 @@ const initialState: AppStoreState = {
 
 const createAppStore = () => {
   const store = writable(initialState)
-  const derivedStore = derived(store, $store => {
+  const derivedStore = derived(store, ($store) => {
     return {
       ...$store,
       isDevApp: $store.appId?.startsWith("app_dev"),
@@ -52,13 +52,13 @@ const createAppStore = () => {
 
   // Sets the initial app ID
   const setAppId = (id: string) => {
-    store.update(state => {
+    store.update((state) => {
       return { ...state, appId: id }
     })
   }
 
   const setAppEmbedded = (embedded: boolean) => {
-    store.update(state => {
+    store.update((state) => {
       return { ...state, embedded }
     })
   }

@@ -1,15 +1,13 @@
-import {
-  WorkspaceFavouriteResponse,
-  AddWorkspaceFavouriteResponse,
+import type {
   AddWorkspaceFavouriteRequest,
+  AddWorkspaceFavouriteResponse,
+  WorkspaceFavouriteResponse,
 } from "@budibase/types"
-import { BaseAPIClient } from "./types"
+import type { BaseAPIClient } from "./types"
 
 export interface WorkspaceFavouriteEndpoints {
   fetch: () => Promise<WorkspaceFavouriteResponse>
-  create: (
-    favourite: AddWorkspaceFavouriteRequest
-  ) => Promise<AddWorkspaceFavouriteResponse>
+  create: (favourite: AddWorkspaceFavouriteRequest) => Promise<AddWorkspaceFavouriteResponse>
   delete: (id: string, rev: string) => Promise<void>
 }
 
@@ -22,7 +20,7 @@ export const buildWorkspaceFavouriteEndpoints = (
       url: "/api/workspace/favourites",
     })
   },
-  create: async favourite => {
+  create: async (favourite) => {
     return await API.post({
       url: "/api/workspace/favourites",
       body: favourite,

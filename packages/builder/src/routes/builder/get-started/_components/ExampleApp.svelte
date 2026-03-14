@@ -1,31 +1,31 @@
 <script lang="ts">
-  import { onMount } from "svelte"
+import { onMount } from "svelte"
 
-  let container: HTMLDivElement
-  let panel: HTMLImageElement
-  let panelWidth: number = 0
-  let containerWidth: number = 0
-  let isPanelCutOff: boolean = false
+let container: HTMLDivElement
+let panel: HTMLImageElement
+let panelWidth: number = 0
+let containerWidth: number = 0
+let isPanelCutOff: boolean = false
 
-  // side panel screenshot is overlaid over grid screenshot
-  // it should be anchored to the right until the screen is too narrow
-  function checkPanelVisibility(): void {
-    if (container && panel) {
-      containerWidth = container.clientWidth
-      panelWidth = panel.clientWidth
+// side panel screenshot is overlaid over grid screenshot
+// it should be anchored to the right until the screen is too narrow
+function checkPanelVisibility(): void {
+  if (container && panel) {
+    containerWidth = container.clientWidth
+    panelWidth = panel.clientWidth
 
-      isPanelCutOff = panelWidth > containerWidth
-    }
+    isPanelCutOff = panelWidth > containerWidth
   }
+}
 
-  onMount(() => {
-    checkPanelVisibility()
-    window.addEventListener("resize", checkPanelVisibility)
+onMount(() => {
+  checkPanelVisibility()
+  window.addEventListener("resize", checkPanelVisibility)
 
-    return () => {
-      window.removeEventListener("resize", checkPanelVisibility)
-    }
-  })
+  return () => {
+    window.removeEventListener("resize", checkPanelVisibility)
+  }
+})
 </script>
 
 <div tabindex="-1" class="exampleApp">

@@ -1,66 +1,65 @@
 <script lang="ts">
-  import type { UIEvent } from "@budibase/types"
-  import { createEventDispatcher, onMount } from "svelte"
-  import { fade } from "svelte/transition"
-  import FancyField from "./FancyField.svelte"
-  import FancyFieldLabel from "./FancyFieldLabel.svelte"
+import type { UIEvent } from "@budibase/types"
+import { createEventDispatcher, onMount } from "svelte"
+import { fade } from "svelte/transition"
+import FancyField from "./FancyField.svelte"
+import FancyFieldLabel from "./FancyFieldLabel.svelte"
 
-  export let label: string
-  export let value: string
-  export let type: string = "text"
-  export let disabled: boolean = false
-  export let error: string | null = null
-  export let validate: ((_value: string | undefined) => string | null) | null =
-    null
-  export let suffix: string | null = null
-  export let validateOn: "change" | "blur" = "change"
+export let label: string
+export let value: string
+export let type: string = "text"
+export let disabled: boolean = false
+export let error: string | null = null
+export let validate: ((_value: string | undefined) => string | null) | null = null
+export let suffix: string | null = null
+export let validateOn: "change" | "blur" = "change"
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  let ref: HTMLInputElement
-  let focused = false
-  let autofilled = false
+let ref: HTMLInputElement
+let focused = false
+let autofilled = false
 
-  $: placeholder = !autofilled && !focused && !value
+$: placeholder = !autofilled && !focused && !value
 
-  const onChange = (e: UIEvent) => {
-    const newValue = e.target.value
-    dispatch("change", newValue)
-    value = newValue
-    if (validate && (error || validateOn === "change")) {
-      error = validate(newValue)
-    }
+const onChange = (e: UIEvent) => {
+  const newValue = e.target.value
+  dispatch("change", newValue)
+  value = newValue
+  if (validate && (error || validateOn === "change")) {
+    error = validate(newValue)
   }
+}
 
-  const onBlur = (e: UIEvent) => {
-    focused = false
-    const newValue = e.target.value
-    dispatch("blur", newValue)
-    if (validate && validateOn === "blur") {
-      error = validate(newValue)
-    }
+const onBlur = (e: UIEvent) => {
+  focused = false
+  const newValue = e.target.value
+  dispatch("blur", newValue)
+  if (validate && validateOn === "blur") {
+    error = validate(newValue)
   }
+}
 
-  onMount(() => {
-    // Start watching for autofill every 100ms
-    const interval = setInterval(() => {
-      autofilled = ref?.matches(":-webkit-autofill")
-      if (autofilled) {
-        clearInterval(interval)
-      }
-    }, 100)
-
-    // Give up after 2 seconds and assume autofill has not been used
-    const timeout = setTimeout(() => {
+onMount(() => {
+  // Start watching for autofill every 100ms
+  const interval = setInterval(() => {
+    autofilled = ref?.matches(":-webkit-autofill")
+    if (autofilled) {
       clearInterval(interval)
-    }, 2000)
-
-    // Cleanup
-    return () => {
-      clearInterval(interval)
-      clearTimeout(timeout)
     }
-  })
+  }, 100)
+
+  // Give up after 2 seconds and assume autofill has not been used
+  const timeout = setTimeout(() => {
+    clearInterval(interval)
+  }, 2000)
+
+  // Cleanup
+  return () => {
+    clearInterval(interval)
+    clearTimeout(timeout)
+  }
+})
 </script>
 
 <FancyField {error} {value} {validate} {disabled} {focused}>

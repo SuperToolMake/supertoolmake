@@ -1,7 +1,7 @@
-import { derived, get, Writable } from "svelte/store"
-import { memo } from "../../../utils"
 import { SortOrder } from "@budibase/types"
-import { Store as StoreContext } from "."
+import { derived, get, type Writable } from "svelte/store"
+import { memo } from "../../../utils"
+import type { Store as StoreContext } from "."
 
 interface SortStore {
   sort: Writable<{
@@ -31,11 +31,11 @@ export const initialise = (context: StoreContext) => {
   const { sort, initialSortColumn, initialSortOrder, schema } = context
 
   // Reset sort when initial sort props change
-  initialSortColumn.subscribe(newSortColumn => {
-    sort.update(state => ({ ...state, column: newSortColumn }))
+  initialSortColumn.subscribe((newSortColumn) => {
+    sort.update((state) => ({ ...state, column: newSortColumn }))
   })
-  initialSortOrder.subscribe(newSortOrder => {
-    sort.update(state => ({
+  initialSortOrder.subscribe((newSortOrder) => {
+    sort.update((state) => ({
       ...state,
       order: newSortOrder || SortOrder.ASCENDING,
     }))
@@ -50,7 +50,7 @@ export const initialise = (context: StoreContext) => {
   })
 
   // Clear sort state if our sort column does not exist
-  sortColumnExists.subscribe(exists => {
+  sortColumnExists.subscribe((exists) => {
     if (!exists) {
       sort.set({
         column: null,

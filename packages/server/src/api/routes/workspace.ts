@@ -6,26 +6,15 @@ import { applicationValidator } from "./utils/validators"
 builderRoutes
   .post("/api/applications/:appId/sync", controller.sync)
   .get("/api/applications/:appId", controller.find)
-  .put(
-    "/api/applications/:appId",
-    applicationValidator({ isCreate: false }),
-    controller.update
-  )
+  .put("/api/applications/:appId", applicationValidator({ isCreate: false }), controller.update)
   .post("/api/applications/:appId/client/update", controller.updateClient)
   .post("/api/applications/:appId/client/revert", controller.revertClient)
-  .post(
-    "/api/applications/:appId/publish",
-    deploymentController.publishWorkspace
-  )
+  .post("/api/applications/:appId/publish", deploymentController.publishWorkspace)
   .post("/api/applications/:appId/unpublish", controller.unpublish)
   .post("/api/applications/:appId/duplicate", controller.duplicateWorkspace)
   .post("/api/applications/:appId/import", controller.importToWorkspace)
 
-creatorRoutes.post(
-  "/api/applications",
-  applicationValidator(),
-  controller.create
-)
+creatorRoutes.post("/api/applications", applicationValidator(), controller.create)
 
 // Client only endpoints
 publicRoutes

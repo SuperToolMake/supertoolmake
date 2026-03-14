@@ -1,44 +1,44 @@
 <script lang="ts">
-  import { createEventDispatcher, onMount, onDestroy } from "svelte"
-  import { Icon, Menu, MenuItem, TooltipPosition } from "@budibase/bbui"
-  import Portal from "svelte-portal"
+import { Icon, Menu, MenuItem, TooltipPosition } from "@budibase/bbui"
+import { createEventDispatcher, onDestroy, onMount } from "svelte"
+import Portal from "svelte-portal"
 
-  export let currentSort: string
-  export let open = false
-  export let options: { key: string; label: string }[] = []
+export let currentSort: string
+export let open = false
+export let options: { key: string; label: string }[] = []
 
-  const dispatch = createEventDispatcher<{ select: string }>()
+const dispatch = createEventDispatcher<{ select: string }>()
 
-  let anchor: HTMLButtonElement | null = null
-  let dropdown: HTMLDivElement | null = null
-  let left = 0
-  let top = 0
+let anchor: HTMLButtonElement | null = null
+let dropdown: HTMLDivElement | null = null
+let left = 0
+let top = 0
 
-  const updatePosition = () => {
-    if (!anchor) return
-    const rect = anchor.getBoundingClientRect()
-    left = rect.left
-    top = rect.bottom + 6
-  }
+const updatePosition = () => {
+  if (!anchor) return
+  const rect = anchor.getBoundingClientRect()
+  left = rect.left
+  top = rect.bottom + 6
+}
 
-  const toggle = () => {
-    open = !open
-    if (open) updatePosition()
-  }
+const toggle = () => {
+  open = !open
+  if (open) updatePosition()
+}
 
-  const handleClickOutside = (e: MouseEvent) => {
-    const target = e.target as Node
-    if (anchor?.contains(target) || dropdown?.contains(target)) return
-    open = false
-  }
+const handleClickOutside = (e: MouseEvent) => {
+  const target = e.target as Node
+  if (anchor?.contains(target) || dropdown?.contains(target)) return
+  open = false
+}
 
-  onMount(() => {
-    window.addEventListener("click", handleClickOutside, true)
-  })
+onMount(() => {
+  window.addEventListener("click", handleClickOutside, true)
+})
 
-  onDestroy(() => {
-    window.removeEventListener("click", handleClickOutside, true)
-  })
+onDestroy(() => {
+  window.removeEventListener("click", handleClickOutside, true)
+})
 </script>
 
 <button

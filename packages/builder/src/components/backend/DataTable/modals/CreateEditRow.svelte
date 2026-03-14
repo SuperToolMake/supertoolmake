@@ -1,44 +1,41 @@
 <script>
-  import { createEventDispatcher } from "svelte"
-  import { tables, dataAPI } from "@/stores/builder"
-  import { ModalContent, keepOpen, notifications } from "@budibase/bbui"
-  import RowFieldControl from "../RowFieldControl.svelte"
+import { keepOpen, ModalContent, notifications } from "@budibase/bbui"
+import { createEventDispatcher } from "svelte"
+import { dataAPI, tables } from "@/stores/builder"
+import RowFieldControl from "../RowFieldControl.svelte"
 
-  export let row = {}
+export let row = {}
 
-  let errors = []
-  const dispatch = createEventDispatcher()
+let errors = []
+const dispatch = createEventDispatcher()
 
-  $: creating = row?._id == null
-  $: table = row.tableId
-    ? $tables.list.find(table => table._id === row?.tableId)
-    : $tables.selected
-  $: tableSchema = Object.entries(table?.schema ?? {})
+$: creating = row?._id == null
+$: table = row.tableId ? $tables.list.find((table) => table._id === row?.tableId) : $tables.selected
+$: tableSchema = Object.entries(table?.schema ?? {})
 
-  async function saveRow() {
-    errors = []
-    try {
-      const res = await $dataAPI.saveRow({ ...row, tableId: table._id })
-      notifications.success("Row saved successfully")
-      dispatch("updaterows", res._id)
-    } catch (error) {
-      const response = error.json
-      if (error.handled && response?.errors) {
-        errors = response.errors
-      } else if (error.handled && response?.validationErrors) {
-        const mappedErrors = {}
-        for (let field in response.validationErrors) {
-          mappedErrors[field] =
-            `${field} ${response.validationErrors[field][0]}`
-        }
-        errors = mappedErrors
-      } else {
-        notifications.error(`Failed to save row - ${error.message}`)
+async function saveRow() {
+  errors = []
+  try {
+    const res = await $dataAPI.saveRow({ ...row, tableId: table._id })
+    notifications.success("Row saved successfully")
+    dispatch("updaterows", res._id)
+  } catch (error) {
+    const response = error.json
+    if (error.handled && response?.errors) {
+      errors = response.errors
+    } else if (error.handled && response?.validationErrors) {
+      const mappedErrors = {}
+      for (let field in response.validationErrors) {
+        mappedErrors[field] = `${field} ${response.validationErrors[field][0]}`
       }
-
-      return keepOpen
+      errors = mappedErrors
+    } else {
+      notifications.error(`Failed to save row - ${error.message}`)
     }
+
+    return keepOpen
   }
+}
 </script>
 
 <span class="modal-wrap">

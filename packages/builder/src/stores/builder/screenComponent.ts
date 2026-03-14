@@ -1,21 +1,21 @@
-import { derived } from "svelte/store"
-import { tables } from "./tables"
-import { selectedScreen } from "./screens"
-import {
-  UIDatasourceType,
+import { getSettingsDefinition } from "@budibase/frontend-core"
+import { helpers, utils } from "@budibase/shared-core"
+import type {
   Component,
-  UIComponentError,
   ComponentDefinition,
   DependsOnComponentSetting,
   Screen,
+  UIComponentError,
+  UIDatasourceType,
 } from "@budibase/types"
-import { queries } from "./queries"
-import { findAllComponents } from "@/helpers/components"
-import { bindings } from "@/helpers"
+import { derived } from "svelte/store"
 import { getBindableProperties } from "@/dataBinding"
+import { bindings } from "@/helpers"
+import { findAllComponents } from "@/helpers/components"
 import { componentStore } from "./components"
-import { getSettingsDefinition } from "@budibase/frontend-core"
-import { utils, helpers } from "@budibase/shared-core"
+import { queries } from "./queries"
+import { selectedScreen } from "./screens"
+import { tables } from "./tables"
 
 const reduceBy = utils.toMap
 
@@ -34,25 +34,17 @@ const validationKeyByType: Record<UIDatasourceType, string | null> = {
   jsonarray: "value",
 }
 
-export const screenComponentsList = derived(
-  [selectedScreen],
-  ([$selectedScreen]): Component[] => {
-    if (!$selectedScreen) {
-      return []
-    }
-
-    return findAllComponents($selectedScreen.props)
+export const screenComponentsList = derived([selectedScreen], ([$selectedScreen]): Component[] => {
+  if (!$selectedScreen) {
+    return []
   }
-)
+
+  return findAllComponents($selectedScreen.props)
+})
 
 export const screenComponentErrorList = derived(
   [selectedScreen, tables, queries, componentStore],
-  ([
-    $selectedScreen,
-    $tables,
-    $queries,
-    $componentStore,
-  ]): UIComponentError[] => {
+  ([$selectedScreen, $tables, $queries, $componentStore]): UIComponentError[] => {
     if (!$selectedScreen) {
       return []
     }
@@ -69,9 +61,7 @@ export const screenComponentErrorList = derived(
 
     function checkComponentErrors(component: Component, ancestors: string[]) {
       errors.push(...getMissingAncestors(component, definitions, ancestors))
-      errors.push(
-        ...getInvalidDatasources(screen, component, datasources, definitions)
-      )
+      errors.push(...getInvalidDatasources(screen, component, datasources, definitions))
       errors.push(...getMissingRequiredSettings(component, definitions))
 
       for (const child of component._children || []) {
@@ -95,8 +85,8 @@ function getInvalidDatasources(
 
   const datasourceTypes = ["table", "dataSource"]
 
-  const possibleSettings = definitions[component._component]?.settings?.filter(
-    s => datasourceTypes.includes(s.type)
+  const possibleSettings = definitions[component._component]?.settings?.filter((s) =>
+    datasourceTypes.includes(s.type)
   )
   if (possibleSettings) {
     for (const setting of possibleSettings) {
@@ -118,10 +108,7 @@ function getInvalidDatasources(
       const componentDatasources = {
         ...reduceBy("rowId", bindings.extractRelationships(componentBindings)),
         ...reduceBy("value", bindings.extractFields(componentBindings)),
-        ...reduceBy(
-          "value",
-          bindings.extractJSONArrayFields(componentBindings)
-        ),
+        ...reduceBy("value", bindings.extractJSONArrayFields(componentBindings)),
       }
 
       const resourceId = componentSettings[validationKey]
@@ -168,22 +155,19 @@ function getMissingRequiredSettings(
 
   const settings = getSettingsDefinition(definition)
 
-  const missingRequiredSettings = settings.filter(setting => {
-    let empty = component[setting.key] == null || component[setting.key] === ""
-    let missing = setting.required && empty
+  const missingRequiredSettings = settings.filter((setting) => {
+    const empty = component[setting.key] == null || component[setting.key] === ""
+    const missing = setting.required && empty
 
     // Check if this setting depends on another, as it may not be required
     if (setting.dependsOn) {
-      const { key: dependsOnKey, value: dependsOnValue } = parseDependsOn(
-        setting.dependsOn
-      )
-      const realDependentValue =
-        component[dependsOnKey as keyof typeof component]
+      const { key: dependsOnKey, value: dependsOnValue } = parseDependsOn(setting.dependsOn)
+      const realDependentValue = component[dependsOnKey as keyof typeof component]
 
-      const { key: sectionDependsOnKey, value: sectionDependsOnValue } =
-        parseDependsOn(setting.sectionDependsOn)
-      const sectionRealDependentValue =
-        component[sectionDependsOnKey as keyof typeof component]
+      const { key: sectionDependsOnKey, value: sectionDependsOnValue } = parseDependsOn(
+        setting.sectionDependsOn
+      )
+      const sectionRealDependentValue = component[sectionDependsOnKey as keyof typeof component]
 
       if (dependsOnValue == null && realDependentValue == null) {
         return false
@@ -192,10 +176,7 @@ function getMissingRequiredSettings(
         return false
       }
 
-      if (
-        sectionDependsOnValue != null &&
-        sectionDependsOnValue !== sectionRealDependentValue
-      ) {
+      if (sectionDependsOnValue != null && sectionDependsOnValue !== sectionRealDependentValue) {
         return false
       }
     }
@@ -205,7 +186,7 @@ function getMissingRequiredSettings(
 
   if (missingRequiredSettings?.length) {
     result.push(
-      ...missingRequiredSettings.map<UIComponentError>(s => ({
+      ...missingRequiredSettings.map<UIComponentError>((s) => ({
         componentId: component._id!,
         key: s.key,
         label: s.label || s.key,
@@ -226,7 +207,7 @@ function getMissingAncestors(
   ancestors: string[]
 ): UIComponentError[] {
   const definition = definitions[component._component]
-  if (ancestors.some(a => !a.startsWith(BudibasePrefix))) {
+  if (ancestors.some((a) => !a.startsWith(BudibasePrefix))) {
     return []
   }
   if (!definition?.requiredAncestors?.length) {
@@ -235,7 +216,7 @@ function getMissingAncestors(
 
   const result: UIComponentError[] = []
   const missingAncestors = definition.requiredAncestors.filter(
-    ancestor => !ancestors.includes(`${BudibasePrefix}${ancestor}`)
+    (ancestor) => !ancestors.includes(`${BudibasePrefix}${ancestor}`)
   )
 
   if (missingAncestors.length) {
@@ -244,7 +225,7 @@ function getMissingAncestors(
     }
 
     result.push(
-      ...missingAncestors.map<UIComponentError>(ancestor => {
+      ...missingAncestors.map<UIComponentError>((ancestor) => {
         const ancestorDefinition = definitions[`${BudibasePrefix}${ancestor}`]
         return {
           componentId: component._id!,

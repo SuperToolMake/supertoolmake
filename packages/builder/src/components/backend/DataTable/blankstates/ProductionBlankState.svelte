@@ -1,48 +1,46 @@
 <script lang="ts">
-  import { Button } from "@budibase/bbui"
-  import { createEventDispatcher } from "svelte"
+import { Button } from "@budibase/bbui"
+import { createEventDispatcher } from "svelte"
 
-  export let title = "To view your production table:"
-  export let description = ""
-  export let publishing = false
-  export let canSeed = true
-  let loadingAction: "publish" | "seed" | null = null
-  let publishCycleStarted = false
-  let loading = false
-  let publishLoading = false
-  let seedLoading = false
+export let title = "To view your production table:"
+export let description = ""
+export let publishing = false
+export let canSeed = true
+let loadingAction: "publish" | "seed" | null = null
+let publishCycleStarted = false
+let loading = false
+let publishLoading = false
+let seedLoading = false
 
-  $: loading = publishing || loadingAction !== null
-  $: publishLoading =
-    loading && (loadingAction === null || loadingAction === "publish")
-  $: seedLoading =
-    loading && (loadingAction === null || loadingAction === "seed")
-  $: {
-    if (publishing) {
-      publishCycleStarted = true
-    } else if (publishCycleStarted && loadingAction) {
-      loadingAction = null
-      publishCycleStarted = false
-    }
+$: loading = publishing || loadingAction !== null
+$: publishLoading = loading && (loadingAction === null || loadingAction === "publish")
+$: seedLoading = loading && (loadingAction === null || loadingAction === "seed")
+$: {
+  if (publishing) {
+    publishCycleStarted = true
+  } else if (publishCycleStarted && loadingAction) {
+    loadingAction = null
+    publishCycleStarted = false
   }
+}
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  const publishEmpty = () => {
-    if (loading) {
-      return
-    }
-    loadingAction = "publish"
-    dispatch("publish")
+const publishEmpty = () => {
+  if (loading) {
+    return
   }
+  loadingAction = "publish"
+  dispatch("publish")
+}
 
-  const seedAndPublish = () => {
-    if (loading || !canSeed) {
-      return
-    }
-    loadingAction = "seed"
-    dispatch("seedPublish")
+const seedAndPublish = () => {
+  if (loading || !canSeed) {
+    return
   }
+  loadingAction = "seed"
+  dispatch("seedPublish")
+}
 </script>
 
 <div class="production-blank">

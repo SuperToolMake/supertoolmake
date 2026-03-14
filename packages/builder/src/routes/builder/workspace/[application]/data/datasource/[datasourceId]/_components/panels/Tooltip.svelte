@@ -1,11 +1,11 @@
 <script>
-  import { ActionButton } from "@budibase/bbui"
+import { ActionButton } from "@budibase/bbui"
 
-  export let title = ""
-  export let href = null
-  export let showLabel = true
+export let title = ""
+export let href = null
+export let showLabel = true
 
-  const ariaLabel = title || "More info"
+const ariaLabel = title || "More info"
 </script>
 
 <ActionButton

@@ -26,20 +26,18 @@ export const TYPE_TRANSFORM_MAP: Record<
     ""?: null | []
     true?: true
     false?: false
-    parse?: (
-      input: string | string[] | { _id: unknown }[] | Date
-    ) => string | undefined | {}
+    parse?: (input: string | string[] | { _id: unknown }[] | Date) => string | undefined | {}
   }
 > = {
   [FieldType.LINK]: {
     "": [],
-    //@ts-ignore
+    //@ts-expect-error
     [null]: [],
-    //@ts-ignore
+    //@ts-expect-error
     [undefined]: undefined,
-    parse: link => {
+    parse: (link) => {
       if (Array.isArray(link) && typeof link[0] === "object") {
-        return link.map(el => {
+        return link.map((el) => {
           const objEl = el as { _id: unknown }
           return objEl && objEl._id ? objEl._id : el
         })
@@ -52,42 +50,42 @@ export const TYPE_TRANSFORM_MAP: Record<
   },
   [FieldType.OPTIONS]: {
     "": null,
-    //@ts-ignore
+    //@ts-expect-error
     [null]: null,
-    //@ts-ignore
+    //@ts-expect-error
     [undefined]: undefined,
   },
   [FieldType.ARRAY]: {
-    //@ts-ignore
+    //@ts-expect-error
     [null]: [],
-    //@ts-ignore
+    //@ts-expect-error
     [undefined]: undefined,
     parse: parseArrayString,
   },
   [FieldType.BB_REFERENCE]: {
-    //@ts-ignore
+    //@ts-expect-error
     [null]: [],
-    //@ts-ignore
+    //@ts-expect-error
     [undefined]: undefined,
     parse: parseArrayString,
   },
   [FieldType.STRING]: {
     "": null,
-    //@ts-ignore
+    //@ts-expect-error
     [null]: null,
-    //@ts-ignore
+    //@ts-expect-error
     [undefined]: undefined,
   },
   [FieldType.LONGFORM]: {
     "": null,
-    //@ts-ignore
+    //@ts-expect-error
     [null]: null,
-    //@ts-ignore
+    //@ts-expect-error
     [undefined]: undefined,
   },
   [FieldType.NUMBER]: {
     "": null,
-    //@ts-ignore
+    //@ts-expect-error
     [null]: null,
     //@ts-expect-error
     [undefined]: undefined,
@@ -101,18 +99,18 @@ export const TYPE_TRANSFORM_MAP: Record<
   },
   [FieldType.BIGINT]: {
     "": null,
-    //@ts-ignore
+    //@ts-expect-error
     [null]: null,
-    //@ts-ignore
+    //@ts-expect-error
     [undefined]: undefined,
   },
   [FieldType.DATETIME]: {
     "": null,
-    //@ts-ignore
+    //@ts-expect-error
     [null]: null,
-    //@ts-ignore
+    //@ts-expect-error
     [undefined]: undefined,
-    parse: input => {
+    parse: (input) => {
       if (input instanceof Date) {
         return input.toISOString()
       } else if (typeof input === "string" && sql.utils.isValidTime(input)) {
@@ -134,9 +132,9 @@ export const TYPE_TRANSFORM_MAP: Record<
   },
   [FieldType.BOOLEAN]: {
     "": null,
-    //@ts-ignore
+    //@ts-expect-error
     [null]: null,
-    //@ts-ignore
+    //@ts-expect-error
     [undefined]: undefined,
     true: true,
     false: false,
@@ -145,7 +143,7 @@ export const TYPE_TRANSFORM_MAP: Record<
     parse: () => undefined,
   },
   [FieldType.JSON]: {
-    parse: input => {
+    parse: (input) => {
       try {
         if (typeof input !== "string") {
           throw new Error("input was not a string")

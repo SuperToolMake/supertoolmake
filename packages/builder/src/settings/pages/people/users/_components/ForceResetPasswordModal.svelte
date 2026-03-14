@@ -1,35 +1,35 @@
 <script>
-  import { createEventDispatcher } from "svelte"
-  import { ModalContent, Body, Input, notifications } from "@budibase/bbui"
-  import { users } from "@/stores/portal/users"
+import { Body, Input, ModalContent, notifications } from "@budibase/bbui"
+import { createEventDispatcher } from "svelte"
+import { users } from "@/stores/portal/users"
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  export let user
+export let user
 
-  const generatePassword = length => {
-    const array = new Uint8Array(length)
-    crypto.getRandomValues(array)
-    return Array.from(array, byte => byte.toString(36).padStart(2, "0"))
-      .join("")
-      .slice(0, length)
+const generatePassword = (length) => {
+  const array = new Uint8Array(length)
+  crypto.getRandomValues(array)
+  return Array.from(array, (byte) => byte.toString(36).padStart(2, "0"))
+    .join("")
+    .slice(0, length)
+}
+
+const password = generatePassword(12)
+
+async function resetPassword() {
+  try {
+    await users.save({
+      ...user,
+      password,
+      forceResetPassword: true,
+    })
+    notifications.success("Password reset successfully")
+    dispatch("update")
+  } catch (error) {
+    notifications.error("Error resetting password")
   }
-
-  const password = generatePassword(12)
-
-  async function resetPassword() {
-    try {
-      await users.save({
-        ...user,
-        password,
-        forceResetPassword: true,
-      })
-      notifications.success("Password reset successfully")
-      dispatch("update")
-    } catch (error) {
-      notifications.error("Error resetting password")
-    }
-  }
+}
 </script>
 
 <ModalContent

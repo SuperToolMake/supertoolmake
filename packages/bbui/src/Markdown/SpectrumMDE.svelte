@@ -1,44 +1,44 @@
 <script lang="ts">
-  import type EasyMDE from "easymde"
-  import "easymde/dist/easymde.min.css"
-  import { onDestroy, onMount } from "svelte"
+import type EasyMDE from "easymde"
+import "easymde/dist/easymde.min.css"
+import { onDestroy, onMount } from "svelte"
 
-  export let height: string | null = null
-  export let scroll: boolean = true
-  export let easyMDEOptions: Record<string, any> | null = null
-  export let mde: EasyMDE | null = null
-  export let id: string | null = null
-  export let fullScreenOffset: { x: string; y: string } | null = null
-  export let disabled: boolean = false
+export let height: string | null = null
+export let scroll: boolean = true
+export let easyMDEOptions: Record<string, any> | null = null
+export let mde: EasyMDE | null = null
+export let id: string | null = null
+export let fullScreenOffset: { x: string; y: string } | null = null
+export let disabled: boolean = false
 
-  let element: HTMLTextAreaElement | undefined = undefined
+let element: HTMLTextAreaElement | undefined
 
-  onMount(async () => {
-    height = height || "200px"
-    const { default: EasyMDE } = await import("easymde")
-    mde = new EasyMDE({
-      element,
-      spellChecker: false,
-      status: false,
-      unorderedListStyle: "-",
-      maxHeight: scroll ? height : undefined,
-      minHeight: scroll ? undefined : height,
-      ...easyMDEOptions,
-    })
+onMount(async () => {
+  height = height || "200px"
+  const { default: EasyMDE } = await import("easymde")
+  mde = new EasyMDE({
+    element,
+    spellChecker: false,
+    status: false,
+    unorderedListStyle: "-",
+    maxHeight: scroll ? height : undefined,
+    minHeight: scroll ? undefined : height,
+    ...easyMDEOptions,
   })
+})
 
-  onDestroy(() => {
-    mde?.toTextArea()
-  })
+onDestroy(() => {
+  mde?.toTextArea()
+})
 
-  $: styleString = getStyleString(fullScreenOffset)
+$: styleString = getStyleString(fullScreenOffset)
 
-  const getStyleString = (offset: { x?: string; y?: string } | null) => {
-    let string = ""
-    string += `--fullscreen-offset-x:${offset?.x || "0px"};`
-    string += `--fullscreen-offset-y:${offset?.y || "0px"};`
-    return string
-  }
+const getStyleString = (offset: { x?: string; y?: string } | null) => {
+  let string = ""
+  string += `--fullscreen-offset-x:${offset?.x || "0px"};`
+  string += `--fullscreen-offset-y:${offset?.y || "0px"};`
+  return string
+}
 </script>
 
 <div class:disabled style={styleString}>

@@ -1,11 +1,9 @@
+import { env } from "@budibase/backend-core"
+import type { GetDiagnosticsResponse, UserCtx } from "@budibase/types"
 import os from "os"
 import process from "process"
-import { env } from "@budibase/backend-core"
-import { GetDiagnosticsResponse, UserCtx } from "@budibase/types"
 
-export async function systemDebugInfo(
-  ctx: UserCtx<void, GetDiagnosticsResponse>
-) {
+export async function systemDebugInfo(ctx: UserCtx<void, GetDiagnosticsResponse>) {
   const { days, hours, minutes } = secondsToHMS(os.uptime())
   const totalMemory = convertBytes(os.totalmem())
 

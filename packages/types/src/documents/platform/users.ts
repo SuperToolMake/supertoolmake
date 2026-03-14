@@ -1,4 +1,4 @@
-import { Document } from "../document"
+import type { Document } from "../document"
 
 /**
  * doc id is user email
@@ -30,7 +30,4 @@ export interface PlatformUserBySsoId extends Document {
   ssoId?: string
 }
 
-export type PlatformUser =
-  | PlatformUserByEmail
-  | PlatformUserById
-  | PlatformUserBySsoId
+export type PlatformUser = PlatformUserByEmail | PlatformUserById | PlatformUserBySsoId

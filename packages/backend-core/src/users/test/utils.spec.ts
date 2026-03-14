@@ -1,4 +1,4 @@
-import { User } from "@budibase/types"
+import type { User } from "@budibase/types"
 import { structures } from "../../../tests"
 import { isCreatorSync } from "../utils"
 

@@ -1,7 +1,7 @@
-import { derived, writable, get } from "svelte/store"
 import { keepOpen, notifications } from "@budibase/bbui"
+import type { Datasource } from "@budibase/types"
+import { derived, get, writable } from "svelte/store"
 import { datasources, tables } from "@/stores/builder"
-import { Datasource } from "@budibase/types"
 
 export const createTableSelectionStore = (datasource: Datasource) => {
   const tableNamesStore = writable<string[]>([])
@@ -9,11 +9,9 @@ export const createTableSelectionStore = (datasource: Datasource) => {
   const errorStore = writable<Error | null>(null)
   const loadingStore = writable<boolean>(true)
 
-  datasources.getTableNames(datasource).then(tableNames => {
+  datasources.getTableNames(datasource).then((tableNames) => {
     tableNamesStore.set(tableNames)
-    selectedTableNamesStore.set(
-      tableNames.filter(tableName => datasource.entities?.[tableName])
-    )
+    selectedTableNamesStore.set(tableNames.filter((tableName) => datasource.entities?.[tableName]))
 
     loadingStore.set(false)
   })
@@ -38,12 +36,7 @@ export const createTableSelectionStore = (datasource: Datasource) => {
 
   const combined = derived(
     [tableNamesStore, selectedTableNamesStore, errorStore, loadingStore],
-    ([
-      $tableNamesStore,
-      $selectedTableNamesStore,
-      $errorStore,
-      $loadingStore,
-    ]) => {
+    ([$tableNamesStore, $selectedTableNamesStore, $errorStore, $loadingStore]) => {
       return {
         tableNames: $tableNamesStore,
         selectedTableNames: $selectedTableNamesStore,

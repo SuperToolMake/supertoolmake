@@ -1,7 +1,6 @@
-import { AnyDocument, Database, Document, DocumentType } from "@budibase/types"
-
-import { BudibaseQueue, JobQueue } from "../queue"
+import { type AnyDocument, type Database, type Document, DocumentType } from "@budibase/types"
 import * as dbUtils from "../db"
+import { BudibaseQueue, JobQueue } from "../queue"
 
 interface ProcessDocMessage {
   dbName: string
@@ -31,7 +30,7 @@ export class DocWritethroughProcessor {
   }
 
   init() {
-    DocWritethroughProcessor.queue.process(async message => {
+    DocWritethroughProcessor.queue.process(async (message) => {
       try {
         await this.persistToDb(message.data)
       } catch (err: any) {

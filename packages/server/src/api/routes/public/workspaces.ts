@@ -31,9 +31,7 @@ const read = [],
  *                 $ref: '#/components/examples/workspace'
  */
 write.push(
-  new Endpoint("post", "/workspaces", controller.create).addMiddleware(
-    applicationValidator()
-  )
+  new Endpoint("post", "/workspaces", controller.create).addMiddleware(applicationValidator())
 )
 
 /**
@@ -64,9 +62,7 @@ write.push(
  *                 $ref: '#/components/examples/workspace'
  */
 write.push(
-  new Endpoint("put", "/workspaces/:appId", controller.update).addMiddleware(
-    applicationValidator()
-  )
+  new Endpoint("put", "/workspaces/:appId", controller.update).addMiddleware(applicationValidator())
 )
 
 /**
@@ -90,9 +86,7 @@ write.push(
  *               deployment:
  *                 $ref: '#/components/examples/deploymentOutput'
  */
-write.push(
-  new Endpoint("post", "/workspaces/:appId/publish", controller.publish)
-)
+write.push(new Endpoint("post", "/workspaces/:appId/publish", controller.publish))
 
 /**
  * @openapi
@@ -108,9 +102,7 @@ write.push(
  *       204:
  *         description: The workspace was published successfully.
  */
-write.push(
-  new Endpoint("post", "/workspaces/:appId/unpublish", controller.unpublish)
-)
+write.push(new Endpoint("post", "/workspaces/:appId/unpublish", controller.unpublish))
 
 /**
  * @openapi
@@ -162,9 +154,7 @@ read.push(new Endpoint("get", "/workspaces/:appId", controller.read))
  *                 $ref: '#/components/examples/workspaces'
  */
 read.push(
-  new Endpoint("post", "/workspaces/search", controller.search).addMiddleware(
-    nameValidator()
-  )
+  new Endpoint("post", "/workspaces/search", controller.search).addMiddleware(nameValidator())
 )
 
 export default { read, write }

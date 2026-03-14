@@ -1,4 +1,4 @@
-import { TestAPI, TestAPIOpts } from "./base"
+import { TestAPI, type TestAPIOpts } from "./base"
 
 export class TemplatesAPI extends TestAPI {
   definitions = (opts?: TestAPIOpts) => {
@@ -23,10 +23,7 @@ export class TemplatesAPI extends TestAPI {
       .expect(opts?.status ? opts.status : 200)
   }
 
-  exportTemplates = (
-    req?: { type?: string; data?: any },
-    opts?: TestAPIOpts
-  ) => {
+  exportTemplates = (req?: { type?: string; data?: any }, opts?: TestAPIOpts) => {
     const { type = "email", data } = req || {}
     return this.request
       .post(`/api/global/template/${type}/export`)

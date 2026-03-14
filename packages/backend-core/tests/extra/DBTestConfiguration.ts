@@ -1,7 +1,7 @@
 import "../core/utilities/mocks"
+import * as context from "../../src/context"
 import * as structures from "../core/utilities/structures"
 import * as testEnv from "./testEnv"
-import * as context from "../../src/context"
 
 class DBTestConfiguration {
   tenantId: string

@@ -1,133 +1,120 @@
 <script>
-  import {
-    Combobox,
-    DatePicker,
-    Input,
-    Multiselect,
-    Icon,
-    Drawer,
-    Button,
-  } from "@budibase/bbui"
+import { Button, Combobox, DatePicker, Drawer, Icon, Input, Multiselect } from "@budibase/bbui"
+import { findHBSBlocks, isJSBinding } from "@budibase/string-templates"
+import { ArrayOperator, FieldType } from "@budibase/types"
+import { createEventDispatcher } from "svelte"
+import * as Constants from "../constants"
+import FilterUsers from "./FilterUsers.svelte"
 
-  import FilterUsers from "./FilterUsers.svelte"
-  import { FieldType, ArrayOperator } from "@budibase/types"
-  import * as Constants from "../constants"
-  import { isJSBinding, findHBSBlocks } from "@budibase/string-templates"
-  import { createEventDispatcher } from "svelte"
+export let filter
+export let disabled = false
+export let bindings = []
+export let allowBindings = false
+export let schemaFields
+export let panel
+export let drawerTitle
+export let toReadable
+export let toRuntime
+export let evaluationContext = {}
 
-  export let filter
-  export let disabled = false
-  export let bindings = []
-  export let allowBindings = false
-  export let schemaFields
-  export let panel
-  export let drawerTitle
-  export let toReadable
-  export let toRuntime
-  export let evaluationContext = {}
+const dispatch = createEventDispatcher()
+const { OperatorOptions, FilterValueType } = Constants
 
-  const dispatch = createEventDispatcher()
-  const { OperatorOptions, FilterValueType } = Constants
+let bindingDrawer
 
-  let bindingDrawer
+$: fieldValue = filter?.value
+$: readableValue = toReadable ? toReadable(bindings, fieldValue) : fieldValue
+$: drawerValue = toDrawerValue(fieldValue)
+$: isJS = isJSBinding(fieldValue)
+$: fieldIsValid = isValid(fieldValue)
 
-  $: fieldValue = filter?.value
-  $: readableValue = toReadable ? toReadable(bindings, fieldValue) : fieldValue
-  $: drawerValue = toDrawerValue(fieldValue)
-  $: isJS = isJSBinding(fieldValue)
-  $: fieldIsValid = isValid(fieldValue)
+const getFieldOptions = (field) => {
+  const schema = schemaFields.find((x) => x.name === field)
+  return schema?.constraints?.inclusion || []
+}
 
-  const getFieldOptions = field => {
-    const schema = schemaFields.find(x => x.name === field)
-    return schema?.constraints?.inclusion || []
+const getSchema = (filter) => {
+  return schemaFields.find((field) => field.name === filter.field)
+}
+
+const drawerOnChange = (e) => {
+  drawerValue = e.detail
+}
+
+const onChange = (e) => {
+  fieldValue = e.detail
+  dispatch("change", {
+    value: toRuntime ? toRuntime(bindings, fieldValue) : fieldValue,
+  })
+}
+
+const onConfirmBinding = () => {
+  dispatch("change", {
+    value: toRuntime ? toRuntime(bindings, drawerValue) : drawerValue,
+    valueType: drawerValue ? FilterValueType.BINDING : FilterValueType.VALUE,
+  })
+}
+
+const isValidDate = (value) => {
+  return !value || !isNaN(new Date(value).valueOf())
+}
+
+const hasValidOptions = (value) => {
+  let links = []
+  if (Array.isArray(value)) {
+    links = value
+  } else if (value && typeof value === "string") {
+    links = value.split(",")
+  } else {
+    return !value
+  }
+  return links.every((link) => getSchema(filter)?.constraints?.inclusion?.includes(link))
+}
+
+const isValidBoolean = (value) => {
+  return value === "false" || value === "true" || value == ""
+}
+
+const hasValidLinks = (value) => {
+  let links = []
+  if (Array.isArray(value)) {
+    links = value
+  } else if (value && typeof value === "string") {
+    links = value.split(",")
+  } else {
+    return !value
   }
 
-  const getSchema = filter => {
-    return schemaFields.find(field => field.name === filter.field)
-  }
+  return links.every((link) => link.startsWith("ro_"))
+}
 
-  const drawerOnChange = e => {
-    drawerValue = e.detail
-  }
+const validationMap = {
+  date: isValidDate,
+  datetime: isValidDate,
+  bb_reference: hasValidLinks,
+  bb_reference_single: hasValidLinks,
+  array: hasValidOptions,
+  longform: (value) => !isJSBinding(value),
+  options: (value) => !isJSBinding(value) && !findHBSBlocks(value)?.length,
+  boolean: isValidBoolean,
+}
 
-  const onChange = e => {
-    fieldValue = e.detail
-    dispatch("change", {
-      value: toRuntime ? toRuntime(bindings, fieldValue) : fieldValue,
-    })
-  }
+const isValid = (value) => {
+  const validate = validationMap[filter.type]
+  return validate ? validate(value) : true
+}
 
-  const onConfirmBinding = () => {
-    dispatch("change", {
-      value: toRuntime ? toRuntime(bindings, drawerValue) : drawerValue,
-      valueType: drawerValue ? FilterValueType.BINDING : FilterValueType.VALUE,
-    })
-  }
-
-  const isValidDate = value => {
-    return !value || !isNaN(new Date(value).valueOf())
-  }
-
-  const hasValidOptions = value => {
-    let links = []
-    if (Array.isArray(value)) {
-      links = value
-    } else if (value && typeof value === "string") {
-      links = value.split(",")
-    } else {
-      return !value
-    }
-    return links.every(link =>
-      getSchema(filter)?.constraints?.inclusion?.includes(link)
-    )
-  }
-
-  const isValidBoolean = value => {
-    return value === "false" || value === "true" || value == ""
-  }
-
-  const hasValidLinks = value => {
-    let links = []
-    if (Array.isArray(value)) {
-      links = value
-    } else if (value && typeof value === "string") {
-      links = value.split(",")
-    } else {
-      return !value
-    }
-
-    return links.every(link => link.startsWith("ro_"))
-  }
-
-  const validationMap = {
-    date: isValidDate,
-    datetime: isValidDate,
-    bb_reference: hasValidLinks,
-    bb_reference_single: hasValidLinks,
-    array: hasValidOptions,
-    longform: value => !isJSBinding(value),
-    options: value => !isJSBinding(value) && !findHBSBlocks(value)?.length,
-    boolean: isValidBoolean,
-  }
-
-  const isValid = value => {
-    const validate = validationMap[filter.type]
-    return validate ? validate(value) : true
-  }
-
-  /**
-   * Converts arrays into strings. The CodeEditor expects a string or encoded JS
-   * value, so normalise everything to a readable string but preserve whatever the
-   * user last entered when reopening the drawer.
-   *
-   * @param{string} fieldValue
-   */
-  const toDrawerValue = fieldValue => {
-    const normalised = Array.isArray(fieldValue)
-      ? fieldValue.join(",")
-      : readableValue
-    return normalised ?? ""
-  }
+/**
+ * Converts arrays into strings. The CodeEditor expects a string or encoded JS
+ * value, so normalise everything to a readable string but preserve whatever the
+ * user last entered when reopening the drawer.
+ *
+ * @param{string} fieldValue
+ */
+const toDrawerValue = (fieldValue) => {
+  const normalised = Array.isArray(fieldValue) ? fieldValue.join(",") : readableValue
+  return normalised ?? ""
+}
 </script>
 
 <div>

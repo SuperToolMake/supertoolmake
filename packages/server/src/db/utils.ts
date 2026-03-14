@@ -1,12 +1,12 @@
 import { context, db as dbCore, utils } from "@budibase/backend-core"
 import {
   DocumentType,
-  FieldSchema,
+  type FieldSchema,
   FieldType,
-  LinkDocument,
-  RelationshipFieldMetadata,
+  type LinkDocument,
+  type RelationshipFieldMetadata,
 } from "@budibase/types"
-import { DocumentListParams } from "nano"
+import type { DocumentListParams } from "nano"
 
 export { DocumentType, VirtualDocumentType } from "@budibase/types"
 
@@ -14,7 +14,7 @@ const newid = utils.newid
 
 type Optional = string | null
 
-export const enum WorkspaceStatus {
+export enum WorkspaceStatus {
   DEV = "development",
   ALL = "all",
   DEPLOYED = "published",
@@ -43,8 +43,7 @@ export const getRowParams = dbCore.getRowParams
 export const generateRowID = dbCore.generateRowID
 export const getUserMetadataParams = dbCore.getUserMetadataParams
 export const generateUserMetadataID = dbCore.generateUserMetadataID
-export const getGlobalIDFromUserMetadataID =
-  dbCore.getGlobalIDFromUserMetadataID
+export const getGlobalIDFromUserMetadataID = dbCore.getGlobalIDFromUserMetadataID
 
 /**
  * Gets parameters for retrieving tables, this is a utility function for the getDocParams function.
@@ -96,7 +95,7 @@ export async function allLinkDocs() {
       include_docs: true,
     })
   )
-  return response.rows.map(row => row.doc!)
+  return response.rows.map((row) => row.doc!)
 }
 
 /**
@@ -130,9 +129,7 @@ export function getScreenParams(screenId?: Optional, otherProps = {}) {
 }
 
 export function generateDatasourceID({ plus = false } = {}) {
-  return `${
-    plus ? DocumentType.DATASOURCE_PLUS : DocumentType.DATASOURCE
-  }${SEPARATOR}${newid()}`
+  return `${plus ? DocumentType.DATASOURCE_PLUS : DocumentType.DATASOURCE}${SEPARATOR}${newid()}`
 }
 
 /**
@@ -154,9 +151,7 @@ export function getDatasourcePlusParams(
  * @returns The new query ID which the query doc can be stored under.
  */
 export function generateQueryID(datasourceId: string) {
-  return `${
-    DocumentType.QUERY
-  }${SEPARATOR}${datasourceId}${SEPARATOR}${newid()}`
+  return `${DocumentType.QUERY}${SEPARATOR}${datasourceId}${SEPARATOR}${newid()}`
 }
 
 /**
@@ -185,11 +180,7 @@ export function getQueryParams(
     return getDocParams(DocumentType.QUERY, null, otherProps)
   }
 
-  return getDocParams(
-    DocumentType.QUERY,
-    `${datasourceId}${SEPARATOR}`,
-    otherProps
-  )
+  return getDocParams(DocumentType.QUERY, `${datasourceId}${SEPARATOR}`, otherProps)
 }
 
 /**
@@ -220,9 +211,7 @@ export function generateMemoryViewID(viewName: string) {
   return `${DocumentType.MEM_VIEW}${SEPARATOR}${viewName}`
 }
 
-export function getMemoryViewParams(
-  otherProps: Partial<DocumentListParams> = {}
-) {
+export function getMemoryViewParams(otherProps: Partial<DocumentListParams> = {}) {
   return getDocParams(DocumentType.MEM_VIEW, null, otherProps)
 }
 
@@ -232,9 +221,7 @@ export function generateJunctionTableID(tableId1: string, tableId2: string) {
   return `${first}${SEPARATOR}${second}`
 }
 
-export function isRelationshipColumn(
-  column: FieldSchema
-): column is RelationshipFieldMetadata {
+export function isRelationshipColumn(column: FieldSchema): column is RelationshipFieldMetadata {
   return column.type === FieldType.LINK
 }
 
@@ -247,8 +234,5 @@ export function generateRowActionsID(tableId: string) {
 }
 
 export function extractTableIdFromRowActionsID(rowActionIds: string) {
-  return rowActionIds.replace(
-    new RegExp(`^${DocumentType.ROW_ACTIONS}${SEPARATOR}`),
-    ""
-  )
+  return rowActionIds.replace(new RegExp(`^${DocumentType.ROW_ACTIONS}${SEPARATOR}`), "")
 }

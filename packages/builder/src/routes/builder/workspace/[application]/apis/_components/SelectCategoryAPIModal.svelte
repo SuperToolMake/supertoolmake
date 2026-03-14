@@ -1,206 +1,200 @@
 <script lang="ts">
-  import { Button, CollapsibleSearch, Divider, Select } from "@budibase/bbui"
-  import { createEventDispatcher, onDestroy, onMount, tick } from "svelte"
-  import type {
-    ConnectorCard,
-    GroupTemplateName,
-    RestTemplate,
-    RestTemplateGroup,
-    RestTemplateGroupName,
-    RestTemplateName,
-    TemplateSelection,
-  } from "@budibase/types"
-  import DescriptionViewer from "@/components/common/DescriptionViewer.svelte"
+import { Button, CollapsibleSearch, Divider, Select } from "@budibase/bbui"
+import type {
+  ConnectorCard,
+  GroupTemplateName,
+  RestTemplate,
+  RestTemplateGroup,
+  RestTemplateGroupName,
+  RestTemplateName,
+  TemplateSelection,
+} from "@budibase/types"
+import { createEventDispatcher, onDestroy, onMount, tick } from "svelte"
+import DescriptionViewer from "@/components/common/DescriptionViewer.svelte"
 
-  export let templates: RestTemplate[] = []
-  export let templateGroups: RestTemplateGroup<RestTemplateGroupName>[] = []
-  export let loading = false
-  export let customDisabled = false
+export let templates: RestTemplate[] = []
+export let templateGroups: RestTemplateGroup<RestTemplateGroupName>[] = []
+export let loading = false
+export let customDisabled = false
 
-  const dispatch = createEventDispatcher<{
-    selectTemplate: TemplateSelection
-    custom: void
-  }>()
+const dispatch = createEventDispatcher<{
+  selectTemplate: TemplateSelection
+  custom: void
+}>()
 
-  let scrolling = false
-  let scrollContainer: HTMLDivElement | undefined
-  let loadTrigger: HTMLDivElement | undefined
-  let observer: IntersectionObserver | null = null
-  let loadingMore = false
-  let activeGroup: RestTemplateGroup<RestTemplateGroupName> | null = null
-  let activeGroupTemplateName: GroupTemplateName | null = null
-  let currentPage = 1
-  let lastConnectorCount = 0
-  let searchValue = ""
-  let lastSearchValue = ""
-  const itemsPerPage = 24
+let scrolling = false
+let scrollContainer: HTMLDivElement | undefined
+let loadTrigger: HTMLDivElement | undefined
+let observer: IntersectionObserver | null = null
+let loadingMore = false
+let activeGroup: RestTemplateGroup<RestTemplateGroupName> | null = null
+let activeGroupTemplateName: GroupTemplateName | null = null
+let currentPage = 1
+let lastConnectorCount = 0
+let searchValue = ""
+let lastSearchValue = ""
+const itemsPerPage = 24
 
-  $: normalizedSearchValue = searchValue.trim().toLowerCase()
-  $: if (normalizedSearchValue !== lastSearchValue) {
-    lastSearchValue = normalizedSearchValue
-    currentPage = 1
-    if (scrollContainer) {
-      scrollContainer.scrollTop = 0
-    }
-    if (observer && loadTrigger) {
-      observer.disconnect()
-      observer.observe(loadTrigger)
-    }
+$: normalizedSearchValue = searchValue.trim().toLowerCase()
+$: if (normalizedSearchValue !== lastSearchValue) {
+  lastSearchValue = normalizedSearchValue
+  currentPage = 1
+  if (scrollContainer) {
+    scrollContainer.scrollTop = 0
   }
-
-  $: groupedTemplateNames = new Set<RestTemplateName>(
-    templateGroups.flatMap(group =>
-      group.templates.map(template => template.name)
-    )
-  )
-  $: visibleTemplates = (templates || []).filter(
-    template => !groupedTemplateNames.has(template.name)
-  )
-  $: filteredTemplateGroups = normalizedSearchValue
-    ? templateGroups.filter(
-        group =>
-          group.name.toLowerCase().includes(normalizedSearchValue) ||
-          group.templates.some(template =>
-            template.name.toLowerCase().includes(normalizedSearchValue)
-          )
-      )
-    : templateGroups
-  $: filteredTemplates = normalizedSearchValue
-    ? visibleTemplates.filter(template =>
-        template.name.toLowerCase().includes(normalizedSearchValue)
-      )
-    : visibleTemplates
-  $: connectorCards = [
-    ...filteredTemplateGroups.map<ConnectorCard>(group => ({
-      type: "group",
-      name: group.name,
-      icon: group.icon,
-      key: `group-${group.name}`,
-      group,
-    })),
-    ...filteredTemplates.map<ConnectorCard>(template => ({
-      type: "template",
-      name: template.name,
-      icon: template.icon,
-      key: `template-${template.name}`,
-      template,
-    })),
-  ].sort((a, b) => a.name.localeCompare(b.name))
-  $: if (connectorCards.length !== lastConnectorCount) {
-    lastConnectorCount = connectorCards.length
-    currentPage = 1
-  }
-  $: if (activeGroup) {
-    currentPage = 1
-  }
-  $: totalPages = Math.max(1, Math.ceil(connectorCards.length / itemsPerPage))
-  $: if (currentPage > totalPages) {
-    currentPage = totalPages
-  }
-  $: pagedConnectorCards = connectorCards.slice(0, currentPage * itemsPerPage)
-  $: hasNextPage = currentPage < totalPages
-  $: activeGroupOptions = activeGroup
-    ? activeGroup.templates.map(template => ({
-        label: template.name,
-        value: template.name,
-        description: template.description,
-      }))
-    : []
-  $: selectedGroupTemplate =
-    activeGroup && activeGroupTemplateName
-      ? activeGroup.templates.find(
-          template => template.name === activeGroupTemplateName
-        ) || null
-      : null
-  $: selectedGroupTemplateDescription = activeGroupOptions.find(
-    option => option.value === activeGroupTemplateName
-  )?.description
-
-  const handleScroll = (event: Event) => {
-    const target = event.target as HTMLDivElement
-    scrolling = target?.scrollTop !== 0
-  }
-
-  const openTemplateGroup = (
-    group: RestTemplateGroup<RestTemplateGroupName>
-  ) => {
-    if (loading) {
-      return
-    }
-    activeGroup = group
-    activeGroupTemplateName = group.templates[0]?.name || null
-  }
-
-  const resetGroupSelection = () => {
-    activeGroup = null
-    activeGroupTemplateName = null
-    searchValue = ""
-  }
-
-  const confirmGroupTemplateSelection = () => {
-    if (!activeGroup || !selectedGroupTemplate) {
-      return
-    }
-    dispatch("selectTemplate", {
-      kind: "group",
-      groupName: activeGroup.name,
-      template: selectedGroupTemplate,
-    })
-  }
-
-  const handleTemplateSelection = (template: RestTemplate) => {
-    dispatch("selectTemplate", { kind: "template", template })
-  }
-
-  const handleCustomClick = () => {
-    dispatch("custom")
-  }
-
-  const handleIntersect = async (entries: IntersectionObserverEntry[]) => {
-    if (loadingMore || !hasNextPage) {
-      return
-    }
-    const isVisible = entries.some(entry => entry.isIntersecting)
-    if (!isVisible) {
-      return
-    }
-    loadingMore = true
-    currentPage += 1
-    await tick()
-    loadingMore = false
-  }
-
-  const ensureObserver = () => {
-    if (!scrollContainer || !loadTrigger) {
-      return
-    }
-    observer?.disconnect()
-    if (!observer) {
-      observer = new IntersectionObserver(handleIntersect, {
-        root: scrollContainer,
-        rootMargin: "80px",
-        threshold: 0.1,
-      })
-    }
+  if (observer && loadTrigger) {
+    observer.disconnect()
     observer.observe(loadTrigger)
   }
+}
 
-  onMount(() => {
-    ensureObserver()
-  })
+$: groupedTemplateNames = new Set<RestTemplateName>(
+  templateGroups.flatMap((group) => group.templates.map((template) => template.name))
+)
+$: visibleTemplates = (templates || []).filter(
+  (template) => !groupedTemplateNames.has(template.name)
+)
+$: filteredTemplateGroups = normalizedSearchValue
+  ? templateGroups.filter(
+      (group) =>
+        group.name.toLowerCase().includes(normalizedSearchValue) ||
+        group.templates.some((template) =>
+          template.name.toLowerCase().includes(normalizedSearchValue)
+        )
+    )
+  : templateGroups
+$: filteredTemplates = normalizedSearchValue
+  ? visibleTemplates.filter((template) =>
+      template.name.toLowerCase().includes(normalizedSearchValue)
+    )
+  : visibleTemplates
+$: connectorCards = [
+  ...filteredTemplateGroups.map<ConnectorCard>((group) => ({
+    type: "group",
+    name: group.name,
+    icon: group.icon,
+    key: `group-${group.name}`,
+    group,
+  })),
+  ...filteredTemplates.map<ConnectorCard>((template) => ({
+    type: "template",
+    name: template.name,
+    icon: template.icon,
+    key: `template-${template.name}`,
+    template,
+  })),
+].sort((a, b) => a.name.localeCompare(b.name))
+$: if (connectorCards.length !== lastConnectorCount) {
+  lastConnectorCount = connectorCards.length
+  currentPage = 1
+}
+$: if (activeGroup) {
+  currentPage = 1
+}
+$: totalPages = Math.max(1, Math.ceil(connectorCards.length / itemsPerPage))
+$: if (currentPage > totalPages) {
+  currentPage = totalPages
+}
+$: pagedConnectorCards = connectorCards.slice(0, currentPage * itemsPerPage)
+$: hasNextPage = currentPage < totalPages
+$: activeGroupOptions = activeGroup
+  ? activeGroup.templates.map((template) => ({
+      label: template.name,
+      value: template.name,
+      description: template.description,
+    }))
+  : []
+$: selectedGroupTemplate =
+  activeGroup && activeGroupTemplateName
+    ? activeGroup.templates.find((template) => template.name === activeGroupTemplateName) || null
+    : null
+$: selectedGroupTemplateDescription = activeGroupOptions.find(
+  (option) => option.value === activeGroupTemplateName
+)?.description
 
-  onDestroy(() => {
-    if (observer) {
-      observer.disconnect()
-      observer = null
-    }
-  })
+const handleScroll = (event: Event) => {
+  const target = event.target as HTMLDivElement
+  scrolling = target?.scrollTop !== 0
+}
 
-  $: if (activeGroup) {
-    observer?.disconnect()
-  } else if (loadTrigger) {
-    ensureObserver()
+const openTemplateGroup = (group: RestTemplateGroup<RestTemplateGroupName>) => {
+  if (loading) {
+    return
   }
+  activeGroup = group
+  activeGroupTemplateName = group.templates[0]?.name || null
+}
+
+const resetGroupSelection = () => {
+  activeGroup = null
+  activeGroupTemplateName = null
+  searchValue = ""
+}
+
+const confirmGroupTemplateSelection = () => {
+  if (!activeGroup || !selectedGroupTemplate) {
+    return
+  }
+  dispatch("selectTemplate", {
+    kind: "group",
+    groupName: activeGroup.name,
+    template: selectedGroupTemplate,
+  })
+}
+
+const handleTemplateSelection = (template: RestTemplate) => {
+  dispatch("selectTemplate", { kind: "template", template })
+}
+
+const handleCustomClick = () => {
+  dispatch("custom")
+}
+
+const handleIntersect = async (entries: IntersectionObserverEntry[]) => {
+  if (loadingMore || !hasNextPage) {
+    return
+  }
+  const isVisible = entries.some((entry) => entry.isIntersecting)
+  if (!isVisible) {
+    return
+  }
+  loadingMore = true
+  currentPage += 1
+  await tick()
+  loadingMore = false
+}
+
+const ensureObserver = () => {
+  if (!scrollContainer || !loadTrigger) {
+    return
+  }
+  observer?.disconnect()
+  if (!observer) {
+    observer = new IntersectionObserver(handleIntersect, {
+      root: scrollContainer,
+      rootMargin: "80px",
+      threshold: 0.1,
+    })
+  }
+  observer.observe(loadTrigger)
+}
+
+onMount(() => {
+  ensureObserver()
+})
+
+onDestroy(() => {
+  if (observer) {
+    observer.disconnect()
+    observer = null
+  }
+})
+
+$: if (activeGroup) {
+  observer?.disconnect()
+} else if (loadTrigger) {
+  ensureObserver()
+}
 </script>
 
 <div class="api-main" class:scrolling>

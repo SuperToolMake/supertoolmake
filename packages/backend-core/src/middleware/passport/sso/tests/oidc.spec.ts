@@ -1,13 +1,13 @@
-import { generator, structures } from "../../../../../tests"
 import {
-  JwtClaims,
-  OIDCInnerConfig,
-  SSOAuthDetails,
+  type JwtClaims,
+  type OIDCInnerConfig,
+  type SSOAuthDetails,
   SSOProviderType,
 } from "@budibase/types"
-import * as _sso from "../sso"
-import * as oidc from "../oidc"
 import nock from "nock"
+import { generator, structures } from "../../../../../tests"
+import * as oidc from "../oidc"
+import * as _sso from "../sso"
 
 jest.mock("@techpass/passport-openidconnect")
 const mockStrategy = require("@techpass/passport-openidconnect").Strategy
@@ -30,10 +30,7 @@ describe("oidc", () => {
 
   describe("strategyFactory", () => {
     it("should create successfully create an oidc strategy", async () => {
-      const strategyConfiguration = await oidc.fetchStrategyConfig(
-        oidcConfig,
-        callbackUrl
-      )
+      const strategyConfiguration = await oidc.fetchStrategyConfig(oidcConfig, callbackUrl)
       await oidc.strategyFactory(strategyConfiguration, mockSaveUser)
 
       const expectedOptions = {
@@ -45,10 +42,7 @@ describe("oidc", () => {
         clientSecret: oidcConfig.clientSecret,
         callbackURL: callbackUrl,
       }
-      expect(mockStrategy).toHaveBeenCalledWith(
-        expectedOptions,
-        expect.anything()
-      )
+      expect(mockStrategy).toHaveBeenCalledWith(expectedOptions, expect.anything())
     })
   })
 
@@ -87,12 +81,7 @@ describe("oidc", () => {
     it("passes auth details to sso module", async () => {
       await authenticate()
 
-      expect(sso.authenticate).toHaveBeenCalledWith(
-        details,
-        false,
-        mockDone,
-        mockSaveUser
-      )
+      expect(sso.authenticate).toHaveBeenCalledWith(details, false, mockDone, mockSaveUser)
     })
 
     it("uses JWT email to get email", async () => {
@@ -104,12 +93,7 @@ describe("oidc", () => {
 
       await authenticate()
 
-      expect(sso.authenticate).toHaveBeenCalledWith(
-        details,
-        false,
-        mockDone,
-        mockSaveUser
-      )
+      expect(sso.authenticate).toHaveBeenCalledWith(details, false, mockDone, mockSaveUser)
     })
 
     it("uses JWT username to get email", async () => {
@@ -121,12 +105,7 @@ describe("oidc", () => {
 
       await authenticate()
 
-      expect(sso.authenticate).toHaveBeenCalledWith(
-        details,
-        false,
-        mockDone,
-        mockSaveUser
-      )
+      expect(sso.authenticate).toHaveBeenCalledWith(details, false, mockDone, mockSaveUser)
     })
 
     it("uses JWT invalid username to get email", async () => {
@@ -136,9 +115,7 @@ describe("oidc", () => {
         preferred_username: "invalidUsername",
       }
 
-      await expect(authenticate()).rejects.toThrow(
-        "Could not determine user email from profile"
-      )
+      await expect(authenticate()).rejects.toThrow("Could not determine user email from profile")
     })
   })
 })

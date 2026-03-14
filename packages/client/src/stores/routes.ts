@@ -1,8 +1,8 @@
 import { get, writable } from "svelte/store"
 import { push } from "svelte-spa-router"
 import { API } from "@/api"
-import { peekStore } from "./peek"
 import { builderStore } from "./builder"
+import { peekStore } from "./peek"
 
 interface Route {
   path: string
@@ -39,7 +39,7 @@ const createRouteStore = () => {
       routeConfig = null
     }
     const routes: Route[] = []
-    Object.values(routeConfig?.routes || {}).forEach(route => {
+    Object.values(routeConfig?.routes || {}).forEach((route) => {
       Object.entries(route.subpaths || {}).forEach(([path, config]) => {
         routes.push({
           path,
@@ -53,20 +53,20 @@ const createRouteStore = () => {
       return a.path > b.path ? -1 : 1
     })
 
-    store.update(state => {
+    store.update((state) => {
       state.routes = routes
       state.routeSessionId = Math.random()
       return state
     })
   }
   const setRouteParams = (routeParams: StoreType["routeParams"]) => {
-    store.update(state => {
+    store.update((state) => {
       state.routeParams = routeParams
       return state
     })
   }
   const setQueryParams = (queryParams: { peek?: boolean }) => {
-    store.update(state => {
+    store.update((state) => {
       state.queryParams = {
         ...queryParams,
         // Never unset the peek param - screen peek modals should always be
@@ -77,8 +77,8 @@ const createRouteStore = () => {
     })
   }
   const setActiveRoute = (route: string) => {
-    store.update(state => {
-      state.activeRoute = state.routes.find(x => x.path === route)
+    store.update((state) => {
+      state.activeRoute = state.routes.find((x) => x.path === route)
       return state
     })
   }
@@ -107,7 +107,7 @@ const createRouteStore = () => {
     }
   }
   const setRouterLoaded = () => {
-    store.update(state => ({ ...state, routerLoaded: true }))
+    store.update((state) => ({ ...state, routerLoaded: true }))
   }
   const createFullURL = (relativeURL: string) => {
     if (!relativeURL?.startsWith("/")) {
@@ -141,7 +141,7 @@ const createRouteStore = () => {
 
     const queryParams: Record<string, string> = {}
     if (queryPart) {
-      queryPart.split("&").forEach(param => {
+      queryPart.split("&").forEach((param) => {
         const [key, value] = param.split("=")
         if (key && value) {
           queryParams[key] = value
@@ -150,7 +150,7 @@ const createRouteStore = () => {
     }
 
     setQueryParams({ ...queryParams })
-    store.update(state => ({ ...state, testUrlParams: params }))
+    store.update((state) => ({ ...state, testUrlParams: params }))
   }
   return {
     subscribe: store.subscribe,

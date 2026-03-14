@@ -1,27 +1,21 @@
-import { SSOUser, User } from "@budibase/types"
+import type { SSOUser, User } from "@budibase/types"
 
 jest.mock("nodemailer")
-import {
-  TestConfiguration,
-  mocks,
-  structures,
-  generator,
-} from "../../../../tests"
+
+import { generator, mocks, structures, TestConfiguration } from "../../../../tests"
 
 const sendMailMock = mocks.email.mock()
-import { constants } from "@budibase/backend-core"
-import { Response } from "superagent"
 
-import * as userSdk from "../../../../sdk/users"
+import { constants } from "@budibase/backend-core"
 import nock from "nock"
+import type { Response } from "superagent"
+import * as userSdk from "../../../../sdk/users"
 
 function getAuthCookie(response: Response) {
   const cookies = response.headers["set-cookie"]
   if (!cookies) throw new Error("No cookies found")
   const cookieArray = Array.isArray(cookies) ? cookies : [cookies]
-  const authCookie = cookieArray.find((s: string) =>
-    s.startsWith(`${constants.Cookie.Auth}=`)
-  )
+  const authCookie = cookieArray.find((s: string) => s.startsWith(`${constants.Cookie.Auth}=`))
   if (!authCookie) throw new Error("No auth cookie found")
   return authCookie.split("=")[1].split(";")[0]
 }
@@ -70,12 +64,7 @@ describe("/api/global/auth", () => {
         const email = config.user!.email!
         const password = "incorrect123"
 
-        const response = await config.api.auth.login(
-          tenantId,
-          email,
-          password,
-          { status: 403 }
-        )
+        const response = await config.api.auth.login(tenantId, email, password, { status: 403 })
         expect(response.body).toEqual({
           message: "Invalid credentials",
           status: 403,
@@ -87,12 +76,7 @@ describe("/api/global/auth", () => {
         const email = "invaliduser@example.com"
         const password = "password123!"
 
-        const response = await config.api.auth.login(
-          tenantId,
-          email,
-          password,
-          { status: 403 }
-        )
+        const response = await config.api.auth.login(tenantId, email, password, { status: 403 })
         expect(response.body).toEqual({
           message: "Invalid credentials",
           status: 403,
@@ -107,12 +91,7 @@ describe("/api/global/auth", () => {
           const email = user.email
           const password = "test"
 
-          const response = await config.api.auth.login(
-            tenantId,
-            email,
-            password,
-            { status: 403 }
-          )
+          const response = await config.api.auth.login(tenantId, email, password, { status: 403 })
 
           expect(response.body).toEqual({
             message: "Invalid credentials",
@@ -159,22 +138,17 @@ describe("/api/global/auth", () => {
               })
 
               // wait for TTL to expire (add buffer for redis expiration granularity)
-              await new Promise(r => setTimeout(r, 3000))
+              await new Promise((r) => setTimeout(r, 3000))
 
               // Clear any remaining lockout state to ensure clean test
               await config.doInTenant(async () => {
                 const { cache } = require("@budibase/backend-core")
                 const normalizeEmail = (e: string) => (e || "").toLowerCase()
-                const lockKey = (email: string) =>
-                  `auth:login:lock:${normalizeEmail(email)}`
+                const lockKey = (email: string) => `auth:login:lock:${normalizeEmail(email)}`
                 await cache.destroy(lockKey(email))
               })
 
-              const response = await config.api.auth.login(
-                tenantId,
-                email,
-                correctPassword
-              )
+              const response = await config.api.auth.login(tenantId, email, correctPassword)
               expectSetAuthCookie(response)
             }
           )
@@ -195,10 +169,7 @@ describe("/api/global/auth", () => {
       it("should generate password reset email", async () => {
         const user = await config.createUser()
 
-        const { res, code } = await config.api.auth.requestPasswordReset(
-          sendMailMock,
-          user.email
-        )
+        const { res, code } = await config.api.auth.requestPasswordReset(sendMailMock, user.email)
 
         expect(res.body).toEqual({
           message: "Please check your email for a reset link.",
@@ -227,10 +198,7 @@ describe("/api/global/auth", () => {
     describe("POST /api/global/auth/:tenantId/reset/update", () => {
       it("should reset password", async () => {
         let user = await config.createUser()
-        const { code } = await config.api.auth.requestPasswordReset(
-          sendMailMock,
-          user.email
-        )
+        const { code } = await config.api.auth.requestPasswordReset(sendMailMock, user.email)
         delete user.password
 
         const newPassword = "newpassword1"
@@ -249,11 +217,9 @@ describe("/api/global/auth", () => {
         let user: User | SSOUser
 
         async function testSSOUser(code: string) {
-          const res = await config.api.auth.updatePassword(
-            code!,
-            generator.string(),
-            { status: 400 }
-          )
+          const res = await config.api.auth.updatePassword(code!, generator.string(), {
+            status: 400,
+          })
 
           expect(res.body).toEqual({
             message: "Password change is disabled for this user",
@@ -264,10 +230,7 @@ describe("/api/global/auth", () => {
         describe("budibase sso user", () => {
           it("should prevent user from generating password reset email", async () => {
             user = await config.createUser()
-            const { code } = await config.api.auth.requestPasswordReset(
-              sendMailMock,
-              user.email
-            )
+            const { code } = await config.api.auth.requestPasswordReset(sendMailMock, user.email)
 
             // convert to sso now that password reset has been requested
             const ssoUser = user as SSOUser

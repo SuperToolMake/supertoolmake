@@ -1,5 +1,5 @@
-import { Document } from "../document"
-import { FieldSchema } from "./table"
+import type { Document } from "../document"
+import type { FieldSchema } from "./table"
 
 export const EXTERNAL_ROW_REV = "rev"
 

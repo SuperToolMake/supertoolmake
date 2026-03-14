@@ -1,9 +1,9 @@
 <script>
-  import { Accordion } from "@budibase/bbui"
+import { Accordion } from "@budibase/bbui"
 
-  export let bold
-  export let initialOpen
-  export let label
+export let bold
+export let initialOpen
+export let label
 </script>
 
 <Accordion header={label || ""} {bold} {initialOpen}>

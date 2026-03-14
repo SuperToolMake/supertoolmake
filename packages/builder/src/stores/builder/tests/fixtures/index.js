@@ -1,10 +1,10 @@
+import manifest from "@budibase/client/manifest.json"
+import { FieldType } from "@budibase/types"
+import { get } from "svelte/store"
 import { v4 } from "uuid"
+import { DB_TYPE_EXTERNAL } from "@/constants/backend"
 import { Component } from "@/templates/Component"
 import { Screen } from "@/templates/screenTemplating/Screen"
-import { get } from "svelte/store"
-import { DB_TYPE_EXTERNAL } from "@/constants/backend"
-import { FieldType } from "@budibase/types"
-import manifest from "@budibase/client/manifest.json"
 
 const getDocId = () => {
   return v4().replace(/-/g, "")
@@ -18,7 +18,7 @@ export const getScreenFixture = () => {
   return new Screen()
 }
 
-export const getComponentFixture = type => {
+export const getComponentFixture = (type) => {
   if (!type) {
     return null
   }
@@ -29,7 +29,7 @@ export const getComponentFixture = type => {
 export const COMPONENT_DEFINITIONS = manifest
 
 // Take a component array and turn it into a deeply nested tree
-export const componentsToNested = components => {
+export const componentsToNested = (components) => {
   let nested
   do {
     const current = components.pop()
@@ -44,9 +44,9 @@ export const componentsToNested = components => {
   return nested
 }
 
-export const getFakeScreenPatch = store => {
+export const getFakeScreenPatch = (store) => {
   return async (patchFn, screenId) => {
-    const target = get(store).screens.find(screen => screen._id === screenId)
+    const target = get(store).screens.find((screen) => screen._id === screenId)
 
     patchFn(target)
 
@@ -62,11 +62,11 @@ export const componentDefinitionMap = () => {
   }, {})
 }
 
-export const generateFakeRoutes = screens => {
+export const generateFakeRoutes = (screens) => {
   return {
     routes: screens.reduce((acc, screen, idx) => {
-      let routing = screen.routing
-      let route = routing.route || "/screen_" + idx
+      const routing = screen.routing
+      const route = routing.route || "/screen_" + idx
       acc[route] = {
         subpaths: {
           [route]: {

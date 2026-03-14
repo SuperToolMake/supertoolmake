@@ -1,7 +1,7 @@
-import { Document } from "../document"
-import { SourceName } from "../../sdk"
-import { Table } from "./table"
-import { RestTemplateName, RestTemplateSpecVersion } from "../../ui/rest"
+import type { SourceName } from "../../sdk"
+import type { RestTemplateName, RestTemplateSpecVersion } from "../../ui/rest"
+import type { Document } from "../document"
+import type { Table } from "./table"
 
 export interface Datasource extends Document {
   type: string

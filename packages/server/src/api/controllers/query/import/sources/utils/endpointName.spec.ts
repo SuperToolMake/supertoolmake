@@ -8,11 +8,7 @@ describe("buildEndpointName", () => {
       description: "Returns a company.",
     }
 
-    const name = buildEndpointName(
-      operation,
-      "get",
-      "/crm/v3/objects/companies/{companyId}"
-    )
+    const name = buildEndpointName(operation, "get", "/crm/v3/objects/companies/{companyId}")
 
     expect(name).toBe("getCompany")
   })

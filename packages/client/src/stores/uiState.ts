@@ -1,5 +1,5 @@
-import { Writable } from "svelte/store"
 import { createLocalStorageStore } from "@budibase/frontend-core"
+import type { Writable } from "svelte/store"
 
 /**
  * Creates a generic app store for persisting component instance settings

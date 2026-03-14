@@ -1,6 +1,6 @@
-import { get, writable, type Writable } from "svelte/store"
+import type { Datasource, Integration, SourceName } from "@budibase/types"
+import { get, type Writable, writable } from "svelte/store"
 import { API } from "@/api"
-import { Datasource, Integration, SourceName } from "@budibase/types"
 import { integrationForDatasource } from "@/stores/selectors"
 import { datasources } from "./datasources"
 
@@ -15,15 +15,12 @@ const createIntegrationsStore = () => {
     const response = await API.getIntegrations()
 
     // Filter out undefineds
-    const integrations = Object.entries(response).reduce(
-      (acc, [key, value]) => {
-        if (value) {
-          acc[key as SourceName] = value
-        }
-        return acc
-      },
-      {} as IntegrationsState
-    )
+    const integrations = Object.entries(response).reduce((acc, [key, value]) => {
+      if (value) {
+        acc[key as SourceName] = value
+      }
+      return acc
+    }, {} as IntegrationsState)
     store.set(integrations)
   }
 

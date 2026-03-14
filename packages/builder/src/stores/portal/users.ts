@@ -1,9 +1,7 @@
-import { API } from "@/api"
-import { UserInfo } from "@/types"
 import { notifications } from "@budibase/bbui"
 import { Constants } from "@budibase/frontend-core"
 import { sdk } from "@budibase/shared-core"
-import {
+import type {
   DeleteInviteUsersRequest,
   InviteUsersRequest,
   SearchUsersRequest,
@@ -12,6 +10,8 @@ import {
   User,
   UserIdentifier,
 } from "@budibase/types"
+import { API } from "@/api"
+import type { UserInfo } from "@/types"
 import { BudiStore } from "../BudiStore"
 
 type UserState = SearchUsersResponse & SearchUsersRequest
@@ -58,8 +58,8 @@ class UserStore extends BudiStore<UserState> {
       apps?: Record<string, string>
     }[]
   ) {
-    const users: InviteUsersRequest = payload.map(user => {
-      let builder = undefined
+    const users: InviteUsersRequest = payload.map((user) => {
+      let builder
       if (user.admin || user.builder) {
         builder = { global: true }
       } else if (user.creator) {
@@ -126,7 +126,7 @@ class UserStore extends BudiStore<UserState> {
   }
 
   async create(data: { users: UserInfo[] }) {
-    let mappedUsers: UnsavedUser[] = data.users.map(user => {
+    const mappedUsers: UnsavedUser[] = data.users.map((user) => {
       const body: UnsavedUser = {
         email: user.email,
         password: user.password,

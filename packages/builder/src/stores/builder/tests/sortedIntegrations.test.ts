@@ -1,9 +1,8 @@
-import { it, expect, describe, beforeEach, vi } from "vitest"
-import { SortedIntegrationStore } from "@/stores/builder/sortedIntegrations"
-import { DatasourceTypes } from "@/constants/backend"
-
 import { derived } from "svelte/store"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { DatasourceTypes } from "@/constants/backend"
 import { integrations } from "@/stores/builder/integrations"
+import { SortedIntegrationStore } from "@/stores/builder/sortedIntegrations"
 
 vi.mock("svelte/store", () => ({
   derived: vi.fn(() => ({
@@ -113,7 +112,7 @@ describe("sorted integrations store", () => {
     derivedCallback: any
   }
 
-  beforeEach<LocalContext>(ctx => {
+  beforeEach<LocalContext>((ctx) => {
     vi.clearAllMocks()
 
     ctx.returnedStore = new SortedIntegrationStore()
@@ -122,14 +121,11 @@ describe("sorted integrations store", () => {
 
   it("calls derived with the correct parameters", () => {
     expect(mockedDerived).toHaveBeenCalledTimes(1)
-    expect(mockedDerived).toHaveBeenCalledWith(
-      integrations,
-      expect.any(Function)
-    )
+    expect(mockedDerived).toHaveBeenCalledWith(integrations, expect.any(Function))
   })
 
   describe("derived callback", () => {
-    it<LocalContext>("When integrations are present", ctx => {
+    it<LocalContext>("When integrations are present", (ctx) => {
       expect(ctx.derivedCallback(inputA)).toEqual(expectedOutput)
       expect(ctx.derivedCallback(inputB)).toEqual(expectedOutput)
     })

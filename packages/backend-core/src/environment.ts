@@ -23,8 +23,7 @@ function isTest() {
 function isJest() {
   return (
     process.env.NODE_ENV === "jest" ||
-    (process.env.JEST_WORKER_ID != null &&
-      process.env.JEST_WORKER_ID !== "null")
+    (process.env.JEST_WORKER_ID != null && process.env.JEST_WORKER_ID !== "null")
   )
 }
 
@@ -49,9 +48,7 @@ const DefaultBucketName = {
 const selfHosted = !!parseInt(process.env.SELF_HOSTED || "")
 
 function getAPIEncryptionKey() {
-  return process.env.API_ENCRYPTION_KEY
-    ? process.env.API_ENCRYPTION_KEY
-    : process.env.JWT_SECRET // fallback to the JWT_SECRET used historically
+  return process.env.API_ENCRYPTION_KEY ? process.env.API_ENCRYPTION_KEY : process.env.JWT_SECRET // fallback to the JWT_SECRET used historically
 }
 
 function httpLogging() {
@@ -68,10 +65,7 @@ function getPackageJsonFields(): {
   SERVICE_NAME: string
 } {
   function getParentFile(file: string) {
-    function findFileInAncestors(
-      fileName: string,
-      currentDir: string
-    ): string | null {
+    function findFileInAncestors(fileName: string, currentDir: string): string | null {
       const filePath = `${currentDir}/${fileName}`
       if (existsSync(filePath)) {
         return filePath
@@ -105,8 +99,7 @@ function getPackageJsonFields(): {
   try {
     const parsedContent = getParentFile("package.json")
     return {
-      VERSION:
-        localVersion || process.env.BUDIBASE_VERSION || parsedContent.version,
+      VERSION: localVersion || process.env.BUDIBASE_VERSION || parsedContent.version,
       SERVICE_NAME: parsedContent.name,
     }
   } catch {
@@ -152,9 +145,7 @@ const environment = {
     return !isDev()
   },
   BUDIBASE_ENVIRONMENT: process.env.BUDIBASE_ENVIRONMENT,
-  JWT_SECRET: process.env.JWT_SECRET
-    ? createSecretKey(process.env.JWT_SECRET, "utf8")
-    : undefined,
+  JWT_SECRET: process.env.JWT_SECRET ? createSecretKey(process.env.JWT_SECRET, "utf8") : undefined,
   JWT_SECRET_FALLBACK: process.env.JWT_SECRET_FALLBACK
     ? createSecretKey(process.env.JWT_SECRET_FALLBACK, "utf8")
     : undefined,
@@ -189,13 +180,10 @@ const environment = {
   CLOUDFRONT_CDN: process.env.CLOUDFRONT_CDN,
   CLOUDFRONT_PRIVATE_KEY_64: process.env.CLOUDFRONT_PRIVATE_KEY_64,
   CLOUDFRONT_PUBLIC_KEY_ID: process.env.CLOUDFRONT_PUBLIC_KEY_ID,
-  BACKUPS_BUCKET_NAME:
-    process.env.BACKUPS_BUCKET_NAME || DefaultBucketName.BACKUPS,
+  BACKUPS_BUCKET_NAME: process.env.BACKUPS_BUCKET_NAME || DefaultBucketName.BACKUPS,
   APPS_BUCKET_NAME: process.env.APPS_BUCKET_NAME || DefaultBucketName.APPS,
-  TEMPLATES_BUCKET_NAME:
-    process.env.TEMPLATES_BUCKET_NAME || DefaultBucketName.TEMPLATES,
-  GLOBAL_BUCKET_NAME:
-    process.env.GLOBAL_BUCKET_NAME || DefaultBucketName.GLOBAL,
+  TEMPLATES_BUCKET_NAME: process.env.TEMPLATES_BUCKET_NAME || DefaultBucketName.TEMPLATES,
+  GLOBAL_BUCKET_NAME: process.env.GLOBAL_BUCKET_NAME || DefaultBucketName.GLOBAL,
   TEMP_BUCKET_NAME: process.env.TEMP_BUCKET_NAME || DefaultBucketName.TEMP,
   USE_COUCH: process.env.USE_COUCH || true,
   MOCK_REDIS: process.env.MOCK_REDIS,
@@ -203,8 +191,7 @@ const environment = {
   SERVICE: getServiceName(),
   LOG_LEVEL: process.env.LOG_LEVEL || "info",
   SESSION_UPDATE_PERIOD: process.env.SESSION_UPDATE_PERIOD,
-  DEPLOYMENT_ENVIRONMENT:
-    process.env.DEPLOYMENT_ENVIRONMENT || "docker-compose",
+  DEPLOYMENT_ENVIRONMENT: process.env.DEPLOYMENT_ENVIRONMENT || "docker-compose",
   HTTP_LOGGING: httpLogging(),
   ENABLE_AUDIT_LOG_IP_ADDR: process.env.ENABLE_AUDIT_LOG_IP_ADDR,
   // Couch/search
@@ -228,16 +215,14 @@ const environment = {
    * This can be useful to prevent lockout when configuring SSO.
    * However, this should be turned OFF by default for security purposes.
    */
-  ENABLE_SSO_MAINTENANCE_MODE: selfHosted
-    ? process.env.ENABLE_SSO_MAINTENANCE_MODE
-    : false,
+  ENABLE_SSO_MAINTENANCE_MODE: selfHosted ? process.env.ENABLE_SSO_MAINTENANCE_MODE : false,
   ...getPackageJsonFields(),
   DISABLE_PINO_LOGGER: process.env.DISABLE_PINO_LOGGER,
   OFFLINE_MODE: process.env.OFFLINE_MODE,
   SESSION_EXPIRY_SECONDS: process.env.SESSION_EXPIRY_SECONDS,
   _set(key: any, value: any) {
     process.env[key] = value
-    // @ts-ignore
+    // @ts-expect-error
     environment[key] = value
   },
   ROLLING_LOG_MAX_SIZE: process.env.ROLLING_LOG_MAX_SIZE || "10M",
@@ -245,8 +230,7 @@ const environment = {
   BB_ADMIN_USER_EMAIL: process.env.BB_ADMIN_USER_EMAIL,
   BB_ADMIN_USER_PASSWORD: process.env.BB_ADMIN_USER_PASSWORD,
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-  MIN_VERSION_WITHOUT_POWER_ROLE:
-    process.env.MIN_VERSION_WITHOUT_POWER_ROLE || "3.0.0",
+  MIN_VERSION_WITHOUT_POWER_ROLE: process.env.MIN_VERSION_WITHOUT_POWER_ROLE || "3.0.0",
   DISABLE_CONTENT_SECURITY_POLICY: process.env.DISABLE_CONTENT_SECURITY_POLICY,
   BSON_BUFFER_SIZE: parseIntSafe(process.env.BSON_BUFFER_SIZE),
 }
@@ -295,15 +279,15 @@ export const SECRETS: EnvironmentKey[] = [
 ]
 
 // clean up any environment variable edge cases
-for (let [key, value] of Object.entries(environment)) {
+for (const [key, value] of Object.entries(environment)) {
   // handle the edge case of "0" to disable an environment variable
   if (value === "0") {
-    // @ts-ignore
+    // @ts-expect-error
     environment[key] = 0
   }
   // handle the edge case of "false" to disable an environment variable
   if (value === "false") {
-    // @ts-ignore
+    // @ts-expect-error
     environment[key] = 0
   }
 }

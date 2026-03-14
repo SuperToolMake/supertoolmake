@@ -22,7 +22,7 @@ describe("contentSecurityPolicy middleware", () => {
       set: jest.fn(),
     }
     next = jest.fn()
-    // @ts-ignore
+    // @ts-expect-error
     crypto.randomBytes.mockReturnValue(Buffer.from(mockNonce, "base64"))
   })
 

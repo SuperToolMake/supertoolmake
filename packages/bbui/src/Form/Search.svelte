@@ -1,24 +1,24 @@
 <script lang="ts">
-  import Field from "./Field.svelte"
-  import Search from "./Core/Search.svelte"
-  import { createEventDispatcher } from "svelte"
-  import type { LabelPosition } from "../types"
+import { createEventDispatcher } from "svelte"
+import type { LabelPosition } from "../types"
+import Search from "./Core/Search.svelte"
+import Field from "./Field.svelte"
 
-  export let value: string | undefined = undefined
-  export let label: string | undefined = undefined
-  export let labelPosition: LabelPosition = "above"
-  export let placeholder: string | undefined = undefined
-  export let disabled = false
-  export let updateOnChange = true
-  export let quiet = false
-  export let inputRef: HTMLInputElement | undefined = undefined
-  export let helpText: string | undefined = undefined
+export let value: string | undefined = undefined
+export let label: string | undefined = undefined
+export let labelPosition: LabelPosition = "above"
+export let placeholder: string | undefined = undefined
+export let disabled = false
+export let updateOnChange = true
+export let quiet = false
+export let inputRef: HTMLInputElement | undefined = undefined
+export let helpText: string | undefined = undefined
 
-  const dispatch = createEventDispatcher()
-  const onChange = (e: CustomEvent<string>) => {
-    value = e.detail
-    dispatch("change", e.detail)
-  }
+const dispatch = createEventDispatcher()
+const onChange = (e: CustomEvent<string>) => {
+  value = e.detail
+  dispatch("change", e.detail)
+}
 </script>
 
 <Field {helpText} {label} {labelPosition}>

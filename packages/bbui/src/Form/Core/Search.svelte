@@ -1,54 +1,54 @@
 <script lang="ts">
-  import "@spectrum-css/search/dist/index-vars.css"
-  import { createEventDispatcher } from "svelte"
-  import Icon from "../../Icon/Icon.svelte"
+import "@spectrum-css/search/dist/index-vars.css"
+import { createEventDispatcher } from "svelte"
+import Icon from "../../Icon/Icon.svelte"
 
-  export let value: any = null
-  export let placeholder: string | undefined = undefined
-  export let disabled = false
-  export let id = null
-  export let updateOnChange = true
-  export let quiet = false
-  export let inputRef: HTMLElement | undefined = undefined
+export let value: any = null
+export let placeholder: string | undefined = undefined
+export let disabled = false
+export let id = null
+export let updateOnChange = true
+export let quiet = false
+export let inputRef: HTMLElement | undefined = undefined
 
-  interface SearchEvents {
-    change: any
-    clear: void
+interface SearchEvents {
+  change: any
+  clear: void
+}
+
+const dispatch = createEventDispatcher<SearchEvents>()
+let focus = false
+
+const updateValue = (value: any) => {
+  dispatch("change", value)
+}
+
+const clearValue = () => {
+  updateValue("")
+  dispatch("clear")
+}
+
+const onFocus = () => {
+  focus = true
+}
+
+const onBlur = (event: any) => {
+  focus = false
+  updateValue(event.target.value)
+}
+
+const onInput = (event: any) => {
+  if (!updateOnChange) {
+    return
   }
+  updateValue(event.target.value)
+}
 
-  const dispatch = createEventDispatcher<SearchEvents>()
-  let focus = false
-
-  const updateValue = (value: any) => {
-    dispatch("change", value)
-  }
-
-  const clearValue = () => {
-    updateValue("")
-    dispatch("clear")
-  }
-
-  const onFocus = () => {
-    focus = true
-  }
-
-  const onBlur = (event: any) => {
-    focus = false
+const updateValueOnEnter = (event: any) => {
+  if (event.key === "Enter") {
     updateValue(event.target.value)
   }
-
-  const onInput = (event: any) => {
-    if (!updateOnChange) {
-      return
-    }
-    updateValue(event.target.value)
-  }
-
-  const updateValueOnEnter = (event: any) => {
-    if (event.key === "Enter") {
-      updateValue(event.target.value)
-    }
-  }
+}
 </script>
 
 <div class="spectrum-Search" class:is-disabled={disabled}>

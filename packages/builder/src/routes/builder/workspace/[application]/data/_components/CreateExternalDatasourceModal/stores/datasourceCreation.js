@@ -24,21 +24,21 @@ export const createDatasourceCreationStore = () => {
 
   // Used only by Google Sheets
   store.googleAuthStage = () => {
-    store.update($store => ({
+    store.update(($store) => ({
       ...$store,
       stage: "googleAuth",
     }))
   }
 
-  store.setIntegration = integration => {
-    store.update($store => ({
+  store.setIntegration = (integration) => {
+    store.update(($store) => ({
       ...$store,
       integration,
     }))
   }
 
-  store.setConfig = config => {
-    store.update($store => ({
+  store.setConfig = (config) => {
+    store.update(($store) => ({
       ...$store,
       config,
     }))
@@ -46,13 +46,13 @@ export const createDatasourceCreationStore = () => {
 
   // Used for every flow but REST
   store.editConfigStage = () => {
-    store.update($store => ({
+    store.update(($store) => ({
       ...$store,
       stage: "editConfig",
     }))
   }
 
-  store.setDatasource = datasource => {
+  store.setDatasource = (datasource) => {
     const $store = get(store)
     store.set({ ...$store, datasource })
 
@@ -65,14 +65,14 @@ export const createDatasourceCreationStore = () => {
 
   // Only used for datasource plus
   store.selectTablesStage = () => {
-    store.update($store => ({
+    store.update(($store) => ({
       ...$store,
       stage: "selectTables",
     }))
   }
 
   store.markAsFinished = () => {
-    store.update($store => ({
+    store.update(($store) => ({
       ...$store,
       finished: true,
     }))

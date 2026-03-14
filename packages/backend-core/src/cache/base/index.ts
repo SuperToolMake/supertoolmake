@@ -1,6 +1,6 @@
 import { getTenantId } from "../../context"
+import type { Client } from "../../redis"
 import * as redis from "../../redis/init"
-import { Client } from "../../redis"
 
 function generateTenantKey(key: string) {
   const tenantId = getTenantId()
@@ -48,7 +48,7 @@ export default class BaseCache {
    * Read only from the cache.
    */
   async bulkGet<T>(keys: string[], opts = { useTenancy: true }) {
-    keys = opts.useTenancy ? keys.map(key => generateTenantKey(key)) : keys
+    keys = opts.useTenancy ? keys.map((key) => generateTenantKey(key)) : keys
     const client = await this.getClient()
     return client.bulkGet<T>(keys)
   }
@@ -56,12 +56,7 @@ export default class BaseCache {
   /**
    * Write to the cache.
    */
-  async store(
-    key: string,
-    value: any,
-    ttl: number | null = null,
-    opts = { useTenancy: true }
-  ) {
+  async store(key: string, value: any, ttl: number | null = null, opts = { useTenancy: true }) {
     key = opts.useTenancy ? generateTenantKey(key) : key
     const client = await this.getClient()
     await client.store(key, value, ttl)
@@ -102,7 +97,7 @@ export default class BaseCache {
    * Remove from cache.
    */
   async bulkDelete(keys: string[], opts = { useTenancy: true }) {
-    keys = opts.useTenancy ? keys.map(key => generateTenantKey(key)) : keys
+    keys = opts.useTenancy ? keys.map((key) => generateTenantKey(key)) : keys
     const client = await this.getClient()
     return client.bulkDelete(keys)
   }

@@ -1,48 +1,48 @@
-import { API } from "@/api"
 import {
-  authStore,
-  notificationStore,
-  routeStore,
-  screenStore,
-  builderStore,
-  uploadStore,
-  rowSelectionStore,
-  componentStore,
-  currentRole,
-  environmentStore,
-  sidePanelStore,
-  modalStore,
-  dndIsDragging,
-  confirmationStore,
-  roleStore,
-  appStore,
-  stateStore,
-  createContextStore,
-} from "@/stores"
-import { styleable } from "@/utils/styleable"
-import { linkable } from "@/utils/linkable"
-import { getAction } from "@/utils/getAction"
-import Provider from "@/components/context/Provider.svelte"
+  Constants,
+  derivedMemo,
+  fetchData,
+  memo,
+  QueryUtils,
+  RowUtils,
+} from "@budibase/frontend-core"
+import { makePropSafe, processStringSync } from "@budibase/string-templates"
+import { API } from "@/api"
+import { createValidatorFromConstraints } from "@/components/app/forms/validation"
 import Block from "@/components/Block.svelte"
 import BlockComponent from "@/components/BlockComponent.svelte"
-import { ActionTypes } from "./constants"
+import Provider from "@/components/context/Provider.svelte"
 import {
-  fetchDatasourceSchema,
-  fetchDatasourceDefinition,
-  getRelationshipSchemaAdditions,
-} from "./utils/schema"
+  appStore,
+  authStore,
+  builderStore,
+  componentStore,
+  confirmationStore,
+  createContextStore,
+  currentRole,
+  dndIsDragging,
+  environmentStore,
+  modalStore,
+  notificationStore,
+  roleStore,
+  routeStore,
+  rowSelectionStore,
+  screenStore,
+  sidePanelStore,
+  stateStore,
+  uploadStore,
+} from "@/stores"
+import { getAction } from "@/utils/getAction"
+import { linkable } from "@/utils/linkable"
+import { styleable } from "@/utils/styleable"
+import { ActionTypes } from "./constants"
 import { getAPIKey } from "./utils/api.js"
 import { enrichButtonActions } from "./utils/buttonActions.js"
-import { processStringSync, makePropSafe } from "@budibase/string-templates"
 import {
-  fetchData,
-  QueryUtils,
-  Constants,
-  RowUtils,
-  memo,
-  derivedMemo,
-} from "@budibase/frontend-core"
-import { createValidatorFromConstraints } from "@/components/app/forms/validation"
+  fetchDatasourceDefinition,
+  fetchDatasourceSchema,
+  getRelationshipSchemaAdditions,
+} from "./utils/schema"
 
 export default {
   API,

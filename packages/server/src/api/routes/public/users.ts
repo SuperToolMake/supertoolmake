@@ -1,5 +1,5 @@
-import controller from "../../controllers/public/users"
 import { Endpoint } from "@budibase/backend-core"
+import controller from "../../controllers/public/users"
 import { nameValidator } from "../utils/validators"
 
 const read = [],
@@ -133,10 +133,6 @@ read.push(new Endpoint("get", "/users/:userId", controller.read))
  *               users:
  *                 $ref: '#/components/examples/users'
  */
-read.push(
-  new Endpoint("post", "/users/search", controller.search).addMiddleware(
-    nameValidator()
-  )
-)
+read.push(new Endpoint("post", "/users/search", controller.search).addMiddleware(nameValidator()))
 
 export default { read, write }

@@ -1,271 +1,254 @@
 <script>
-  import { flip } from "svelte/animate"
-  import { tick } from "svelte"
-  import { dndzone } from "svelte-dnd-action"
-  import {
-    Icon,
-    Button,
-    Layout,
-    DrawerContent,
-    ActionButton,
-    Search,
-  } from "@budibase/bbui"
-  import { getAvailableActions } from "./index"
-  import { generate } from "shortid"
-  import {
-    getEventContextBindings,
-    getActionBindings,
-    makeStateBinding,
-    updateReferencesInObject,
-  } from "@/dataBinding"
-  import { cloneDeep } from "lodash/fp"
+import { ActionButton, Button, DrawerContent, Icon, Layout, Search } from "@budibase/bbui"
+import { cloneDeep } from "lodash/fp"
+import { generate } from "shortid"
+import { tick } from "svelte"
+import { flip } from "svelte/animate"
+import { dndzone } from "svelte-dnd-action"
+import {
+  getActionBindings,
+  getEventContextBindings,
+  makeStateBinding,
+  updateReferencesInObject,
+} from "@/dataBinding"
+import { getAvailableActions } from "./index"
 
-  const flipDurationMs = 150
-  const EVENT_TYPE_KEY = "##eventHandlerType"
-  const actionTypes = getAvailableActions()
-  const zoneType = generate()
+const flipDurationMs = 150
+const EVENT_TYPE_KEY = "##eventHandlerType"
+const actionTypes = getAvailableActions()
+const zoneType = generate()
 
-  export let key
-  export let actions
-  export let bindings = []
-  export let nested
-  export let componentInstance
+export let key
+export let actions
+export let bindings = []
+export let nested
+export let componentInstance
 
-  let actionQuery
-  let selectedAction = actions?.length ? actions[0] : null
-  let originalActionIndex
-  let draggingActionId
+let actionQuery
+let selectedAction = actions?.length ? actions[0] : null
+let originalActionIndex
+let draggingActionId
 
-  const setUpdateActions = actions => {
-    return actions
-      ? cloneDeep(actions)
-          .filter(action => {
-            return (
-              action[EVENT_TYPE_KEY] === "Update State" &&
-              action.parameters?.type === "set" &&
-              action.parameters.key
-            )
-          })
-          .reduce((acc, action) => {
-            acc[action.id] = action
-            return acc
-          }, {})
-      : []
+const setUpdateActions = (actions) => {
+  return actions
+    ? cloneDeep(actions)
+        .filter((action) => {
+          return (
+            action[EVENT_TYPE_KEY] === "Update State" &&
+            action.parameters?.type === "set" &&
+            action.parameters.key
+          )
+        })
+        .reduce((acc, action) => {
+          acc[action.id] = action
+          return acc
+        }, {})
+    : []
+}
+
+// Snapshot original action state
+let updateStateActions = setUpdateActions(actions)
+
+$: {
+  // Ensure parameters object is never null
+  if (selectedAction && !selectedAction.parameters) {
+    selectedAction.parameters = {}
   }
-
-  // Snapshot original action state
-  let updateStateActions = setUpdateActions(actions)
-
-  $: {
-    // Ensure parameters object is never null
-    if (selectedAction && !selectedAction.parameters) {
-      selectedAction.parameters = {}
-    }
-  }
-  $: parsedQuery =
-    typeof actionQuery === "string" ? actionQuery.toLowerCase().trim() : ""
-  $: showAvailableActions = !actions?.length
-  $: mappedActionTypes = actionTypes.reduce((acc, action) => {
-    let parsedName = action.name.toLowerCase().trim()
-    if (parsedQuery.length && parsedName.indexOf(parsedQuery) < 0) {
-      return acc
-    }
-    acc[action.type] = acc[action.type] || []
-    acc[action.type].push(action)
+}
+$: parsedQuery = typeof actionQuery === "string" ? actionQuery.toLowerCase().trim() : ""
+$: showAvailableActions = !actions?.length
+$: mappedActionTypes = actionTypes.reduce((acc, action) => {
+  let parsedName = action.name.toLowerCase().trim()
+  if (parsedQuery.length && parsedName.indexOf(parsedQuery) < 0) {
     return acc
-  }, {})
+  }
+  acc[action.type] = acc[action.type] || []
+  acc[action.type].push(action)
+  return acc
+}, {})
 
-  // These are ephemeral bindings which only exist while executing actions
-  $: eventContextBindings = getEventContextBindings({
-    componentInstance,
-    settingKey: key,
+// These are ephemeral bindings which only exist while executing actions
+$: eventContextBindings = getEventContextBindings({
+  componentInstance,
+  settingKey: key,
+})
+$: actionContextBindings = getActionBindings(actions, selectedAction?.id)
+
+$: allBindings = getAllBindings(
+  bindings,
+  [...eventContextBindings, ...actionContextBindings],
+  actions
+)
+$: {
+  // Ensure each action has a unique ID
+  if (actions) {
+    actions.forEach((action) => {
+      if (!action.id) {
+        action.id = generate()
+      }
+    })
+  }
+}
+$: selectedActionComponent =
+  selectedAction && actionTypes.find((t) => t.name === selectedAction[EVENT_TYPE_KEY])?.component
+$: {
+  // Select the first action if we delete an action
+  if (selectedAction && !actions?.includes(selectedAction)) {
+    selectedAction = actions?.[0]
+  }
+}
+
+const deleteAction = (index) => {
+  // Check if we're deleting the selected action
+  const selectedIndex = actions.indexOf(selectedAction)
+  const isSelected = index === selectedIndex
+
+  // Delete the action
+  actions.splice(index, 1)
+  actions = actions
+
+  // Select a new action if we deleted the selected one
+  if (isSelected) {
+    selectedAction = actions?.length ? actions[0] : null
+  }
+
+  // Update action binding references
+  updateReferencesInObject({
+    obj: actions,
+    modifiedIndex: index,
+    action: "delete",
+    label: "actions",
   })
-  $: actionContextBindings = getActionBindings(actions, selectedAction?.id)
+}
 
-  $: allBindings = getAllBindings(
-    bindings,
-    [...eventContextBindings, ...actionContextBindings],
-    actions
-  )
-  $: {
-    // Ensure each action has a unique ID
-    if (actions) {
-      actions.forEach(action => {
-        if (!action.id) {
-          action.id = generate()
-        }
-      })
-    }
+const toggleActionList = () => {
+  actionQuery = null
+  showAvailableActions = !showAvailableActions
+}
+
+const addAction = (actionType) => {
+  const newAction = {
+    parameters: {},
+    [EVENT_TYPE_KEY]: actionType.name,
+    id: generate(),
   }
-  $: selectedActionComponent =
-    selectedAction &&
-    actionTypes.find(t => t.name === selectedAction[EVENT_TYPE_KEY])?.component
-  $: {
-    // Select the first action if we delete an action
-    if (selectedAction && !actions?.includes(selectedAction)) {
-      selectedAction = actions?.[0]
-    }
+  if (!actions) {
+    actions = []
   }
+  actions = [...actions, newAction]
+  selectedAction = newAction
+}
 
-  const deleteAction = index => {
-    // Check if we're deleting the selected action
-    const selectedIndex = actions.indexOf(selectedAction)
-    const isSelected = index === selectedIndex
-
-    // Delete the action
-    actions.splice(index, 1)
-    actions = actions
-
-    // Select a new action if we deleted the selected one
-    if (isSelected) {
-      selectedAction = actions?.length ? actions[0] : null
-    }
-
-    // Update action binding references
-    updateReferencesInObject({
-      obj: actions,
-      modifiedIndex: index,
-      action: "delete",
-      label: "actions",
-    })
+const selectAction = (action) => async () => {
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur()
   }
+  await tick()
+  selectedAction = action
+  originalActionIndex = actions.findIndex((item) => item.id === action.id)
+}
 
-  const toggleActionList = () => {
-    actionQuery = null
-    showAvailableActions = !showAvailableActions
+const onAddAction = (actionType) => {
+  addAction(actionType)
+  toggleActionList()
+}
+
+const recordOriginalActionIndex = (id) => {
+  if (!actions || !id) {
+    return
   }
-
-  const addAction = actionType => {
-    const newAction = {
-      parameters: {},
-      [EVENT_TYPE_KEY]: actionType.name,
-      id: generate(),
-    }
-    if (!actions) {
-      actions = []
-    }
-    actions = [...actions, newAction]
-    selectedAction = newAction
-  }
-
-  const selectAction = action => async () => {
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur()
-    }
-    await tick()
-    selectedAction = action
-    originalActionIndex = actions.findIndex(item => item.id === action.id)
-  }
-
-  const onAddAction = actionType => {
-    addAction(actionType)
-    toggleActionList()
-  }
-
-  const recordOriginalActionIndex = id => {
-    if (!actions || !id) {
-      return
-    }
-    if (draggingActionId !== id) {
-      draggingActionId = id
-      originalActionIndex = -1
-    }
-    if (originalActionIndex >= 0) {
-      return
-    }
-    const index = actions.findIndex(action => action.id === id)
-    if (index !== -1) {
-      originalActionIndex = index
-    }
-  }
-
-  function handleDndConsider(e) {
-    recordOriginalActionIndex(e.detail.info.id)
-    actions = e.detail.items
-  }
-  function handleDndFinalize(e) {
-    actions = e.detail.items
-
-    // Update action binding references
-    updateReferencesInObject({
-      obj: actions,
-      modifiedIndex: actions.findIndex(
-        action => action.id === e.detail.info.id
-      ),
-      action: "move",
-      label: "actions",
-      originalIndex: originalActionIndex,
-    })
-
+  if (draggingActionId !== id) {
+    draggingActionId = id
     originalActionIndex = -1
-    draggingActionId = undefined
+  }
+  if (originalActionIndex >= 0) {
+    return
+  }
+  const index = actions.findIndex((action) => action.id === id)
+  if (index !== -1) {
+    originalActionIndex = index
+  }
+}
+
+function handleDndConsider(e) {
+  recordOriginalActionIndex(e.detail.info.id)
+  actions = e.detail.items
+}
+function handleDndFinalize(e) {
+  actions = e.detail.items
+
+  // Update action binding references
+  updateReferencesInObject({
+    obj: actions,
+    modifiedIndex: actions.findIndex((action) => action.id === e.detail.info.id),
+    action: "move",
+    label: "actions",
+    originalIndex: originalActionIndex,
+  })
+
+  originalActionIndex = -1
+  draggingActionId = undefined
+}
+
+const getAllBindings = (actionBindings, eventContextBindings, actions) => {
+  let allBindings = []
+  let cloneActionBindings = cloneDeep(actionBindings)
+  if (!actions) {
+    return []
   }
 
-  const getAllBindings = (actionBindings, eventContextBindings, actions) => {
-    let allBindings = []
-    let cloneActionBindings = cloneDeep(actionBindings)
-    if (!actions) {
-      return []
-    }
-
-    // Ensure bindings are generated for all "update state" action keys
-    actions
-      .filter(action => {
-        // Find all "Update State" actions which set values
-        return (
-          action[EVENT_TYPE_KEY] === "Update State" &&
-          action.parameters?.type === "set" &&
-          action.parameters.key
-        )
+  // Ensure bindings are generated for all "update state" action keys
+  actions
+    .filter((action) => {
+      // Find all "Update State" actions which set values
+      return (
+        action[EVENT_TYPE_KEY] === "Update State" &&
+        action.parameters?.type === "set" &&
+        action.parameters.key
+      )
+    })
+    .forEach((action) => {
+      // Check we have a binding for this action, and generate one if not
+      const stateBinding = makeStateBinding(action.parameters.key)
+      const hasKey = actionBindings.some((binding) => {
+        return binding.runtimeBinding === stateBinding.runtimeBinding
       })
-      .forEach(action => {
-        // Check we have a binding for this action, and generate one if not
-        const stateBinding = makeStateBinding(action.parameters.key)
-        const hasKey = actionBindings.some(binding => {
-          return binding.runtimeBinding === stateBinding.runtimeBinding
-        })
-        if (!hasKey) {
-          let existing = updateStateActions[action.id]
-          if (existing) {
-            const existingBinding = makeStateBinding(existing.parameters.key)
-            cloneActionBindings = cloneActionBindings.filter(
-              binding =>
-                binding.runtimeBinding !== existingBinding.runtimeBinding
-            )
-          }
-          allBindings.push(stateBinding)
+      if (!hasKey) {
+        let existing = updateStateActions[action.id]
+        if (existing) {
+          const existingBinding = makeStateBinding(existing.parameters.key)
+          cloneActionBindings = cloneActionBindings.filter(
+            (binding) => binding.runtimeBinding !== existingBinding.runtimeBinding
+          )
         }
+        allBindings.push(stateBinding)
+      }
+    })
+  // Get which indexes are asynchronous automations as we want to filter them out from the bindings
+  const asynchronousAutomationIndexes = actions
+    .map((action, index) => {
+      if (action[EVENT_TYPE_KEY] === "Trigger Automation" && !action.parameters?.synchronous) {
+        return index
+      }
+    })
+    .filter((index) => index !== undefined)
+
+  // Based on the above, filter out the asynchronous automations from the bindings
+  let contextBindings = asynchronousAutomationIndexes
+    ? eventContextBindings.filter((binding, index) => {
+        return !asynchronousAutomationIndexes.includes(index)
       })
-    // Get which indexes are asynchronous automations as we want to filter them out from the bindings
-    const asynchronousAutomationIndexes = actions
-      .map((action, index) => {
-        if (
-          action[EVENT_TYPE_KEY] === "Trigger Automation" &&
-          !action.parameters?.synchronous
-        ) {
-          return index
-        }
-      })
-      .filter(index => index !== undefined)
+    : eventContextBindings
 
-    // Based on the above, filter out the asynchronous automations from the bindings
-    let contextBindings = asynchronousAutomationIndexes
-      ? eventContextBindings.filter((binding, index) => {
-          return !asynchronousAutomationIndexes.includes(index)
-        })
-      : eventContextBindings
+  allBindings = contextBindings.concat(cloneActionBindings).concat(allBindings)
 
-    allBindings = contextBindings
-      .concat(cloneActionBindings)
-      .concat(allBindings)
+  return allBindings
+}
 
-    return allBindings
-  }
-
-  const toDisplay = eventKey => {
-    const type = actionTypes.find(action => action.name == eventKey)
-    return type?.displayName || type?.name
-  }
+const toDisplay = (eventKey) => {
+  const type = actionTypes.find((action) => action.name == eventKey)
+  return type?.displayName || type?.name
+}
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

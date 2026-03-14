@@ -1,5 +1,5 @@
 import { constants, logging, queue } from "@budibase/backend-core"
-import { DocUpdateEvent, WorkspaceUserSyncEvents } from "@budibase/types"
+import { type DocUpdateEvent, WorkspaceUserSyncEvents } from "@budibase/types"
 import { syncUsersAcrossWorkspaces } from "../../sdk/workspace/workspaces/sync"
 
 export class UserSyncProcessor {
@@ -22,14 +22,10 @@ export class UserSyncProcessor {
   }
 
   init() {
-    UserSyncProcessor.queue.process(1, async job => {
-      const pendingJobs = await UserSyncProcessor.queue
-        .getBullQueue()
-        .getWaiting(0, 100)
+    UserSyncProcessor.queue.process(1, async (job) => {
+      const pendingJobs = await UserSyncProcessor.queue.getBullQueue().getWaiting(0, 100)
 
-      const userIds = Array.from(
-        new Set([job, ...pendingJobs].map(m => m.data.userId))
-      )
+      const userIds = Array.from(new Set([job, ...pendingJobs].map((m) => m.data.userId)))
       await syncUsersAcrossWorkspaces(userIds)
 
       for (const job of pendingJobs) {

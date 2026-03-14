@@ -1,5 +1,5 @@
-import { writable, get, derived } from "svelte/store"
 import { createLocalStorageStore } from "@budibase/frontend-core"
+import { derived, get, writable } from "svelte/store"
 
 const createStateStore = () => {
   const appId = window["##BUDIBASE_APP_ID##"] || "app"
@@ -13,21 +13,21 @@ const createStateStore = () => {
   const setValue = (key, value, persist = false) => {
     const storeToSave = persist ? persistentStore : tempStore
     const storeToClear = persist ? tempStore : persistentStore
-    storeToSave.update(state => {
+    storeToSave.update((state) => {
       state[key] = value
       return state
     })
-    storeToClear.update(state => {
+    storeToClear.update((state) => {
       delete state[key]
       return state
     })
   }
 
   // Delete a certain key from both stores
-  const deleteValue = key => {
+  const deleteValue = (key) => {
     const stores = [tempStore, persistentStore]
-    stores.forEach(store => {
-      store.update(state => {
+    stores.forEach((store) => {
+      store.update((state) => {
         delete state[key]
         return state
       })
@@ -38,15 +38,12 @@ const createStateStore = () => {
   const initialise = tempStore.set
 
   // Derive the combination of both persisted and non persisted stores
-  const store = derived(
-    [tempStore, persistentStore],
-    ([$tempStore, $persistentStore]) => {
-      return {
-        ...$tempStore,
-        ...$persistentStore,
-      }
+  const store = derived([tempStore, persistentStore], ([$tempStore, $persistentStore]) => {
+    return {
+      ...$tempStore,
+      ...$persistentStore,
     }
-  )
+  })
 
   return {
     subscribe: store.subscribe,

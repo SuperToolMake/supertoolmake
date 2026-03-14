@@ -1,39 +1,39 @@
 <script>
-  import { Heading, Select, ActionButton } from "@budibase/bbui"
-  import { devToolsStore } from "@/stores"
-  import { getContext, onMount } from "svelte"
-  import { API } from "@/api"
+import { ActionButton, Heading, Select } from "@budibase/bbui"
+import { getContext, onMount } from "svelte"
+import { API } from "@/api"
+import { devToolsStore } from "@/stores"
 
-  const context = getContext("context")
-  const SELF_ROLE = "self"
+const context = getContext("context")
+const SELF_ROLE = "self"
 
-  let roles
+let roles
 
-  $: previewOptions = buildRoleList(roles)
+$: previewOptions = buildRoleList(roles)
 
-  function buildRoleList(roles) {
-    const list = []
-    list.push({
-      label: "View as yourself",
-      value: SELF_ROLE,
-    })
-    if (!roles) {
-      return list
-    }
-    for (let role of roles) {
-      list.push({
-        label: `View as ${role.uiMetadata?.displayName || role.name}`,
-        value: role._id,
-      })
-    }
+function buildRoleList(roles) {
+  const list = []
+  list.push({
+    label: "View as yourself",
+    value: SELF_ROLE,
+  })
+  if (!roles) {
     return list
   }
+  for (let role of roles) {
+    list.push({
+      label: `View as ${role.uiMetadata?.displayName || role.name}`,
+      value: role._id,
+    })
+  }
+  return list
+}
 
-  onMount(async () => {
-    // make sure correct before starting
-    await devToolsStore.actions.changeRole(SELF_ROLE)
-    roles = await API.getRoles()
-  })
+onMount(async () => {
+  // make sure correct before starting
+  await devToolsStore.actions.changeRole(SELF_ROLE)
+  roles = await API.getRoles()
+})
 </script>
 
 <div class="dev-preview-header" class:mobile={$context.device.mobile}>

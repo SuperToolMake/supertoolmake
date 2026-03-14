@@ -7,30 +7,20 @@ import { capitalise } from "@/helpers"
 // Some examples are saving rows or duplicating rows.
 export const getDatasourceLikeProviders = ({ asset, componentId, nested }) => {
   // Get all form context providers
-  const formComponentContexts = getAllComponentContexts(
-    asset,
-    componentId,
-    "form",
-    {
-      includeSelf: nested,
-    }
-  )
+  const formComponentContexts = getAllComponentContexts(asset, componentId, "form", {
+    includeSelf: nested,
+  })
   // Get all schema context providers
-  const schemaComponentContexts = getAllComponentContexts(
-    asset,
-    componentId,
-    "schema",
-    {
-      includeSelf: nested,
-    }
-  )
+  const schemaComponentContexts = getAllComponentContexts(asset, componentId, "schema", {
+    includeSelf: nested,
+  })
 
   // Check for duplicate contexts by the same component. In this case, attempt
   // to label contexts with their suffixes
-  schemaComponentContexts.forEach(schemaContext => {
+  schemaComponentContexts.forEach((schemaContext) => {
     // Check if we have a form context for this component
     const id = schemaContext.component._id
-    const existing = formComponentContexts.find(x => x.component._id === id)
+    const existing = formComponentContexts.find((x) => x.component._id === id)
     if (existing) {
       if (existing.contexts[0].suffix) {
         const suffix = capitalise(existing.contexts[0].suffix)

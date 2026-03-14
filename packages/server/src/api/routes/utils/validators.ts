@@ -1,11 +1,7 @@
 import { auth, permissions } from "@budibase/backend-core"
-import {
-  EmptyFilterOption,
-  SearchFilters,
-  BuiltinPermissionID,
-} from "@budibase/types"
-import Joi from "joi"
 import { ValidSnippetNameRegex } from "@budibase/shared-core"
+import { BuiltinPermissionID, EmptyFilterOption, type SearchFilters } from "@budibase/types"
+import Joi from "joi"
 
 const OPTIONAL_STRING = Joi.string().optional().allow(null).allow("")
 const OPTIONAL_NUMBER = Joi.number().optional().allow(null)
@@ -101,9 +97,7 @@ export function internalSearchValidator() {
       sortType: OPTIONAL_STRING,
       paginate: Joi.boolean(),
       countRows: Joi.boolean(),
-      bookmark: Joi.alternatives()
-        .try(OPTIONAL_STRING, OPTIONAL_NUMBER)
-        .optional(),
+      bookmark: Joi.alternatives().try(OPTIONAL_STRING, OPTIONAL_NUMBER).optional(),
     })
   )
 }
@@ -113,9 +107,7 @@ export function externalSearchValidator() {
     Joi.object({
       query: filterObject(),
       paginate: Joi.boolean().optional(),
-      bookmark: Joi.alternatives()
-        .try(OPTIONAL_STRING, OPTIONAL_NUMBER)
-        .optional(),
+      bookmark: Joi.alternatives().try(OPTIONAL_STRING, OPTIONAL_NUMBER).optional(),
       limit: OPTIONAL_NUMBER,
       sort: Joi.object({
         column: Joi.string(),
@@ -148,16 +140,10 @@ export function roleValidator() {
       permissions: Joi.object()
         .pattern(
           /.*/,
-          Joi.alternatives().try(
-            Joi.array().items(permissionString),
-            permissionString
-          )
+          Joi.alternatives().try(Joi.array().items(permissionString), permissionString)
         )
         .optional(),
-      inherits: Joi.alternatives().try(
-        OPTIONAL_STRING,
-        Joi.array().items(OPTIONAL_STRING)
-      ),
+      inherits: Joi.alternatives().try(OPTIONAL_STRING, Joi.array().items(OPTIONAL_STRING)),
     }).unknown(true)
   )
 }

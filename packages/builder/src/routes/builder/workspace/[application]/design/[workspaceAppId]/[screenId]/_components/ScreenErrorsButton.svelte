@@ -1,44 +1,41 @@
 <script lang="ts">
-  import type { UIComponentError } from "@budibase/types"
-  import {
-    builderStore,
-    componentStore,
-    screenComponentErrorList,
-    screenComponentsList,
-  } from "@/stores/builder"
-  import {
-    AbsTooltip,
-    ActionButton,
-    Icon,
-    Link,
-    Popover,
-    PopoverAlignment,
-    TooltipPosition,
-  } from "@budibase/bbui"
-  import CircleIndicator from "@/components/common/Icons/CircleIndicator.svelte"
+import {
+  AbsTooltip,
+  ActionButton,
+  Icon,
+  Link,
+  Popover,
+  PopoverAlignment,
+  TooltipPosition,
+} from "@budibase/bbui"
+import type { UIComponentError } from "@budibase/types"
+import CircleIndicator from "@/components/common/Icons/CircleIndicator.svelte"
+import {
+  builderStore,
+  componentStore,
+  screenComponentErrorList,
+  screenComponentsList,
+} from "@/stores/builder"
 
-  let button: any
-  let popover: any
+let button: any
+let popover: any
 
-  $: hasErrors = !!$screenComponentErrorList.length
+$: hasErrors = !!$screenComponentErrorList.length
 
-  function getErrorTitle(error: UIComponentError) {
-    const titleParts = [
-      $screenComponentsList.find(c => c._id === error.componentId)!
-        ._instanceName,
-    ]
-    if (error.errorType === "setting" && error.cause === "invalid") {
-      titleParts.push(error.label)
-    }
-    return titleParts.join(" - ")
+function getErrorTitle(error: UIComponentError) {
+  const titleParts = [$screenComponentsList.find((c) => c._id === error.componentId)!._instanceName]
+  if (error.errorType === "setting" && error.cause === "invalid") {
+    titleParts.push(error.label)
   }
+  return titleParts.join(" - ")
+}
 
-  async function onErrorClick(error: UIComponentError) {
-    componentStore.select(error.componentId)
-    if (error.errorType === "setting") {
-      builderStore.highlightSetting(error.key, "error")
-    }
+async function onErrorClick(error: UIComponentError) {
+  componentStore.select(error.componentId)
+  if (error.errorType === "setting") {
+    builderStore.highlightSetting(error.key, "error")
   }
+}
 </script>
 
 <div bind:this={button} class="error-button">

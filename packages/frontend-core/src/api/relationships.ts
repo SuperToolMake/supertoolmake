@@ -1,17 +1,11 @@
-import { FetchEnrichedRowResponse, Row } from "@budibase/types"
-import { BaseAPIClient } from "./types"
+import type { FetchEnrichedRowResponse, Row } from "@budibase/types"
+import type { BaseAPIClient } from "./types"
 
 export interface RelationshipEndpoints {
-  fetchRelationshipData: (
-    sourceId: string,
-    rowId: string,
-    fieldName?: string
-  ) => Promise<Row[]>
+  fetchRelationshipData: (sourceId: string, rowId: string, fieldName?: string) => Promise<Row[]>
 }
 
-export const buildRelationshipEndpoints = (
-  API: BaseAPIClient
-): RelationshipEndpoints => ({
+export const buildRelationshipEndpoints = (API: BaseAPIClient): RelationshipEndpoints => ({
   /**
    * Fetches related rows for a certain field of a certain row.
    * @param sourceId the ID of the table to fetch from

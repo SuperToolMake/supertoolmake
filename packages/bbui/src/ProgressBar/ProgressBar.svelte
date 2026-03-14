@@ -1,13 +1,13 @@
 <script lang="ts">
-  import "@spectrum-css/progressbar/dist/index-vars.css"
+import "@spectrum-css/progressbar/dist/index-vars.css"
 
-  export let value: number | boolean = false
-  export let duration: number = 1000
-  export let width: string | boolean = false
-  export let sideLabel: boolean = false
-  export let hidePercentage: boolean = true
-  export let color: "red" | "green" | undefined = undefined // red, green, default = blue
-  export let size: string = "M"
+export let value: number | boolean = false
+export let duration: number = 1000
+export let width: string | boolean = false
+export let sideLabel: boolean = false
+export let hidePercentage: boolean = true
+export let color: "red" | "green" | undefined = undefined // red, green, default = blue
+export let size: string = "M"
 </script>
 
 <div

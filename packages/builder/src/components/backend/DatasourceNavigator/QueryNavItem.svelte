@@ -1,86 +1,82 @@
 <script>
-  import {
-    customQueryIconText,
-    customQueryIconColor,
-    customQueryText,
-  } from "@/helpers/data/utils"
-  import { goto as gotoStore, isActive } from "@roxi/routify"
-  import {
-    queries,
-    userSelectedResourceMap,
-    contextMenuStore,
-    workspaceFavouriteStore,
-  } from "@/stores/builder"
-  import NavItem from "@/components/common/NavItem.svelte"
-  import DeleteDataConfirmModal from "@/components/backend/modals/DeleteDataConfirmationModal.svelte"
-  import EditQueryModal from "./EditQueryModal.svelte"
-  import { notifications, Icon } from "@budibase/bbui"
-  import FavouriteResourceButton from "@/routes/builder/_components/FavouriteResourceButton.svelte"
-  import { WorkspaceResource } from "@budibase/types"
-  import { IntegrationTypes } from "@/constants/backend"
+import { Icon, notifications } from "@budibase/bbui"
+import { WorkspaceResource } from "@budibase/types"
+import { goto as gotoStore, isActive } from "@roxi/routify"
+import DeleteDataConfirmModal from "@/components/backend/modals/DeleteDataConfirmationModal.svelte"
+import NavItem from "@/components/common/NavItem.svelte"
+import { IntegrationTypes } from "@/constants/backend"
+import { customQueryIconColor, customQueryIconText, customQueryText } from "@/helpers/data/utils"
+import FavouriteResourceButton from "@/routes/builder/_components/FavouriteResourceButton.svelte"
+import {
+  contextMenuStore,
+  queries,
+  userSelectedResourceMap,
+  workspaceFavouriteStore,
+} from "@/stores/builder"
+import EditQueryModal from "./EditQueryModal.svelte"
 
-  $gotoStore
-  $isActive
+$gotoStore
+$isActive
 
-  export let datasource
-  export let query
+export let datasource
+export let query
 
-  const favourites = workspaceFavouriteStore.lookup
+const favourites = workspaceFavouriteStore.lookup
 
-  let confirmDeleteModal
-  let editQueryModal
+let confirmDeleteModal
+let editQueryModal
 
-  $: favourite = query?._id ? $favourites[query?._id] : undefined
-  $: isRestDatasource = datasource?.source === IntegrationTypes.REST
-  $: iconVerb = isRestDatasource ? customQueryIconText(query) : ""
-  $: iconColor = isRestDatasource ? customQueryIconColor(query) : undefined
+$: favourite = query?._id ? $favourites[query?._id] : undefined
+$: isRestDatasource = datasource?.source === IntegrationTypes.REST
+$: iconVerb = isRestDatasource ? customQueryIconText(query) : ""
+$: iconColor = isRestDatasource ? customQueryIconColor(query) : undefined
 
-  // goto won't work in the context menu callback if the store is called directly
-  $: goto = $gotoStore
+// goto won't work in the context menu callback if the store is called directly
+$: goto = $gotoStore
 
-  const getContextMenuItems = () => {
-    return [
-      {
-        icon: "pencil",
-        name: "Edit",
-        keyBind: null,
-        visible: isRestDatasource,
-        disabled: false,
-        callback: editQueryModal.show,
+const getContextMenuItems = () => {
+  return [
+    {
+      icon: "pencil",
+      name: "Edit",
+      keyBind: null,
+      visible: isRestDatasource,
+      disabled: false,
+      callback: editQueryModal.show,
+    },
+    {
+      icon: "trash",
+      name: "Delete",
+      keyBind: null,
+      visible: true,
+      disabled: false,
+      callback: confirmDeleteModal.show,
+    },
+    {
+      icon: "copy",
+      name: "Duplicate",
+      keyBind: null,
+      visible: true,
+      disabled: false,
+      callback: async () => {
+        try {
+          const newQuery = await queries.duplicate(query)
+          goto("./query/[queryId]", { queryId: newQuery._id })
+        } catch (error) {
+          notifications.error("Error duplicating query")
+        }
       },
-      {
-        icon: "trash",
-        name: "Delete",
-        keyBind: null,
-        visible: true,
-        disabled: false,
-        callback: confirmDeleteModal.show,
-      },
-      {
-        icon: "copy",
-        name: "Duplicate",
-        keyBind: null,
-        visible: true,
-        disabled: false,
-        callback: async () => {
-          try {
-            const newQuery = await queries.duplicate(query)
-            goto("./query/[queryId]", { queryId: newQuery._id })
-          } catch (error) {
-            notifications.error("Error duplicating query")
-          }
-        },
-      },
-    ]
-  }
+    },
+  ]
+}
 
-  const openContextMenu = e => {
-    e.preventDefault()
-    e.stopPropagation()
+const openContextMenu = (e) => {
+  e.preventDefault()
+  e.stopPropagation()
 
-    const items = getContextMenuItems()
-    contextMenuStore.open(query._id, items, { x: e.clientX, y: e.clientY })
-  }
+  const items = getContextMenuItems()
+  contextMenuStore.open(query._id, items, { x: e.clientX, y: e.clientY })
+}
 </script>
 
 <NavItem

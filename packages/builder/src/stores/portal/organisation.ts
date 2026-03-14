@@ -1,11 +1,11 @@
+import {
+  ConfigType,
+  type PublicSettingsInnerConfig,
+  type SettingsInnerConfig,
+} from "@budibase/types"
 import { get } from "svelte/store"
 import { API } from "@/api"
 import { auth } from "@/stores/portal"
-import {
-  ConfigType,
-  PublicSettingsInnerConfig,
-  SettingsInnerConfig,
-} from "@budibase/types"
 import { BudiStore } from "../BudiStore"
 
 interface LocalOrganisationState {
@@ -13,9 +13,7 @@ interface LocalOrganisationState {
 }
 
 type SavedOrganisationState = SettingsInnerConfig
-type OrganisationState = SavedOrganisationState &
-  PublicSettingsInnerConfig &
-  LocalOrganisationState
+type OrganisationState = SavedOrganisationState & PublicSettingsInnerConfig & LocalOrganisationState
 
 const DEFAULT_STATE: OrganisationState = {
   platformUrl: "",

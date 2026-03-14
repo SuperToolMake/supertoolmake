@@ -1,6 +1,6 @@
 import { BuilderSocketEvent } from "@budibase/shared-core"
-import { Workspace } from "@budibase/types"
-import { Socket } from "socket.io-client"
+import type { Workspace } from "@budibase/types"
+import type { Socket } from "socket.io-client"
 import { get } from "svelte/store"
 import { BudiStore } from "../BudiStore.js"
 import { createBuilderWebsocket } from "./websocket.js"
@@ -64,21 +64,21 @@ export class BuilderStore extends BudiStore<BuilderState> {
   }
 
   highlightSetting(key?: string, type?: string) {
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       highlightedSetting: key ? { key, type: type || "info" } : null,
     }))
   }
 
   propertyFocus(key: string | null) {
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       propertyFocus: key,
     }))
   }
 
   setPreviousTopNavPath(route: string, url: string) {
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       previousTopNavPath: {
         ...(state.previousTopNavPath || {}),
@@ -94,14 +94,14 @@ export class BuilderStore extends BudiStore<BuilderState> {
   }
 
   setResizingPanel(isResizing: boolean) {
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       isResizingPanel: isResizing,
     }))
   }
 
   appCreated(created: boolean) {
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       created,
     }))

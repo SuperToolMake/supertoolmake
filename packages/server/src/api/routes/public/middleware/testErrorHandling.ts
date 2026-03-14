@@ -1,4 +1,4 @@
-import { Ctx } from "@budibase/types"
+import type { Ctx } from "@budibase/types"
 import environment from "../../../../environment"
 
 export default () => {

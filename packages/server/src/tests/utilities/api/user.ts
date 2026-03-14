@@ -1,30 +1,22 @@
-import {
+import type {
   FetchUserMetadataResponse,
   FindUserMetadataResponse,
   UserMetadata,
 } from "@budibase/types"
-import { Expectations, TestAPI } from "./base"
-import { DocumentInsertResponse } from "nano"
+import type { DocumentInsertResponse } from "nano"
+import { type Expectations, TestAPI } from "./base"
 
 export class UserAPI extends TestAPI {
-  fetch = async (
-    expectations?: Expectations
-  ): Promise<FetchUserMetadataResponse> => {
+  fetch = async (expectations?: Expectations): Promise<FetchUserMetadataResponse> => {
     return await this._get<FetchUserMetadataResponse>("/api/users/metadata", {
       expectations,
     })
   }
 
-  find = async (
-    id: string,
-    expectations?: Expectations
-  ): Promise<FindUserMetadataResponse> => {
-    return await this._get<FindUserMetadataResponse>(
-      `/api/users/metadata/${id}`,
-      {
-        expectations,
-      }
-    )
+  find = async (id: string, expectations?: Expectations): Promise<FindUserMetadataResponse> => {
+    return await this._get<FindUserMetadataResponse>(`/api/users/metadata/${id}`, {
+      expectations,
+    })
   }
 
   update = async (
@@ -41,24 +33,15 @@ export class UserAPI extends TestAPI {
     user: UserMetadata,
     expectations?: Expectations
   ): Promise<DocumentInsertResponse> => {
-    return await this._post<DocumentInsertResponse>(
-      "/api/users/metadata/self",
-      {
-        body: user,
-        expectations,
-      }
-    )
+    return await this._post<DocumentInsertResponse>("/api/users/metadata/self", {
+      body: user,
+      expectations,
+    })
   }
 
-  destroy = async (
-    id: string,
-    expectations?: Expectations
-  ): Promise<{ message: string }> => {
-    return await this._delete<{ message: string }>(
-      `/api/users/metadata/${id}`,
-      {
-        expectations,
-      }
-    )
+  destroy = async (id: string, expectations?: Expectations): Promise<{ message: string }> => {
+    return await this._delete<{ message: string }>(`/api/users/metadata/${id}`, {
+      expectations,
+    })
   }
 }

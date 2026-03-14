@@ -1,16 +1,16 @@
 import {
   auth as authCore,
+  cache,
   env as coreEnv,
+  utils as coreUtils,
   HTTPError,
   sessions,
   tenancy,
-  utils as coreUtils,
-  cache,
 } from "@budibase/backend-core"
-import { PlatformLogoutOpts, User, EmailTemplatePurpose } from "@budibase/types"
+import { EmailTemplatePurpose, type PlatformLogoutOpts, type User } from "@budibase/types"
 import jwt from "jsonwebtoken"
-import * as userSdk from "../users"
 import * as emails from "../../utilities/email"
+import * as userSdk from "../users"
 
 // LOGIN / LOGOUT
 
@@ -51,10 +51,7 @@ export async function logout(opts: PlatformLogoutOpts) {
 export const reset = async (email: string) => {
   const configured = await emails.isEmailConfigured()
   if (!configured) {
-    throw new HTTPError(
-      "Please contact your platform administrator, SMTP is not configured.",
-      400
-    )
+    throw new HTTPError("Please contact your platform administrator, SMTP is not configured.", 400)
   }
 
   const user = await userSdk.core.getGlobalUserByEmail(email)

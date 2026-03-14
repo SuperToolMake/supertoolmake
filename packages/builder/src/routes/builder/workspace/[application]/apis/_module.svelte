@@ -1,70 +1,65 @@
 <script lang="ts">
-  import { Layout } from "@budibase/bbui"
-  import DatasourceNavigator from "@/components/backend/DatasourceNavigator/DatasourceNavigator.svelte"
-  import Panel from "@/components/design/Panel.svelte"
-  import { isActive, goto as gotoStore } from "@roxi/routify"
-  import { datasources, builderStore } from "@/stores/builder"
-  import NavHeader from "@/components/common/NavHeader.svelte"
-  import TopBar from "@/components/common/TopBar.svelte"
-  import { getHorizontalResizeActions } from "@/components/common/resizable"
-  import { IntegrationTypes } from "@/constants/backend"
-  import type { Datasource, UIInternalDatasource } from "@budibase/types"
-  import { onMount } from "svelte"
-  import APIModal from "./_components/APIModal.svelte"
+import { Layout } from "@budibase/bbui"
+import type { Datasource, UIInternalDatasource } from "@budibase/types"
+import { goto as gotoStore, isActive } from "@roxi/routify"
+import { onMount } from "svelte"
+import DatasourceNavigator from "@/components/backend/DatasourceNavigator/DatasourceNavigator.svelte"
+import NavHeader from "@/components/common/NavHeader.svelte"
+import { getHorizontalResizeActions } from "@/components/common/resizable"
+import TopBar from "@/components/common/TopBar.svelte"
+import Panel from "@/components/design/Panel.svelte"
+import { IntegrationTypes } from "@/constants/backend"
+import { builderStore, datasources } from "@/stores/builder"
+import type APIModal from "./_components/APIModal.svelte"
 
-  let searchValue: string
-  let panelWidth = 260
-  let apiModal: APIModal
+let searchValue: string
+let panelWidth = 260
+let apiModal: APIModal
 
-  $: goto = $gotoStore
+$: goto = $gotoStore
 
-  const loadPanelWidth = () => {
-    const saved = localStorage.getItem("api-panel-width")
-    if (saved) {
-      const width = parseInt(saved, 10)
-      if (width && width > 100 && width < window.innerWidth) {
-        panelWidth = width
-      }
+const loadPanelWidth = () => {
+  const saved = localStorage.getItem("api-panel-width")
+  if (saved) {
+    const width = parseInt(saved, 10)
+    if (width && width > 100 && width < window.innerWidth) {
+      panelWidth = width
     }
   }
+}
 
-  type SortableDatasource = Pick<Datasource | UIInternalDatasource, "name">
+type SortableDatasource = Pick<Datasource | UIInternalDatasource, "name">
 
-  const sortByDatasourceName = (a: SortableDatasource, b: SortableDatasource) =>
-    (a.name || "").localeCompare(b.name || "", undefined, {
-      sensitivity: "base",
-    })
-
-  const datasourceFilter = (datasource: any) =>
-    datasource.source === IntegrationTypes.REST
-
-  const [resizable, resizableHandle] = getHorizontalResizeActions(
-    panelWidth,
-    (width: number) => {
-      if (width) {
-        localStorage.setItem("api-panel-width", width.toString())
-        panelWidth = width
-      }
-    }
-  )
-
-  onMount(() => {
-    loadPanelWidth()
+const sortByDatasourceName = (a: SortableDatasource, b: SortableDatasource) =>
+  (a.name || "").localeCompare(b.name || "", undefined, {
+    sensitivity: "base",
   })
 
-  $: restDatasources = ($datasources.list || []).filter(
-    datasource => datasource.source === IntegrationTypes.REST
-  )
-  $: hasRestDatasources = restDatasources.length > 0
+const datasourceFilter = (datasource: any) => datasource.source === IntegrationTypes.REST
 
-  const APIS_BASE_ROUTE = "/builder/workspace/[application]/apis"
-
-  $: shouldRedirectToNew =
-    !hasRestDatasources && !$isActive("./new") && $isActive(APIS_BASE_ROUTE)
-
-  $: if (shouldRedirectToNew) {
-    goto("./new")
+const [resizable, resizableHandle] = getHorizontalResizeActions(panelWidth, (width: number) => {
+  if (width) {
+    localStorage.setItem("api-panel-width", width.toString())
+    panelWidth = width
   }
+})
+
+onMount(() => {
+  loadPanelWidth()
+})
+
+$: restDatasources = ($datasources.list || []).filter(
+  (datasource) => datasource.source === IntegrationTypes.REST
+)
+$: hasRestDatasources = restDatasources.length > 0
+
+const APIS_BASE_ROUTE = "/builder/workspace/[application]/apis"
+
+$: shouldRedirectToNew = !hasRestDatasources && !$isActive("./new") && $isActive(APIS_BASE_ROUTE)
+
+$: if (shouldRedirectToNew) {
+  goto("./new")
+}
 </script>
 
 <APIModal bind:this={apiModal} />

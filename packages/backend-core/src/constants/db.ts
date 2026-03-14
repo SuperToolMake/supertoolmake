@@ -1,9 +1,4 @@
-import {
-  DocumentType,
-  InternalTable,
-  prefixed,
-  SEPARATOR,
-} from "@budibase/types"
+import { DocumentType, InternalTable, prefixed, SEPARATOR } from "@budibase/types"
 
 export {
   DocumentType,
@@ -72,6 +67,6 @@ export const WORKSPACE_DEV_PREFIX = WORKSPACE_DEV
 export const BUDIBASE_DATASOURCE_TYPE = "budibase"
 export const USER_METADATA_PREFIX = `${DocumentType.ROW}${SEPARATOR}${InternalTable.USER_METADATA}${SEPARATOR}`
 
-export const enum DesignDocuments {
+export enum DesignDocuments {
   MIGRATIONS = "_design/migrations",
 }

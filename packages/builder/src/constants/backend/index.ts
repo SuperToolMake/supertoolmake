@@ -1,12 +1,12 @@
-import {
-  FieldType,
-  BBReferenceFieldSubType,
-  INTERNAL_TABLE_SOURCE_ID,
-  AutoFieldSubType,
-  Hosting,
-} from "@budibase/types"
 import { Constants } from "@budibase/frontend-core"
-import { UIField } from "@budibase/types"
+import {
+  AutoFieldSubType,
+  BBReferenceFieldSubType,
+  FieldType,
+  Hosting,
+  INTERNAL_TABLE_SOURCE_ID,
+  type UIField,
+} from "@budibase/types"
 
 const { TypeIconMap } = Constants
 
@@ -17,10 +17,7 @@ export {
 
 export const AUTO_COLUMN_SUB_TYPES = AutoFieldSubType
 
-export const AUTO_COLUMN_DISPLAY_NAMES: Record<
-  keyof typeof AUTO_COLUMN_SUB_TYPES,
-  string
-> = {
+export const AUTO_COLUMN_DISPLAY_NAMES: Record<keyof typeof AUTO_COLUMN_SUB_TYPES, string> = {
   AUTO_ID: "Auto ID",
   CREATED_BY: "Created By",
   CREATED_AT: "Created At",
@@ -135,9 +132,7 @@ export const FIELDS: Record<string, UIField> = {
     name: "Single user",
     type: FieldType.BB_REFERENCE_SINGLE,
     subtype: BBReferenceFieldSubType.USER,
-    icon: TypeIconMap[FieldType.BB_REFERENCE_SINGLE][
-      BBReferenceFieldSubType.USER
-    ],
+    icon: TypeIconMap[FieldType.BB_REFERENCE_SINGLE][BBReferenceFieldSubType.USER],
   },
   USERS: {
     name: "Multi user",
@@ -209,7 +204,7 @@ export const SchemaTypeOptions = [
   { label: "JSON", value: FieldType.JSON },
 ]
 
-export const SchemaTypeOptionsExpanded = SchemaTypeOptions.map(el => ({
+export const SchemaTypeOptionsExpanded = SchemaTypeOptions.map((el) => ({
   ...el,
   value: { type: el.value },
 }))

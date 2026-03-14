@@ -1,5 +1,5 @@
 <script>
-  import { NodeWidth, NodeHeight } from "./constants"
+import { NodeHeight, NodeWidth } from "./constants"
 </script>
 
 <div class="node" style={`--width:${NodeWidth}px; --height:${NodeHeight}px;`}>

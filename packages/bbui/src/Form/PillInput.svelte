@@ -1,144 +1,133 @@
 <script lang="ts">
-  import "@spectrum-css/textfield/dist/index-vars.css"
-  import Field from "./Field.svelte"
-  import Tag from "../Tags/Tag.svelte"
-  import type { LabelPosition } from "../types"
-  import { createEventDispatcher } from "svelte"
+import "@spectrum-css/textfield/dist/index-vars.css"
+import { createEventDispatcher } from "svelte"
+import Tag from "../Tags/Tag.svelte"
+import type { LabelPosition } from "../types"
+import Field from "./Field.svelte"
 
-  export let value: string[] = []
-  export let label: string | undefined = undefined
-  export let labelPosition: LabelPosition = "above"
-  export let error: string | undefined = undefined
-  export let helpText: string | undefined = undefined
-  export let placeholder: string | undefined = undefined
-  export let disabled: boolean = false
-  export let readonly: boolean = false
-  export let id: string | undefined = undefined
-  export let delimiter = ","
-  export let splitOnSpace = false
-  export let allowDuplicates = false
-  export let maxItems: number | undefined = undefined
+export let value: string[] = []
+export let label: string | undefined = undefined
+export let labelPosition: LabelPosition = "above"
+export let error: string | undefined = undefined
+export let helpText: string | undefined = undefined
+export let placeholder: string | undefined = undefined
+export let disabled: boolean = false
+export let readonly: boolean = false
+export let id: string | undefined = undefined
+export let delimiter = ","
+export let splitOnSpace = false
+export let allowDuplicates = false
+export let maxItems: number | undefined = undefined
 
-  let inputValue = ""
-  let focused = false
-  let inputEl: HTMLInputElement | null = null
+let inputValue = ""
+let focused = false
+let inputEl: HTMLInputElement | null = null
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  const updateValue = (next: string[]) => {
-    value = next
-    dispatch("change", next)
+const updateValue = (next: string[]) => {
+  value = next
+  dispatch("change", next)
+}
+
+const notifyMax = () => {
+  if (maxItems != null) {
+    dispatch("max", maxItems)
+  }
+}
+
+const addTokens = (tokens: string[]) => {
+  const cleaned = tokens.map((token) => token.trim()).filter(Boolean)
+  if (!cleaned.length) {
+    return
   }
 
-  const notifyMax = () => {
-    if (maxItems != null) {
-      dispatch("max", maxItems)
-    }
+  if (maxItems != null && value.length >= maxItems) {
+    notifyMax()
+    return
   }
 
-  const addTokens = (tokens: string[]) => {
-    const cleaned = tokens.map(token => token.trim()).filter(Boolean)
-    if (!cleaned.length) {
-      return
-    }
-
-    if (maxItems != null && value.length >= maxItems) {
-      notifyMax()
-      return
-    }
-
-    const available =
-      maxItems != null ? Math.max(maxItems - value.length, 0) : cleaned.length
-    if (available === 0) {
-      notifyMax()
-      return
-    }
-
-    const next = cleaned.slice(0, available).reduce(
-      (acc, token) => {
-        if (allowDuplicates || !acc.includes(token)) {
-          acc.push(token)
-        }
-        return acc
-      },
-      [...value]
-    )
-
-    updateValue(next)
-
-    if (maxItems != null && cleaned.length > available) {
-      notifyMax()
-    }
+  const available = maxItems != null ? Math.max(maxItems - value.length, 0) : cleaned.length
+  if (available === 0) {
+    notifyMax()
+    return
   }
 
-  const removeToken = (index: number) => {
-    updateValue(value.filter((_, idx) => idx !== index))
+  const next = cleaned.slice(0, available).reduce(
+    (acc, token) => {
+      if (allowDuplicates || !acc.includes(token)) {
+        acc.push(token)
+      }
+      return acc
+    },
+    [...value]
+  )
+
+  updateValue(next)
+
+  if (maxItems != null && cleaned.length > available) {
+    notifyMax()
   }
+}
 
-  const escapeRegExp = (value: string) =>
-    value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+const removeToken = (index: number) => {
+  updateValue(value.filter((_, idx) => idx !== index))
+}
 
-  const getSplitPattern = () => {
-    const parts = [escapeRegExp(delimiter)]
-    if (splitOnSpace) {
-      parts.push("\\s")
-    }
-    return new RegExp(`(?:${parts.join("|")})+`)
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+
+const getSplitPattern = () => {
+  const parts = [escapeRegExp(delimiter)]
+  if (splitOnSpace) {
+    parts.push("\\s")
   }
+  return new RegExp(`(?:${parts.join("|")})+`)
+}
 
-  const shouldSplit = (value: string) => {
+const shouldSplit = (value: string) => {
+  const pattern = getSplitPattern()
+  return pattern.test(value)
+}
+
+const handleInput = (event: Event) => {
+  if (readonly || disabled) {
+    return
+  }
+  const target = event.target as HTMLInputElement
+  inputValue = target.value
+  if (shouldSplit(inputValue)) {
     const pattern = getSplitPattern()
-    return pattern.test(value)
+    const endsWithSeparator = new RegExp(`${pattern.source}$`).test(inputValue)
+    const hasDelimiterSpace = new RegExp(`${escapeRegExp(delimiter)}\\s+`).test(inputValue)
+    const parts = inputValue.split(pattern).filter(Boolean)
+    const shouldCommitAll = hasDelimiterSpace && parts.length > 1 && !endsWithSeparator
+    const trailing = endsWithSeparator || shouldCommitAll ? "" : (parts.pop() ?? "")
+    addTokens(parts)
+    inputValue = trailing
   }
+}
 
-  const handleInput = (event: Event) => {
-    if (readonly || disabled) {
-      return
-    }
-    const target = event.target as HTMLInputElement
-    inputValue = target.value
-    if (shouldSplit(inputValue)) {
-      const pattern = getSplitPattern()
-      const endsWithSeparator = new RegExp(`${pattern.source}$`).test(
-        inputValue
-      )
-      const hasDelimiterSpace = new RegExp(
-        `${escapeRegExp(delimiter)}\\s+`
-      ).test(inputValue)
-      const parts = inputValue.split(pattern).filter(Boolean)
-      const shouldCommitAll =
-        hasDelimiterSpace && parts.length > 1 && !endsWithSeparator
-      const trailing =
-        endsWithSeparator || shouldCommitAll ? "" : (parts.pop() ?? "")
-      addTokens(parts)
-      inputValue = trailing
-    }
+const handleBlur = () => {
+  if (inputValue.trim()) {
+    addTokens([inputValue])
+    inputValue = ""
   }
+  dispatch("blur", value)
+}
 
-  const handleBlur = () => {
-    if (inputValue.trim()) {
-      addTokens([inputValue])
-      inputValue = ""
-    }
-    dispatch("blur", value)
+const handleKeydown = (event: KeyboardEvent) => {
+  if (readonly || disabled) {
+    return
   }
-
-  const handleKeydown = (event: KeyboardEvent) => {
-    if (readonly || disabled) {
-      return
-    }
-    if (
-      event.key === delimiter ||
-      (splitOnSpace && event.key === " " && !event.shiftKey)
-    ) {
-      event.preventDefault()
-      addTokens([inputValue])
-      inputValue = ""
-    }
-    if (event.key === "Backspace" && !inputValue && value.length) {
-      removeToken(value.length - 1)
-    }
+  if (event.key === delimiter || (splitOnSpace && event.key === " " && !event.shiftKey)) {
+    event.preventDefault()
+    addTokens([inputValue])
+    inputValue = ""
   }
+  if (event.key === "Backspace" && !inputValue && value.length) {
+    removeToken(value.length - 1)
+  }
+}
 </script>
 
 <Field {helpText} {label} {labelPosition} {error}>

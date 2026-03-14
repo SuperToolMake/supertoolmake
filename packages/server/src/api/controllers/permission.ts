@@ -1,5 +1,5 @@
 import { context, permissions, roles } from "@budibase/backend-core"
-import {
+import type {
   AddPermissionRequest,
   AddPermissionResponse,
   FetchBuiltinPermissionsResponse,
@@ -13,16 +13,11 @@ import {
 } from "@budibase/types"
 import sdk from "../../sdk"
 import { PermissionUpdateType } from "../../sdk/workspace/permissions"
-import {
-  CURRENTLY_SUPPORTED_LEVELS,
-  getBasePermissions,
-} from "../../utilities/security"
+import { CURRENTLY_SUPPORTED_LEVELS, getBasePermissions } from "../../utilities/security"
 
 const SUPPORTED_LEVELS = CURRENTLY_SUPPORTED_LEVELS
 
-export function fetchBuiltin(
-  ctx: UserCtx<void, FetchBuiltinPermissionsResponse>
-) {
+export function fetchBuiltin(ctx: UserCtx<void, FetchBuiltinPermissionsResponse>) {
   ctx.body = Object.values(permissions.getBuiltinPermissions())
 }
 
@@ -31,14 +26,12 @@ export function fetchLevels(ctx: UserCtx<void, FetchPermissionLevelsRequest>) {
   ctx.body = SUPPORTED_LEVELS
 }
 
-export async function fetch(
-  ctx: UserCtx<void, FetchResourcePermissionInfoResponse>
-) {
+export async function fetch(ctx: UserCtx<void, FetchResourcePermissionInfoResponse>) {
   const db = context.getWorkspaceDB()
   const dbRoles = await sdk.permissions.getAllDBRoles(db)
-  let permissions: Record<string, Record<string, string>> = {}
+  const permissions: Record<string, Record<string, string>> = {}
   // create an object with structure role ID -> resource ID -> level
-  for (let role of dbRoles) {
+  for (const role of dbRoles) {
     if (!role.permissions) {
       continue
     }
@@ -46,25 +39,23 @@ export async function fetch(
     if (!roleId) {
       ctx.throw(400, "Unable to retrieve role")
     }
-    for (let [resource, levelArr] of Object.entries(role.permissions)) {
+    for (const [resource, levelArr] of Object.entries(role.permissions)) {
       const levels: string[] = Array.isArray(levelArr) ? levelArr : [levelArr]
       const perms: Record<string, string> = permissions[resource] || {}
-      levels.forEach(level => (perms[level] = roleId!))
+      levels.forEach((level) => (perms[level] = roleId!))
       permissions[resource] = perms
     }
   }
   // apply the base permissions
   const finalPermissions: FetchResourcePermissionInfoResponse = {}
-  for (let [resource, permission] of Object.entries(permissions)) {
+  for (const [resource, permission] of Object.entries(permissions)) {
     const basePerms = getBasePermissions(resource)
     finalPermissions[resource] = Object.assign(basePerms, permission)
   }
   ctx.body = finalPermissions
 }
 
-export async function getResourcePerms(
-  ctx: UserCtx<void, GetResourcePermsResponse>
-) {
+export async function getResourcePerms(ctx: UserCtx<void, GetResourcePermsResponse>) {
   const resourceId = ctx.params.resourceId
   const resourcePermissions = await sdk.permissions.getResourcePerms(resourceId)
 
@@ -88,13 +79,8 @@ export async function addPermission(ctx: UserCtx<void, AddPermissionResponse>) {
   ctx.body = { message: "Permission added." }
 }
 
-export async function removePermission(
-  ctx: UserCtx<void, RemovePermissionResponse>
-) {
+export async function removePermission(ctx: UserCtx<void, RemovePermissionResponse>) {
   const params: RemovePermissionRequest = ctx.params
-  await sdk.permissions.updatePermissionOnRole(
-    params,
-    PermissionUpdateType.REMOVE
-  )
+  await sdk.permissions.updatePermissionOnRole(params, PermissionUpdateType.REMOVE)
   ctx.body = { message: "Permission removed." }
 }

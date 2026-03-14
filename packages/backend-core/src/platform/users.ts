@@ -1,13 +1,13 @@
-import { getPlatformDB } from "./platformDb"
-import { DEFAULT_TENANT_ID } from "../constants"
-import env from "../environment"
-import {
+import type {
   PlatformUser,
   PlatformUserByEmail,
   PlatformUserById,
   PlatformUserBySsoId,
   User,
 } from "@budibase/types"
+import { DEFAULT_TENANT_ID } from "../constants"
+import env from "../environment"
+import { getPlatformDB } from "./platformDb"
 
 // READ
 
@@ -39,11 +39,7 @@ function newUserIdDoc(id: string, tenantId: string): PlatformUserById {
   }
 }
 
-function newUserEmailDoc(
-  userId: string,
-  email: string,
-  tenantId: string
-): PlatformUserByEmail {
+function newUserEmailDoc(userId: string, email: string, tenantId: string): PlatformUserByEmail {
   return {
     _id: email,
     userId,
@@ -84,23 +80,11 @@ async function addUserDoc(emailOrId: string, newDocFn: () => PlatformUser) {
   }
 }
 
-export async function addSsoUser(
-  ssoId: string,
-  email: string,
-  userId: string,
-  tenantId: string
-) {
-  return addUserDoc(ssoId, () =>
-    newUserSsoIdDoc(ssoId, email, userId, tenantId)
-  )
+export async function addSsoUser(ssoId: string, email: string, userId: string, tenantId: string) {
+  return addUserDoc(ssoId, () => newUserSsoIdDoc(ssoId, email, userId, tenantId))
 }
 
-export async function addUser(
-  tenantId: string,
-  userId: string,
-  email: string,
-  ssoId?: string
-) {
+export async function addUser(tenantId: string, userId: string, email: string, ssoId?: string) {
   const promises = [
     addUserDoc(userId, () => newUserIdDoc(userId, tenantId)),
     addUserDoc(email, () => newUserEmailDoc(userId, email, tenantId)),
@@ -123,7 +107,7 @@ export async function removeUser(user: User) {
     include_docs: true,
   })
   await db.bulkRemove(
-    userDocs.rows.map(row => row.doc!),
+    userDocs.rows.map((row) => row.doc!),
     { silenceErrors: true }
   )
 }

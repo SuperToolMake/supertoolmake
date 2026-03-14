@@ -1,28 +1,28 @@
-import validateJs from "validate.js"
+import { BUDIBASE_DATASOURCE_TYPE, sql } from "@budibase/backend-core"
+import { isDatasourceOrDatasourcePlusId } from "@budibase/shared-core"
+import {
+  ArrayOperator,
+  type Datasource,
+  type DatasourcePlusQueryResponse,
+  type EnrichedQueryJson,
+  type FieldConstraints,
+  FieldType,
+  type QueryJson,
+  type Row,
+  SourceName,
+  SqlClient,
+  type Table,
+  type TableSchema,
+} from "@budibase/types"
 import dayjs from "dayjs"
 import cloneDeep from "lodash/fp/cloneDeep"
-import {
-  Datasource,
-  DatasourcePlusQueryResponse,
-  FieldConstraints,
-  FieldType,
-  QueryJson,
-  Row,
-  SourceName,
-  Table,
-  TableSchema,
-  SqlClient,
-  ArrayOperator,
-  EnrichedQueryJson,
-} from "@budibase/types"
-import { Format } from "../../../api/controllers/table/exporters"
-import sdk from "../.."
-import { isRelationshipColumn } from "../../../db/utils"
-import { isSQL } from "../../../integrations/utils"
-import { sql, BUDIBASE_DATASOURCE_TYPE } from "@budibase/backend-core"
+import validateJs from "validate.js"
 import { getTableFromSource } from "../../../api/controllers/row/utils"
+import { Format } from "../../../api/controllers/table/exporters"
+import { isRelationshipColumn } from "../../../db/utils"
 import env from "../../../environment"
-import { isDatasourceOrDatasourcePlusId } from "@budibase/shared-core"
+import { isSQL } from "../../../integrations/utils"
+import sdk from "../.."
 
 const SQL_CLIENT_SOURCE_MAP: Record<SourceName, SqlClient | undefined> = {
   [SourceName.POSTGRES]: SqlClient.POSTGRES,
@@ -49,14 +49,8 @@ export function getSQLClient(datasource: Datasource): SqlClient {
   throw new Error("Unable to determine client for SQL datasource")
 }
 
-export function processRowCountResponse(
-  response: DatasourcePlusQueryResponse
-): number {
-  if (
-    response &&
-    response.length === 1 &&
-    sql.COUNT_FIELD_NAME in response[0]
-  ) {
+export function processRowCountResponse(response: DatasourcePlusQueryResponse): number {
+  if (response && response.length === 1 && sql.COUNT_FIELD_NAME in response[0]) {
     const total = response[0][sql.COUNT_FIELD_NAME]
     return typeof total === "number" ? total : parseInt(total)
   } else {
@@ -66,7 +60,7 @@ export function processRowCountResponse(
 
 function processInternalTables(tables: Table[]) {
   const tableMap: Record<string, Table> = {}
-  for (let table of tables) {
+  for (const table of tables) {
     // update the table name, should never query by name for SQLite
     table.originalName = table.name
     table.name = table._id!
@@ -75,10 +69,8 @@ function processInternalTables(tables: Table[]) {
   return tableMap
 }
 
-export async function enrichQueryJson(
-  json: QueryJson
-): Promise<EnrichedQueryJson> {
-  let datasource: Datasource | undefined = undefined
+export async function enrichQueryJson(json: QueryJson): Promise<EnrichedQueryJson> {
+  let datasource: Datasource | undefined
 
   if (typeof json.endpoint.datasourceId === "string") {
     if (json.endpoint.datasourceId !== BUDIBASE_DATASOURCE_TYPE) {
@@ -125,14 +117,14 @@ export function cleanExportRows(
   columns?: string[],
   customHeaders: { [key: string]: string } = {}
 ) {
-  let cleanRows = [...rows]
+  const cleanRows = [...rows]
 
   const relationships = Object.entries(schema)
-    .filter(entry => entry[1].type === FieldType.LINK)
-    .map(entry => entry[0])
+    .filter((entry) => entry[1].type === FieldType.LINK)
+    .map((entry) => entry[0])
 
-  relationships.forEach(column => {
-    cleanRows.forEach(row => {
+  relationships.forEach((column) => {
+    cleanRows.forEach((row) => {
       delete row[column]
     })
     delete schema[column]
@@ -141,11 +133,11 @@ export function cleanExportRows(
   if (format === Format.CSV) {
     // Intended to append empty values in export
     const schemaKeys = Object.keys(schema)
-    for (let key of schemaKeys) {
+    for (const key of schemaKeys) {
       if (columns?.length && columns.indexOf(key) > 0) {
         continue
       }
-      for (let row of cleanRows) {
+      for (const row of cleanRows) {
         if (row[key] == null) {
           row[key] = undefined
         }
@@ -153,7 +145,7 @@ export function cleanExportRows(
     }
   } else if (format === Format.JSON) {
     // Replace row keys with custom headers
-    for (let row of cleanRows) {
+    for (const row of cleanRows) {
       renameKeys(customHeaders, row)
     }
   }
@@ -163,36 +155,24 @@ export function cleanExportRows(
 
 function renameKeys(keysMap: { [key: string]: any }, row: any) {
   for (const key in keysMap) {
-    Object.defineProperty(
-      row,
-      keysMap[key],
-      Object.getOwnPropertyDescriptor(row, key) || {}
-    )
+    Object.defineProperty(row, keysMap[key], Object.getOwnPropertyDescriptor(row, key) || {})
     delete row[key]
   }
 }
 
 function isForeignKey(key: string, table: Table) {
   const relationships = Object.values(table.schema).filter(isRelationshipColumn)
-  return relationships.some(
-    relationship => (relationship as any).foreignKey === key
-  )
+  return relationships.some((relationship) => (relationship as any).foreignKey === key)
 }
 
-export async function validate({
-  source,
-  row,
-}: {
-  source: Table
-  row: Row
-}): Promise<{
+export async function validate({ source, row }: { source: Table; row: Row }): Promise<{
   valid: boolean
   errors: Record<string, any>
 }> {
   const table = await getTableFromSource(source)
   const errors: Record<string, any> = {}
   const disallowArrayTypes = [FieldType.BB_REFERENCE_SINGLE]
-  for (let fieldName of Object.keys(table.schema)) {
+  for (const fieldName of Object.keys(table.schema)) {
     const column = table.schema[fieldName]
     const type = column.type
     let constraints = cloneDeep(column.constraints)
@@ -226,10 +206,7 @@ export async function validate({
           row[fieldName] = row[fieldName].split(",")
         }
         row[fieldName].map((val: any) => {
-          if (
-            !constraints?.inclusion?.includes(val) &&
-            constraints?.inclusion?.length !== 0
-          ) {
+          if (!constraints?.inclusion?.includes(val) && constraints?.inclusion?.length !== 0) {
             errors[fieldName] = "Field not in list"
           }
         })
@@ -245,9 +222,7 @@ export async function validate({
 
     if (env.XSS_SAFE_MODE && typeof row[fieldName] === "string") {
       if (XSS_INPUT_REGEX.test(row[fieldName])) {
-        errors[fieldName] = [
-          "Input not sanitised - potentially vulnerable to XSS",
-        ]
+        errors[fieldName] = ["Input not sanitised - potentially vulnerable to XSS"]
       }
     }
 
@@ -278,25 +253,21 @@ function validateTimeOnlyField(
     if (castedValue) {
       castedValue = stringTimeToDate(castedValue)
     }
-    let castedConstraints = cloneDeep(constraints)
+    const castedConstraints = cloneDeep(constraints)
 
     let earliest, latest
     let easliestTimeString: string, latestTimeString: string
     if (castedConstraints.datetime?.earliest) {
       easliestTimeString = castedConstraints.datetime.earliest
       if (dayjs(castedConstraints.datetime.earliest).isValid()) {
-        easliestTimeString = dayjs(castedConstraints.datetime.earliest).format(
-          "HH:mm"
-        )
+        easliestTimeString = dayjs(castedConstraints.datetime.earliest).format("HH:mm")
       }
       earliest = stringTimeToDate(easliestTimeString)
     }
     if (castedConstraints.datetime?.latest) {
       latestTimeString = castedConstraints.datetime.latest
       if (dayjs(castedConstraints.datetime.latest).isValid()) {
-        latestTimeString = dayjs(castedConstraints.datetime.latest).format(
-          "HH:mm"
-        )
+        latestTimeString = dayjs(castedConstraints.datetime.latest).format("HH:mm")
       }
       latest = stringTimeToDate(latestTimeString)
     }
@@ -315,20 +286,11 @@ function validateTimeOnlyField(
       }
     }
 
-    let jsValidation = validateJs.single(
-      castedValue?.toISOString(),
-      castedConstraints
-    )
+    let jsValidation = validateJs.single(castedValue?.toISOString(), castedConstraints)
     jsValidation = jsValidation?.map((m: string) =>
       m
-        ?.replace(
-          castedConstraints.datetime?.earliest || "",
-          easliestTimeString || ""
-        )
-        .replace(
-          castedConstraints.datetime?.latest || "",
-          latestTimeString || ""
-        )
+        ?.replace(castedConstraints.datetime?.earliest || "", easliestTimeString || "")
+        .replace(castedConstraints.datetime?.latest || "", latestTimeString || "")
     )
     if (jsValidation) {
       res ??= []

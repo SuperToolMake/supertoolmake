@@ -1,5 +1,5 @@
+import type { PublishedWorkspaceData } from "@budibase/types"
 import { API } from "@/api"
-import { PublishedWorkspaceData } from "@budibase/types"
 import { BudiStore } from "../BudiStore"
 
 interface ClientAppsStoreState {
@@ -15,7 +15,7 @@ export class ClientAppsStore extends BudiStore<ClientAppsStoreState> {
 
   async load() {
     const apps = await API.getPublishedApps()
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       apps,
     }))

@@ -1,15 +1,15 @@
 <script>
-  import { notifications } from "@budibase/bbui"
-  import { themeStore, appStore } from "@/stores/builder"
-  import { ThemeOptions, getThemeClassNames } from "@budibase/shared-core"
+import { notifications } from "@budibase/bbui"
+import { getThemeClassNames, ThemeOptions } from "@budibase/shared-core"
+import { appStore, themeStore } from "@/stores/builder"
 
-  const onChangeTheme = async theme => {
-    try {
-      await themeStore.save(theme, $appStore.appId)
-    } catch (error) {
-      notifications.error("Error updating theme")
-    }
+const onChangeTheme = async (theme) => {
+  try {
+    await themeStore.save(theme, $appStore.appId)
+  } catch (error) {
+    notifications.error("Error updating theme")
   }
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

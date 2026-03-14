@@ -1,137 +1,133 @@
 <script>
-  import {
-    FieldType,
-    BBReferenceFieldSubType,
-    SourceName,
-  } from "@budibase/types"
-  import { Select, Toggle, Label, Layout } from "@budibase/bbui"
-  import { API } from "@/api"
-  import { parseFile } from "./utils"
-  import { tables, datasources } from "@/stores/builder"
+import { Label, Layout, Select, Toggle } from "@budibase/bbui"
+import { BBReferenceFieldSubType, FieldType, SourceName } from "@budibase/types"
+import { API } from "@/api"
+import { datasources, tables } from "@/stores/builder"
+import { parseFile } from "./utils"
 
-  let error = null
-  let fileName = null
+let error = null
+let fileName = null
 
-  let loading = false
-  let updateExistingRows = false
-  let validation = {}
-  let validateHash = ""
-  let schema = null
-  let invalidColumns = []
+let loading = false
+let updateExistingRows = false
+let validation = {}
+let validateHash = ""
+let schema = null
+let invalidColumns = []
 
-  export let tableId = null
-  export let rows = []
-  export let allValid = false
-  export let identifierFields = []
+export let tableId = null
+export let rows = []
+export let allValid = false
+export let identifierFields = []
 
-  const typeOptions = [
-    {
-      label: "Text",
-      value: FieldType.STRING,
-    },
-    {
-      label: "Number",
-      value: FieldType.NUMBER,
-    },
-    {
-      label: "Date",
-      value: FieldType.DATETIME,
-    },
-    {
-      label: "Options",
-      value: FieldType.OPTIONS,
-    },
-    {
-      label: "Multi-select",
-      value: FieldType.ARRAY,
-    },
-    {
-      label: "Barcode/QR",
-      value: FieldType.BARCODEQR,
-    },
-    {
-      label: "Long Form Text",
-      value: FieldType.LONGFORM,
-    },
-    {
-      label: "Attachment",
-      value: FieldType.ATTACHMENT_SINGLE,
-    },
-    {
-      label: "Signature",
-      value: FieldType.SIGNATURE_SINGLE,
-    },
-    {
-      label: "Attachment list",
-      value: FieldType.ATTACHMENTS,
-    },
-    {
-      label: "Users",
-      value: `${FieldType.BB_REFERENCE}${BBReferenceFieldSubType.USER}`,
-    },
-    {
-      label: "Users",
-      value: `${FieldType.BB_REFERENCE}${BBReferenceFieldSubType.USERS}`,
-    },
-    {
-      label: "User",
-      value: `${FieldType.BB_REFERENCE_SINGLE}${BBReferenceFieldSubType.USER}`,
-    },
-  ]
+const typeOptions = [
+  {
+    label: "Text",
+    value: FieldType.STRING,
+  },
+  {
+    label: "Number",
+    value: FieldType.NUMBER,
+  },
+  {
+    label: "Date",
+    value: FieldType.DATETIME,
+  },
+  {
+    label: "Options",
+    value: FieldType.OPTIONS,
+  },
+  {
+    label: "Multi-select",
+    value: FieldType.ARRAY,
+  },
+  {
+    label: "Barcode/QR",
+    value: FieldType.BARCODEQR,
+  },
+  {
+    label: "Long Form Text",
+    value: FieldType.LONGFORM,
+  },
+  {
+    label: "Attachment",
+    value: FieldType.ATTACHMENT_SINGLE,
+  },
+  {
+    label: "Signature",
+    value: FieldType.SIGNATURE_SINGLE,
+  },
+  {
+    label: "Attachment list",
+    value: FieldType.ATTACHMENTS,
+  },
+  {
+    label: "Users",
+    value: `${FieldType.BB_REFERENCE}${BBReferenceFieldSubType.USER}`,
+  },
+  {
+    label: "Users",
+    value: `${FieldType.BB_REFERENCE}${BBReferenceFieldSubType.USERS}`,
+  },
+  {
+    label: "User",
+    value: `${FieldType.BB_REFERENCE_SINGLE}${BBReferenceFieldSubType.USER}`,
+  },
+]
 
-  $: {
-    schema = fetchSchema(tableId)
+$: {
+  schema = fetchSchema(tableId)
+}
+
+$: table = $tables.list.find((table) => table._id === tableId)
+$: datasource = $datasources.list.find((ds) => ds._id === table?.sourceId)
+
+async function fetchSchema(tableId) {
+  try {
+    const definition = await API.fetchTableDefinition(tableId)
+    schema = definition.schema
+  } catch (e) {
+    error = e
   }
+}
 
-  $: table = $tables.list.find(table => table._id === tableId)
-  $: datasource = $datasources.list.find(ds => ds._id === table?.sourceId)
+async function handleFile(e) {
+  loading = true
+  error = null
+  const previousValidation = validation
+  validation = {}
 
-  async function fetchSchema(tableId) {
-    try {
-      const definition = await API.fetchTableDefinition(tableId)
-      schema = definition.schema
-    } catch (e) {
-      error = e
+  try {
+    const response = await parseFile(e)
+    rows = response.rows
+    fileName = response.fileName
+
+    const newValidateHash = JSON.stringify(rows)
+    if (newValidateHash === validateHash) {
+      validation = previousValidation
+    } else {
+      await validate(rows)
+      validateHash = newValidateHash
     }
+  } catch (e) {
+    error = e.message || e
+  } finally {
+    loading = false
   }
+}
 
-  async function handleFile(e) {
-    loading = true
-    error = null
-    const previousValidation = validation
-    validation = {}
+async function validate(rows) {
+  error = null
+  validation = {}
+  allValid = false
 
-    try {
-      const response = await parseFile(e)
-      rows = response.rows
-      fileName = response.fileName
-
-      const newValidateHash = JSON.stringify(rows)
-      if (newValidateHash === validateHash) {
-        validation = previousValidation
-      } else {
-        await validate(rows)
-        validateHash = newValidateHash
-      }
-    } catch (e) {
-      error = e.message || e
-    } finally {
-      loading = false
-    }
+  if (rows.length > 0) {
+    const response = await API.validateExistingTableImport(rows, tableId)
+    validation = response.schemaValidation
+    invalidColumns = response.invalidColumns
+    allValid = response.allValid
   }
-
-  async function validate(rows) {
-    error = null
-    validation = {}
-    allValid = false
-
-    if (rows.length > 0) {
-      const response = await API.validateExistingTableImport(rows, tableId)
-      validation = response.schemaValidation
-      invalidColumns = response.invalidColumns
-      allValid = response.allValid
-    }
-  }
+}
 </script>
 
 <Layout gap="S" noPadding>

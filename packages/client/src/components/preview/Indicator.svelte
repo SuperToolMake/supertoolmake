@@ -1,34 +1,34 @@
 <script lang="ts">
-  import { Icon } from "@budibase/bbui"
-  import { GridDragMode } from "@/utils/grid"
+import { Icon } from "@budibase/bbui"
+import { GridDragMode } from "@/utils/grid"
 
-  export let top: number
-  export let left: number
-  export let width: number
-  export let height: number
-  export let text: string | undefined
-  export let icon: string | undefined
-  export let color: string
-  export let zIndex: number
-  export let componentId: string
-  export let line = false
-  export let alignRight = false
-  export let showResizeAnchors = false
-  export let background: string | undefined
-  export let animate = false
+export let top: number
+export let left: number
+export let width: number
+export let height: number
+export let text: string | undefined
+export let icon: string | undefined
+export let color: string
+export let zIndex: number
+export let componentId: string
+export let line = false
+export let alignRight = false
+export let showResizeAnchors = false
+export let background: string | undefined
+export let animate = false
 
-  const AnchorSides = [
-    "right",
-    "left",
-    "top",
-    "bottom",
-    "bottom-right",
-    "bottom-left",
-    "top-right",
-    "top-left",
-  ]
+const AnchorSides = [
+  "right",
+  "left",
+  "top",
+  "bottom",
+  "bottom-right",
+  "bottom-left",
+  "top-right",
+  "top-left",
+]
 
-  $: flipped = top < 24
+$: flipped = top < 24
 </script>
 
 <div

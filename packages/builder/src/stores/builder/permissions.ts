@@ -1,10 +1,10 @@
-import { BudiStore } from "../BudiStore"
-import { API } from "@/api"
-import {
-  PermissionLevel,
+import type {
   GetResourcePermsResponse,
+  PermissionLevel,
   ResourcePermissionInfo,
 } from "@budibase/types"
+import { API } from "@/api"
+import { BudiStore } from "../BudiStore"
 
 interface Permission {
   level: PermissionLevel
@@ -27,15 +27,11 @@ export class PermissionStore extends BudiStore<Permission[]> {
     return await API.removePermissionFromResource(resource, role, level)
   }
 
-  forResource = async (
-    resourceId: string
-  ): Promise<Record<string, ResourcePermissionInfo>> => {
+  forResource = async (resourceId: string): Promise<Record<string, ResourcePermissionInfo>> => {
     return (await API.getPermissionForResource(resourceId)).permissions
   }
 
-  forResourceDetailed = async (
-    resourceId: string
-  ): Promise<GetResourcePermsResponse> => {
+  forResourceDetailed = async (resourceId: string): Promise<GetResourcePermsResponse> => {
     return await API.getPermissionForResource(resourceId)
   }
 }

@@ -1,5 +1,5 @@
+import type { Ctx } from "@budibase/types"
 import { Header } from "../constants"
-import { Ctx } from "@budibase/types"
 import { isValidInternalAPIKey } from "../utils"
 
 /**

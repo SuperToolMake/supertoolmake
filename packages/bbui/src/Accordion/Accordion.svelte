@@ -1,31 +1,31 @@
 <script lang="ts">
-  import "@spectrum-css/accordion"
-  import Icon from "../Icon/Icon.svelte"
+import "@spectrum-css/accordion"
+import Icon from "../Icon/Icon.svelte"
 
-  export let itemName: string | undefined = undefined
-  export let initialOpen: boolean = false
-  export let header: string | undefined
-  export let headerSize: "S" | "M" | "L" = "S"
-  export let bold: boolean = true
-  export let noPadding: boolean = false
+export let itemName: string | undefined = undefined
+export let initialOpen: boolean = false
+export let header: string | undefined
+export let headerSize: "S" | "M" | "L" = "S"
+export let bold: boolean = true
+export let noPadding: boolean = false
 
-  let isOpen = initialOpen
+let isOpen = initialOpen
 
-  export function open() {
-    isOpen = true
-  }
+export function open() {
+  isOpen = true
+}
 
-  export function close() {
-    isOpen = false
-  }
+export function close() {
+  isOpen = false
+}
 
-  function headerSizeClass(size: "S" | "M" | "L") {
-    return size === "S"
-      ? "spectrum-Accordion-itemHeaderS"
-      : size === "M"
-        ? "spectrum-Accordion-itemHeaderM"
-        : "spectrum-Accordion-itemHeaderL"
-  }
+function headerSizeClass(size: "S" | "M" | "L") {
+  return size === "S"
+    ? "spectrum-Accordion-itemHeaderS"
+    : size === "M"
+      ? "spectrum-Accordion-itemHeaderM"
+      : "spectrum-Accordion-itemHeaderL"
+}
 </script>
 
 <div class="spectrum-Accordion" role={itemName}>

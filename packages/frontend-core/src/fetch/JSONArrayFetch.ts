@@ -1,6 +1,6 @@
-import FieldFetch from "./FieldFetch"
+import type { JSONArrayFieldDatasource } from "@budibase/types"
 import { getJSONArrayDatasourceSchema } from "../utils/json"
-import { JSONArrayFieldDatasource } from "@budibase/types"
+import FieldFetch from "./FieldFetch"
 
 export default class JSONArrayFetch extends FieldFetch<JSONArrayFieldDatasource> {
   async getDefinition() {
@@ -12,8 +12,7 @@ export default class JSONArrayFetch extends FieldFetch<JSONArrayFieldDatasource>
       const { fieldName } = datasource
       const table = await this.API.fetchTableDefinition(datasource.tableId)
       const schema =
-        table.schema[fieldName].schema ??
-        getJSONArrayDatasourceSchema(table.schema, datasource)
+        table.schema[fieldName].schema ?? getJSONArrayDatasourceSchema(table.schema, datasource)
       return { schema }
     } catch (error) {
       return null

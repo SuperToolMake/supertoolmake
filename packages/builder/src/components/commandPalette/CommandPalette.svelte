@@ -1,303 +1,288 @@
 <script>
-  import {
-    Context,
-    Icon,
-    Input,
-    ModalContent,
-    Detail,
-    notifications,
-  } from "@budibase/bbui"
-  import { API } from "@/api"
-  import { goto, params, isActive } from "@roxi/routify"
-  import {
-    previewStore,
-    sortedScreens,
-    appStore,
-    datasources,
-    queries,
-    tables,
-  } from "@/stores/builder"
-  import { themeStore } from "@/stores/portal"
-  import { bb } from "@/stores/bb"
-  import { getContext } from "svelte"
-  import { ThemeOptions, BUILDER_URLS } from "@budibase/shared-core"
-  import { IntegrationTypes } from "@/constants/backend"
+import { Context, Detail, Icon, Input, ModalContent, notifications } from "@budibase/bbui"
+import { BUILDER_URLS, ThemeOptions } from "@budibase/shared-core"
+import { goto, isActive, params } from "@roxi/routify"
+import { getContext } from "svelte"
+import { API } from "@/api"
+import { IntegrationTypes } from "@/constants/backend"
+import { bb } from "@/stores/bb"
+import {
+  appStore,
+  datasources,
+  previewStore,
+  queries,
+  sortedScreens,
+  tables,
+} from "@/stores/builder"
+import { themeStore } from "@/stores/portal"
 
-  $goto
-  $isActive
-  $params
+$goto
+$isActive
+$params
 
-  const modalContext = getContext(Context.Modal)
+const modalContext = getContext(Context.Modal)
 
-  let search
-  let selected = null
+let search
+let selected = null
 
-  $: inApp = $isActive("/builder/workspace/:application")
-  $: commands = [
+$: inApp = $isActive("/builder/workspace/:application")
+$: commands = [
+  {
+    type: "Access",
+    name: "Invite users and manage app access",
+    description: "",
+    icon: "user",
+    action: () => bb.settings("/people/workspace"),
+    requiresApp: true,
+  },
+  ...navigationCommands(),
+  {
+    type: "Publish",
+    name: "App",
+    description: "Deploy your application",
+    icon: "cube",
+    action: deployApp,
+    requiresApp: true,
+  },
+  {
+    type: "Preview",
+    name: "App",
+    description: "",
+    icon: "play",
+    action: () => previewStore.showPreview(true),
+    requiresApp: true,
+  },
+  {
+    type: "Preview",
+    name: "Published App",
+    icon: "play",
+    action: () => window.open(`/app${$appStore.url}`),
+    requiresApp: true,
+  },
+  {
+    type: "Support",
+    name: "Raise Github Discussion",
+    icon: "question",
+    action: () => window.open(`https://github.com/SuperToolMake/supertoolmake/discussions/new`),
+    requiresApp: true,
+  },
+  {
+    type: "Support",
+    name: "Raise A Bug",
+    icon: "bug",
+    action: () =>
+      window.open(
+        `https://github.com/SuperToolMake/supertoolmake/issues/new?assignees=&labels=bug&template=bug_report.md&title=`
+      ),
+    requiresApp: true,
+  },
+  ...datasourceCommands($datasources?.list || []),
+  ...tableCommands($tables?.list || []),
+  ...queryCommands($queries?.list || []),
+  ...screenCommands($sortedScreens),
+  ...themeCommands(),
+]
+$: enrichedCommands = commands.map((cmd) => ({
+  ...cmd,
+  searchValue: `${cmd.type} ${cmd.name} ${cmd.codeName || ""}`.toLowerCase().replace(/_/g, " "),
+}))
+$: results = filterResults(enrichedCommands, search, inApp)
+$: categories = groupResults(results)
+
+const navigationCommands = () => {
+  const routes = [
     {
-      type: "Access",
-      name: "Invite users and manage app access",
-      description: "",
-      icon: "user",
-      action: () => bb.settings("/people/workspace"),
-      requiresApp: true,
-    },
-    ...navigationCommands(),
-    {
-      type: "Publish",
-      name: "App",
-      description: "Deploy your application",
-      icon: "cube",
-      action: deployApp,
-      requiresApp: true,
+      name: "Workspaces",
+      url: BUILDER_URLS.WORKSPACES,
     },
     {
-      type: "Preview",
-      name: "App",
-      description: "",
-      icon: "play",
-      action: () => previewStore.showPreview(true),
-      requiresApp: true,
+      name: "Data",
+      url: "/builder/workspace/:application/data",
     },
     {
-      type: "Preview",
-      name: "Published App",
-      icon: "play",
-      action: () => window.open(`/app${$appStore.url}`),
-      requiresApp: true,
+      name: "Design",
+      url: "/builder/workspace/:application/design",
     },
-    {
-      type: "Support",
-      name: "Raise Github Discussion",
-      icon: "question",
-      action: () =>
-        window.open(
-          `https://github.com/SuperToolMake/supertoolmake/discussions/new`
-        ),
-      requiresApp: true,
-    },
-    {
-      type: "Support",
-      name: "Raise A Bug",
-      icon: "bug",
-      action: () =>
-        window.open(
-          `https://github.com/SuperToolMake/supertoolmake/issues/new?assignees=&labels=bug&template=bug_report.md&title=`
-        ),
-      requiresApp: true,
-    },
-    ...datasourceCommands($datasources?.list || []),
-    ...tableCommands($tables?.list || []),
-    ...queryCommands($queries?.list || []),
-    ...screenCommands($sortedScreens),
-    ...themeCommands(),
   ]
-  $: enrichedCommands = commands.map(cmd => ({
-    ...cmd,
-    searchValue: `${cmd.type} ${cmd.name} ${cmd.codeName || ""}`
-      .toLowerCase()
-      .replace(/_/g, " "),
+  return routes.map((route) => ({
+    type: "Navigate",
+    name: route.name,
+    icon: "compass",
+    action: () => {
+      const gotoParams = route.url.includes(":application")
+        ? { application: $params.application }
+        : {}
+      $goto(route.url, gotoParams)
+    },
+    requiresApp: true,
   }))
-  $: results = filterResults(enrichedCommands, search, inApp)
-  $: categories = groupResults(results)
+}
 
-  const navigationCommands = () => {
-    const routes = [
-      {
-        name: "Workspaces",
-        url: BUILDER_URLS.WORKSPACES,
-      },
-      {
-        name: "Data",
-        url: "/builder/workspace/:application/data",
-      },
-      {
-        name: "Design",
-        url: "/builder/workspace/:application/design",
-      },
-    ]
-    return routes.map(route => ({
-      type: "Navigate",
-      name: route.name,
-      icon: "compass",
-      action: () => {
-        const gotoParams = route.url.includes(":application")
-          ? { application: $params.application }
-          : {}
-        $goto(route.url, gotoParams)
-      },
-      requiresApp: true,
-    }))
-  }
-
-  const datasourceCommands = datasourceList => {
-    return datasourceList.map(datasource => ({
-      type: "Datasource",
-      name: datasource.name,
-      icon:
+const datasourceCommands = (datasourceList) => {
+  return datasourceList.map((datasource) => ({
+    type: "Datasource",
+    name: datasource.name,
+    icon: datasource.source === IntegrationTypes.REST ? "webhooks-logo" : "database",
+    action: () =>
+      $goto(
         datasource.source === IntegrationTypes.REST
-          ? "webhooks-logo"
-          : "database",
+          ? `/builder/workspace/:application/apis/datasource/:id`
+          : `/builder/workspace/:application/data/datasource/:id`,
+        {
+          application: $params.application,
+          id: datasource._id,
+        }
+      ),
+    requiresApp: true,
+  }))
+}
+
+const tableCommands = (tables) => {
+  return tables.map((table) => ({
+    type: "Table",
+    name: table.name,
+    icon: "table",
+    action: () =>
+      $goto(`/builder/workspace/:application/data/table/:id`, {
+        application: $params.application,
+        id: table._id,
+      }),
+    requiresApp: true,
+  }))
+}
+
+const queryCommands = (queries) => {
+  const datasourceLookup = new Map(
+    ($datasources.list || []).map((datasource) => [datasource._id, datasource])
+  )
+  return queries.map((query) => {
+    const datasource = datasourceLookup.get(query.datasourceId)
+    const isRest = datasource?.source === IntegrationTypes.REST
+    return {
+      type: "Query",
+      name: query.name,
+      icon: isRest ? "globe-hemisphere-west" : "database",
       action: () =>
         $goto(
-          datasource.source === IntegrationTypes.REST
-            ? `/builder/workspace/:application/apis/datasource/:id`
-            : `/builder/workspace/:application/data/datasource/:id`,
+          isRest
+            ? `/builder/workspace/:application/apis/query/:id`
+            : `/builder/workspace/:application/data/query/:id`,
           {
             application: $params.application,
-            id: datasource._id,
+            id: query._id,
           }
         ),
       requiresApp: true,
-    }))
-  }
+    }
+  })
+}
 
-  const tableCommands = tables => {
-    return tables.map(table => ({
-      type: "Table",
-      name: table.name,
-      icon: "table",
-      action: () =>
-        $goto(`/builder/workspace/:application/data/table/:id`, {
-          application: $params.application,
-          id: table._id,
-        }),
-      requiresApp: true,
-    }))
-  }
+const screenCommands = (screens) => {
+  return screens.map((screen) => ({
+    type: "Screen",
+    name: screen.routing.route,
+    icon: "browser",
+    action: () =>
+      $goto(`/builder/workspace/:application/design/:screenId/:componentId`, {
+        application: $params.application,
+        screenId: screen._id,
+        componentId: `${screen._id}-screen`,
+      }),
+    requiresApp: true,
+  }))
+}
 
-  const queryCommands = queries => {
-    const datasourceLookup = new Map(
-      ($datasources.list || []).map(datasource => [datasource._id, datasource])
-    )
-    return queries.map(query => {
-      const datasource = datasourceLookup.get(query.datasourceId)
-      const isRest = datasource?.source === IntegrationTypes.REST
-      return {
-        type: "Query",
-        name: query.name,
-        icon: isRest ? "globe-hemisphere-west" : "database",
-        action: () =>
-          $goto(
-            isRest
-              ? `/builder/workspace/:application/apis/query/:id`
-              : `/builder/workspace/:application/data/query/:id`,
-            {
-              application: $params.application,
-              id: query._id,
-            }
-          ),
-        requiresApp: true,
+const themeCommands = () => {
+  return ThemeOptions.map((themeMeta) => ({
+    type: "Change Builder Theme",
+    name: themeMeta.name,
+    icon: "palette",
+    action: () =>
+      themeStore.update((state) => {
+        state.theme = themeMeta.id
+        return state
+      }),
+  }))
+}
+
+const filterResults = (commands, search, inApp) => {
+  if (search) {
+    selected = 0
+    search = search.toLowerCase().replace(/_/g, " ")
+  } else {
+    selected = null
+  }
+  return commands
+    .filter((cmd) => {
+      // Handle searching
+      if (search && !cmd.searchValue.includes(search)) {
+        return false
       }
+      // Handle commands that require an app
+      return inApp || !cmd.requiresApp
     })
-  }
-
-  const screenCommands = screens => {
-    return screens.map(screen => ({
-      type: "Screen",
-      name: screen.routing.route,
-      icon: "browser",
-      action: () =>
-        $goto(`/builder/workspace/:application/design/:screenId/:componentId`, {
-          application: $params.application,
-          screenId: screen._id,
-          componentId: `${screen._id}-screen`,
-        }),
-      requiresApp: true,
+    .map((cmd, idx) => ({
+      ...cmd,
+      idx,
     }))
-  }
+}
 
-  const themeCommands = () => {
-    return ThemeOptions.map(themeMeta => ({
-      type: "Change Builder Theme",
-      name: themeMeta.name,
-      icon: "palette",
-      action: () =>
-        themeStore.update(state => {
-          state.theme = themeMeta.id
-          return state
-        }),
-    }))
-  }
+const groupResults = (results) => {
+  let categories = {}
+  results?.forEach((result) => {
+    if (!categories[result.type]) {
+      categories[result.type] = []
+    }
+    categories[result.type].push(result)
+  })
+  return Object.entries(categories)
+}
 
-  const filterResults = (commands, search, inApp) => {
-    if (search) {
+const onKeyDown = (e) => {
+  if (e.key === "ArrowDown") {
+    e.preventDefault()
+    if (selected === null) {
       selected = 0
-      search = search.toLowerCase().replace(/_/g, " ")
-    } else {
-      selected = null
-    }
-    return commands
-      .filter(cmd => {
-        // Handle searching
-        if (search && !cmd.searchValue.includes(search)) {
-          return false
-        }
-        // Handle commands that require an app
-        return inApp || !cmd.requiresApp
-      })
-      .map((cmd, idx) => ({
-        ...cmd,
-        idx,
-      }))
-  }
-
-  const groupResults = results => {
-    let categories = {}
-    results?.forEach(result => {
-      if (!categories[result.type]) {
-        categories[result.type] = []
-      }
-      categories[result.type].push(result)
-    })
-    return Object.entries(categories)
-  }
-
-  const onKeyDown = e => {
-    if (e.key === "ArrowDown") {
-      e.preventDefault()
-      if (selected === null) {
-        selected = 0
-        return
-      }
-      if (selected < results.length - 1) {
-        selected += 1
-      }
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault()
-      if (selected === null) {
-        selected = results.length - 1
-        return
-      }
-      if (selected > 0) {
-        selected -= 1
-      }
-    } else if (e.key === "Enter") {
-      if (selected == null) {
-        return
-      }
-      runAction(results[selected])
-    } else if (e.key === "Escape") {
-      modalContext.hide()
-    }
-  }
-
-  async function deployApp() {
-    try {
-      await API.publishAppChanges($appStore.appId)
-      notifications.success("App published successfully")
-    } catch (error) {
-      notifications.error("Error publishing app")
-    }
-  }
-
-  const runAction = command => {
-    if (!command) {
       return
     }
-    command.action()
+    if (selected < results.length - 1) {
+      selected += 1
+    }
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault()
+    if (selected === null) {
+      selected = results.length - 1
+      return
+    }
+    if (selected > 0) {
+      selected -= 1
+    }
+  } else if (e.key === "Enter") {
+    if (selected == null) {
+      return
+    }
+    runAction(results[selected])
+  } else if (e.key === "Escape") {
     modalContext.hide()
   }
+}
+
+async function deployApp() {
+  try {
+    await API.publishAppChanges($appStore.appId)
+    notifications.success("App published successfully")
+  } catch (error) {
+    notifications.error("Error publishing app")
+  }
+}
+
+const runAction = (command) => {
+  if (!command) {
+    return
+  }
+  command.action()
+  modalContext.hide()
+}
 </script>
 
 <svelte:window on:keydown={onKeyDown} />

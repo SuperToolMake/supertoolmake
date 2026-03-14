@@ -1,29 +1,29 @@
 import { context } from "@budibase/backend-core"
 import {
-  BuildSchemaFromSourceRequest,
-  BuildSchemaFromSourceResponse,
-  CreateDatasourceRequest,
-  CreateDatasourceResponse,
-  Datasource,
-  DatasourcePlus,
-  DatasourceRelationshipConfig,
-  DeleteDatasourceResponse,
-  DynamicVariable,
-  FetchDatasourceInfoRequest,
-  FetchDatasourceInfoResponse,
-  FetchDatasourceRelationshipInfoRequest,
-  FetchDatasourceRelationshipInfoResponse,
-  FetchDatasourceViewInfoRequest,
-  FetchDatasourceViewInfoResponse,
-  FetchDatasourcesResponse,
-  FindDatasourcesResponse,
-  RowValue,
+  type BuildSchemaFromSourceRequest,
+  type BuildSchemaFromSourceResponse,
+  type CreateDatasourceRequest,
+  type CreateDatasourceResponse,
+  type Datasource,
+  type DatasourcePlus,
+  type DatasourceRelationshipConfig,
+  type DeleteDatasourceResponse,
+  type DynamicVariable,
+  type FetchDatasourceInfoRequest,
+  type FetchDatasourceInfoResponse,
+  type FetchDatasourceRelationshipInfoRequest,
+  type FetchDatasourceRelationshipInfoResponse,
+  type FetchDatasourcesResponse,
+  type FetchDatasourceViewInfoRequest,
+  type FetchDatasourceViewInfoResponse,
+  type FindDatasourcesResponse,
+  type RowValue,
   SourceName,
-  UpdateDatasourceRequest,
-  UpdateDatasourceResponse,
-  UserCtx,
-  VerifyDatasourceRequest,
-  VerifyDatasourceResponse,
+  type UpdateDatasourceRequest,
+  type UpdateDatasourceResponse,
+  type UserCtx,
+  type VerifyDatasourceRequest,
+  type VerifyDatasourceResponse,
 } from "@budibase/types"
 import { isEqual } from "lodash"
 import { getQueryParams } from "../../db/utils"
@@ -36,12 +36,9 @@ export async function fetch(ctx: UserCtx<void, FetchDatasourcesResponse>) {
   ctx.body = await sdk.datasources.fetch()
 }
 
-export async function verify(
-  ctx: UserCtx<VerifyDatasourceRequest, VerifyDatasourceResponse>
-) {
+export async function verify(ctx: UserCtx<VerifyDatasourceRequest, VerifyDatasourceResponse>) {
   const { datasource } = ctx.request.body
-  const enrichedDatasource =
-    await sdk.datasources.getAndMergeDatasource(datasource)
+  const enrichedDatasource = await sdk.datasources.getAndMergeDatasource(datasource)
   const connector = await sdk.datasources.getConnector(enrichedDatasource)
   if (!connector.testConnection) {
     ctx.throw(400, "Connection information verification not supported")
@@ -58,11 +55,8 @@ export async function information(
   ctx: UserCtx<FetchDatasourceInfoRequest, FetchDatasourceInfoResponse>
 ) {
   const { datasource } = ctx.request.body
-  const enrichedDatasource =
-    await sdk.datasources.getAndMergeDatasource(datasource)
-  const connector = (await sdk.datasources.getConnector(
-    enrichedDatasource
-  )) as DatasourcePlus
+  const enrichedDatasource = await sdk.datasources.getAndMergeDatasource(datasource)
+  const connector = (await sdk.datasources.getConnector(enrichedDatasource)) as DatasourcePlus
   if (!connector.getTableNames) {
     ctx.throw(400, "Table name fetching not supported by datasource")
   }
@@ -80,11 +74,8 @@ export async function viewInformation(
   let error: string | undefined
 
   try {
-    const enrichedDatasource =
-      await sdk.datasources.getAndMergeDatasource(datasource)
-    const connector = (await sdk.datasources.getConnector(
-      enrichedDatasource
-    )) as DatasourcePlus
+    const enrichedDatasource = await sdk.datasources.getAndMergeDatasource(datasource)
+    const connector = (await sdk.datasources.getConnector(enrichedDatasource)) as DatasourcePlus
 
     if (connector.getViewNames) {
       views = await connector.getViewNames()
@@ -102,21 +93,15 @@ export async function viewInformation(
 }
 
 export async function getRelationshipInformation(
-  ctx: UserCtx<
-    FetchDatasourceRelationshipInfoRequest,
-    FetchDatasourceRelationshipInfoResponse
-  >
+  ctx: UserCtx<FetchDatasourceRelationshipInfoRequest, FetchDatasourceRelationshipInfoResponse>
 ) {
   const { datasource } = ctx.request.body
   let relationships: DatasourceRelationshipConfig[] = []
   let error: string | undefined
 
   try {
-    const enrichedDatasource =
-      await sdk.datasources.getAndMergeDatasource(datasource)
-    const connector = (await sdk.datasources.getConnector(
-      enrichedDatasource
-    )) as DatasourcePlus
+    const enrichedDatasource = await sdk.datasources.getAndMergeDatasource(datasource)
+    const connector = (await sdk.datasources.getConnector(enrichedDatasource)) as DatasourcePlus
 
     if (connector.getRelationships) {
       // Extract imported table names from datasource.entities
@@ -155,14 +140,9 @@ export async function buildSchemaFromSource(
 /**
  * Check for variables that have been updated or removed and invalidate them.
  */
-async function invalidateVariables(
-  existingDatasource: Datasource,
-  updatedDatasource: Datasource
-) {
-  const existingVariables: DynamicVariable[] =
-    existingDatasource.config?.dynamicVariables || []
-  const updatedVariables: DynamicVariable[] =
-    updatedDatasource.config?.dynamicVariables || []
+async function invalidateVariables(existingDatasource: Datasource, updatedDatasource: Datasource) {
+  const existingVariables: DynamicVariable[] = existingDatasource.config?.dynamicVariables || []
+  const updatedVariables: DynamicVariable[] = updatedDatasource.config?.dynamicVariables || []
   const toInvalidate = []
 
   if (!existingVariables) {
@@ -174,9 +154,9 @@ async function invalidateVariables(
     toInvalidate.push(...existingVariables)
   } else {
     // invaldate changed / removed
-    existingVariables.forEach(existing => {
+    existingVariables.forEach((existing) => {
       const unchanged = updatedVariables.find(
-        updated =>
+        (updated) =>
           existing.name === updated.name &&
           existing.queryId === updated.queryId &&
           existing.value === updated.value
@@ -189,9 +169,7 @@ async function invalidateVariables(
   await invalidateCachedVariable(toInvalidate)
 }
 
-export async function update(
-  ctx: UserCtx<UpdateDatasourceRequest, UpdateDatasourceResponse>
-) {
+export async function update(ctx: UserCtx<UpdateDatasourceRequest, UpdateDatasourceResponse>) {
   const db = context.getWorkspaceDB()
   const datasourceId = ctx.params.datasourceId
   const baseDatasource = await sdk.datasources.get(datasourceId)
@@ -199,7 +177,7 @@ export async function update(
 
   const dataSourceBody: Datasource = ctx.request.body
 
-  let datasource: Datasource = {
+  const datasource: Datasource = {
     ...baseDatasource,
     ...sdk.datasources.mergeConfigs(dataSourceBody, baseDatasource),
   }
@@ -212,16 +190,11 @@ export async function update(
   }
 
   // check all variables are unique
-  if (
-    datasource.source === SourceName.REST &&
-    !sdk.datasources.areRESTVariablesValid(datasource)
-  ) {
+  if (datasource.source === SourceName.REST && !sdk.datasources.areRESTVariablesValid(datasource)) {
     ctx.throw(400, "Duplicate dynamic/static variable names are invalid.")
   }
 
-  const response = await db.put(
-    sdk.tables.populateExternalTableSchemas(datasource)
-  )
+  const response = await db.put(sdk.tables.populateExternalTableSchemas(datasource))
   datasource._rev = response.rev
 
   ctx.message = "Datasource saved successfully."
@@ -243,14 +216,8 @@ export async function update(
   }
 }
 
-export async function save(
-  ctx: UserCtx<CreateDatasourceRequest, CreateDatasourceResponse>
-) {
-  const {
-    datasource: datasourceData,
-    fetchSchema,
-    tablesFilter,
-  } = ctx.request.body
+export async function save(ctx: UserCtx<CreateDatasourceRequest, CreateDatasourceResponse>) {
+  const { datasource: datasourceData, fetchSchema, tablesFilter } = ctx.request.body
   const { datasource, errors } = await sdk.datasources.save(datasourceData, {
     fetchSchema,
     tablesFilter,
@@ -273,7 +240,7 @@ export async function destroy(ctx: UserCtx<void, DeleteDatasourceResponse>) {
 
   const queries = await db.allDocs<RowValue>(getQueryParams(datasourceId))
   await db.bulkDocs(
-    queries.rows.map(row => ({
+    queries.rows.map((row) => ({
       _id: row.id,
       _rev: row.value.rev,
       _deleted: true,

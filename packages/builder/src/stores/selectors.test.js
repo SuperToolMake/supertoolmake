@@ -1,5 +1,5 @@
-import { it, expect, describe, beforeEach, vi } from "vitest"
-import { integrationForDatasource, hasData } from "./selectors"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { hasData, integrationForDatasource } from "./selectors"
 
 describe("selectors", () => {
   beforeEach(() => {
@@ -9,10 +9,7 @@ describe("selectors", () => {
   describe("integrationForDatasource", () => {
     it("returns the integration corresponding to the given datasource", () => {
       expect(
-        integrationForDatasource(
-          { integrationOne: { some: "data" } },
-          { source: "integrationOne" }
-        )
+        integrationForDatasource({ integrationOne: { some: "data" } }, { source: "integrationOne" })
       ).toEqual({ some: "data", name: "integrationOne" })
     })
 

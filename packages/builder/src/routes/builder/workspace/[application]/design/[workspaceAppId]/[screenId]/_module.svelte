@@ -1,41 +1,35 @@
 <script lang="ts">
-  import { goto, params } from "@roxi/routify"
-  import {
-    builderStore,
-    componentStore,
-    screenStore,
-    workspaceAppStore,
-  } from "@/stores/builder"
-  import { onMount } from "svelte"
-  import AppPanel from "./_components/AppPanel.svelte"
-  import LeftPanel from "./_components/LeftPanel.svelte"
-  import TopBar from "@/components/common/TopBar.svelte"
+import { goto, params } from "@roxi/routify"
+import { onMount } from "svelte"
+import TopBar from "@/components/common/TopBar.svelte"
+import { builderStore, componentStore, screenStore, workspaceAppStore } from "@/stores/builder"
+import AppPanel from "./_components/AppPanel.svelte"
+import LeftPanel from "./_components/LeftPanel.svelte"
 
-  $goto
-  $params
+$goto
+$params
 
-  $: navigateToComponent($componentStore.selectedComponentId)
+$: navigateToComponent($componentStore.selectedComponentId)
 
-  const navigateToComponent = (componentId: string | undefined) => {
-    if (!componentId) {
-      return
-    }
-    $goto("./[componentId]", { componentId })
+const navigateToComponent = (componentId: string | undefined) => {
+  if (!componentId) {
+    return
   }
+  $goto("./[componentId]", { componentId })
+}
 
-  const validate = (id: string) =>
-    $screenStore.screens.some(screen => screen._id === id)
+const validate = (id: string) => $screenStore.screens.some((screen) => screen._id === id)
 
-  onMount(() => {
-    const screenId = $params.screenId
-    if (validate(screenId)) {
-      screenStore.select(screenId)
-      const componentId = $params.componentId
-      if (!componentId) {
-        componentStore.select(`${screenId}-screen`)
-      }
+onMount(() => {
+  const screenId = $params.screenId
+  if (validate(screenId)) {
+    screenStore.select(screenId)
+    const componentId = $params.componentId
+    if (!componentId) {
+      componentStore.select(`${screenId}-screen`)
     }
-  })
+  }
+})
 </script>
 
 <div class="design" class:resizing-panel={$builderStore.isResizingPanel}>

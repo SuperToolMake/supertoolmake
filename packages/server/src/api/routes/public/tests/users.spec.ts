@@ -1,8 +1,8 @@
-import * as setup from "../../tests/utilities"
-import { User } from "@budibase/types"
 import { generator } from "@budibase/backend-core/tests"
+import type { User } from "@budibase/types"
 import nock from "nock"
 import TestConfiguration from "../../../../tests/utilities/TestConfiguration"
+import * as setup from "../../tests/utilities"
 import { mockWorkerUserAPI } from "./utils"
 
 describe("public users API", () => {

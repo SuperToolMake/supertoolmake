@@ -1,26 +1,18 @@
+import { utils } from "@budibase/shared-core"
 import {
-  AutoFieldSubType,
-  DateFieldMetadata,
+  type AutoFieldSubType,
+  type DateFieldMetadata,
   FieldType,
-  NumberFieldMetadata,
-  RelationshipFieldMetadata,
+  type NumberFieldMetadata,
+  type RelationshipFieldMetadata,
   RelationshipType,
 } from "@budibase/types"
 import { TableNames } from "@/constants"
-import {
-  AUTO_COLUMN_DISPLAY_NAMES,
-  AUTO_COLUMN_SUB_TYPES,
-  FIELDS,
-} from "@/constants/backend"
-import { utils } from "@budibase/shared-core"
+import { AUTO_COLUMN_DISPLAY_NAMES, AUTO_COLUMN_SUB_TYPES, FIELDS } from "@/constants/backend"
 
-type AutoColumnInformation = Partial<
-  Record<AutoFieldSubType, { enabled: boolean; name: string }>
->
+type AutoColumnInformation = Partial<Record<AutoFieldSubType, { enabled: boolean; name: string }>>
 
-export function getAutoColumnInformation(
-  enabled = true
-): AutoColumnInformation {
+export function getAutoColumnInformation(enabled = true): AutoColumnInformation {
   const info: AutoColumnInformation = {}
   for (const [key, subtype] of Object.entries(AUTO_COLUMN_SUB_TYPES)) {
     // Because it's possible to replicate the functionality of CREATED_AT and

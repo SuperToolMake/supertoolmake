@@ -1,7 +1,7 @@
-import { users } from "@/stores/portal/users"
-import type { UserInfo } from "@/types"
 import { Constants } from "@budibase/frontend-core"
 import type { User } from "@budibase/types"
+import { users } from "@/stores/portal/users"
+import type { UserInfo } from "@/types"
 import { getRoleFlags, shouldSyncGlobalRole } from "./roleUtils"
 
 export interface UserData {
@@ -54,7 +54,7 @@ export const buildWorkspaceInvitePayload = (
   workspaceId: string,
   assignToWorkspace = true
 ): InvitePayloadUser[] => {
-  return usersForInvite.map(user => {
+  return usersForInvite.map((user) => {
     const workspaceRole = getWorkspaceRole(workspaceId, user.role, user.appRole)
     return {
       email: user.email,
@@ -70,11 +70,7 @@ export const buildWorkspaceInvitePayload = (
   })
 }
 
-export const getWorkspaceRole = (
-  workspaceId: string,
-  role?: string,
-  appRole?: string
-) => {
+export const getWorkspaceRole = (workspaceId: string, role?: string, appRole?: string) => {
   if (!workspaceId || !role) {
     return undefined
   }
@@ -105,9 +101,7 @@ export const assignExistingUsersToWorkspace = async (
   }
 
   const existingUsers = (await users.fetch()) || []
-  const existingByEmail = new Map(
-    existingUsers.map(user => [user.email.toLowerCase(), user])
-  )
+  const existingByEmail = new Map(existingUsers.map((user) => [user.email.toLowerCase(), user]))
   const usersToInvite: UserInfo[] = []
   const usersToAssign: {
     user: User
@@ -144,11 +138,7 @@ export const assignExistingUsersToWorkspace = async (
           rev = loaded._rev
         }
       }
-      if (
-        user._id &&
-        fullUser &&
-        shouldSyncGlobalRole(selectedRole, fullUser)
-      ) {
+      if (user._id && fullUser && shouldSyncGlobalRole(selectedRole, fullUser)) {
         const roleUpdates = getRoleFlags(selectedRole, fullUser)
         const saved = await users.save({ ...fullUser, ...roleUpdates })
         rev = saved?._rev || rev
@@ -162,19 +152,14 @@ export const assignExistingUsersToWorkspace = async (
   )
 
   const addedToWorkspaceEmails = assignmentResults
-    .filter(
-      (result): result is PromiseFulfilledResult<string> =>
-        result.status === "fulfilled"
-    )
-    .map(result => result.value)
+    .filter((result): result is PromiseFulfilledResult<string> => result.status === "fulfilled")
+    .map((result) => result.value)
 
   return {
     usersToInvite,
     addedToWorkspaceEmails,
     assignedCount: addedToWorkspaceEmails.length,
-    failedCount: assignmentResults.filter(
-      result => result.status === "rejected"
-    ).length,
+    failedCount: assignmentResults.filter((result) => result.status === "rejected").length,
   }
 }
 
@@ -192,21 +177,15 @@ export const assignCreatedUsersToWorkspace = async (
   }
 
   const sourceUsersByEmail = new Map(
-    dedupeUsersByEmail({ users: sourceUsers, groups: [] }).users.map(user => [
+    dedupeUsersByEmail({ users: sourceUsers, groups: [] }).users.map((user) => [
       user.email.toLowerCase(),
       user,
     ])
   )
   const assignmentResults = await Promise.allSettled(
-    createdUsers.map(async createdUser => {
-      const matchingUser = sourceUsersByEmail.get(
-        createdUser.email.toLowerCase()
-      )
-      const role = getWorkspaceRole(
-        workspaceId,
-        matchingUser?.role,
-        matchingUser?.appRole
-      )
+    createdUsers.map(async (createdUser) => {
+      const matchingUser = sourceUsersByEmail.get(createdUser.email.toLowerCase())
+      const role = getWorkspaceRole(workspaceId, matchingUser?.role, matchingUser?.appRole)
       if (!role) {
         return null
       }
@@ -221,17 +200,14 @@ export const assignCreatedUsersToWorkspace = async (
 
   const addedToWorkspaceEmails = assignmentResults
     .filter(
-      (result): result is PromiseFulfilledResult<string | null> =>
-        result.status === "fulfilled"
+      (result): result is PromiseFulfilledResult<string | null> => result.status === "fulfilled"
     )
-    .map(result => result.value)
+    .map((result) => result.value)
     .filter((email): email is string => !!email)
 
   return {
     addedToWorkspaceEmails,
     assignedCount: addedToWorkspaceEmails.length,
-    failedCount: assignmentResults.filter(
-      result => result.status === "rejected"
-    ).length,
+    failedCount: assignmentResults.filter((result) => result.status === "rejected").length,
   }
 }

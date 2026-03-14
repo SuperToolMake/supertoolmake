@@ -1,77 +1,69 @@
 <script>
-  import {
-    Body,
-    Button,
-    Heading,
-    Layout,
-    ProgressCircle,
-    notifications,
-  } from "@budibase/bbui"
-  import { goto as gotoStore } from "@roxi/routify"
-  import { auth, organisation, admin } from "@/stores/portal"
-  import Logo from "assets/supertoolmake-emblem.svg"
-  import { PasswordRepeatInput } from "@budibase/frontend-core"
-  import { onMount } from "svelte"
+import { Body, Button, Heading, Layout, notifications, ProgressCircle } from "@budibase/bbui"
+import { PasswordRepeatInput } from "@budibase/frontend-core"
+import { goto as gotoStore } from "@roxi/routify"
+import Logo from "assets/supertoolmake-emblem.svg"
+import { onMount } from "svelte"
+import { admin, auth, organisation } from "@/stores/portal"
 
-  $: goto = $gotoStore
+$: goto = $gotoStore
 
-  const getQueryParam = key =>
-    new URLSearchParams(window.location.search).get(key) || undefined
+const getQueryParam = (key) => new URLSearchParams(window.location.search).get(key) || undefined
 
-  let resetCode = getQueryParam("code")
-  let form
-  let loaded = false
-  let loading = false
-  let password
-  let passwordError
+let resetCode = getQueryParam("code")
+let form
+let loaded = false
+let loading = false
+let password
+let passwordError
 
-  $: forceResetPassword = $auth?.user?.forceResetPassword
+$: forceResetPassword = $auth?.user?.forceResetPassword
 
-  async function reset() {
-    if (!form.validate() || passwordError) {
-      return
-    }
-    try {
-      loading = true
-      if (forceResetPassword) {
-        const email = $auth.user.email
-        const tenantId = $auth.user.tenantId
-        await auth.updateSelf({
-          password,
-          forceResetPassword: false,
-        })
-        if (!$auth.user) {
-          // Update self will clear the platform user, so need to login
-          await auth.login(email, password, tenantId)
-        }
-        goto("/")
-      } else {
-        await auth.resetPassword(password, resetCode)
-        notifications.success("Password reset successfully")
-        // send them to login if reset successful
-        goto("../login")
+async function reset() {
+  if (!form.validate() || passwordError) {
+    return
+  }
+  try {
+    loading = true
+    if (forceResetPassword) {
+      const email = $auth.user.email
+      const tenantId = $auth.user.tenantId
+      await auth.updateSelf({
+        password,
+        forceResetPassword: false,
+      })
+      if (!$auth.user) {
+        // Update self will clear the platform user, so need to login
+        await auth.login(email, password, tenantId)
       }
-    } catch (err) {
-      loading = false
-      notifications.error(err.message || "Unable to reset password")
+      goto("/")
+    } else {
+      await auth.resetPassword(password, resetCode)
+      notifications.success("Password reset successfully")
+      // send them to login if reset successful
+      goto("../login")
     }
+  } catch (err) {
+    loading = false
+    notifications.error(err.message || "Unable to reset password")
   }
+}
 
-  onMount(async () => {
-    try {
-      await auth.getSelf()
-      await organisation.init()
-    } catch (error) {
-      notifications.error("Error getting org config")
-    }
-    loaded = true
-  })
-
-  const handleKeydown = evt => {
-    if (evt.key === "Enter") {
-      reset()
-    }
+onMount(async () => {
+  try {
+    await auth.getSelf()
+    await organisation.init()
+  } catch (error) {
+    notifications.error("Error getting org config")
   }
+  loaded = true
+})
+
+const handleKeydown = (evt) => {
+  if (evt.key === "Enter") {
+    reset()
+  }
+}
 </script>
 
 <svelte:window on:keydown={handleKeydown} />

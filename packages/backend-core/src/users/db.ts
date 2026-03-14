@@ -1,13 +1,13 @@
 import {
-  AnyDocument,
-  BulkUserCreated,
-  BulkUserDeleted,
+  type AnyDocument,
+  type BulkUserCreated,
+  type BulkUserDeleted,
   isSSOUser,
-  PlatformUserById,
-  PlatformUserBySsoId,
-  SaveUserOpts,
-  User,
-  UserIdentifier,
+  type PlatformUserById,
+  type PlatformUserBySsoId,
+  type SaveUserOpts,
+  type User,
+  type UserIdentifier,
   UserStatus,
 } from "@budibase/types"
 import * as cache from "../cache"
@@ -19,18 +19,9 @@ import * as platform from "../platform"
 import { validatePassword } from "../security"
 import * as sessions from "../security/sessions"
 import { hash } from "../utils"
-import {
-  getFirstPlatformUser,
-  getPlatformUsers,
-  searchExistingEmails,
-} from "./lookup"
+import { getFirstPlatformUser, getPlatformUsers, searchExistingEmails } from "./lookup"
 import * as usersCore from "./users"
-import {
-  creatorsInList,
-  isAdmin,
-  isCreatorAsync,
-  validateUniqueUser,
-} from "./utils"
+import { creatorsInList, isAdmin, isCreatorAsync, validateUniqueUser } from "./utils"
 
 type CreateAdminUserOpts = {
   password?: string
@@ -134,21 +125,20 @@ export class UserDB {
         include_docs: true,
       })
     )
-    return response.rows.map(row => row.doc!)
+    return response.rows.map((row) => row.doc!)
   }
 
   static async countUsersByApp(appId: string) {
-    let response: any = await usersCore.searchGlobalUsersByApp(appId, {})
+    const response: any = await usersCore.searchGlobalUsersByApp(appId, {})
     return {
       userCount: response.length,
     }
   }
 
   static async getUsersByAppAccess(opts: { appId?: string; limit?: number }) {
-    let response: User[] = await usersCore.searchGlobalUsersByAppAccess(
-      opts.appId,
-      { limit: opts.limit || 50 }
-    )
+    const response: User[] = await usersCore.searchGlobalUsersByAppAccess(opts.appId, {
+      limit: opts.limit || 50,
+    })
     return response
   }
 
@@ -243,19 +233,14 @@ export class UserDB {
 
       try {
         // save the user to db
-        let response = await db.put(builtUser)
+        const response = await db.put(builtUser)
         builtUser._rev = response.rev
         if (dbUser && builtUser.email !== dbUser.email) {
           // Remove the plaform email reference if the email changed
           await platform.users.removeUser({ email: dbUser.email } as User)
         }
 
-        await platform.users.addUser(
-          tenantId,
-          builtUser._id!,
-          builtUser.email,
-          builtUser.ssoId
-        )
+        await platform.users.addUser(tenantId, builtUser._id!, builtUser.email, builtUser.ssoId)
         await cache.user.invalidateUser(response.id)
 
         // finally returned the saved user from the db
@@ -274,9 +259,9 @@ export class UserDB {
   static async bulkCreate(newUsersRequested: User[]): Promise<BulkUserCreated> {
     const tenantId = getTenantId()
 
-    let usersToSave: Promise<User>[] = []
-    let newUsers: User[] = []
-    let newCreators: User[] = []
+    const usersToSave: Promise<User>[] = []
+    const newUsers: User[] = []
+    const newCreators: User[] = []
 
     const emails = newUsersRequested.map((user: User) => user.email)
     const existingEmails = await searchExistingEmails(emails)
@@ -284,7 +269,7 @@ export class UserDB {
 
     for (const newUser of newUsersRequested) {
       const duplicateUser = newUsers.find(
-        user => user.email.toLowerCase() === newUser.email.toLowerCase()
+        (user) => user.email.toLowerCase() === newUser.email.toLowerCase()
       )
       const userExists = existingEmails.includes(newUser.email.toLowerCase())
       if (duplicateUser || userExists) {
@@ -300,12 +285,7 @@ export class UserDB {
     const addUsers = async () => {
       for (const user of newUsers) {
         usersToSave.push(
-          UserDB.buildUser(
-            user,
-            { hashPassword: true, requirePassword: true },
-            tenantId,
-            undefined
-          )
+          UserDB.buildUser(user, { hashPassword: true, requirePassword: true }, tenantId, undefined)
         )
       }
 
@@ -317,7 +297,7 @@ export class UserDB {
         await platform.users.addUser(tenantId, user._id!, user.email)
       }
 
-      const saved = usersToBulkSave.map(user => {
+      const saved = usersToBulkSave.map((user) => {
         return {
           _id: user._id,
           email: user.email,
@@ -332,9 +312,7 @@ export class UserDB {
     return (await addUsers()) as BulkUserCreated
   }
 
-  static async bulkDelete(
-    users: Array<UserIdentifier>
-  ): Promise<BulkUserDeleted> {
+  static async bulkDelete(users: Array<UserIdentifier>): Promise<BulkUserDeleted> {
     const db = getGlobalDB()
 
     const response: BulkUserDeleted = {
@@ -345,33 +323,29 @@ export class UserDB {
     // Get users and delete
     const allDocsResponse = await db.allDocs<User>({
       include_docs: true,
-      keys: users.map(u => u.userId),
+      keys: users.map((u) => u.userId),
     })
-    const usersToDelete = allDocsResponse.rows.map(user => {
+    const usersToDelete = allDocsResponse.rows.map((user) => {
       return user.doc!
     })
 
     // Delete from DB
-    const toDelete = usersToDelete.map(user => ({
+    const toDelete = usersToDelete.map((user) => ({
       ...user,
       _deleted: true,
     }))
     const dbResponse = await usersCore.bulkUpdateGlobalUsers(toDelete)
 
     const ssoUsersToDelete: AnyDocument[] = []
-    for (let user of usersToDelete) {
-      const platformUser = (await getFirstPlatformUser(
-        user._id!
-      )) as PlatformUserById
+    for (const user of usersToDelete) {
+      const platformUser = (await getFirstPlatformUser(user._id!)) as PlatformUserById
       const ssoId = platformUser.ssoId
       if (ssoId) {
         // Need to get the _rev of the SSO user doc to delete it. The view also returns docs that have the ssoId property, so we need to ignore those.
-        const ssoUsers = (await getPlatformUsers(
-          ssoId
-        )) as PlatformUserBySsoId[]
+        const ssoUsers = (await getPlatformUsers(ssoId)) as PlatformUserBySsoId[]
         ssoUsers
-          .filter(user => user.ssoId == null)
-          .forEach(user => {
+          .filter((user) => user.ssoId == null)
+          .forEach((user) => {
             ssoUsersToDelete.push({
               ...user,
               _deleted: true,
@@ -393,7 +367,7 @@ export class UserDB {
     }, userIndex)
 
     // add the successful and unsuccessful users to response
-    dbResponse.forEach(item => {
+    dbResponse.forEach((item) => {
       const email = userIndex[item.id].email
       if (item.ok) {
         response.successful.push({ _id: item.id, email })
@@ -421,11 +395,7 @@ export class UserDB {
     await sessions.invalidateSessions(userId, { reason: "deletion" })
   }
 
-  static async createAdminUser(
-    email: string,
-    tenantId: string,
-    opts?: CreateAdminUserOpts
-  ) {
+  static async createAdminUser(email: string, tenantId: string, opts?: CreateAdminUserOpts) {
     const password = opts?.password
     const user: User = {
       email: email,

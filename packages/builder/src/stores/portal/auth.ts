@@ -1,15 +1,15 @@
+import { Constants, CookieUtils } from "@budibase/frontend-core"
+import {
+  type GetGlobalSelfResponse,
+  isSSOUser,
+  type SetInitInfoRequest,
+  type UpdateSelfRequest,
+} from "@budibase/types"
 import { get } from "svelte/store"
 import { API } from "@/api"
-import { admin } from "./admin"
 import { BudiStore } from "@/stores/BudiStore"
 import { reset as resetBuilderStores } from "@/stores/builder"
-import { CookieUtils, Constants } from "@budibase/frontend-core"
-import {
-  GetGlobalSelfResponse,
-  isSSOUser,
-  SetInitInfoRequest,
-  UpdateSelfRequest,
-} from "@budibase/types"
+import { admin } from "./admin"
 
 interface PortalAuthStore {
   user?: GetGlobalSelfResponse
@@ -50,7 +50,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
 
   async setOrganisation(tenantId = "default") {
     const prevId = get(this.store).tenantId
-    auth.update(store => {
+    auth.update((store) => {
       store.tenantId = tenantId
       store.tenantSet = !!tenantId
       return store
@@ -63,7 +63,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
 
   async setInitInfo(info: SetInitInfoRequest) {
     await API.setInitInfo(info)
-    auth.update(store => {
+    auth.update((store) => {
       store.initInfo = info
       return store
     })
@@ -71,7 +71,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
   }
 
   setPostLogout() {
-    auth.update(store => {
+    auth.update((store) => {
       store.postLogout = true
       return store
     })
@@ -79,7 +79,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
 
   async getInitInfo() {
     const info = await API.getInitInfo()
-    auth.update(store => {
+    auth.update((store) => {
       store.initInfo = info
       return store
     })
@@ -130,10 +130,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
       currentPath.startsWith("/builder/invite") ||
       currentPath.startsWith("/builder/admin")
 
-    if (
-      !isPreLoginPage &&
-      !CookieUtils.getCookie(Constants.Cookies.ReturnUrl)
-    ) {
+    if (!isPreLoginPage && !CookieUtils.getCookie(Constants.Cookies.ReturnUrl)) {
       CookieUtils.setCookie(Constants.Cookies.ReturnUrl, window.location.href)
     }
 
@@ -197,7 +194,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
     const mainHost = new URL(adminStore.baseUrl).host
     let urlTenantId
     // remove the main host part
-    const hostParts = host.split(mainHost).filter(part => part !== "")
+    const hostParts = host.split(mainHost).filter((part) => part !== "")
     // if there is a part left, it has to be the tenant ID subdomain
     if (hostParts.length === 1) {
       urlTenantId = hostParts[0].replace(/\./g, "")
@@ -220,9 +217,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
           await this.logout()
           await this.setOrganisation()
         } catch (error) {
-          console.error(
-            `Tenant mis-match - "${urlTenantId}" and "${store.user.tenantId}" - logout`
-          )
+          console.error(`Tenant mis-match - "${urlTenantId}" and "${store.user.tenantId}" - logout`)
         }
       }
     } else {

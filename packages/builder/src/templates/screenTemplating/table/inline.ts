@@ -1,7 +1,7 @@
+import type { Screen as ScreenDoc, UIPermissions } from "@budibase/types"
 import { capitalise } from "@/helpers"
-import { SourceOption } from "@/routes/builder/workspace/[application]/design/_components/NewScreen/utils"
+import type { SourceOption } from "@/routes/builder/workspace/[application]/design/_components/NewScreen/utils"
 import { getRowActionButtonTemplates } from "@/templates/rowActions"
-import { Screen as ScreenDoc, UIPermissions } from "@budibase/types"
 import { Component } from "../../Component"
 import getValidRoute from "../getValidRoute"
 import { Screen } from "../Screen"
@@ -45,14 +45,7 @@ const inline = async ({
   }
 
   const screenTemplate = new Screen(workspaceAppId)
-    .route(
-      getValidRoute(
-        screens,
-        tableOrView.name,
-        permissions.write,
-        workspaceAppId
-      )
-    )
+    .route(getValidRoute(screens, tableOrView.name, permissions.write, workspaceAppId))
     .instanceName(`${tableOrView.name} - List`)
     .customProps({ layout: "grid" })
     .role(permissions.write)

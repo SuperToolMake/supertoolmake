@@ -1,102 +1,102 @@
 <script lang="ts">
-  import { Modal, Helpers, notifications, Icon } from "@budibase/bbui"
-  import {
-    screenStore,
-    userSelectedResourceMap,
-    contextMenuStore,
-    componentStore,
-  } from "@/stores/builder"
-  import NavItem from "@/components/common/NavItem.svelte"
-  import RoleIndicator from "./RoleIndicator.svelte"
-  import ScreenDetailsModal from "@/components/design/ScreenDetailsModal.svelte"
-  import sanitizeUrl from "@/helpers/sanitizeUrl"
-  import { makeComponentUnique } from "@/helpers/components"
-  import { capitalise } from "@/helpers"
-  import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
-  import type { Screen } from "@budibase/types"
+import { Helpers, Icon, type Modal, notifications } from "@budibase/bbui"
+import type { Screen } from "@budibase/types"
+import type ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
+import NavItem from "@/components/common/NavItem.svelte"
+import ScreenDetailsModal from "@/components/design/ScreenDetailsModal.svelte"
+import { capitalise } from "@/helpers"
+import { makeComponentUnique } from "@/helpers/components"
+import sanitizeUrl from "@/helpers/sanitizeUrl"
+import {
+  componentStore,
+  contextMenuStore,
+  screenStore,
+  userSelectedResourceMap,
+} from "@/stores/builder"
+import RoleIndicator from "./RoleIndicator.svelte"
 
-  export let screen
-  export let deletionAllowed: boolean
+export let screen
+export let deletionAllowed: boolean
 
-  let confirmDeleteDialog: ConfirmDialog
-  let screenDetailsModal: Modal
+let confirmDeleteDialog: ConfirmDialog
+let screenDetailsModal: Modal
 
-  const createDuplicateScreen = async ({ route }: { route: string }) => {
-    // Create a dupe and ensure it is unique
-    let duplicateScreen = Helpers.cloneDeep(screen)
-    delete duplicateScreen._id
-    delete duplicateScreen._rev
-    duplicateScreen.props = makeComponentUnique(duplicateScreen.props)
+const createDuplicateScreen = async ({ route }: { route: string }) => {
+  // Create a dupe and ensure it is unique
+  let duplicateScreen = Helpers.cloneDeep(screen)
+  delete duplicateScreen._id
+  delete duplicateScreen._rev
+  duplicateScreen.props = makeComponentUnique(duplicateScreen.props)
 
-    // Attach the new name and URL
-    duplicateScreen.routing.route = sanitizeUrl(route)
-    duplicateScreen.routing.homeScreen = false
+  // Attach the new name and URL
+  duplicateScreen.routing.route = sanitizeUrl(route)
+  duplicateScreen.routing.homeScreen = false
 
-    try {
-      const linkLabel = capitalise(duplicateScreen.routing.route.split("/")[1])
+  try {
+    const linkLabel = capitalise(duplicateScreen.routing.route.split("/")[1])
 
-      await screenStore.save({
-        ...duplicateScreen,
-        navigationLinkLabel: linkLabel,
-      })
-    } catch (error) {
-      notifications.error("Error duplicating screen")
-    }
+    await screenStore.save({
+      ...duplicateScreen,
+      navigationLinkLabel: linkLabel,
+    })
+  } catch (error) {
+    notifications.error("Error duplicating screen")
   }
+}
 
-  const deleteScreen = async () => {
-    try {
-      await screenStore.delete(screen)
-      notifications.success("Deleted screen successfully")
-    } catch (err) {
-      notifications.error("Error deleting screen")
-    }
+const deleteScreen = async () => {
+  try {
+    await screenStore.delete(screen)
+    notifications.success("Deleted screen successfully")
+  } catch (err) {
+    notifications.error("Error deleting screen")
   }
+}
 
-  $: noPaste = !$componentStore.componentToPaste
+$: noPaste = !$componentStore.componentToPaste
 
-  const pasteComponent = (mode: "inside") => {
-    try {
-      componentStore.paste(screen.props, mode, screen)
-    } catch (error) {
-      notifications.error("Error saving component")
-    }
+const pasteComponent = (mode: "inside") => {
+  try {
+    componentStore.paste(screen.props, mode, screen)
+  } catch (error) {
+    notifications.error("Error saving component")
   }
+}
 
-  const openContextMenu = (e: MouseEvent, screen: Screen) => {
-    e.preventDefault()
-    e.stopPropagation()
+const openContextMenu = (e: MouseEvent, screen: Screen) => {
+  e.preventDefault()
+  e.stopPropagation()
 
-    const items = [
-      {
-        icon: "stack",
-        name: "Paste inside",
-        keyBind: null,
-        visible: true,
-        disabled: noPaste,
-        callback: () => pasteComponent("inside"),
-      },
-      {
-        icon: "copy",
-        name: "Duplicate",
-        keyBind: null,
-        visible: true,
-        disabled: false,
-        callback: screenDetailsModal.show,
-      },
-      {
-        icon: "trash",
-        name: "Delete",
-        keyBind: null,
-        visible: true,
-        disabled: !deletionAllowed,
-        callback: confirmDeleteDialog.show,
-        tooltip: deletionAllowed ? "" : "At least one screen is required",
-      },
-    ]
+  const items = [
+    {
+      icon: "stack",
+      name: "Paste inside",
+      keyBind: null,
+      visible: true,
+      disabled: noPaste,
+      callback: () => pasteComponent("inside"),
+    },
+    {
+      icon: "copy",
+      name: "Duplicate",
+      keyBind: null,
+      visible: true,
+      disabled: false,
+      callback: screenDetailsModal.show,
+    },
+    {
+      icon: "trash",
+      name: "Delete",
+      keyBind: null,
+      visible: true,
+      disabled: !deletionAllowed,
+      callback: confirmDeleteDialog.show,
+      tooltip: deletionAllowed ? "" : "At least one screen is required",
+    },
+  ]
 
-    contextMenuStore.open(screen._id!, items, { x: e.clientX, y: e.clientY })
-  }
+  contextMenuStore.open(screen._id!, items, { x: e.clientX, y: e.clientY })
+}
 </script>
 
 <NavItem

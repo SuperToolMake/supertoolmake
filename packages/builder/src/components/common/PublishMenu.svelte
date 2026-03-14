@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { Body, Icon, Popover, PopoverAlignment } from "@budibase/bbui"
-  import { deploymentStore, workspaceAppStore } from "@/stores/builder"
-  import type { PopoverAPI } from "@budibase/bbui"
+import type { PopoverAPI } from "@budibase/bbui"
+import { Body, Icon, Popover, PopoverAlignment } from "@budibase/bbui"
+import { deploymentStore, workspaceAppStore } from "@/stores/builder"
 
-  let publishPopoverAnchor: HTMLElement | undefined
-  let publishSuccessPopover: PopoverAPI | undefined
+let publishPopoverAnchor: HTMLElement | undefined
+let publishSuccessPopover: PopoverAPI | undefined
 
-  const publish = async () => {
-    if ($deploymentStore.isPublishing) {
-      return
-    }
-    await deploymentStore.publishApp()
-    publishSuccessPopover?.show()
+const publish = async () => {
+  if ($deploymentStore.isPublishing) {
+    return
   }
+  await deploymentStore.publishApp()
+  publishSuccessPopover?.show()
+}
 </script>
 
 <div

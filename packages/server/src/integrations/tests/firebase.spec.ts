@@ -12,7 +12,7 @@ class TestConfiguration {
 
 describe("Firebase Integration", () => {
   let config: any
-  let tableName = "Users"
+  const tableName = "Users"
 
   beforeEach(() => {
     config = new TestConfiguration({
@@ -51,11 +51,7 @@ describe("Firebase Integration", () => {
       },
     })
     expect(config.integration.client.collection).toHaveBeenCalledWith("test")
-    expect(config.integration.client.where).toHaveBeenCalledWith(
-      "field",
-      "==",
-      "value"
-    )
+    expect(config.integration.client.where).toHaveBeenCalledWith("field", "==", "value")
     expect(response).toEqual([{ result: "test" }])
   })
 

@@ -1,8 +1,8 @@
-import env from "../environment"
-import * as matchers from "jest-extended"
 import { env as coreEnv, timers } from "@budibase/backend-core"
 import { testContainerUtils } from "@budibase/backend-core/tests"
+import * as matchers from "jest-extended"
 import nock from "nock"
+import env from "../environment"
 
 expect.extend(matchers)
 if (!process.env.CI) {
@@ -13,12 +13,8 @@ if (!process.env.CI) {
 }
 
 nock.disableNetConnect()
-nock.enableNetConnect(host => {
-  return (
-    host.includes("localhost") ||
-    host.includes("127.0.0.1") ||
-    host.includes("::1")
-  )
+nock.enableNetConnect((host) => {
+  return host.includes("localhost") || host.includes("127.0.0.1") || host.includes("::1")
 })
 
 testContainerUtils.setupEnv(env, coreEnv)

@@ -1,16 +1,13 @@
-import { Screen, UsageInScreensResponse } from "@budibase/types"
-import { Expectations, TestAPI } from "./base"
+import type { Screen, UsageInScreensResponse } from "@budibase/types"
 import { TEST_WORKSPACEAPPID_PLACEHOLDER } from "../structures"
+import { type Expectations, TestAPI } from "./base"
 
 export class ScreenAPI extends TestAPI {
   list = async (expectations?: Expectations): Promise<Screen[]> => {
     return await this._get<Screen[]>(`/api/screens`, { expectations })
   }
 
-  save = async (
-    screen: Screen,
-    expectations?: Expectations
-  ): Promise<Screen> => {
+  save = async (screen: Screen, expectations?: Expectations): Promise<Screen> => {
     if (screen.workspaceAppId === TEST_WORKSPACEAPPID_PLACEHOLDER) {
       screen.workspaceAppId = this.config.getDefaultWorkspaceAppId()
     }
@@ -26,23 +23,17 @@ export class ScreenAPI extends TestAPI {
     screenRev: string,
     expectations?: Expectations
   ): Promise<{ message: string }> => {
-    return this._delete<{ message: string }>(
-      `/api/screens/${screenId}/${screenRev}`,
-      {
-        expectations,
-      }
-    )
+    return this._delete<{ message: string }>(`/api/screens/${screenId}/${screenRev}`, {
+      expectations,
+    })
   }
 
   usage = async (
     sourceId: string,
     expectations?: Expectations
   ): Promise<UsageInScreensResponse> => {
-    return this._post<UsageInScreensResponse>(
-      `/api/screens/usage/${sourceId}`,
-      {
-        expectations,
-      }
-    )
+    return this._post<UsageInScreensResponse>(`/api/screens/usage/${sourceId}`, {
+      expectations,
+    })
   }
 }

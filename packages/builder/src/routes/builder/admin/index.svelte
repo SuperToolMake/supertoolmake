@@ -1,55 +1,47 @@
 <script>
-  import {
-    Button,
-    Heading,
-    notifications,
-    Layout,
-    Body,
-    FancyForm,
-    FancyInput,
-  } from "@budibase/bbui"
-  import { goto as gotoStore } from "@roxi/routify"
-  import { API } from "@/api"
-  import { admin, auth } from "@/stores/portal"
-  import Logo from "assets/supertoolmake-emblem.svg"
-  import { passwordsMatch, handleError } from "../auth/_components/utils"
+import { Body, Button, FancyForm, FancyInput, Heading, Layout, notifications } from "@budibase/bbui"
+import { goto as gotoStore } from "@roxi/routify"
+import Logo from "assets/supertoolmake-emblem.svg"
+import { API } from "@/api"
+import { admin, auth } from "@/stores/portal"
+import { handleError, passwordsMatch } from "../auth/_components/utils"
 
-  $: goto = $gotoStore
+$: goto = $gotoStore
 
-  let form
-  let errors = {}
-  let formData = {}
-  let submitted = false
+let form
+let errors = {}
+let formData = {}
+let submitted = false
 
-  $: tenantId = $auth.tenantId
-  $: passwordMinLength = $admin.passwordMinLength ?? 12
+$: tenantId = $auth.tenantId
+$: passwordMinLength = $admin.passwordMinLength ?? 12
 
-  async function save() {
-    form.validate()
-    if (Object.keys(errors).length > 0) {
-      return
-    }
-    submitted = true
-    try {
-      let adminUser = { ...formData, tenantId }
-      delete adminUser.confirmationPassword
-      // Save the admin user
-      await API.createAdminUser(adminUser)
-      notifications.success("Admin user created")
-      await admin.init()
-      await auth.login(formData?.email.trim(), formData?.password)
-      goto("/builder")
-    } catch (error) {
-      submitted = false
-      notifications.error(error.message || "Failed to create admin user")
-    }
+async function save() {
+  form.validate()
+  if (Object.keys(errors).length > 0) {
+    return
   }
-
-  const handleKeydown = evt => {
-    if (evt.key === "Enter") {
-      save()
-    }
+  submitted = true
+  try {
+    let adminUser = { ...formData, tenantId }
+    delete adminUser.confirmationPassword
+    // Save the admin user
+    await API.createAdminUser(adminUser)
+    notifications.success("Admin user created")
+    await admin.init()
+    await auth.login(formData?.email.trim(), formData?.password)
+    goto("/builder")
+  } catch (error) {
+    submitted = false
+    notifications.error(error.message || "Failed to create admin user")
   }
+}
+
+const handleKeydown = (evt) => {
+  if (evt.key === "Enter") {
+    save()
+  }
+}
 </script>
 
 <svelte:window on:keydown={handleKeydown} />

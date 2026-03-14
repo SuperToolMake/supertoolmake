@@ -34,9 +34,7 @@ const read = [],
  *                 $ref: '#/components/examples/application'
  */
 write.push(
-  new Endpoint("post", "/applications", controller.create).addMiddleware(
-    applicationValidator()
-  )
+  new Endpoint("post", "/applications", controller.create).addMiddleware(applicationValidator())
 )
 
 /**
@@ -88,9 +86,7 @@ write.push(
  *       204:
  *         description: The app was published successfully.
  */
-write.push(
-  new Endpoint("post", "/applications/:appId/unpublish", controller.unpublish)
-)
+write.push(new Endpoint("post", "/applications/:appId/unpublish", controller.unpublish))
 
 /**
  * @openapi
@@ -114,9 +110,7 @@ write.push(
  *               deployment:
  *                 $ref: '#/components/examples/deploymentOutput'
  */
-write.push(
-  new Endpoint("post", "/applications/:appId/publish", controller.publish)
-)
+write.push(new Endpoint("post", "/applications/:appId/publish", controller.publish))
 
 /**
  * @openapi
@@ -170,9 +164,7 @@ read.push(new Endpoint("get", "/applications/:appId", controller.read))
  *                 $ref: '#/components/examples/applications'
  */
 read.push(
-  new Endpoint("post", "/applications/search", controller.search).addMiddleware(
-    nameValidator()
-  )
+  new Endpoint("post", "/applications/search", controller.search).addMiddleware(nameValidator())
 )
 
 export default { read, write }

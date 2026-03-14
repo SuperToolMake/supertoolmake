@@ -1,17 +1,17 @@
 <script>
-  export let width = "100"
-  export let height = "100"
+export let width = "100"
+export let height = "100"
 
-  const resolveNumber = value => {
-    if (typeof value === "number") {
-      return value
-    }
-    const parsed = parseFloat(value)
-    return Number.isFinite(parsed) ? parsed : 18
+const resolveNumber = (value) => {
+  if (typeof value === "number") {
+    return value
   }
+  const parsed = parseFloat(value)
+  return Number.isFinite(parsed) ? parsed : 18
+}
 
-  $: dimension = Math.min(resolveNumber(width), resolveNumber(height))
-  $: iconStyle = `font-size:${dimension}px;`
+$: dimension = Math.min(resolveNumber(width), resolveNumber(height))
+$: iconStyle = `font-size:${dimension}px;`
 </script>
 
 <span class="rest-icon" style={iconStyle}>

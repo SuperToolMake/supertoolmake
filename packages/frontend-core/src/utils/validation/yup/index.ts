@@ -1,6 +1,6 @@
-import { object, string, number, AnySchema } from "yup"
-import { writable, get, type Writable } from "svelte/store"
 import { Helpers, notifications } from "@budibase/bbui"
+import { get, type Writable, writable } from "svelte/store"
+import { type AnySchema, number, object, string } from "yup"
 
 type ValidationState = {
   values: Record<string, any>
@@ -26,10 +26,7 @@ export const createValidationStore = () => {
   const validator: ValidatorMap = {}
   const validation: Writable<ValidationState> = writable(DEFAULT)
 
-  const addValidator = (
-    propertyName: string,
-    propertyValidator: AnySchema | null
-  ) => {
+  const addValidator = (propertyName: string, propertyValidator: AnySchema | null) => {
     if (!propertyValidator || !propertyName) return
     validator[propertyName] = propertyValidator
   }
@@ -73,7 +70,7 @@ export const createValidationStore = () => {
     const { values } = get(validation)
     let fieldIsValid = false
 
-    if (!Object.prototype.hasOwnProperty.call(values, propertyName)) {
+    if (!Object.hasOwn(values, propertyName)) {
       // Initial setup
       values[propertyName] = value
       return
@@ -85,7 +82,7 @@ export const createValidationStore = () => {
 
     const obj = object().shape(validator)
     try {
-      validation.update(store => {
+      validation.update((store) => {
         delete store.errors[propertyName]
         return store
       })
@@ -94,7 +91,7 @@ export const createValidationStore = () => {
     } catch (error: any) {
       const [fieldError] = error.errors
       if (fieldError) {
-        validation.update(store => {
+        validation.update((store) => {
           store.errors[propertyName] = Helpers.capitalise(fieldError)
           store.valid = false
           return store
@@ -105,16 +102,13 @@ export const createValidationStore = () => {
     if (fieldIsValid) {
       // Validate the rest of the fields
       try {
-        await obj.validate(
-          { ...values, [propertyName]: value },
-          { abortEarly: false }
-        )
-        validation.update(store => {
+        await obj.validate({ ...values, [propertyName]: value }, { abortEarly: false })
+        validation.update((store) => {
           store.valid = true
           return store
         })
       } catch {
-        validation.update(store => {
+        validation.update((store) => {
           store.valid = false
           return store
         })
@@ -126,7 +120,7 @@ export const createValidationStore = () => {
     const obj = object().shape(validator)
     // clear the previous errors
     const properties = Object.keys(validator)
-    properties.forEach(property => {
+    properties.forEach((property) => {
       delete get(validation).errors[property]
     })
 
@@ -139,7 +133,7 @@ export const createValidationStore = () => {
         validationError = true
       } else {
         error.inner.forEach((err: any) => {
-          validation.update(store => {
+          validation.update((store) => {
             store.errors[err.path] = Helpers.capitalise(err.message)
             return store
           })
@@ -155,7 +149,7 @@ export const createValidationStore = () => {
       valid = false
     }
 
-    validation.update(store => {
+    validation.update((store) => {
       store.valid = valid
       return store
     })

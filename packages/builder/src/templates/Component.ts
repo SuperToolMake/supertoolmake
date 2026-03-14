@@ -1,5 +1,5 @@
 import { Helpers } from "@budibase/bbui"
-import { Component as ComponentDoc } from "@budibase/types"
+import type { Component as ComponentDoc } from "@budibase/types"
 import { BaseStructure } from "./BaseStructure"
 
 export class Component extends BaseStructure<ComponentDoc> {

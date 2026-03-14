@@ -1,4 +1,4 @@
-import { writable, get } from "svelte/store"
+import { get, writable } from "svelte/store"
 
 const createEventStore = () => {
   const initialState = {
@@ -9,15 +9,15 @@ const createEventStore = () => {
   const actions = {
     dispatchEvent: (type, data) => {
       const id = Math.random()
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         window.parent.postMessage({ type, data, id })
-        store.update(state => {
+        store.update((state) => {
           state.eventResolvers[id] = resolve
           return state
         })
       })
     },
-    resolveEvent: data => {
+    resolveEvent: (data) => {
       get(store).eventResolvers[data]?.()
     },
   }

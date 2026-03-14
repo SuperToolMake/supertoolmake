@@ -1,5 +1,5 @@
+import { context, env } from "@budibase/backend-core"
 import { structures } from "../../../tests"
-import { env, context } from "@budibase/backend-core"
 import { db as userDb } from "../"
 
 describe("users", () => {

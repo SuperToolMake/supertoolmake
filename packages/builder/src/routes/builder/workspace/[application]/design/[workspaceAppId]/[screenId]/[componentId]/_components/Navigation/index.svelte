@@ -1,70 +1,60 @@
 <script>
-  import NavItemConfiguration from "./NavItemConfiguration.svelte"
-  import { get } from "svelte/store"
-  import Panel from "@/components/design/Panel.svelte"
-  import {
-    Toggle,
-    DetailSummary,
-    Checkbox,
-    notifications,
-    Select,
-    Stepper,
-  } from "@budibase/bbui"
-  import {
-    themeStore,
-    selectedScreen,
-    screenStore,
-    componentStore,
-    navigationStore as nav,
-  } from "@/stores/builder"
-  import { DefaultAppTheme } from "@/constants"
-  import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
-  import BarButtonList from "@/components/design/settings/controls/BarButtonList.svelte"
-  import ColorPicker from "@/components/design/settings/controls/ColorPicker.svelte"
-  import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
-  import DrawerBindableCombobox from "@/components/common/bindings/DrawerBindableCombobox.svelte"
-  import { getBindableProperties } from "@/dataBinding"
+import { Checkbox, DetailSummary, notifications, Select, Stepper, Toggle } from "@budibase/bbui"
+import { get } from "svelte/store"
+import DrawerBindableCombobox from "@/components/common/bindings/DrawerBindableCombobox.svelte"
+import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import Panel from "@/components/design/Panel.svelte"
+import BarButtonList from "@/components/design/settings/controls/BarButtonList.svelte"
+import ColorPicker from "@/components/design/settings/controls/ColorPicker.svelte"
+import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
+import { DefaultAppTheme } from "@/constants"
+import { getBindableProperties } from "@/dataBinding"
+import {
+  componentStore,
+  navigationStore as nav,
+  screenStore,
+  selectedScreen,
+  themeStore,
+} from "@/stores/builder"
+import NavItemConfiguration from "./NavItemConfiguration.svelte"
 
-  const positionOptions = [
-    { value: "Top", barIcon: "browser" },
-    { value: "Left", barIcon: "sidebar-simple" },
-  ]
-  const alignmentOptions = [
-    { value: "Left", barIcon: "text-align-left" },
-    { value: "Center", barIcon: "text-align-center" },
-    { value: "Right", barIcon: "text-align-right" },
-  ]
-  const widthOptions = ["Max", "Large", "Medium", "Small"]
-  const logoPositionOptions = [
-    { value: "top", barIcon: "PaddingTop" },
-    { value: "bottom", barIcon: "PaddingBottom" },
-  ]
-  const titleSizeOptions = [
-    { value: "XS", label: "XS" },
-    { value: "S", label: "S" },
-    { value: "M", label: "M" },
-    { value: "L", label: "L" },
-  ]
+const positionOptions = [
+  { value: "Top", barIcon: "browser" },
+  { value: "Left", barIcon: "sidebar-simple" },
+]
+const alignmentOptions = [
+  { value: "Left", barIcon: "text-align-left" },
+  { value: "Center", barIcon: "text-align-center" },
+  { value: "Right", barIcon: "text-align-right" },
+]
+const widthOptions = ["Max", "Large", "Medium", "Small"]
+const logoPositionOptions = [
+  { value: "top", barIcon: "PaddingTop" },
+  { value: "bottom", barIcon: "PaddingBottom" },
+]
+const titleSizeOptions = [
+  { value: "XS", label: "XS" },
+  { value: "S", label: "S" },
+  { value: "M", label: "M" },
+  { value: "L", label: "L" },
+]
 
-  $: bindings = getBindableProperties(
-    $selectedScreen,
-    $componentStore.selectedComponentId
-  )
-  $: screenRouteOptions = screenStore.routes
+$: bindings = getBindableProperties($selectedScreen, $componentStore.selectedComponentId)
+$: screenRouteOptions = screenStore.routes
 
-  const updateShowNavigation = async show => {
-    await screenStore.updateSetting(get(selectedScreen), "showNavigation", show)
+const updateShowNavigation = async (show) => {
+  await screenStore.updateSetting(get(selectedScreen), "showNavigation", show)
+}
+
+const update = async (key, value) => {
+  try {
+    let navigation = $nav
+    navigation[key] = value
+    await nav.save(navigation)
+  } catch (error) {
+    notifications.error("Error updating navigation settings")
   }
-
-  const update = async (key, value) => {
-    try {
-      let navigation = $nav
-      navigation[key] = value
-      await nav.save(navigation)
-    } catch (error) {
-      notifications.error("Error updating navigation settings")
-    }
-  }
+}
 </script>
 
 <Panel

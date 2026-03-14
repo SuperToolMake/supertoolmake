@@ -17,9 +17,7 @@ class NavigationStore extends BudiStore<NavigationState> {
 
   init(gotoFunc: GotoFuncType) {
     if (typeof gotoFunc !== "function") {
-      throw new Error(
-        `gotoFunc must be a function, found a "${typeof gotoFunc}" instead`
-      )
+      throw new Error(`gotoFunc must be a function, found a "${typeof gotoFunc}" instead`)
     }
     this.set({
       initialisated: true,

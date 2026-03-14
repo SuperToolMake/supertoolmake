@@ -1,5 +1,5 @@
-import Endpoint, { CtxFn, Method } from "./Endpoint"
 import Router from "@koa/router"
+import Endpoint, { type CtxFn, type Method } from "./Endpoint"
 
 type ArrayOneOrMore<T> = [T, ...T[]]
 
@@ -11,10 +11,7 @@ export default class EndpointGroup {
   // if locked, can't add anymore middlewares
   private locked = false
 
-  addGroupMiddleware(
-    middleware: CtxFn,
-    opts: { first: boolean } = { first: true }
-  ) {
+  addGroupMiddleware(middleware: CtxFn, opts: { first: boolean } = { first: true }) {
     if (this.locked) {
       throw new Error("Group locked, no more middleware can be added.")
     }
@@ -22,10 +19,7 @@ export default class EndpointGroup {
     return this
   }
 
-  addGroupMiddlewareOutput(
-    middleware: CtxFn,
-    opts: { first: boolean } = { first: false }
-  ) {
+  addGroupMiddlewareOutput(middleware: CtxFn, opts: { first: boolean } = { first: false }) {
     if (this.locked) {
       throw new Error("Group locked, no more middleware can be added.")
     }
@@ -34,7 +28,7 @@ export default class EndpointGroup {
   }
 
   private addEndpoint(method: Method, url: string, ...fns: CtxFn[]) {
-    let controller = fns.pop()!
+    const controller = fns.pop()!
     const endpoint = new Endpoint(method, url, controller)
     if (fns.length !== 0) {
       for (const fn of fns) {
@@ -90,12 +84,8 @@ export default class EndpointGroup {
     }
     this.applied = true
     for (const endpoint of this.endpoints) {
-      this.middlewares.forEach(({ fn, first }) =>
-        endpoint.addMiddleware(fn, { first })
-      )
-      this.outputMiddlewares.forEach(({ fn, first }) =>
-        endpoint.addOutputMiddleware(fn, { first })
-      )
+      this.middlewares.forEach(({ fn, first }) => endpoint.addMiddleware(fn, { first }))
+      this.outputMiddlewares.forEach(({ fn, first }) => endpoint.addOutputMiddleware(fn, { first }))
     }
     return this.endpoints
   }

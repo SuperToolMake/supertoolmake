@@ -1,8 +1,7 @@
+import type { Diagnostic } from "@codemirror/lint"
+import type * as acorn from "acorn"
 import { Parser } from "acorn"
 import * as walk from "acorn-walk"
-
-import type * as acorn from "acorn"
-import type { Diagnostic } from "@codemirror/lint"
 import type { CodeValidator } from "@/types"
 
 const FUNCTION_NODE_TYPES = [
@@ -19,12 +18,10 @@ type FunctionLikeNode = Extract<acorn.AnyNode, { type: FunctionNodeType }>
 const isFunctionNode = (node?: acorn.Node | null): node is FunctionLikeNode =>
   !!node && FUNCTION_NODE_TYPES.includes(node.type as FunctionNodeType)
 
-const isProgramNode = (node?: acorn.Node | null): node is acorn.Program =>
-  node?.type === "Program"
+const isProgramNode = (node?: acorn.Node | null): node is acorn.Program => node?.type === "Program"
 
-const isBlockStatement = (
-  node?: acorn.Node | null
-): node is acorn.BlockStatement => node?.type === "BlockStatement"
+const isBlockStatement = (node?: acorn.Node | null): node is acorn.BlockStatement =>
+  node?.type === "BlockStatement"
 
 const isIfStatement = (node?: acorn.Node | null): node is acorn.IfStatement =>
   node?.type === "IfStatement"
@@ -42,20 +39,14 @@ const getHelperFunctionName = (callee: acorn.Expression | acorn.Super) => {
     return callee.property.name
   }
 
-  if (
-    callee.property.type === "Literal" &&
-    typeof callee.property.value === "string"
-  ) {
+  if (callee.property.type === "Literal" && typeof callee.property.value === "string") {
     return callee.property.value
   }
 
   return undefined
 }
 
-export function validateJsTemplate(
-  code: string,
-  validations: CodeValidator
-): Diagnostic[] {
+export function validateJsTemplate(code: string, validations: CodeValidator): Diagnostic[] {
   const diagnostics: Diagnostic[] = []
 
   try {
@@ -118,14 +109,11 @@ export function validateJsTemplate(
           return
         }
 
-        const isInsideFunction = ancestors
-          .slice(0, -1)
-          .some(ancestor => isFunctionNode(ancestor))
+        const isInsideFunction = ancestors.slice(0, -1).some((ancestor) => isFunctionNode(ancestor))
 
         if (
           !isInsideFunction &&
-          (isTopLevelReturn(ancestors) ||
-            isReturnInTopLevelPlainElse(ancestors))
+          (isTopLevelReturn(ancestors) || isReturnInTopLevelPlainElse(ancestors))
         ) {
           hasReturnStatement = true
         }
@@ -140,8 +128,7 @@ export function validateJsTemplate(
           return
         }
 
-        const from =
-          lineOffsets[node.loc.start.line - 1] + node.loc.start.column
+        const from = lineOffsets[node.loc.start.line - 1] + node.loc.start.column
         const to = lineOffsets[node.loc.end.line - 1] + node.loc.end.column
 
         if (!(functionName in validations)) {
@@ -155,19 +142,14 @@ export function validateJsTemplate(
         }
 
         const { arguments: expectedArguments } = validations[functionName]
-        if (
-          expectedArguments &&
-          node.arguments.length !== expectedArguments.length
-        ) {
+        if (expectedArguments && node.arguments.length !== expectedArguments.length) {
           diagnostics.push({
             from,
             to,
             severity: "error",
             message: `Function "${functionName}" expects ${
               expectedArguments.length
-            } parameters (${expectedArguments.join(", ")}), but got ${
-              node.arguments.length
-            }.`,
+            } parameters (${expectedArguments.join(", ")}), but got ${node.arguments.length}.`,
           })
         }
       },

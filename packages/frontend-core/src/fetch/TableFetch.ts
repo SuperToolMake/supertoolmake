@@ -1,6 +1,6 @@
+import { SortOrder, type Table, type TableDatasource } from "@budibase/types"
 import { get } from "svelte/store"
 import BaseDataFetch from "./DataFetch"
-import { SortOrder, Table, TableDatasource } from "@budibase/types"
 
 export default class TableFetch extends BaseDataFetch<TableDatasource, Table> {
   async determineFeatureFlags() {
@@ -20,7 +20,7 @@ export default class TableFetch extends BaseDataFetch<TableDatasource, Table> {
     try {
       return await this.API.fetchTableDefinition(datasource.tableId)
     } catch (error: any) {
-      this.store.update(state => ({
+      this.store.update((state) => ({
         ...state,
         error,
       }))
@@ -29,8 +29,7 @@ export default class TableFetch extends BaseDataFetch<TableDatasource, Table> {
   }
 
   async getData() {
-    const { datasource, limit, sortColumn, sortOrder, sortType, paginate } =
-      this.options
+    const { datasource, limit, sortColumn, sortOrder, sortType, paginate } = this.options
     const { tableId } = datasource
     const { cursor, query } = get(this.store)
 

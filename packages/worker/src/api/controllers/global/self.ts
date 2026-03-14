@@ -1,12 +1,12 @@
 import {
   auth as authCore,
-  db as dbCore,
   configs,
+  db as dbCore,
   encryption,
   tenancy,
   utils,
 } from "@budibase/backend-core"
-import {
+import type {
   DevInfo,
   FetchAPIKeyResponse,
   GenerateAPIKeyRequest,
@@ -27,9 +27,7 @@ function newTestApiKey() {
 }
 
 function newApiKey() {
-  return encryption.encrypt(
-    `${tenancy.getTenantId()}${dbCore.SEPARATOR}${newid()}`
-  )
+  return encryption.encrypt(`${tenancy.getTenantId()}${dbCore.SEPARATOR}${newid()}`)
 }
 
 function cleanupDevInfo(info: any) {
@@ -39,9 +37,7 @@ function cleanupDevInfo(info: any) {
   return info
 }
 
-export async function generateAPIKey(
-  ctx: UserCtx<GenerateAPIKeyRequest, GenerateAPIKeyResponse>
-) {
+export async function generateAPIKey(ctx: UserCtx<GenerateAPIKeyRequest, GenerateAPIKeyResponse>) {
   let userId
   let apiKey
   if (env.isTest() && ctx.request.body.userId) {
@@ -135,21 +131,15 @@ export const syncAppFavourites = async (processedAppIds: string[]) => {
   }, [])
 }
 
-export const fetchAppsByIds = async (
-  processedAppIds: string[],
-  appPrefix: string
-) => {
+export const fetchAppsByIds = async (processedAppIds: string[], appPrefix: string) => {
   return await dbCore.getWorkspacesByIDs(
-    processedAppIds.map(appId => {
+    processedAppIds.map((appId) => {
       return `${appPrefix}${appId}`
     })
   )
 }
 
-const processUserAppFavourites = async (
-  user: User,
-  update: UpdateSelfRequest
-) => {
+const processUserAppFavourites = async (user: User, update: UpdateSelfRequest) => {
   if (!("appFavourites" in update)) {
     // Ignore requests without an explicit update to favourites.
     return
@@ -157,7 +147,7 @@ const processUserAppFavourites = async (
 
   const userAppFavourites = user.appFavourites || []
   const requestAppFavourites = new Set(update.appFavourites || [])
-  const containsAll = userAppFavourites.every(v => requestAppFavourites.has(v))
+  const containsAll = userAppFavourites.every((v) => requestAppFavourites.has(v))
 
   if (containsAll && requestAppFavourites.size === userAppFavourites.length) {
     // Ignore request if the outcome will have no change
@@ -169,9 +159,7 @@ const processUserAppFavourites = async (
   return syncedAppFavourites
 }
 
-export async function updateSelf(
-  ctx: UserCtx<UpdateSelfRequest, UpdateSelfResponse>
-) {
+export async function updateSelf(ctx: UserCtx<UpdateSelfRequest, UpdateSelfResponse>) {
   const update = ctx.request.body
 
   let user = await userSdk.db.getUser(ctx.user._id!)

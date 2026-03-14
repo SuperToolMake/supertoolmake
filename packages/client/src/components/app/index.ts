@@ -29,11 +29,10 @@ export const accordion = () => import("./Accordion.svelte")
 export const singlerowprovider = () => import("./SingleRowProvider.svelte")
 export * from "./blocks"
 export * from "./charts"
-export * from "./dynamic-filter"
-export * from "./forms"
-
 // Deprecated component left for compatibility in old apps
 export * from "./deprecated/table"
+export * from "./dynamic-filter"
+export * from "./forms"
 export const tableblock = () => import("./deprecated/TableBlock.svelte")
 export const navigation = () => import("./deprecated/Navigation.svelte")
 export const cardhorizontal = () => import("./deprecated/CardHorizontal.svelte")

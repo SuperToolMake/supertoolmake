@@ -15,9 +15,8 @@ jest.mock("@budibase/handlebars-helpers/lib/uuid", () => {
   }
 })
 
-import { defaultJSSetup, processString } from "../src/index"
-
 import tk from "timekeeper"
+import { defaultJSSetup, processString } from "../src/index"
 import { getParsedManifest, runJsHelpersTests } from "./utils"
 
 tk.freeze("2021-01-21T12:00:00")
@@ -34,7 +33,7 @@ describe("manifest", () => {
   })
 
   describe("examples are valid", () => {
-    describe.each(Object.keys(manifest))("%s", collection => {
+    describe.each(Object.keys(manifest))("%s", (collection) => {
       it.each(manifest[collection])("%s", async (_, { hbs, js }) => {
         const context: any = {
           double: (i: number) => i * 2,

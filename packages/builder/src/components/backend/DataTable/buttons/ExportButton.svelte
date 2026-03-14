@@ -1,95 +1,89 @@
 <script>
-  import {
-    ActionButton,
-    Select,
-    notifications,
-    Body,
-    Button,
-  } from "@budibase/bbui"
-  import { dataAPI } from "@/stores/builder"
-  import download from "downloadjs"
-  import { ROW_EXPORT_FORMATS } from "@/constants/backend"
-  import DetailPopover from "@/components/common/DetailPopover.svelte"
+import { ActionButton, Body, Button, notifications, Select } from "@budibase/bbui"
+import download from "downloadjs"
+import DetailPopover from "@/components/common/DetailPopover.svelte"
+import { ROW_EXPORT_FORMATS } from "@/constants/backend"
+import { dataAPI } from "@/stores/builder"
 
-  export let view
-  export let sorting
-  export let disabled = false
-  export let selectedRows
-  export let formats
+export let view
+export let sorting
+export let disabled = false
+export let selectedRows
+export let formats
 
-  const FORMATS = [
-    {
-      name: "CSV",
-      key: ROW_EXPORT_FORMATS.CSV,
-    },
-    {
-      name: "JSON",
-      key: ROW_EXPORT_FORMATS.JSON,
-    },
-    {
-      name: "JSON with Schema",
-      key: ROW_EXPORT_FORMATS.JSON_WITH_SCHEMA,
-    },
-  ]
+const FORMATS = [
+  {
+    name: "CSV",
+    key: ROW_EXPORT_FORMATS.CSV,
+  },
+  {
+    name: "JSON",
+    key: ROW_EXPORT_FORMATS.JSON,
+  },
+  {
+    name: "JSON with Schema",
+    key: ROW_EXPORT_FORMATS.JSON_WITH_SCHEMA,
+  },
+]
 
-  let popover
-  let exportFormat
-  let loading = false
+let popover
+let exportFormat
+let loading = false
 
-  $: options = FORMATS.filter(format => {
-    if (formats && !formats.includes(format.key)) {
-      return false
-    }
-    return true
-  })
-  $: if (options && !exportFormat) {
-    exportFormat = Array.isArray(options) ? options[0]?.key : []
+$: options = FORMATS.filter((format) => {
+  if (formats && !formats.includes(format.key)) {
+    return false
   }
+  return true
+})
+$: if (options && !exportFormat) {
+  exportFormat = Array.isArray(options) ? options[0]?.key : []
+}
 
-  const openPopover = () => {
+const openPopover = () => {
+  loading = false
+  popover.show()
+}
+
+function downloadWithBlob(data, filename) {
+  download(new Blob([data], { type: "text/plain" }), filename)
+}
+
+const exportAllData = async () => {
+  return await $dataAPI.exportView(view, exportFormat)
+}
+
+const exportFilteredData = async () => {
+  let payload = {}
+  if (selectedRows?.length) {
+    payload.rows = selectedRows.map((row) => row._id)
+  }
+  if (sorting) {
+    payload.sort = sorting.sortColumn
+    payload.sortOrder = sorting.sortOrder
+  }
+  return await $dataAPI.exportRows(view, exportFormat, payload)
+}
+
+const exportData = async () => {
+  try {
+    loading = true
+    let data
+    if (selectedRows?.length || sorting) {
+      data = await exportFilteredData()
+    } else {
+      data = await exportAllData()
+    }
+    notifications.success("Export successful")
+    downloadWithBlob(data, `export.${exportFormat}`)
+    popover.hide()
+  } catch (error) {
+    console.error(error)
+    notifications.error("Error exporting data")
+  } finally {
     loading = false
-    popover.show()
   }
-
-  function downloadWithBlob(data, filename) {
-    download(new Blob([data], { type: "text/plain" }), filename)
-  }
-
-  const exportAllData = async () => {
-    return await $dataAPI.exportView(view, exportFormat)
-  }
-
-  const exportFilteredData = async () => {
-    let payload = {}
-    if (selectedRows?.length) {
-      payload.rows = selectedRows.map(row => row._id)
-    }
-    if (sorting) {
-      payload.sort = sorting.sortColumn
-      payload.sortOrder = sorting.sortOrder
-    }
-    return await $dataAPI.exportRows(view, exportFormat, payload)
-  }
-
-  const exportData = async () => {
-    try {
-      loading = true
-      let data
-      if (selectedRows?.length || sorting) {
-        data = await exportFilteredData()
-      } else {
-        data = await exportAllData()
-      }
-      notifications.success("Export successful")
-      downloadWithBlob(data, `export.${exportFormat}`)
-      popover.hide()
-    } catch (error) {
-      console.error(error)
-      notifications.error("Error exporting data")
-    } finally {
-      loading = false
-    }
-  }
+}
 </script>
 
 <DetailPopover title="Export data" bind:this={popover}>

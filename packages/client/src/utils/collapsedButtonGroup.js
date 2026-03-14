@@ -1,7 +1,7 @@
 import { getSettingsDefinition } from "@budibase/frontend-core"
+import { componentStore } from "@/stores/components"
 import { enrichProps } from "@/utils/componentProps"
 import { getActiveConditions, reduceConditionActions } from "@/utils/conditions"
-import { componentStore } from "@/stores/components"
 
 let buttonSettingsDefinitionMap
 
@@ -20,8 +20,8 @@ const getButtonSettingsDefinitionMap = () => {
   }
 
   const settingsDefinition = getSettingsDefinition(definition)
-  let map = {}
-  settingsDefinition?.forEach(setting => {
+  const map = {}
+  settingsDefinition?.forEach((setting) => {
     map[setting.key] = setting
   })
 
@@ -29,13 +29,13 @@ const getButtonSettingsDefinitionMap = () => {
   return buttonSettingsDefinitionMap
 }
 
-const evaluateButtonConditions = conditions => {
+const evaluateButtonConditions = (conditions) => {
   if (!conditions?.length) {
     return { visible: true, settingUpdates: {} }
   }
 
   // Keep in line with Component.svelte's condition evaluation behavior.
-  let visible = !conditions.find(condition => condition.action === "show")
+  let visible = !conditions.find((condition) => condition.action === "show")
   const activeConditions = getActiveConditions(conditions)
   const result = reduceConditionActions(activeConditions)
   if (result.visible != null) {
@@ -45,12 +45,7 @@ const evaluateButtonConditions = conditions => {
   return { visible, settingUpdates: result.settingUpdates }
 }
 
-const buildCollapsedButton = (
-  button,
-  context,
-  enrichButtonActions,
-  settingsDefinitionMap
-) => {
+const buildCollapsedButton = (button, context, enrichButtonActions, settingsDefinitionMap) => {
   const rawConditions = button?._conditions || button?.conditions
   // Enrich bindings so dynamic text/actions/conditions resolve in collapsed mode.
   const enriched = enrichProps(
@@ -61,9 +56,7 @@ const buildCollapsedButton = (
     context,
     settingsDefinitionMap
   )
-  const { visible, settingUpdates } = evaluateButtonConditions(
-    enriched._conditions
-  )
+  const { visible, settingUpdates } = evaluateButtonConditions(enriched._conditions)
 
   if (!visible) {
     return null
@@ -89,11 +82,7 @@ const buildCollapsedButton = (
 
 // Collapsed button groups bypass the normal Component pipeline, so we need to
 // enrich bindings and evaluate conditions manually to match standard behavior.
-export const resolveCollapsedButtons = (
-  buttons,
-  context,
-  enrichButtonActions
-) => {
+export const resolveCollapsedButtons = (buttons, context, enrichButtonActions) => {
   if (!buttons?.length) {
     return []
   }
@@ -101,13 +90,8 @@ export const resolveCollapsedButtons = (
   const settingsDefinitionMap = getButtonSettingsDefinitionMap()
 
   return buttons
-    .map(button =>
-      buildCollapsedButton(
-        button,
-        context,
-        enrichButtonActions,
-        settingsDefinitionMap
-      )
+    .map((button) =>
+      buildCollapsedButton(button, context, enrichButtonActions, settingsDefinitionMap)
     )
     .filter(Boolean)
 }

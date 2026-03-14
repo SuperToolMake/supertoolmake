@@ -1,10 +1,10 @@
 import { withEnv } from "../../../environment"
-import { getRequest, getConfig, afterAll as _afterAll } from "./utilities"
+import { afterAll as _afterAll, getConfig, getRequest } from "./utilities"
 import { checkBuilderEndpoint } from "./utilities/TestFunctions"
 
 describe("/api/keys", () => {
-  let request = getRequest()
-  let config = getConfig()
+  const request = getRequest()
+  const config = getConfig()
 
   afterAll(_afterAll)
 

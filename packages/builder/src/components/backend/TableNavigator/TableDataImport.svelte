@@ -1,187 +1,187 @@
 <script>
-  import { Select, Icon, Layout, Label } from "@budibase/bbui"
-  import { FIELDS } from "@/constants/backend"
-  import { utils } from "@budibase/shared-core"
-  import { canBeDisplayColumn } from "@budibase/frontend-core"
-  import { API } from "@/api"
-  import { parseFile } from "./utils"
+import { Icon, Label, Layout, Select } from "@budibase/bbui"
+import { canBeDisplayColumn } from "@budibase/frontend-core"
+import { utils } from "@budibase/shared-core"
+import { API } from "@/api"
+import { FIELDS } from "@/constants/backend"
+import { parseFile } from "./utils"
 
-  export let rows = []
-  export let schema = {}
-  export let allValid = true
-  export let displayColumn = null
-  export let promptUpload = false
+export let rows = []
+export let schema = {}
+export let allValid = true
+export let displayColumn = null
+export let promptUpload = false
 
-  const typeOptions = {
-    [FIELDS.STRING.type]: {
-      label: "Text",
-      value: FIELDS.STRING.type,
-      config: {
-        type: FIELDS.STRING.type,
-        constraints: FIELDS.STRING.constraints,
-      },
+const typeOptions = {
+  [FIELDS.STRING.type]: {
+    label: "Text",
+    value: FIELDS.STRING.type,
+    config: {
+      type: FIELDS.STRING.type,
+      constraints: FIELDS.STRING.constraints,
     },
-    [FIELDS.NUMBER.type]: {
-      label: "Number",
-      value: FIELDS.NUMBER.type,
-      config: {
-        type: FIELDS.NUMBER.type,
-        constraints: FIELDS.NUMBER.constraints,
-      },
+  },
+  [FIELDS.NUMBER.type]: {
+    label: "Number",
+    value: FIELDS.NUMBER.type,
+    config: {
+      type: FIELDS.NUMBER.type,
+      constraints: FIELDS.NUMBER.constraints,
     },
-    [FIELDS.DATETIME.type]: {
-      label: "Date",
-      value: FIELDS.DATETIME.type,
-      config: {
-        type: FIELDS.DATETIME.type,
-        constraints: FIELDS.DATETIME.constraints,
-      },
+  },
+  [FIELDS.DATETIME.type]: {
+    label: "Date",
+    value: FIELDS.DATETIME.type,
+    config: {
+      type: FIELDS.DATETIME.type,
+      constraints: FIELDS.DATETIME.constraints,
     },
-    [FIELDS.OPTIONS.type]: {
-      label: "Single select",
-      value: FIELDS.OPTIONS.type,
-      config: {
-        type: FIELDS.OPTIONS.type,
-        constraints: FIELDS.OPTIONS.constraints,
-      },
+  },
+  [FIELDS.OPTIONS.type]: {
+    label: "Single select",
+    value: FIELDS.OPTIONS.type,
+    config: {
+      type: FIELDS.OPTIONS.type,
+      constraints: FIELDS.OPTIONS.constraints,
     },
-    [FIELDS.ARRAY.type]: {
-      label: "Multi select",
-      value: FIELDS.ARRAY.type,
-      config: {
-        type: FIELDS.ARRAY.type,
-        constraints: FIELDS.ARRAY.constraints,
-      },
+  },
+  [FIELDS.ARRAY.type]: {
+    label: "Multi select",
+    value: FIELDS.ARRAY.type,
+    config: {
+      type: FIELDS.ARRAY.type,
+      constraints: FIELDS.ARRAY.constraints,
     },
-    [FIELDS.BARCODEQR.type]: {
-      label: "Barcode/QR",
-      value: FIELDS.BARCODEQR.type,
-      config: {
-        type: FIELDS.BARCODEQR.type,
-        constraints: FIELDS.BARCODEQR.constraints,
-      },
+  },
+  [FIELDS.BARCODEQR.type]: {
+    label: "Barcode/QR",
+    value: FIELDS.BARCODEQR.type,
+    config: {
+      type: FIELDS.BARCODEQR.type,
+      constraints: FIELDS.BARCODEQR.constraints,
     },
-    [FIELDS.LONGFORM.type]: {
-      label: "Long Form Text",
-      value: FIELDS.LONGFORM.type,
-      config: {
-        type: FIELDS.LONGFORM.type,
-        constraints: FIELDS.LONGFORM.constraints,
-      },
+  },
+  [FIELDS.LONGFORM.type]: {
+    label: "Long Form Text",
+    value: FIELDS.LONGFORM.type,
+    config: {
+      type: FIELDS.LONGFORM.type,
+      constraints: FIELDS.LONGFORM.constraints,
     },
-    user: {
-      label: "User",
-      value: "user",
-      config: {
-        type: FIELDS.USER.type,
-        subtype: FIELDS.USER.subtype,
-        constraints: FIELDS.USER.constraints,
-      },
+  },
+  user: {
+    label: "User",
+    value: "user",
+    config: {
+      type: FIELDS.USER.type,
+      subtype: FIELDS.USER.subtype,
+      constraints: FIELDS.USER.constraints,
     },
-    users: {
-      label: "Users",
-      value: "users",
-      config: {
-        type: FIELDS.USERS.type,
-        subtype: FIELDS.USERS.subtype,
-        constraints: FIELDS.USERS.constraints,
-      },
+  },
+  users: {
+    label: "Users",
+    value: "users",
+    config: {
+      type: FIELDS.USERS.type,
+      subtype: FIELDS.USERS.subtype,
+      constraints: FIELDS.USERS.constraints,
     },
+  },
+}
+
+let fileInput
+let error = null
+let fileName = null
+let loading = false
+let validation = {}
+let validateHash = ""
+let errors = {}
+let selectedColumnTypes = {}
+
+let rawRows = []
+
+$: displayColumnOptions = Object.keys(schema || {}).filter((column) => {
+  return validation[column] && canBeDisplayColumn(schema[column])
+})
+
+$: if (displayColumn && !canBeDisplayColumn(schema[displayColumn])) {
+  displayColumn = null
+}
+
+$: {
+  rows = rawRows.map((row) => utils.trimOtherProps(row, Object.keys(schema)))
+
+  // binding in consumer is causing double renders here
+  const newValidateHash = JSON.stringify(rows) + JSON.stringify(schema)
+  if (newValidateHash !== validateHash) {
+    validate(rows, schema)
   }
+  validateHash = newValidateHash
+}
+$: openFileUpload(promptUpload, fileInput)
 
-  let fileInput
-  let error = null
-  let fileName = null
-  let loading = false
-  let validation = {}
-  let validateHash = ""
-  let errors = {}
-  let selectedColumnTypes = {}
+async function handleFile(e) {
+  loading = true
+  error = null
+  validation = {}
 
-  let rawRows = []
-
-  $: displayColumnOptions = Object.keys(schema || {}).filter(column => {
-    return validation[column] && canBeDisplayColumn(schema[column])
-  })
-
-  $: if (displayColumn && !canBeDisplayColumn(schema[displayColumn])) {
-    displayColumn = null
-  }
-
-  $: {
-    rows = rawRows.map(row => utils.trimOtherProps(row, Object.keys(schema)))
-
-    // binding in consumer is causing double renders here
-    const newValidateHash = JSON.stringify(rows) + JSON.stringify(schema)
-    if (newValidateHash !== validateHash) {
-      validate(rows, schema)
-    }
-    validateHash = newValidateHash
-  }
-  $: openFileUpload(promptUpload, fileInput)
-
-  async function handleFile(e) {
-    loading = true
-    error = null
-    validation = {}
-
-    try {
-      const response = await parseFile(e)
-      rawRows = response.rows
-      schema = response.schema
-      fileName = response.fileName
-      selectedColumnTypes = Object.entries(response.schema).reduce(
-        (acc, [colName, fieldConfig]) => ({
-          ...acc,
-          [colName]: fieldConfig.type,
-        }),
-        {}
-      )
-    } catch (e) {
-      loading = false
-      error = e
-    }
-  }
-
-  async function validate(rows, schema) {
-    loading = true
-    try {
-      if (rows.length > 0) {
-        const response = await API.validateNewTableImport(rows, schema)
-        validation = response.schemaValidation
-        allValid = response.allValid
-        errors = response.errors
-        error = null
-      }
-    } catch (e) {
-      error = e.message
-      validation = {}
-      allValid = false
-      errors = {}
-    }
+  try {
+    const response = await parseFile(e)
+    rawRows = response.rows
+    schema = response.schema
+    fileName = response.fileName
+    selectedColumnTypes = Object.entries(response.schema).reduce(
+      (acc, [colName, fieldConfig]) => ({
+        ...acc,
+        [colName]: fieldConfig.type,
+      }),
+      {}
+    )
+  } catch (e) {
     loading = false
+    error = e
   }
+}
 
-  const handleChange = (name, e) => {
-    const { config } = typeOptions[e.detail]
-    schema[name].type = config.type
-    schema[name].subtype = config.subtype
-    schema[name].constraints = config.constraints
-  }
-
-  const openFileUpload = (promptUpload, fileInput) => {
-    if (promptUpload && fileInput) {
-      fileInput.click()
+async function validate(rows, schema) {
+  loading = true
+  try {
+    if (rows.length > 0) {
+      const response = await API.validateNewTableImport(rows, schema)
+      validation = response.schemaValidation
+      allValid = response.allValid
+      errors = response.errors
+      error = null
     }
+  } catch (e) {
+    error = e.message
+    validation = {}
+    allValid = false
+    errors = {}
   }
+  loading = false
+}
 
-  const deleteColumn = name => {
-    if (loading) {
-      return
-    }
-    delete schema[name]
-    schema = schema
+const handleChange = (name, e) => {
+  const { config } = typeOptions[e.detail]
+  schema[name].type = config.type
+  schema[name].subtype = config.subtype
+  schema[name].constraints = config.constraints
+}
+
+const openFileUpload = (promptUpload, fileInput) => {
+  if (promptUpload && fileInput) {
+    fileInput.click()
   }
+}
+
+const deleteColumn = (name) => {
+  if (loading) {
+    return
+  }
+  delete schema[name]
+  schema = schema
+}
 </script>
 
 <Layout noPadding gap="S">

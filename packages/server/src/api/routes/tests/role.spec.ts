@@ -1,7 +1,7 @@
 import { db as dbCore, roles } from "@budibase/backend-core"
 import { BuiltinPermissionID, PermissionLevel } from "@budibase/types"
+import { type DatabaseName, getDatasource } from "../../../integrations/tests/utils"
 import * as setup from "./utilities"
-import { getDatasource, DatabaseName } from "../../../integrations/tests/utils"
 
 const { basicRole, basicTable } = setup.structures
 const { BUILTIN_ROLE_IDS } = roles
@@ -9,7 +9,7 @@ const { BUILTIN_ROLE_IDS } = roles
 const LOOP_ERROR = "Role inheritance contains a loop, this is not supported"
 
 describe("/roles", () => {
-  let config = setup.getConfig()
+  const config = setup.getConfig()
 
   afterAll(setup.afterAll)
 
@@ -100,17 +100,17 @@ describe("/roles", () => {
     })
 
     it("disallow more complex loops", async () => {
-      let role1 = await config.api.roles.save({
+      const role1 = await config.api.roles.save({
         ...basicRole(),
         name: "role1",
         inherits: [BUILTIN_ROLE_IDS.POWER],
       })
-      let role2 = await config.api.roles.save({
+      const role2 = await config.api.roles.save({
         ...basicRole(),
         name: "role2",
         inherits: [BUILTIN_ROLE_IDS.POWER, role1._id!],
       })
-      let role3 = await config.api.roles.save({
+      const role3 = await config.api.roles.save({
         ...basicRole(),
         name: "role3",
         inherits: [BUILTIN_ROLE_IDS.POWER, role1._id!, role2._id!],
@@ -203,28 +203,25 @@ describe("/roles", () => {
 
       expect(res.length).toBe(5)
 
-      const adminRole = res.find(r => r._id === BUILTIN_ROLE_IDS.ADMIN)
+      const adminRole = res.find((r) => r._id === BUILTIN_ROLE_IDS.ADMIN)
       expect(adminRole).toBeDefined()
       expect(adminRole!.inherits).toEqual(BUILTIN_ROLE_IDS.POWER)
       expect(adminRole!.permissionId).toEqual(BuiltinPermissionID.ADMIN)
 
-      const powerUserRole = res.find(r => r._id === BUILTIN_ROLE_IDS.POWER)
+      const powerUserRole = res.find((r) => r._id === BUILTIN_ROLE_IDS.POWER)
       expect(powerUserRole).toBeDefined()
       expect(powerUserRole!.inherits).toEqual(BUILTIN_ROLE_IDS.BASIC)
       expect(powerUserRole!.permissionId).toEqual(BuiltinPermissionID.POWER)
 
-      const customRoleFetched = res.find(r => r._id === customRole.name)
+      const customRoleFetched = res.find((r) => r._id === customRole.name)
       expect(customRoleFetched).toBeDefined()
       expect(customRoleFetched!.inherits).toEqual(BUILTIN_ROLE_IDS.BASIC)
       expect(customRoleFetched!.permissionId).toEqual(BuiltinPermissionID.WRITE)
     })
 
     it("should be able to get the role with a permission added", async () => {
-      const ds =
-        process.env.DATASOURCE === "none" ? "postgres" : process.env.DATASOURCE
-      const rawDatasource = await getDatasource(
-        (ds as DatabaseName) || "postgres"
-      )
+      const ds = process.env.DATASOURCE === "none" ? "postgres" : process.env.DATASOURCE
+      const rawDatasource = await getDatasource((ds as DatabaseName) || "postgres")
       const datasource = await config.api.datasource.create(rawDatasource!)
       const table = await config.api.table.save(basicTable(datasource))
       await config.api.permission.add({
@@ -234,7 +231,7 @@ describe("/roles", () => {
       })
       const res = await config.api.roles.fetch()
       expect(res.length).toBeGreaterThan(0)
-      const power = res.find(role => role._id === BUILTIN_ROLE_IDS.POWER)
+      const power = res.find((role) => role._id === BUILTIN_ROLE_IDS.POWER)
       expect(power?.permissions[table._id!]).toEqual(["read"])
     })
   })
@@ -324,15 +321,12 @@ describe("/roles", () => {
         permissionId: BuiltinPermissionID.READ_ONLY,
         version: "name",
       })
-      await config.withHeaders(
-        { "x-budibase-role": customRoleName },
-        async () => {
-          const res = await config.api.roles.accessible({
-            status: 200,
-          })
-          expect(res).toEqual([customRoleName, "BASIC", "PUBLIC"])
-        }
-      )
+      await config.withHeaders({ "x-budibase-role": customRoleName }, async () => {
+        const res = await config.api.roles.accessible({
+          status: 200,
+        })
+        expect(res).toEqual([customRoleName, "BASIC", "PUBLIC"])
+      })
     })
 
     it("should fetch preview role correctly even without basic specified", async () => {

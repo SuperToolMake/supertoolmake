@@ -1,5 +1,5 @@
 import { context, db as dbCore, roles } from "@budibase/backend-core"
-import { ContextUser, SelfResponse, UserCtx } from "@budibase/types"
+import type { ContextUser, SelfResponse, UserCtx } from "@budibase/types"
 import { InternalTables } from "../../db/utils"
 import sdk from "../../sdk"
 import { processUser } from "../../utilities/global"
@@ -18,7 +18,7 @@ const addSessionAttributesToUser = (ctx: any) => {
 }
 
 export async function fetchSelf(ctx: UserCtx<void, SelfResponse>) {
-  let userId = ctx.user.userId || ctx.user._id
+  const userId = ctx.user.userId || ctx.user._id
   /* istanbul ignore next */
   if (!userId || !ctx.isAuthenticated) {
     ctx.body = {}

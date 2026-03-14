@@ -1,9 +1,9 @@
-import { DBTestConfiguration } from "../../../tests/extra"
-import { structures } from "../../../tests"
-import { Writethrough } from "../writethrough"
-import { getDB } from "../../db"
-import { Document } from "@budibase/types"
+import type { Document } from "@budibase/types"
 import tk from "timekeeper"
+import { structures } from "../../../tests"
+import { DBTestConfiguration } from "../../../tests/extra"
+import { getDB } from "../../db"
+import { Writethrough } from "../writethrough"
 
 tk.freeze(Date.now())
 
@@ -74,9 +74,9 @@ describe("writethrough", () => {
         ])
 
         // with a lock, this will work
-        const newRev = responses.map(x => x.rev).find(x => x !== current._rev)
+        const newRev = responses.map((x) => x.rev).find((x) => x !== current._rev)
         expect(newRev).toBeDefined()
-        expect(responses.map(x => x.rev)).toEqual(
+        expect(responses.map((x) => x.rev)).toEqual(
           expect.arrayContaining([current._rev, current._rev, newRev])
         )
 

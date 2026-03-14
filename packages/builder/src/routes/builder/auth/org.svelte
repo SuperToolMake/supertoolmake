@@ -1,50 +1,42 @@
 <script>
-  import {
-    Body,
-    Button,
-    Divider,
-    Heading,
-    Input,
-    Layout,
-    notifications,
-  } from "@budibase/bbui"
-  import { goto } from "@roxi/routify"
-  import { auth, admin } from "@/stores/portal"
-  import Logo from "assets/supertoolmake-emblem.svg"
-  import { get } from "svelte/store"
-  import { onMount } from "svelte"
+import { Body, Button, Divider, Heading, Input, Layout, notifications } from "@budibase/bbui"
+import { goto } from "@roxi/routify"
+import Logo from "assets/supertoolmake-emblem.svg"
+import { onMount } from "svelte"
+import { get } from "svelte/store"
+import { admin, auth } from "@/stores/portal"
 
-  $goto
+$goto
 
-  let tenantId = get(auth).tenantSet ? get(auth).tenantId : ""
-  $: multiTenancyEnabled = $admin.multiTenancy
+let tenantId = get(auth).tenantSet ? get(auth).tenantId : ""
+$: multiTenancyEnabled = $admin.multiTenancy
 
-  async function setOrg() {
-    try {
-      if (tenantId == null || tenantId === "") {
-        tenantId = "default"
-      }
-      await auth.setOrg(tenantId)
-      // re-init now org selected
-      await admin.init()
-      $goto("../")
-    } catch (error) {
-      notifications.error("Error setting organisation")
+async function setOrg() {
+  try {
+    if (tenantId == null || tenantId === "") {
+      tenantId = "default"
     }
+    await auth.setOrg(tenantId)
+    // re-init now org selected
+    await admin.init()
+    $goto("../")
+  } catch (error) {
+    notifications.error("Error setting organisation")
   }
+}
 
-  function handleKeydown(evt) {
-    if (evt.key === "Enter") setOrg()
+function handleKeydown(evt) {
+  if (evt.key === "Enter") setOrg()
+}
+
+onMount(async () => {
+  await auth.checkQueryString()
+  if (!multiTenancyEnabled) {
+    $goto("../")
+  } else {
+    admin.unload()
   }
-
-  onMount(async () => {
-    await auth.checkQueryString()
-    if (!multiTenancyEnabled) {
-      $goto("../")
-    } else {
-      admin.unload()
-    }
-  })
+})
 </script>
 
 <svelte:window on:keydown={handleKeydown} />

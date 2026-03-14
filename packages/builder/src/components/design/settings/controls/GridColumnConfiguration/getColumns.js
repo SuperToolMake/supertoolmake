@@ -1,10 +1,10 @@
-export const modernize = columns => {
+export const modernize = (columns) => {
   if (!columns) {
     return []
   }
   // If the first element has no active key then it's safe to assume all elements are in the old format
   if (columns?.[0] && columns[0].active === undefined) {
-    return columns.map(column => ({
+    return columns.map((column) => ({
       label: column.displayName,
       field: column.name,
       active: true,
@@ -15,19 +15,17 @@ export const modernize = columns => {
 }
 
 export const removeInvalidAddMissing = (columns = [], defaultColumns = []) => {
-  const defaultColumnNames = defaultColumns.map(column => column.field)
-  const columnNames = columns.map(column => column.field)
+  const defaultColumnNames = defaultColumns.map((column) => column.field)
+  const columnNames = columns.map((column) => column.field)
 
-  const validColumns = columns.filter(column =>
-    defaultColumnNames.includes(column.field)
-  )
+  const validColumns = columns.filter((column) => defaultColumnNames.includes(column.field))
   let missingColumns = defaultColumns.filter(
-    defaultColumn => !columnNames.includes(defaultColumn.field)
+    (defaultColumn) => !columnNames.includes(defaultColumn.field)
   )
 
   // If the user already has fields selected, any appended missing fields should be disabled by default
   if (validColumns.length) {
-    missingColumns = missingColumns.map(field => ({ ...field, active: false }))
+    missingColumns = missingColumns.map((field) => ({ ...field, active: false }))
   }
 
   const combinedColumns = [...validColumns, ...missingColumns]
@@ -37,8 +35,8 @@ export const removeInvalidAddMissing = (columns = [], defaultColumns = []) => {
 
 export const getDefault = (schema = {}) => {
   const defaultValues = Object.values(schema)
-    .filter(column => !column.nestedJSON)
-    .map(column => ({
+    .filter((column) => !column.nestedJSON)
+    .map((column) => ({
       label: column.displayName || column.name,
       field: column.name,
       active: column.visible ?? true,
@@ -50,8 +48,8 @@ export const getDefault = (schema = {}) => {
   return defaultValues
 }
 
-const toGridFormat = draggableListColumns => {
-  return draggableListColumns.map(entry => ({
+const toGridFormat = (draggableListColumns) => {
+  return draggableListColumns.map((entry) => ({
     label: entry.label,
     field: entry.field,
     active: entry.active,
@@ -62,7 +60,7 @@ const toGridFormat = draggableListColumns => {
 }
 
 const toDraggableListFormat = (gridFormatColumns, createComponent, schema) => {
-  return gridFormatColumns.map(column => {
+  return gridFormatColumns.map((column) => {
     return createComponent(
       "@budibase/standard-components/labelfield",
       {
@@ -93,26 +91,22 @@ export const getColumns = ({
     getDefault(schema),
     primaryDisplayColumnName
   )
-  const draggableList = toDraggableListFormat(
-    validatedColumns,
-    createComponent,
-    schema
-  )
+  const draggableList = toDraggableListFormat(validatedColumns, createComponent, schema)
   const primary = draggableList
-    .filter(entry => entry.field === primaryDisplayColumnName)
-    .map(instance => ({ ...instance, schema }))[0]
+    .filter((entry) => entry.field === primaryDisplayColumnName)
+    .map((instance) => ({ ...instance, schema }))[0]
   const sortable = draggableList
-    .filter(entry => entry.field !== primaryDisplayColumnName)
-    .map(instance => ({ ...instance, schema }))
+    .filter((entry) => entry.field !== primaryDisplayColumnName)
+    .map((instance) => ({ ...instance, schema }))
 
   return {
     primary,
     sortable,
-    updateSortable: newDraggableList => {
+    updateSortable: (newDraggableList) => {
       onChange(toGridFormat(newDraggableList.concat(primary || [])))
     },
-    update: newEntry => {
-      const newDraggableList = draggableList.map(entry => {
+    update: (newEntry) => {
+      const newDraggableList = draggableList.map((entry) => {
         return newEntry.field === entry.field ? newEntry : entry
       })
 

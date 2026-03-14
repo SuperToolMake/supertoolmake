@@ -1,12 +1,12 @@
 <script context="module" lang="ts">
-  interface JSONViewerClickContext {
-    label: string | undefined
-    value: any
-    path: (string | number)[]
-  }
-  export interface JSONViewerClickEvent {
-    detail: JSONViewerClickContext
-  }
+interface JSONViewerClickContext {
+  label: string | undefined
+  value: any
+  path: (string | number)[]
+}
+export interface JSONViewerClickEvent {
+  detail: JSONViewerClickContext
+}
 </script>
 
 <script lang="ts">

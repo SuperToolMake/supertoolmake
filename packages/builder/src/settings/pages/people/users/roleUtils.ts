@@ -6,11 +6,7 @@ export const getRoleFlags = (role: string, currentUser?: User) => {
   if (role === Constants.BudibaseRoles.Developer) {
     return { admin: { global: false }, builder: { global: true } }
   }
-  if (
-    [Constants.BudibaseRoles.Admin, Constants.BudibaseRoles.Owner].includes(
-      role
-    )
-  ) {
+  if ([Constants.BudibaseRoles.Admin, Constants.BudibaseRoles.Owner].includes(role)) {
     return { admin: { global: true }, builder: { global: true } }
   }
   if (role === Constants.BudibaseRoles.Creator) {

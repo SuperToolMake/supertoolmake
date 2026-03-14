@@ -1,14 +1,14 @@
 <script lang="ts">
-  import "@spectrum-css/pagination/dist/index-vars.css"
-  import "@spectrum-css/actionbutton/dist/index-vars.css"
-  import "@spectrum-css/typography/dist/index-vars.css"
-  import Icon from "../Icon/Icon.svelte"
+import "@spectrum-css/pagination/dist/index-vars.css"
+import "@spectrum-css/actionbutton/dist/index-vars.css"
+import "@spectrum-css/typography/dist/index-vars.css"
+import Icon from "../Icon/Icon.svelte"
 
-  export let page: number
-  export let goToPrevPage: () => void
-  export let goToNextPage: () => void
-  export let hasPrevPage: boolean = true
-  export let hasNextPage: boolean = true
+export let page: number
+export let goToPrevPage: () => void
+export let goToNextPage: () => void
+export let hasPrevPage: boolean = true
+export let hasNextPage: boolean = true
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

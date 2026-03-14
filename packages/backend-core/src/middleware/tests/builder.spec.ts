@@ -1,4 +1,4 @@
-import { ServiceType, User } from "@budibase/types"
+import { ServiceType, type User } from "@budibase/types"
 import { structures } from "../../../tests"
 import { Header } from "../../constants"
 import env from "../../environment"
@@ -29,11 +29,7 @@ function buildUserCtx(user: User) {
   return ctx
 }
 
-async function doInWorkspaceContext(
-  ctx: any,
-  workspaceId: string,
-  fnc: () => Promise<void>
-) {
+async function doInWorkspaceContext(ctx: any, workspaceId: string, fnc: () => Promise<void>) {
   ctx.request.headers[Header.APP_ID] = workspaceId
   try {
     await fnc()

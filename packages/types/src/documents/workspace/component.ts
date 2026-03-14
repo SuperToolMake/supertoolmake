@@ -1,6 +1,6 @@
-import { Document } from "../document"
-import { ArrayOperator, BasicOperator } from "../../sdk"
-import { FieldType } from "./row"
+import type { ArrayOperator, BasicOperator } from "../../sdk"
+import type { Document } from "../document"
+import type { FieldType } from "./row"
 
 export interface Component extends Document {
   _instanceName: string

@@ -1,4 +1,4 @@
-import { Component, Query, Screen, Table } from "@budibase/types"
+import type { Component, Query, Screen, Table } from "@budibase/types"
 
 function heading(text: string): Component {
   return {
@@ -16,10 +16,7 @@ function heading(text: string): Component {
   }
 }
 
-export function createTableScreen(
-  datasourceName: string,
-  table: Table
-): Screen {
+export function createTableScreen(datasourceName: string, table: Table): Screen {
   return {
     props: {
       _id: "cad0a0904cacd4678a2ac094e293db1a5",

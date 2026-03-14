@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { DrawerBindableInput } from "@/components/common/bindings"
+import { DrawerBindableInput } from "@/components/common/bindings"
 </script>
 
 <DrawerBindableInput

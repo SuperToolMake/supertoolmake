@@ -1,8 +1,8 @@
-import { Operation } from "./datasources"
-import { Row, DocumentType, Table, Datasource } from "../documents"
-import { SortOrder, SortType } from "../api"
-import { Knex } from "knex"
+import type { Knex } from "knex"
 import isPlainObject from "lodash/isPlainObject"
+import type { SortOrder, SortType } from "../api"
+import type { Datasource, DocumentType, Row, Table } from "../documents"
+import type { Operation } from "./datasources"
 
 export enum BasicOperator {
   EQUAL = "equal",
@@ -29,9 +29,7 @@ export enum LogicalOperator {
   OR = "$or",
 }
 
-export function isLogicalSearchOperator(
-  value: string
-): value is LogicalOperator {
+export function isLogicalSearchOperator(value: string): value is LogicalOperator {
   return Object.values(LogicalOperator).includes(value as LogicalOperator)
 }
 
@@ -47,11 +45,7 @@ export function isRangeSearchOperator(value: string): value is RangeOperator {
   return Object.values(RangeOperator).includes(value as RangeOperator)
 }
 
-export type SearchFilterOperator =
-  | BasicOperator
-  | ArrayOperator
-  | RangeOperator
-  | LogicalOperator
+export type SearchFilterOperator = BasicOperator | ArrayOperator | RangeOperator | LogicalOperator
 
 export enum InternalSearchFilterOperator {
   COMPLEX_ID_OPERATOR = "_complexIdOperator",

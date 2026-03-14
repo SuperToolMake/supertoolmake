@@ -1,66 +1,66 @@
-import ClientApp from "./components/ClientApp.svelte"
-import UpdatingApp from "./components/UpdatingApp.svelte"
-import {
-  authStore,
-  builderStore,
-  appStore,
-  blockStore,
-  componentStore,
-  environmentStore,
-  dndStore,
-  eventStore,
-  hoverStore,
-  stateStore,
-  routeStore,
-  notificationStore,
-} from "@/stores"
+import type { APIClient } from "@budibase/frontend-core"
+import type {
+  AppCustomTheme,
+  AppNavigation,
+  DataFetchDatasource,
+  PreviewDevice,
+  Screen,
+  Snippet,
+  Table,
+  Theme,
+  UIComponentError,
+} from "@budibase/types"
 import { mount } from "svelte"
 import { get } from "svelte/store"
-import { initWebsocket } from "@/websocket"
+import type { ActionTypes } from "@/constants"
 import {
-  Screen,
-  Theme,
-  AppCustomTheme,
-  PreviewDevice,
-  AppNavigation,
-  Snippet,
-  UIComponentError,
-  Table,
-  DataFetchDatasource,
-} from "@budibase/types"
-import { ActionTypes } from "@/constants"
-import { APIClient } from "@budibase/frontend-core"
-import BlockComponent from "./components/BlockComponent.svelte"
-import Block from "./components/Block.svelte"
+  appStore,
+  type authStore,
+  blockStore,
+  builderStore,
+  componentStore,
+  dndStore,
+  environmentStore,
+  eventStore,
+  hoverStore,
+  type notificationStore,
+  routeStore,
+  stateStore,
+} from "@/stores"
+import { initWebsocket } from "@/websocket"
+import type Block from "./components/Block.svelte"
+import type BlockComponent from "./components/BlockComponent.svelte"
+import ClientApp from "./components/ClientApp.svelte"
+import UpdatingApp from "./components/UpdatingApp.svelte"
 
 // Set up global PWA install prompt handler
 if (typeof window !== "undefined") {
-  window.addEventListener("beforeinstallprompt", e => {
+  window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault()
     window.deferredPwaPrompt = e
   })
 }
 
 import * as svelte from "svelte"
-import * as svelteStore from "svelte/store"
-// @ts-ignore
-import * as svelteLegacyStore from "svelte-legacy/store"
-// @ts-ignore
+// @ts-expect-error
 import * as svelteInternal from "svelte/internal/client"
-// @ts-ignore
+import * as svelteStore from "svelte/store"
+// @ts-expect-error
 import * as svelteLegacyInternal from "svelte-legacy/internal"
+// @ts-expect-error
+import * as svelteLegacyStore from "svelte-legacy/store"
 
 window.svelte = svelte
-// @ts-ignore - augmenting the window at runtime
+// @ts-expect-error - augmenting the window at runtime
 window.svelteLegacyInternal = svelteLegacyInternal
 // Provide the legacy global names that Svelte 4 bundles hardcode
-// @ts-ignore - augmenting the window at runtime
+// @ts-expect-error - augmenting the window at runtime
 window.svelte_internal = svelteLegacyInternal
-// @ts-ignore - augmenting the window at runtime
+// @ts-expect-error - augmenting the window at runtime
 window.svelte_store = svelteLegacyStore
-// @ts-ignore - augmenting the window at runtime
+// @ts-expect-error - augmenting the window at runtime
 window.svelteStore = svelteStore
-// @ts-ignore - augmenting the window at runtime
+// @ts-expect-error - augmenting the window at runtime
 window.svelteInternal = svelteInternal
 
 // Extend global window scope
@@ -141,9 +141,7 @@ const loadBudibase = async () => {
   appStore.actions.setAppId(window["##BUDIBASE_APP_ID##"])
 
   // Set the flag used to determine if the app is being loaded via an iframe
-  appStore.actions.setAppEmbedded(
-    window["##BUDIBASE_APP_EMBEDDED##"] === "true"
-  )
+  appStore.actions.setAppEmbedded(window["##BUDIBASE_APP_EMBEDDED##"] === "true")
 
   if (window.MIGRATING_APP) {
     if (!app) {
@@ -177,8 +175,7 @@ const loadBudibase = async () => {
         dndStore.actions.reset()
       }
     } else if (type === "request-context") {
-      const { selectedComponentInstance, screenslotInstance } =
-        get(componentStore)
+      const { selectedComponentInstance, screenslotInstance } = get(componentStore)
       const instance = selectedComponentInstance || screenslotInstance
       const context = instance?.getDataContext()
       let stringifiedContext = null

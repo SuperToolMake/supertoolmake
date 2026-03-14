@@ -1,189 +1,177 @@
 <script lang="ts">
-  import {
-    type PopoverAPI,
-    Popover,
-    PopoverAlignment,
-    Input,
-    Button,
-    Select,
-    Helpers,
-    CoreCheckboxGroup,
-    CoreRadioGroup,
-    DatePicker,
-    DateRangePicker,
-  } from "@budibase/bbui"
-  import {
-    FilterValueType,
-    OperatorOptions,
-  } from "@budibase/frontend-core/src/constants"
-  import {
-    type FieldSchema,
-    type FilterConfig,
-    type TableSchema,
-    type SearchFilter,
-    ArrayOperator,
-    BasicOperator,
-    FieldType,
-  } from "@budibase/types"
-  import { createEventDispatcher } from "svelte"
-  import BbReferenceField from "../forms/BBReferenceField.svelte"
-  import { type Writable } from "svelte/store"
-  import { getContext } from "svelte"
-  import { isArrayOperator } from "@/utils/filtering"
-  import dayjs from "dayjs"
-  import utc from "dayjs/plugin/utc"
+import {
+  Button,
+  CoreCheckboxGroup,
+  CoreRadioGroup,
+  DatePicker,
+  DateRangePicker,
+  Helpers,
+  Input,
+  Popover,
+  PopoverAlignment,
+  type PopoverAPI,
+  Select,
+} from "@budibase/bbui"
+import { FilterValueType, OperatorOptions } from "@budibase/frontend-core/src/constants"
+import {
+  ArrayOperator,
+  BasicOperator,
+  type FieldSchema,
+  FieldType,
+  type FilterConfig,
+  type SearchFilter,
+  type TableSchema,
+} from "@budibase/types"
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
+import { createEventDispatcher, getContext } from "svelte"
+import type { Writable } from "svelte/store"
+import { isArrayOperator } from "@/utils/filtering"
+import BbReferenceField from "../forms/BBReferenceField.svelte"
 
-  dayjs.extend(utc)
+dayjs.extend(utc)
 
-  export const show = () => popover?.show()
-  export const hide = () => popover?.hide()
+export const show = () => popover?.show()
+export const hide = () => popover?.hide()
 
-  export let align: PopoverAlignment = PopoverAlignment.Left
-  export let showPopover: boolean = true
-  export let filter: SearchFilter | undefined = undefined
-  export let schema: TableSchema | null = null
-  export let buttonText: string | undefined = undefined
-  export let config: FilterConfig | undefined = undefined
-  export let defaultOperator: string | undefined = undefined
-  export let operators:
-    | {
-        value: string
-        label: string
-      }[]
-    | undefined = undefined
+export let align: PopoverAlignment = PopoverAlignment.Left
+export let showPopover: boolean = true
+export let filter: SearchFilter | undefined = undefined
+export let schema: TableSchema | null = null
+export let buttonText: string | undefined = undefined
+export let config: FilterConfig | undefined = undefined
+export let defaultOperator: string | undefined = undefined
+export let operators:
+  | {
+      value: string
+      label: string
+    }[]
+  | undefined = undefined
 
-  const dispatch = createEventDispatcher()
-  const rowCache: Writable<Record<string, any>> = getContext("rows")
+const dispatch = createEventDispatcher()
+const rowCache: Writable<Record<string, any>> = getContext("rows")
 
-  let popover: PopoverAPI | undefined
-  let anchor: HTMLElement | undefined
-  let open: boolean = false
+let popover: PopoverAPI | undefined
+let anchor: HTMLElement | undefined
+let open: boolean = false
 
-  // Date/time
-  let enableTime: boolean
-  let timeOnly: boolean
-  let ignoreTimezones: boolean
+// Date/time
+let enableTime: boolean
+let timeOnly: boolean
+let ignoreTimezones: boolean
 
-  // Change on update
-  $: editableFilter = getDefaultFilter(filter, schema, config)
-  $: fieldSchema = config ? schema?.[config?.field] : undefined
-  $: options = getOptions(fieldSchema)
+// Change on update
+$: editableFilter = getDefaultFilter(filter, schema, config)
+$: fieldSchema = config ? schema?.[config?.field] : undefined
+$: options = getOptions(fieldSchema)
 
-  $: if (fieldSchema?.type === FieldType.DATETIME) {
-    enableTime = !fieldSchema?.dateOnly
-    timeOnly = !!fieldSchema?.timeOnly
-    ignoreTimezones = !!fieldSchema?.ignoreTimezones
+$: if (fieldSchema?.type === FieldType.DATETIME) {
+  enableTime = !fieldSchema?.dateOnly
+  timeOnly = !!fieldSchema?.timeOnly
+  ignoreTimezones = !!fieldSchema?.ignoreTimezones
+}
+
+const parseDateRange = (range: { high: string; low: string } | undefined): string[] | undefined => {
+  if (!range) {
+    return
+  }
+  const values = [range.low, range.high]
+  if (values.filter((value) => value).length === 2) {
+    return values
+  }
+}
+
+const sanitizeOperator = (filter: SearchFilter | undefined): SearchFilter | undefined => {
+  if (!filter) return
+  const clone = Helpers.cloneDeep(filter)
+  const isOperatorArray = isArrayOperator(filter.operator)
+
+  // Ensure the correct filter value types when switching between operators.
+  // Accommodates the user picker which always returns an array.
+  // Also ensures that strings using 'oneOf' operator are left as strings
+  if (
+    isOperatorArray &&
+    typeof filter.value === "string" &&
+    ![FieldType.STRING, FieldType.NUMBER].includes(filter.type!)
+  ) {
+    clone.value = [filter.value]
+  } else if (isOperatorArray && !filter?.value?.length) {
+    delete clone.value
+  } else if (!isOperatorArray && Array.isArray(filter.value)) {
+    clone.value = filter.value[0]
   }
 
-  const parseDateRange = (
-    range: { high: string; low: string } | undefined
-  ): string[] | undefined => {
-    if (!range) {
-      return
-    }
-    const values = [range.low, range.high]
-    if (values.filter(value => value).length === 2) {
-      return values
-    }
+  // Update the noValue flag if the operator does not take a value
+  const noValueOptions = [OperatorOptions.Empty.value, OperatorOptions.NotEmpty.value]
+  clone.noValue = noValueOptions.includes(clone.operator)
+
+  // Clear out the value when the operator is unset or the value
+  if (!clone?.operator) {
+    delete clone.value
   }
 
-  const sanitizeOperator = (
-    filter: SearchFilter | undefined
-  ): SearchFilter | undefined => {
-    if (!filter) return
-    const clone = Helpers.cloneDeep(filter)
-    const isOperatorArray = isArrayOperator(filter.operator)
+  return clone
+}
 
-    // Ensure the correct filter value types when switching between operators.
-    // Accommodates the user picker which always returns an array.
-    // Also ensures that strings using 'oneOf' operator are left as strings
-    if (
-      isOperatorArray &&
-      typeof filter.value === "string" &&
-      ![FieldType.STRING, FieldType.NUMBER].includes(filter.type!)
-    ) {
-      clone.value = [filter.value]
-    } else if (isOperatorArray && !filter?.value?.length) {
-      delete clone.value
-    } else if (!isOperatorArray && Array.isArray(filter.value)) {
-      clone.value = filter.value[0]
-    }
+const getOptions = (schema: FieldSchema | undefined) => {
+  if (!schema) return []
+  const constraints = fieldSchema?.constraints
+  const opts = constraints?.inclusion ?? []
+  return opts
+}
 
-    // Update the noValue flag if the operator does not take a value
-    const noValueOptions = [
-      OperatorOptions.Empty.value,
-      OperatorOptions.NotEmpty.value,
-    ]
-    clone.noValue = noValueOptions.includes(clone.operator)
-
-    // Clear out the value when the operator is unset or the value
-    if (!clone?.operator) {
-      delete clone.value
-    }
-
-    return clone
+const getDefaultFilter = (
+  filter: SearchFilter | undefined,
+  schema: TableSchema | null,
+  config: FilterConfig | undefined
+) => {
+  if (filter) {
+    return Helpers.cloneDeep(filter)
+  } else if (!schema || !config) {
+    return
   }
+  const schemaField = schema[config.field]
+  const defaultValue = schemaField?.type === FieldType.BOOLEAN ? "true" : undefined
 
-  const getOptions = (schema: FieldSchema | undefined) => {
-    if (!schema) return []
-    const constraints = fieldSchema?.constraints
-    const opts = constraints?.inclusion ?? []
-    return opts
+  const defaultFilter: SearchFilter = {
+    valueType: FilterValueType.VALUE,
+    field: config.field,
+    type: schemaField?.type,
+    operator: BasicOperator.EMPTY,
+    value: defaultValue,
   }
+  const findOperator = (value?: string) =>
+    value && operators?.find((op) => op.value === value)?.value
+  const operatorFallback = operators?.[0]?.value
+  const configuredOperator = findOperator(config?.defaultOperator)
+  const componentOperator = findOperator(defaultOperator)
 
-  const getDefaultFilter = (
-    filter: SearchFilter | undefined,
-    schema: TableSchema | null,
-    config: FilterConfig | undefined
-  ) => {
-    if (filter) {
-      return Helpers.cloneDeep(filter)
-    } else if (!schema || !config) {
-      return
-    }
-    const schemaField = schema[config.field]
-    const defaultValue =
-      schemaField?.type === FieldType.BOOLEAN ? "true" : undefined
+  return {
+    ...defaultFilter,
+    operator: configuredOperator ?? componentOperator ?? operatorFallback,
+  } as SearchFilter
+}
 
-    const defaultFilter: SearchFilter = {
-      valueType: FilterValueType.VALUE,
-      field: config.field,
-      type: schemaField?.type,
-      operator: BasicOperator.EMPTY,
-      value: defaultValue,
-    }
-    const findOperator = (value?: string) =>
-      value && operators?.find(op => op.value === value)?.value
-    const operatorFallback = operators?.[0]?.value
-    const configuredOperator = findOperator(config?.defaultOperator)
-    const componentOperator = findOperator(defaultOperator)
+const changeUser = (update: { value: string[] }) => {
+  if (!update || !editableFilter) return
 
-    return {
-      ...defaultFilter,
-      operator: configuredOperator ?? componentOperator ?? operatorFallback,
-    } as SearchFilter
-  }
+  editableFilter = sanitizeOperator({
+    ...editableFilter,
+    value: update.value,
+  })
+}
 
-  const changeUser = (update: { value: string[] }) => {
-    if (!update || !editableFilter) return
+const cacheUserRows = (e: CustomEvent) => {
+  const retrieved = e.detail.reduce((acc: any, ele: any) => {
+    acc[ele._id] = ele
+    return acc
+  }, {})
 
-    editableFilter = sanitizeOperator({
-      ...editableFilter,
-      value: update.value,
-    })
-  }
-
-  const cacheUserRows = (e: CustomEvent) => {
-    const retrieved = e.detail.reduce((acc: any, ele: any) => {
-      acc[ele._id] = ele
-      return acc
-    }, {})
-
-    rowCache.update(state => ({
-      ...state,
-      ...retrieved,
-    }))
-  }
+  rowCache.update((state) => ({
+    ...state,
+    ...retrieved,
+  }))
+}
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

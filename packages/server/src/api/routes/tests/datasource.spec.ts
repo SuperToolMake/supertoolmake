@@ -1,26 +1,25 @@
 import { context } from "@budibase/backend-core"
-import sdk from "../../../sdk"
-import { getCachedVariable } from "../../../threads/utils"
-import * as setup from "./utilities"
-import { allowUndefined, checkBuilderEndpoint } from "./utilities/TestFunctions"
-
 import { generator } from "@budibase/backend-core/tests"
 import {
   BBReferenceFieldSubType,
-  Datasource,
-  FieldSchema,
+  type Datasource,
+  type FieldSchema,
   FieldType,
   JsonFieldSubType,
   RelationshipType,
   SourceName,
-  SupportedSqlTypes,
-  Table,
-  TableSchema,
+  type SupportedSqlTypes,
+  type Table,
+  type TableSchema,
 } from "@budibase/types"
-import { Knex } from "knex"
+import type { Knex } from "knex"
 import nock from "nock"
 import { datasourceDescribe } from "../../../integrations/tests/utils"
+import sdk from "../../../sdk"
 import { tableForDatasource } from "../../../tests/utilities/structures"
+import { getCachedVariable } from "../../../threads/utils"
+import * as setup from "./utilities"
+import { allowUndefined, checkBuilderEndpoint } from "./utilities/TestFunctions"
 
 describe("/datasources", () => {
   const config = setup.getConfig()
@@ -234,9 +233,7 @@ if (descriptions.length) {
         const ds = await config.api.datasource.get(datasource._id!)
         expect(ds.config!.password).toBe("--secret-value--")
 
-        await config.api.datasource.update(
-          await config.api.datasource.get(datasource._id!)
-        )
+        await config.api.datasource.update(await config.api.datasource.get(datasource._id!))
 
         const newPassword = await context.doInWorkspaceContext(
           config.getDevWorkspaceId(),
@@ -280,9 +277,7 @@ if (descriptions.length) {
 
         await config.api.datasource.delete(datasource2)
         const datasources = await config.api.datasource.fetch()
-        expect(datasources).not.toContainEqual(
-          expect.objectContaining(datasource2)
-        )
+        expect(datasources).not.toContainEqual(expect.objectContaining(datasource2))
       })
     })
 
@@ -421,7 +416,7 @@ if (descriptions.length) {
             .fill(0)
             .map((_, i) => i.toString())
             .toSorted()
-          await client.schema.createTable("options", table => {
+          await client.schema.createTable("options", (table) => {
             table.increments("id").primary()
             table.enum("enum", enumOptions, {
               useNative: true,
@@ -435,9 +430,7 @@ if (descriptions.length) {
           expect(resp.errors).toEqual({})
 
           const table = resp.datasource.entities!.options
-          expect(table.schema.enum.constraints!.inclusion!.toSorted()).toEqual(
-            enumOptions
-          )
+          expect(table.schema.enum.constraints!.inclusion!.toSorted()).toEqual(enumOptions)
 
           await client.schema.dropTable("options")
           if (datasource.source === "POSTGRES") {
@@ -447,13 +440,8 @@ if (descriptions.length) {
 
       !isMSSQL &&
         it("can fetch options with commas in them", async () => {
-          const enumOptions = [
-            "Lincoln, Abraham",
-            "Washington, George",
-            "Fred",
-            "Bob",
-          ].toSorted()
-          await client.schema.createTable("options", table => {
+          const enumOptions = ["Lincoln, Abraham", "Washington, George", "Fred", "Bob"].toSorted()
+          await client.schema.createTable("options", (table) => {
             table.increments("id").primary()
             table.enum("enum", enumOptions, {
               useNative: true,
@@ -467,9 +455,7 @@ if (descriptions.length) {
           expect(resp.errors).toEqual({})
 
           const table = resp.datasource.entities!.options
-          expect(table.schema.enum.constraints!.inclusion!.toSorted()).toEqual(
-            enumOptions
-          )
+          expect(table.schema.enum.constraints!.inclusion!.toSorted()).toEqual(enumOptions)
 
           await client.schema.dropTable("options")
           if (datasource.source === "POSTGRES") {
@@ -479,16 +465,9 @@ if (descriptions.length) {
 
       !isMSSQL &&
         it("can fetch options that may include other type names", async () => {
-          const enumOptions = [
-            "int",
-            "bigint",
-            "float",
-            "numeric",
-            "json",
-            "map",
-          ].toSorted()
+          const enumOptions = ["int", "bigint", "float", "numeric", "json", "map"].toSorted()
 
-          await client.schema.createTable("options", table => {
+          await client.schema.createTable("options", (table) => {
             table.increments("id").primary()
             table.enum("enum", enumOptions, {
               useNative: true,
@@ -503,9 +482,7 @@ if (descriptions.length) {
           expect(resp.errors).toEqual({})
 
           const table = resp.datasource.entities!.options
-          expect(table.schema.enum.constraints!.inclusion!.toSorted()).toEqual(
-            enumOptions
-          )
+          expect(table.schema.enum.constraints!.inclusion!.toSorted()).toEqual(enumOptions)
 
           await client.schema.dropTable("options")
           if (datasource.source === "POSTGRES") {
@@ -551,36 +528,25 @@ if (descriptions.length) {
 
     describe("info", () => {
       it("should fetch information about a datasource with a single table", async () => {
-        const existingTableNames = (
-          await config.api.datasource.info(datasource)
-        ).tableNames
+        const existingTableNames = (await config.api.datasource.info(datasource)).tableNames
 
         const tableName = generator.guid()
-        await client.schema.createTable(tableName, table => {
+        await client.schema.createTable(tableName, (table) => {
           table.increments("id").primary()
           table.string("name")
         })
 
         const info = await config.api.datasource.info(datasource)
-        expect(info.tableNames).toEqual(
-          expect.arrayContaining([tableName, ...existingTableNames])
-        )
+        expect(info.tableNames).toEqual(expect.arrayContaining([tableName, ...existingTableNames]))
         expect(info.tableNames).toHaveLength(existingTableNames.length + 1)
       })
 
       it("should fetch information about a datasource with multiple tables", async () => {
-        const existingTableNames = (
-          await config.api.datasource.info(datasource)
-        ).tableNames
+        const existingTableNames = (await config.api.datasource.info(datasource)).tableNames
 
-        const tableNames = [
-          generator.guid(),
-          generator.guid(),
-          generator.guid(),
-          generator.guid(),
-        ]
+        const tableNames = [generator.guid(), generator.guid(), generator.guid(), generator.guid()]
         for (const tableName of tableNames) {
-          await client.schema.createTable(tableName, table => {
+          await client.schema.createTable(tableName, (table) => {
             table.increments("id").primary()
             table.string("name")
           })
@@ -590,9 +556,7 @@ if (descriptions.length) {
         expect(info.tableNames).toEqual(
           expect.arrayContaining([...tableNames, ...existingTableNames])
         )
-        expect(info.tableNames).toHaveLength(
-          existingTableNames.length + tableNames.length
-        )
+        expect(info.tableNames).toHaveLength(existingTableNames.length + tableNames.length)
       })
     })
   })

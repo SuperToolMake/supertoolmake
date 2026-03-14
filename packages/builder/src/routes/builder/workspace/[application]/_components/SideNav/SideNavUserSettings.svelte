@@ -1,30 +1,30 @@
 <script lang="ts">
-  import { UserAvatar } from "@budibase/frontend-core"
-  import { auth } from "@/stores/portal"
-  import SideNavLink from "./SideNavLink.svelte"
-  import UserDropdown from "@/routes/builder/_components/UserDropdown.svelte"
-  import { PopoverAlignment } from "@budibase/bbui"
-  import { type User } from "@budibase/types"
+import { PopoverAlignment } from "@budibase/bbui"
+import { UserAvatar } from "@budibase/frontend-core"
+import type { User } from "@budibase/types"
+import UserDropdown from "@/routes/builder/_components/UserDropdown.svelte"
+import { auth } from "@/stores/portal"
+import SideNavLink from "./SideNavLink.svelte"
 
-  export let collapsed = false
+export let collapsed = false
 
-  $: user = $auth.user
-  $: name = getName(user)
+$: user = $auth.user
+$: name = getName(user)
 
-  const getName = (user?: User) => {
-    if (!user) {
-      return ""
-    }
-    if (user.firstName) {
-      if (user.lastName) {
-        return `${user.firstName} ${user.lastName}`
-      } else {
-        return `${user.firstName}`
-      }
-    } else {
-      return user.email
-    }
+const getName = (user?: User) => {
+  if (!user) {
+    return ""
   }
+  if (user.firstName) {
+    if (user.lastName) {
+      return `${user.firstName} ${user.lastName}`
+    } else {
+      return `${user.firstName}`
+    }
+  } else {
+    return user.email
+  }
+}
 </script>
 
 {#if user}

@@ -1,12 +1,12 @@
-import { Screen } from "../Screen"
-import { Component } from "../../Component"
-import { capitalise } from "@/helpers"
-import { makePropSafe as safe } from "@budibase/string-templates"
-import getValidRoute from "../getValidRoute"
 import { Helpers } from "@budibase/bbui"
+import { makePropSafe as safe } from "@budibase/string-templates"
+import type { Screen as ScreenDoc, UIPermissions } from "@budibase/types"
+import { capitalise } from "@/helpers"
+import type { SourceOption } from "@/routes/builder/workspace/[application]/design/_components/NewScreen/utils"
 import { getRowActionButtonTemplates } from "@/templates/rowActions"
-import { SourceOption } from "@/routes/builder/workspace/[application]/design/_components/NewScreen/utils"
-import { UIPermissions, Screen as ScreenDoc } from "@budibase/types"
+import { Component } from "../../Component"
+import getValidRoute from "../getValidRoute"
+import { Screen } from "../Screen"
 
 const getTableScreenTemplate = ({
   route,
@@ -176,10 +176,7 @@ const getUpdateScreenTemplate = async ({
       ],
     })
 
-  let updateFormBlock = new Component(
-    "@budibase/standard-components/formblock",
-    formBlockId
-  )
+  let updateFormBlock = new Component("@budibase/standard-components/formblock", formBlockId)
     .instanceName("Update row form block")
     .customProps({
       dataSource: tableOrView.tableSelectFormat,
@@ -190,7 +187,7 @@ const getUpdateScreenTemplate = async ({
     })
 
   // Generate button config including row actions
-  let baseButtons = [saveButton.json(), deleteButton.json()]
+  const baseButtons = [saveButton.json(), deleteButton.json()]
   const rowActionButtons = await getRowActionButtonTemplates({
     instance: updateFormBlock.json(),
   })
@@ -259,10 +256,7 @@ const getCreateScreenTemplate = ({
       ],
     })
 
-  const createFormBlock = new Component(
-    "@budibase/standard-components/formblock",
-    formBlockId
-  )
+  const createFormBlock = new Component("@budibase/standard-components/formblock", formBlockId)
     .instanceName("Create row form block")
     .customProps({
       dataSource: tableOrView.tableSelectFormat,

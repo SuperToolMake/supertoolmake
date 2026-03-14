@@ -1,7 +1,7 @@
 <script lang="ts">
-  export let name
-  export let value: unknown | undefined = undefined
-  export let truncate = false
+export let name
+export let value: unknown | undefined = undefined
+export let truncate = false
 </script>
 
 <div class:truncate class="property">

@@ -1,16 +1,7 @@
-import {
-  PROTECTED_EXTERNAL_COLUMNS,
-  PROTECTED_INTERNAL_COLUMNS,
-} from "@budibase/shared-core"
+import type { PROTECTED_EXTERNAL_COLUMNS, PROTECTED_INTERNAL_COLUMNS } from "@budibase/shared-core"
 
-export function expectFunctionWasCalledTimesWith(
-  jestFunction: any,
-  times: number,
-  argument: any
-) {
-  expect(
-    jestFunction.mock.calls.filter((call: any) => call[0] === argument).length
-  ).toBe(times)
+export function expectFunctionWasCalledTimesWith(jestFunction: any, times: number, argument: any) {
+  expect(jestFunction.mock.calls.filter((call: any) => call[0] === argument).length).toBe(times)
 }
 
 export const expectAnyInternalColsAttributes: {

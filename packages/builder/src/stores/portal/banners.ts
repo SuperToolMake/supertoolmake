@@ -1,6 +1,6 @@
-import { BannerType } from "@/constants/banners"
+import { derived, type Readable } from "svelte/store"
+import type { BannerType } from "@/constants/banners"
 import { BudiStore } from "../BudiStore"
-import { derived, Readable } from "svelte/store"
 
 interface BannerState {
   closedBanners: Set<BannerType>
@@ -20,7 +20,7 @@ export class BannerStore extends BudiStore<BannerState> {
       closedBanners,
     })
 
-    this.store.subscribe($store => {
+    this.store.subscribe(($store) => {
       localStorage.setItem(
         BannerStore.STORAGE_KEY_PREFIX,
         JSON.stringify([...$store.closedBanners])
@@ -29,13 +29,13 @@ export class BannerStore extends BudiStore<BannerState> {
   }
 
   shouldDisplayBanner(type: BannerType): Readable<boolean> {
-    return derived(this.store, $state => {
+    return derived(this.store, ($state) => {
       return !$state.closedBanners.has(type)
     })
   }
 
   closeBanner(type: BannerType) {
-    this.store.update(state => {
+    this.store.update((state) => {
       state.closedBanners.add(type)
       return state
     })

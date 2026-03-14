@@ -1,10 +1,4 @@
-import {
-  cache,
-  context,
-  db as dbCore,
-  csv,
-  HTTPError,
-} from "@budibase/backend-core"
+import { cache, context, csv, db as dbCore, HTTPError } from "@budibase/backend-core"
 import {
   canBeDisplayColumn,
   helpers,
@@ -12,41 +6,37 @@ import {
   PROTECTED_INTERNAL_COLUMNS,
 } from "@budibase/shared-core"
 import {
-  BulkImportRequest,
-  BulkImportResponse,
-  CsvToJsonRequest,
-  CsvToJsonResponse,
-  DeleteTableResponse,
-  EventType,
-  FetchTablesResponse,
-  FieldType,
-  FindTableResponse,
-  MigrateTableRequest,
-  MigrateTableResponse,
-  PublishTableRequest,
-  PublishTableResponse,
+  type BulkImportRequest,
+  type BulkImportResponse,
+  type CsvToJsonRequest,
+  type CsvToJsonResponse,
+  type DeleteTableResponse,
   DocumentType,
+  EventType,
+  type FetchTablesResponse,
+  FieldType,
+  type FindTableResponse,
+  type MigrateTableRequest,
+  type MigrateTableResponse,
+  type PublishTableRequest,
+  type PublishTableResponse,
+  type SaveTableRequest,
+  type SaveTableResponse,
   SEPARATOR,
-  SaveTableRequest,
-  SaveTableResponse,
-  Table,
+  type Table,
   TableSourceType,
-  UserCtx,
-  ValidateNewTableImportRequest,
-  ValidateTableImportRequest,
-  ValidateTableImportResponse,
+  type UserCtx,
+  type ValidateNewTableImportRequest,
+  type ValidateTableImportRequest,
+  type ValidateTableImportResponse,
 } from "@budibase/types"
 import { cloneDeep } from "lodash"
 import { isExternalTable, isSQL } from "../../../integrations/utils"
 import sdk from "../../../sdk"
 import { processTable } from "../../../sdk/workspace/tables/getters"
-import { publishWorkspaceInternal } from "../deploy"
-import {
-  isRows,
-  isSchema,
-  validate as validateSchema,
-} from "../../../utilities/schema"
+import { isRows, isSchema, validate as validateSchema } from "../../../utilities/schema"
 import { builderSocket } from "../../../websockets"
+import { publishWorkspaceInternal } from "../deploy"
 import * as external from "./external"
 
 function checkDefaultFields(table: Table) {
@@ -55,10 +45,7 @@ function checkDefaultFields(table: Table) {
       continue
     }
     if (helpers.schema.isRequired(field.constraints)) {
-      throw new HTTPError(
-        `Cannot make field "${key}" required, it has a default value.`,
-        400
-      )
+      throw new HTTPError(`Cannot make field "${key}" required, it has a default value.`, 400)
     }
   }
 }
@@ -66,20 +53,13 @@ function checkDefaultFields(table: Table) {
 async function guardTable(table: Table, isCreate: boolean) {
   checkDefaultFields(table)
 
-  if (
-    table.primaryDisplay &&
-    !canBeDisplayColumn(table.schema[table.primaryDisplay]?.type)
-  ) {
+  if (table.primaryDisplay && !canBeDisplayColumn(table.schema[table.primaryDisplay]?.type)) {
     // Prevent throwing errors from existing badly configured tables. Only throw for new tables or if this setting is being updated
     if (
       isCreate ||
-      (await sdk.tables.getTable(table._id!)).primaryDisplay !==
-        table.primaryDisplay
+      (await sdk.tables.getTable(table._id!)).primaryDisplay !== table.primaryDisplay
     ) {
-      throw new HTTPError(
-        `Column "${table.primaryDisplay}" cannot be used as a display type.`,
-        400
-      )
+      throw new HTTPError(`Column "${table.primaryDisplay}" cannot be used as a display type.`, 400)
     }
   }
 }
@@ -92,7 +72,7 @@ export async function fetch(ctx: UserCtx<void, FetchTablesResponse>) {
 
   const external: Table[] = []
   for (const datasource of datasources) {
-    let entities = datasource.entities
+    const entities = datasource.entities
     if (entities) {
       for (const entity of Object.values(entities)) {
         external.push({
@@ -156,9 +136,7 @@ export async function destroy(ctx: UserCtx<void, DeleteTableResponse>) {
   builderSocket?.emitTableDeletion(ctx, deletedTable)
 }
 
-export async function bulkImport(
-  ctx: UserCtx<BulkImportRequest, BulkImportResponse>
-) {
+export async function bulkImport(ctx: UserCtx<BulkImportRequest, BulkImportResponse>) {
   await external.bulkImport(ctx)
 
   // right now we don't trigger anything for bulk import because it
@@ -168,9 +146,7 @@ export async function bulkImport(
   ctx.body = { message: `Bulk rows created.` }
 }
 
-export async function csvToJson(
-  ctx: UserCtx<CsvToJsonRequest, CsvToJsonResponse>
-) {
+export async function csvToJson(ctx: UserCtx<CsvToJsonRequest, CsvToJsonResponse>) {
   const { csvString } = ctx.request.body
 
   const result = await csv.jsonFromCsvString(csvString)
@@ -207,7 +183,7 @@ export async function validateExistingTableImport(
         name: "_id",
         type: FieldType.STRING,
       }
-      protectedColumnNames = PROTECTED_INTERNAL_COLUMNS.filter(x => x !== "_id")
+      protectedColumnNames = PROTECTED_INTERNAL_COLUMNS.filter((x) => x !== "_id")
     } else {
       protectedColumnNames = PROTECTED_EXTERNAL_COLUMNS
     }
@@ -223,15 +199,13 @@ export async function validateExistingTableImport(
   }
 }
 
-export async function migrate(
-  ctx: UserCtx<MigrateTableRequest, MigrateTableResponse>
-) {
+export async function migrate(ctx: UserCtx<MigrateTableRequest, MigrateTableResponse>) {
   const { oldColumn, newColumn } = ctx.request.body
-  let tableId = ctx.params.tableId as string
+  const tableId = ctx.params.tableId as string
   const table = await sdk.tables.getTable(tableId)
-  let result = await sdk.tables.migrate(table, oldColumn, newColumn)
+  const result = await sdk.tables.migrate(table, oldColumn, newColumn)
 
-  for (let table of result.tablesUpdated) {
+  for (const table of result.tablesUpdated) {
     builderSocket?.emitTableUpdate(ctx, table, {
       includeOriginator: true,
     })
@@ -257,9 +231,7 @@ export async function duplicate(ctx: UserCtx<void, SaveTableResponse>) {
   builderSocket?.emitTableUpdate(ctx, cloneDeep(processedTable))
 }
 
-export async function publish(
-  ctx: UserCtx<PublishTableRequest, PublishTableResponse>
-) {
+export async function publish(ctx: UserCtx<PublishTableRequest, PublishTableResponse>) {
   const tableId = ctx.params.tableId as string
   const table = await sdk.tables.getTable(tableId)
 
@@ -268,16 +240,12 @@ export async function publish(
   }
 
   if (isExternalTable(table)) {
-    ctx.throw(
-      400,
-      "Publishing production data is only supported for internal tables"
-    )
+    ctx.throw(400, "Publishing production data is only supported for internal tables")
   }
 
   const appId = context.getWorkspaceId()!
   const prodWorkspaceId = dbCore.getProdWorkspaceID(appId)
-  const prodPublished =
-    await sdk.workspaces.isWorkspacePublished(prodWorkspaceId)
+  const prodPublished = await sdk.workspaces.isWorkspacePublished(prodWorkspaceId)
 
   if (!prodPublished) {
     await publishWorkspaceInternal(ctx)
@@ -285,9 +253,7 @@ export async function publish(
 
   const tableSegment = `${SEPARATOR}${tableId}${SEPARATOR}`
   const matchesTable = (_id: string) =>
-    _id === tableId ||
-    _id.endsWith(`${SEPARATOR}${tableId}`) ||
-    _id.includes(tableSegment)
+    _id === tableId || _id.endsWith(`${SEPARATOR}${tableId}`) || _id.includes(tableSegment)
 
   const replication = new dbCore.Replication({
     source: dbCore.getDevWorkspaceID(appId),
@@ -322,10 +288,7 @@ export async function publish(
   })
 
   if (!metadata?._id) {
-    ctx.throw(
-      400,
-      "Production workspace metadata missing. Please publish the workspace first."
-    )
+    ctx.throw(400, "Production workspace metadata missing. Please publish the workspace first.")
   }
 
   metadata.resourcesPublishedAt = {

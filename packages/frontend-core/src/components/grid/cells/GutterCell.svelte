@@ -1,49 +1,49 @@
 <script>
-  import { GutterWidth } from "../lib/constants"
-  import { getContext, createEventDispatcher } from "svelte"
-  import { Checkbox, Icon } from "@budibase/bbui"
-  import GridCell from "./GridCell.svelte"
+import { Checkbox, Icon } from "@budibase/bbui"
+import { createEventDispatcher, getContext } from "svelte"
+import { GutterWidth } from "../lib/constants"
+import GridCell from "./GridCell.svelte"
 
-  export let row
-  export let rowFocused = false
-  export let rowHovered = false
-  export let rowSelected = false
-  export let expandable = false
-  export let disableNumber = false
-  export let defaultHeight = false
-  export let disabled = false
+export let row
+export let rowFocused = false
+export let rowHovered = false
+export let rowSelected = false
+export let expandable = false
+export let disableNumber = false
+export let defaultHeight = false
+export let disabled = false
 
-  const { config, dispatch, selectedRows } = getContext("grid")
-  const svelteDispatch = createEventDispatcher()
+const { config, dispatch, selectedRows } = getContext("grid")
+const svelteDispatch = createEventDispatcher()
 
-  const select = e => {
-    e.stopPropagation()
-    svelteDispatch("select")
-    const id = row?._id
-    if (id) {
-      // Bulk select with shift
-      if (e.shiftKey) {
-        // Prevent default if already selected, to prevent checkbox clearing
-        if (rowSelected) {
-          e.preventDefault()
-        } else {
-          selectedRows.actions.bulkSelectRows(id)
-        }
+const select = (e) => {
+  e.stopPropagation()
+  svelteDispatch("select")
+  const id = row?._id
+  if (id) {
+    // Bulk select with shift
+    if (e.shiftKey) {
+      // Prevent default if already selected, to prevent checkbox clearing
+      if (rowSelected) {
+        e.preventDefault()
       } else {
-        selectedRows.actions.toggleRow(id)
+        selectedRows.actions.bulkSelectRows(id)
       }
+    } else {
+      selectedRows.actions.toggleRow(id)
     }
   }
+}
 
-  const bulkDelete = e => {
-    e.stopPropagation()
-    dispatch("request-bulk-delete")
-  }
+const bulkDelete = (e) => {
+  e.stopPropagation()
+  dispatch("request-bulk-delete")
+}
 
-  const expand = e => {
-    e.stopPropagation()
-    svelteDispatch("expand")
-  }
+const expand = (e) => {
+  e.stopPropagation()
+  svelteDispatch("expand")
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

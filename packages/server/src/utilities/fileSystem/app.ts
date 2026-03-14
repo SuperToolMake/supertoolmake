@@ -34,16 +34,14 @@ export const getComponentLibraryManifest = async (library: string) => {
       join(TOP_LEVEL_PATH, "packages/client", filename),
       join(process.cwd(), "client", filename),
     ]
-    for (let path of paths) {
+    for (const path of paths) {
       if (fs.existsSync(path)) {
         // always load from new so that updates are refreshed
         delete require.cache[require.resolve(path)]
         return require(path)
       }
     }
-    throw new Error(
-      `Unable to find ${filename} in development environment (may need to build).`
-    )
+    throw new Error(`Unable to find ${filename} in development environment (may need to build).`)
   }
 
   if (!appId) {
@@ -57,10 +55,7 @@ export const getComponentLibraryManifest = async (library: string) => {
     path = join(appId, filename)
     resp = await objectStore.retrieve(ObjectStoreBuckets.APPS, path)
   } catch (error) {
-    console.error(
-      `component-manifest-objectstore=failed appId=${appId} path=${path}`,
-      error
-    )
+    console.error(`component-manifest-objectstore=failed appId=${appId} path=${path}`, error)
     // Fallback to loading it from the old location for old apps
     path = join(appId, "node_modules", library, "package", filename)
     resp = await objectStore.retrieve(ObjectStoreBuckets.APPS, path)
@@ -75,7 +70,7 @@ export const getComponentLibraryManifest = async (library: string) => {
  * Given a set of app IDs makes sure file system is cleared of any of their temp info.
  */
 export const cleanup = (appIds: string[]) => {
-  for (let appId of appIds) {
+  for (const appId of appIds) {
     const path = join(budibaseTempDir(), appId)
     if (fs.existsSync(path)) {
       fs.rmdirSync(path, { recursive: true })

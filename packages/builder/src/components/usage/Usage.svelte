@@ -1,32 +1,32 @@
 <script>
-  import { Body, ProgressBar, Heading, Icon } from "@budibase/bbui"
-  import { onMount } from "svelte"
+import { Body, Heading, Icon, ProgressBar } from "@budibase/bbui"
+import { onMount } from "svelte"
 
-  export let usage
-  export let warnWhenFull = false
+export let usage
+export let warnWhenFull = false
 
-  let percentage
-  let unlimited = false
-  let showWarning = false
+let percentage
+let unlimited = false
+let showWarning = false
 
-  const isUnlimited = () => {
-    if (usage.total === -1) {
-      return true
-    }
-    return false
+const isUnlimited = () => {
+  if (usage.total === -1) {
+    return true
   }
+  return false
+}
 
-  const getPercentage = () => {
-    return (usage.used / usage.total) * 100
+const getPercentage = () => {
+  return (usage.used / usage.total) * 100
+}
+
+onMount(() => {
+  unlimited = isUnlimited()
+  percentage = getPercentage()
+  if (warnWhenFull && percentage >= 100) {
+    showWarning = true
   }
-
-  onMount(() => {
-    unlimited = isUnlimited()
-    percentage = getPercentage()
-    if (warnWhenFull && percentage >= 100) {
-      showWarning = true
-    }
-  })
+})
 </script>
 
 <div class="usage">

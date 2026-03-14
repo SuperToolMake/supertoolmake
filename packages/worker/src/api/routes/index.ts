@@ -16,7 +16,7 @@ import "./system/status"
 import "./system/tenants"
 
 const endpointGroupsRouter = new Router()
-for (let endpoint of endpointGroupList.listAllEndpoints()) {
+for (const endpoint of endpointGroupList.listAllEndpoints()) {
   endpoint.apply(endpointGroupsRouter)
 }
 

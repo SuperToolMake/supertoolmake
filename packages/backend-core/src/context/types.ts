@@ -1,4 +1,4 @@
-import { IdentityContext, Snippet, Table, VM } from "@budibase/types"
+import type { IdentityContext, Snippet, Table, VM } from "@budibase/types"
 
 export type ContextMap = {
   tenantId?: string

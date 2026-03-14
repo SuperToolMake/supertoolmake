@@ -1,5 +1,5 @@
-import { Row, RowSearch } from "./types"
-import { RequiredKeys } from "@budibase/types"
+import type { RequiredKeys } from "@budibase/types"
+import type { Row, RowSearch } from "./types"
 
 function row(body: any): RequiredKeys<Row> {
   delete body._rev

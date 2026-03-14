@@ -1,8 +1,8 @@
-import { Document } from "@budibase/types"
+import type { Document } from "@budibase/types"
 import * as jsonpatch from "fast-json-patch"
-import { writable, derived, get, Readable } from "svelte/store"
+import { derived, get, type Readable, writable } from "svelte/store"
 
-export const enum Operations {
+export enum Operations {
   Add = "Add",
   Delete = "Delete",
   Change = "Change",
@@ -35,12 +35,8 @@ export interface HistoryStore<T extends Document>
       canRedo: boolean
     }
   > {
-  wrapSaveDoc: (
-    fn: (doc: T) => Promise<T>
-  ) => (doc: T, operationId?: number) => Promise<T>
-  wrapDeleteDoc: (
-    fn: (doc: T) => Promise<void>
-  ) => (doc: T, operationId?: number) => Promise<void>
+  wrapSaveDoc: (fn: (doc: T) => Promise<T>) => (doc: T, operationId?: number) => Promise<T>
+  wrapDeleteDoc: (fn: (doc: T) => Promise<void>) => (doc: T, operationId?: number) => Promise<void>
 
   reset: () => void
   undo: () => Promise<void>
@@ -60,7 +56,7 @@ export const createHistoryStore = <T extends Document>({
 }): HistoryStore<T> => {
   // Use a derived store to check if we are able to undo or redo any operations
   const store = writable<HistoryState<T>>(initialState)
-  const derivedStore = derived(store, $store => {
+  const derivedStore = derived(store, ($store) => {
     return {
       ...$store,
       canUndo: $store.position > 0,
@@ -77,7 +73,7 @@ export const createHistoryStore = <T extends Document>({
    * Internal util to set the loading flag
    */
   const startLoading = () => {
-    store.update(state => {
+    store.update((state) => {
       state.loading = true
       return state
     })
@@ -87,7 +83,7 @@ export const createHistoryStore = <T extends Document>({
    * Internal util to unset the loading flag
    */
   const stopLoading = () => {
-    store.update(state => {
+    store.update((state) => {
       state.loading = false
       return state
     })
@@ -106,7 +102,7 @@ export const createHistoryStore = <T extends Document>({
    * @param operation the operation to save
    */
   const saveOperation = (operation: Operator<T>) => {
-    store.update(state => {
+    store.update((state) => {
       // Update history
       let history = state.history
       let position = state.position
@@ -118,7 +114,7 @@ export const createHistoryStore = <T extends Document>({
       } else {
         // If this is a redo/undo of an existing operation, just update history
         // to replace the doc object as revisions may have changed
-        const idx = history.findIndex(op => op.id === operation.id)
+        const idx = history.findIndex((op) => op.id === operation.id)
         history[idx].doc = operation.doc
       }
       return { history, position }
@@ -228,7 +224,7 @@ export const createHistoryStore = <T extends Document>({
 
     // Update state immediately to prevent further clicks and to prevent bad
     // history in the event of an update failing
-    store.update(state => {
+    store.update((state) => {
       return {
         ...state,
         position: state.position - 1,
@@ -249,7 +245,7 @@ export const createHistoryStore = <T extends Document>({
       else if (operation.type === Operations.Delete) {
         // Delete the _rev from the deleted doc so that we can save it as a new
         // doc again without conflicts
-        let doc = jsonpatch.deepClone(operation.doc)
+        const doc = jsonpatch.deepClone(operation.doc)
         delete doc._rev
         const created = await saveFn(doc, operation.id)
         selectDoc?.(created?._id || doc._id)
@@ -258,12 +254,9 @@ export const createHistoryStore = <T extends Document>({
       // Undo CHANGE
       else {
         // Get the current doc and apply the backwards patch on top of it
-        let doc = jsonpatch.deepClone(getDoc(operation.doc._id!))
+        const doc = jsonpatch.deepClone(getDoc(operation.doc._id!))
         if (doc) {
-          jsonpatch.applyPatch(
-            doc,
-            jsonpatch.deepClone(operation.backwardsPatch)
-          )
+          jsonpatch.applyPatch(doc, jsonpatch.deepClone(operation.backwardsPatch))
           await saveFn(doc, operation.id)
           selectDoc?.(doc._id)
         }
@@ -300,7 +293,7 @@ export const createHistoryStore = <T extends Document>({
 
     // Update state immediately to prevent further clicks and to prevent bad
     // history in the event of an update failing
-    store.update(state => {
+    store.update((state) => {
       return {
         ...state,
         position: state.position + 1,
@@ -313,7 +306,7 @@ export const createHistoryStore = <T extends Document>({
       if (operation.type === Operations.Add) {
         // Delete the _rev from the deleted doc so that we can save it as a new
         // doc again without conflicts
-        let doc = jsonpatch.deepClone(operation.doc)
+        const doc = jsonpatch.deepClone(operation.doc)
         delete doc._rev
         const created = await saveFn(doc, operation.id)
         selectDoc?.(created?._id || doc._id)
@@ -330,7 +323,7 @@ export const createHistoryStore = <T extends Document>({
       // Redo CHANGE
       else {
         // Get the current doc and apply the forwards patch on top of it
-        let doc = jsonpatch.deepClone(getDoc(operation.doc._id!))
+        const doc = jsonpatch.deepClone(getDoc(operation.doc._id!))
         if (doc) {
           jsonpatch.applyPatch(doc, jsonpatch.deepClone(operation.forwardPatch))
           await saveFn(doc, operation.id)

@@ -1,11 +1,11 @@
-import {
+import type {
   CreateRowActionRequest,
   RowActionPermissionsResponse,
   RowActionResponse,
   RowActionsResponse,
   RowActionTriggerRequest,
 } from "@budibase/types"
-import { Expectations, TestAPI } from "./base"
+import { type Expectations, TestAPI } from "./base"
 
 export class RowActionAPI extends TestAPI {
   save = async (
@@ -14,17 +14,14 @@ export class RowActionAPI extends TestAPI {
     expectations?: Expectations,
     config?: { publicUser?: boolean }
   ) => {
-    return await this._post<RowActionResponse>(
-      `/api/tables/${tableId}/actions`,
-      {
-        body: rowAction,
-        expectations: {
-          status: 201,
-          ...expectations,
-        },
-        ...config,
-      }
-    )
+    return await this._post<RowActionResponse>(`/api/tables/${tableId}/actions`, {
+      body: rowAction,
+      expectations: {
+        status: 201,
+        ...expectations,
+      },
+      ...config,
+    })
   }
 
   find = async (
@@ -32,13 +29,10 @@ export class RowActionAPI extends TestAPI {
     expectations?: Expectations,
     config?: { publicUser?: boolean }
   ) => {
-    return await this._get<RowActionsResponse>(
-      `/api/tables/${tableId}/actions`,
-      {
-        expectations,
-        ...config,
-      }
-    )
+    return await this._get<RowActionsResponse>(`/api/tables/${tableId}/actions`, {
+      expectations,
+      ...config,
+    })
   }
 
   delete = async (
@@ -47,13 +41,10 @@ export class RowActionAPI extends TestAPI {
     expectations?: Expectations,
     config?: { publicUser?: boolean }
   ) => {
-    return await this._delete<RowActionResponse>(
-      `/api/tables/${tableId}/actions/${rowActionId}`,
-      {
-        expectations,
-        ...config,
-      }
-    )
+    return await this._delete<RowActionResponse>(`/api/tables/${tableId}/actions/${rowActionId}`, {
+      expectations,
+      ...config,
+    })
   }
 
   setTablePermission = async (

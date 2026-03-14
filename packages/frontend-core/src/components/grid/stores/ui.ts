@@ -1,14 +1,9 @@
-import { writable, get, derived, Writable, Readable } from "svelte/store"
+import type { Row } from "@budibase/types"
 import { tick } from "svelte"
-import {
-  DefaultRowHeight,
-  LargeRowHeight,
-  MediumRowHeight,
-  NewRowID,
-} from "../lib/constants"
+import { derived, get, type Readable, type Writable, writable } from "svelte/store"
+import { DefaultRowHeight, LargeRowHeight, MediumRowHeight, NewRowID } from "../lib/constants"
 import { getCellID, parseCellID } from "../lib/utils"
-import { Store as StoreContext } from "."
-import { Row } from "@budibase/types"
+import type { Store as StoreContext } from "."
 
 export interface UIStore {
   focusedCellId: Writable<string | null>
@@ -110,27 +105,24 @@ export const deriveStores = (context: StoreContext): UIDerivedStore => {
   } = context
 
   // Derive the current focused row ID
-  const focusedRowId = derived(focusedCellId, $focusedCellId => {
+  const focusedRowId = derived(focusedCellId, ($focusedCellId) => {
     return parseCellID($focusedCellId).rowId ?? null
   })
 
   // Derive the row that contains the selected cell
-  const focusedRow = derived(
-    [focusedRowId, rowLookupMap],
-    ([$focusedRowId, $rowLookupMap]) => {
-      if ($focusedRowId === null) {
-        return
-      }
-
-      if ($focusedRowId === NewRowID) {
-        return { _id: NewRowID }
-      }
-      return $rowLookupMap[$focusedRowId]
+  const focusedRow = derived([focusedRowId, rowLookupMap], ([$focusedRowId, $rowLookupMap]) => {
+    if ($focusedRowId === null) {
+      return
     }
-  )
+
+    if ($focusedRowId === NewRowID) {
+      return { _id: NewRowID }
+    }
+    return $rowLookupMap[$focusedRowId]
+  })
 
   // Derive the amount of content lines to show in cells depending on row height
-  const contentLines = derived(rowHeight, $rowHeight => {
+  const contentLines = derived(rowHeight, ($rowHeight) => {
     if ($rowHeight >= LargeRowHeight) {
       return 3
     } else if ($rowHeight >= MediumRowHeight) {
@@ -140,17 +132,17 @@ export const deriveStores = (context: StoreContext): UIDerivedStore => {
   })
 
   // Derive whether we should use the compact UI, depending on width
-  const compact = derived(width, $width => {
+  const compact = derived(width, ($width) => {
     return $width < 600
   })
 
   // Derive we have any selected rows or not
-  const selectedRowCount = derived(selectedRows, $selectedRows => {
+  const selectedRowCount = derived(selectedRows, ($selectedRows) => {
     return Object.keys($selectedRows).length
   })
 
   // Derive whether or not we're actively selecting cells
-  const isSelectingCells = derived(cellSelection, $cellSelection => {
+  const isSelectingCells = derived(cellSelection, ($cellSelection) => {
     return $cellSelection.active
   })
 
@@ -191,10 +183,10 @@ export const deriveStores = (context: StoreContext): UIDerivedStore => {
       const upperColIndex = Math.max(sourceColIndex, targetColIndex)
 
       // Build 2 dimensional array of all cells inside these bounds
-      let cells = []
+      const cells = []
       let rowId, colName
       for (let rowIdx = lowerRowIndex; rowIdx <= upperRowIndex; rowIdx++) {
-        let rowCells = []
+        const rowCells = []
         for (let colIdx = lowerColIndex; colIdx <= upperColIndex; colIdx++) {
           rowId = $rows[rowIdx]._id
           colName = $visibleColumns[colIdx].name
@@ -207,10 +199,10 @@ export const deriveStores = (context: StoreContext): UIDerivedStore => {
   )
 
   // Derive a quick lookup map of the selected cells
-  const selectedCellMap = derived(selectedCells, $selectedCells => {
-    let map: Record<string, boolean> = {}
-    for (let row of $selectedCells) {
-      for (let cell of row) {
+  const selectedCellMap = derived(selectedCells, ($selectedCells) => {
+    const map: Record<string, boolean> = {}
+    for (const row of $selectedCells) {
+      for (const cell of row) {
         map[cell] = true
       }
     }
@@ -218,7 +210,7 @@ export const deriveStores = (context: StoreContext): UIDerivedStore => {
   })
 
   // Derive the count of the selected cells
-  const selectedCellCount = derived(selectedCellMap, $selectedCellMap => {
+  const selectedCellCount = derived(selectedCellMap, ($selectedCellMap) => {
     return Object.keys($selectedCellMap).length
   })
 
@@ -258,8 +250,8 @@ export const createActions = (context: StoreContext) => {
 
   // Toggles whether a certain row ID is selected or not
   const toggleSelectedRow = (id: string) => {
-    selectedRows.update(state => {
-      let newState = {
+    selectedRows.update((state) => {
+      const newState = {
         ...state,
         [id]: !state[id],
       }
@@ -290,7 +282,7 @@ export const createActions = (context: StoreContext) => {
     const from = Math.min(lastSelectedIndex, thisIndex)
     const to = Math.max(lastSelectedIndex, thisIndex)
     const $rows = get(rows)
-    selectedRows.update(state => {
+    selectedRows.update((state) => {
       for (let i = from; i <= to; i++) {
         state[$rows[i]._id] = true
       }
@@ -307,14 +299,14 @@ export const createActions = (context: StoreContext) => {
   }
 
   const updateCellSelection = (targetCellId: string) => {
-    cellSelection.update(state => ({
+    cellSelection.update((state) => ({
       ...state,
       targetCellId,
     }))
   }
 
   const stopCellSelection = () => {
-    cellSelection.update(state => ({
+    cellSelection.update((state) => ({
       ...state,
       active: false,
     }))
@@ -382,7 +374,7 @@ export const initialise = (context: StoreContext) => {
   } = context
 
   // Ensure we clear invalid rows from state if they disappear
-  rowLookupMap.subscribe(async $rowLookupMap => {
+  rowLookupMap.subscribe(async ($rowLookupMap) => {
     // We tick here to ensure other derived stores have properly updated.
     // We depend on the row lookup map which is a derived store,
     await tick()
@@ -404,7 +396,7 @@ export const initialise = (context: StoreContext) => {
     // Check selected rows
     const selectedIds = Object.keys($selectedRows)
     if (selectedIds.length) {
-      let newSelectedRows = { ...$selectedRows }
+      const newSelectedRows = { ...$selectedRows }
       let selectedRowsNeedsUpdate = false
       for (let i = 0; i < selectedIds.length; i++) {
         if (!hasRow(selectedIds[i])) {
@@ -420,13 +412,13 @@ export const initialise = (context: StoreContext) => {
 
   // Remember the last focused row ID so that we can store the previous one
   let lastFocusedRowId: string | null = null
-  focusedRowId.subscribe(id => {
+  focusedRowId.subscribe((id) => {
     previousFocusedRowId.set(lastFocusedRowId)
     lastFocusedRowId = id
   })
 
   let lastFocusedCellId: string | null = null
-  focusedCellId.subscribe(id => {
+  focusedCellId.subscribe((id) => {
     // Remember the last focused cell ID so that we can store the previous one
     previousFocusedCellId.set(lastFocusedCellId)
     lastFocusedCellId = id
@@ -451,14 +443,14 @@ export const initialise = (context: StoreContext) => {
   })
 
   // Pull row height from table as long as we don't have a fixed height
-  definition.subscribe($definition => {
+  definition.subscribe(($definition) => {
     if (!get(fixedRowHeight)) {
       rowHeight.set($definition?.rowHeight || DefaultRowHeight)
     }
   })
 
   // Reset row height when initial row height prop changes
-  fixedRowHeight.subscribe(height => {
+  fixedRowHeight.subscribe((height) => {
     if (height) {
       rowHeight.set(height)
     } else {
@@ -467,7 +459,7 @@ export const initialise = (context: StoreContext) => {
   })
 
   // Clear focused cell when selecting rows
-  selectedRowCount.subscribe(count => {
+  selectedRowCount.subscribe((count) => {
     if (count) {
       if (get(focusedCellId)) {
         focusedCellId.set(null)
@@ -479,7 +471,7 @@ export const initialise = (context: StoreContext) => {
   })
 
   // Clear state when selecting cells
-  selectedCellCount.subscribe($selectedCellCount => {
+  selectedCellCount.subscribe(($selectedCellCount) => {
     if ($selectedCellCount) {
       if (get(selectedRowCount)) {
         selectedRows.set({})
@@ -489,11 +481,7 @@ export const initialise = (context: StoreContext) => {
 
   // Ensure the source of cell selection is focused
   cellSelection.subscribe(async ({ sourceCellId, targetCellId }) => {
-    if (
-      sourceCellId &&
-      sourceCellId !== targetCellId &&
-      get(focusedCellId) !== sourceCellId
-    ) {
+    if (sourceCellId && sourceCellId !== targetCellId && get(focusedCellId) !== sourceCellId) {
       focusedCellId.set(sourceCellId)
     }
   })

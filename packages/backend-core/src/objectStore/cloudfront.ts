@@ -1,5 +1,5 @@
-import env from "../environment"
 import * as cfsign from "aws-cloudfront-sign"
+import env from "../environment"
 
 let PRIVATE_KEY: string | undefined
 
@@ -12,9 +12,7 @@ function getPrivateKey() {
     return PRIVATE_KEY
   }
 
-  PRIVATE_KEY = Buffer.from(env.CLOUDFRONT_PRIVATE_KEY_64, "base64").toString(
-    "utf-8"
-  )
+  PRIVATE_KEY = Buffer.from(env.CLOUDFRONT_PRIVATE_KEY_64, "base64").toString("utf-8")
 
   return PRIVATE_KEY
 }

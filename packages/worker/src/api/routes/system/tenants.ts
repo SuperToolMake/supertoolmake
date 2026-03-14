@@ -3,7 +3,4 @@ import { adminRoutes } from "../endpointGroups"
 
 adminRoutes.delete("/api/system/tenants/:tenantId", controller.destroy)
 adminRoutes.put("/api/system/tenants/:tenantId/lock", controller.lock)
-adminRoutes.put(
-  "/api/system/tenants/:tenantId/activation",
-  controller.activation
-)
+adminRoutes.put("/api/system/tenants/:tenantId/activation", controller.activation)

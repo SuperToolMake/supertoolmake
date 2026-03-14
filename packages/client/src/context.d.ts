@@ -1,10 +1,5 @@
 import type { Writable } from "svelte/store"
-import type {
-  Component as ComponentStore,
-  Context,
-  FieldGroupContext,
-  FormContext,
-} from "@/types"
+import type { Component as ComponentStore, Context, FieldGroupContext, FormContext } from "@/types"
 import type { SDK } from "@/index"
 
 declare module "svelte" {

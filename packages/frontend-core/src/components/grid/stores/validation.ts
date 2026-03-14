@@ -1,6 +1,6 @@
-import { writable, get, derived, Writable, Readable } from "svelte/store"
-import { Store as StoreContext } from "."
+import { derived, get, type Readable, type Writable, writable } from "svelte/store"
 import { parseCellID } from "../lib/utils"
+import type { Store as StoreContext } from "."
 
 interface ValidationStore {
   validation: Writable<Record<string, string>>
@@ -37,7 +37,7 @@ export const deriveStores = (context: StoreContext): DerivedValidationStore => {
   const { validation } = context
 
   // Derive which rows have errors so that we can use that info later
-  const validationRowLookupMap = derived(validation, $validation => {
+  const validationRowLookupMap = derived(validation, ($validation) => {
     const map: Record<string, string[]> = {}
     Object.entries($validation).forEach(([key, error]) => {
       // Extract row ID from all errored cell IDs
@@ -66,7 +66,7 @@ export const createActions = (context: StoreContext): ValidationActions => {
     if (!cellId) {
       return
     }
-    validation.update(state => ({
+    validation.update((state) => ({
       ...state,
       [cellId]: error,
     }))
@@ -100,12 +100,12 @@ export const initialise = (context: StoreContext) => {
   const { validation, previousFocusedRowId, validationRowLookupMap } = context
 
   // Remove validation errors when changing rows
-  previousFocusedRowId.subscribe(id => {
+  previousFocusedRowId.subscribe((id) => {
     if (id) {
       const errorCells = get(validationRowLookupMap)[id]
       if (errorCells?.length) {
-        validation.update(state => {
-          for (let cellId of errorCells) {
+        validation.update((state) => {
+          for (const cellId of errorCells) {
             delete state[cellId]
           }
           return state

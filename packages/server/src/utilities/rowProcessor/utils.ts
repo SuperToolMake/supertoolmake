@@ -1,10 +1,10 @@
 import {
-  AutoColumnFieldMetadata,
+  type AutoColumnFieldMetadata,
   AutoFieldSubType,
-  FieldSchema,
+  type FieldSchema,
   FieldType,
-  Row,
-  Table,
+  type Row,
+  type Table,
 } from "@budibase/types"
 import { AutoFieldDefaultNames } from "../../constants"
 
@@ -12,9 +12,7 @@ import { AutoFieldDefaultNames } from "../../constants"
  * If the subtype has been lost for any reason this works out what
  * subtype the auto column should be.
  */
-export function fixAutoColumnSubType(
-  column: FieldSchema
-): AutoColumnFieldMetadata | FieldSchema {
+export function fixAutoColumnSubType(column: FieldSchema): AutoColumnFieldMetadata | FieldSchema {
   if (!column.autocolumn || !column.name || column.subtype) {
     return column
   }
@@ -37,12 +35,9 @@ export function fixAutoColumnSubType(
  * Processes any date columns and ensures that those without the ignoreTimezones
  * flag set are parsed as UTC rather than local time.
  */
-export function processDates<T extends Row | Row[]>(
-  table: Table,
-  inputRows: T
-): T {
-  let rows = Array.isArray(inputRows) ? inputRows : [inputRows]
-  let datesWithTZ: string[] = []
+export function processDates<T extends Row | Row[]>(table: Table, inputRows: T): T {
+  const rows = Array.isArray(inputRows) ? inputRows : [inputRows]
+  const datesWithTZ: string[] = []
   for (const [column, schema] of Object.entries(table.schema)) {
     if (schema.type !== FieldType.DATETIME) {
       continue

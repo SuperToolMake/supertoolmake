@@ -1,8 +1,8 @@
 <script context="module" lang="ts">
-  export interface PopoverAPI {
-    show: () => void
-    hide: () => void
-  }
+export interface PopoverAPI {
+  show: () => void
+  hide: () => void
+}
 </script>
 
 <script lang="ts">

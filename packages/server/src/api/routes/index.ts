@@ -38,7 +38,7 @@ export { default as staticRoutes } from "./static"
 const endpoints = endpointGroupList.listAllEndpoints()
 
 const appRoutes = new Router()
-for (let endpoint of endpoints) {
+for (const endpoint of endpoints) {
   endpoint.apply(appRoutes)
 }
 

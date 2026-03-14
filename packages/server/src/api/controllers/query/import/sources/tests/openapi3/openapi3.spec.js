@@ -6,10 +6,7 @@ const { BodyType } = require("@budibase/types")
 const { OpenAPI3 } = require("../../openapi3")
 
 const getData = (file, extension) => {
-  return fs.readFileSync(
-    path.join(__dirname, `./data/${file}/${file}.${extension}`),
-    "utf8"
-  )
+  return fs.readFileSync(path.join(__dirname, `./data/${file}/${file}.${extension}`), "utf8")
 }
 
 describe("OpenAPI3 Import", () => {
@@ -174,7 +171,7 @@ describe("OpenAPI3 Import", () => {
   })
 
   const runTests = async (filename, test, assertions) => {
-    for (let extension of ["json", "yaml"]) {
+    for (const extension of ["json", "yaml"]) {
       await test(filename, extension, assertions)
     }
   }
@@ -190,7 +187,7 @@ describe("OpenAPI3 Import", () => {
   })
 
   describe("Returns queries", () => {
-    const indexQueries = queries => {
+    const indexQueries = (queries) => {
       return queries.reduce((acc, query) => {
         acc[query.name] = query
         return acc
@@ -206,7 +203,7 @@ describe("OpenAPI3 Import", () => {
 
     const testVerb = async (file, extension, assertions) => {
       const queries = await getQueries(file, extension)
-      for (let [operationId, method] of Object.entries(assertions)) {
+      for (const [operationId, method] of Object.entries(assertions)) {
         expect(queries[operationId].queryVerb).toBe(method)
       }
     }
@@ -225,7 +222,7 @@ describe("OpenAPI3 Import", () => {
 
     const testPath = async (file, extension, assertions) => {
       const queries = await getQueries(file, extension)
-      for (let [operationId, urlPath] of Object.entries(assertions)) {
+      for (const [operationId, urlPath] of Object.entries(assertions)) {
         expect(queries[operationId].fields.path).toBe(urlPath)
       }
     }
@@ -244,7 +241,7 @@ describe("OpenAPI3 Import", () => {
 
     const testHeaders = async (file, extension, assertions) => {
       const queries = await getQueries(file, extension)
-      for (let [operationId, headers] of Object.entries(assertions)) {
+      for (const [operationId, headers] of Object.entries(assertions)) {
         expect(queries[operationId].fields.headers).toStrictEqual(headers)
       }
     }
@@ -346,9 +343,7 @@ describe("OpenAPI3 Import", () => {
 
       const [query] = await openapi3.getQueries("datasourceId")
       expect(query.fields.bodyType).toBe(BodyType.ENCODED)
-      expect(query.fields.headers["Content-Type"]).toBe(
-        "application/x-www-form-urlencoded"
-      )
+      expect(query.fields.headers["Content-Type"]).toBe("application/x-www-form-urlencoded")
       expect(query.fields.requestBody).toEqual({
         name: "{{ name }}",
         "address[city]": "{{ address_city }}",
@@ -372,10 +367,8 @@ describe("OpenAPI3 Import", () => {
 
     const testQuery = async (file, extension, assertions) => {
       const queries = await getQueries(file, extension)
-      for (let [operationId, queryString] of Object.entries(assertions)) {
-        expect(queries[operationId].fields.queryString).toStrictEqual(
-          queryString
-        )
+      for (const [operationId, queryString] of Object.entries(assertions)) {
+        expect(queries[operationId].fields.queryString).toStrictEqual(queryString)
       }
     }
 
@@ -393,7 +386,7 @@ describe("OpenAPI3 Import", () => {
 
     const testParameters = async (file, extension, assertions) => {
       const queries = await getQueries(file, extension)
-      for (let [operationId, parameters] of Object.entries(assertions)) {
+      for (const [operationId, parameters] of Object.entries(assertions)) {
         expect(queries[operationId].parameters).toStrictEqual(parameters)
       }
     }
@@ -478,7 +471,7 @@ describe("OpenAPI3 Import", () => {
 
     const testBody = async (file, extension, assertions) => {
       const queries = await getQueries(file, extension)
-      for (let [operationId, body] of Object.entries(assertions)) {
+      for (const [operationId, body] of Object.entries(assertions)) {
         expect(queries[operationId].fields.requestBody).toStrictEqual(body)
       }
     }

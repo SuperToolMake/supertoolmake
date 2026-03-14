@@ -1,36 +1,29 @@
-import {
+import type {
   DeleteQueryResponse,
   ExecuteQueryRequest,
   ExecuteV2QueryResponse,
   FetchQueriesResponse,
   FindQueryResponse,
-  ImportRestQueryRequest,
-  ImportRestQueryResponse,
   ImportRestQueryInfoRequest,
   ImportRestQueryInfoResponse,
+  ImportRestQueryRequest,
+  ImportRestQueryResponse,
   PreviewQueryRequest,
   PreviewQueryResponse,
   SaveQueryRequest,
   SaveQueryResponse,
 } from "@budibase/types"
-import { BaseAPIClient } from "./types"
+import type { BaseAPIClient } from "./types"
 
 export interface QueryEndpoints {
-  executeQuery: (
-    queryId: string,
-    opts?: ExecuteQueryRequest
-  ) => Promise<ExecuteV2QueryResponse>
+  executeQuery: (queryId: string, opts?: ExecuteQueryRequest) => Promise<ExecuteV2QueryResponse>
   fetchQueryDefinition: (queryId: string) => Promise<FindQueryResponse>
   getQueries: () => Promise<FetchQueriesResponse>
   saveQuery: (query: SaveQueryRequest) => Promise<SaveQueryResponse>
   deleteQuery: (id: string, rev: string) => Promise<DeleteQueryResponse>
   previewQuery: (query: PreviewQueryRequest) => Promise<PreviewQueryResponse>
-  importQueries: (
-    data: ImportRestQueryRequest
-  ) => Promise<ImportRestQueryResponse>
-  getImportInfo: (
-    data: ImportRestQueryInfoRequest
-  ) => Promise<ImportRestQueryInfoResponse>
+  importQueries: (data: ImportRestQueryRequest) => Promise<ImportRestQueryResponse>
+  getImportInfo: (data: ImportRestQueryInfoRequest) => Promise<ImportRestQueryInfoResponse>
 }
 
 export const buildQueryEndpoints = (API: BaseAPIClient): QueryEndpoints => ({
@@ -54,7 +47,7 @@ export const buildQueryEndpoints = (API: BaseAPIClient): QueryEndpoints => ({
    * Fetches the definition of an external query.
    * @param queryId the ID of thr query to fetch the definition of
    */
-  fetchQueryDefinition: async queryId => {
+  fetchQueryDefinition: async (queryId) => {
     return await API.get({
       url: `/api/queries/${queryId}`,
       cache: true,
@@ -74,7 +67,7 @@ export const buildQueryEndpoints = (API: BaseAPIClient): QueryEndpoints => ({
    * Saves a query.
    * @param query the query to save
    */
-  saveQuery: async query => {
+  saveQuery: async (query) => {
     return await API.post({
       url: "/api/queries",
       body: query,
@@ -95,14 +88,14 @@ export const buildQueryEndpoints = (API: BaseAPIClient): QueryEndpoints => ({
   /**
    * Imports a set of queries into a certain datasource
    */
-  importQueries: async data => {
+  importQueries: async (data) => {
     return await API.post({
       url: "/api/queries/import",
       body: data,
     })
   },
 
-  getImportInfo: async data => {
+  getImportInfo: async (data) => {
     return await API.post({
       url: "/api/queries/import/info",
       body: data,
@@ -113,7 +106,7 @@ export const buildQueryEndpoints = (API: BaseAPIClient): QueryEndpoints => ({
    * Runs a query with test parameters to see the result.
    * @param query the query to run
    */
-  previewQuery: async query => {
+  previewQuery: async (query) => {
     return await API.post({
       url: "/api/queries/preview",
       body: query,

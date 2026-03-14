@@ -1,10 +1,6 @@
 import { dataFilters } from "@budibase/shared-core"
-import {
-  BulkDocsResponse,
-  ContextUser,
-  SearchUsersRequest,
-  User,
-} from "@budibase/types"
+import type { BulkDocsResponse, ContextUser, SearchUsersRequest, User } from "@budibase/types"
+import type { DocumentListParams } from "nano"
 import * as context from "../context"
 import { getGlobalDB } from "../context"
 import {
@@ -22,13 +18,12 @@ import {
 } from "../db"
 import { UserDB } from "./db"
 import { creatorsInList } from "./utils"
-import { DocumentListParams } from "nano"
 
 type GetOpts = { cleanup?: boolean }
 
 function removeUserPassword(users: User | User[]) {
   if (Array.isArray(users)) {
-    return users.map(user => {
+    return users.map((user) => {
       if (user) {
         delete user.password
         return user
@@ -41,17 +36,14 @@ function removeUserPassword(users: User | User[]) {
   return users
 }
 
-export async function bulkGetGlobalUsersById(
-  userIds: string[],
-  opts?: GetOpts
-) {
+export async function bulkGetGlobalUsersById(userIds: string[], opts?: GetOpts) {
   const db = getGlobalDB()
   let users = (
     await db.allDocs({
       keys: userIds,
       include_docs: true,
     })
-  ).rows.map(row => row.doc) as User[]
+  ).rows.map((row) => row.doc) as User[]
   if (opts?.cleanup) {
     users = removeUserPassword(users) as User[]
   }
@@ -65,7 +57,7 @@ export async function getAllUserIds() {
     startkey: startKey,
     endkey: `${startKey}${UNICODE_MAX}`,
   })
-  return response.rows.map(row => row.id)
+  return response.rows.map((row) => row.id)
 }
 
 export async function getAllUsers(): Promise<User[]> {
@@ -76,7 +68,7 @@ export async function getAllUsers(): Promise<User[]> {
     endkey: `${startKey}${UNICODE_MAX}`,
     include_docs: true,
   })
-  return response.rows.map(row => row.doc) as User[]
+  return response.rows.map((row) => row.doc) as User[]
 }
 
 export async function bulkUpdateGlobalUsers(users: User[]) {
@@ -98,7 +90,7 @@ export async function getById(id: string, opts?: GetOpts): Promise<User> {
  * all the users to find one with this email address.
  */
 export async function getGlobalUserByEmail(
-  email: String,
+  email: string,
   opts?: GetOpts
 ): Promise<User | undefined> {
   if (email == null) {
@@ -163,13 +155,10 @@ export async function searchGlobalUsersByApp(
   Return any user who potentially has access to the application
   Admins, developers and app users with the explicitly role.
 */
-export async function searchGlobalUsersByAppAccess(
-  appId: any,
-  opts?: { limit?: number }
-) {
+export async function searchGlobalUsersByAppAccess(appId: any, opts?: { limit?: number }) {
   const roleSelector = `roles.${appId}`
 
-  let orQuery: any[] = [
+  const orQuery: any[] = [
     {
       "builder.global": true,
     },
@@ -237,12 +226,7 @@ export async function searchGlobalUsersByEmail(
 }
 
 const PAGE_LIMIT = 8
-export async function paginatedUsers({
-  bookmark,
-  query,
-  appId,
-  limit,
-}: SearchUsersRequest = {}) {
+export async function paginatedUsers({ bookmark, query, appId, limit }: SearchUsersRequest = {}) {
   const db = getGlobalDB()
   const pageSize = limit ?? PAGE_LIMIT
   const pageLimit = pageSize + 1
@@ -272,15 +256,13 @@ export async function paginatedUsers({
       cleanup: true,
     })
   } else if (query) {
-    const response = await db.allDocs<User>(
-      getGlobalUserParams(null, { ...opts, limit: 100 })
-    )
-    userList = response.rows.map(row => row.doc!)
+    const response = await db.allDocs<User>(getGlobalUserParams(null, { ...opts, limit: 100 }))
+    userList = response.rows.map((row) => row.doc!)
     userList = dataFilters.search(userList, { query, limit: opts.limit }).rows
   } else {
     // no search, query allDocs
     const response = await db.allDocs<User>(getGlobalUserParams(null, opts))
-    userList = response.rows.map(row => row.doc!)
+    userList = response.rows.map((row) => row.doc!)
   }
   return pagination(userList, pageSize, {
     paginate: true,
@@ -302,7 +284,7 @@ export async function getCreatorCount() {
   async function iterate(startPage?: string) {
     const page = await paginatedUsers({ bookmark: startPage })
     const creatorsEval = await creatorsInList(page.data)
-    creators += creatorsEval.filter(creator => creator).length
+    creators += creatorsEval.filter((creator) => creator).length
     if (page.hasNextPage) {
       await iterate(page.nextPage)
     }
@@ -343,7 +325,7 @@ export async function addAppBuilder(user: User, appId: string) {
 export async function removeAppBuilder(user: User, appId: string) {
   const prodAppId = getProdWorkspaceID(appId)
   if (user.builder && user.builder.apps?.includes(prodAppId)) {
-    user.builder.apps = user.builder.apps.filter(id => id !== prodAppId)
+    user.builder.apps = user.builder.apps.filter((id) => id !== prodAppId)
   }
   await UserDB.save(user, { hashPassword: false })
 }

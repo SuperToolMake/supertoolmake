@@ -1,9 +1,5 @@
+import type { FetchIntegrationsResponse, FindIntegrationResponse, UserCtx } from "@budibase/types"
 import { getDefinition, getDefinitions } from "../../integrations"
-import {
-  UserCtx,
-  FetchIntegrationsResponse,
-  FindIntegrationResponse,
-} from "@budibase/types"
 
 export async function fetch(ctx: UserCtx<void, FetchIntegrationsResponse>) {
   const definitions = await getDefinitions()

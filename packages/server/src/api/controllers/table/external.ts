@@ -1,21 +1,21 @@
-import { breakExternalTableId } from "../../../integrations/utils"
-import { handleRequest } from "../row/external"
-import { isRows, isSchema, parse } from "../../../utilities/schema"
 import {
-  BulkImportRequest,
-  BulkImportResponse,
+  type BulkImportRequest,
+  type BulkImportResponse,
   Operation,
-  RenameColumn,
-  SaveTableRequest,
-  SaveTableResponse,
-  Table,
-  TableRequest,
-  UserCtx,
+  type RenameColumn,
+  type SaveTableRequest,
+  type SaveTableResponse,
+  type Table,
+  type TableRequest,
+  type UserCtx,
 } from "@budibase/types"
-import sdk from "../../../sdk"
-import { builderSocket } from "../../../websockets"
-import { inputProcessing } from "../../../utilities/rowProcessor"
 import { isEqual } from "lodash"
+import { breakExternalTableId } from "../../../integrations/utils"
+import sdk from "../../../sdk"
+import { inputProcessing } from "../../../utilities/rowProcessor"
+import { isRows, isSchema, parse } from "../../../utilities/schema"
+import { builderSocket } from "../../../websockets"
+import { handleRequest } from "../row/external"
 
 function getDatasourceId(table: Table) {
   if (!table) {
@@ -44,11 +44,10 @@ export async function updateTable(
     inputs.created = true
   }
   try {
-    const { datasource, oldTable, table } = await sdk.tables.external.save(
-      datasourceId!,
-      inputs,
-      { tableId, renaming }
-    )
+    const { datasource, oldTable, table } = await sdk.tables.external.save(datasourceId!, inputs, {
+      tableId,
+      renaming,
+    })
     builderSocket?.emitDatasourceUpdate(ctx, datasource)
     return { table, oldTable }
   } catch (err: any) {
@@ -61,15 +60,10 @@ export async function updateTable(
 }
 
 export async function destroy(ctx: UserCtx) {
-  const tableToDelete: TableRequest = await sdk.tables.getTable(
-    ctx.params.tableId
-  )
+  const tableToDelete: TableRequest = await sdk.tables.getTable(ctx.params.tableId)
   const datasourceId = getDatasourceId(tableToDelete)
   try {
-    const { datasource, table } = await sdk.tables.external.destroy(
-      datasourceId!,
-      tableToDelete
-    )
+    const { datasource, table } = await sdk.tables.external.destroy(datasourceId!, tableToDelete)
     builderSocket?.emitDatasourceUpdate(ctx, datasource)
     return table
   } catch (err: any) {
@@ -81,10 +75,8 @@ export async function destroy(ctx: UserCtx) {
   }
 }
 
-export async function bulkImport(
-  ctx: UserCtx<BulkImportRequest, BulkImportResponse>
-) {
-  let table = await sdk.tables.getTable(ctx.params.tableId)
+export async function bulkImport(ctx: UserCtx<BulkImportRequest, BulkImportResponse>) {
+  const table = await sdk.tables.getTable(ctx.params.tableId)
   const { rows, identifierFields } = ctx.request.body
   const schema = table.schema
 

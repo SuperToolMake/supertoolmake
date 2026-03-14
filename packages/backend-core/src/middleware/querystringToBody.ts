@@ -1,4 +1,4 @@
-import { Ctx } from "@budibase/types"
+import type { Ctx } from "@budibase/types"
 
 /**
  * Expects a standard "query" query string property which is the JSON body
@@ -8,10 +8,7 @@ import { Ctx } from "@budibase/types"
 export function querystringToBody(ctx: Ctx, next: any) {
   const queryString = ctx.request.query?.query as string | undefined
   if (ctx.request.method.toLowerCase() !== "get") {
-    ctx.throw(
-      500,
-      "Query to download middleware can only be used for get requests."
-    )
+    ctx.throw(500, "Query to download middleware can only be used for get requests.")
   }
   if (!queryString) {
     return next()

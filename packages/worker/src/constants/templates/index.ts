@@ -1,21 +1,15 @@
-import { readStaticFile } from "../../utilities/fileSystem"
-import { TemplateType, TemplatePurpose, GLOBAL_OWNER } from "../index"
+import { context, db as dbCore, tenancy } from "@budibase/backend-core"
+import { EmailTemplatePurpose, type Template } from "@budibase/types"
 import { join } from "path"
-import { db as dbCore, tenancy, context } from "@budibase/backend-core"
-import { Template, EmailTemplatePurpose } from "@budibase/types"
 import yaml from "yaml"
+import { readStaticFile } from "../../utilities/fileSystem"
+import { GLOBAL_OWNER, TemplatePurpose, TemplateType } from "../index"
 
 export const EmailTemplates = {
-  [EmailTemplatePurpose.PASSWORD_RECOVERY]: readStaticFile(
-    join(__dirname, "passwordRecovery.hbs")
-  ),
-  [EmailTemplatePurpose.INVITATION]: readStaticFile(
-    join(__dirname, "invitation.hbs")
-  ),
+  [EmailTemplatePurpose.PASSWORD_RECOVERY]: readStaticFile(join(__dirname, "passwordRecovery.hbs")),
+  [EmailTemplatePurpose.INVITATION]: readStaticFile(join(__dirname, "invitation.hbs")),
   [EmailTemplatePurpose.BASE]: readStaticFile(join(__dirname, "base.hbs")),
-  [EmailTemplatePurpose.WELCOME]: readStaticFile(
-    join(__dirname, "welcome.hbs")
-  ),
+  [EmailTemplatePurpose.WELCOME]: readStaticFile(join(__dirname, "welcome.hbs")),
   [EmailTemplatePurpose.CUSTOM]: readStaticFile(join(__dirname, "custom.hbs")),
   [EmailTemplatePurpose.CORE]: readStaticFile(join(__dirname, "core.hbs")),
 }
@@ -50,36 +44,29 @@ export async function loadTemplateConfig(pathTo: string) {
     try {
       const templates = await getTemplates({ type: "email" })
 
-      const updates: Template[] = templates.reduce(
-        (acc: Template[], template: Template) => {
-          const config = templateConfig[template.purpose]
-          if (config) {
-            // Need to normalise the text spacing for comparison
-            const configContent = removeWhitespaceBetweenTags(config)
-            const templateContent = removeWhitespaceBetweenTags(
-              template.contents
-            )
+      const updates: Template[] = templates.reduce((acc: Template[], template: Template) => {
+        const config = templateConfig[template.purpose]
+        if (config) {
+          // Need to normalise the text spacing for comparison
+          const configContent = removeWhitespaceBetweenTags(config)
+          const templateContent = removeWhitespaceBetweenTags(template.contents)
 
-            // If the template is exactly the same, ignore it.
-            if (configContent === templateContent) return acc
-            const owner = template.ownerId || GLOBAL_OWNER
-            // Create/Update template docs
-            acc.push({
-              ...template,
-              contents: config,
-              ...(!template._id
-                ? { _id: dbCore.generateTemplateID(owner) }
-                : {}),
-              ownerId: owner,
-            })
-          }
-          return acc
-        },
-        []
-      )
+          // If the template is exactly the same, ignore it.
+          if (configContent === templateContent) return acc
+          const owner = template.ownerId || GLOBAL_OWNER
+          // Create/Update template docs
+          acc.push({
+            ...template,
+            contents: config,
+            ...(!template._id ? { _id: dbCore.generateTemplateID(owner) } : {}),
+            ownerId: owner,
+          })
+        }
+        return acc
+      }, [])
 
       if (updates.length) {
-        const updateList = updates.map(u => u.purpose)
+        const updateList = updates.map((u) => u.purpose)
         const db = tenancy.getGlobalDB()
         await db.bulkDocs(updates)
         console.log(`Email templates updated: ${updateList.join(",")}`)
@@ -102,9 +89,9 @@ export function addBaseTemplates(templates: Template[], type?: string) {
       purposeList = Object.values(TemplatePurpose)
       break
   }
-  for (let purpose of purposeList) {
+  for (const purpose of purposeList) {
     // check if a template exists already for purpose
-    if (templates.find(template => template.purpose === purpose)) {
+    if (templates.find((template) => template.purpose === purpose)) {
       continue
     }
     if (EmailTemplates[purpose]) {
@@ -118,19 +105,16 @@ export function addBaseTemplates(templates: Template[], type?: string) {
   return templates
 }
 
-export async function getTemplates({
-  ownerId,
-  type,
-}: { ownerId?: string; type?: string } = {}) {
+export async function getTemplates({ ownerId, type }: { ownerId?: string; type?: string } = {}) {
   const db = tenancy.getGlobalDB()
   const response = await db.allDocs<Template>(
     dbCore.getTemplateParams(ownerId || GLOBAL_OWNER, undefined, {
       include_docs: true,
     })
   )
-  let templates = response.rows.map(row => row.doc!)
+  let templates = response.rows.map((row) => row.doc!)
   if (type) {
-    templates = templates.filter(template => template.type === type)
+    templates = templates.filter((template) => template.type === type)
   }
   return addBaseTemplates(templates, type)
 }
@@ -142,7 +126,7 @@ export async function getTemplateByID(id: string, ownerId?: string) {
       include_docs: true,
     })
   )
-  let templates = response.rows.map(row => row.doc!)
+  const templates = response.rows.map((row) => row.doc!)
   // should only be one template with ID
   return templates[0]
 }

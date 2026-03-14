@@ -1,14 +1,14 @@
 <script>
-  export let value
-  export let min
-  export let max
-  export let hideArrows = false
-  export let width
-  export let type = "number"
+export let value
+export let min
+export let max
+export let hideArrows = false
+export let width
+export let type = "number"
 
-  $: style = width ? `width:${width}px;` : ""
+$: style = width ? `width:${width}px;` : ""
 
-  const selectAll = event => event.target.select()
+const selectAll = (event) => event.target.select()
 </script>
 
 <input

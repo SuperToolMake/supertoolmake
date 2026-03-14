@@ -1,4 +1,4 @@
-import { TestAPI, TestAPIOpts } from "./base"
+import { TestAPI, type TestAPIOpts } from "./base"
 
 export class RestoreAPI extends TestAPI {
   restored = (opts?: TestAPIOpts) => {

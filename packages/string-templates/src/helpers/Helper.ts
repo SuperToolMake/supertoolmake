@@ -1,4 +1,4 @@
-import Handlebars from "handlebars"
+import type Handlebars from "handlebars"
 
 export default class Helper {
   private name: any
@@ -13,21 +13,18 @@ export default class Helper {
 
   register(handlebars: typeof Handlebars) {
     // wrap the function so that no helper can cause handlebars to break
-    handlebars.registerHelper(
-      this.name,
-      (value: any, info: { data: { root: {} } }) => {
-        let context = {}
-        if (info && info.data && info.data.root) {
-          context = info.data.root
-        }
-        const result = this.fn(value, context)
-        if (result == null) {
-          return this.useValueFallback ? value : null
-        } else {
-          return result
-        }
+    handlebars.registerHelper(this.name, (value: any, info: { data: { root: {} } }) => {
+      let context = {}
+      if (info && info.data && info.data.root) {
+        context = info.data.root
       }
-    )
+      const result = this.fn(value, context)
+      if (result == null) {
+        return this.useValueFallback ? value : null
+      } else {
+        return result
+      }
+    })
   }
 
   unregister(handlebars: { unregisterHelper: any }) {

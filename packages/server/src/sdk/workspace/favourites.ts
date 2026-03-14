@@ -2,8 +2,8 @@ import { context, db as dbCore } from "@budibase/backend-core"
 import {
   DocumentType,
   SEPARATOR,
-  WithoutDocMetadata,
-  WorkspaceFavourite,
+  type WithoutDocMetadata,
+  type WorkspaceFavourite,
 } from "@budibase/types"
 
 export async function fetch(userId?: string): Promise<WorkspaceFavourite[]> {

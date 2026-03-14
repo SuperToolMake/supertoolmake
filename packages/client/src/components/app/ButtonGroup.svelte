@@ -1,24 +1,24 @@
 <script>
-  import BlockComponent from "../BlockComponent.svelte"
-  import Block from "../Block.svelte"
-  import { CollapsedButtonGroup } from "@budibase/bbui"
-  import { getContext } from "svelte"
-  import { resolveCollapsedButtons } from "@/utils/collapsedButtonGroup"
+import { CollapsedButtonGroup } from "@budibase/bbui"
+import { getContext } from "svelte"
+import { resolveCollapsedButtons } from "@/utils/collapsedButtonGroup"
+import Block from "../Block.svelte"
+import BlockComponent from "../BlockComponent.svelte"
 
-  export let buttons = []
-  export let direction = "row"
-  export let hAlign = "left"
-  export let vAlign = "top"
-  export let gap = "S"
-  export let collapsed = false
-  export let collapsedText = "Action"
+export let buttons = []
+export let direction = "row"
+export let hAlign = "left"
+export let vAlign = "top"
+export let gap = "S"
+export let collapsed = false
+export let collapsedText = "Action"
 
-  const { enrichButtonActions } = getContext("sdk")
-  const context = getContext("context")
+const { enrichButtonActions } = getContext("sdk")
+const context = getContext("context")
 
-  $: collapsedButtons = collapsed
-    ? resolveCollapsedButtons(buttons, $context, enrichButtonActions)
-    : null
+$: collapsedButtons = collapsed
+  ? resolveCollapsedButtons(buttons, $context, enrichButtonActions)
+  : null
 </script>
 
 <Block>

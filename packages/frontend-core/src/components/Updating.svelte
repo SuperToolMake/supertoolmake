@@ -1,31 +1,31 @@
 <script>
-  export let isMigrationDone
-  export let onMigrationDone
-  export let timeoutSeconds = 60 // 1 minute
+export let isMigrationDone
+export let onMigrationDone
+export let timeoutSeconds = 60 // 1 minute
 
-  let timedOut = false
+let timedOut = false
 
-  async function checkMigrationsFinished() {
-    let totalWaitMs = 0
-    while (true) {
-      const waitForMs = 5000 + Math.random() * 5000
-      await new Promise(resolve => setTimeout(resolve, waitForMs))
-      totalWaitMs += waitForMs
+async function checkMigrationsFinished() {
+  let totalWaitMs = 0
+  while (true) {
+    const waitForMs = 5000 + Math.random() * 5000
+    await new Promise((resolve) => setTimeout(resolve, waitForMs))
+    totalWaitMs += waitForMs
 
-      const isMigrated = await isMigrationDone()
-      if (isMigrated) {
-        onMigrationDone()
-        return
-      }
+    const isMigrated = await isMigrationDone()
+    if (isMigrated) {
+      onMigrationDone()
+      return
+    }
 
-      if (totalWaitMs > timeoutSeconds * 1000) {
-        timedOut = true
-        return
-      }
+    if (totalWaitMs > timeoutSeconds * 1000) {
+      timedOut = true
+      return
     }
   }
+}
 
-  checkMigrationsFinished()
+checkMigrationsFinished()
 </script>
 
 <div class="loading" class:timeout={timedOut}>

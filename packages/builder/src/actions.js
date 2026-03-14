@@ -9,7 +9,7 @@ export const gradient = (node, config = {}) => {
   }
 
   // Applies a gradient background
-  const createGradient = config => {
+  const createGradient = (config) => {
     config = {
       ...defaultConfig,
       ...config,
@@ -37,18 +37,8 @@ export const gradient = (node, config = {}) => {
       const lowerLightness = Math.min(100, lightness * 100)
       const upperLightness = Math.min(100, (lightness + 0.2) * 100)
       const hue = rangeHash(seed, 0, 360, version)
-      const sat = `${rangeHash(
-        seed,
-        lowerSaturation,
-        upperSaturation,
-        version
-      )}%`
-      const light = `${rangeHash(
-        seed,
-        lowerLightness,
-        upperLightness,
-        version
-      )}%`
+      const sat = `${rangeHash(seed, lowerSaturation, upperSaturation, version)}%`
+      const light = `${rangeHash(seed, lowerLightness, upperLightness, version)}%`
       return `hsla(${hue},${sat},${light},${alpha})`
     }
 
@@ -56,12 +46,7 @@ export const gradient = (node, config = {}) => {
     const randomGradientPoint = (seed, version) => {
       const lowerTransparency = Math.min(100, softness * 100)
       const upperTransparency = Math.min(100, (softness + 0.2) * 100)
-      const transparency = rangeHash(
-        seed,
-        lowerTransparency,
-        upperTransparency,
-        version
-      )
+      const transparency = rangeHash(seed, lowerTransparency, upperTransparency, version)
       return (
         `radial-gradient(at ` +
         `${rangeHash(seed, 0, 100, version)}% ` +
@@ -85,7 +70,7 @@ export const gradient = (node, config = {}) => {
 
   return {
     // Apply a new gradient
-    update: config => {
+    update: (config) => {
       createGradient(config)
     },
   }

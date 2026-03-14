@@ -1,5 +1,5 @@
-import stream from "node:stream"
-import { Workspace } from "../../../documents"
+import type stream from "node:stream"
+import type { Workspace } from "../../../documents"
 
 export type ServeAppResponse = string | Workspace
 

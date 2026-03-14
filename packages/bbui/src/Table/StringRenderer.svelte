@@ -1,6 +1,6 @@
 <script lang="ts">
-  export let value: string | object
-  export let schema: { capitalise?: boolean }
+export let value: string | object
+export let schema: { capitalise?: boolean }
 </script>
 
 <div class:capitalise={schema?.capitalise}>

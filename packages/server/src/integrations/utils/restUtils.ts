@@ -1,12 +1,12 @@
-import type { Headers as UndiciHeaders } from "undici"
 import type { Headers as NodeFetchHeaders } from "node-fetch"
+import type { Headers as UndiciHeaders } from "undici"
 
 export function getAttachmentHeaders(
   headers: UndiciHeaders | NodeFetchHeaders,
   opts?: { downloadImages?: boolean }
 ) {
   const contentType = headers.get("content-type") || ""
-  let contentDisposition = headers.get("content-disposition") || ""
+  const contentDisposition = headers.get("content-disposition") || ""
 
   // the API does not follow the requirements of https://www.ietf.org/rfc/rfc2183.txt
   // all content-disposition headers should be format disposition-type; parameters

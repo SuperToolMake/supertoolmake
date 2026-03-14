@@ -1,145 +1,133 @@
 <script lang="ts">
-  import FilterPopover from "./FilterPopover.svelte"
-  import {
-    type FieldSchema,
-    type FilterConfig,
-    type TableSchema,
-    type SearchFilter,
-    FieldType,
-    RangeOperator,
-  } from "@budibase/types"
-  import { type PopoverAPI, Helpers, Icon } from "@budibase/bbui"
-  import { createEventDispatcher, getContext } from "svelte"
-  import { type Writable } from "svelte/store"
-  import { isArrayOperator } from "@/utils/filtering"
+import { Helpers, Icon, type PopoverAPI } from "@budibase/bbui"
+import {
+  type FieldSchema,
+  FieldType,
+  type FilterConfig,
+  RangeOperator,
+  type SearchFilter,
+  type TableSchema,
+} from "@budibase/types"
+import { createEventDispatcher, getContext } from "svelte"
+import type { Writable } from "svelte/store"
+import { isArrayOperator } from "@/utils/filtering"
+import FilterPopover from "./FilterPopover.svelte"
 
-  export let disabled = false
-  export let size: "S" | "M" | "L" = "S"
-  export let buttonText = "Apply"
-  export let defaultOperator: string | undefined = undefined
+export let disabled = false
+export let size: "S" | "M" | "L" = "S"
+export let buttonText = "Apply"
+export let defaultOperator: string | undefined = undefined
 
-  export let filter: SearchFilter | undefined = undefined
-  export let config: FilterConfig | undefined = undefined
-  export let schema: TableSchema | null = null
-  export let operators:
-    | {
-        value: string
-        label: string
-      }[]
-    | undefined = undefined
+export let filter: SearchFilter | undefined = undefined
+export let config: FilterConfig | undefined = undefined
+export let schema: TableSchema | null = null
+export let operators:
+  | {
+      value: string
+      label: string
+    }[]
+  | undefined = undefined
 
-  const dispatch = createEventDispatcher()
-  const rowCache: Writable<Record<string, any>> = getContext("rows")
+const dispatch = createEventDispatcher()
+const rowCache: Writable<Record<string, any>> = getContext("rows")
 
-  let popover: PopoverAPI
-  let button: HTMLDivElement
+let popover: PopoverAPI
+let button: HTMLDivElement
 
-  let filterMeta: string | undefined
-  let filterTitle: string | undefined
+let filterMeta: string | undefined
+let filterTitle: string | undefined
 
-  $: iconName = !filter ? "sliders-horizontal" : "x-circle"
-  $: fieldSchema = config ? schema?.[config?.field] : undefined
-  $: filterOp = filter
-    ? operators?.find(op => op.value === filter.operator)
-    : undefined
+$: iconName = !filter ? "sliders-horizontal" : "x-circle"
+$: fieldSchema = config ? schema?.[config?.field] : undefined
+$: filterOp = filter ? operators?.find((op) => op.value === filter.operator) : undefined
 
-  $: truncate = filterOp?.value !== RangeOperator.RANGE
-  $: filterDisplay = displayText(filter, fieldSchema)
+$: truncate = filterOp?.value !== RangeOperator.RANGE
+$: filterDisplay = displayText(filter, fieldSchema)
 
-  const parseDateDisplay = (
-    filter: SearchFilter | undefined,
-    fieldSchema: FieldSchema | undefined
-  ) => {
-    if (!filter || !fieldSchema || fieldSchema.type !== FieldType.DATETIME)
-      return ""
+const parseDateDisplay = (
+  filter: SearchFilter | undefined,
+  fieldSchema: FieldSchema | undefined
+) => {
+  if (!filter || !fieldSchema || fieldSchema.type !== FieldType.DATETIME) return ""
 
-    if (filter.operator === RangeOperator.RANGE) {
-      const enableTime = !fieldSchema.dateOnly
-      const { high, low } = filter.value
-      return `${Helpers.getDateDisplayValue(low, { enableTime })}
+  if (filter.operator === RangeOperator.RANGE) {
+    const enableTime = !fieldSchema.dateOnly
+    const { high, low } = filter.value
+    return `${Helpers.getDateDisplayValue(low, { enableTime })}
         - ${Helpers.getDateDisplayValue(high, { enableTime })}`
+  }
+
+  const parsed = Helpers.parseDate(filter.value, {
+    enableTime: !fieldSchema.dateOnly,
+  })
+
+  const display = Helpers.getDateDisplayValue(parsed, {
+    enableTime: !fieldSchema.dateOnly,
+  })
+
+  return `${display}`
+}
+
+const parseMultiDisplay = (value: string[] | undefined) => {
+  const moreThanOne =
+    Array.isArray(value) && value?.length > 1 ? `+${value?.length - 1} more` : undefined
+  filterMeta = moreThanOne
+  filterTitle = `${value?.join(", ")}`
+
+  return `${value?.[0]}`
+}
+
+/**
+ * Determine appropriate display text for the filter button
+ * @param filter
+ * @param fieldSchema
+ */
+const displayText = (filter: SearchFilter | undefined, fieldSchema: FieldSchema | undefined) => {
+  filterMeta = undefined
+  filterTitle = undefined
+  if (!filter || !fieldSchema) return
+
+  // Default to the base value. This could be a string or an array
+  // Some of the values could be refs for users.
+  let display = filter.value
+
+  if (fieldSchema.type === FieldType.BOOLEAN) {
+    display = Helpers.capitalise(filter.value)
+  } else if (fieldSchema.type === FieldType.DATETIME) {
+    display = parseDateDisplay(filter, fieldSchema)
+  } else if (fieldSchema.type === FieldType.ARRAY) {
+    if (!isArrayOperator(filter.operator)) {
+      display = filter.value
+    } else {
+      const filterVals = Array.isArray(filter.value) ? filter.value : [filter.value]
+      display = parseMultiDisplay(filterVals)
+    }
+  } else if (
+    fieldSchema.type === FieldType.BB_REFERENCE ||
+    fieldSchema.type === FieldType.BB_REFERENCE_SINGLE
+  ) {
+    // The display text for the user refs is dependent on
+    // a row cache.
+    let userDisplay: string = ""
+
+    // Process as single if the operator requires it
+    if (!isArrayOperator(filter.operator)) {
+      const userRow = $rowCache?.[filter.value]
+      userDisplay = userRow?.email ?? filter.value
+    } else {
+      const filterVals = Array.isArray(filter.value) ? filter.value : [filter.value]
+
+      // Email is currently the default display field for users.
+      userDisplay = parseMultiDisplay(
+        filterVals.map((val: string) => $rowCache?.[val]?.email ?? val)
+      )
     }
 
-    const parsed = Helpers.parseDate(filter.value, {
-      enableTime: !fieldSchema.dateOnly,
-    })
-
-    const display = Helpers.getDateDisplayValue(parsed, {
-      enableTime: !fieldSchema.dateOnly,
-    })
-
-    return `${display}`
+    display = userDisplay
   }
 
-  const parseMultiDisplay = (value: string[] | undefined) => {
-    const moreThanOne =
-      Array.isArray(value) && value?.length > 1
-        ? `+${value?.length - 1} more`
-        : undefined
-    filterMeta = moreThanOne
-    filterTitle = `${value?.join(", ")}`
-
-    return `${value?.[0]}`
-  }
-
-  /**
-   * Determine appropriate display text for the filter button
-   * @param filter
-   * @param fieldSchema
-   */
-  const displayText = (
-    filter: SearchFilter | undefined,
-    fieldSchema: FieldSchema | undefined
-  ) => {
-    filterMeta = undefined
-    filterTitle = undefined
-    if (!filter || !fieldSchema) return
-
-    // Default to the base value. This could be a string or an array
-    // Some of the values could be refs for users.
-    let display = filter.value
-
-    if (fieldSchema.type === FieldType.BOOLEAN) {
-      display = Helpers.capitalise(filter.value)
-    } else if (fieldSchema.type === FieldType.DATETIME) {
-      display = parseDateDisplay(filter, fieldSchema)
-    } else if (fieldSchema.type === FieldType.ARRAY) {
-      if (!isArrayOperator(filter.operator)) {
-        display = filter.value
-      } else {
-        const filterVals = Array.isArray(filter.value)
-          ? filter.value
-          : [filter.value]
-        display = parseMultiDisplay(filterVals)
-      }
-    } else if (
-      fieldSchema.type === FieldType.BB_REFERENCE ||
-      fieldSchema.type === FieldType.BB_REFERENCE_SINGLE
-    ) {
-      // The display text for the user refs is dependent on
-      // a row cache.
-      let userDisplay: string = ""
-
-      // Process as single if the operator requires it
-      if (!isArrayOperator(filter.operator)) {
-        const userRow = $rowCache?.[filter.value]
-        userDisplay = userRow?.email ?? filter.value
-      } else {
-        const filterVals = Array.isArray(filter.value)
-          ? filter.value
-          : [filter.value]
-
-        // Email is currently the default display field for users.
-        userDisplay = parseMultiDisplay(
-          filterVals.map((val: string) => $rowCache?.[val]?.email ?? val)
-        )
-      }
-
-      display = userDisplay
-    }
-
-    return `${filterOp?.label.toLowerCase()} ${filter.noValue ? "" : display}`
-  }
+  return `${filterOp?.label.toLowerCase()} ${filter.noValue ? "" : display}`
+}
 </script>
 
 <FilterPopover

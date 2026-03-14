@@ -1,4 +1,5 @@
 jest.mock("nodemailer")
+
 import { TestConfiguration } from "../../../../tests"
 
 describe("/api/global/self", () => {

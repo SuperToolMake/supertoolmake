@@ -1,23 +1,21 @@
 import type { Component } from "svelte"
-
-// General
-import ProfilePage from "@/settings/pages/profile.svelte"
-import WorkspaceUsersPage from "@/settings/pages/people/users/workspace.svelte"
-import UserPage from "@/settings/pages/people/users/user.svelte"
-import UserInvitesPage from "@/settings/pages/people/users/invites.svelte"
-import EmailPage from "@/settings/pages/email.svelte"
+import AuthPage from "@/settings/pages/auth/index.svelte"
+import DiagnosticsPage from "@/settings/pages/diagnostics.svelte"
 import EmailTemplatesPage from "@/settings/pages/email/EmailTemplates.svelte"
 import EmailTemplatePage from "@/settings/pages/email/Template.svelte"
-import AuthPage from "@/settings/pages/auth/index.svelte"
-import OrgPage from "@/settings/pages/organisation.svelte"
-import VersionPage from "@/settings/pages/version.svelte"
-import DiagnosticsPage from "@/settings/pages/diagnostics.svelte"
-import SystemLogsPage from "@/settings/pages/systemLogs.svelte"
-import Agplv3Page from "./agplv3.svelte"
-
+import EmailPage from "@/settings/pages/email.svelte"
+import EmbedPage from "@/settings/pages/embed.svelte"
 // App pages
 import GeneralInfoPage from "@/settings/pages/general.svelte"
-import EmbedPage from "@/settings/pages/embed.svelte"
+import OrgPage from "@/settings/pages/organisation.svelte"
+import UserInvitesPage from "@/settings/pages/people/users/invites.svelte"
+import UserPage from "@/settings/pages/people/users/user.svelte"
+import WorkspaceUsersPage from "@/settings/pages/people/users/workspace.svelte"
+// General
+import ProfilePage from "@/settings/pages/profile.svelte"
+import SystemLogsPage from "@/settings/pages/systemLogs.svelte"
+import VersionPage from "@/settings/pages/version.svelte"
+import Agplv3Page from "./agplv3.svelte"
 
 const componentMap = {
   profile: ProfilePage,
@@ -49,11 +47,8 @@ export const Pages = {
   },
 }
 
-export const routeActions = (
-  node: HTMLElement,
-  target = ".route-header .page-actions"
-) => {
-  let targetEl = document.querySelector(target)
+export const routeActions = (node: HTMLElement, target = ".route-header .page-actions") => {
+  const targetEl = document.querySelector(target)
 
   if (targetEl) {
     targetEl.appendChild(node)

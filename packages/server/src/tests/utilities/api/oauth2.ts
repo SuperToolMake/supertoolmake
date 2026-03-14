@@ -1,13 +1,13 @@
-import {
+import type {
+  FetchOAuth2ConfigsResponse,
   InsertOAuth2ConfigRequest,
   InsertOAuth2ConfigResponse,
-  FetchOAuth2ConfigsResponse,
   UpdateOAuth2ConfigRequest,
   UpdateOAuth2ConfigResponse,
   ValidateConfigRequest,
   ValidateConfigResponse,
 } from "@budibase/types"
-import { Expectations, TestAPI } from "./base"
+import { type Expectations, TestAPI } from "./base"
 
 export class OAuth2API extends TestAPI {
   fetch = async (expectations?: Expectations) => {
@@ -16,10 +16,7 @@ export class OAuth2API extends TestAPI {
     })
   }
 
-  create = async (
-    body: InsertOAuth2ConfigRequest,
-    expectations?: Expectations
-  ) => {
+  create = async (body: InsertOAuth2ConfigRequest, expectations?: Expectations) => {
     return await this._post<InsertOAuth2ConfigResponse>("/api/oauth2", {
       body,
       expectations: {
@@ -29,17 +26,11 @@ export class OAuth2API extends TestAPI {
     })
   }
 
-  update = async (
-    body: UpdateOAuth2ConfigRequest,
-    expectations?: Expectations
-  ) => {
-    return await this._put<UpdateOAuth2ConfigResponse>(
-      `/api/oauth2/${body._id}`,
-      {
-        body,
-        expectations,
-      }
-    )
+  update = async (body: UpdateOAuth2ConfigRequest, expectations?: Expectations) => {
+    return await this._put<UpdateOAuth2ConfigResponse>(`/api/oauth2/${body._id}`, {
+      body,
+      expectations,
+    })
   }
 
   delete = async (id: string, rev: string, expectations?: Expectations) => {
@@ -48,10 +39,7 @@ export class OAuth2API extends TestAPI {
     })
   }
 
-  validate = async (
-    body: ValidateConfigRequest,
-    expectations?: Expectations
-  ) => {
+  validate = async (body: ValidateConfigRequest, expectations?: Expectations) => {
     return await this._post<ValidateConfigResponse>("/api/oauth2/validate", {
       body,
       expectations,

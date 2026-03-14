@@ -1,39 +1,36 @@
 <script>
-  import { Popover, Select } from "@budibase/bbui"
-  import { createEventDispatcher, onMount } from "svelte"
-  import {
-    tables as tableStore,
-    datasources as datasourceStore,
-  } from "@/stores/builder"
-  import DataSourceCategory from "./DataSourceSelect/DataSourceCategory.svelte"
-  import { sortAndFormat } from "@/helpers/data/format"
+import { Popover, Select } from "@budibase/bbui"
+import { createEventDispatcher, onMount } from "svelte"
+import { sortAndFormat } from "@/helpers/data/format"
+import { datasources as datasourceStore, tables as tableStore } from "@/stores/builder"
+import DataSourceCategory from "./DataSourceSelect/DataSourceCategory.svelte"
 
-  export let value
+export let value
 
-  let anchorRight, dropdownRight
+let anchorRight, dropdownRight
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  $: tables = sortAndFormat.tables($tableStore.list, $datasourceStore.list)
-  $: options = [...(tables || [])]
+$: tables = sortAndFormat.tables($tableStore.list, $datasourceStore.list)
+$: options = [...(tables || [])]
 
-  $: text = value?.label ?? "Choose an option"
+$: text = value?.label ?? "Choose an option"
 
-  const onChange = e => {
-    dispatch(
-      "change",
-      options.find(x => x.resourceId === e.resourceId)
-    )
-    dropdownRight.hide()
+const onChange = (e) => {
+  dispatch(
+    "change",
+    options.find((x) => x.resourceId === e.resourceId)
+  )
+  dropdownRight.hide()
+}
+
+onMount(() => {
+  // Migrate old values before "resourceId" existed
+  if (value && !value.resourceId) {
+    const table = tables.find((x) => x.resourceId === value.tableId)
+    dispatch("change", table)
   }
-
-  onMount(() => {
-    // Migrate old values before "resourceId" existed
-    if (value && !value.resourceId) {
-      const table = tables.find(x => x.resourceId === value.tableId)
-      dispatch("change", table)
-    }
-  })
+})
 </script>
 
 <div class="container" bind:this={anchorRight}>

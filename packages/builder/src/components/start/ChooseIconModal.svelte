@@ -1,50 +1,44 @@
 <script lang="ts">
-  import {
-    ColorPicker,
-    Icon,
-    Label,
-    ModalContent,
-    Helpers,
-  } from "@budibase/bbui"
-  import { createEventDispatcher } from "svelte"
+import { ColorPicker, Helpers, Icon, Label, ModalContent } from "@budibase/bbui"
+import { createEventDispatcher } from "svelte"
 
-  export let name: string
-  export let color: string
+export let name: string
+export let color: string
 
-  const dispatch = createEventDispatcher()
-  const iconsList = [
-    "dots-nine",
-    "pencil-ruler",
-    "funnel-simple",
-    "app-store-logo",
-    "briefcase",
-    "money",
-    "shopping-cart",
-    "list",
-    "question",
-    "monitor",
-    "columns",
-    "folder",
-    "city",
-    "magnifying-glass",
-    "rocket-launch",
-    "car",
-    "camera",
-    "bug",
-    "snowflake",
-    "calculator",
-    "calendar-dots",
-    "chart-donut",
-    "chart-bar-horizontal",
-    "users-three",
-  ]
+const dispatch = createEventDispatcher()
+const iconsList = [
+  "dots-nine",
+  "pencil-ruler",
+  "funnel-simple",
+  "app-store-logo",
+  "briefcase",
+  "money",
+  "shopping-cart",
+  "list",
+  "question",
+  "monitor",
+  "columns",
+  "folder",
+  "city",
+  "magnifying-glass",
+  "rocket-launch",
+  "car",
+  "camera",
+  "bug",
+  "snowflake",
+  "calculator",
+  "calendar-dots",
+  "chart-donut",
+  "chart-bar-horizontal",
+  "users-three",
+]
 
-  $: phosphorIcon = Helpers.getPhosphorIcon(name)
+$: phosphorIcon = Helpers.getPhosphorIcon(name)
 
-  const save = async () => {
-    dispatch("change", { color, name })
-    return
-  }
+const save = async () => {
+  dispatch("change", { color, name })
+  return
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

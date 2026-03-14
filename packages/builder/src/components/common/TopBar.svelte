@@ -1,8 +1,8 @@
 <script context="module" lang="ts">
-  interface Breadcrumb {
-    text?: string
-    url?: string
-  }
+interface Breadcrumb {
+  text?: string
+  url?: string
+}
 </script>
 
 <script lang="ts">

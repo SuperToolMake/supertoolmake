@@ -1,7 +1,7 @@
 import { generator } from "@budibase/backend-core/tests"
-import { User } from "@budibase/types"
+import type { User } from "@budibase/types"
 import nock from "nock"
-import supertest from "supertest"
+import type supertest from "supertest"
 import environment from "../../../../environment"
 import { checkSlashesInUrl } from "../../../../utilities"
 import * as setup from "../../tests/utilities"
@@ -37,9 +37,7 @@ function base(
     extraHeaders["x-budibase-app-id"] = opts.intAppId
   }
 
-  const url = opts?.internal
-    ? endpoint
-    : checkSlashesInUrl(`/api/public/v1/${endpoint}`)
+  const url = opts?.internal ? endpoint : checkSlashesInUrl(`/api/public/v1/${endpoint}`)
   return { headers: extraHeaders, url }
 }
 
@@ -83,7 +81,7 @@ export function generateMakeRequestWithFormData(
   ) => {
     const { headers, url } = base(apiKey, endpoint, { ...opts, intAppId })
     const req = request[method](url).set(config.defaultHeaders(headers))
-    for (let [field, value] of Object.entries(fields)) {
+    for (const [field, value] of Object.entries(fields)) {
       if (typeof value === "string") {
         req.field(field, value)
       } else {
@@ -108,7 +106,7 @@ export function mockWorkerUserAPI(...seedUsers: User[]) {
   }
 
   nock(environment.WORKER_URL!)
-    .get(new RegExp(`/api/global/users/.*`))
+    .get(/\/api\/global\/users\/.*/)
     .reply(200, (uri, body) => {
       const id = uri.split("/").pop()
       return users[id!]
@@ -128,7 +126,7 @@ export function mockWorkerUserAPI(...seedUsers: User[]) {
     .persist()
 
   nock(environment.WORKER_URL!)
-    .put(new RegExp(`/api/global/users/.*`))
+    .put(/\/api\/global\/users\/.*/)
     .reply(200, (uri, body) => {
       const id = uri.split("/").pop()!
       const updatedUser = body as User

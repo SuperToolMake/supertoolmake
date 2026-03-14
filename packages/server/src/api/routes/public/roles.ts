@@ -1,5 +1,5 @@
-import controller from "../../controllers/public/roles"
 import { Endpoint } from "@budibase/backend-core"
+import controller from "../../controllers/public/roles"
 
 const write = []
 

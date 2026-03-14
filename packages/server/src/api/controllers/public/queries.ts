@@ -1,7 +1,7 @@
-import { search as stringSearch } from "./utils"
+import type { UserCtx } from "@budibase/types"
+import type { Next } from "koa"
 import * as queryController from "../query"
-import { UserCtx } from "@budibase/types"
-import { Next } from "koa"
+import { search as stringSearch } from "./utils"
 
 export async function search(ctx: UserCtx, next: Next) {
   await queryController.fetchQueries(ctx)

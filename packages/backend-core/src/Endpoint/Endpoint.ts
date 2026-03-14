@@ -1,21 +1,14 @@
-import Router from "@koa/router"
-import { UserCtx, Ctx } from "@budibase/types"
-import { Next } from "koa"
+import type { Ctx, UserCtx } from "@budibase/types"
+import type Router from "@koa/router"
+import type { Next } from "koa"
 
 export type Method = "post" | "put" | "patch" | "get" | "delete" | "head"
 
-export type UserCtxWithNextFn = (
-  ctx: UserCtx,
-  next: Next
-) => void | Promise<unknown>
+export type UserCtxWithNextFn = (ctx: UserCtx, next: Next) => void | Promise<unknown>
 export type CtxWithNextFn = (ctx: Ctx, next: Next) => void | Promise<unknown>
 export type UserCtxWithoutNextFn = (ctx: UserCtx) => void | Promise<unknown>
 export type CtxWithoutNextFn = (ctx: Ctx) => void | Promise<unknown>
-export type CtxFn =
-  | UserCtxWithNextFn
-  | UserCtxWithoutNextFn
-  | CtxWithNextFn
-  | CtxWithoutNextFn
+export type CtxFn = UserCtxWithNextFn | UserCtxWithoutNextFn | CtxWithNextFn | CtxWithoutNextFn
 
 class Endpoint {
   method: Method
@@ -59,14 +52,8 @@ class Endpoint {
     // need a function to do nothing to stop the execution at the end
     // middlewares are circular so if they always keep calling next, it'll just keep looping
     const complete = () => {}
-    const params = [
-      url,
-      ...middlewares,
-      controller,
-      ...outputMiddlewares,
-      complete,
-    ]
-    // @ts-ignore
+    const params = [url, ...middlewares, controller, ...outputMiddlewares, complete]
+    // @ts-expect-error
     router[method](...params)
   }
 }

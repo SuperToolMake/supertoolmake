@@ -1,10 +1,11 @@
-import { generator, structures } from "../../../../../tests"
 import { SSOProviderType } from "@budibase/types"
+import { generator, structures } from "../../../../../tests"
 
 jest.mock("passport-google-oauth")
 const mockStrategy = require("passport-google-oauth").OAuth2Strategy
 
 jest.mock("../sso")
+
 import * as _sso from "../sso"
 
 const sso = jest.mocked(_sso)
@@ -28,10 +29,7 @@ describe("google", () => {
         callbackURL: callbackUrl,
       }
 
-      expect(mockStrategy).toHaveBeenCalledWith(
-        expectedOptions,
-        expect.anything()
-      )
+      expect(mockStrategy).toHaveBeenCalledWith(expectedOptions, expect.anything())
     })
   })
 
@@ -57,12 +55,7 @@ describe("google", () => {
         mockDone
       )
 
-      expect(sso.authenticate).toHaveBeenCalledWith(
-        details,
-        true,
-        mockDone,
-        mockSaveUserFn
-      )
+      expect(sso.authenticate).toHaveBeenCalledWith(details, true, mockDone, mockSaveUserFn)
     })
   })
 })

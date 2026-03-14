@@ -1,220 +1,208 @@
 <script lang="ts">
-  import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
-  import PublishStatusBadge from "@/components/common/PublishStatusBadge.svelte"
-  import TopBar from "@/components/common/TopBar.svelte"
-  import VersionModal from "@/components/deploy/VersionModal.svelte"
-  import { capitalise, durationFromNow } from "@/helpers"
-  import { buildLiveUrl } from "@/helpers/urls"
-  import FavouriteResourceButton from "@/routes/builder/_components/FavouriteResourceButton.svelte"
-  import WorkspaceAppModal from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/_components/WorkspaceApp/WorkspaceAppModal.svelte"
-  import {
-    appStore,
-    contextMenuStore,
-    isOnlyUser,
-    workspaceAppStore,
-    workspaceFavouriteStore,
-  } from "@/stores/builder"
-  import {
-    AbsTooltip,
-    ActionButton,
-    Body,
-    Button,
-    Helpers,
-    Icon,
-    notifications,
-    StatusLight,
-    TooltipPosition,
-  } from "@budibase/bbui"
-  import {
-    PublishResourceState,
-    WorkspaceResource,
-    type UIWorkspaceApp,
-  } from "@budibase/types"
-  import NoResults from "../_components/NoResults.svelte"
-  import { url } from "@roxi/routify"
+import {
+  AbsTooltip,
+  ActionButton,
+  Body,
+  Button,
+  Helpers,
+  Icon,
+  notifications,
+  StatusLight,
+  TooltipPosition,
+} from "@budibase/bbui"
+import { PublishResourceState, type UIWorkspaceApp, WorkspaceResource } from "@budibase/types"
+import { url } from "@roxi/routify"
+import type ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
+import PublishStatusBadge from "@/components/common/PublishStatusBadge.svelte"
+import TopBar from "@/components/common/TopBar.svelte"
+import VersionModal from "@/components/deploy/VersionModal.svelte"
+import { capitalise, durationFromNow } from "@/helpers"
+import { buildLiveUrl } from "@/helpers/urls"
+import FavouriteResourceButton from "@/routes/builder/_components/FavouriteResourceButton.svelte"
+import type WorkspaceAppModal from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/_components/WorkspaceApp/WorkspaceAppModal.svelte"
+import {
+  appStore,
+  contextMenuStore,
+  isOnlyUser,
+  workspaceAppStore,
+  workspaceFavouriteStore,
+} from "@/stores/builder"
+import NoResults from "../_components/NoResults.svelte"
 
-  type ShowUI = { show: () => void }
+type ShowUI = { show: () => void }
 
-  let showHighlight = false
-  let filter: PublishResourceState | undefined
-  let selectedWorkspaceApp: UIWorkspaceApp | undefined = undefined
-  let workspaceAppModal: WorkspaceAppModal
-  let confirmDeleteDialog: ConfirmDialog
-  let appChangingStatus: string | undefined = undefined
-  let versionModal: ShowUI
+let showHighlight = false
+let filter: PublishResourceState | undefined
+let selectedWorkspaceApp: UIWorkspaceApp | undefined
+let workspaceAppModal: WorkspaceAppModal
+let confirmDeleteDialog: ConfirmDialog
+let appChangingStatus: string | undefined
+let versionModal: ShowUI
 
-  $: favourites = workspaceFavouriteStore.lookup
-  $: updateAvailable =
-    $appStore.upgradableVersion &&
-    $appStore.version &&
-    $appStore.upgradableVersion !== $appStore.version
+$: favourites = workspaceFavouriteStore.lookup
+$: updateAvailable =
+  $appStore.upgradableVersion &&
+  $appStore.version &&
+  $appStore.upgradableVersion !== $appStore.version
 
-  const filters: {
-    label: string
-    filterValue: PublishResourceState | undefined
+const filters: {
+  label: string
+  filterValue: PublishResourceState | undefined
+}[] = [
+  {
+    label: "All apps",
+    filterValue: undefined,
+  },
+  {
+    label: "Live",
+    filterValue: PublishResourceState.PUBLISHED,
+  },
+  {
+    label: "Off",
+    filterValue: PublishResourceState.DISABLED,
+  },
+]
+
+const deleteWorkspaceApp = async () => {
+  if (!selectedWorkspaceApp) {
+    return
+  }
+
+  try {
+    await workspaceAppStore.delete(selectedWorkspaceApp._id!, selectedWorkspaceApp._rev!)
+
+    notifications.success(`App '${selectedWorkspaceApp.name}' deleted successfully`)
+  } catch (e: any) {
+    let message = "Error deleting app"
+    if (e.message) {
+      message += ` - ${e.message}`
+    }
+    notifications.error(message)
+  }
+}
+
+const buildLiveWorkspaceAppUrl = (workspaceApp?: UIWorkspaceApp | null) => {
+  if (
+    !workspaceApp ||
+    workspaceApp.publishStatus?.state !== PublishResourceState.PUBLISHED ||
+    workspaceApp.disabled
+  ) {
+    return null
+  }
+
+  const liveUrl = buildLiveUrl(workspaceApp.url ?? "", true)
+
+  return liveUrl || null
+}
+
+const openLiveWorkspaceApp = (liveUrl: string | null) => {
+  if (!liveUrl || typeof window === "undefined") {
+    return
+  }
+  window.open(liveUrl, "_blank")
+}
+
+const getContextMenuOptions = (workspaceApp: UIWorkspaceApp) => {
+  const liveUrl = buildLiveWorkspaceAppUrl(workspaceApp)
+  const pause = {
+    icon: workspaceApp.disabled ? "play-circle" : "pause-circle",
+    name: workspaceApp.disabled ? "Switch on" : "Switch off",
+    visible: true,
+    callback: async () => {
+      try {
+        appChangingStatus = workspaceApp._id
+        await workspaceAppStore.toggleDisabled(workspaceApp._id!, !workspaceApp.disabled)
+      } finally {
+        appChangingStatus = undefined
+      }
+    },
+  }
+
+  const commands: {
+    icon: string
+    name: string
+    visible: boolean
+    callback: () => void
+    disabled?: boolean
   }[] = [
     {
-      label: "All apps",
-      filterValue: undefined,
+      icon: "pencil",
+      name: "Edit",
+      visible: true,
+      callback: () => workspaceAppModal.show(),
     },
     {
-      label: "Live",
-      filterValue: PublishResourceState.PUBLISHED,
+      icon: "globe-simple",
+      name: "View live app",
+      visible: !!liveUrl,
+      callback: () => openLiveWorkspaceApp(liveUrl),
     },
+
+    pause,
     {
-      label: "Off",
-      filterValue: PublishResourceState.DISABLED,
+      icon: "trash",
+      name: "Delete",
+      visible: true,
+      callback: () => confirmDeleteDialog.show(),
     },
   ]
 
-  const deleteWorkspaceApp = async () => {
-    if (!selectedWorkspaceApp) {
-      return
+  return commands
+}
+
+const openContextMenu = (e: MouseEvent, workspaceApp: UIWorkspaceApp) => {
+  e.preventDefault()
+  e.stopPropagation()
+  selectedWorkspaceApp = workspaceApp
+  showHighlight = true
+  contextMenuStore.open(
+    "workspace-app",
+    getContextMenuOptions(workspaceApp),
+    {
+      x: e.clientX,
+      y: e.clientY,
+    },
+    () => {
+      showHighlight = false
+    }
+  )
+}
+
+const createApp = () => {
+  selectedWorkspaceApp = undefined
+  workspaceAppModal.show()
+}
+
+$: workspaceApps = $workspaceAppStore.workspaceApps
+$: filteredWorkspaceApps = workspaceApps
+  .filter((a) => {
+    if (!filter) {
+      return true
     }
 
-    try {
-      await workspaceAppStore.delete(
-        selectedWorkspaceApp._id!,
-        selectedWorkspaceApp._rev!
-      )
-
-      notifications.success(
-        `App '${selectedWorkspaceApp.name}' deleted successfully`
-      )
-    } catch (e: any) {
-      let message = "Error deleting app"
-      if (e.message) {
-        message += ` - ${e.message}`
-      }
-      notifications.error(message)
-    }
-  }
-
-  const buildLiveWorkspaceAppUrl = (workspaceApp?: UIWorkspaceApp | null) => {
-    if (
-      !workspaceApp ||
-      workspaceApp.publishStatus?.state !== PublishResourceState.PUBLISHED ||
-      workspaceApp.disabled
-    ) {
-      return null
-    }
-
-    const liveUrl = buildLiveUrl(workspaceApp.url ?? "", true)
-
-    return liveUrl || null
-  }
-
-  const openLiveWorkspaceApp = (liveUrl: string | null) => {
-    if (!liveUrl || typeof window === "undefined") {
-      return
-    }
-    window.open(liveUrl, "_blank")
-  }
-
-  const getContextMenuOptions = (workspaceApp: UIWorkspaceApp) => {
-    const liveUrl = buildLiveWorkspaceAppUrl(workspaceApp)
-    const pause = {
-      icon: workspaceApp.disabled ? "play-circle" : "pause-circle",
-      name: workspaceApp.disabled ? "Switch on" : "Switch off",
-      visible: true,
-      callback: async () => {
-        try {
-          appChangingStatus = workspaceApp._id
-          await workspaceAppStore.toggleDisabled(
-            workspaceApp._id!,
-            !workspaceApp.disabled
-          )
-        } finally {
-          appChangingStatus = undefined
-        }
+    return a.publishStatus.state === filter
+  })
+  .map((app) => {
+    return {
+      ...app,
+      favourite: $favourites?.[app._id!] ?? {
+        resourceType: WorkspaceResource.WORKSPACE_APP,
+        resourceId: app._id!,
       },
     }
+  })
+  .sort((a, b) => {
+    const aIsFav = !!a.favourite._id
+    const bIsFav = !!b.favourite._id
 
-    const commands: {
-      icon: string
-      name: string
-      visible: boolean
-      callback: () => void
-      disabled?: boolean
-    }[] = [
-      {
-        icon: "pencil",
-        name: "Edit",
-        visible: true,
-        callback: () => workspaceAppModal.show(),
-      },
-      {
-        icon: "globe-simple",
-        name: "View live app",
-        visible: !!liveUrl,
-        callback: () => openLiveWorkspaceApp(liveUrl),
-      },
+    // Group by favourite status
+    if (aIsFav !== bIsFav) {
+      return bIsFav ? 1 : -1
+    }
 
-      pause,
-      {
-        icon: "trash",
-        name: "Delete",
-        visible: true,
-        callback: () => confirmDeleteDialog.show(),
-      },
-    ]
-
-    return commands
-  }
-
-  const openContextMenu = (e: MouseEvent, workspaceApp: UIWorkspaceApp) => {
-    e.preventDefault()
-    e.stopPropagation()
-    selectedWorkspaceApp = workspaceApp
-    showHighlight = true
-    contextMenuStore.open(
-      "workspace-app",
-      getContextMenuOptions(workspaceApp),
-      {
-        x: e.clientX,
-        y: e.clientY,
-      },
-      () => {
-        showHighlight = false
-      }
-    )
-  }
-
-  const createApp = () => {
-    selectedWorkspaceApp = undefined
-    workspaceAppModal.show()
-  }
-
-  $: workspaceApps = $workspaceAppStore.workspaceApps
-  $: filteredWorkspaceApps = workspaceApps
-    .filter(a => {
-      if (!filter) {
-        return true
-      }
-
-      return a.publishStatus.state === filter
-    })
-    .map(app => {
-      return {
-        ...app,
-        favourite: $favourites?.[app._id!] ?? {
-          resourceType: WorkspaceResource.WORKSPACE_APP,
-          resourceId: app._id!,
-        },
-      }
-    })
-    .sort((a, b) => {
-      const aIsFav = !!a.favourite._id
-      const bIsFav = !!b.favourite._id
-
-      // Group by favourite status
-      if (aIsFav !== bIsFav) {
-        return bIsFav ? 1 : -1
-      }
-
-      // Within same group, sort by updatedAt
-      return b.updatedAt!.localeCompare(a.updatedAt!)
-    })
+    // Within same group, sort by updatedAt
+    return b.updatedAt!.localeCompare(a.updatedAt!)
+  })
 </script>
 
 <div class="apps-index">

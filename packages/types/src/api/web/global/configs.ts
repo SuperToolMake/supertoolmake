@@ -1,9 +1,4 @@
-import {
-  Config,
-  ConfigType,
-  SettingsConfig,
-  SettingsInnerConfig,
-} from "../../../documents"
+import type { Config, ConfigType, SettingsConfig, SettingsInnerConfig } from "../../../documents"
 
 /**
  * Settings that aren't stored in the database - enriched at runtime.

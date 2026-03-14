@@ -1,4 +1,4 @@
-import {
+import type {
   FieldDatasource,
   JSONArrayFieldDatasource,
   QueryArrayFieldDatasource,
@@ -51,7 +51,7 @@ export default class FieldFetch<
     const data = datasource?.value || []
     let rows: Row[]
     if (isArrayOfStrings(data)) {
-      rows = data.map(value => ({ value }))
+      rows = data.map((value) => ({ value }))
     } else {
       rows = data
     }

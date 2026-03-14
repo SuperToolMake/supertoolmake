@@ -1,39 +1,29 @@
-import { v4 } from "uuid"
+import { db as dbCore, objectStore, tenancy } from "@budibase/backend-core"
 import {
-  TemplateMetadata,
-  TemplateBindings,
-  GLOBAL_OWNER,
-} from "../../../constants"
-import {
-  addBaseTemplates,
-  getTemplateByID,
-  getTemplates,
-} from "../../../constants/templates"
-import { tenancy, db as dbCore, objectStore } from "@budibase/backend-core"
-import {
-  DeleteGlobalTemplateResponse,
-  FetchGlobalTemplateByOwnerIDResponse,
-  FetchGlobalTemplateByTypeResponse,
-  FetchGlobalTemplateDefinitionResponse,
-  FetchGlobalTemplateResponse,
-  FindGlobalTemplateResponse,
-  SaveGlobalTemplateRequest,
-  SaveGlobalTemplateResponse,
-  GlobalTemplateBinding,
-  GlobalTemplateDefinition,
-  UserCtx,
-  Ctx,
+  type Ctx,
+  type DeleteGlobalTemplateResponse,
   EmailTemplatePurpose,
+  type FetchGlobalTemplateByOwnerIDResponse,
+  type FetchGlobalTemplateByTypeResponse,
+  type FetchGlobalTemplateDefinitionResponse,
+  type FetchGlobalTemplateResponse,
+  type FindGlobalTemplateResponse,
+  type GlobalTemplateBinding,
+  type GlobalTemplateDefinition,
+  type SaveGlobalTemplateRequest,
+  type SaveGlobalTemplateResponse,
+  type UserCtx,
 } from "@budibase/types"
-import { join } from "path"
 import fs from "fs"
+import { join } from "path"
+import { v4 } from "uuid"
 import yaml from "yaml"
+import { GLOBAL_OWNER, TemplateBindings, TemplateMetadata } from "../../../constants"
+import { addBaseTemplates, getTemplateByID, getTemplates } from "../../../constants/templates"
 
-export async function save(
-  ctx: UserCtx<SaveGlobalTemplateRequest, SaveGlobalTemplateResponse>
-) {
+export async function save(ctx: UserCtx<SaveGlobalTemplateRequest, SaveGlobalTemplateResponse>) {
   const db = tenancy.getGlobalDB()
-  let template = ctx.request.body
+  const template = ctx.request.body
   if (!template.ownerId) {
     template.ownerId = GLOBAL_OWNER
   }
@@ -48,12 +38,10 @@ export async function save(
   }
 }
 
-export async function definitions(
-  ctx: UserCtx<void, FetchGlobalTemplateDefinitionResponse>
-) {
+export async function definitions(ctx: UserCtx<void, FetchGlobalTemplateDefinitionResponse>) {
   const bindings: Record<string, GlobalTemplateBinding[]> = {}
   const info: Record<string, GlobalTemplateDefinition> = {}
-  for (let template of TemplateMetadata.email) {
+  for (const template of TemplateMetadata.email) {
     bindings[template.purpose] = template.bindings
     info[template.purpose] = {
       name: template.name,
@@ -75,18 +63,14 @@ export async function fetch(ctx: UserCtx<void, FetchGlobalTemplateResponse>) {
   ctx.body = await getTemplates()
 }
 
-export async function fetchByType(
-  ctx: UserCtx<void, FetchGlobalTemplateByTypeResponse>
-) {
+export async function fetchByType(ctx: UserCtx<void, FetchGlobalTemplateByTypeResponse>) {
   ctx.body = await getTemplates({
     type: ctx.params.type,
   })
 }
 
-export async function fetchByOwner(
-  ctx: UserCtx<void, FetchGlobalTemplateByOwnerIDResponse>
-) {
-  // @ts-ignore
+export async function fetchByOwner(ctx: UserCtx<void, FetchGlobalTemplateByOwnerIDResponse>) {
+  // @ts-expect-error
   ctx.body = await getTemplates({
     ownerId: ctx.params.ownerId,
   })
@@ -96,22 +80,18 @@ export async function find(ctx: UserCtx<void, FindGlobalTemplateResponse>) {
   ctx.body = await getTemplateByID(ctx.params.id)
 }
 
-export async function destroy(
-  ctx: UserCtx<void, DeleteGlobalTemplateResponse>
-) {
+export async function destroy(ctx: UserCtx<void, DeleteGlobalTemplateResponse>) {
   const db = tenancy.getGlobalDB()
   await db.remove(ctx.params.id, ctx.params.rev)
   ctx.body = { message: `Template ${ctx.params.id} deleted.` }
 }
 
-function templatesToYaml(
-  templates: Array<{ contents: string; purpose: string }>
-): string {
+function templatesToYaml(templates: Array<{ contents: string; purpose: string }>): string {
   const doc = new yaml.Document()
 
   // Build the template object
   const templatesObj: Record<string, yaml.Scalar> = {}
-  templates.forEach(template => {
+  templates.forEach((template) => {
     const scalar = new yaml.Scalar(template.contents)
     scalar.type = "BLOCK_LITERAL"
     templatesObj[template.purpose] = scalar
@@ -132,14 +112,11 @@ export async function exportTemplates(ctx: Ctx) {
     const { type = "default" } = ctx.request?.body || {}
 
     // Load either original or customised templates
-    const allTemplates =
-      type === "custom" ? await getTemplates() : addBaseTemplates([], "email")
+    const allTemplates = type === "custom" ? await getTemplates() : addBaseTemplates([], "email")
 
-    const filtered = allTemplates.filter(
-      ({ purpose }) => purpose !== EmailTemplatePurpose.CORE
-    )
+    const filtered = allTemplates.filter(({ purpose }) => purpose !== EmailTemplatePurpose.CORE)
     // Outline all the type keys
-    const header = `# Template types: ${filtered.map(t => t.purpose).join(", ")} :) \n\n`
+    const header = `# Template types: ${filtered.map((t) => t.purpose).join(", ")} :) \n\n`
     const yamlContent = templatesToYaml(filtered)
     try {
       // Combine header and content
@@ -151,10 +128,7 @@ export async function exportTemplates(ctx: Ctx) {
       fs.writeFileSync(path, finalYaml)
       ctx.body = fs.createReadStream(path)
     } catch (err: any) {
-      ctx.throw(
-        err.status,
-        `Could not download email templates: ${err.message}`
-      )
+      ctx.throw(err.status, `Could not download email templates: ${err.message}`)
     }
   }
 }

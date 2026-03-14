@@ -1,79 +1,75 @@
 <script lang="ts">
-  import { isActive, goto as gotoStore, params } from "@roxi/routify"
-  import { BUDIBASE_INTERNAL_DB_ID } from "@/constants/backend"
-  import { contextMenuStore, userSelectedResourceMap } from "@/stores/builder"
-  import { restTemplates } from "@/stores/builder/restTemplates"
-  import NavItem from "@/components/common/NavItem.svelte"
+import { Icon } from "@budibase/bbui"
+import { goto as gotoStore, isActive, params } from "@roxi/routify"
+import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
+import type UpdateDatasourceModal from "@/components/backend/DatasourceNavigator/modals/UpdateDatasourceModal.svelte"
+import type DeleteDataConfirmModal from "@/components/backend/modals/DeleteDataConfirmationModal.svelte"
+import NavItem from "@/components/common/NavItem.svelte"
+import { BUDIBASE_INTERNAL_DB_ID } from "@/constants/backend"
+import { contextMenuStore, userSelectedResourceMap } from "@/stores/builder"
+import { restTemplates } from "@/stores/builder/restTemplates"
 
-  import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
-  import { Icon } from "@budibase/bbui"
-  import UpdateDatasourceModal from "@/components/backend/DatasourceNavigator/modals/UpdateDatasourceModal.svelte"
-  import DeleteDataConfirmModal from "@/components/backend/modals/DeleteDataConfirmationModal.svelte"
+$: goto = $gotoStore
+$params
 
-  $: goto = $gotoStore
-  $params
+export let datasource
 
-  export let datasource
+$: templateIcon =
+  datasource?.restTemplate && $restTemplates
+    ? restTemplates.getByName(datasource.restTemplate)?.icon
+    : undefined
 
-  $: templateIcon =
-    datasource?.restTemplate && $restTemplates
-      ? restTemplates.getByName(datasource.restTemplate)?.icon
-      : undefined
+let editModal: UpdateDatasourceModal
+let deleteConfirmationModal: DeleteDataConfirmModal
 
-  let editModal: UpdateDatasourceModal
-  let deleteConfirmationModal: DeleteDataConfirmModal
+let addQueryItem = {
+  icon: "plus",
+  name: datasource?.source === "REST" ? "Add action" : "Create new query",
+  keyBind: null,
+  visible: true,
+  disabled: false,
+  callback: () => {
+    const section = datasource?.source === "REST" ? "apis" : "data"
+    goto(`/builder/workspace/[application]/${section}/query/new/[datasourceId]`, {
+      application: $params.application,
+      datasourceId: datasource._id,
+    })
+  },
+}
 
-  let addQueryItem = {
-    icon: "plus",
-    name: datasource?.source === "REST" ? "Add action" : "Create new query",
-    keyBind: null,
-    visible: true,
-    disabled: false,
-    callback: () => {
-      const section = datasource?.source === "REST" ? "apis" : "data"
-      goto(
-        `/builder/workspace/[application]/${section}/query/new/[datasourceId]`,
-        {
-          application: $params.application,
-          datasourceId: datasource._id,
-        }
-      )
+const getContextMenuItems = () => {
+  return [
+    ...(datasource._id !== BUDIBASE_INTERNAL_DB_ID ? [addQueryItem] : []),
+    {
+      icon: "pencil",
+      name: "Edit",
+      keyBind: null,
+      visible: true,
+      disabled: false,
+      callback: editModal.show,
     },
-  }
+    {
+      icon: "trash",
+      name: "Delete",
+      keyBind: null,
+      visible: true,
+      disabled: false,
+      callback: deleteConfirmationModal.show,
+    },
+  ]
+}
 
-  const getContextMenuItems = () => {
-    return [
-      ...(datasource._id !== BUDIBASE_INTERNAL_DB_ID ? [addQueryItem] : []),
-      {
-        icon: "pencil",
-        name: "Edit",
-        keyBind: null,
-        visible: true,
-        disabled: false,
-        callback: editModal.show,
-      },
-      {
-        icon: "trash",
-        name: "Delete",
-        keyBind: null,
-        visible: true,
-        disabled: false,
-        callback: deleteConfirmationModal.show,
-      },
-    ]
+// @ts-expect-error TODO(mel): Add type
+const openContextMenu = (e) => {
+  if (datasource._id === BUDIBASE_INTERNAL_DB_ID) {
+    return
   }
+  e.preventDefault()
+  e.stopPropagation()
 
-  // @ts-expect-error TODO(mel): Add type
-  const openContextMenu = e => {
-    if (datasource._id === BUDIBASE_INTERNAL_DB_ID) {
-      return
-    }
-    e.preventDefault()
-    e.stopPropagation()
-
-    const items = getContextMenuItems()
-    contextMenuStore.open(datasource._id, items, { x: e.clientX, y: e.clientY })
-  }
+  const items = getContextMenuItems()
+  contextMenuStore.open(datasource._id, items, { x: e.clientX, y: e.clientY })
+}
 </script>
 
 <NavItem

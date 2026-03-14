@@ -1,4 +1,4 @@
-import { Document } from "../document"
+import type { Document } from "../document"
 
 export interface EnvironmentVariablesDoc extends Document {
   variables: string
@@ -10,10 +10,7 @@ export type EnvironmentVariableValue = {
 }
 
 // what comes out of the "variables" when it is decrypted
-export type EnvironmentVariablesDecrypted = Record<
-  string,
-  EnvironmentVariableValue
->
+export type EnvironmentVariablesDecrypted = Record<string, EnvironmentVariableValue>
 
 export interface EnvironmentVariablesDocDecrypted extends Document {
   variables: EnvironmentVariablesDecrypted

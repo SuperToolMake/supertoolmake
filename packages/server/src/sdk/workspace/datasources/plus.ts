@@ -1,11 +1,5 @@
 import { context } from "@budibase/backend-core"
-import {
-  Datasource,
-  DatasourcePlus,
-  IntegrationBase,
-  Schema,
-  Table,
-} from "@budibase/types"
+import type { Datasource, DatasourcePlus, IntegrationBase, Schema, Table } from "@budibase/types"
 
 import { getIntegration } from "../../../integrations"
 import tableSdk from "../tables"
@@ -13,17 +7,14 @@ import * as datasources from "./datasources"
 
 function checkForSchemaErrors(schema: Record<string, Table>) {
   const errors: Record<string, string> = {}
-  for (let [tableName, table] of Object.entries(schema)) {
+  for (const [tableName, table] of Object.entries(schema)) {
     if (tableName.includes(".")) {
       errors[tableName] = "Table names containing dots are not supported."
     } else {
       const columnNames = Object.keys(table.schema)
-      const invalidColumnName = columnNames.find(columnName =>
-        columnName.includes(".")
-      )
+      const invalidColumnName = columnNames.find((columnName) => columnName.includes("."))
       if (invalidColumnName) {
-        errors[tableName] =
-          `Column '${invalidColumnName}' is not supported as it contains a dot.`
+        errors[tableName] = `Column '${invalidColumnName}' is not supported as it contains a dot.`
       }
     }
   }
@@ -39,15 +30,15 @@ export async function buildFilteredSchema(
     return schema
   }
 
-  let filteredSchema: Schema = { tables: {}, errors: {} }
-  for (let key in schema.tables) {
-    if (filter.some(filter => filter.toLowerCase() === key.toLowerCase())) {
+  const filteredSchema: Schema = { tables: {}, errors: {} }
+  for (const key in schema.tables) {
+    if (filter.some((filter) => filter.toLowerCase() === key.toLowerCase())) {
       filteredSchema.tables[key] = schema.tables[key]
     }
   }
 
-  for (let key in schema.errors) {
-    if (filter.some(filter => filter.toLowerCase() === key.toLowerCase())) {
+  for (const key in schema.errors) {
+    if (filter.some((filter) => filter.toLowerCase() === key.toLowerCase())) {
       filteredSchema.errors[key] = schema.errors[key]
     }
   }
@@ -61,16 +52,9 @@ export async function buildFilteredSchema(
   }
 }
 
-async function buildSchemaHelper(
-  datasource: Datasource,
-  filter?: string[]
-): Promise<Schema> {
+async function buildSchemaHelper(datasource: Datasource, filter?: string[]): Promise<Schema> {
   const connector = (await getConnector(datasource)) as DatasourcePlus
-  return await connector.buildSchema(
-    datasource._id!,
-    datasource.entities!,
-    filter
-  )
+  return await connector.buildSchema(datasource._id!, datasource.entities!, filter)
 }
 
 export async function getConnector(
@@ -94,10 +78,7 @@ export async function getAndMergeDatasource(datasource: Datasource) {
   return await datasources.enrich(datasource)
 }
 
-export async function buildSchemaFromSource(
-  datasourceId: string,
-  tablesFilter?: string[]
-) {
+export async function buildSchemaFromSource(datasourceId: string, tablesFilter?: string[]) {
   const db = context.getWorkspaceDB()
 
   const datasource = await datasources.get(datasourceId)

@@ -1,6 +1,6 @@
-import { enrichDataBindings } from "./enrichDataBinding"
-import { enrichButtonActions } from "./buttonActions"
 import { decodeJSBinding } from "@budibase/string-templates"
+import { enrichButtonActions } from "./buttonActions"
+import { enrichDataBindings } from "./enrichDataBinding"
 
 /**
  * Deeply compares 2 props using JSON.stringify.
@@ -25,9 +25,9 @@ export const propsAreSame = (a, b) => {
 export const enrichProps = (props, context, settingsDefinitionMap) => {
   // We want to exclude any button actions from enrichment at this stage.
   // Extract top level button action settings.
-  let normalProps = { ...props }
-  let actionProps = {}
-  Object.keys(normalProps).forEach(prop => {
+  const normalProps = { ...props }
+  const actionProps = {}
+  Object.keys(normalProps).forEach((prop) => {
     if (settingsDefinitionMap?.[prop]?.type === "event") {
       actionProps[prop] = normalProps[prop]
       delete normalProps[prop]
@@ -36,15 +36,15 @@ export const enrichProps = (props, context, settingsDefinitionMap) => {
 
   // Store the original conditions so that we can restore parts of them after
   // enrichment
-  let rawConditions = normalProps._conditions
+  const rawConditions = normalProps._conditions
 
   // Enrich all props except button actions
-  let enrichedProps = enrichDataBindings(normalProps, context)
+  const enrichedProps = enrichDataBindings(normalProps, context)
 
   // Enrich button actions.
   // Actions are enriched into a function at this stage, but actual data
   // binding enrichment is done dynamically at runtime.
-  Object.keys(actionProps).forEach(prop => {
+  Object.keys(actionProps).forEach((prop) => {
     enrichedProps[prop] = enrichButtonActions(actionProps[prop], context)
   })
 
@@ -54,10 +54,7 @@ export const enrichProps = (props, context, settingsDefinitionMap) => {
       if (settingsDefinitionMap?.[condition.setting]?.type === "event") {
         // Use the original condition action value to enrich it to a button
         // action
-        condition.settingValue = enrichButtonActions(
-          rawConditions[idx].settingValue,
-          context
-        )
+        condition.settingValue = enrichButtonActions(rawConditions[idx].settingValue, context)
 
         // Since we can't compare functions, we need to assume that conditions
         // change after every enrichment
@@ -86,9 +83,9 @@ export const propsUseBinding = (props, bindingKey) => {
   if (usedInHBS) {
     return true
   }
-  const jsBindingRegex = new RegExp("{{ js [^}]+ }}", "g")
+  const jsBindingRegex = /{{ js [^}]+ }}/g
   const jsBindings = [...string.matchAll(jsBindingRegex)]
-  for (let jsBinding of jsBindings) {
+  for (const jsBinding of jsBindings) {
     const encoded = jsBinding[0]
     const js = decodeJSBinding(encoded)
     if (js?.includes(`$("[${bindingKey}]`)) {

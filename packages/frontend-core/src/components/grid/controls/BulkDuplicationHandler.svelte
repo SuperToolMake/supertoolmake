@@ -1,61 +1,58 @@
 <script>
-  import { Modal, ModalContent, ProgressBar } from "@budibase/bbui"
-  import { getContext, onMount } from "svelte"
-  import { getCellID } from "../lib/utils"
-  import { sleep } from "../../../utils/utils"
+import { Modal, ModalContent, ProgressBar } from "@budibase/bbui"
+import { getContext, onMount } from "svelte"
+import { sleep } from "../../../utils/utils"
+import { getCellID } from "../lib/utils"
 
-  const {
-    selectedRows,
-    rows,
-    subscribe,
-    selectedRowCount,
-    visibleColumns,
-    selectedCells,
-    rowLookupMap,
-  } = getContext("grid")
-  const duration = 260
+const {
+  selectedRows,
+  rows,
+  subscribe,
+  selectedRowCount,
+  visibleColumns,
+  selectedCells,
+  rowLookupMap,
+} = getContext("grid")
+const duration = 260
 
-  let modal
-  let progressPercentage = 0
-  let processing = false
-  let promptQuantity = 0
+let modal
+let progressPercentage = 0
+let processing = false
+let promptQuantity = 0
 
-  // Deletion callback when confirmed
-  const performDuplication = async () => {
-    progressPercentage = 0
-    processing = true
+// Deletion callback when confirmed
+const performDuplication = async () => {
+  progressPercentage = 0
+  processing = true
 
-    // duplicate rows
-    const rowsToDuplicate = Object.keys($selectedRows).map(id => {
-      return $rowLookupMap[id]
-    })
-    const newRows = await rows.actions.bulkDuplicate(
-      rowsToDuplicate,
-      progress => {
-        progressPercentage = progress * 100
-      }
-    )
-    await sleep(duration)
+  // duplicate rows
+  const rowsToDuplicate = Object.keys($selectedRows).map((id) => {
+    return $rowLookupMap[id]
+  })
+  const newRows = await rows.actions.bulkDuplicate(rowsToDuplicate, (progress) => {
+    progressPercentage = progress * 100
+  })
+  await sleep(duration)
 
-    // Select new cells to highlight them
-    if (newRows.length) {
-      const firstRow = newRows[0]
-      const lastRow = newRows[newRows.length - 1]
-      const firstCol = $visibleColumns[0]
-      const lastCol = $visibleColumns[$visibleColumns.length - 1]
-      const startCellId = getCellID(firstRow._id, firstCol.name)
-      const endCellId = getCellID(lastRow._id, lastCol.name)
-      selectedCells.actions.selectRange(startCellId, endCellId)
-    }
-    processing = false
+  // Select new cells to highlight them
+  if (newRows.length) {
+    const firstRow = newRows[0]
+    const lastRow = newRows[newRows.length - 1]
+    const firstCol = $visibleColumns[0]
+    const lastCol = $visibleColumns[$visibleColumns.length - 1]
+    const startCellId = getCellID(firstRow._id, firstCol.name)
+    const endCellId = getCellID(lastRow._id, lastCol.name)
+    selectedCells.actions.selectRange(startCellId, endCellId)
   }
+  processing = false
+}
 
-  const handleBulkDuplicateRequest = () => {
-    promptQuantity = $selectedRowCount
-    modal?.show()
-  }
+const handleBulkDuplicateRequest = () => {
+  promptQuantity = $selectedRowCount
+  modal?.show()
+}
 
-  onMount(() => subscribe("request-bulk-duplicate", handleBulkDuplicateRequest))
+onMount(() => subscribe("request-bulk-duplicate", handleBulkDuplicateRequest))
 </script>
 
 <Modal bind:this={modal}>

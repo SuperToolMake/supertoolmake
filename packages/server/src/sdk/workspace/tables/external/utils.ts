@@ -1,21 +1,21 @@
 import {
-  Datasource,
+  type Datasource,
   FieldType,
-  ManyToManyRelationshipFieldMetadata,
-  ManyToOneRelationshipFieldMetadata,
-  OneToManyRelationshipFieldMetadata,
-  RelationshipFieldMetadata,
+  type ManyToManyRelationshipFieldMetadata,
+  type ManyToOneRelationshipFieldMetadata,
+  type OneToManyRelationshipFieldMetadata,
+  type RelationshipFieldMetadata,
   RelationshipType,
-  Table,
+  type Table,
   TableSourceType,
 } from "@budibase/types"
+import { cloneDeep } from "lodash/fp"
 import {
   foreignKeyStructure,
   generateForeignKey,
   generateJunctionTableName,
 } from "../../../../api/controllers/table/utils"
 import { buildExternalTableId } from "../../../../integrations/utils"
-import { cloneDeep } from "lodash/fp"
 
 export function cleanupRelationships(
   table: Table,
@@ -35,25 +35,20 @@ export function cleanupRelationships(
   const oldTable = opts?.oldTable
   const tableToIterate = oldTable ? oldTable : table
   // clean up relationships in couch table schemas
-  for (let [key, schema] of Object.entries(tableToIterate.schema)) {
+  for (const [key, schema] of Object.entries(tableToIterate.schema)) {
     if (
       schema.type === FieldType.LINK &&
       (opts?.deleting || oldTable?.schema[key] != null) &&
       table.schema[key] == null
     ) {
       const schemaTableId = schema.tableId
-      const relatedTable = Object.values(tables).find(
-        table => table._id === schemaTableId
-      )
+      const relatedTable = Object.values(tables).find((table) => table._id === schemaTableId)
       const foreignKey =
-        schema.relationshipType !== RelationshipType.MANY_TO_MANY &&
-        schema.foreignKey
+        schema.relationshipType !== RelationshipType.MANY_TO_MANY && schema.foreignKey
       if (!relatedTable || !foreignKey) {
         continue
       }
-      for (let [relatedKey, relatedSchema] of Object.entries(
-        relatedTable.schema
-      )) {
+      for (const [relatedKey, relatedSchema] of Object.entries(relatedTable.schema)) {
         if (relatedSchema.type !== FieldType.LINK) {
           continue
         }
@@ -121,9 +116,7 @@ export function generateManyLinkSchema(
 }
 
 export function generateLinkSchema(
-  column:
-    | OneToManyRelationshipFieldMetadata
-    | ManyToOneRelationshipFieldMetadata,
+  column: OneToManyRelationshipFieldMetadata | ManyToOneRelationshipFieldMetadata,
   table: Table,
   relatedTable: Table,
   type: RelationshipType.ONE_TO_MANY | RelationshipType.MANY_TO_ONE
@@ -149,8 +142,7 @@ export function generateRelatedSchema(
 ) {
   // generate column for other table
   let relatedSchema: RelationshipFieldMetadata
-  const isMany2Many =
-    linkColumn.relationshipType === RelationshipType.MANY_TO_MANY
+  const isMany2Many = linkColumn.relationshipType === RelationshipType.MANY_TO_MANY
   // swap them from the main link
   if (!isMany2Many && linkColumn.foreignKey) {
     relatedSchema = cloneDeep(linkColumn) as
@@ -168,9 +160,7 @@ export function generateRelatedSchema(
     relatedSchema.throughTo = manyToManyCol.throughFrom
     relatedSchema.throughFrom = manyToManyCol.throughTo
   }
-  relatedSchema.relationshipType = otherRelationshipType(
-    linkColumn.relationshipType
-  )
+  relatedSchema.relationshipType = otherRelationshipType(linkColumn.relationshipType)
   relatedSchema.tableId = relatedTable._id!
   relatedSchema.name = columnName
   table.schema[columnName] = relatedSchema

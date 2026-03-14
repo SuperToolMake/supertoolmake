@@ -1,20 +1,20 @@
 <script lang="ts">
-  import { Icon, ProgressCircle } from "@budibase/bbui"
+import { Icon, ProgressCircle } from "@budibase/bbui"
 
-  export let backgroundColour: string
-  export let imageSrc: string
-  export let name: string
-  export let icon: string
-  export let description = ""
-  export let overlayEnabled: boolean = true
-  export let isLoading: boolean = false
-  export let isSelected: boolean = false
+export let backgroundColour: string
+export let imageSrc: string
+export let name: string
+export let icon: string
+export let description = ""
+export let overlayEnabled: boolean = true
+export let isLoading: boolean = false
+export let isSelected: boolean = false
 
-  let imageError = false
+let imageError = false
 
-  const imageRenderError = () => {
-    imageError = true
-  }
+const imageRenderError = () => {
+  imageError = true
+}
 </script>
 
 <div

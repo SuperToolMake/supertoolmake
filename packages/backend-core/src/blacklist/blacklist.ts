@@ -1,7 +1,7 @@
 import dns from "dns"
 import net from "net"
-import env from "../environment"
 import { promisify } from "util"
+import env from "../environment"
 
 const DEFAULT_BLACKLIST = [
   "127.0.0.0/8",
@@ -66,7 +66,7 @@ async function lookup(address: string): Promise<string[]> {
   const addresses = await performLookup(address, {
     all: true,
   })
-  return addresses.map(addr => addr.address)
+  return addresses.map((addr) => addr.address)
 }
 
 function addEntryToBlacklist(blockList: net.BlockList, entry: string) {
@@ -144,5 +144,5 @@ export async function isBlacklisted(address: string): Promise<boolean> {
   } else {
     ips = [address]
   }
-  return ips.some(ip => blackList!.check(ip, getIpVersion(ip)))
+  return ips.some((ip) => blackList!.check(ip, getIpVersion(ip)))
 }

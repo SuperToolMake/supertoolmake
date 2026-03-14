@@ -1,4 +1,4 @@
-import {
+import type {
   BuildSchemaFromSourceRequest,
   BuildSchemaFromSourceResponse,
   CreateDatasourceRequest,
@@ -16,7 +16,7 @@ import {
   VerifyDatasourceRequest,
   VerifyDatasourceResponse,
 } from "@budibase/types"
-import { BaseAPIClient } from "./types"
+import type { BaseAPIClient } from "./types"
 
 export interface DatasourceEndpoints {
   getDatasources: () => Promise<Datasource[]>
@@ -24,33 +24,18 @@ export interface DatasourceEndpoints {
     datasourceId: string,
     tablesFilter?: string[]
   ) => Promise<BuildSchemaFromSourceResponse>
-  createDatasource: (
-    data: CreateDatasourceRequest
-  ) => Promise<CreateDatasourceResponse>
-  updateDatasource: (
-    datasource: Datasource
-  ) => Promise<UpdateDatasourceResponse>
-  deleteDatasource: (
-    id: string,
-    rev: string
-  ) => Promise<DeleteDatasourceResponse>
-  validateDatasource: (
-    datasource: Datasource
-  ) => Promise<VerifyDatasourceResponse>
-  fetchInfoForDatasource: (
-    datasource: Datasource
-  ) => Promise<FetchDatasourceInfoResponse>
-  fetchViewInfoForDatasource: (
-    datasource: Datasource
-  ) => Promise<FetchDatasourceViewInfoResponse>
+  createDatasource: (data: CreateDatasourceRequest) => Promise<CreateDatasourceResponse>
+  updateDatasource: (datasource: Datasource) => Promise<UpdateDatasourceResponse>
+  deleteDatasource: (id: string, rev: string) => Promise<DeleteDatasourceResponse>
+  validateDatasource: (datasource: Datasource) => Promise<VerifyDatasourceResponse>
+  fetchInfoForDatasource: (datasource: Datasource) => Promise<FetchDatasourceInfoResponse>
+  fetchViewInfoForDatasource: (datasource: Datasource) => Promise<FetchDatasourceViewInfoResponse>
   fetchRelationshipInfoForDatasource: (
     datasource: Datasource
   ) => Promise<FetchDatasourceRelationshipInfoResponse>
 }
 
-export const buildDatasourceEndpoints = (
-  API: BaseAPIClient
-): DatasourceEndpoints => ({
+export const buildDatasourceEndpoints = (API: BaseAPIClient): DatasourceEndpoints => ({
   /**
    * Gets a list of datasources.
    */
@@ -64,10 +49,7 @@ export const buildDatasourceEndpoints = (
    * Prompts the server to build the schema for a datasource.
    */
   buildDatasourceSchema: async (datasourceId, tablesFilter?) => {
-    return await API.post<
-      BuildSchemaFromSourceRequest,
-      BuildSchemaFromSourceResponse
-    >({
+    return await API.post<BuildSchemaFromSourceRequest, BuildSchemaFromSourceResponse>({
       url: `/api/datasources/${datasourceId}/schema`,
       body: {
         tablesFilter,
@@ -78,7 +60,7 @@ export const buildDatasourceEndpoints = (
   /**
    * Creates a datasource
    */
-  createDatasource: async data => {
+  createDatasource: async (data) => {
     return await API.post({
       url: "/api/datasources",
       body: data,
@@ -88,7 +70,7 @@ export const buildDatasourceEndpoints = (
   /**
    * Updates a datasource
    */
-  updateDatasource: async datasource => {
+  updateDatasource: async (datasource) => {
     return await API.put<UpdateDatasourceRequest, UpdateDatasourceResponse>({
       url: `/api/datasources/${datasource._id}`,
       body: datasource,
@@ -118,10 +100,7 @@ export const buildDatasourceEndpoints = (
    * Fetch table names available within the datasource, for filtering out undesired tables
    */
   fetchInfoForDatasource: async (datasource: Datasource) => {
-    return await API.post<
-      FetchDatasourceInfoRequest,
-      FetchDatasourceInfoResponse
-    >({
+    return await API.post<FetchDatasourceInfoRequest, FetchDatasourceInfoResponse>({
       url: `/api/datasources/info`,
       body: { datasource },
     })
@@ -131,10 +110,7 @@ export const buildDatasourceEndpoints = (
    * Fetch view names and definitions available within the datasource
    */
   fetchViewInfoForDatasource: async (datasource: Datasource) => {
-    return await API.post<
-      FetchDatasourceViewInfoRequest,
-      FetchDatasourceViewInfoResponse
-    >({
+    return await API.post<FetchDatasourceViewInfoRequest, FetchDatasourceViewInfoResponse>({
       url: `/api/datasources/views`,
       body: { datasource },
     })

@@ -98,8 +98,7 @@ export const getLocaleStartDayOfWeek = (
     if (!normalized) {
       continue
     }
-    const match =
-      localeLookup.get(normalized) || localeLookup.get(normalized.split("-")[0])
+    const match = localeLookup.get(normalized) || localeLookup.get(normalized.split("-")[0])
     const weekStartsOn = match?.options?.weekStartsOn
     if (typeof weekStartsOn === "number") {
       const index = ((weekStartsOn % 7) + 7) % 7

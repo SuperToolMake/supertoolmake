@@ -1,12 +1,11 @@
 import { context } from "@budibase/backend-core"
-import { DocumentInsertResponse } from "nano"
-import { RenameColumn, Table } from "@budibase/types"
+import type { RenameColumn, Table } from "@budibase/types"
+import { cloneDeep } from "lodash"
+import type { DocumentInsertResponse } from "nano"
 import { isExternalTableID } from "../../../integrations/utils"
 import sdk from "../../index"
-import { isExternal } from "./utils"
-
-import { cloneDeep } from "lodash"
 import * as external from "./external"
+import { isExternal } from "./utils"
 
 export * as external from "./external"
 
@@ -21,7 +20,7 @@ export async function saveTable(table: Table): Promise<Table> {
     resp = await db.put(table)
   }
 
-  let tableClone = cloneDeep(table)
+  const tableClone = cloneDeep(table)
   tableClone._rev = resp.rev
   return tableClone
 }

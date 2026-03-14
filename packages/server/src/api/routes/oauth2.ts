@@ -1,9 +1,9 @@
-import { OAuth2CredentialsMethod, OAuth2GrantType } from "@budibase/types"
 import { middleware } from "@budibase/backend-core"
-import { builderRoutes } from "./endpointGroups"
+import { OAuth2CredentialsMethod, OAuth2GrantType } from "@budibase/types"
+import Joi from "joi"
 
 import * as controller from "../controllers/oauth2"
-import Joi from "joi"
+import { builderRoutes } from "./endpointGroups"
 
 const baseSchema = {
   url: Joi.string().required(),
@@ -46,8 +46,4 @@ builderRoutes
   .post("/api/oauth2", oAuth2ConfigValidator(insertSchema), controller.create)
   .put("/api/oauth2/:id", oAuth2ConfigValidator(updateSchema), controller.edit)
   .delete("/api/oauth2/:id/:rev", controller.remove)
-  .post(
-    "/api/oauth2/validate",
-    oAuth2ConfigValidator(validationSchema),
-    controller.validate
-  )
+  .post("/api/oauth2/validate", oAuth2ConfigValidator(validationSchema), controller.validate)

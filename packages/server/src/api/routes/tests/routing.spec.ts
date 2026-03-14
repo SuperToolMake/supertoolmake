@@ -1,8 +1,8 @@
+import { roles } from "@budibase/backend-core"
+import { structures } from "@budibase/backend-core/tests"
+import type { Screen } from "@budibase/types"
 import * as setup from "./utilities"
 import { checkBuilderEndpoint, runInProd } from "./utilities/TestFunctions"
-import { roles } from "@budibase/backend-core"
-import { Screen } from "@budibase/types"
-import { structures } from "@budibase/backend-core/tests"
 
 const { BUILTIN_ROLE_IDS } = roles
 const { basicScreen, powerScreen } = setup.structures
@@ -12,7 +12,7 @@ const route = "/test"
 // these checks need to be enabled for this test
 
 describe("/routing", () => {
-  let config = setup.getConfig()
+  const config = setup.getConfig()
   let basic: Screen, power: Screen
 
   afterAll(setup.afterAll)

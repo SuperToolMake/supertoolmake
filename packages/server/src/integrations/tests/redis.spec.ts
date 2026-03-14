@@ -65,9 +65,7 @@ describe("Redis Integration", () => {
     }))
 
     await config.integration.command(body)
-    expect(config.integration.client.pipeline).toHaveBeenCalledWith([
-      ["keys", "*"],
-    ])
+    expect(config.integration.client.pipeline).toHaveBeenCalledWith([["keys", "*"]])
   })
 
   it("calls the pipeline method with several separated commands when there are newlines", async () => {

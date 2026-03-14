@@ -1,14 +1,9 @@
-import { makePropSafe as safe } from "@budibase/string-templates"
 import { Helpers } from "@budibase/bbui"
+import { makePropSafe as safe } from "@budibase/string-templates"
+import type { SearchFilterGroup, UISearchFilter, UITableResource } from "@budibase/types"
 import cloneDeep from "lodash/cloneDeep"
-import {
-  SearchFilterGroup,
-  UISearchFilter,
-  UITableResource,
-} from "@budibase/types"
 
-export const sleep = (ms: number) =>
-  new Promise(resolve => setTimeout(resolve, ms))
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 /**
  * Utility to wrap an async function and ensure all invocations happen
@@ -16,13 +11,10 @@ export const sleep = (ms: number) =>
  * @param fn the async function to run
  * @return {Function} a sequential version of the function
  */
-export const sequential = <
-  TReturn,
-  TFunction extends (...args: any[]) => Promise<TReturn>,
->(
+export const sequential = <TReturn, TFunction extends (...args: any[]) => Promise<TReturn>>(
   fn: TFunction
 ): TFunction => {
-  let queue: (() => Promise<void>)[] = []
+  const queue: (() => Promise<void>)[] = []
   const result = (...params: Parameters<TFunction>) => {
     return new Promise<TReturn>((resolve, reject) => {
       queue.push(async () => {
@@ -58,13 +50,10 @@ export const sequential = <
  * @param minDelay the minimum delay between invocations
  * @returns a debounced version of the callback
  */
-export const debounce = <T extends (...args: any[]) => any>(
-  callback: T,
-  minDelay = 1000
-) => {
+export const debounce = <T extends (...args: any[]) => any>(callback: T, minDelay = 1000) => {
   let timeout: ReturnType<typeof setTimeout>
   return async (...params: Parameters<T>): Promise<ReturnType<T>> => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (timeout) {
         clearTimeout(timeout)
       }
@@ -254,11 +243,7 @@ export const buildFormBlockButtonConfig = (props?: {
 
   const defaultButtons = []
 
-  if (
-    actionType &&
-    ["Update", "Create"].includes(actionType) &&
-    showSaveButton !== false
-  ) {
+  if (actionType && ["Update", "Create"].includes(actionType) && showSaveButton !== false) {
     defaultButtons.push({
       text: saveText || "Save",
       _id: Helpers.uuid(),
@@ -299,7 +284,7 @@ export const buildMultiStepFormBlockDefaultProps = (props?: {
   const title = `Step {{ [${_id}-form].[__currentStep] }}`
   const resourceId = dataSource?.resourceId
   const formId = `${_id}-form`
-  let buttons = []
+  const buttons = []
 
   // Add previous step button if we aren't the first step
   if (currentStep !== 0) {
@@ -407,7 +392,7 @@ export function parseFilter(filter: UISearchFilter) {
 
   if (update.groups) {
     update.groups = update.groups
-      .map(group => {
+      .map((group) => {
         if (group.filters) {
           group.filters = group.filters.filter((filter: any) => {
             return filter.field && filter.operator
@@ -428,10 +413,7 @@ export function parseFilter(filter: UISearchFilter) {
  * @returns {TransformStream<T, T>}
  */
 
-export function createSseToJsonTransformStream<T>(): TransformStream<
-  string,
-  T
-> {
+export function createSseToJsonTransformStream<T>(): TransformStream<string, T> {
   let buffer = ""
   return new TransformStream({
     transform(chunk, controller) {

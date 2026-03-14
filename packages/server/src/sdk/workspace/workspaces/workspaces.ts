@@ -1,9 +1,9 @@
 import { db, db as dbCore, users } from "@budibase/backend-core"
-import { ContextUser, User, Workspace } from "@budibase/types"
+import type { ContextUser, User, Workspace } from "@budibase/types"
 import { WorkspaceStatus } from "../../../db/utils"
 import { getLocksById } from "../../../utilities/redis"
-import { enrichApps } from "../../users/sessions"
 import sdk from "../.."
+import { enrichApps } from "../../users/sessions"
 
 export function filterAppList(user: User, apps: Workspace[]) {
   let appList: string[] = []
@@ -16,9 +16,7 @@ export function filterAppList(user: User, apps: Workspace[]) {
   } else {
     return apps
   }
-  return apps.filter(app =>
-    appList.includes(dbCore.getProdWorkspaceID(app.appId))
-  )
+  return apps.filter((app) => appList.includes(dbCore.getProdWorkspaceID(app.appId)))
 }
 
 export async function fetch(status: WorkspaceStatus, user: ContextUser) {
@@ -34,13 +32,13 @@ export async function fetch(status: WorkspaceStatus, user: ContextUser) {
   workspaces = filterAppList(completeUser, workspaces)
 
   const workspaceIds = workspaces
-    .filter(workspace => workspace.status === "development")
-    .map(workspace => workspace.appId)
+    .filter((workspace) => workspace.status === "development")
+    .map((workspace) => workspace.appId)
 
   // get the locks for all the dev workspaces
   if (dev || all) {
     const locks = await getLocksById(workspaceIds)
-    for (let workspace of workspaces) {
+    for (const workspace of workspaces) {
       const lock = locks[workspace.appId]
       if (lock) {
         workspace.lockedBy = lock as any
@@ -60,9 +58,7 @@ export async function fetch(status: WorkspaceStatus, user: ContextUser) {
 export async function enrichWithDefaultWorkspaceAppUrl(apps: Workspace[]) {
   const result = []
   for (const app of apps) {
-    const workspaceApps = await db.doWithDB(app.appId, db =>
-      sdk.workspaceApps.fetch(db)
-    )
+    const workspaceApps = await db.doWithDB(app.appId, (db) => sdk.workspaceApps.fetch(db))
 
     result.push({
       ...app,

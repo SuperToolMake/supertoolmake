@@ -1,4 +1,4 @@
-import {
+import type {
   FetchAPIKeyResponse,
   GenerateAPIKeyResponse,
   GetGlobalSelfResponse,
@@ -6,7 +6,7 @@ import {
   UpdateSelfRequest,
   UpdateSelfResponse,
 } from "@budibase/types"
-import { BaseAPIClient } from "./types"
+import type { BaseAPIClient } from "./types"
 
 export interface SelfEndpoints {
   updateSelf: (user: UpdateSelfRequest) => Promise<UpdateSelfResponse>
@@ -61,7 +61,7 @@ export const buildSelfEndpoints = (API: BaseAPIClient): SelfEndpoints => ({
    * Updates the current logged-in user.
    * @param user the new user object to save
    */
-  updateSelf: async user => {
+  updateSelf: async (user) => {
     return await API.post({
       url: "/api/global/self",
       body: user,

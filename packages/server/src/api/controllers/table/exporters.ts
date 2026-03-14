@@ -1,12 +1,9 @@
-import { Row, RowExportFormat, TableSchema } from "@budibase/types"
+import { type Row, RowExportFormat, type TableSchema } from "@budibase/types"
 
 export { RowExportFormat as Format } from "@budibase/types"
 
-function getHeaders(
-  headers: string[],
-  customHeaders: { [key: string]: string }
-) {
-  return headers.map(header => `"${customHeaders[header] || header}"`)
+function getHeaders(headers: string[], customHeaders: { [key: string]: string }) {
+  return headers.map((header) => `"${customHeaders[header] || header}"`)
 }
 
 function escapeCsvString(str: string) {
@@ -19,11 +16,11 @@ export function csv(
   delimiter = ",",
   customHeaders: { [key: string]: string } = {}
 ) {
-  let csvRows = [getHeaders(headers, customHeaders)]
+  const csvRows = [getHeaders(headers, customHeaders)]
 
-  for (let row of rows) {
+  for (const row of rows) {
     csvRows.push(
-      headers.map(header => {
+      headers.map((header) => {
         const val = row[header]
         if (typeof val === "object" && !(val instanceof Date)) {
           return `"${escapeCsvString(JSON.stringify(val))}"`
@@ -35,7 +32,7 @@ export function csv(
       })
     )
   }
-  return csvRows.map(row => row.join(delimiter)).join("\n")
+  return csvRows.map((row) => row.join(delimiter)).join("\n")
 }
 
 export function json(rows: Row[]) {
@@ -44,7 +41,7 @@ export function json(rows: Row[]) {
 
 export function jsonWithSchema(schema: TableSchema, rows: Row[]) {
   const newSchema: TableSchema = {}
-  Object.values(schema).forEach(column => {
+  Object.values(schema).forEach((column) => {
     if (!column.autocolumn && column.name) {
       newSchema[column.name] = column
     }

@@ -37,8 +37,7 @@ const DEFAULTS = {
 }
 
 const QUERY_THREAD_TIMEOUT =
-  parseIntSafe(process.env.QUERY_THREAD_TIMEOUT) ||
-  DEFAULTS.QUERY_THREAD_TIMEOUT
+  parseIntSafe(process.env.QUERY_THREAD_TIMEOUT) || DEFAULTS.QUERY_THREAD_TIMEOUT
 const DEFAULT_AUTOMATION_TIMEOUT =
   QUERY_THREAD_TIMEOUT > DEFAULTS.AUTOMATION_THREAD_TIMEOUT
     ? QUERY_THREAD_TIMEOUT
@@ -76,8 +75,7 @@ const environment = {
   JEST_WORKER_ID: process.env.JEST_WORKER_ID,
   BUDIBASE_ENVIRONMENT: process.env.BUDIBASE_ENVIRONMENT,
   DISABLE_ACCOUNT_PORTAL: process.env.DISABLE_ACCOUNT_PORTAL,
-  TEMPLATE_REPOSITORY:
-    process.env.TEMPLATE_REPOSITORY || DEFAULTS.TEMPLATE_REPOSITORY,
+  TEMPLATE_REPOSITORY: process.env.TEMPLATE_REPOSITORY || DEFAULTS.TEMPLATE_REPOSITORY,
   DISABLE_AUTO_PROD_APP_SYNC: process.env.DISABLE_AUTO_PROD_APP_SYNC,
   SESSION_UPDATE_PERIOD: process.env.SESSION_UPDATE_PERIOD,
   RECAPTCHA_SITE_KEY: process.env.RECAPTCHA_SITE_KEY,
@@ -91,16 +89,13 @@ const environment = {
   INTERNAL_ACCOUNT_PORTAL_URL:
     process.env.INTERNAL_ACCOUNT_PORTAL_URL || process.env.ACCOUNT_PORTAL_URL,
   AUTOMATION_MAX_ITERATIONS:
-    parseIntSafe(process.env.AUTOMATION_MAX_ITERATIONS) ||
-    DEFAULTS.AUTOMATION_MAX_ITERATIONS,
+    parseIntSafe(process.env.AUTOMATION_MAX_ITERATIONS) || DEFAULTS.AUTOMATION_MAX_ITERATIONS,
   DYNAMO_ENDPOINT: process.env.DYNAMO_ENDPOINT,
   QUERY_THREAD_TIMEOUT: QUERY_THREAD_TIMEOUT,
   AUTOMATION_THREAD_TIMEOUT:
-    parseIntSafe(process.env.AUTOMATION_THREAD_TIMEOUT) ||
-    DEFAULT_AUTOMATION_TIMEOUT,
+    parseIntSafe(process.env.AUTOMATION_THREAD_TIMEOUT) || DEFAULT_AUTOMATION_TIMEOUT,
   AUTOMATION_MAX_NESTED_LOOPS:
-    parseIntSafe(process.env.AUTOMATION_MAX_NESTED_LOOPS) ||
-    DEFAULTS.AUTOMATION_MAX_NESTED_LOOPS,
+    parseIntSafe(process.env.AUTOMATION_MAX_NESTED_LOOPS) || DEFAULTS.AUTOMATION_MAX_NESTED_LOOPS,
   AUTOMATION_MAX_STORED_LOOP_RESULTS:
     parseIntSafe(process.env.AUTOMATION_MAX_STORED_LOOP_RESULTS) ||
     DEFAULTS.AUTOMATION_MAX_STORED_LOOP_RESULTS,
@@ -125,32 +120,26 @@ const environment = {
   HTTP_HEADERS_TIMEOUT_MS: process.env.HTTP_HEADERS_TIMEOUT_MS,
   HTTP_REQUEST_TIMEOUT_MS: process.env.HTTP_REQUEST_TIMEOUT_MS,
   HTTP_KEEPALIVE_TIMEOUT_MS: process.env.HTTP_KEEPALIVE_TIMEOUT_MS,
-  FORKED_PROCESS_NAME:
-    process.env.FORKED_PROCESS_NAME || DEFAULTS.FORKED_PROCESS_NAME,
+  FORKED_PROCESS_NAME: process.env.FORKED_PROCESS_NAME || DEFAULTS.FORKED_PROCESS_NAME,
   JS_PER_INVOCATION_TIMEOUT_MS:
     parseIntSafe(process.env.JS_PER_EXECUTION_TIME_LIMIT_MS) ||
     DEFAULTS.JS_PER_EXECUTION_TIME_LIMIT_MS,
-  JS_PER_REQUEST_TIMEOUT_MS: parseIntSafe(
-    process.env.JS_PER_REQUEST_TIME_LIMIT_MS
-  ),
+  JS_PER_REQUEST_TIMEOUT_MS: parseIntSafe(process.env.JS_PER_REQUEST_TIME_LIMIT_MS),
   TOP_LEVEL_PATH: TOP_LEVEL_PATH,
   APP_MIGRATION_TIMEOUT: parseIntSafe(process.env.APP_MIGRATION_TIMEOUT),
   JS_RUNNER_MEMORY_LIMIT:
-    parseIntSafe(process.env.JS_RUNNER_MEMORY_LIMIT) ||
-    DEFAULTS.JS_RUNNER_MEMORY_LIMIT,
+    parseIntSafe(process.env.JS_RUNNER_MEMORY_LIMIT) || DEFAULTS.JS_RUNNER_MEMORY_LIMIT,
   LOG_JS_ERRORS: process.env.LOG_JS_ERRORS,
   DISABLE_USER_SYNC: process.env.DISABLE_USER_SYNC,
-  SYNC_MIGRATION_CHECKS_MS:
-    parseIntSafe(process.env.SYNC_MIGRATION_CHECKS_MS) || 5000,
-  SKIP_MIGRATION_LOCKS_IN_TESTS:
-    process.env.SKIP_MIGRATION_LOCKS_IN_TESTS ?? true,
+  SYNC_MIGRATION_CHECKS_MS: parseIntSafe(process.env.SYNC_MIGRATION_CHECKS_MS) || 5000,
+  SKIP_MIGRATION_LOCKS_IN_TESTS: process.env.SKIP_MIGRATION_LOCKS_IN_TESTS ?? true,
   REST_REJECT_UNAUTHORIZED: process.env.REST_REJECT_UNAUTHORIZED !== "false",
   UPLOAD_APPS_FILES_ON_TEST: process.env.UPLOAD_APPS_FILES_ON_TEST,
   // old
   CLIENT_ID: process.env.CLIENT_ID,
   _set(key: string, value: any) {
     process.env[key] = value
-    // @ts-ignore
+    // @ts-expect-error
     environment[key] = value
     cleanVariables()
   },
@@ -196,15 +185,15 @@ export function withEnv<T>(envVars: Partial<typeof environment>, f: () => T) {
 
 function cleanVariables() {
   // clean up any environment variable edge cases
-  for (let [key, value] of Object.entries(environment)) {
+  for (const [key, value] of Object.entries(environment)) {
     // handle the edge case of "0" to disable an environment variable
     if (value === "0") {
-      // @ts-ignore
+      // @ts-expect-error
       environment[key] = 0
     }
     // handle the edge case of "false" to disable an environment variable
     if (value === "false") {
-      // @ts-ignore
+      // @ts-expect-error
       environment[key] = 0
     }
   }

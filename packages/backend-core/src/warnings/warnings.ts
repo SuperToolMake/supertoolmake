@@ -28,10 +28,7 @@ export class UsageLimitWarning extends APIWarning {
   limitName: string
 
   constructor(limitName: string) {
-    super(
-      `Usage limit exceeded: '${limitName}'`,
-      APIWarningCode.USAGE_LIMIT_EXCEEDED
-    )
+    super(`Usage limit exceeded: '${limitName}'`, APIWarningCode.USAGE_LIMIT_EXCEEDED)
     this.limitName = limitName
   }
 

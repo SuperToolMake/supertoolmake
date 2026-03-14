@@ -1,5 +1,3 @@
-import { generator, structures } from "@budibase/backend-core/tests"
-
 // init the licensing mock
 import {
   cache,
@@ -13,8 +11,37 @@ import {
   tenancy,
   utils,
 } from "@budibase/backend-core"
+import { generator, structures } from "@budibase/backend-core/tests"
+import {
+  type AuthToken,
+  type Datasource,
+  type DevInfo,
+  FieldType,
+  INTERNAL_TABLE_SOURCE_ID,
+  type Layout,
+  type Query,
+  type RelationshipFieldMetadata,
+  RelationshipType,
+  type Row,
+  type RowSearchParams,
+  type Screen,
+  SourceName,
+  type Table,
+  TableSourceType,
+  type User,
+  type UserCtx,
+  type WithRequired,
+  type Workspace,
+} from "@budibase/types"
+import type { Server } from "http"
+import jwt, { type Secret } from "jsonwebtoken"
+import supertest from "supertest"
 import { init as dbInit } from "../../db"
+import { generateUserMetadataID } from "../../db/utils"
 import env from "../../environment"
+import { startup } from "../../startup"
+import { cleanup } from "../../utilities/fileSystem"
+import API from "./api"
 import {
   deploy as deployController,
   layout as layoutController,
@@ -32,36 +59,6 @@ import {
   basicTable,
   TEST_WORKSPACEAPPID_PLACEHOLDER,
 } from "./structures"
-
-import {
-  AuthToken,
-  Datasource,
-  DevInfo,
-  FieldType,
-  INTERNAL_TABLE_SOURCE_ID,
-  Layout,
-  Query,
-  RelationshipFieldMetadata,
-  RelationshipType,
-  Row,
-  RowSearchParams,
-  Screen,
-  SourceName,
-  Table,
-  TableSourceType,
-  User,
-  UserCtx,
-  WithRequired,
-  Workspace,
-} from "@budibase/types"
-import supertest from "supertest"
-import { generateUserMetadataID } from "../../db/utils"
-import { startup } from "../../startup"
-import { cleanup } from "../../utilities/fileSystem"
-
-import { Server } from "http"
-import jwt, { Secret } from "jsonwebtoken"
-import API from "./api"
 
 const newid = utils.newid
 
@@ -115,45 +112,35 @@ export default class TestConfiguration {
 
   getDevWorkspace() {
     if (!this.devWorkspace) {
-      throw new Error(
-        "workspace has not been initialised, call config.init() first"
-      )
+      throw new Error("workspace has not been initialised, call config.init() first")
     }
     return this.devWorkspace
   }
 
   getProdWorkspace() {
     if (!this.prodWorkspace) {
-      throw new Error(
-        "prodWorkspace has not been initialised, call config.init() first"
-      )
+      throw new Error("prodWorkspace has not been initialised, call config.init() first")
     }
     return this.prodWorkspace
   }
 
   getDevWorkspaceId() {
     if (!this.devWorkspaceId) {
-      throw new Error(
-        "devWorkspaceId has not been initialised, call config.init() first"
-      )
+      throw new Error("devWorkspaceId has not been initialised, call config.init() first")
     }
     return this.devWorkspaceId
   }
 
   getDefaultWorkspaceAppId() {
     if (!this.defaultWorkspaceAppId) {
-      throw new Error(
-        "appId has not been initialised, call config.init() first"
-      )
+      throw new Error("appId has not been initialised, call config.init() first")
     }
     return this.defaultWorkspaceAppId
   }
 
   getProdWorkspaceId() {
     if (!this.prodWorkspaceId) {
-      throw new Error(
-        "prodWorkspaceId has not been initialised, call config.init() first"
-      )
+      throw new Error("prodWorkspaceId has not been initialised, call config.init() first")
     }
     return this.prodWorkspaceId
   }
@@ -177,17 +164,12 @@ export default class TestConfiguration {
 
   getDatasource() {
     if (!this.datasource) {
-      throw new Error(
-        "datasource has not been initialised, call config.init() first"
-      )
+      throw new Error("datasource has not been initialised, call config.init() first")
     }
     return this.datasource
   }
 
-  async doInContext<T>(
-    appId: string | undefined,
-    task: () => Promise<T>
-  ): Promise<T> {
+  async doInContext<T>(appId: string | undefined, task: () => Promise<T>): Promise<T> {
     const tenant = this.getTenantId()
     return tenancy.doInTenant(tenant, () => {
       if (!appId) {
@@ -226,7 +208,7 @@ export default class TestConfiguration {
       require("../../app").getServer().close()
     }
     if (this.allWorkspaces) {
-      cleanup(this.allWorkspaces.map(app => app.appId))
+      cleanup(this.allWorkspaces.map((app) => app.appId))
     }
   }
 
@@ -243,8 +225,7 @@ export default class TestConfiguration {
   async withApp<R>(workspace: Workspace | string, f: () => Promise<R>) {
     const oldAppId = this.devWorkspaceId
     const oldProdAppId = this.prodWorkspaceId
-    this.devWorkspaceId =
-      typeof workspace === "string" ? workspace : workspace.appId
+    this.devWorkspaceId = typeof workspace === "string" ? workspace : workspace.appId
     this.prodWorkspaceId = dbCore.getProdWorkspaceID(this.devWorkspaceId)
     return await context.doInWorkspaceContext(this.devWorkspaceId, async () => {
       try {
@@ -417,10 +398,7 @@ export default class TestConfiguration {
     })
   }
 
-  async withHeaders<T>(
-    headers: Record<string, string | string[]>,
-    cb: () => Promise<T>
-  ) {
+  async withHeaders<T>(headers: Record<string, string | string[]>, cb: () => Promise<T>) {
     this.temporaryHeaders = headers
     try {
       return await cb()
@@ -429,10 +407,7 @@ export default class TestConfiguration {
     }
   }
 
-  defaultHeaders(
-    extras: Record<string, string | string[]> = {},
-    prodApp = false
-  ) {
+  defaultHeaders(extras: Record<string, string | string[]> = {}, prodApp = false) {
     const tenantId = this.getTenantId()
     const user = this.getUser()
     const authObj: AuthToken = {
@@ -442,15 +417,11 @@ export default class TestConfiguration {
     }
     const authToken = jwt.sign(authObj, coreEnv.JWT_SECRET as Secret)
 
-    let cookie: (string | string[])[] = [
-      `${constants.Cookie.Auth}=${authToken}`,
-    ]
+    let cookie: (string | string[])[] = [`${constants.Cookie.Auth}=${authToken}`]
     const tempHeaderCookie = this.temporaryHeaders?.["Cookie"]
     let hasAuth = false
     if (Array.isArray(tempHeaderCookie)) {
-      hasAuth = !!tempHeaderCookie.find(cookie =>
-        cookie.includes(constants.Cookie.Auth)
-      )
+      hasAuth = !!tempHeaderCookie.find((cookie) => cookie.includes(constants.Cookie.Auth))
     } else if (typeof tempHeaderCookie === "string") {
       hasAuth = tempHeaderCookie.includes(constants.Cookie.Auth)
     }
@@ -482,7 +453,10 @@ export default class TestConfiguration {
   publicHeaders({
     prodApp = true,
     extras = {},
-  }: { prodApp?: boolean; extras?: Record<string, string | string[]> } = {}) {
+  }: {
+    prodApp?: boolean
+    extras?: Record<string, string | string[]>
+  } = {}) {
     const appId = prodApp ? this.prodWorkspaceId : this.devWorkspaceId
 
     const headers: Record<string, string> = {
@@ -549,18 +523,14 @@ export default class TestConfiguration {
     return this.createWorkspace(appName)
   }
 
-  async createDefaultWorkspaceApp(
-    appName: string,
-    mode: "dev" | "prod" = "dev"
-  ) {
+  async createDefaultWorkspaceApp(appName: string, mode: "dev" | "prod" = "dev") {
     const { workspaceApp } = await this.api.workspaceApp.create(
       structures.workspaceApps.createRequest({
         name: appName,
         url: "/",
       })
     )
-    const appId =
-      mode === "dev" ? this.getDevWorkspaceId() : this.getProdWorkspaceId()
+    const appId = mode === "dev" ? this.getDevWorkspaceId() : this.getProdWorkspaceId()
     const db = dbCore.getDB(appId)
     await db.put({ ...workspaceApp, isDefault: true })
 
@@ -585,19 +555,14 @@ export default class TestConfiguration {
       return devInfo.apiKey
     }
 
-    const apiKey = encryption.encrypt(
-      `${this.getTenantId()}${dbCore.SEPARATOR}${newid()}`
-    )
+    const apiKey = encryption.encrypt(`${this.getTenantId()}${dbCore.SEPARATOR}${newid()}`)
     const newDevInfo: DevInfo = { _id: id, userId, apiKey }
     await db.put(newDevInfo)
     return apiKey
   }
 
   // WORKSPACE
-  async createWorkspace(
-    name: string = generator.guid(),
-    url?: string
-  ): Promise<Workspace> {
+  async createWorkspace(name: string = generator.guid(), url?: string): Promise<Workspace> {
     this.devWorkspaceId = undefined
     this.devWorkspace = await context.doInTenant(
       this.tenantId!,
@@ -612,24 +577,18 @@ export default class TestConfiguration {
     const defaultWorkspaceApp = await this.createDefaultWorkspaceApp(name)
     this.defaultWorkspaceAppId = defaultWorkspaceApp?._id
 
-    return await context.doInWorkspaceContext(
-      this.devWorkspace.appId!,
-      async () => {
-        // create production app
-        this.prodWorkspace = await this.publish()
+    return await context.doInWorkspaceContext(this.devWorkspace.appId!, async () => {
+      // create production app
+      this.prodWorkspace = await this.publish()
 
-        this.allWorkspaces.push(this.prodWorkspace)
-        this.allWorkspaces.push(this.devWorkspace!)
+      this.allWorkspaces.push(this.prodWorkspace)
+      this.allWorkspaces.push(this.devWorkspace!)
 
-        return this.devWorkspace!
-      }
-    )
+      return this.devWorkspace!
+    })
   }
 
-  async createWorkspaceWithOnboarding(
-    _name = "Workspace",
-    url?: string
-  ): Promise<Workspace> {
+  async createWorkspaceWithOnboarding(_name = "Workspace", url?: string): Promise<Workspace> {
     this.devWorkspaceId = undefined
     this.devWorkspace = await this.api.workspace.create({
       isOnboarding: "true",
@@ -638,19 +597,15 @@ export default class TestConfiguration {
     this.devWorkspaceId = this.devWorkspace.appId
 
     const { workspaceApps } = await this.api.workspaceApp.fetch()
-    const defaultWorkspaceApp =
-      workspaceApps.find(app => app.isDefault) || workspaceApps[0]
+    const defaultWorkspaceApp = workspaceApps.find((app) => app.isDefault) || workspaceApps[0]
     this.defaultWorkspaceAppId = defaultWorkspaceApp?._id
 
-    return await context.doInWorkspaceContext(
-      this.devWorkspace.appId!,
-      async () => {
-        this.prodWorkspace = await this.publish()
-        this.allWorkspaces.push(this.prodWorkspace)
-        this.allWorkspaces.push(this.devWorkspace!)
-        return this.devWorkspace!
-      }
-    )
+    return await context.doInWorkspaceContext(this.devWorkspace.appId!, async () => {
+      this.prodWorkspace = await this.publish()
+      this.allWorkspaces.push(this.prodWorkspace)
+      this.allWorkspaces.push(this.devWorkspace!)
+      return this.devWorkspace!
+    })
   }
 
   async publish() {
@@ -690,10 +645,7 @@ export default class TestConfiguration {
     return response
   }
 
-  async createTable(
-    config?: TableToBuild,
-    options = { skipReassigning: false }
-  ) {
+  async createTable(config?: TableToBuild, options = { skipReassigning: false }) {
     if (config != null && config._id) {
       delete config._id
     }
@@ -704,10 +656,7 @@ export default class TestConfiguration {
     return this.upsertTable(config, options)
   }
 
-  async createExternalTable(
-    config?: TableToBuild,
-    options = { skipReassigning: false }
-  ) {
+  async createExternalTable(config?: TableToBuild, options = { skipReassigning: false }) {
     if (config != null && config._id) {
       delete config._id
     }
@@ -737,7 +686,7 @@ export default class TestConfiguration {
       tableConfig.sourceId = INTERNAL_TABLE_SOURCE_ID
     }
     tableConfig.primaryDisplay = "name"
-    for (let link of links) {
+    for (const link of links) {
       tableConfig.schema[link] = {
         type: FieldType.LINK,
         fieldName: link,
@@ -805,9 +754,7 @@ export default class TestConfiguration {
     return { ...this.datasource, _id: this.datasource!._id! }
   }
 
-  async updateDatasource(
-    datasource: Datasource
-  ): Promise<WithRequired<Datasource, "_id">> {
+  async updateDatasource(datasource: Datasource): Promise<WithRequired<Datasource, "_id">> {
     const response = await this.api.datasource.update(datasource)
     this.datasource = response
     return { ...this.datasource, _id: this.datasource!._id! }
@@ -850,20 +797,14 @@ export default class TestConfiguration {
   // QUERY
 
   async createQuery(config?: Query) {
-    return this._req(
-      queryController.save,
-      config || basicQuery(this.getDatasource()._id!)
-    )
+    return this._req(queryController.save, config || basicQuery(this.getDatasource()._id!))
   }
 
   // SCREEN
 
   async createScreen(config?: Screen) {
     config = config || basicScreen()
-    if (
-      !config.workspaceAppId ||
-      config.workspaceAppId === TEST_WORKSPACEAPPID_PLACEHOLDER
-    ) {
+    if (!config.workspaceAppId || config.workspaceAppId === TEST_WORKSPACEAPPID_PLACEHOLDER) {
       config.workspaceAppId = this.getDefaultWorkspaceAppId()
     }
 

@@ -12,12 +12,12 @@ export const integrationForDatasource = (integrations, datasource) => {
 export const hasData = (datasources, tables) =>
   datasources.list.length > 1 || tables.list.length > 1
 
-export const configFromIntegration = integration => {
+export const configFromIntegration = (integration) => {
   const config = {}
 
   Object.entries(integration?.datasource || {}).forEach(([key, properties]) => {
     if (properties.type === "fieldGroup") {
-      Object.keys(properties.fields).forEach(fieldKey => {
+      Object.keys(properties.fields).forEach((fieldKey) => {
         config[fieldKey] = null
       })
     } else {
@@ -28,6 +28,6 @@ export const configFromIntegration = integration => {
   return config
 }
 
-export const shouldIntegrationFetchTableNames = integration => {
+export const shouldIntegrationFetchTableNames = (integration) => {
   return integration.features?.[DatasourceFeature.FETCH_TABLE_NAMES]
 }

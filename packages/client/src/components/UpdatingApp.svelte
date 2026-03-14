@@ -1,22 +1,22 @@
 <script>
-  import { Updating } from "@budibase/frontend-core"
-  import { API } from "../api"
-  import { onMount } from "svelte"
-  import { getThemeClassNames } from "@budibase/shared-core"
-  import { themeStore } from "@/stores"
+import { Updating } from "@budibase/frontend-core"
+import { getThemeClassNames } from "@budibase/shared-core"
+import { onMount } from "svelte"
+import { themeStore } from "@/stores"
+import { API } from "../api"
 
-  async function isMigrationDone() {
-    const response = await API.getMigrationStatus()
-    return response.migrated
-  }
+async function isMigrationDone() {
+  const response = await API.getMigrationStatus()
+  return response.migrated
+}
 
-  async function onMigrationDone() {
-    window.location.reload()
-  }
+async function onMigrationDone() {
+  window.location.reload()
+}
 
-  onMount(() => {
-    document.getElementById("clientAppSkeletonLoader")?.remove()
-  })
+onMount(() => {
+  document.getElementById("clientAppSkeletonLoader")?.remove()
+})
 </script>
 
 <div

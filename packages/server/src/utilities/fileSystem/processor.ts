@@ -6,7 +6,7 @@ const FORMATS = {
 
 function processImage(file: { path: string }) {
   // this will overwrite the temp file
-  return Jimp.read(file.path).then(img => {
+  return Jimp.read(file.path).then((img) => {
     return img.resize({ w: 256 }).write(file.path as `${string}.${string}`)
   })
 }

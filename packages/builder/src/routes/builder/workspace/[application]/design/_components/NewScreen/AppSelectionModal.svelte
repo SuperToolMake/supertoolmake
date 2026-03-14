@@ -1,26 +1,26 @@
 <script lang="ts">
-  import { ModalContent, Body, Select } from "@budibase/bbui"
-  import { workspaceAppStore } from "@/stores/builder"
+import { Body, ModalContent, Select } from "@budibase/bbui"
+import { workspaceAppStore } from "@/stores/builder"
 
-  export let onConfirm: (_selectedAppId: string) => Promise<void> | void
-  export let selectedAppId: string | undefined = undefined
+export let onConfirm: (_selectedAppId: string) => Promise<void> | void
+export let selectedAppId: string | undefined = undefined
 
-  async function handleConfirm() {
-    if (selectedAppId) {
-      await onConfirm(selectedAppId)
-    }
+async function handleConfirm() {
+  if (selectedAppId) {
+    await onConfirm(selectedAppId)
   }
+}
 
-  async function createDefaultApp() {
-    const workspaceApp = await workspaceAppStore.add({
-      name: "My first app",
-      url: "/",
-    })
-    selectedAppId = workspaceApp._id
-    await onConfirm(workspaceApp._id)
-  }
+async function createDefaultApp() {
+  const workspaceApp = await workspaceAppStore.add({
+    name: "My first app",
+    url: "/",
+  })
+  selectedAppId = workspaceApp._id
+  await onConfirm(workspaceApp._id)
+}
 
-  $: hasApps = !!$workspaceAppStore.workspaceApps.length
+$: hasApps = !!$workspaceAppStore.workspaceApps.length
 </script>
 
 {#if hasApps}

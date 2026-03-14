@@ -1,136 +1,136 @@
 <script>
-  import {
-    ActionButton,
-    Drawer,
-    Button,
-    DrawerContent,
-    Layout,
-    Select,
-    Icon,
-    DatePicker,
-    Combobox,
-    Multiselect,
-  } from "@budibase/bbui"
-  import { createEventDispatcher } from "svelte"
-  import { cloneDeep } from "lodash"
-  import ColorPicker from "./ColorPicker.svelte"
-  import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
-  import { QueryUtils, Constants, FilterUsers } from "@budibase/frontend-core"
-  import { generate } from "shortid"
-  import { FieldType } from "@budibase/types"
-  import { dndzone } from "svelte-dnd-action"
-  import { flip } from "svelte/animate"
+import {
+  ActionButton,
+  Button,
+  Combobox,
+  DatePicker,
+  Drawer,
+  DrawerContent,
+  Icon,
+  Layout,
+  Multiselect,
+  Select,
+} from "@budibase/bbui"
+import { Constants, FilterUsers, QueryUtils } from "@budibase/frontend-core"
+import { FieldType } from "@budibase/types"
+import { cloneDeep } from "lodash"
+import { generate } from "shortid"
+import { createEventDispatcher } from "svelte"
+import { flip } from "svelte/animate"
+import { dndzone } from "svelte-dnd-action"
+import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import ColorPicker from "./ColorPicker.svelte"
 
-  export let componentInstance
-  export let bindings
-  export let value
+export let componentInstance
+export let bindings
+export let value
 
-  const dispatch = createEventDispatcher()
-  const flipDuration = 130
-  const targetOptions = [
+const dispatch = createEventDispatcher()
+const flipDuration = 130
+const targetOptions = [
+  {
+    label: "Cell",
+    value: "cell",
+  },
+  {
+    label: "Row",
+    value: "row",
+  },
+]
+const conditionOptions = [
+  {
+    label: "Background color",
+    value: "backgroundColor",
+  },
+  {
+    label: "Text color",
+    value: "textColor",
+  },
+]
+
+let tempValue = []
+let drawer
+let dragDisabled = true
+
+$: count = value?.length
+$: conditionText = `${count || "No"} condition${count !== 1 ? "s" : ""} set`
+$: type = componentInstance.columnType
+$: valueTypeOptions = getValueTypeOptions(type)
+$: hasValueOption = type !== FieldType.STRING
+$: operatorOptions = QueryUtils.getValidOperatorsForType({
+  type,
+})
+
+const getValueTypeOptions = (type) => {
+  let options = [
     {
-      label: "Cell",
-      value: "cell",
-    },
-    {
-      label: "Row",
-      value: "row",
+      label: "Binding",
+      value: FieldType.STRING,
     },
   ]
-  const conditionOptions = [
-    {
-      label: "Background color",
-      value: "backgroundColor",
-    },
-    {
-      label: "Text color",
-      value: "textColor",
-    },
+  if (type !== FieldType.STRING) {
+    options.push({
+      label: "Value",
+      value: type,
+    })
+  }
+  return options
+}
+
+const openDrawer = () => {
+  tempValue = cloneDeep(value || [])
+  drawer.show()
+}
+
+const save = async () => {
+  dispatch("change", tempValue)
+  drawer.hide()
+}
+
+const addCondition = () => {
+  const condition = {
+    id: generate(),
+    target: targetOptions[0].value,
+    metadataKey: conditionOptions[0].value,
+    operator: operatorOptions[0]?.value,
+    valueType: FieldType.STRING,
+  }
+  tempValue = [...tempValue, condition]
+}
+
+const duplicateCondition = (condition) => {
+  const dupe = { ...condition, id: generate() }
+  tempValue = [...tempValue, dupe]
+}
+
+const removeCondition = (condition) => {
+  tempValue = tempValue.filter((c) => c.id !== condition.id)
+}
+
+const onOperatorChange = (condition, newOperator) => {
+  const noValueOptions = [
+    Constants.OperatorOptions.Empty.value,
+    Constants.OperatorOptions.NotEmpty.value,
   ]
-
-  let tempValue = []
-  let drawer
-  let dragDisabled = true
-
-  $: count = value?.length
-  $: conditionText = `${count || "No"} condition${count !== 1 ? "s" : ""} set`
-  $: type = componentInstance.columnType
-  $: valueTypeOptions = getValueTypeOptions(type)
-  $: hasValueOption = type !== FieldType.STRING
-  $: operatorOptions = QueryUtils.getValidOperatorsForType({
-    type,
-  })
-
-  const getValueTypeOptions = type => {
-    let options = [
-      {
-        label: "Binding",
-        value: FieldType.STRING,
-      },
-    ]
-    if (type !== FieldType.STRING) {
-      options.push({
-        label: "Value",
-        value: type,
-      })
-    }
-    return options
-  }
-
-  const openDrawer = () => {
-    tempValue = cloneDeep(value || [])
-    drawer.show()
-  }
-
-  const save = async () => {
-    dispatch("change", tempValue)
-    drawer.hide()
-  }
-
-  const addCondition = () => {
-    const condition = {
-      id: generate(),
-      target: targetOptions[0].value,
-      metadataKey: conditionOptions[0].value,
-      operator: operatorOptions[0]?.value,
-      valueType: FieldType.STRING,
-    }
-    tempValue = [...tempValue, condition]
-  }
-
-  const duplicateCondition = condition => {
-    const dupe = { ...condition, id: generate() }
-    tempValue = [...tempValue, dupe]
-  }
-
-  const removeCondition = condition => {
-    tempValue = tempValue.filter(c => c.id !== condition.id)
-  }
-
-  const onOperatorChange = (condition, newOperator) => {
-    const noValueOptions = [
-      Constants.OperatorOptions.Empty.value,
-      Constants.OperatorOptions.NotEmpty.value,
-    ]
-    condition.noValue = noValueOptions.includes(newOperator)
-    if (condition.noValue) {
-      condition.referenceValue = null
-      condition.valueType = "string"
-    }
-  }
-
-  const onValueTypeChange = condition => {
+  condition.noValue = noValueOptions.includes(newOperator)
+  if (condition.noValue) {
     condition.referenceValue = null
+    condition.valueType = "string"
   }
+}
 
-  const updateConditions = e => {
-    tempValue = e.detail.items
-  }
+const onValueTypeChange = (condition) => {
+  condition.referenceValue = null
+}
 
-  const handleFinalize = e => {
-    updateConditions(e)
-    dragDisabled = true
-  }
+const updateConditions = (e) => {
+  tempValue = e.detail.items
+}
+
+const handleFinalize = (e) => {
+  updateConditions(e)
+  dragDisabled = true
+}
 </script>
 
 <ActionButton on:click={openDrawer}>{conditionText}</ActionButton>

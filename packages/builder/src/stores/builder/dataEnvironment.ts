@@ -1,7 +1,7 @@
 import { DataEnvironmentMode } from "@budibase/types"
-import { BudiStore, PersistenceType } from "../BudiStore"
 import { derived } from "svelte/store"
 import { API, productionAPI } from "@/api"
+import { BudiStore, PersistenceType } from "../BudiStore"
 
 interface DataEnvironmentState {
   mode: DataEnvironmentMode
@@ -27,14 +27,14 @@ export class DataEnvironmentStore extends BudiStore<DataEnvironmentState> {
   }
 
   setMode(mode: DataEnvironmentMode) {
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       mode,
     }))
   }
 
   toggleMode() {
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       mode:
         state.mode === DataEnvironmentMode.DEVELOPMENT
@@ -44,7 +44,7 @@ export class DataEnvironmentStore extends BudiStore<DataEnvironmentState> {
   }
 
   hideBanner() {
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       bannerHidden: true,
     }))
@@ -53,8 +53,6 @@ export class DataEnvironmentStore extends BudiStore<DataEnvironmentState> {
 
 export const dataEnvironmentStore = new DataEnvironmentStore()
 
-export const dataAPI = derived(dataEnvironmentStore, $dataEnvironmentStore =>
-  $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION
-    ? productionAPI
-    : API
+export const dataAPI = derived(dataEnvironmentStore, ($dataEnvironmentStore) =>
+  $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION ? productionAPI : API
 )

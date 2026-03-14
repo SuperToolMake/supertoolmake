@@ -1,8 +1,8 @@
+import type { Ctx } from "@budibase/types"
 import { UserStatus } from "../../constants"
-import { compare } from "../../utils"
 import * as users from "../../users"
+import { compare } from "../../utils"
 import { authError } from "./utils"
-import { Ctx } from "@budibase/types"
 
 const INVALID_ERR = "Invalid credentials"
 const EXPIRED = "This account has expired. Please reset your password"
@@ -19,12 +19,7 @@ export const options = {
  * @param done callback from passport to return user information and errors
  * @returns The authenticated user, or errors if they occur
  */
-export async function authenticate(
-  ctx: Ctx,
-  email: string,
-  password: string,
-  done: Function
-) {
+export async function authenticate(ctx: Ctx, email: string, password: string, done: Function) {
   if (!email) return authError(done, "Email Required")
   if (!password) return authError(done, "Password Required")
 

@@ -1,11 +1,11 @@
-import dayjs from "dayjs"
 import { Helpers } from "@budibase/bbui"
 import {
-  FieldConstraints,
+  type FieldConstraints,
   FieldType,
-  Table,
-  UIFieldValidationRule,
+  type Table,
+  type UIFieldValidationRule,
 } from "@budibase/types"
+import dayjs from "dayjs"
 
 /**
  * Creates a validation function from a combination of schema-level constraints
@@ -28,10 +28,7 @@ export const createValidatorFromConstraints = (
       schemaConstraints.presence === true
     ) {
       rules.push({
-        type:
-          schemaConstraints.type == FieldType.ARRAY
-            ? FieldType.ARRAY
-            : FieldType.STRING,
+        type: schemaConstraints.type == FieldType.ARRAY ? FieldType.ARRAY : FieldType.STRING,
         constraint: "required",
         error: "Required",
       })
@@ -69,10 +66,7 @@ export const createValidatorFromConstraints = (
     }
 
     // Inclusion constraint
-    if (
-      exists(schemaConstraints.inclusion) &&
-      schemaConstraints.type !== "array"
-    ) {
+    if (exists(schemaConstraints.inclusion) && schemaConstraints.type !== "array") {
       const options = schemaConstraints.inclusion || []
       rules.push({
         type: FieldType.STRING,
@@ -110,7 +104,7 @@ export const createValidatorFromConstraints = (
 
   // Evaluate each constraint
   return (value: any) => {
-    for (let rule of rules) {
+    for (const rule of rules) {
       const error = evaluateRule(rule, value)
       if (error) {
         return error
@@ -241,8 +235,7 @@ const maxLengthHandler = (value: any, rule: UIFieldValidationRule) => {
 // Evaluates a max file size (MB) constraint
 const maxFileSizeHandler = (value: any, rule: UIFieldValidationRule) => {
   const limit = parseType(rule.value, "number")
-  const check = (attachment: { size: number }) =>
-    attachment.size / 1000000 > limit
+  const check = (attachment: { size: number }) => attachment.size / 1000000 > limit
   return value == null || !(value?.key ? check(value) : value.some(check))
 }
 
@@ -253,11 +246,7 @@ const maxUploadSizeHandler = (value: any, rule: UIFieldValidationRule) => {
     value == null ||
     (value?.key
       ? value.size / 1000000 <= limit
-      : value.reduce(
-          (acc: number, currentItem: { size: number }) =>
-            acc + currentItem.size,
-          0
-        ) /
+      : value.reduce((acc: number, currentItem: { size: number }) => acc + currentItem.size, 0) /
           1000000 <=
         limit)
   )

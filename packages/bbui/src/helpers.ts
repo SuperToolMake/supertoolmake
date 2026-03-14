@@ -8,7 +8,7 @@ export const deepGet = helpers.deepGet
  * Starting with a letter is important to make it DOM safe.
  */
 export function uuid(): string {
-  return "cxxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx".replace(/[xy]/g, c => {
+  return "cxxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx".replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0
     const v = c === "x" ? r : (r & 0x3) | 0x8
     return v.toString(16)
@@ -34,7 +34,7 @@ export const hashString = (string?: string | null): string => {
   }
   let hash = 0
   for (let i = 0; i < string.length; i++) {
-    let char = string.charCodeAt(i)
+    const char = string.charCodeAt(i)
     hash = (hash << 5) - hash + char
     hash = hash & hash // Convert to 32bit integer
   }
@@ -50,15 +50,11 @@ export const hashString = (string?: string | null): string => {
  * If a deep path is specified and the parent keys don't exist then these will
  * be created.
  */
-export const deepSet = (
-  obj: Record<string, any> | null,
-  key: string | null,
-  value: any
-): void => {
+export const deepSet = (obj: Record<string, any> | null, key: string | null, value: any): void => {
   if (!obj || !key) {
     return
   }
-  if (Object.prototype.hasOwnProperty.call(obj, key)) {
+  if (Object.hasOwn(obj, key)) {
     obj[key] = value
     return
   }
@@ -90,13 +86,13 @@ export const cloneDeep = <T>(obj: T): T => {
  * Copies a value to the clipboard
  */
 export const copyToClipboard = (value: any): Promise<void> => {
-  return new Promise(res => {
+  return new Promise((res) => {
     if (navigator.clipboard && window.isSecureContext) {
       // Try using the clipboard API first
       navigator.clipboard.writeText(value).then(res)
     } else {
       // Fall back to the textarea hack
-      let textArea = document.createElement("textarea")
+      const textArea = document.createElement("textarea")
       textArea.value = value
       textArea.style.position = "fixed"
       textArea.style.left = "-9999px"
@@ -242,19 +238,14 @@ export const hexToRGBA = (color: string, opacity: number): string => {
 export function rgbToHex(rgbStr: string | undefined): string {
   if (rgbStr?.startsWith("#")) return rgbStr
 
-  const rgbMatch = rgbStr?.match(
-    /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/
-  )
+  const rgbMatch = rgbStr?.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/)
   if (!rgbMatch) return rgbStr || "#FFFFFF"
 
   const r = parseInt(rgbMatch[1])
   const g = parseInt(rgbMatch[2])
   const b = parseInt(rgbMatch[3])
 
-  return `#${((1 << 24) | (r << 16) | (g << 8) | b)
-    .toString(16)
-    .slice(1)
-    .toUpperCase()}`
+  return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1).toUpperCase()}`
 }
 
 // Icon conversions for app icons

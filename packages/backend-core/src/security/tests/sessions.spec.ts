@@ -1,5 +1,5 @@
+import { DBTestConfiguration, generator } from "../../../tests"
 import * as sessions from "../sessions"
-import { generator, DBTestConfiguration } from "../../../tests"
 
 async function createSession(userId: string, tenantId: string, email: string) {
   return await sessions.createASession(userId, {
@@ -15,7 +15,7 @@ describe("sessions", () => {
 
   describe("getSessionsForUser", () => {
     it("returns empty when user is undefined", async () => {
-      // @ts-ignore - allow the undefined to be passed
+      // @ts-expect-error - allow the undefined to be passed
       const results = await sessions.getSessionsForUser(undefined)
 
       expect(results).toStrictEqual([])
@@ -36,7 +36,7 @@ describe("sessions", () => {
         const userSessions = await sessions.getSessionsForUser(userId)
         expect(userSessions).toHaveLength(3)
 
-        const sessionIds = userSessions.map(s => s.sessionId)
+        const sessionIds = userSessions.map((s) => s.sessionId)
         expect(sessionIds).toContain(one.session.sessionId)
         expect(sessionIds).toContain(two.session.sessionId)
         expect(sessionIds).toContain(three.session.sessionId)
@@ -63,7 +63,7 @@ describe("sessions", () => {
         userSessions = await sessions.getSessionsForUser(userId)
         expect(userSessions).toHaveLength(3)
 
-        const sessionIds = userSessions.map(s => s.sessionId)
+        const sessionIds = userSessions.map((s) => s.sessionId)
         expect(sessionIds).not.toContain(one.session.sessionId)
         expect(sessionIds).toContain(two.session.sessionId)
         expect(sessionIds).toContain(three.session.sessionId)

@@ -1,6 +1,6 @@
-import { Document } from "../document"
-import { RestAuthType } from "./datasource"
-import { Row } from "./row"
+import type { Document } from "../document"
+import type { RestAuthType } from "./datasource"
+import type { Row } from "./row"
 
 export interface QuerySchema {
   name?: string

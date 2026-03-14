@@ -1,4 +1,4 @@
-import {
+import type {
   AddPermissionRequest,
   AddPermissionResponse,
   FetchResourcePermissionInfoResponse,
@@ -6,14 +6,13 @@ import {
   RemovePermissionRequest,
   RemovePermissionResponse,
 } from "@budibase/types"
-import { Expectations, TestAPI } from "./base"
+import { type Expectations, TestAPI } from "./base"
 
 export class PermissionAPI extends TestAPI {
   get = async (resourceId: string, expectations?: Expectations) => {
-    return await this._get<GetResourcePermsResponse>(
-      `/api/permission/${resourceId}`,
-      { expectations }
-    )
+    return await this._get<GetResourcePermsResponse>(`/api/permission/${resourceId}`, {
+      expectations,
+    })
   }
 
   add = async (
@@ -27,19 +26,13 @@ export class PermissionAPI extends TestAPI {
     )
   }
 
-  fetch = async (
-    expectations?: Expectations
-  ): Promise<FetchResourcePermissionInfoResponse> => {
-    return await this._get<FetchResourcePermissionInfoResponse>(
-      `/api/permission`,
-      { expectations }
-    )
+  fetch = async (expectations?: Expectations): Promise<FetchResourcePermissionInfoResponse> => {
+    return await this._get<FetchResourcePermissionInfoResponse>(`/api/permission`, {
+      expectations,
+    })
   }
 
-  revoke = async (
-    request: RemovePermissionRequest,
-    expectations?: Expectations
-  ) => {
+  revoke = async (request: RemovePermissionRequest, expectations?: Expectations) => {
     const { roleId, resourceId, level } = request
     return await this._delete<RemovePermissionResponse>(
       `/api/permission/${roleId}/${resourceId}/${level}`,

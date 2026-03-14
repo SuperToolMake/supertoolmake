@@ -1,6 +1,6 @@
-import { Ctx } from "@budibase/types"
+import type { Ctx } from "@budibase/types"
 import crypto from "crypto"
-import { Middleware, Next } from "koa"
+import type { Middleware, Next } from "koa"
 
 const CSP_DIRECTIVES = {
   "default-src": ["'self'"],
@@ -66,22 +66,15 @@ const CSP_DIRECTIVES = {
   "frame-src": ["'self'", "https:"],
   "img-src": ["http:", "https:", "data:", "blob:"],
   "manifest-src": ["'self'"],
-  "media-src": [
-    "'self'",
-    "https://js.intercomcdn.com",
-    "https://cdn.budi.live",
-  ],
+  "media-src": ["'self'", "https://js.intercomcdn.com", "https://cdn.budi.live"],
   "worker-src": ["blob:", "'self'"],
 }
 
 export const contentSecurityPolicy = (async (ctx: Ctx, next: Next) => {
   const nonce = crypto.randomBytes(16).toString("base64")
   ctx.state.nonce = nonce
-  let directives = { ...CSP_DIRECTIVES }
-  directives["script-src"] = [
-    ...CSP_DIRECTIVES["script-src"],
-    `'nonce-${nonce}'`,
-  ]
+  const directives = { ...CSP_DIRECTIVES }
+  directives["script-src"] = [...CSP_DIRECTIVES["script-src"], `'nonce-${nonce}'`]
 
   const cspHeader = Object.entries(directives)
     .map(([key, sources]) => `${key} ${sources.join(" ")}`)

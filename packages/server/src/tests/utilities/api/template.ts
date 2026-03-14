@@ -1,5 +1,5 @@
-import { Template } from "@budibase/types"
-import { Expectations, TestAPI } from "./base"
+import type { Template } from "@budibase/types"
+import { type Expectations, TestAPI } from "./base"
 
 export class TemplateAPI extends TestAPI {
   fetch = async (expectations?: Expectations): Promise<Template[]> => {

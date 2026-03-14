@@ -1,11 +1,5 @@
-import {
-  OAuth2,
-  SSOProfileJson,
-  SSOProviderType,
-  SSOUser,
-  User,
-} from "../documents"
-import { SaveUserOpts } from "./user"
+import type { OAuth2, SSOProfileJson, SSOProviderType, SSOUser, User } from "../documents"
+import type { SaveUserOpts } from "./user"
 
 export interface JwtClaims {
   preferred_username?: string
@@ -31,7 +25,4 @@ export interface SSOProfile {
   provider?: string
 }
 
-export type SaveSSOUserFunction = (
-  user: SSOUser,
-  opts: SaveUserOpts
-) => Promise<User>
+export type SaveSSOUserFunction = (user: SSOUser, opts: SaveUserOpts) => Promise<User>

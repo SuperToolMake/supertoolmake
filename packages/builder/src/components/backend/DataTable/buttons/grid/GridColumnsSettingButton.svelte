@@ -1,9 +1,9 @@
 <script context="module">
-  export const FieldPermissions = {
-    WRITABLE: "writable",
-    READONLY: "readonly",
-    HIDDEN: "hidden",
-  }
+export const FieldPermissions = {
+  WRITABLE: "writable",
+  READONLY: "readonly",
+  HIDDEN: "hidden",
+}
 </script>
 
 <script>

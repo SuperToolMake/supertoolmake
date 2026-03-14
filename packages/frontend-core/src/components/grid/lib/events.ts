@@ -2,7 +2,7 @@ import { createEventDispatcher } from "svelte"
 
 export const createEventManagers = () => {
   const svelteDispatch = createEventDispatcher()
-  let subscribers: Record<string, ((...params: any) => void)[]> = {}
+  const subscribers: Record<string, ((...params: any) => void)[]> = {}
 
   // Dispatches an event, notifying subscribers and also emitting a normal
   // svelte event
@@ -21,7 +21,7 @@ export const createEventManagers = () => {
 
     // Return unsubscribe function
     return () => {
-      subscribers[event] = subscribers[event].filter(cb => cb !== callback)
+      subscribers[event] = subscribers[event].filter((cb) => cb !== callback)
     }
   }
 

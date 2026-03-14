@@ -1,35 +1,29 @@
 <script>
-  import { Select, Layout, Checkbox } from "@budibase/bbui"
-  import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
-  import { datasources, integrations, queries } from "@/stores/builder"
-  import BindingBuilder from "@/components/integration/QueryBindingBuilder.svelte"
-  import IntegrationQueryEditor from "@/components/integration/index.svelte"
-  import { BUDIBASE_INTERNAL_DB_ID } from "@/constants/backend"
+import { Checkbox, Layout, Select } from "@budibase/bbui"
+import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import IntegrationQueryEditor from "@/components/integration/index.svelte"
+import BindingBuilder from "@/components/integration/QueryBindingBuilder.svelte"
+import { BUDIBASE_INTERNAL_DB_ID } from "@/constants/backend"
+import { datasources, integrations, queries } from "@/stores/builder"
 
-  export let parameters
-  export let bindings = []
+export let parameters
+export let bindings = []
 
-  $: query = $queries.list.find(q => q._id === parameters.queryId)
-  $: datasource = $datasources.list.find(
-    ds => ds._id === parameters.datasourceId
-  )
-  // Executequery must exclude budibase datasource
-  $: executeQueryDatasources = $datasources.list.filter(
-    x => x._id !== BUDIBASE_INTERNAL_DB_ID
-  )
-  // Ensure query params exist so they can be bound
-  $: {
-    if (!parameters.queryParams) {
-      parameters.queryParams = {}
-    }
+$: query = $queries.list.find((q) => q._id === parameters.queryId)
+$: datasource = $datasources.list.find((ds) => ds._id === parameters.datasourceId)
+// Executequery must exclude budibase datasource
+$: executeQueryDatasources = $datasources.list.filter((x) => x._id !== BUDIBASE_INTERNAL_DB_ID)
+// Ensure query params exist so they can be bound
+$: {
+  if (!parameters.queryParams) {
+    parameters.queryParams = {}
   }
+}
 
-  function fetchQueryDefinition(query) {
-    const source = $datasources.list.find(
-      ds => ds._id === query.datasourceId
-    ).source
-    return $integrations[source].query[query.queryVerb]
-  }
+function fetchQueryDefinition(query) {
+  const source = $datasources.list.find((ds) => ds._id === query.datasourceId).source
+  return $integrations[source].query[query.queryVerb]
+}
 </script>
 
 <Layout gap="XS" noPadding>

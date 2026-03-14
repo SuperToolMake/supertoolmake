@@ -75,10 +75,8 @@ describe("fetch utilities", () => {
 
     describe("when GLOBAL_AGENT_* environment variables are configured", () => {
       beforeEach(() => {
-        process.env.GLOBAL_AGENT_HTTP_PROXY =
-          "http://global-proxy.example.com:3128"
-        process.env.GLOBAL_AGENT_HTTPS_PROXY =
-          "https://global-secure-proxy.example.com:3129"
+        process.env.GLOBAL_AGENT_HTTP_PROXY = "http://global-proxy.example.com:3128"
+        process.env.GLOBAL_AGENT_HTTPS_PROXY = "https://global-secure-proxy.example.com:3129"
       })
 
       it("should return a ProxyAgent instance", () => {
@@ -98,10 +96,8 @@ describe("fetch utilities", () => {
 
     describe("environment variable precedence", () => {
       beforeEach(() => {
-        process.env.GLOBAL_AGENT_HTTP_PROXY =
-          "http://global-proxy.example.com:3128"
-        process.env.GLOBAL_AGENT_HTTPS_PROXY =
-          "https://global-secure-proxy.example.com:3129"
+        process.env.GLOBAL_AGENT_HTTP_PROXY = "http://global-proxy.example.com:3128"
+        process.env.GLOBAL_AGENT_HTTPS_PROXY = "https://global-secure-proxy.example.com:3129"
         process.env.HTTP_PROXY = "http://proxy.example.com:8080"
         process.env.HTTPS_PROXY = "https://secure-proxy.example.com:8443"
       })

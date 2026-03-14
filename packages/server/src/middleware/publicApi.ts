@@ -1,16 +1,11 @@
 import { constants, utils } from "@budibase/backend-core"
-import { Ctx } from "@budibase/types"
+import type { Ctx } from "@budibase/types"
 
-export function publicApiMiddleware({
-  requiresAppId,
-}: { requiresAppId?: boolean } = {}) {
+export function publicApiMiddleware({ requiresAppId }: { requiresAppId?: boolean } = {}) {
   return async (ctx: Ctx, next: () => void) => {
     const appId = await utils.getWorkspaceIdFromCtx(ctx)
     if (requiresAppId && !appId) {
-      ctx.throw(
-        400,
-        `Invalid app ID provided, please check the ${constants.Header.APP_ID} header.`
-      )
+      ctx.throw(400, `Invalid app ID provided, please check the ${constants.Header.APP_ID} header.`)
     }
     if (!ctx.headers[constants.Header.API_KEY]) {
       ctx.throw(

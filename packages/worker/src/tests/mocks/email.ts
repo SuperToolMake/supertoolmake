@@ -1,6 +1,6 @@
 import MailDev from "maildev"
 import { promisify } from "util"
-import TestConfiguration from "../TestConfiguration"
+import type TestConfiguration from "../TestConfiguration"
 
 /**
  * @deprecated please use the `MailDev` email server instead of this mock.
@@ -86,12 +86,9 @@ export function getUnusedPort(): Promise<number> {
   })
 }
 
-export async function captureEmail(
-  mailserver: Mailserver,
-  f: () => Promise<void>
-): Promise<Email> {
+export async function captureEmail(mailserver: Mailserver, f: () => Promise<void>): Promise<Email> {
   const timeoutMs = 5000
-  let timeout: ReturnType<typeof setTimeout> | undefined = undefined
+  let timeout: ReturnType<typeof setTimeout> | undefined
   const cancel = () => {
     if (timeout) {
       clearTimeout(timeout)
@@ -103,9 +100,9 @@ export async function captureEmail(
       reject(new Error("Timed out waiting for email"))
     }, timeoutMs)
   })
-  const mailPromise = new Promise<Email>(resolve => {
+  const mailPromise = new Promise<Email>((resolve) => {
     // @ts-expect-error - types are wrong
-    mailserver.once("new", email => {
+    mailserver.once("new", (email) => {
       resolve(email as Email)
       cancel()
     })
@@ -131,7 +128,7 @@ export async function startMailserver(
   }
   const mailserver = new MailDev(opts || {})
   await new Promise((resolve, reject) => {
-    mailserver.listen(err => {
+    mailserver.listen((err) => {
       if (err) {
         return reject(err)
       }
@@ -155,12 +152,8 @@ export function stopMailserver(mailserver: Mailserver) {
   return promisify(mailserver.close).bind(mailserver)()
 }
 
-export function getAttachment(
-  mailserver: Mailserver,
-  email: Email,
-  attachment: Attachment
-) {
-  return new Promise<string>(resolve => {
+export function getAttachment(mailserver: Mailserver, email: Email, attachment: Attachment) {
+  return new Promise<string>((resolve) => {
     // @ts-expect-error - types are wrong
     mailserver.getEmailAttachment(
       email.id,
@@ -177,8 +170,6 @@ export function getAttachment(
 
 export function getAttachments(mailserver: Mailserver, email: Email) {
   return Promise.all(
-    email.attachments.map(attachment =>
-      getAttachment(mailserver, email, attachment)
-    )
+    email.attachments.map((attachment) => getAttachment(mailserver, email, attachment))
   )
 }

@@ -1,5 +1,5 @@
-import { Table, Row } from "../documents"
-import { EnrichedQueryJson } from "./search"
+import type { Row, Table } from "../documents"
+import type { EnrichedQueryJson } from "./search"
 
 export const PASSWORD_REPLACEMENT = "--secret-value--"
 
@@ -208,9 +208,7 @@ export interface DatasourcePlus extends IntegrationBase {
   ): Promise<Schema>
   getTableNames(): Promise<string[]>
   getViewNames?(): Promise<string[]>
-  getRelationships?(
-    tableNames?: string[]
-  ): Promise<DatasourceRelationshipConfig[]>
+  getRelationships?(tableNames?: string[]): Promise<DatasourceRelationshipConfig[]>
 }
 
 export enum DatasourceRelationshipType {

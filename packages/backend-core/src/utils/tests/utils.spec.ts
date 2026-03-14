@@ -1,4 +1,4 @@
-import { Ctx } from "@budibase/types"
+import type { Ctx } from "@budibase/types"
 import { structures } from "../../../tests"
 import { DBTestConfiguration } from "../../../tests/extra"
 import { Header } from "../../constants"
@@ -170,8 +170,7 @@ describe("utils", () => {
   describe("isServingBuilder", () => {
     let ctx: Ctx
 
-    const expectResult = (result: boolean) =>
-      expect(utils.isServingBuilder(ctx)).toBe(result)
+    const expectResult = (result: boolean) => expect(utils.isServingBuilder(ctx)).toBe(result)
 
     beforeEach(() => {
       ctx = structures.koa.newContext()
@@ -218,8 +217,7 @@ describe("utils", () => {
   describe("isPublicAPIRequest", () => {
     let ctx: Ctx
 
-    const expectResult = (result: boolean) =>
-      expect(utils.isPublicApiRequest(ctx)).toBe(result)
+    const expectResult = (result: boolean) => expect(utils.isPublicApiRequest(ctx)).toBe(result)
 
     beforeEach(() => {
       ctx = structures.koa.newContext()

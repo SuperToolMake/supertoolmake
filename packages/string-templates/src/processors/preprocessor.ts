@@ -1,6 +1,6 @@
 import { HelperNames } from "../helpers"
-import { swapStrings, isAlphaNumeric } from "../utilities"
-import { ProcessOptions } from "../types"
+import type { ProcessOptions } from "../types"
+import { isAlphaNumeric, swapStrings } from "../utilities"
 
 const FUNCTION_CASES = ["#", "else", "/"]
 
@@ -11,10 +11,7 @@ export enum PreprocessorNames {
   NORMALIZE_SPACES = "normalize-spaces",
 }
 
-export type PreprocessorFn = (
-  statement: string,
-  opts?: ProcessOptions
-) => string
+export type PreprocessorFn = (statement: string, opts?: ProcessOptions) => string
 
 export class Preprocessor {
   name: string
@@ -49,7 +46,7 @@ export const processors = [
   }),
 
   new Preprocessor(PreprocessorNames.FIX_FUNCTIONS, (statement: string) => {
-    for (let specialCase of FUNCTION_CASES) {
+    for (const specialCase of FUNCTION_CASES) {
       const toFind = `{ ${specialCase}`,
         replacement = `{${specialCase}`
       statement = statement.replace(new RegExp(toFind, "g"), replacement)
@@ -60,34 +57,31 @@ export const processors = [
   new Preprocessor(PreprocessorNames.NORMALIZE_SPACES, (statement: string) => {
     return statement.replace(/{{(\s{2,})/g, "{{ ")
   }),
-  new Preprocessor(
-    PreprocessorNames.FINALISE,
-    (statement: string, opts?: ProcessOptions) => {
-      const noHelpers = opts?.noHelpers
-      const helpersEnabled = !noHelpers
-      let insideStatement = statement.slice(2, statement.length - 2)
-      if (insideStatement.charAt(0) === " ") {
-        insideStatement = insideStatement.slice(1)
-      }
-      if (insideStatement.charAt(insideStatement.length - 1) === " ") {
-        insideStatement = insideStatement.slice(0, insideStatement.length - 1)
-      }
-      const possibleHelper = insideStatement.split(" ")[0]
-      // function helpers can't be wrapped
-      for (let specialCase of FUNCTION_CASES) {
-        if (possibleHelper.includes(specialCase)) {
-          return statement
-        }
-      }
-      const testHelper = possibleHelper.trim().toLowerCase()
-      if (
-        helpersEnabled &&
-        !opts?.disabledHelpers?.includes(testHelper) &&
-        HelperNames().some(option => testHelper === option.toLowerCase())
-      ) {
-        insideStatement = `(${insideStatement})`
-      }
-      return `{{ all ${insideStatement} }}`
+  new Preprocessor(PreprocessorNames.FINALISE, (statement: string, opts?: ProcessOptions) => {
+    const noHelpers = opts?.noHelpers
+    const helpersEnabled = !noHelpers
+    let insideStatement = statement.slice(2, statement.length - 2)
+    if (insideStatement.charAt(0) === " ") {
+      insideStatement = insideStatement.slice(1)
     }
-  ),
+    if (insideStatement.charAt(insideStatement.length - 1) === " ") {
+      insideStatement = insideStatement.slice(0, insideStatement.length - 1)
+    }
+    const possibleHelper = insideStatement.split(" ")[0]
+    // function helpers can't be wrapped
+    for (const specialCase of FUNCTION_CASES) {
+      if (possibleHelper.includes(specialCase)) {
+        return statement
+      }
+    }
+    const testHelper = possibleHelper.trim().toLowerCase()
+    if (
+      helpersEnabled &&
+      !opts?.disabledHelpers?.includes(testHelper) &&
+      HelperNames().some((option) => testHelper === option.toLowerCase())
+    ) {
+      insideStatement = `(${insideStatement})`
+    }
+    return `{{ all ${insideStatement} }}`
+  }),
 ]

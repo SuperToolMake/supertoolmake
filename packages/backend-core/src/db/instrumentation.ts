@@ -1,11 +1,4 @@
-import Nano, {
-  DocumentDestroyResponse,
-  DocumentListParams,
-  DocumentInsertResponse,
-  DocumentBulkResponse,
-  OkResponse,
-} from "nano"
-import {
+import type {
   AllDocsResponse,
   AnyDocument,
   Database,
@@ -15,7 +8,15 @@ import {
   Document,
   RowValue,
 } from "@budibase/types"
-import { Writable } from "stream"
+import type Nano from "nano"
+import type {
+  DocumentBulkResponse,
+  DocumentDestroyResponse,
+  DocumentInsertResponse,
+  DocumentListParams,
+  OkResponse,
+} from "nano"
+import type { Writable } from "stream"
 
 export class DDInstrumentedDatabase implements Database {
   constructor(private readonly db: Database) {}
@@ -48,20 +49,14 @@ export class DDInstrumentedDatabase implements Database {
 
   remove(idOrDoc: Document): Promise<DocumentDestroyResponse>
   remove(idOrDoc: string, rev?: string): Promise<DocumentDestroyResponse>
-  remove(
-    idOrDoc: string | Document,
-    rev?: string
-  ): Promise<DocumentDestroyResponse> {
+  remove(idOrDoc: string | Document, rev?: string): Promise<DocumentDestroyResponse> {
     const isDocument = typeof idOrDoc === "object"
     const id = isDocument ? idOrDoc._id! : idOrDoc
     rev = isDocument ? idOrDoc._rev : rev
     return this.db.remove(id, rev)
   }
 
-  bulkRemove(
-    documents: Document[],
-    opts?: { silenceErrors?: boolean }
-  ): Promise<void> {
+  bulkRemove(documents: Document[], opts?: { silenceErrors?: boolean }): Promise<void> {
     return this.db.bulkRemove(documents, opts)
   }
 
@@ -84,16 +79,12 @@ export class DDInstrumentedDatabase implements Database {
     return this.db.bulkDocs(documents)
   }
 
-  async find<T extends Document>(
-    params: Nano.MangoQuery
-  ): Promise<Nano.MangoResponse<T>> {
+  async find<T extends Document>(params: Nano.MangoQuery): Promise<Nano.MangoResponse<T>> {
     const resp = await this.db.find<T>(params)
     return resp
   }
 
-  allDocs<T extends Document | RowValue>(
-    params: DocumentListParams
-  ): Promise<AllDocsResponse<T>> {
+  allDocs<T extends Document | RowValue>(params: DocumentListParams): Promise<AllDocsResponse<T>> {
     return this.db.allDocs<T>(params)
   }
 
@@ -112,10 +103,7 @@ export class DDInstrumentedDatabase implements Database {
     return this.db.compact()
   }
 
-  dump(
-    stream: Writable,
-    opts?: DatabaseDumpOpts | undefined
-  ): ReturnType<Database["dump"]> {
+  dump(stream: Writable, opts?: DatabaseDumpOpts | undefined): ReturnType<Database["dump"]> {
     return this.db.dump(stream, opts)
   }
 

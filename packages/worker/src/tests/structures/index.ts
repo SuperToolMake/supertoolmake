@@ -1,6 +1,6 @@
 import { structures } from "@budibase/backend-core/tests"
-import * as configs from "./configs"
 import { v4 as uuid } from "uuid"
+import * as configs from "./configs"
 
 export const TENANT_ID = "default"
 export const CSRF_TOKEN = "e3727778-7af0-4226-b5eb-f43cbe60a306"

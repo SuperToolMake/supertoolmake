@@ -1,11 +1,5 @@
-import {
-  cache,
-  context,
-  db as dbCore,
-  roles,
-  tenancy,
-} from "@budibase/backend-core"
-import {
+import { cache, context, db as dbCore, roles, tenancy } from "@budibase/backend-core"
+import type {
   Ctx,
   FetchGlobalRolesResponse,
   FindGlobalRoleResponse,
@@ -20,13 +14,13 @@ export async function fetch(ctx: Ctx<void, FetchGlobalRolesResponse>) {
     // always use the dev workspaces as they'll be most up to date (true)
     const workspaces = await dbCore.getAllWorkspaces({ all: true })
     const promises = []
-    for (let workspace of workspaces) {
+    for (const workspace of workspaces) {
       // use dev workspace IDs
       promises.push(roles.getAllRoles(workspace.appId))
     }
     const roleList = await Promise.all(promises)
     const response: any = {}
-    for (let workspace of workspaces) {
+    for (const workspace of workspaces) {
       const deployedAppId = dbCore.getProdWorkspaceID(workspace.appId)
       response[deployedAppId] = {
         roles: roleList.shift(),
@@ -41,33 +35,26 @@ export async function fetch(ctx: Ctx<void, FetchGlobalRolesResponse>) {
 
 export async function find(ctx: Ctx<void, FindGlobalRoleResponse>) {
   const appId = ctx.params.appId
-  await context.doInWorkspaceContext(
-    dbCore.getDevWorkspaceID(appId),
-    async () => {
-      const db = context.getWorkspaceDB()
-      const app = await db.get<Workspace>(
-        dbCore.DocumentType.WORKSPACE_METADATA
-      )
-      ctx.body = {
-        roles: await roles.getAllRoles(),
-        name: app.name,
-        version: app.version,
-        url: app.url,
-      }
+  await context.doInWorkspaceContext(dbCore.getDevWorkspaceID(appId), async () => {
+    const db = context.getWorkspaceDB()
+    const app = await db.get<Workspace>(dbCore.DocumentType.WORKSPACE_METADATA)
+    ctx.body = {
+      roles: await roles.getAllRoles(),
+      name: app.name,
+      version: app.version,
+      url: app.url,
     }
-  )
+  })
 }
 
-export async function removeAppRole(
-  ctx: Ctx<void, RemoveWorkspaceRoleResponse>
-) {
+export async function removeAppRole(ctx: Ctx<void, RemoveWorkspaceRoleResponse>) {
   const { appId } = ctx.params
   const db = tenancy.getGlobalDB()
   const users = await sdk.users.db.allUsers()
   const bulk = []
   const cacheInvalidations = []
   const prodAppId = dbCore.getProdWorkspaceID(appId)
-  for (let user of users) {
+  for (const user of users) {
     let updated = false
     if (user.roles[prodAppId]) {
       cacheInvalidations.push(cache.user.invalidateUser(user._id!))

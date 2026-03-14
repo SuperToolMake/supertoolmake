@@ -1,9 +1,9 @@
-import { newid } from "./utils"
-import { StaticDatabases, doWithDB } from "./db"
-import { Installation, Database } from "@budibase/types"
-import { bustCache, withCache, TTL, CacheKey } from "./cache/generic"
+import type { Database, Installation } from "@budibase/types"
+import { bustCache, CacheKey, TTL, withCache } from "./cache/generic"
+import { doWithDB, StaticDatabases } from "./db"
 import environment from "./environment"
 import { logAlert } from "./logging"
+import { newid } from "./utils"
 
 export const getInstall = async (): Promise<Installation> => {
   return withCache(CacheKey.INSTALLATION, TTL.ONE_DAY, getInstallFromDB, {
@@ -30,37 +30,29 @@ async function createInstallDoc(platformDb: Database) {
 }
 
 export const getInstallFromDB = async (): Promise<Installation> => {
-  return doWithDB(
-    StaticDatabases.PLATFORM_INFO.name,
-    async (platformDb: any) => {
-      let install: Installation
-      try {
-        install = await platformDb.get(
-          StaticDatabases.PLATFORM_INFO.docs.install
-        )
-      } catch (e: any) {
-        if (e.status === 404) {
-          install = await createInstallDoc(platformDb)
-        } else {
-          throw e
-        }
+  return doWithDB(StaticDatabases.PLATFORM_INFO.name, async (platformDb: any) => {
+    let install: Installation
+    try {
+      install = await platformDb.get(StaticDatabases.PLATFORM_INFO.docs.install)
+    } catch (e: any) {
+      if (e.status === 404) {
+        install = await createInstallDoc(platformDb)
+      } else {
+        throw e
       }
-      return install
     }
-  )
+    return install
+  })
 }
 
 const updateVersion = async (version: string): Promise<boolean> => {
   try {
-    await doWithDB(
-      StaticDatabases.PLATFORM_INFO.name,
-      async (platformDb: any) => {
-        const install = await getInstall()
-        install.version = version
-        await platformDb.put(install)
-        await bustCache(CacheKey.INSTALLATION)
-      }
-    )
+    await doWithDB(StaticDatabases.PLATFORM_INFO.name, async (platformDb: any) => {
+      const install = await getInstall()
+      install.version = version
+      await platformDb.put(install)
+      await bustCache(CacheKey.INSTALLATION)
+    })
   } catch (e: any) {
     if (e.status === 409) {
       // do nothing - version has already been updated

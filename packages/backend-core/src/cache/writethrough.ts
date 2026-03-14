@@ -1,8 +1,8 @@
-import BaseCache from "./base"
-import { getWritethroughClient } from "../redis/init"
+import { type Database, type Document, LockName, LockType } from "@budibase/types"
 import { logWarn } from "../logging"
-import { Database, Document, LockName, LockType } from "@budibase/types"
+import { getWritethroughClient } from "../redis/init"
 import * as locks from "../redis/redlockImpl"
+import BaseCache from "./base"
 
 const DEFAULT_WRITE_RATE_MS = 10000
 let CACHE: BaseCache | null = null
@@ -24,18 +24,11 @@ function makeCacheKey(db: Database, key: string) {
   return db.name + key
 }
 
-function makeCacheItem<T extends Document>(
-  doc: T,
-  lastWrite: number | null = null
-): CacheItem<T> {
+function makeCacheItem<T extends Document>(doc: T, lastWrite: number | null = null): CacheItem<T> {
   return { doc, lastWrite: lastWrite || Date.now() }
 }
 
-async function put(
-  db: Database,
-  doc: Document,
-  writeRateMs: number = DEFAULT_WRITE_RATE_MS
-) {
+async function put(db: Database, doc: Document, writeRateMs: number = DEFAULT_WRITE_RATE_MS) {
   const cache = await getCache()
   const key = doc._id
   let cacheItem: CacheItem<any> | undefined
@@ -43,7 +36,7 @@ async function put(
     cacheItem = await cache.get(makeCacheKey(db, key))
   }
   const updateDb = !cacheItem || cacheItem.lastWrite < Date.now() - writeRateMs
-  let output = doc
+  const output = doc
   if (updateDb) {
     const lockResponse = await locks.doWithLock(
       {
@@ -96,10 +89,7 @@ async function get<T extends Document>(db: Database, id: string): Promise<T> {
   return cacheItem.doc
 }
 
-async function tryGet<T extends Document>(
-  db: Database,
-  id: string
-): Promise<T | null> {
+async function tryGet<T extends Document>(db: Database, id: string): Promise<T | null> {
   const cache = await getCache()
   const cacheKey = makeCacheKey(db, id)
   let cacheItem: CacheItem<T> | null = await cache.get(cacheKey)

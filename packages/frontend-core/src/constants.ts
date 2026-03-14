@@ -2,14 +2,10 @@
  * Operator options for lucene queries
  */
 export { OperatorOptions, SqlNumberTypeRangeMap } from "@budibase/shared-core"
+
 import { BBReferenceFieldSubType, FieldType } from "@budibase/types"
 
-export const BannedSearchTypes = [
-  FieldType.LINK,
-  FieldType.JSON,
-  "jsonarray",
-  "queryarray",
-]
+export const BannedSearchTypes = [FieldType.LINK, FieldType.JSON, "jsonarray", "queryarray"]
 
 // Cookie names
 export const Cookies = {
@@ -19,7 +15,7 @@ export const Cookies = {
 }
 
 // Table names
-export const enum TableNames {
+export enum TableNames {
   USERS = "ta_users",
 }
 
@@ -48,8 +44,7 @@ export const BudibaseRoleOptions = [
   {
     label: "Creator",
     value: BudibaseRoles.Creator,
-    subtitle:
-      "Builder access. Can create/edit everything within assigned workspace.",
+    subtitle: "Builder access. Can create/edit everything within assigned workspace.",
     sortOrder: 2,
   },
   {
@@ -115,7 +110,7 @@ export const TypeIconMap = {
   },
 }
 
-export const OptionColours = [...new Array(12).keys()].map(idx => {
+export const OptionColours = [...new Array(12).keys()].map((idx) => {
   return `hsla(${((idx + 1) * 222) % 360}, 90%, 75%, 0.3)`
 })
 

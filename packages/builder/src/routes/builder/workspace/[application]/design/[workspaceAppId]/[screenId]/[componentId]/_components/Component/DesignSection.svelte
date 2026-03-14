@@ -1,41 +1,41 @@
 <script>
-  import StyleSection from "./StyleSection.svelte"
-  import * as ComponentStyles from "./componentStyles"
-  import ComponentSettingsSection from "./ComponentSettingsSection.svelte"
-  import ColorPicker from "@/components/design/settings/controls/ColorPicker.svelte"
+import ColorPicker from "@/components/design/settings/controls/ColorPicker.svelte"
+import ComponentSettingsSection from "./ComponentSettingsSection.svelte"
+import * as ComponentStyles from "./componentStyles"
+import StyleSection from "./StyleSection.svelte"
 
-  export let componentDefinition
-  export let componentInstance
-  export let bindings
-  export let componentBindings
+export let componentDefinition
+export let componentInstance
+export let bindings
+export let componentBindings
 
-  const getStyles = def => {
-    if (!def?.styles?.length) {
-      return [...ComponentStyles.all]
+const getStyles = (def) => {
+  if (!def?.styles?.length) {
+    return [...ComponentStyles.all]
+  }
+  let styles = [...ComponentStyles.all]
+  def.styles.forEach((style) => {
+    if (ComponentStyles[style]) {
+      styles.push(ComponentStyles[style])
     }
-    let styles = [...ComponentStyles.all]
-    def.styles.forEach(style => {
-      if (ComponentStyles[style]) {
-        styles.push(ComponentStyles[style])
-      }
+  })
+
+  // Add section for CSS variables if present
+  if (def?.cssVariables?.length) {
+    styles.push({
+      label: "Customization",
+      settings: def.cssVariables.map((variable) => ({
+        label: variable.label,
+        key: variable.variable,
+        control: ColorPicker,
+      })),
     })
-
-    // Add section for CSS variables if present
-    if (def?.cssVariables?.length) {
-      styles.push({
-        label: "Customization",
-        settings: def.cssVariables.map(variable => ({
-          label: variable.label,
-          key: variable.variable,
-          control: ColorPicker,
-        })),
-      })
-    }
-
-    return styles
   }
 
-  $: styles = getStyles(componentDefinition)
+  return styles
+}
+
+$: styles = getStyles(componentDefinition)
 </script>
 
 <!--

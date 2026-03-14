@@ -1,72 +1,59 @@
 <script lang="ts">
-  import { ActionMenu, Icon, MenuItem, Modal } from "@budibase/bbui"
-  import {
-    UserAvatar,
-    ProfileModal,
-    ChangePasswordModal,
-  } from "@budibase/frontend-core"
-  import { getContext } from "svelte"
-  import { type User, type ContextUser, isSSOUser } from "@budibase/types"
-  import {
-    helpers,
-    sdk,
-    resolveTranslationGroup,
-    resolveWorkspaceTranslations,
-  } from "@budibase/shared-core"
-  import { API } from "@/api"
+import { ActionMenu, Icon, MenuItem, Modal } from "@budibase/bbui"
+import { ChangePasswordModal, ProfileModal, UserAvatar } from "@budibase/frontend-core"
+import {
+  helpers,
+  resolveTranslationGroup,
+  resolveWorkspaceTranslations,
+  sdk,
+} from "@budibase/shared-core"
+import { type ContextUser, isSSOUser, type User } from "@budibase/types"
+import { getContext } from "svelte"
+import { API } from "@/api"
 
-  export let compact: boolean = false
-  export let collapsed: boolean = false
+export let compact: boolean = false
+export let collapsed: boolean = false
 
-  const { authStore, environmentStore, notificationStore, appStore } =
-    getContext("sdk")
+const { authStore, environmentStore, notificationStore, appStore } = getContext("sdk")
 
-  let profileModal: any
-  let changePasswordModal: any
+let profileModal: any
+let changePasswordModal: any
 
-  $: text = getText($authStore)
-  $: isBuilder = sdk.users.hasBuilderPermissions($authStore)
-  $: isSSO = $authStore != null && isSSOUser($authStore)
-  $: embedded = $appStore.embedded || $appStore.inIframe
-  $: translationOverrides = resolveWorkspaceTranslations(
-    $appStore.application?.translationOverrides
-  )
-  $: userMenuLabels = resolveTranslationGroup("userMenu", translationOverrides)
-  $: profileLabels = resolveTranslationGroup(
-    "profileModal",
-    translationOverrides
-  )
-  $: passwordLabels = resolveTranslationGroup(
-    "passwordModal",
-    translationOverrides
-  )
+$: text = getText($authStore)
+$: isBuilder = sdk.users.hasBuilderPermissions($authStore)
+$: isSSO = $authStore != null && isSSOUser($authStore)
+$: embedded = $appStore.embedded || $appStore.inIframe
+$: translationOverrides = resolveWorkspaceTranslations($appStore.application?.translationOverrides)
+$: userMenuLabels = resolveTranslationGroup("userMenu", translationOverrides)
+$: profileLabels = resolveTranslationGroup("profileModal", translationOverrides)
+$: passwordLabels = resolveTranslationGroup("passwordModal", translationOverrides)
 
-  const { builderWorkspacesUrl, builderAppsUrl } = helpers
+const { builderWorkspacesUrl, builderAppsUrl } = helpers
 
-  const getText = (user?: User | ContextUser): string => {
-    if (!user) {
-      return ""
-    }
-    if (user.firstName) {
-      let text = user.firstName
-      if (user.lastName) {
-        text += ` ${user.lastName}`
-      }
-      return text
-    } else {
-      return user.email
-    }
+const getText = (user?: User | ContextUser): string => {
+  if (!user) {
+    return ""
   }
-
-  const goToPortal = () => {
-    const builderBaseUrl = $environmentStore.baseUrl
-    const targetUrl = isBuilder
-      ? builderWorkspacesUrl(builderBaseUrl)
-      : builderAppsUrl(builderBaseUrl)
-    window.location.href = targetUrl
+  if (user.firstName) {
+    let text = user.firstName
+    if (user.lastName) {
+      text += ` ${user.lastName}`
+    }
+    return text
+  } else {
+    return user.email
   }
+}
 
-  $: user = $authStore as User
+const goToPortal = () => {
+  const builderBaseUrl = $environmentStore.baseUrl
+  const targetUrl = isBuilder
+    ? builderWorkspacesUrl(builderBaseUrl)
+    : builderAppsUrl(builderBaseUrl)
+  window.location.href = targetUrl
+}
+
+$: user = $authStore as User
 </script>
 
 {#if $authStore}

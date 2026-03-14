@@ -1,6 +1,6 @@
 import * as controller from "../controllers/role"
+import { builderRoutes, publicRoutes } from "./endpointGroups"
 import { roleValidator } from "./utils/validators"
-import { publicRoutes, builderRoutes } from "./endpointGroups"
 
 // retrieve a list of the roles a user can access
 // needs to be public for public screens

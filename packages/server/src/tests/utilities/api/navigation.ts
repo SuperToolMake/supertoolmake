@@ -1,12 +1,8 @@
-import { UpdateNavigationRequest } from "@budibase/types"
-import { Expectations, TestAPI } from "./base"
+import type { UpdateNavigationRequest } from "@budibase/types"
+import { type Expectations, TestAPI } from "./base"
 
 export class NavigationAPI extends TestAPI {
-  update = async (
-    id: string,
-    request: UpdateNavigationRequest,
-    expectations?: Expectations
-  ) => {
+  update = async (id: string, request: UpdateNavigationRequest, expectations?: Expectations) => {
     return await this._put<void>(`/api/navigation/${id}`, {
       body: request,
       expectations: {

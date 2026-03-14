@@ -1,7 +1,7 @@
-import { SortOrder, UIDatasource } from "@budibase/types"
+import { SortOrder, type UIDatasource } from "@budibase/types"
 import { get } from "svelte/store"
-import { Store as StoreContext } from ".."
-import { DatasourceNonPlusActions } from "."
+import type { Store as StoreContext } from ".."
+import type { DatasourceNonPlusActions } from "."
 
 interface NonPlusActions {
   nonPlus: {
@@ -33,13 +33,11 @@ export const createActions = (context: StoreContext): NonPlusActions => {
   const isDatasourceValid = (datasource: UIDatasource) => {
     // There are many different types and shapes of datasource, so we only
     // check that we aren't null
-    return (
-      !table.actions.isDatasourceValid(datasource) && datasource?.type != null
-    )
+    return !table.actions.isDatasourceValid(datasource) && datasource?.type != null
   }
 
   const canUseColumn = (name: string) => {
-    return get(columns).some(col => col.name === name)
+    return get(columns).some((col) => col.name === name)
   }
 
   return {
@@ -80,9 +78,9 @@ export const initialise = (context: StoreContext) => {
   let unsubscribers: any[] = []
 
   // Observe datasource changes and apply logic for view V2 datasources
-  datasource.subscribe($datasource => {
+  datasource.subscribe(($datasource) => {
     // Clear previous subscriptions
-    unsubscribers?.forEach(unsubscribe => unsubscribe())
+    unsubscribers?.forEach((unsubscribe) => unsubscribe())
     unsubscribers = []
     if (!nonPlus.actions.isDatasourceValid($datasource)) {
       return
@@ -98,7 +96,7 @@ export const initialise = (context: StoreContext) => {
 
     // Update fetch when filter changes
     unsubscribers.push(
-      allFilters.subscribe($allFilters => {
+      allFilters.subscribe(($allFilters) => {
         // Ensure we're updating the correct fetch
         const $fetch = get(fetch)
         if (!isSameDatasource($fetch?.options?.datasource, $datasource)) {
@@ -112,7 +110,7 @@ export const initialise = (context: StoreContext) => {
 
     // Update fetch when sorting changes
     unsubscribers.push(
-      sort.subscribe($sort => {
+      sort.subscribe(($sort) => {
         // Ensure we're updating the correct fetch
         const $fetch = get(fetch)
         if (!isSameDatasource($fetch?.options?.datasource, $datasource)) {

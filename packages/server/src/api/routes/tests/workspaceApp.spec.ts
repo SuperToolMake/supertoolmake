@@ -1,9 +1,9 @@
-import { structures } from "@budibase/backend-core/tests"
-import { type Workspace } from "@budibase/types"
-import nock from "nock"
-import * as setup from "./utilities"
-import sdk from "../../../sdk"
 import { context } from "@budibase/backend-core"
+import { structures } from "@budibase/backend-core/tests"
+import type { Workspace } from "@budibase/types"
+import nock from "nock"
+import sdk from "../../../sdk"
+import * as setup from "./utilities"
 
 describe("/workspaceApp", () => {
   const testConfig = setup.getConfig()
@@ -33,14 +33,11 @@ describe("/workspaceApp", () => {
   })
 
   const getAppScrens = async (appId: string) => {
-    const screens = await context.doInWorkspaceContext(
-      testConfig.getDevWorkspaceId(),
-      async () => {
-        const screens = await sdk.screens.fetch()
-        const appScreens = screens.filter(s => s.workspaceAppId === appId)
-        return appScreens
-      }
-    )
+    const screens = await context.doInWorkspaceContext(testConfig.getDevWorkspaceId(), async () => {
+      const screens = await sdk.screens.fetch()
+      const appScreens = screens.filter((s) => s.workspaceAppId === appId)
+      return appScreens
+    })
 
     return screens
   }
@@ -57,24 +54,21 @@ describe("/workspaceApp", () => {
         })
       )
 
-      await context.doInWorkspaceContext(
-        testConfig.getDevWorkspaceId(),
-        async () => {
-          await sdk.screens.create({
-            layoutId: "screen.layoutId",
-            showNavigation: true,
-            width: "100",
-            routing: { route: "first", roleId: "assistant_to_the_manager" },
-            workspaceAppId: firstApp._id,
-            props: {
-              _instanceName: "Æthelstan",
-              _styles: {},
-              _component: "mc_guffin_9001",
-            },
-            name: "screen in first app",
-          })
-        }
-      )
+      await context.doInWorkspaceContext(testConfig.getDevWorkspaceId(), async () => {
+        await sdk.screens.create({
+          layoutId: "screen.layoutId",
+          showNavigation: true,
+          width: "100",
+          routing: { route: "first", roleId: "assistant_to_the_manager" },
+          workspaceAppId: firstApp._id,
+          props: {
+            _instanceName: "Æthelstan",
+            _styles: {},
+            _component: "mc_guffin_9001",
+          },
+          name: "screen in first app",
+        })
+      })
 
       const { workspaceApp: originalApp } = await api.workspaceApp.create(
         structures.workspaceApps.createRequest({
@@ -83,29 +77,24 @@ describe("/workspaceApp", () => {
         })
       )
 
-      await context.doInWorkspaceContext(
-        testConfig.getDevWorkspaceId(),
-        async () => {
-          await sdk.screens.create({
-            layoutId: "screen.layoutId",
-            showNavigation: true,
-            width: "100",
-            routing: { route: "66", roleId: "assistant_to_the_manager" },
-            workspaceAppId: originalApp._id,
-            props: {
-              _instanceName: "Æthelstan",
-              _styles: {},
-              _component: "mc_guffin_9001",
-            },
-            name: "screen in second app",
-          })
-        }
-      )
+      await context.doInWorkspaceContext(testConfig.getDevWorkspaceId(), async () => {
+        await sdk.screens.create({
+          layoutId: "screen.layoutId",
+          showNavigation: true,
+          width: "100",
+          routing: { route: "66", roleId: "assistant_to_the_manager" },
+          workspaceAppId: originalApp._id,
+          props: {
+            _instanceName: "Æthelstan",
+            _styles: {},
+            _component: "mc_guffin_9001",
+          },
+          name: "screen in second app",
+        })
+      })
 
       const originalScreens = await getAppScrens(originalApp._id)
-      const { workspaceApp: duplicatedApp } = await api.workspaceApp.duplicate(
-        originalApp._id
-      )
+      const { workspaceApp: duplicatedApp } = await api.workspaceApp.duplicate(originalApp._id)
 
       // check basics
       const dupeScreens = await getAppScrens(duplicatedApp._id)
@@ -119,9 +108,7 @@ describe("/workspaceApp", () => {
 
       // ensure original isnt messed with
       const originalScreensAfterDupe = await getAppScrens(originalApp._id)
-      expect(JSON.stringify(originalScreens)).toBe(
-        JSON.stringify(originalScreensAfterDupe)
-      )
+      expect(JSON.stringify(originalScreens)).toBe(JSON.stringify(originalScreensAfterDupe))
     })
   })
 })

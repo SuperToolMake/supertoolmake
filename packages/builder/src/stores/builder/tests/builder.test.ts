@@ -1,9 +1,9 @@
-import { it, expect, describe, beforeEach, vi } from "vitest"
-import { get } from "svelte/store"
-import { INITIAL_BUILDER_STATE, BuilderStore } from "@/stores/builder/builder"
-import { createBuilderWebsocket } from "../websocket.js"
 import { BuilderSocketEvent } from "@budibase/shared-core"
 import type { Workspace } from "@budibase/types"
+import { get } from "svelte/store"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { BuilderStore, INITIAL_BUILDER_STATE } from "@/stores/builder/builder"
+import { createBuilderWebsocket } from "../websocket.js"
 
 vi.mock("../websocket.js")
 
@@ -63,7 +63,7 @@ describe("Builder store", () => {
 
     builderStore.init(buildWorkspace("1234"))
 
-    builderStore.update(state => ({
+    builderStore.update((state) => ({
       ...state,
       propertyFocus: "testing",
     }))
@@ -84,12 +84,9 @@ describe("Builder store", () => {
 
     builderStore.selectResource("tester")
 
-    expect(websocket.emit).toHaveBeenCalledWith(
-      BuilderSocketEvent.SelectResource,
-      {
-        resourceId: "tester",
-      }
-    )
+    expect(websocket.emit).toHaveBeenCalledWith(BuilderSocketEvent.SelectResource, {
+      resourceId: "tester",
+    })
   })
 
   it("Sync a highlighted setting key to state. Default to info type", () => {
@@ -159,8 +156,7 @@ describe("Builder store", () => {
     const dataURL = "/builder/workspace/app_dev_123/data/table/ta_users"
 
     const designRoute = "/builder/workspace/:application/design"
-    const designURL =
-      "/builder/workspace/app_dev_123/design/screen_456/screen_456-screen"
+    const designURL = "/builder/workspace/app_dev_123/design/screen_456/screen_456-screen"
 
     builderStore.setPreviousTopNavPath(dataRoute, dataURL)
 

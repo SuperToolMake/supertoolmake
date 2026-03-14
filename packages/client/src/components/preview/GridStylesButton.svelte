@@ -1,13 +1,13 @@
 <script>
-  import { Icon } from "@budibase/bbui"
-  import { builderStore } from "@/stores"
+import { Icon } from "@budibase/bbui"
+import { builderStore } from "@/stores"
 
-  export let style
-  export let value
-  export let icon
-  export let title
-  export let componentId
-  export let active
+export let style
+export let value
+export let icon
+export let title
+export let componentId
+export let active
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

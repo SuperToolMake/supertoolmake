@@ -1,4 +1,4 @@
-import { Screen } from "@budibase/types"
+import type { Screen } from "@budibase/types"
 
 export const ONBOARDING_WELCOME_SCREEN_NAME = "onboarding-welcome-screen"
 

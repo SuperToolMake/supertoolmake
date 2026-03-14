@@ -1,10 +1,9 @@
-import { getRoutingInfo as sut } from "./index"
-
 import { db, ViewName } from "@budibase/backend-core"
 import { structures } from "@budibase/backend-core/tests"
-import { DesignDocument, Screen, WorkspaceApp } from "@budibase/types"
+import type { DesignDocument, Screen, WorkspaceApp } from "@budibase/types"
 import { basicScreen } from "../../tests/utilities/structures"
 import TestConfiguration from "../../tests/utilities/TestConfiguration"
+import { getRoutingInfo as sut } from "./index"
 
 describe("getRoutingInfo", () => {
   const config = new TestConfiguration()
@@ -14,9 +13,9 @@ describe("getRoutingInfo", () => {
     jest.clearAllMocks()
     await config.newTenant()
 
-    defaultWorkspaceApp = (
-      await config.api.workspaceApp.fetch()
-    ).workspaceApps.find(w => w.isDefault)!
+    defaultWorkspaceApp = (await config.api.workspaceApp.fetch()).workspaceApps.find(
+      (w) => w.isDefault
+    )!
   })
 
   it("should have default workspace app", () => {
@@ -36,9 +35,7 @@ describe("getRoutingInfo", () => {
   async function createScreens(workspaceAppId: string, count: number) {
     const result: Screen[] = []
     for (const _ of Array.from({ length: count })) {
-      result.push(
-        await config.api.screen.save({ ...basicScreen(), workspaceAppId })
-      )
+      result.push(await config.api.screen.save({ ...basicScreen(), workspaceAppId }))
     }
     return result
   }
@@ -71,7 +68,7 @@ describe("getRoutingInfo", () => {
     expect(result.length).toBe(3)
     expect(result).toEqual(
       expect.arrayContaining(
-        app1Screens.map(s =>
+        app1Screens.map((s) =>
           expect.objectContaining({
             id: s._id,
           })
@@ -92,20 +89,16 @@ describe("getRoutingInfo", () => {
     // Force screens without workspaceAppId
     const unmappedScreens = await createScreens(workspaceAppId2._id, 2)
     const appDb = db.getDB(config.getDevWorkspaceId())
-    await appDb.bulkDocs(
-      unmappedScreens.map(s => ({ ...s, workspaceAppId: null as any }))
-    )
+    await appDb.bulkDocs(unmappedScreens.map((s) => ({ ...s, workspaceAppId: null as any })))
 
     const result = await config.doInContext(config.getDevWorkspaceId(), () =>
       getRoutingInfo(defaultWorkspaceApp.url)
     )
 
-    expect(result.length).toBe(
-      defaultAppScreens.length + unmappedScreens.length
-    )
+    expect(result.length).toBe(defaultAppScreens.length + unmappedScreens.length)
     expect(result).toEqual(
       expect.arrayContaining(
-        [...defaultAppScreens, ...unmappedScreens].map(s =>
+        [...defaultAppScreens, ...unmappedScreens].map((s) =>
           expect.objectContaining({
             id: s._id,
           })
@@ -123,9 +116,7 @@ describe("getRoutingInfo", () => {
     // Force screens without workspaceAppId
     const unmappedScreens = await createScreens(defaultWorkspaceApp._id!, 2)
     const appDb = db.getDB(config.getDevWorkspaceId())
-    await appDb.bulkDocs(
-      unmappedScreens.map(s => ({ ...s, workspaceAppId: null as any }))
-    )
+    await appDb.bulkDocs(unmappedScreens.map((s) => ({ ...s, workspaceAppId: null as any })))
 
     const result = await config.doInContext(config.getDevWorkspaceId(), () =>
       getRoutingInfo(workspaceAppId2.url)
@@ -134,7 +125,7 @@ describe("getRoutingInfo", () => {
     expect(result.length).toBe(app2Screens.length)
     expect(result).toEqual(
       expect.arrayContaining(
-        app2Screens.map(s =>
+        app2Screens.map((s) =>
           expect.objectContaining({
             id: s._id,
           })
@@ -157,9 +148,7 @@ describe("getRoutingInfo", () => {
 
     expect(result.length).toBe(1)
     expect(
-      (await appDb.get<DesignDocument>("_design/database")).views?.[
-        ViewName.ROUTING
-      ]
+      (await appDb.get<DesignDocument>("_design/database")).views?.[ViewName.ROUTING]
     ).toBeDefined()
   })
 })

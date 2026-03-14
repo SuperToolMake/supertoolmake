@@ -1,75 +1,67 @@
 <script lang="ts">
-  import { Icon } from "@budibase/bbui"
-  import Field from "./Field.svelte"
-  import { FieldType } from "@budibase/types"
-  import type { FieldSchema, UIFieldValidationRule } from "@budibase/types"
-  import type { FieldApi, FieldState } from "@/types"
+import { Icon } from "@budibase/bbui"
+import type { FieldSchema, UIFieldValidationRule } from "@budibase/types"
+import { FieldType } from "@budibase/types"
+import type { FieldApi, FieldState } from "@/types"
+import Field from "./Field.svelte"
 
-  type Size = "XS" | "S" | "M" | "L" | "XL"
-  type IconType = "star" | "heart"
-  type ColourVariant =
-    | "Primary"
-    | "Secondary"
-    | "Mono"
-    | "Gold"
-    | "Red"
-    | "Custom"
+type Size = "XS" | "S" | "M" | "L" | "XL"
+type IconType = "star" | "heart"
+type ColourVariant = "Primary" | "Secondary" | "Mono" | "Gold" | "Red" | "Custom"
 
-  export let colour: string = ""
-  export let disabled: boolean = false
-  export let readonly: boolean = false
-  export let field: string
-  export let label: string
-  export let numberOfStars: number = 5
-  export let size: Size = "L"
-  export let type: IconType = "star"
-  export let variant: ColourVariant = "Primary"
+export let colour: string = ""
+export let disabled: boolean = false
+export let readonly: boolean = false
+export let field: string
+export let label: string
+export let numberOfStars: number = 5
+export let size: Size = "L"
+export let type: IconType = "star"
+export let variant: ColourVariant = "Primary"
 
-  export let validation: UIFieldValidationRule[] | undefined
-  export let onChange: (_event: { value: number }) => void
+export let validation: UIFieldValidationRule[] | undefined
+export let onChange: (_event: { value: number }) => void
 
-  let hoverRating: number | null = null
-  let fieldState: FieldState
-  let fieldApi: FieldApi
-  let fieldSchema: FieldSchema
+let hoverRating: number | null = null
+let fieldState: FieldState
+let fieldApi: FieldApi
+let fieldSchema: FieldSchema
 
-  const colourVariants: Record<ColourVariant, string> = {
-    Primary: "var(--primaryColor)",
-    Secondary: "var(--primaryColorHover)",
-    Mono: "var(--spectrum-global-color-gray-900)",
-    Gold: "var(--spectrum-global-color-yellow-500)",
-    Red: "var(--spectrum-global-color-red-500)",
-    Custom: "var(--primaryColor)",
-  }
+const colourVariants: Record<ColourVariant, string> = {
+  Primary: "var(--primaryColor)",
+  Secondary: "var(--primaryColorHover)",
+  Mono: "var(--spectrum-global-color-gray-900)",
+  Gold: "var(--spectrum-global-color-yellow-500)",
+  Red: "var(--spectrum-global-color-red-500)",
+  Custom: "var(--primaryColor)",
+}
 
-  $: ratingColour =
-    variant === "Custom" && colour
-      ? colour
-      : colourVariants[variant] || "var(--primaryColor)"
+$: ratingColour =
+  variant === "Custom" && colour ? colour : colourVariants[variant] || "var(--primaryColor)"
 
-  const sizeSpacing: Record<Size, number> = {
-    XS: 0.25,
-    S: 0.5,
-    M: 1,
-    L: 1.5,
-    XL: 2,
-  }
+const sizeSpacing: Record<Size, number> = {
+  XS: 0.25,
+  S: 0.5,
+  M: 1,
+  L: 1.5,
+  XL: 2,
+}
 
-  $: spacing = sizeSpacing[size] || sizeSpacing.M
-  $: enabled = !fieldState?.disabled && !fieldState?.readonly
+$: spacing = sizeSpacing[size] || sizeSpacing.M
+$: enabled = !fieldState?.disabled && !fieldState?.readonly
 
-  const handleClick = (value: number): void => {
-    if (enabled) {
-      const changed = fieldApi?.setValue(value)
-      if (onChange && changed) {
-        onChange({ value })
-      }
+const handleClick = (value: number): void => {
+  if (enabled) {
+    const changed = fieldApi?.setValue(value)
+    if (onChange && changed) {
+      onChange({ value })
     }
   }
+}
 
-  const isRated = (value: number | null, index: number): boolean => {
-    return typeof value === "number" && value >= index + 1
-  }
+const isRated = (value: number | null, index: number): boolean => {
+  return typeof value === "number" && value >= index + 1
+}
 </script>
 
 <Field

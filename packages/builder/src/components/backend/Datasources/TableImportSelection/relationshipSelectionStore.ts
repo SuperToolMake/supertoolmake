@@ -1,30 +1,28 @@
-import { derived, writable, get } from "svelte/store"
 import { keepOpen, notifications } from "@budibase/bbui"
-import { datasources, tables, integrations } from "@/stores/builder"
 import {
-  Datasource,
-  DatasourceRelationshipConfig,
+  type Datasource,
+  type DatasourceRelationshipConfig,
   DatasourceRelationshipType,
+  type FieldSchema,
   FieldType,
-  Table,
-  TableSchema,
-  FieldSchema,
+  type Table,
+  type TableSchema,
 } from "@budibase/types"
+import { derived, get, writable } from "svelte/store"
 import { RelationshipType } from "@/constants/backend"
+import { datasources, integrations, tables } from "@/stores/builder"
 import { integrationForDatasource } from "@/stores/selectors"
 
 export const createRelationshipSelectionStore = (datasource: Datasource) => {
   const relationshipsStore = writable<DatasourceRelationshipConfig[]>([])
-  const selectedRelationshipsStore = writable<DatasourceRelationshipConfig[]>(
-    []
-  )
+  const selectedRelationshipsStore = writable<DatasourceRelationshipConfig[]>([])
   const errorStore = writable<Error | null>(null)
   const loadingStore = writable<boolean>(true)
 
-  datasources.getRelationships(datasource).then(relationships => {
+  datasources.getRelationships(datasource).then((relationships) => {
     relationshipsStore.set(relationships)
     selectedRelationshipsStore.set(
-      relationships.filter(_relationship => {
+      relationships.filter((_relationship) => {
         // For now, select all relationships by default
         // In the future, we might check if relationships are already defined
         return true
@@ -33,9 +31,7 @@ export const createRelationshipSelectionStore = (datasource: Datasource) => {
     loadingStore.set(false)
   })
 
-  const setSelectedRelationships = (
-    selectedRelationships: DatasourceRelationshipConfig[]
-  ) => {
+  const setSelectedRelationships = (selectedRelationships: DatasourceRelationshipConfig[]) => {
     selectedRelationshipsStore.set(selectedRelationships)
   }
 
@@ -50,8 +46,7 @@ export const createRelationshipSelectionStore = (datasource: Datasource) => {
       const junctionTablesToImport = new Set<string>()
       for (const relationship of _selectedRelationships) {
         if (
-          relationship.relationshipType ===
-            DatasourceRelationshipType.MANY_TO_MANY &&
+          relationship.relationshipType === DatasourceRelationshipType.MANY_TO_MANY &&
           relationship.junctionTable
         ) {
           // Check if junction table is already imported
@@ -72,9 +67,7 @@ export const createRelationshipSelectionStore = (datasource: Datasource) => {
         await datasources.fetch()
         // Get the updated datasource
         const updatedDatasources = (get(datasources) as any).list
-        const updatedDatasource = updatedDatasources.find(
-          (ds: any) => ds._id === datasource._id
-        )
+        const updatedDatasource = updatedDatasources.find((ds: any) => ds._id === datasource._id)
         if (updatedDatasource) {
           datasource = updatedDatasource
         }
@@ -82,10 +75,7 @@ export const createRelationshipSelectionStore = (datasource: Datasource) => {
 
       // Create relationship columns for each selected relationship
       for (const relationship of _selectedRelationships) {
-        const wasCreated = await createRelationshipColumns(
-          datasource,
-          relationship
-        )
+        const wasCreated = await createRelationshipColumns(datasource, relationship)
         if (wasCreated) {
           importedCount++
         }
@@ -94,10 +84,7 @@ export const createRelationshipSelectionStore = (datasource: Datasource) => {
       // Only save if we actually created new relationships
       if (importedCount > 0) {
         // Save the updated datasource
-        const integration = integrationForDatasource(
-          get(integrations),
-          datasource
-        )
+        const integration = integrationForDatasource(get(integrations), datasource)
         await datasources.save({ datasource, integration })
 
         // Refresh tables to show the new relationship columns
@@ -132,14 +119,10 @@ export const createRelationshipSelectionStore = (datasource: Datasource) => {
       datasource.entities = {}
     }
     if (!datasource.entities[relationship.sourceTable]) {
-      throw new Error(
-        `Source table '${relationship.sourceTable}' not found in datasource`
-      )
+      throw new Error(`Source table '${relationship.sourceTable}' not found in datasource`)
     }
     if (!datasource.entities[relationship.targetTable]) {
-      throw new Error(
-        `Target table '${relationship.targetTable}' not found in datasource`
-      )
+      throw new Error(`Target table '${relationship.targetTable}' not found in datasource`)
     }
 
     const sourceTable = datasource.entities[relationship.sourceTable]
@@ -147,25 +130,16 @@ export const createRelationshipSelectionStore = (datasource: Datasource) => {
 
     // Check if this relationship already exists
     const junctionTableId =
-      relationship.relationshipType ===
-        DatasourceRelationshipType.MANY_TO_MANY && relationship.junctionTable
+      relationship.relationshipType === DatasourceRelationshipType.MANY_TO_MANY &&
+      relationship.junctionTable
         ? datasource.entities[relationship.junctionTable]?._id
         : undefined
-    if (
-      relationshipExists(
-        sourceTable,
-        targetTable,
-        relationship,
-        junctionTableId
-      )
-    ) {
+    if (relationshipExists(sourceTable, targetTable, relationship, junctionTableId)) {
       // Relationship already exists, skip creating it
       return false
     }
 
-    if (
-      relationship.relationshipType === DatasourceRelationshipType.MANY_TO_MANY
-    ) {
+    if (relationship.relationshipType === DatasourceRelationshipType.MANY_TO_MANY) {
       // For many-to-many relationships, we need the junction table
       if (!relationship.junctionTable) {
         throw new Error(
@@ -176,9 +150,7 @@ export const createRelationshipSelectionStore = (datasource: Datasource) => {
       // Get the junction table entity
       const junctionTable = datasource.entities[relationship.junctionTable]
       if (!junctionTable) {
-        throw new Error(
-          `Junction table '${relationship.junctionTable}' not found in datasource`
-        )
+        throw new Error(`Junction table '${relationship.junctionTable}' not found in datasource`)
       }
 
       // Generate unique column names
@@ -278,9 +250,7 @@ export const createRelationshipSelectionStore = (datasource: Datasource) => {
       (col): col is FieldSchema => col.type === FieldType.LINK
     )
 
-    if (
-      relationship.relationshipType === DatasourceRelationshipType.MANY_TO_MANY
-    ) {
+    if (relationship.relationshipType === DatasourceRelationshipType.MANY_TO_MANY) {
       // For many-to-many, check if there's already a link with the same through table and FK mappings
       const sourceMatch = sourceLinks.some(
         (link: any) =>
@@ -345,20 +315,13 @@ export const createRelationshipSelectionStore = (datasource: Datasource) => {
 
   const combined = derived(
     [relationshipsStore, selectedRelationshipsStore, errorStore, loadingStore],
-    ([
-      $relationshipsStore,
-      $selectedRelationshipsStore,
-      $errorStore,
-      $loadingStore,
-    ]) => {
+    ([$relationshipsStore, $selectedRelationshipsStore, $errorStore, $loadingStore]) => {
       return {
-        relationshipOptions: $relationshipsStore.map(rel => ({
+        relationshipOptions: $relationshipsStore.map((rel) => ({
           id: rel._id,
           label: rel.label,
         })),
-        selectedRelationshipIds: $selectedRelationshipsStore.map(
-          rel => rel._id
-        ),
+        selectedRelationshipIds: $selectedRelationshipsStore.map((rel) => rel._id),
         relationships: $relationshipsStore,
         selectedRelationships: $selectedRelationshipsStore,
         error: $errorStore,

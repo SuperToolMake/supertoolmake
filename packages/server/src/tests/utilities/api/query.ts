@@ -1,12 +1,12 @@
 import { constants } from "@budibase/backend-core"
-import {
+import type {
   ExecuteQueryRequest,
   ExecuteV2QueryResponse,
   PreviewQueryRequest,
   PreviewQueryResponse,
   Query,
 } from "@budibase/types"
-import { Expectations, TestAPI } from "./base"
+import { type Expectations, TestAPI } from "./base"
 
 export class QueryAPI extends TestAPI {
   save = async (body: Query, expectations?: Expectations): Promise<Query> => {
@@ -18,19 +18,13 @@ export class QueryAPI extends TestAPI {
     body?: ExecuteQueryRequest,
     expectations?: Expectations
   ): Promise<ExecuteV2QueryResponse> => {
-    return await this._post<ExecuteV2QueryResponse>(
-      `/api/v2/queries/${queryId}`,
-      {
-        body,
-        expectations,
-      }
-    )
+    return await this._post<ExecuteV2QueryResponse>(`/api/v2/queries/${queryId}`, {
+      body,
+      expectations,
+    })
   }
 
-  preview = async (
-    queryPreview: PreviewQueryRequest,
-    expectations?: Expectations
-  ) => {
+  preview = async (queryPreview: PreviewQueryRequest, expectations?: Expectations) => {
     return await this._post<PreviewQueryResponse>(`/api/queries/preview`, {
       body: queryPreview,
       expectations,

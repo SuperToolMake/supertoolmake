@@ -1,31 +1,31 @@
 <script>
-  import { screenStore } from "@/stores/builder"
-  import { onMount } from "svelte"
-  import { Label, Checkbox, Select } from "@budibase/bbui"
-  import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
-  import DrawerBindableCombobox from "@/components/common/bindings/DrawerBindableCombobox.svelte"
+import { Checkbox, Label, Select } from "@budibase/bbui"
+import { onMount } from "svelte"
+import DrawerBindableCombobox from "@/components/common/bindings/DrawerBindableCombobox.svelte"
+import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import { screenStore } from "@/stores/builder"
 
-  export let parameters
-  export let bindings = []
+export let parameters
+export let bindings = []
 
-  $: urlOptions = screenStore.routes
+$: urlOptions = screenStore.routes
 
-  const typeOptions = [
-    {
-      label: "Screen",
-      value: "screen",
-    },
-    {
-      label: "URL",
-      value: "url",
-    },
-  ]
+const typeOptions = [
+  {
+    label: "Screen",
+    value: "screen",
+  },
+  {
+    label: "URL",
+    value: "url",
+  },
+]
 
-  onMount(() => {
-    if (!parameters.type) {
-      parameters.type = "screen"
-    }
-  })
+onMount(() => {
+  if (!parameters.type) {
+    parameters.type = "screen"
+  }
+})
 </script>
 
 <div class="root">

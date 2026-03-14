@@ -1,7 +1,7 @@
+import type Router from "@koa/router"
 import env from "../environment"
-import { devClientLibPath } from "../utilities/fileSystem"
 import { budibaseTempDir } from "../utilities/budibaseDir"
-import Router from "@koa/router"
+import { devClientLibPath } from "../utilities/fileSystem"
 
 export function addFileManagement(router: Router) {
   /* istanbul ignore next */

@@ -27,14 +27,11 @@ describe("ISO date string validity checks", () => {
 })
 
 describe("time string validity checks", () => {
-  it.each(["10:14", "10:14:43", "10:14.431534", "10:14:43.431534"])(
-    "accepts %s",
-    value => {
-      expect(isValidTime(value)).toEqual(true)
-    }
-  )
+  it.each(["10:14", "10:14:43", "10:14.431534", "10:14:43.431534"])("accepts %s", (value) => {
+    expect(isValidTime(value)).toEqual(true)
+  })
 
-  it.each(["10:14:431534"])("rejects %s", value => {
+  it.each(["10:14:431534"])("rejects %s", (value) => {
     expect(isValidTime(value)).toEqual(false)
   })
 })

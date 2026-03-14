@@ -1,7 +1,6 @@
-import pino, { LoggerOptions } from "pino"
+import type { IdentityType } from "@budibase/types"
+import pino, { type LoggerOptions } from "pino"
 import pinoPretty from "pino-pretty"
-
-import { IdentityType } from "@budibase/types"
 import * as context from "../../context"
 import env from "../../environment"
 import * as correlation from "../correlation"
@@ -28,7 +27,7 @@ if (!env.DISABLE_PINO_LOGGER) {
   const pinoOptions: LoggerOptions = {
     level,
     formatters: {
-      level: level => {
+      level: (level) => {
         return { level: level.toUpperCase() }
       },
       bindings: () => {
@@ -86,11 +85,11 @@ if (!env.DISABLE_PINO_LOGGER) {
    * and pino logging requirements.
    */
   const getLogParams = (args: any[]): [MergingObject, string] => {
-    let error = undefined
-    let objects: any[] = []
+    let error
+    const objects: any[] = []
     let message = ""
 
-    args.forEach(arg => {
+    args.forEach((arg) => {
       if (isMessage(arg)) {
         message = `${message} ${arg}`.trimStart()
       }

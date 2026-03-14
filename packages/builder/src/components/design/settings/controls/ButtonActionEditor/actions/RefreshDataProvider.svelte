@@ -1,20 +1,20 @@
 <script>
-  import { Select, Label } from "@budibase/bbui"
-  import { selectedScreen, componentStore } from "@/stores/builder"
-  import { getActionProviders } from "@/dataBinding"
+import { Label, Select } from "@budibase/bbui"
+import { getActionProviders } from "@/dataBinding"
+import { componentStore, selectedScreen } from "@/stores/builder"
 
-  export let parameters
-  export let nested
+export let parameters
+export let nested
 
-  $: actionProviders = getActionProviders(
-    $selectedScreen,
-    $componentStore.selectedComponentId,
-    "RefreshDatasource",
-    { includeSelf: nested }
-  ).concat({
-    readableBinding: "All data providers",
-    runtimeBinding: "all",
-  })
+$: actionProviders = getActionProviders(
+  $selectedScreen,
+  $componentStore.selectedComponentId,
+  "RefreshDatasource",
+  { includeSelf: nested }
+).concat({
+  readableBinding: "All data providers",
+  runtimeBinding: "all",
+})
 </script>
 
 <div class="root">

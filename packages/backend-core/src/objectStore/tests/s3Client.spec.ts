@@ -5,7 +5,7 @@ let s3ConstructorCalls: any[] = []
 
 jest.mock("@aws-sdk/client-s3", () => {
   return {
-    S3: jest.fn().mockImplementation(config => {
+    S3: jest.fn().mockImplementation((config) => {
       s3ConstructorCalls.push(config)
       return {
         headBucket: jest.fn(),
@@ -18,7 +18,7 @@ jest.mock("@aws-sdk/client-s3", () => {
 
 jest.mock("@smithy/node-http-handler", () => {
   return {
-    NodeHttpHandler: jest.fn().mockImplementation(config => ({
+    NodeHttpHandler: jest.fn().mockImplementation((config) => ({
       _config: config,
     })),
   }
@@ -99,12 +99,9 @@ describe("ObjectStore S3 client configuration", () => {
       expect(s3ConstructorCalls).toHaveLength(1)
       expect(s3ConstructorCalls[0].requestHandler).toBeDefined()
       expect(s3ConstructorCalls[0].requestHandler._config).toBeDefined()
+      expect(s3ConstructorCalls[0].requestHandler._config.httpsAgent).toBeInstanceOf(https.Agent)
       expect(
-        s3ConstructorCalls[0].requestHandler._config.httpsAgent
-      ).toBeInstanceOf(https.Agent)
-      expect(
-        s3ConstructorCalls[0].requestHandler._config.httpsAgent.options
-          .rejectUnauthorized
+        s3ConstructorCalls[0].requestHandler._config.httpsAgent.options.rejectUnauthorized
       ).toBe(false)
     })
 
@@ -120,9 +117,7 @@ describe("ObjectStore S3 client configuration", () => {
       ObjectStore()
 
       expect(s3ConstructorCalls).toHaveLength(1)
-      expect(s3ConstructorCalls[0].endpoint).toBe(
-        "https://self-signed-s3.local:9000"
-      )
+      expect(s3ConstructorCalls[0].endpoint).toBe("https://self-signed-s3.local:9000")
       expect(s3ConstructorCalls[0].requestHandler).toBeDefined()
     })
 
@@ -138,9 +133,7 @@ describe("ObjectStore S3 client configuration", () => {
       ObjectStore()
 
       expect(s3ConstructorCalls).toHaveLength(1)
-      expect(s3ConstructorCalls[0].endpoint).toBe(
-        "http://minio.example.com:9000"
-      )
+      expect(s3ConstructorCalls[0].endpoint).toBe("http://minio.example.com:9000")
       expect(s3ConstructorCalls[0].requestHandler).toBeDefined()
     })
   })
@@ -158,9 +151,7 @@ describe("ObjectStore S3 client configuration", () => {
       ObjectStore()
 
       expect(s3ConstructorCalls).toHaveLength(1)
-      expect(s3ConstructorCalls[0].endpoint).toBe(
-        "https://custom-s3.example.com:9000"
-      )
+      expect(s3ConstructorCalls[0].endpoint).toBe("https://custom-s3.example.com:9000")
     })
 
     it("should not set endpoint when MINIO_URL is not defined", () => {

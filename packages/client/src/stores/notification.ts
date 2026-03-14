@@ -1,6 +1,6 @@
-import { writable, get } from "svelte/store"
-import { routeStore } from "./routes"
+import { get, writable } from "svelte/store"
 import { PeekMessages } from "@/constants"
+import { routeStore } from "./routes"
 
 const DEFAULT_NOTIFICATION_TIMEOUT = 3000
 
@@ -41,8 +41,8 @@ const createNotificationStore = () => {
     }
 
     const _id = id()
-    store.update(state => {
-      const duplicateError = state.find(err => err.message === message)
+    store.update((state) => {
+      const duplicateError = state.find((err) => err.message === message)
       if (duplicateError) {
         duplicateError.count += 1
         return [...state]
@@ -68,8 +68,8 @@ const createNotificationStore = () => {
   }
 
   const dismiss = (id: string) => {
-    store.update(state => {
-      return state.filter(n => n.id !== id)
+    store.update((state) => {
+      return state.filter((n) => n.id !== id)
     })
   }
 

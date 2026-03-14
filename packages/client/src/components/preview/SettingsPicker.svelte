@@ -1,14 +1,14 @@
 <script>
-  import { Select } from "@budibase/bbui"
-  import { builderStore } from "@/stores"
+import { Select } from "@budibase/bbui"
+import { builderStore } from "@/stores"
 
-  export let prop
-  export let options
-  export let label
-  export let component
-  export let disabled = false
+export let prop
+export let options
+export let label
+export let component
+export let disabled = false
 
-  $: currentValue = component?.[prop]
+$: currentValue = component?.[prop]
 </script>
 
 <div>

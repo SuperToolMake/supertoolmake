@@ -15,13 +15,13 @@ export const createSessionStorageStore = (sessionStorageKey, initialValue) => {
   })
 
   // New store setter which updates the store and sessionstorage
-  const set = value => {
+  const set = (value) => {
     store.set(value)
     sessionStorage.setItem(sessionStorageKey, JSON.stringify(value))
   }
 
   // New store updater which updates the store and sessionstorage
-  const update = updaterFn => set(updaterFn(get(store)))
+  const update = (updaterFn) => set(updaterFn(get(store)))
 
   // Hydrates the store from sessionstorage
   const hydrate = () => {

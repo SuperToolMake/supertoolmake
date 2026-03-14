@@ -1,7 +1,7 @@
 <script>
-  import { goto } from "@roxi/routify"
+import { goto } from "@roxi/routify"
 
-  $goto
+$goto
 
-  $goto("../design")
+$goto("../design")
 </script>

@@ -2,44 +2,44 @@ import { constants, context, utils } from "@budibase/backend-core"
 import { utils as JsonUtils, ValidQueryNameRegex } from "@budibase/shared-core"
 import { findHBSBlocks } from "@budibase/string-templates"
 import {
-  ContextUser,
-  CreateDatasourceRequest,
-  Datasource,
-  DeleteQueryResponse,
-  ExecuteQueryRequest,
-  ExecuteV1QueryResponse,
-  ExecuteV2QueryResponse,
-  FetchQueriesResponse,
+  type ContextUser,
+  type CreateDatasourceRequest,
+  type Datasource,
+  type DeleteQueryResponse,
+  type ExecuteQueryRequest,
+  type ExecuteV1QueryResponse,
+  type ExecuteV2QueryResponse,
+  type FetchQueriesResponse,
   FieldType,
-  FindQueryResponse,
-  ImportRestQueryRequest,
-  ImportRestQueryResponse,
-  ImportRestQueryInfoRequest,
-  ImportRestQueryInfoResponse,
+  type FindQueryResponse,
+  type ImportRestQueryInfoRequest,
+  type ImportRestQueryInfoResponse,
+  type ImportRestQueryRequest,
+  type ImportRestQueryResponse,
   JsonFieldSubType,
-  PreviewQueryRequest,
-  PreviewQueryResponse,
-  Query,
-  QueryResponse,
-  QuerySchema,
-  SaveQueryRequest,
-  SaveQueryResponse,
-  SessionCookie,
+  type PreviewQueryRequest,
+  type PreviewQueryResponse,
+  type Query,
+  type QueryResponse,
+  type QuerySchema,
+  type SaveQueryRequest,
+  type SaveQueryResponse,
+  type SessionCookie,
   SourceName,
   SSOProviderType,
-  UserCtx,
+  type UserCtx,
 } from "@budibase/types"
 import { cloneDeep, merge } from "lodash"
 import { ObjectId } from "mongodb"
+import fetch from "node-fetch"
 import { generateQueryID } from "../../../db/utils"
 import env from "../../../environment"
 import sdk from "../../../sdk"
 import { Thread, ThreadType } from "../../../threads"
-import { QueryEvent, QueryEventParameters } from "../../../threads/definitions"
+import type { QueryEvent, QueryEventParameters } from "../../../threads/definitions"
 import { invalidateCachedVariable } from "../../../threads/utils"
 import { save as saveDatasource } from "../datasource"
 import { RestImporter } from "./import"
-import fetch from "node-fetch"
 
 const Runner = new Thread(ThreadType.QUERY, {
   timeoutMs: env.QUERY_THREAD_TIMEOUT,
@@ -52,7 +52,7 @@ function sanitiseUserStructure(user: ContextUser) {
 }
 
 function validateQueryInputs(parameters: QueryEventParameters) {
-  for (let entry of Object.entries(parameters)) {
+  for (const entry of Object.entries(parameters)) {
     const [key, value] = entry
     if (typeof value !== "string") {
       continue
@@ -69,10 +69,7 @@ export async function fetchQueries(ctx: UserCtx<void, FetchQueriesResponse>) {
   ctx.body = await sdk.queries.fetch()
 }
 
-const resolveImportData = async (
-  ctx: UserCtx,
-  payload: { data?: string; url?: string }
-) => {
+const resolveImportData = async (ctx: UserCtx, payload: { data?: string; url?: string }) => {
   const data = payload.data?.trim()
   if (data) {
     return payload.data as string
@@ -83,10 +80,7 @@ const resolveImportData = async (
     try {
       const response = await fetch(url)
       if (!response.ok) {
-        ctx.throw(
-          response.status,
-          `Failed to fetch import data (status ${response.status})`
-        )
+        ctx.throw(response.status, `Failed to fetch import data (status ${response.status})`)
       }
       return await response.text()
     } catch (error: any) {
@@ -98,9 +92,7 @@ const resolveImportData = async (
   ctx.throw(400, "Import data is required")
 }
 
-const _import = async (
-  ctx: UserCtx<ImportRestQueryRequest, ImportRestQueryResponse>
-) => {
+const _import = async (ctx: UserCtx<ImportRestQueryRequest, ImportRestQueryResponse>) => {
   const body = ctx.request.body
   const data = await resolveImportData(ctx, body)
 
@@ -149,10 +141,7 @@ const _import = async (
 
   let importResult
   try {
-    importResult = await importer.importQueries(
-      datasourceId,
-      body.selectedEndpointId
-    )
+    importResult = await importer.importQueries(datasourceId, body.selectedEndpointId)
   } catch (error: any) {
     if (body.selectedEndpointId && error?.message) {
       ctx.throw(400, error.message)
@@ -165,6 +154,7 @@ const _import = async (
     datasourceId,
   }
 }
+
 export { _import as import }
 
 export async function importInfo(
@@ -253,9 +243,7 @@ function enrichParameters(
   return requestParameters
 }
 
-export async function preview(
-  ctx: UserCtx<PreviewQueryRequest, PreviewQueryResponse>
-) {
+export async function preview(ctx: UserCtx<PreviewQueryRequest, PreviewQueryResponse>) {
   const { datasource, envVars } = await sdk.datasources.getWithEnvVars(
     ctx.request.body.datasourceId
   )
@@ -285,11 +273,7 @@ export async function preview(
   const authConfigCtx = getAuthConfig(ctx)
 
   function getFieldMetadata(field: any, key: string): QuerySchema {
-    const makeQuerySchema = (
-      type: FieldType,
-      name: string,
-      subtype?: string
-    ): QuerySchema => ({
+    const makeQuerySchema = (type: FieldType, name: string, subtype?: string): QuerySchema => ({
       type,
       name,
       subtype,
@@ -307,12 +291,8 @@ export async function preview(
           if (field instanceof Date) {
             fieldMetadata = makeQuerySchema(FieldType.DATETIME, key)
           } else if (Array.isArray(field)) {
-            if (field.some(item => JsonUtils.hasSchema(item))) {
-              fieldMetadata = makeQuerySchema(
-                FieldType.JSON,
-                key,
-                JsonFieldSubType.ARRAY
-              )
+            if (field.some((item) => JsonUtils.hasSchema(item))) {
+              fieldMetadata = makeQuerySchema(FieldType.JSON, key, JsonFieldSubType.ARRAY)
             } else {
               fieldMetadata = makeQuerySchema(FieldType.ARRAY, key)
             }
@@ -336,7 +316,7 @@ export async function preview(
     key: string,
     fieldArray: any[]
   ) {
-    let schema: { [key: string]: any } = {}
+    const schema: { [key: string]: any } = {}
     // build the schema by aggregating all row objects in the array
     for (const item of fieldArray) {
       if (JsonUtils.hasSchema(item)) {
@@ -362,7 +342,7 @@ export async function preview(
       [key: string]: Record<string, string | QuerySchema>
     } = {}
     if (rows?.length > 0) {
-      for (let key of new Set(keys)) {
+      for (const key of new Set(keys)) {
         const fieldMetadata = getFieldMetadata(rows[0][key], key)
         previewSchema[key] = fieldMetadata
         if (
@@ -407,7 +387,7 @@ export async function preview(
 
   // if existing schema, update to include any previous schema keys
   if (existingSchema) {
-    for (let key of Object.keys(existingSchema)) {
+    for (const key of Object.keys(existingSchema)) {
       if (!previewSchema[key]) {
         previewSchema[key] = existingSchema[key]
       }
@@ -425,18 +405,13 @@ export async function preview(
 }
 
 async function execute(
-  ctx: UserCtx<
-    ExecuteQueryRequest,
-    ExecuteV2QueryResponse | ExecuteV1QueryResponse
-  >,
+  ctx: UserCtx<ExecuteQueryRequest, ExecuteV2QueryResponse | ExecuteV1QueryResponse>,
   opts = { rowsOnly: false, isAutomation: false }
 ) {
   const db = context.getWorkspaceDB()
 
   const query = await db.get<Query>(ctx.params.queryId)
-  const { datasource, envVars } = await sdk.datasources.getWithEnvVars(
-    query.datasourceId
-  )
+  const { datasource, envVars } = await sdk.datasources.getWithEnvVars(query.datasourceId)
 
   let authConfigCtx = {}
   if (!opts.isAutomation) {
@@ -487,15 +462,11 @@ async function execute(
   }
 }
 
-export async function executeV1(
-  ctx: UserCtx<ExecuteQueryRequest, ExecuteV1QueryResponse>
-) {
+export async function executeV1(ctx: UserCtx<ExecuteQueryRequest, ExecuteV1QueryResponse>) {
   return execute(ctx, { rowsOnly: true, isAutomation: false })
 }
 
-export async function executeV2(
-  ctx: UserCtx<ExecuteQueryRequest, ExecuteV2QueryResponse>
-) {
+export async function executeV2(ctx: UserCtx<ExecuteQueryRequest, ExecuteV2QueryResponse>) {
   return execute(ctx, { rowsOnly: false, isAutomation: false })
 }
 
@@ -519,9 +490,7 @@ const removeDynamicVariables = async (queryId: string) => {
     await db.put(datasource)
 
     // invalidate the deleted variables
-    const variablesToDelete = dynamicVariables!.filter(
-      (dv: any) => dv.queryId === queryId
-    )
+    const variablesToDelete = dynamicVariables!.filter((dv: any) => dv.queryId === queryId)
     await invalidateCachedVariable(variablesToDelete)
   }
 }

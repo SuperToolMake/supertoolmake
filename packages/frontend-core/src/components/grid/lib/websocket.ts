@@ -1,8 +1,8 @@
+import { GridSocketEvent, SocketEvent } from "@budibase/shared-core"
+import type { UIDatasource, UIUser } from "@budibase/types"
 import { get } from "svelte/store"
 import { createWebsocket } from "../../../utils"
-import { SocketEvent, GridSocketEvent } from "@budibase/shared-core"
-import { Store } from "../stores"
-import { UIDatasource, UIUser } from "@budibase/types"
+import type { Store } from "../stores"
 
 export const createGridWebsocket = (context: Store) => {
   const { rows, datasource, users, focusedCellId, definition, API } = context
@@ -30,7 +30,7 @@ export const createGridWebsocket = (context: Store) => {
   socket.on("connect", () => {
     connectToDatasource(get(datasource))
   })
-  socket.on("connect_error", err => {
+  socket.on("connect_error", (err) => {
     console.error("Failed to connect to grid websocket:", err.message)
   })
 
@@ -53,31 +53,25 @@ export const createGridWebsocket = (context: Store) => {
   })
 
   // Table events
-  socket.onOther(
-    GridSocketEvent.DatasourceChange,
-    ({ datasource: newDatasource }) => {
-      // Only update definition if one exists. If the datasource was deleted
-      // then we don't want to know - let the builder navigate away
-      if (newDatasource) {
-        definition.set(newDatasource)
-      }
+  socket.onOther(GridSocketEvent.DatasourceChange, ({ datasource: newDatasource }) => {
+    // Only update definition if one exists. If the datasource was deleted
+    // then we don't want to know - let the builder navigate away
+    if (newDatasource) {
+      definition.set(newDatasource)
     }
-  )
-  socket.on(
-    GridSocketEvent.DatasourceChange,
-    ({ datasource: newDatasource }) => {
-      // Listen builder renames, as these aren't handled otherwise
-      if (newDatasource?.name !== get(definition)?.name) {
-        definition.set(newDatasource)
-      }
+  })
+  socket.on(GridSocketEvent.DatasourceChange, ({ datasource: newDatasource }) => {
+    // Listen builder renames, as these aren't handled otherwise
+    if (newDatasource?.name !== get(definition)?.name) {
+      definition.set(newDatasource)
     }
-  )
+  })
 
   // Change websocket connection when table changes
   datasource.subscribe(connectToDatasource)
 
   // Notify selected cell changes
-  focusedCellId.subscribe($focusedCellId => {
+  focusedCellId.subscribe(($focusedCellId) => {
     socket.emit(GridSocketEvent.SelectCell, { cellId: $focusedCellId })
   })
 

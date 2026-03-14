@@ -1,11 +1,11 @@
+import { context } from "@budibase/backend-core"
+import type { Datasource, Query } from "@budibase/types"
 import { generateQueryID } from "../../../../db/utils"
 import { queryValidation } from "../validation"
-import { ImportInfo, ImportSource } from "./sources/base"
+import type { ImportInfo, ImportSource } from "./sources/base"
 import { Curl } from "./sources/curl"
 import { OpenAPI2 } from "./sources/openapi2"
 import { OpenAPI3 } from "./sources/openapi3"
-import { context } from "@budibase/backend-core"
-import { Datasource, Query } from "@budibase/types"
 
 interface ImportResult {
   errorQueries: Query[]
@@ -27,18 +27,13 @@ const assignStaticVariableDefaults = (
   return changed
 }
 
-const assignDatasourceHeaderDefaults = (
-  target: Record<string, any>,
-  headerNames: string[]
-) => {
+const assignDatasourceHeaderDefaults = (target: Record<string, any>, headerNames: string[]) => {
   for (const headerName of headerNames) {
     if (!headerName) {
       continue
     }
     const normalized = headerName.toLowerCase()
-    const existingKey = Object.keys(target).find(
-      key => key?.toLowerCase() === normalized
-    )
+    const existingKey = Object.keys(target).find((key) => key?.toLowerCase() === normalized)
     if (existingKey) {
       continue
     }
@@ -57,7 +52,7 @@ export class RestImporter {
   }
 
   init = async () => {
-    for (let source of this.sources) {
+    for (const source of this.sources) {
       if (await source.isSupported(this.data)) {
         this.source = source
         break
@@ -73,11 +68,8 @@ export class RestImporter {
     datasourceId: string,
     selectedEndpointId?: string
   ): Promise<ImportResult> => {
-    const filterIds = selectedEndpointId
-      ? new Set<string>([selectedEndpointId])
-      : undefined
-    const staticVariables =
-      await this.getDatasourceStaticVariables(datasourceId)
+    const filterIds = selectedEndpointId ? new Set<string>([selectedEndpointId]) : undefined
+    const staticVariables = await this.getDatasourceStaticVariables(datasourceId)
     // construct the queries
     let queries = await this.source.getQueries(datasourceId, {
       filterIds,
@@ -92,7 +84,7 @@ export class RestImporter {
     const errorQueries: Query[] = []
     const schema = queryValidation()
     queries = queries
-      .filter(query => {
+      .filter((query) => {
         const validation = schema.validate(query)
         if (validation.error) {
           errorQueries.push(query)
@@ -100,7 +92,7 @@ export class RestImporter {
         }
         return true
       })
-      .map(query => {
+      .map((query) => {
         query._id = generateQueryID(query.datasourceId)
         return query
       })
@@ -146,10 +138,8 @@ export class RestImporter {
     if (tokens.length) {
       config.staticVariables = config.staticVariables || {}
       assignStaticVariableDefaults(config.staticVariables, tokens, defaults)
-      const templateStaticVariables = new Set(
-        config.templateStaticVariables || []
-      )
-      tokens.forEach(token => templateStaticVariables.add(token))
+      const templateStaticVariables = new Set(config.templateStaticVariables || [])
+      tokens.forEach((token) => templateStaticVariables.add(token))
       config.templateStaticVariables = Array.from(templateStaticVariables)
     }
 
@@ -162,10 +152,7 @@ export class RestImporter {
       ) {
         config.defaultHeaders = {}
       }
-      assignDatasourceHeaderDefaults(
-        config.defaultHeaders as Record<string, any>,
-        securityHeaders
-      )
+      assignDatasourceHeaderDefaults(config.defaultHeaders as Record<string, any>, securityHeaders)
     }
   }
 

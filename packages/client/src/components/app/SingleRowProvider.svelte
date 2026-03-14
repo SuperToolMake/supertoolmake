@@ -1,48 +1,48 @@
 <script lang="ts">
-  import { getContext } from "svelte"
-  import type { Row, TableDatasource } from "@budibase/types"
+import type { Row, TableDatasource } from "@budibase/types"
+import { getContext } from "svelte"
 
-  export let datasource: TableDatasource
-  export let rowId: string
-  export let noRowMessage: string | undefined
+export let datasource: TableDatasource
+export let rowId: string
+export let noRowMessage: string | undefined
 
-  const component = getContext("component")
-  const { styleable, API, Provider, ActionTypes } = getContext("sdk")
+const component = getContext("component")
+const { styleable, API, Provider, ActionTypes } = getContext("sdk")
 
-  let row: Row | null | undefined
-  let loading = true
-  let noRowFound = false
+let row: Row | null | undefined
+let loading = true
+let noRowFound = false
 
-  $: datasourceId = datasource.tableId
-  $: fetchRow(datasourceId, rowId)
-  $: actions = [
-    {
-      type: ActionTypes.RefreshDatasource,
-      callback: () => fetchRow(datasourceId, rowId),
-      metadata: { dataSource: datasource },
-    },
-  ]
+$: datasourceId = datasource.tableId
+$: fetchRow(datasourceId, rowId)
+$: actions = [
+  {
+    type: ActionTypes.RefreshDatasource,
+    callback: () => fetchRow(datasourceId, rowId),
+    metadata: { dataSource: datasource },
+  },
+]
 
-  const fetchRow = async (datasourceId: string, rowId: string) => {
-    if (!datasourceId || !rowId) {
-      row = undefined
-      noRowFound = true
-      loading = false
-      return
-    }
-
-    loading = true
-    noRowFound = false
-    try {
-      row = await API.fetchRow(datasourceId, rowId, true)
-      noRowFound = row == null
-    } catch (e) {
-      row = undefined
-      noRowFound = true
-    } finally {
-      loading = false
-    }
+const fetchRow = async (datasourceId: string, rowId: string) => {
+  if (!datasourceId || !rowId) {
+    row = undefined
+    noRowFound = true
+    loading = false
+    return
   }
+
+  loading = true
+  noRowFound = false
+  try {
+    row = await API.fetchRow(datasourceId, rowId, true)
+    noRowFound = row == null
+  } catch (e) {
+    row = undefined
+    noRowFound = true
+  } finally {
+    loading = false
+  }
+}
 </script>
 
 {#if !loading}

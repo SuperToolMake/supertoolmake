@@ -1,6 +1,6 @@
+import type { AppContext, ComponentContext, PreviewDevice } from "@budibase/types"
 import { get } from "svelte/store"
 import { BudiStore } from "../BudiStore"
-import { PreviewDevice, ComponentContext, AppContext } from "@budibase/types"
 
 type PreviewEventHandler = (name: string, payload?: any) => void
 
@@ -28,13 +28,12 @@ export class PreviewStore extends BudiStore<PreviewState> {
     this.startDrag = this.startDrag.bind(this)
     this.stopDrag = this.stopDrag.bind(this)
     this.showPreview = this.showPreview.bind(this)
-    this.setSelectedComponentContext =
-      this.setSelectedComponentContext.bind(this)
+    this.setSelectedComponentContext = this.setSelectedComponentContext.bind(this)
     this.requestComponentContext = this.requestComponentContext.bind(this)
   }
 
   setDevice(device: PreviewDevice) {
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       previewDevice: device,
     }))
@@ -47,7 +46,7 @@ export class PreviewStore extends BudiStore<PreviewState> {
   }
 
   registerEventHandler(handler: PreviewEventHandler) {
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       previewEventHandler: handler,
     }))
@@ -68,14 +67,14 @@ export class PreviewStore extends BudiStore<PreviewState> {
 
   //load preview?
   showPreview(isVisible: boolean) {
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       showPreview: isVisible,
     }))
   }
 
   setSelectedComponentContext(context: ComponentContext) {
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       selectedComponentContext: context,
     }))

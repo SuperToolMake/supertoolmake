@@ -1,24 +1,24 @@
 <script>
-  import Button from "../Button/Button.svelte"
-  import Popover from "../Popover/Popover.svelte"
-  import Menu from "../Menu/Menu.svelte"
-  import MenuItem from "../Menu/Item.svelte"
+import Button from "../Button/Button.svelte"
+import MenuItem from "../Menu/Item.svelte"
+import Menu from "../Menu/Menu.svelte"
+import Popover from "../Popover/Popover.svelte"
 
-  export let buttons
-  export let text = "Action"
-  export let size = "M"
-  export let align = "left"
-  export let offset
-  export let animate
-  export let quiet = false
+export let buttons
+export let text = "Action"
+export let size = "M"
+export let align = "left"
+export let offset
+export let animate
+export let quiet = false
 
-  let anchor
-  let popover
+let anchor
+let popover
 
-  const handleClick = async button => {
-    popover.hide()
-    await button.onClick?.()
-  }
+const handleClick = async (button) => {
+  popover.hide()
+  await button.onClick?.()
+}
 </script>
 
 <Button

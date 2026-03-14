@@ -1,7 +1,7 @@
+import type { Ctx, EndpointMatcher } from "@budibase/types"
+import type { Middleware, Next } from "koa"
 import { Header } from "../constants"
 import { buildMatcherRegex, matches } from "./matchers"
-import { Ctx, EndpointMatcher } from "@budibase/types"
-import type { Middleware, Next } from "koa"
 
 /**
  * GET, HEAD and OPTIONS methods are considered safe operations
@@ -33,9 +33,7 @@ const INCLUDED_CONTENT_TYPES = [
  * https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#synchronizer-token-pattern
  *
  */
-export function csrf(
-  opts: { noCsrfPatterns: EndpointMatcher[] } = { noCsrfPatterns: [] }
-) {
+export function csrf(opts: { noCsrfPatterns: EndpointMatcher[] } = { noCsrfPatterns: [] }) {
   const noCsrfOptions = buildMatcherRegex(opts.noCsrfPatterns)
   return (async (ctx: Ctx, next: Next) => {
     // don't apply for excluded paths
@@ -50,12 +48,8 @@ export function csrf(
     }
 
     // don't apply when the content type isn't supported
-    let contentType = ctx.get("content-type")
-      ? ctx.get("content-type").toLowerCase()
-      : ""
-    if (
-      !INCLUDED_CONTENT_TYPES.filter(type => contentType.includes(type)).length
-    ) {
+    const contentType = ctx.get("content-type") ? ctx.get("content-type").toLowerCase() : ""
+    if (!INCLUDED_CONTENT_TYPES.filter((type) => contentType.includes(type)).length) {
       return next()
     }
 

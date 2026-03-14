@@ -1,49 +1,49 @@
 <script lang="ts">
-  import ActionButton from "../../ActionButton/ActionButton.svelte"
-  import { uuid } from "../../helpers"
-  import Icon from "../../Icon/Icon.svelte"
-  import { createEventDispatcher } from "svelte"
+import { createEventDispatcher } from "svelte"
+import ActionButton from "../../ActionButton/ActionButton.svelte"
+import { uuid } from "../../helpers"
+import Icon from "../../Icon/Icon.svelte"
 
-  const BYTES_IN_MB = 1000000
+const BYTES_IN_MB = 1000000
 
-  export let value: File | undefined = undefined
-  export let statusText: string | undefined = undefined
-  export let title: string = "Upload file"
-  export let disabled: boolean = false
-  export let allowClear: boolean | undefined = undefined
-  export let extensions: string[] | undefined = undefined
-  export let handleFileTooLarge: ((_file: File) => void) | undefined = undefined
-  export let fileSizeLimit: number = BYTES_IN_MB * 20
-  export let id: string | undefined = undefined
-  export let previewUrl: string | undefined = undefined
+export let value: File | undefined = undefined
+export let statusText: string | undefined = undefined
+export let title: string = "Upload file"
+export let disabled: boolean = false
+export let allowClear: boolean | undefined = undefined
+export let extensions: string[] | undefined = undefined
+export let handleFileTooLarge: ((_file: File) => void) | undefined = undefined
+export let fileSizeLimit: number = BYTES_IN_MB * 20
+export let id: string | undefined = undefined
+export let previewUrl: string | undefined = undefined
 
-  const fieldId = id || uuid()
-  const BYTES_IN_KB = 1000
+const fieldId = id || uuid()
+const BYTES_IN_KB = 1000
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  let fileInput: HTMLInputElement | undefined
+let fileInput: HTMLInputElement | undefined
 
-  $: inputAccept = Array.isArray(extensions) ? extensions.join(",") : "*"
+$: inputAccept = Array.isArray(extensions) ? extensions.join(",") : "*"
 
-  async function processFile(targetFile: File | undefined) {
-    if (targetFile) {
-      if (handleFileTooLarge && targetFile.size >= fileSizeLimit) {
-        handleFileTooLarge(targetFile)
-        return
-      }
-      dispatch("change", targetFile)
+async function processFile(targetFile: File | undefined) {
+  if (targetFile) {
+    if (handleFileTooLarge && targetFile.size >= fileSizeLimit) {
+      handleFileTooLarge(targetFile)
+      return
     }
+    dispatch("change", targetFile)
   }
+}
 
-  function handleFile(evt: Event) {
-    const target = evt.target as HTMLInputElement
-    processFile(target.files?.[0])
-  }
+function handleFile(evt: Event) {
+  const target = evt.target as HTMLInputElement
+  processFile(target.files?.[0])
+}
 
-  function clearFile() {
-    if (!disabled) dispatch("change", undefined)
-  }
+function clearFile() {
+  if (!disabled) dispatch("change", undefined)
+}
 </script>
 
 <input

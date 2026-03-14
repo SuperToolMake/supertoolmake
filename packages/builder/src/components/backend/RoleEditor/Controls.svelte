@@ -1,11 +1,11 @@
 <script>
-  import { Button, ActionButton } from "@budibase/bbui"
-  import { useSvelteFlow } from "@xyflow/svelte"
-  import { getContext } from "svelte"
-  import { ZoomDuration } from "./constants"
+import { ActionButton, Button } from "@budibase/bbui"
+import { useSvelteFlow } from "@xyflow/svelte"
+import { getContext } from "svelte"
+import { ZoomDuration } from "./constants"
 
-  const { createRole, layoutAndFit } = getContext("flow")
-  const flow = useSvelteFlow()
+const { createRole, layoutAndFit } = getContext("flow")
+const flow = useSvelteFlow()
 </script>
 
 <div class="control top-right">

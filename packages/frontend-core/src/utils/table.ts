@@ -1,5 +1,5 @@
 import * as sharedCore from "@budibase/shared-core"
-import { UIFieldSchema } from "@budibase/types"
+import type { UIFieldSchema } from "@budibase/types"
 
 export function canBeDisplayColumn(column: UIFieldSchema) {
   if (!sharedCore.canBeDisplayColumn(column.type)) {

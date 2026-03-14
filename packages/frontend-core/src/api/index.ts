@@ -1,43 +1,43 @@
-import {
-  HTTPMethod,
-  APICallParams,
-  APIClientConfig,
-  APIClient,
-  APICallConfig,
-  BaseAPIClient,
-  Headers,
-  APIError,
-} from "./types"
 import { Helpers } from "@budibase/bbui"
 import { Header } from "@budibase/shared-core"
 import { ApiVersion } from "../constants"
 import { buildAppEndpoints } from "./app"
 import { buildAttachmentEndpoints } from "./attachments"
 import { buildAuthEndpoints } from "./auth"
+import { buildBackupEndpoints } from "./backups"
 import { buildConfigEndpoints } from "./configs"
 import { buildDatasourceEndpoints } from "./datasources"
+import { buildDeploymentEndpoints } from "./deploy"
 import { buildLayoutEndpoints } from "./layouts"
+import { buildLogsEndpoints } from "./logs"
+import { buildMigrationEndpoints } from "./migrations"
+import { buildNavigationEndpoints } from "./navigation"
+import { buildOAuth2Endpoints } from "./oauth2"
 import { buildOtherEndpoints } from "./other"
 import { buildPermissionsEndpoints } from "./permissions"
 import { buildQueryEndpoints } from "./queries"
 import { buildRelationshipEndpoints } from "./relationships"
+import { buildResourceEndpoints } from "./resource"
 import { buildRoleEndpoints } from "./roles"
 import { buildRouteEndpoints } from "./routes"
+import { buildRowActionEndpoints } from "./rowActions"
 import { buildRowEndpoints } from "./rows"
 import { buildScreenEndpoints } from "./screens"
+import { buildSelfEndpoints } from "./self"
 import { buildTableEndpoints } from "./tables"
 import { buildTemplateEndpoints } from "./templates"
+import {
+  type APICallConfig,
+  type APICallParams,
+  type APIClient,
+  type APIClientConfig,
+  type APIError,
+  type BaseAPIClient,
+  type Headers,
+  HTTPMethod,
+} from "./types"
 import { buildUserEndpoints } from "./user"
-import { buildSelfEndpoints } from "./self"
-import { buildBackupEndpoints } from "./backups"
-import { buildLogsEndpoints } from "./logs"
-import { buildMigrationEndpoints } from "./migrations"
-import { buildRowActionEndpoints } from "./rowActions"
-import { buildOAuth2Endpoints } from "./oauth2"
-import { buildNavigationEndpoints } from "./navigation"
 import { buildWorkspaceAppEndpoints } from "./workspaceApps"
-import { buildResourceEndpoints } from "./resource"
-import { buildDeploymentEndpoints } from "./deploy"
 import { buildWorkspaceFavouriteEndpoints } from "./workspaceFavourites"
 
 export type { APIClient } from "./types"
@@ -101,11 +101,7 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
   }
 
   // Generates an error object from a string
-  const makeError = (
-    message: string,
-    url: string,
-    method?: HTTPMethod
-  ): APIError => {
+  const makeError = (message: string, url: string, method?: HTTPMethod): APIError => {
     return {
       message,
       json: null,
@@ -121,14 +117,13 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
   const makeApiCall = async <RequestT = null, ResponseT = void>(
     callConfig: APICallConfig<RequestT, ResponseT>
   ): Promise<ResponseT> => {
-    let { json, method, external, body, url, parseResponse, suppressErrors } =
-      callConfig
+    let { json, method, external, body, url, parseResponse, suppressErrors } = callConfig
 
     // Ensure we don't do JSON processing if sending a GET request
     json = json && method !== HTTPMethod.GET
 
     // Build headers
-    let headers: Headers = { Accept: "application/json" }
+    const headers: Headers = { Accept: "application/json" }
     headers[Header.SESSION_ID] = APISessionID
     if (!external) {
       headers[Header.API_VER] = ApiVersion
@@ -217,7 +212,7 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
       params: APICallParams<RequestT, ResponseT>
     ): Promise<ResponseT> => {
       try {
-        let callConfig: APICallConfig<RequestT, ResponseT> = {
+        const callConfig: APICallConfig<RequestT, ResponseT> = {
           json: true,
           external: false,
           suppressErrors: false,
@@ -225,7 +220,7 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
           method,
           ...params,
         }
-        let { url, cache, external } = callConfig
+        const { url, cache, external } = callConfig
         if (!external) {
           callConfig.url = `/${url}`.replace("//", "/")
         }
@@ -243,7 +238,7 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
     }
 
   // Build the underlying core API methods
-  let API: BaseAPIClient = {
+  const API: BaseAPIClient = {
     post: requestApiCall(HTTPMethod.POST),
     get: requestApiCall(HTTPMethod.GET),
     patch: requestApiCall(HTTPMethod.PATCH),
@@ -255,7 +250,7 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
     // Generic utility to extract the current app ID. Assumes that any client
     // that exists in an app context will be attaching our app ID header.
     getAppID: (): string => {
-      let headers: Headers = {}
+      const headers: Headers = {}
       config?.attachHeaders?.(headers)
       return headers?.[Header.APP_ID]
     },

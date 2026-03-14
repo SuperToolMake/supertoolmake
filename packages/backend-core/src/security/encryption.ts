@@ -37,39 +37,20 @@ export function getSecret(secretOption: SecretOption): string {
 }
 
 function stretchString(secret: string, salt: Buffer) {
-  return crypto.pbkdf2Sync(
-    secret,
-    new Uint8Array(salt),
-    ITERATIONS,
-    STRETCH_LENGTH,
-    "sha512"
-  )
+  return crypto.pbkdf2Sync(secret, new Uint8Array(salt), ITERATIONS, STRETCH_LENGTH, "sha512")
 }
 
-export function encrypt(
-  input: string,
-  secretOption: SecretOption = SecretOption.API
-) {
+export function encrypt(input: string, secretOption: SecretOption = SecretOption.API) {
   const salt = crypto.randomBytes(SALT_LENGTH)
   const stretched = stretchString(getSecret(secretOption), salt)
-  const cipher = crypto.createCipheriv(
-    ALGO,
-    new Uint8Array(stretched),
-    new Uint8Array(salt)
-  )
+  const cipher = crypto.createCipheriv(ALGO, new Uint8Array(stretched), new Uint8Array(salt))
   const base = cipher.update(input, "utf8")
   const final = cipher.final()
-  const encrypted = Buffer.concat([
-    new Uint8Array(base),
-    new Uint8Array(final),
-  ]).toString("hex")
+  const encrypted = Buffer.concat([new Uint8Array(base), new Uint8Array(final)]).toString("hex")
   return `${salt.toString("hex")}${SEPARATOR}${encrypted}`
 }
 
-export function decrypt(
-  input: string,
-  secretOption: SecretOption = SecretOption.API
-) {
+export function decrypt(input: string, secretOption: SecretOption = SecretOption.API) {
   const [salt, encrypted] = input.split(SEPARATOR)
   const saltBuffer = Buffer.from(salt, "hex")
   const stretched = stretchString(getSecret(secretOption), saltBuffer)
@@ -99,18 +80,14 @@ export async function encryptFile(
   const salt = crypto.randomBytes(SALT_LENGTH)
   const iv = crypto.randomBytes(IV_LENGTH)
   const stretched = stretchString(secret, salt)
-  const cipher = crypto.createCipheriv(
-    ALGO,
-    new Uint8Array(stretched),
-    new Uint8Array(iv)
-  )
+  const cipher = crypto.createCipheriv(ALGO, new Uint8Array(stretched), new Uint8Array(iv))
 
   outputFile.write(salt)
   outputFile.write(iv)
 
   inputFile.pipe(zlib.createGzip()).pipe(cipher).pipe(outputFile)
 
-  return new Promise<{ filename: string; dir: string }>(r => {
+  return new Promise<{ filename: string; dir: string }>((r) => {
     outputFile.on("finish", () => {
       r({
         filename: outputFileName,
@@ -129,11 +106,7 @@ async function getSaltAndIV(path: string) {
   return { salt, iv }
 }
 
-export async function decryptFile(
-  inputPath: string,
-  outputPath: string,
-  secret: string
-) {
+export async function decryptFile(inputPath: string, outputPath: string, secret: string) {
   if (fs.lstatSync(inputPath).isDirectory()) {
     throw new Error("Unable to decrypt directory")
   }
@@ -145,11 +118,7 @@ export async function decryptFile(
   const outputFile = fs.createWriteStream(outputPath)
 
   const stretched = stretchString(secret, salt)
-  const decipher = crypto.createDecipheriv(
-    ALGO,
-    new Uint8Array(stretched),
-    new Uint8Array(iv)
-  )
+  const decipher = crypto.createDecipheriv(ALGO, new Uint8Array(stretched), new Uint8Array(iv))
 
   const unzip = zlib.createGunzip()
 
@@ -161,22 +130,22 @@ export async function decryptFile(
       res()
     })
 
-    inputFile.on("error", e => {
+    inputFile.on("error", (e) => {
       outputFile.close()
       rej(e)
     })
 
-    decipher.on("error", e => {
+    decipher.on("error", (e) => {
       outputFile.close()
       rej(e)
     })
 
-    unzip.on("error", e => {
+    unzip.on("error", (e) => {
       outputFile.close()
       rej(e)
     })
 
-    outputFile.on("error", e => {
+    outputFile.on("error", (e) => {
       outputFile.close()
       rej(e)
     })
@@ -196,14 +165,14 @@ function readBytes(stream: fs.ReadStream, length: number) {
         bytesRead += chunk.length
       }
 
-      resolve(Buffer.concat(data.map(buf => new Uint8Array(buf))))
+      resolve(Buffer.concat(data.map((buf) => new Uint8Array(buf))))
     })
 
     stream.on("end", () => {
       reject(new Error("Insufficient data in the stream."))
     })
 
-    stream.on("error", error => {
+    stream.on("error", (error) => {
       reject(error)
     })
   })

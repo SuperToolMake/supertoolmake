@@ -1,160 +1,151 @@
 <script>
-  import {
-    readableToRuntimeBinding,
-    runtimeToReadableBinding,
-  } from "@/dataBinding"
-  import {
-    Button,
-    Popover,
-    Select,
-    Layout,
-    Drawer,
-    DrawerContent,
-    Icon,
-    Modal,
-    ModalContent,
-    CoreDropzone,
-    notifications,
-  } from "@budibase/bbui"
-  import { createEventDispatcher } from "svelte"
-  import {
-    tables as tablesStore,
-    queries as queriesStore,
-    selectedScreen,
-    componentStore,
-    datasources,
-    integrations,
-  } from "@/stores/builder"
-  import BindingBuilder from "@/components/integration/QueryBindingBuilder.svelte"
-  import IntegrationQueryEditor from "@/components/integration/index.svelte"
-  import { makePropSafe as safe } from "@budibase/string-templates"
-  import { findAllComponents } from "@/helpers/components"
-  import {
-    extractFields,
-    extractJSONArrayFields,
-    extractRelationships,
-  } from "@/helpers/bindings"
-  import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
-  import DataSourceCategory from "@/components/design/settings/controls/DataSourceSelect/DataSourceCategory.svelte"
-  import { API } from "@/api"
-  import { sortAndFormat } from "@/helpers/data/format"
+import {
+  Button,
+  CoreDropzone,
+  Drawer,
+  DrawerContent,
+  Icon,
+  Layout,
+  Modal,
+  ModalContent,
+  notifications,
+  Popover,
+  Select,
+} from "@budibase/bbui"
+import { makePropSafe as safe } from "@budibase/string-templates"
+import { createEventDispatcher } from "svelte"
+import { API } from "@/api"
+import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
+import DataSourceCategory from "@/components/design/settings/controls/DataSourceSelect/DataSourceCategory.svelte"
+import IntegrationQueryEditor from "@/components/integration/index.svelte"
+import BindingBuilder from "@/components/integration/QueryBindingBuilder.svelte"
+import { readableToRuntimeBinding, runtimeToReadableBinding } from "@/dataBinding"
+import { extractFields, extractJSONArrayFields, extractRelationships } from "@/helpers/bindings"
+import { findAllComponents } from "@/helpers/components"
+import { sortAndFormat } from "@/helpers/data/format"
+import {
+  componentStore,
+  datasources,
+  integrations,
+  queries as queriesStore,
+  selectedScreen,
+  tables as tablesStore,
+} from "@/stores/builder"
 
-  export let value = {}
-  export let otherSources
-  export let showAllQueries
-  export let bindings = []
-  export let showDataProviders = true
+export let value = {}
+export let otherSources
+export let showAllQueries
+export let bindings = []
+export let showDataProviders = true
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  let anchorRight, dropdownRight
-  let drawer
-  let tmpQueryParams
-  let tmpCustomData
-  let modal
+let anchorRight, dropdownRight
+let drawer
+let tmpQueryParams
+let tmpCustomData
+let modal
 
-  $: text = value?.label ?? "Choose an option"
-  $: tables = sortAndFormat.tables($tablesStore.list, $datasources.list)
-  $: queries = $queriesStore.list
-    .filter(q => showAllQueries || q.queryVerb === "read" || q.readable)
-    .map(query => ({
-      label: query.name,
-      name: query.name,
-      ...query,
-      type: "query",
-    }))
-  $: dataProviders = findAllComponents($selectedScreen.props)
-    .filter(component => {
-      return (
-        component._component?.endsWith("/dataprovider") &&
-        component._id !== $componentStore.selectedComponentId
-      )
-    })
-    .map(provider => ({
-      label: provider._instanceName,
-      name: provider._instanceName,
-      providerId: provider._id,
-      value: `{{ literal ${safe(provider._id)} }}`,
-      type: "provider",
-    }))
-  $: links = extractRelationships(bindings)
-  $: fields = extractFields(bindings)
-  $: jsonArrays = extractJSONArrayFields(bindings)
-  $: custom = {
-    type: "custom",
-    label: "JSON / CSV",
-  }
+$: text = value?.label ?? "Choose an option"
+$: tables = sortAndFormat.tables($tablesStore.list, $datasources.list)
+$: queries = $queriesStore.list
+  .filter((q) => showAllQueries || q.queryVerb === "read" || q.readable)
+  .map((query) => ({
+    label: query.name,
+    name: query.name,
+    ...query,
+    type: "query",
+  }))
+$: dataProviders = findAllComponents($selectedScreen.props)
+  .filter((component) => {
+    return (
+      component._component?.endsWith("/dataprovider") &&
+      component._id !== $componentStore.selectedComponentId
+    )
+  })
+  .map((provider) => ({
+    label: provider._instanceName,
+    name: provider._instanceName,
+    providerId: provider._id,
+    value: `{{ literal ${safe(provider._id)} }}`,
+    type: "provider",
+  }))
+$: links = extractRelationships(bindings)
+$: fields = extractFields(bindings)
+$: jsonArrays = extractJSONArrayFields(bindings)
+$: custom = {
+  type: "custom",
+  label: "JSON / CSV",
+}
 
-  const handleSelected = selected => {
-    dispatch("change", selected)
-    dropdownRight.hide()
-  }
+const handleSelected = (selected) => {
+  dispatch("change", selected)
+  dropdownRight.hide()
+}
 
-  const fetchQueryDefinition = query => {
-    const source = $datasources.list.find(
-      ds => ds._id === query.datasourceId
-    ).source
-    return $integrations[source].query[query.queryVerb]
-  }
+const fetchQueryDefinition = (query) => {
+  const source = $datasources.list.find((ds) => ds._id === query.datasourceId).source
+  return $integrations[source].query[query.queryVerb]
+}
 
-  const getQueryParams = query => {
-    return $queriesStore.list.find(q => q._id === query?._id)?.parameters || []
-  }
+const getQueryParams = (query) => {
+  return $queriesStore.list.find((q) => q._id === query?._id)?.parameters || []
+}
 
-  const getQueryDatasource = query => {
-    return $datasources.list.find(ds => ds._id === query?.datasourceId)
-  }
+const getQueryDatasource = (query) => {
+  return $datasources.list.find((ds) => ds._id === query?.datasourceId)
+}
 
-  const openQueryParamsDrawer = () => {
-    tmpQueryParams = { ...value.queryParams }
-    drawer.show()
-  }
+const openQueryParamsDrawer = () => {
+  tmpQueryParams = { ...value.queryParams }
+  drawer.show()
+}
 
-  const openCustomDrawer = () => {
-    tmpCustomData = runtimeToReadableBinding(bindings, value.data || "")
-    drawer.show()
-  }
+const openCustomDrawer = () => {
+  tmpCustomData = runtimeToReadableBinding(bindings, value.data || "")
+  drawer.show()
+}
 
-  const getQueryValue = queries => {
-    return queries.find(q => q._id === value._id) || value
-  }
+const getQueryValue = (queries) => {
+  return queries.find((q) => q._id === value._id) || value
+}
 
-  const saveQueryParams = () => {
-    handleSelected({
-      ...value,
-      queryParams: tmpQueryParams,
-    })
-    drawer.hide()
-  }
+const saveQueryParams = () => {
+  handleSelected({
+    ...value,
+    queryParams: tmpQueryParams,
+  })
+  drawer.hide()
+}
 
-  const saveCustomData = () => {
-    handleSelected({
-      ...value,
-      data: readableToRuntimeBinding(bindings, tmpCustomData),
-    })
-    drawer.hide()
-  }
+const saveCustomData = () => {
+  handleSelected({
+    ...value,
+    data: readableToRuntimeBinding(bindings, tmpCustomData),
+  })
+  drawer.hide()
+}
 
-  const promptForCSV = () => {
-    drawer.hide()
-    modal.show()
-  }
+const promptForCSV = () => {
+  drawer.hide()
+  modal.show()
+}
 
-  const handleCSV = async e => {
-    try {
-      const csv = await e.detail[0]?.text()
-      if (csv?.length) {
-        const js = await API.csvToJson(csv)
-        tmpCustomData = JSON.stringify(js)
-      }
-      modal.hide()
-      saveCustomData()
-    } catch (error) {
-      notifications.error("Failed to parse CSV")
-      modal.hide()
-      drawer.show()
+const handleCSV = async (e) => {
+  try {
+    const csv = await e.detail[0]?.text()
+    if (csv?.length) {
+      const js = await API.csvToJson(csv)
+      tmpCustomData = JSON.stringify(js)
     }
+    modal.hide()
+    saveCustomData()
+  } catch (error) {
+    notifications.error("Failed to parse CSV")
+    modal.hide()
+    drawer.show()
   }
+}
 </script>
 
 <div class="container" bind:this={anchorRight}>

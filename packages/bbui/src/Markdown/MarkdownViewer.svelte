@@ -1,26 +1,23 @@
 <script lang="ts">
-  import { marked } from "marked"
+import { marked } from "marked"
 
-  export let value: string | undefined = undefined
-  export let height: string | undefined = undefined
+export let value: string | undefined = undefined
+export let height: string | undefined = undefined
 
-  let ref: HTMLDivElement | undefined
+let ref: HTMLDivElement | undefined
 
-  $: updateValue(ref, value)
+$: updateValue(ref, value)
 
-  const updateValue = async (
-    ref: HTMLDivElement | undefined,
-    markdown: string | undefined
-  ) => {
-    if (!ref) {
-      return
-    }
-    if (!markdown) {
-      ref.innerHTML = ""
-      return
-    }
-    ref.innerHTML = marked.parse(markdown, { async: false })
+const updateValue = async (ref: HTMLDivElement | undefined, markdown: string | undefined) => {
+  if (!ref) {
+    return
   }
+  if (!markdown) {
+    ref.innerHTML = ""
+    return
+  }
+  ref.innerHTML = marked.parse(markdown, { async: false })
+}
 </script>
 
 <div class="markdown-viewer" style="height:{height};" bind:this={ref}></div>

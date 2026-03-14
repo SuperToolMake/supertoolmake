@@ -1,29 +1,23 @@
 <script>
-  import { getContext } from "svelte"
+import { getContext } from "svelte"
 
-  const { styleable } = getContext("sdk")
-  const component = getContext("component")
+const { styleable } = getContext("sdk")
+const component = getContext("component")
 
-  export let direction
-  export let hAlign
-  export let vAlign
-  export let size
-  export let gap
-  export let wrap
-  export let onClick
+export let direction
+export let hAlign
+export let vAlign
+export let size
+export let gap
+export let wrap
+export let onClick
 
-  $: directionClass = direction ? `flex-container direction-${direction}` : ""
-  $: hAlignClass = hAlign ? `hAlign-${hAlign}` : ""
-  $: vAlignClass = vAlign ? `vAlign-${vAlign}` : ""
-  $: sizeClass = size ? `size-${size}` : ""
-  $: gapClass = gap ? `gap-${gap}` : ""
-  $: classNames = [
-    directionClass,
-    hAlignClass,
-    vAlignClass,
-    sizeClass,
-    gapClass,
-  ].join(" ")
+$: directionClass = direction ? `flex-container direction-${direction}` : ""
+$: hAlignClass = hAlign ? `hAlign-${hAlign}` : ""
+$: vAlignClass = vAlign ? `vAlign-${vAlign}` : ""
+$: sizeClass = size ? `size-${size}` : ""
+$: gapClass = gap ? `gap-${gap}` : ""
+$: classNames = [directionClass, hAlignClass, vAlignClass, sizeClass, gapClass].join(" ")
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

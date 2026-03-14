@@ -74,7 +74,7 @@ const getResizeActions = ({
       }
 
       // Re-enable iframe interactions
-      for (let item of Array.from(document.getElementsByTagName("iframe"))) {
+      for (const item of Array.from(document.getElementsByTagName("iframe"))) {
         item.style.removeProperty("pointer-events")
       }
     }
@@ -91,10 +91,7 @@ const getResizeActions = ({
       }
 
       const target = e.target as HTMLElement
-      if (
-        target.hasAttribute("disabled") &&
-        target.getAttribute("disabled") !== "false"
-      ) {
+      if (target.hasAttribute("disabled") && target.getAttribute("disabled") !== "false") {
         return
       }
 
@@ -108,7 +105,7 @@ const getResizeActions = ({
 
       // iframes swallow mouseup events if your cursor ends up over it during a drag, so make them
       // temporarily non-interactive
-      for (let item of Array.from(document.getElementsByTagName("iframe"))) {
+      for (const item of Array.from(document.getElementsByTagName("iframe"))) {
         item.style.pointerEvents = "none"
       }
 

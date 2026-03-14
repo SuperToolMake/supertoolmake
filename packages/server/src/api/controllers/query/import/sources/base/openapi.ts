@@ -1,7 +1,7 @@
 import SwaggerParser from "@apidevtools/swagger-parser"
 import { load as loadYaml } from "js-yaml"
 import isObject from "lodash/isObject"
-import { OpenAPI } from "openapi-types"
+import type { OpenAPI } from "openapi-types"
 import { ImportSource } from "."
 
 const isYamlDocument = (loaded: unknown): loaded is OpenAPI.Document => {
@@ -46,15 +46,11 @@ export abstract class OpenAPISource extends ImportSource {
     try {
       return await SwaggerParser.validate(document)
     } catch (err) {
-      console.log(
-        `[OpenAPI Import] Schema validation failed, continuing without validation`
-      )
+      console.log(`[OpenAPI Import] Schema validation failed, continuing without validation`)
       try {
         return await SwaggerParser.dereference(document, baseOptions)
       } catch (dereferenceErr) {
-        console.log(
-          `[OpenAPI Import] Dereference failed, continuing with parsed document`
-        )
+        console.log(`[OpenAPI Import] Dereference failed, continuing with parsed document`)
         return document as OpenAPI.Document
       }
     }

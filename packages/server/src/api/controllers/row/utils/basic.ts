@@ -1,13 +1,14 @@
 // need to handle table name + field or just field, depending on if relationships used
-import {
-  FieldSchema,
-  FieldType,
-  Row,
-  Table,
-  JsonTypes,
-  EXTERNAL_ROW_REV,
-} from "@budibase/types"
+
 import { helpers, PROTECTED_EXTERNAL_COLUMNS } from "@budibase/shared-core"
+import {
+  EXTERNAL_ROW_REV,
+  type FieldSchema,
+  FieldType,
+  JsonTypes,
+  type Row,
+  type Table,
+} from "@budibase/types"
 import { generateRowIdField } from "../../../../integrations/utils"
 
 function extractFieldValue({
@@ -37,19 +38,15 @@ export function getInternalRowId(row: Row, table: Table): string {
   })
 }
 
-export function generateIdForRow(
-  row: Row | undefined,
-  table: Table,
-  isLinked = false
-): string {
+export function generateIdForRow(row: Row | undefined, table: Table, isLinked = false): string {
   const primary = table.primary
   if (!row || !primary) {
     return ""
   }
   // build id array
-  let idParts = []
-  for (let field of primary) {
-    let fieldValue = extractFieldValue({
+  const idParts = []
+  for (const field of primary) {
+    const fieldValue = extractFieldValue({
       row,
       tableName: table.name,
       fieldName: field,
@@ -66,7 +63,7 @@ export function generateIdForRow(
 }
 
 function fixJsonTypes(row: Row, table: Table) {
-  for (let [fieldName, schema] of Object.entries(table.schema)) {
+  for (const [fieldName, schema] of Object.entries(table.schema)) {
     if (JsonTypes.includes(schema.type) && typeof row[fieldName] === "string") {
       try {
         row[fieldName] = JSON.parse(row[fieldName])
@@ -92,12 +89,12 @@ export async function basicProcessing({
   tables: Table[]
   isLinked: boolean
 }): Promise<Row> {
-  let table: Table = source
+  const table: Table = source
 
   const thisRow: Row = {}
 
   // filter the row down to what is actually the row (not joined)
-  for (let fieldName of Object.keys(table.schema)) {
+  for (const fieldName of Object.keys(table.schema)) {
     let value = extractFieldValue({
       row,
       tableName: table.name,
@@ -118,12 +115,12 @@ export async function basicProcessing({
   thisRow.tableId = table._id
   thisRow._rev = EXTERNAL_ROW_REV
   columns = columns.concat(PROTECTED_EXTERNAL_COLUMNS)
-  for (let col of columns) {
+  for (const col of columns) {
     const schema: FieldSchema | undefined = table.schema[col]
     if (schema?.type !== FieldType.LINK) {
       continue
     }
-    const relatedTable = tables.find(tbl => tbl._id === schema.tableId)
+    const relatedTable = tables.find((tbl) => tbl._id === schema.tableId)
     if (!relatedTable) {
       continue
     }
@@ -144,7 +141,7 @@ export async function basicProcessing({
       const sortField = relatedTable.primaryDisplay || relatedTable.primary![0]!
       thisRow[col] = (
         await Promise.all(
-          (thisRow[col] as Row[]).map(relatedRow =>
+          (thisRow[col] as Row[]).map((relatedRow) =>
             basicProcessing({
               row: relatedRow,
               source: relatedTable,
@@ -161,9 +158,7 @@ export async function basicProcessing({
         } else if (!bField) {
           return -1
         }
-        return aField.localeCompare
-          ? aField.localeCompare(bField)
-          : aField - bField
+        return aField.localeCompare ? aField.localeCompare(bField) : aField - bField
       })
     }
   }

@@ -1,111 +1,95 @@
 <script>
-  import { DetailSummary, notifications } from "@budibase/bbui"
-  import { componentStore, builderStore } from "@/stores/builder"
-  import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
-  import ResetFieldsButton from "@/components/design/settings/controls/ResetFieldsButton.svelte"
-  import EjectBlockButton from "@/components/design/settings/controls/EjectBlockButton.svelte"
-  import { getComponentForSetting } from "@/components/design/settings/componentSettings"
-  import InfoDisplay from "./InfoDisplay.svelte"
-  import { shouldDisplaySetting } from "@budibase/frontend-core"
-  import { getContext, setContext } from "svelte"
+import { DetailSummary, notifications } from "@budibase/bbui"
+import { shouldDisplaySetting } from "@budibase/frontend-core"
+import { getContext, setContext } from "svelte"
+import { getComponentForSetting } from "@/components/design/settings/componentSettings"
+import EjectBlockButton from "@/components/design/settings/controls/EjectBlockButton.svelte"
+import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
+import ResetFieldsButton from "@/components/design/settings/controls/ResetFieldsButton.svelte"
+import { builderStore, componentStore } from "@/stores/builder"
+import InfoDisplay from "./InfoDisplay.svelte"
 
-  export let componentDefinition
-  export let componentInstance
-  export let bindings
-  export let componentBindings
-  export let isScreen = false
-  export let onUpdateSetting
-  export let showSectionTitle = true
-  export let includeHidden = false
-  export let tag
+export let componentDefinition
+export let componentInstance
+export let bindings
+export let componentBindings
+export let isScreen = false
+export let onUpdateSetting
+export let showSectionTitle = true
+export let includeHidden = false
+export let tag
 
-  // Sometimes we render component settings using a complicated nested
-  // component instance technique. This results in instances with IDs that
-  // don't exist anywhere in the tree. Therefore we need to keep track of
-  // what the real component tree ID is so we can always find it.
-  const rootId = getContext("rootId")
-  if (!rootId) {
-    setContext("rootId", componentInstance._id)
-  }
-  $: componentInstance._rootId = rootId || componentInstance._id
+// Sometimes we render component settings using a complicated nested
+// component instance technique. This results in instances with IDs that
+// don't exist anywhere in the tree. Therefore we need to keep track of
+// what the real component tree ID is so we can always find it.
+const rootId = getContext("rootId")
+if (!rootId) {
+  setContext("rootId", componentInstance._id)
+}
+$: componentInstance._rootId = rootId || componentInstance._id
 
-  $: sections = getSections(
-    componentInstance,
-    componentDefinition,
-    isScreen,
-    tag,
-    includeHidden
-  )
+$: sections = getSections(componentInstance, componentDefinition, isScreen, tag, includeHidden)
 
-  const getSections = (instance, definition, isScreen, tag, includeHidden) => {
-    const settings = definition?.settings ?? []
-    const generalSettings = settings.filter(
-      setting => !setting.section && setting.tag === tag
-    )
-    const customSections = settings.filter(
-      setting => setting.section && setting.tag === tag
-    )
-    let sections = []
-    if (generalSettings.length) {
-      sections.push({
-        name: "General",
-        settings: generalSettings,
-      })
-    }
-    if (customSections.length) {
-      sections = sections.concat(customSections)
-    }
-
-    // Filter out settings which shouldn't be rendered
-    sections.forEach(section => {
-      section.visible = shouldDisplaySetting(instance, section)
-      if (!section.visible) {
-        return
-      }
-      section.settings.forEach(setting => {
-        setting.visible = canRenderControl(
-          instance,
-          setting,
-          isScreen,
-          includeHidden
-        )
-      })
-      section.visible =
-        section.name === "General" ||
-        section.settings.some(setting => setting.visible)
+const getSections = (instance, definition, isScreen, tag, includeHidden) => {
+  const settings = definition?.settings ?? []
+  const generalSettings = settings.filter((setting) => !setting.section && setting.tag === tag)
+  const customSections = settings.filter((setting) => setting.section && setting.tag === tag)
+  let sections = []
+  if (generalSettings.length) {
+    sections.push({
+      name: "General",
+      settings: generalSettings,
     })
-
-    return sections
+  }
+  if (customSections.length) {
+    sections = sections.concat(customSections)
   }
 
-  const updateSetting = async (setting, value) => {
-    try {
-      if (typeof onUpdateSetting === "function") {
-        await onUpdateSetting(setting, value)
-      } else {
-        await componentStore.updateSetting(setting.key, value)
-      }
-    } catch (error) {
-      notifications.error("Error updating component prop")
+  // Filter out settings which shouldn't be rendered
+  sections.forEach((section) => {
+    section.visible = shouldDisplaySetting(instance, section)
+    if (!section.visible) {
+      return
     }
-  }
+    section.settings.forEach((setting) => {
+      setting.visible = canRenderControl(instance, setting, isScreen, includeHidden)
+    })
+    section.visible =
+      section.name === "General" || section.settings.some((setting) => setting.visible)
+  })
 
-  const canRenderControl = (instance, setting, isScreen, includeHidden) => {
-    // Prevent rendering on click setting for screens
-    if (setting?.type === "event" && isScreen) {
-      return false
+  return sections
+}
+
+const updateSetting = async (setting, value) => {
+  try {
+    if (typeof onUpdateSetting === "function") {
+      await onUpdateSetting(setting, value)
+    } else {
+      await componentStore.updateSetting(setting.key, value)
     }
-    // Check we have a component to render for this setting
-    const control = getComponentForSetting(setting)
-    if (!control) {
-      return false
-    }
-    // Check if setting is hidden
-    if (setting.hidden && !includeHidden) {
-      return false
-    }
-    return shouldDisplaySetting(instance, setting)
+  } catch (error) {
+    notifications.error("Error updating component prop")
   }
+}
+
+const canRenderControl = (instance, setting, isScreen, includeHidden) => {
+  // Prevent rendering on click setting for screens
+  if (setting?.type === "event" && isScreen) {
+    return false
+  }
+  // Check we have a component to render for this setting
+  const control = getComponentForSetting(setting)
+  if (!control) {
+    return false
+  }
+  // Check if setting is hidden
+  if (setting.hidden && !includeHidden) {
+    return false
+  }
+  return shouldDisplaySetting(instance, setting)
+}
 </script>
 
 {#each sections as section, idx (section.name)}

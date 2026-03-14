@@ -1,4 +1,4 @@
-import { GridSpacing, GridRowHeight } from "@/constants"
+import { GridRowHeight, GridSpacing } from "@/constants"
 import { builderStore } from "@/stores"
 import { buildStyleString } from "@/utils/styleable.js"
 
@@ -64,8 +64,7 @@ export enum GridDragMode {
 }
 
 // Builds a CSS variable name for a certain piece of grid metadata
-export const getGridVar = (device: string, param: string) =>
-  `--grid-${device}-${param}`
+export const getGridVar = (device: string, param: string) => `--grid-${device}-${param}`
 
 export interface GridEvent extends DragEvent {
   target: HTMLElement
@@ -94,16 +93,8 @@ export const gridLayout = (node: HTMLDivElement, metadata: GridMetadata) => {
 
   // Applies the required listeners, CSS and classes to a component DOM node
   const applyMetadata = (metadata: GridMetadata) => {
-    const {
-      id,
-      styles,
-      interactive,
-      errored,
-      definition,
-      draggable,
-      insideGrid,
-      ignoresLayout,
-    } = metadata
+    const { id, styles, interactive, errored, definition, draggable, insideGrid, ignoresLayout } =
+      metadata
     if (!insideGrid) {
       return
     }
@@ -152,9 +143,9 @@ export const gridLayout = (node: HTMLDivElement, metadata: GridMetadata) => {
     // Specify values for all grid params for all devices, and strip these CSS
     // variables from the styles being applied to the inner component, as we
     // want to apply these to the wrapper instead
-    for (let param of Object.values(GridParams)) {
-      let dVar = getGridVar(Devices.Desktop, param)
-      let mVar = getGridVar(Devices.Mobile, param)
+    for (const param of Object.values(GridParams)) {
+      const dVar = getGridVar(Devices.Desktop, param)
+      const mVar = getGridVar(Devices.Mobile, param)
       vars[dVar] = styles[dVar] ?? styles[mVar] ?? defaults[param]
       vars[mVar] = styles[mVar] ?? styles[dVar] ?? defaults[param]
     }

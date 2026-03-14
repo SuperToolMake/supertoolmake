@@ -1,4 +1,4 @@
-import { UserCtx } from "@budibase/types"
+import type { UserCtx } from "@budibase/types"
 import { isAdmin } from "../users"
 
 export const adminOnly = async (ctx: UserCtx, next: any) => {

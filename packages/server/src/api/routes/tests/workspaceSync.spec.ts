@@ -1,8 +1,8 @@
+import { db as dbCore, roles } from "@budibase/backend-core"
 import * as setup from "./utilities"
-import { roles, db as dbCore } from "@budibase/backend-core"
 
 describe("/api/applications/:appId/sync", () => {
-  let config = setup.getConfig()
+  const config = setup.getConfig()
   let app
 
   afterAll(setup.afterAll)

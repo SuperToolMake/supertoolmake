@@ -1,4 +1,4 @@
-import { Role, DocumentType, SEPARATOR } from "@budibase/types"
+import { DocumentType, type Role, SEPARATOR } from "@budibase/types"
 
 // need to have a way to prefix, so we can check if the ID has its prefix or not
 // all new IDs should be the same in the future, but old roles they are never prefixed
@@ -10,7 +10,7 @@ function prefixForCheck(id: string) {
 // Function to detect loops in roles
 export function checkForRoleInheritanceLoops(roles: Role[]): boolean {
   const roleMap = new Map<string, Role>()
-  roles.forEach(role => {
+  roles.forEach((role) => {
     roleMap.set(role._id!, role)
   })
 
@@ -35,9 +35,7 @@ export function checkForRoleInheritanceLoops(roles: Role[]): boolean {
       return false
     }
 
-    const inherits = Array.isArray(role.inherits)
-      ? role.inherits
-      : [role.inherits]
+    const inherits = Array.isArray(role.inherits) ? role.inherits : [role.inherits]
     for (const inheritedId of inherits) {
       if (inheritedId && hasLoop(inheritedId)) {
         return true
@@ -51,5 +49,5 @@ export function checkForRoleInheritanceLoops(roles: Role[]): boolean {
     return false
   }
 
-  return !!roles.find(role => hasLoop(role._id!))
+  return !!roles.find((role) => hasLoop(role._id!))
 }

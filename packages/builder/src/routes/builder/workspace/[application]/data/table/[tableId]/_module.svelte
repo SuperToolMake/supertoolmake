@@ -1,20 +1,20 @@
 <script lang="ts">
-  import { tables, builderStore } from "@/stores/builder"
-  import NavBar from "./_components/NavBar.svelte"
-  import { params } from "@roxi/routify"
-  import { onMount } from "svelte"
+import { params } from "@roxi/routify"
+import { onMount } from "svelte"
+import { builderStore, tables } from "@/stores/builder"
+import NavBar from "./_components/NavBar.svelte"
 
-  $: tableId = $tables.selectedTableId
-  $: builderStore.selectResource(tableId!)
+$: tableId = $tables.selectedTableId
+$: builderStore.selectResource(tableId!)
 
-  const validate = (id: string) => $tables.list?.some(table => table._id === id)
+const validate = (id: string) => $tables.list?.some((table) => table._id === id)
 
-  onMount(() => {
-    const tableId = $params.tableId
-    if (validate(tableId)) {
-      tables.select(tableId)
-    }
-  })
+onMount(() => {
+  const tableId = $params.tableId
+  if (validate(tableId)) {
+    tables.select(tableId)
+  }
+})
 </script>
 
 <div class="wrapper">

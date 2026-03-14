@@ -1,5 +1,5 @@
 import { context } from "@budibase/backend-core"
-import {
+import type {
   ContextUserMetadata,
   Ctx,
   DeleteUserMetadataResponse,
@@ -45,9 +45,7 @@ export async function updateMetadata(
   ctx.body = await db.put(metadata)
 }
 
-export async function destroyMetadata(
-  ctx: UserCtx<void, DeleteUserMetadataResponse>
-) {
+export async function destroyMetadata(ctx: UserCtx<void, DeleteUserMetadataResponse>) {
   const db = context.getWorkspaceDB()
   try {
     const dbUser = await sdk.users.get(ctx.params.id)
@@ -60,8 +58,6 @@ export async function destroyMetadata(
   }
 }
 
-export async function findMetadata(
-  ctx: UserCtx<void, FindUserMetadataResponse>
-) {
+export async function findMetadata(ctx: UserCtx<void, FindUserMetadataResponse>) {
   ctx.body = await getFullUser(ctx.params.id)
 }

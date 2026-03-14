@@ -1,19 +1,14 @@
+import { constants, env as coreEnv, logging, tenancy } from "@budibase/backend-core"
 import {
-  constants,
-  env as coreEnv,
-  logging,
-  tenancy,
-} from "@budibase/backend-core"
-import {
-  Ctx,
-  EmailAttachment,
-  EmailInvite,
+  type Ctx,
+  type EmailAttachment,
+  type EmailInvite,
   EmailTemplatePurpose,
-  SendEmailRequest,
-  SendEmailResponse,
-  User,
+  type SendEmailRequest,
+  type SendEmailResponse,
+  type User,
 } from "@budibase/types"
-import { Response, default as fetch, type RequestInit } from "node-fetch"
+import { default as fetch, type RequestInit, type Response } from "node-fetch"
 import env from "../environment"
 import { checkSlashesInUrl } from "./index"
 
@@ -37,7 +32,7 @@ export function createRequest<TBody>(request: Request<TBody>): RequestInit {
   } else if (ctx && ctx.headers) {
     // copy all utilised headers over - copying everything can have
     // side effects like requests being rejected due to odd content types etc
-    for (let header of Object.values(constants.Header)) {
+    for (const header of Object.values(constants.Header)) {
       const value = ctx.headers[header]
       if (value === undefined) {
         continue
@@ -50,9 +45,7 @@ export function createRequest<TBody>(request: Request<TBody>): RequestInit {
     if (cookie) {
       headers[constants.Header.COOKIE] = cookie
     } else if (apiKey) {
-      headers[constants.Header.API_KEY] = Array.isArray(apiKey)
-        ? apiKey[0]
-        : apiKey
+      headers[constants.Header.API_KEY] = Array.isArray(apiKey) ? apiKey[0] : apiKey
     }
   }
 
@@ -71,11 +64,7 @@ export function createRequest<TBody>(request: Request<TBody>): RequestInit {
   return requestInit
 }
 
-async function checkResponse(
-  response: Response,
-  errorMsg: string,
-  { ctx }: { ctx?: Ctx } = {}
-) {
+async function checkResponse(response: Response, errorMsg: string, { ctx }: { ctx?: Ctx } = {}) {
   if (response.status >= 300) {
     let responseErrorMessage
     if (response.headers.get("content-type")?.includes("json")) {
@@ -156,9 +145,7 @@ export async function saveGlobalUser(ctx: Ctx) {
 
 export async function deleteGlobalUser(ctx: Ctx) {
   const response = await fetch(
-    checkSlashesInUrl(
-      env.WORKER_URL + `/api/global/users/${ctx.params.userId}`
-    ),
+    checkSlashesInUrl(env.WORKER_URL + `/api/global/users/${ctx.params.userId}`),
     // we don't want to use API key when getting self
     createRequest({ ctx, method: "DELETE" })
   )
@@ -167,9 +154,7 @@ export async function deleteGlobalUser(ctx: Ctx) {
 
 export async function readGlobalUser(ctx: Ctx): Promise<User> {
   const response = await fetch(
-    checkSlashesInUrl(
-      env.WORKER_URL + `/api/global/users/${ctx.params.userId}`
-    ),
+    checkSlashesInUrl(env.WORKER_URL + `/api/global/users/${ctx.params.userId}`),
     // we don't want to use API key when getting self
     createRequest({ ctx, method: "GET" })
   )

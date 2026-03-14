@@ -1,5 +1,5 @@
 <script>
-  import { auth } from "@/stores/portal"
+import { auth } from "@/stores/portal"
 
-  auth.checkQueryString()
+auth.checkQueryString()
 </script>

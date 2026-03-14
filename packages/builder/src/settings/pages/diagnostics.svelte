@@ -1,39 +1,31 @@
 <script>
-  import {
-    Layout,
-    Body,
-    Helpers,
-    Divider,
-    notifications,
-    Icon,
-    TextArea,
-  } from "@budibase/bbui"
-  import { API } from "@/api"
-  import { onMount } from "svelte"
+import { Body, Divider, Helpers, Icon, Layout, notifications, TextArea } from "@budibase/bbui"
+import { onMount } from "svelte"
+import { API } from "@/api"
 
-  let diagnosticInfo = ""
+let diagnosticInfo = ""
 
-  async function fetchSystemDebugInfo() {
-    const diagnostics = await API.fetchSystemDebugInfo()
-    diagnosticInfo = {
-      browser: {
-        language: navigator.language || navigator.userLanguage,
-        userAgent: navigator.userAgent,
-        platform: navigator.platform,
-        vendor: navigator.vendor,
-      },
-      server: diagnostics,
-    }
+async function fetchSystemDebugInfo() {
+  const diagnostics = await API.fetchSystemDebugInfo()
+  diagnosticInfo = {
+    browser: {
+      language: navigator.language || navigator.userLanguage,
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      vendor: navigator.vendor,
+    },
+    server: diagnostics,
   }
+}
 
-  const copyToClipboard = async () => {
-    await Helpers.copyToClipboard(JSON.stringify(diagnosticInfo, undefined, 2))
-    notifications.success("Copied")
-  }
+const copyToClipboard = async () => {
+  await Helpers.copyToClipboard(JSON.stringify(diagnosticInfo, undefined, 2))
+  notifications.success("Copied")
+}
 
-  onMount(async () => {
-    await fetchSystemDebugInfo()
-  })
+onMount(async () => {
+  await fetchSystemDebugInfo()
+})
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

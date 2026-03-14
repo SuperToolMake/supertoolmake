@@ -1,7 +1,7 @@
 import {
   BuiltinPermissionID,
-  BuiltinPermissions,
-  Permission,
+  type BuiltinPermissions,
+  type Permission,
   PermissionLevel,
   PermissionType,
 } from "@budibase/types"
@@ -53,11 +53,7 @@ export function getAllowedLevels(userPermLevel: PermissionLevel): string[] {
       return [PermissionLevel.EXECUTE, PermissionLevel.READ]
     case PermissionLevel.WRITE:
     case PermissionLevel.ADMIN:
-      return [
-        PermissionLevel.EXECUTE,
-        PermissionLevel.READ,
-        PermissionLevel.WRITE,
-      ]
+      return [PermissionLevel.EXECUTE, PermissionLevel.READ, PermissionLevel.WRITE]
     default:
       return []
   }
@@ -120,7 +116,7 @@ export function getBuiltinPermissions(): BuiltinPermissions {
 
 export function getBuiltinPermissionByID(id: string) {
   const perms = Object.values(BUILTIN_PERMISSIONS)
-  return perms.find(perm => perm._id === id)
+  return perms.find((perm) => perm._id === id)
 }
 
 export function doesHaveBasePermission(
@@ -128,16 +124,14 @@ export function doesHaveBasePermission(
   permLevel: PermissionLevel,
   rolesHierarchy: RoleHierarchy
 ) {
-  const basePermissions = [
-    ...new Set(rolesHierarchy.map(role => role.permissionId)),
-  ]
+  const basePermissions = [...new Set(rolesHierarchy.map((role) => role.permissionId))]
   const builtins = Object.values(BUILTIN_PERMISSIONS)
-  let permissions = flatten(
+  const permissions = flatten(
     builtins
-      .filter(builtin => basePermissions.indexOf(builtin._id) !== -1)
-      .map(builtin => builtin.permissions)
+      .filter((builtin) => basePermissions.indexOf(builtin._id) !== -1)
+      .map((builtin) => builtin.permissions)
   )
-  for (let permission of permissions) {
+  for (const permission of permissions) {
     if (
       permission.type === permType &&
       getAllowedLevels(permission.level).indexOf(permLevel) !== -1

@@ -1,107 +1,102 @@
 <script>
-  import { params } from "@roxi/routify"
-  import { Tabs, Tab, Heading, Body, Layout } from "@budibase/bbui"
-  import { datasources, integrations } from "@/stores/builder"
-  import { restTemplates } from "@/stores/builder/restTemplates"
-  import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
-  import EditDatasourceConfig from "./_components/EditDatasourceConfig.svelte"
-  import TablesPanel from "./_components/panels/Tables/index.svelte"
-  import RelationshipsPanel from "./_components/panels/Relationships.svelte"
-  import QueriesPanel from "./_components/panels/Queries/index.svelte"
-  import RestHeadersPanel from "./_components/panels/Headers.svelte"
-  import RestAuthenticationPanel from "./_components/panels/Authentication/index.svelte"
-  import RestVariablesPanel from "./_components/panels/Variables/index.svelte"
-  import PromptQueryModal from "./_components/PromptQueryModal.svelte"
-  import { IntegrationTypes } from "@/constants/backend"
-  import Tooltip from "./_components/panels/Tooltip.svelte"
-  import SaveDatasourceButton from "./_components/panels/SaveDatasourceButton.svelte"
-  import { cloneDeep } from "lodash/fp"
+import { Body, Heading, Layout, Tab, Tabs } from "@budibase/bbui"
+import { params } from "@roxi/routify"
+import { cloneDeep } from "lodash/fp"
+import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
+import { IntegrationTypes } from "@/constants/backend"
+import { datasources, integrations } from "@/stores/builder"
+import { restTemplates } from "@/stores/builder/restTemplates"
+import EditDatasourceConfig from "./_components/EditDatasourceConfig.svelte"
+import PromptQueryModal from "./_components/PromptQueryModal.svelte"
+import RestAuthenticationPanel from "./_components/panels/Authentication/index.svelte"
+import RestHeadersPanel from "./_components/panels/Headers.svelte"
+import QueriesPanel from "./_components/panels/Queries/index.svelte"
+import RelationshipsPanel from "./_components/panels/Relationships.svelte"
+import SaveDatasourceButton from "./_components/panels/SaveDatasourceButton.svelte"
+import TablesPanel from "./_components/panels/Tables/index.svelte"
+import Tooltip from "./_components/panels/Tooltip.svelte"
+import RestVariablesPanel from "./_components/panels/Variables/index.svelte"
 
-  const REST_PANEL_SECTIONS = [
-    { title: "", component: QueriesPanel },
-    {
-      title: "Authentication",
-      component: RestAuthenticationPanel,
+const REST_PANEL_SECTIONS = [
+  { title: "", component: QueriesPanel },
+  {
+    title: "Authentication",
+    component: RestAuthenticationPanel,
+  },
+  {
+    title: "Headers",
+    component: RestHeadersPanel,
+  },
+  {
+    title: "Variables",
+    component: RestVariablesPanel,
+    tooltip: {
+      title: "REST variables",
+      href: "https://docs.budibase.com/docs/rest-variables",
     },
-    {
-      title: "Headers",
-      component: RestHeadersPanel,
-    },
-    {
-      title: "Variables",
-      component: RestVariablesPanel,
-      tooltip: {
-        title: "REST variables",
-        href: "https://docs.budibase.com/docs/rest-variables",
-      },
-    },
-  ]
+  },
+]
 
-  $params
+$params
 
-  let selectedPanel = $params.tab ?? null
-  let panelOptions = []
-  let templateIcon
+let selectedPanel = $params.tab ?? null
+let panelOptions = []
+let templateIcon
 
-  $: datasource = $datasources.selected
-  $: templateIcon =
-    datasource?.restTemplate && $restTemplates
-      ? restTemplates.getByName(datasource.restTemplate)?.icon
-      : undefined
+$: datasource = $datasources.selected
+$: templateIcon =
+  datasource?.restTemplate && $restTemplates
+    ? restTemplates.getByName(datasource.restTemplate)?.icon
+    : undefined
 
-  $: isRestDatasource = datasource?.source === IntegrationTypes.REST
-  $: getOptions(datasource)
+$: isRestDatasource = datasource?.source === IntegrationTypes.REST
+$: getOptions(datasource)
 
-  // Central updated datasource state for REST config edits
-  let updatedDatasource
-  let restConfigDirty = false
-  $: if (
-    datasource &&
-    (!updatedDatasource || updatedDatasource._id !== datasource._id)
-  ) {
-    updatedDatasource = cloneDeep(datasource)
-    restConfigDirty = false
+// Central updated datasource state for REST config edits
+let updatedDatasource
+let restConfigDirty = false
+$: if (datasource && (!updatedDatasource || updatedDatasource._id !== datasource._id)) {
+  updatedDatasource = cloneDeep(datasource)
+  restConfigDirty = false
+}
+
+const markDirty = () => {
+  if (!updatedDatasource) {
+    return
+  }
+  restConfigDirty = true
+  // trigger reactivity for children like Save button
+  updatedDatasource = { ...updatedDatasource }
+}
+
+const handleRestConfigSaved = () => {
+  if (!updatedDatasource) {
+    return
+  }
+  restConfigDirty = false
+  updatedDatasource = cloneDeep(datasource ?? updatedDatasource)
+}
+
+const getOptions = (datasource) => {
+  if (!datasource) {
+    panelOptions = []
+    selectedPanel = null
+    return
   }
 
-  const markDirty = () => {
-    if (!updatedDatasource) {
-      return
-    }
-    restConfigDirty = true
-    // trigger reactivity for children like Save button
-    updatedDatasource = { ...updatedDatasource }
+  if (datasource.plus) {
+    // Google Sheets' integration definition specifies `relationships: false` as it doesn't support relationships like other plus datasources
+    panelOptions =
+      $integrations[datasource.source].relationships === false
+        ? ["Tables", "Queries"]
+        : ["Tables", "Relationships", "Queries"]
+    selectedPanel = panelOptions.includes(selectedPanel) ? selectedPanel : "Tables"
+  } else {
+    const isRest = datasource.source === "REST"
+    panelOptions = isRest ? [] : ["Queries"]
+    selectedPanel = isRest ? null : "Queries"
   }
-
-  const handleRestConfigSaved = () => {
-    if (!updatedDatasource) {
-      return
-    }
-    restConfigDirty = false
-    updatedDatasource = cloneDeep(datasource ?? updatedDatasource)
-  }
-
-  const getOptions = datasource => {
-    if (!datasource) {
-      panelOptions = []
-      selectedPanel = null
-      return
-    }
-
-    if (datasource.plus) {
-      // Google Sheets' integration definition specifies `relationships: false` as it doesn't support relationships like other plus datasources
-      panelOptions =
-        $integrations[datasource.source].relationships === false
-          ? ["Tables", "Queries"]
-          : ["Tables", "Relationships", "Queries"]
-      selectedPanel = panelOptions.includes(selectedPanel)
-        ? selectedPanel
-        : "Tables"
-    } else {
-      const isRest = datasource.source === "REST"
-      panelOptions = isRest ? [] : ["Queries"]
-      selectedPanel = isRest ? null : "Queries"
-    }
-  }
+}
 </script>
 
 <PromptQueryModal />

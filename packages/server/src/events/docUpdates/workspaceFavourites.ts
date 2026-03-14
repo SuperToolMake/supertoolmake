@@ -1,9 +1,8 @@
 import { constants, context, logging } from "@budibase/backend-core"
-import { DocUpdateEvent, WorkspaceResourceEvents } from "@budibase/types"
+import { type DocUpdateEvent, WorkspaceResourceEvents } from "@budibase/types"
 import sdk from "../../sdk"
 
-const { DATASOURCE, TABLE, WORKSPACE_APP, QUERY, MEM_VIEW } =
-  constants.DocumentType
+const { DATASOURCE, TABLE, WORKSPACE_APP, QUERY, MEM_VIEW } = constants.DocumentType
 
 export default function process() {
   const processor = async (update: DocUpdateEvent) => {
@@ -11,15 +10,11 @@ export default function process() {
       const docId = update.id
       const appId = update.appId
 
-      const isWSResource = [
-        DATASOURCE,
-        TABLE,
-        WORKSPACE_APP,
-        QUERY,
-        MEM_VIEW,
-      ].find(type => docId.startsWith(type))
+      const isWSResource = [DATASOURCE, TABLE, WORKSPACE_APP, QUERY, MEM_VIEW].find((type) =>
+        docId.startsWith(type)
+      )
 
-      if (isWSResource!! && appId) {
+      if (isWSResource! && appId) {
         context.doInWorkspaceContext(appId, async () => {
           const result = await sdk.workspace.findByResourceId(docId)
           const [fav] = result

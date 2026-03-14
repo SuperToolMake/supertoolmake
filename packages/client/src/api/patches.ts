@@ -1,6 +1,6 @@
-import { Constants, APIClient } from "@budibase/frontend-core"
+import { type APIClient, Constants } from "@budibase/frontend-core"
+import type { Row, Table } from "@budibase/types"
 import { FieldTypes } from "../constants"
-import { Row, Table } from "@budibase/types"
 
 export const patchAPI = (API: APIClient) => {
   /**
@@ -15,9 +15,9 @@ export const patchAPI = (API: APIClient) => {
     }
     if (rows.length) {
       const tables: Record<string, Table> = {}
-      for (let row of rows) {
+      for (const row of rows) {
         // Fall back to passed in tableId if row doesn't have it specified
-        let rowTableId = row.tableId || tableId
+        const rowTableId = row.tableId || tableId
         let table = tables[rowTableId]
         if (!table) {
           // Fetch table schema so we can check column types
@@ -27,14 +27,14 @@ export const patchAPI = (API: APIClient) => {
         const schema = table?.schema
         if (schema) {
           const keys = Object.keys(schema)
-          for (let key of keys) {
+          for (const key of keys) {
             const type = schema[key].type
             if (type === FieldTypes.LINK && Array.isArray(row[key])) {
               // Enrich row a string join of relationship fields
               row[`${key}_text`] =
                 row[key]
-                  ?.map(option => option?.primaryDisplay)
-                  .filter(option => !!option)
+                  ?.map((option) => option?.primaryDisplay)
+                  .filter((option) => !!option)
                   .join(", ") || ""
             }
           }
@@ -68,11 +68,7 @@ export const patchAPI = (API: APIClient) => {
     return null
   }
   const fetchRelationshipData = API.fetchRelationshipData
-  API.fetchRelationshipData = async (
-    sourceId: string,
-    rowId: string,
-    fieldName?: string
-  ) => {
+  API.fetchRelationshipData = async (sourceId: string, rowId: string, fieldName?: string) => {
     const rows = await fetchRelationshipData(sourceId, rowId, fieldName)
     return await enrichRows(rows, sourceId)
   }

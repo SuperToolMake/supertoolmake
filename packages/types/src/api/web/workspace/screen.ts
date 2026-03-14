@@ -1,11 +1,10 @@
-import { ScreenRoutingJson, Screen, SourceType } from "../../../documents"
+import type { Screen, ScreenRoutingJson, SourceType } from "../../../documents"
 
 export interface FetchScreenRoutingResponse {
   routes: ScreenRoutingJson
 }
 
-export interface FetchClientScreenRoutingResponse
-  extends FetchScreenRoutingResponse {}
+export interface FetchClientScreenRoutingResponse extends FetchScreenRoutingResponse {}
 
 export type FetchScreenResponse = Screen[]
 

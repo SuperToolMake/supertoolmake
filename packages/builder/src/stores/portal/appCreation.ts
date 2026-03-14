@@ -23,35 +23,31 @@ function createAppCreationStore() {
     reset: () => set(initialState),
 
     showCreateModal: () =>
-      update(state => ({
+      update((state) => ({
         ...state,
         showCreateModal: true,
         template: null,
       })),
-    hideCreateModal: () =>
-      update(state => ({ ...state, showCreateModal: false })),
+    hideCreateModal: () => update((state) => ({ ...state, showCreateModal: false })),
 
-    showTemplatesModal: () =>
-      update(state => ({ ...state, showTemplatesModal: true })),
-    hideTemplatesModal: () =>
-      update(state => ({ ...state, showTemplatesModal: false })),
+    showTemplatesModal: () => update((state) => ({ ...state, showTemplatesModal: true })),
+    hideTemplatesModal: () => update((state) => ({ ...state, showTemplatesModal: false })),
 
     showImportModal: () =>
-      update(state => ({
+      update((state) => ({
         ...state,
         showImportModal: true,
         template: { fromFile: true },
       })),
     hideImportModal: () =>
-      update(state => ({
+      update((state) => ({
         ...state,
         showImportModal: false,
         template: null,
       })),
 
-    setTemplate: (template: AppTemplate) =>
-      update(state => ({ ...state, template })),
-    clearTemplate: () => update(state => ({ ...state, template: null })),
+    setTemplate: (template: AppTemplate) => update((state) => ({ ...state, template })),
+    clearTemplate: () => update((state) => ({ ...state, template: null })),
   }
 }
 

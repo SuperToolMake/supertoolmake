@@ -1,150 +1,147 @@
 <script>
-  import { getContext, onMount } from "svelte"
-  import { writable } from "svelte/store"
-  import { GridRowHeight, GridColumns } from "@/constants"
-  import { memo } from "@budibase/frontend-core"
+import { memo } from "@budibase/frontend-core"
+import { getContext, onMount } from "svelte"
+import { writable } from "svelte/store"
+import { GridColumns, GridRowHeight } from "@/constants"
 
-  export let onClick
+export let onClick
 
-  const component = getContext("component")
-  const { styleable, builderStore } = getContext("sdk")
-  const context = getContext("context")
+const component = getContext("component")
+const { styleable, builderStore } = getContext("sdk")
+const context = getContext("context")
 
-  let width
-  let height
-  let ref
-  let children = writable({})
-  let mounted = false
-  let styles = memo({})
+let width
+let height
+let ref
+let children = writable({})
+let mounted = false
+let styles = memo({})
 
-  $: inBuilder = $builderStore.inBuilder
-  $: addEmptyRows = $component.isRoot && inBuilder
-  $: requiredRows = calculateRequiredRows($children, mobile, addEmptyRows)
-  $: requiredHeight = requiredRows * GridRowHeight
-  $: availableRows = Math.floor(height / GridRowHeight)
-  $: rows = Math.max(requiredRows, availableRows)
-  $: mobile = $context.device.mobile
-  $: colSize = width / GridColumns
-  $: styles.set({
-    ...$component.styles,
-    normal: {
-      ...$component.styles?.normal,
-      "--height": `${requiredHeight}px`,
-      "--min-height": $component.styles?.normal?.height || 0,
-      "--cols": GridColumns,
-      "--rows": rows,
-      "--col-size": colSize,
-      "--row-size": GridRowHeight,
+$: inBuilder = $builderStore.inBuilder
+$: addEmptyRows = $component.isRoot && inBuilder
+$: requiredRows = calculateRequiredRows($children, mobile, addEmptyRows)
+$: requiredHeight = requiredRows * GridRowHeight
+$: availableRows = Math.floor(height / GridRowHeight)
+$: rows = Math.max(requiredRows, availableRows)
+$: mobile = $context.device.mobile
+$: colSize = width / GridColumns
+$: styles.set({
+  ...$component.styles,
+  normal: {
+    ...$component.styles?.normal,
+    "--height": `${requiredHeight}px`,
+    "--min-height": $component.styles?.normal?.height || 0,
+    "--cols": GridColumns,
+    "--rows": rows,
+    "--col-size": colSize,
+    "--row-size": GridRowHeight,
+  },
+})
+
+// Calculates the minimum number of rows required to render all child
+// components, on a certain device type
+const calculateRequiredRows = (children, mobile, addEmptyRows) => {
+  const key = mobile ? "mobileRowEnd" : "desktopRowEnd"
+  let max = 2
+  for (let id of Object.keys(children)) {
+    if (children[id][key] > max) {
+      max = children[id][key]
+    }
+  }
+  let requiredRows = max - 1
+  if (addEmptyRows) {
+    return Math.ceil((requiredRows + 10) / 10) * 10
+  } else {
+    return requiredRows
+  }
+}
+
+// Stores metadata about a child node as constraints for determining grid size
+const storeChild = (node) => {
+  children.update((state) => ({
+    ...state,
+    [node.dataset.id]: {
+      desktopRowEnd: parseInt(node.dataset.gridDesktopRowEnd),
+      mobileRowEnd: parseInt(node.dataset.gridMobileRowEnd),
     },
+  }))
+}
+
+// Removes constraint metadata for a certain child node
+const removeChild = (node) => {
+  children.update((state) => {
+    delete state[node.dataset.id]
+    return { ...state }
+  })
+}
+
+// Instead of svelte bind:clientWidth/bind:clientHeight
+// Svelte injects an iframe causing issues with CSP, this avoids it
+const setupResizeObserver = (element) => {
+  const resizeObserver = new ResizeObserver((entries) => {
+    if (!entries?.[0]) {
+      return
+    }
+    const element = entries[0].target
+
+    width = element.clientWidth
+    height = element.clientHeight
   })
 
-  // Calculates the minimum number of rows required to render all child
-  // components, on a certain device type
-  const calculateRequiredRows = (children, mobile, addEmptyRows) => {
-    const key = mobile ? "mobileRowEnd" : "desktopRowEnd"
-    let max = 2
-    for (let id of Object.keys(children)) {
-      if (children[id][key] > max) {
-        max = children[id][key]
-      }
-    }
-    let requiredRows = max - 1
-    if (addEmptyRows) {
-      return Math.ceil((requiredRows + 10) / 10) * 10
-    } else {
-      return requiredRows
-    }
-  }
+  resizeObserver.observe(element)
+  return resizeObserver
+}
 
-  // Stores metadata about a child node as constraints for determining grid size
-  const storeChild = node => {
-    children.update(state => ({
-      ...state,
-      [node.dataset.id]: {
-        desktopRowEnd: parseInt(node.dataset.gridDesktopRowEnd),
-        mobileRowEnd: parseInt(node.dataset.gridMobileRowEnd),
-      },
-    }))
-  }
+onMount(() => {
+  let observer
+  let resizeObserver
 
-  // Removes constraint metadata for a certain child node
-  const removeChild = node => {
-    children.update(state => {
-      delete state[node.dataset.id]
-      return { ...state }
-    })
-  }
+  // Track width and height with an observer.
+  // Svelte clientWidth and clientHeight inject an iframe that violates CSP
+  resizeObserver = setupResizeObserver(ref)
 
-  // Instead of svelte bind:clientWidth/bind:clientHeight
-  // Svelte injects an iframe causing issues with CSP, this avoids it
-  const setupResizeObserver = element => {
-    const resizeObserver = new ResizeObserver(entries => {
-      if (!entries?.[0]) {
-        return
-      }
-      const element = entries[0].target
-
-      width = element.clientWidth
-      height = element.clientHeight
-    })
-
-    resizeObserver.observe(element)
-    return resizeObserver
-  }
-
-  onMount(() => {
-    let observer
-    let resizeObserver
-
-    // Track width and height with an observer.
-    // Svelte clientWidth and clientHeight inject an iframe that violates CSP
-    resizeObserver = setupResizeObserver(ref)
-
-    // Set up an observer to watch for changes in metadata attributes of child
-    // components, as well as child addition and deletion
-    observer = new MutationObserver(mutations => {
-      for (let mutation of mutations) {
-        const { target, type, addedNodes, removedNodes } = mutation
-        if (target === ref) {
-          if (addedNodes[0]?.classList?.contains("component")) {
-            // We've added a new child component inside the grid, so we need
-            // to consider it when determining required rows
-            storeChild(addedNodes[0])
-          } else if (removedNodes[0]?.classList?.contains("component")) {
-            // We've removed a child component inside the grid, so we need
-            // to stop considering it when determining required rows
-            removeChild(removedNodes[0])
-          }
-        } else if (
-          type === "attributes" &&
-          target.parentNode === ref &&
-          target.classList.contains("component")
-        ) {
-          // We've updated the size or position of a child
-          storeChild(target)
+  // Set up an observer to watch for changes in metadata attributes of child
+  // components, as well as child addition and deletion
+  observer = new MutationObserver((mutations) => {
+    for (let mutation of mutations) {
+      const { target, type, addedNodes, removedNodes } = mutation
+      if (target === ref) {
+        if (addedNodes[0]?.classList?.contains("component")) {
+          // We've added a new child component inside the grid, so we need
+          // to consider it when determining required rows
+          storeChild(addedNodes[0])
+        } else if (removedNodes[0]?.classList?.contains("component")) {
+          // We've removed a child component inside the grid, so we need
+          // to stop considering it when determining required rows
+          removeChild(removedNodes[0])
         }
+      } else if (
+        type === "attributes" &&
+        target.parentNode === ref &&
+        target.classList.contains("component")
+      ) {
+        // We've updated the size or position of a child
+        storeChild(target)
       }
-    })
-    observer.observe(ref, {
-      childList: true,
-      attributes: true,
-      subtree: true,
-      attributeFilter: [
-        "data-grid-desktop-row-end",
-        "data-grid-mobile-row-end",
-      ],
-    })
-
-    // Now that the observer is set up, we mark the grid as mounted to mount
-    // our child components
-    mounted = true
-
-    // Cleanup our observer
-    return () => {
-      observer?.disconnect()
-      resizeObserver?.disconnect()
     }
   })
+  observer.observe(ref, {
+    childList: true,
+    attributes: true,
+    subtree: true,
+    attributeFilter: ["data-grid-desktop-row-end", "data-grid-mobile-row-end"],
+  })
+
+  // Now that the observer is set up, we mark the grid as mounted to mount
+  // our child components
+  mounted = true
+
+  // Cleanup our observer
+  return () => {
+    observer?.disconnect()
+    resizeObserver?.disconnect()
+  }
+})
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

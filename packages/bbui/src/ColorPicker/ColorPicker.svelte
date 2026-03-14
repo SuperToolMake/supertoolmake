@@ -1,186 +1,182 @@
 <script lang="ts">
-  import Popover from "../Popover/Popover.svelte"
-  import Layout from "../Layout/Layout.svelte"
-  import { createEventDispatcher } from "svelte"
-  import "@spectrum-css/popover/dist/index-vars.css"
-  import Icon from "../Icon/Icon.svelte"
-  import Input from "../Form/Input.svelte"
-  import { capitalise } from "../helpers"
-  import {
-    ensureValidTheme,
-    getThemeClassNames,
-    DefaultAppTheme,
-  } from "@budibase/shared-core"
-  import type { Theme } from "@budibase/types"
-  import type { PopoverAlignment } from "../constants"
+import { createEventDispatcher } from "svelte"
+import Layout from "../Layout/Layout.svelte"
+import type Popover from "../Popover/Popover.svelte"
+import "@spectrum-css/popover/dist/index-vars.css"
+import { DefaultAppTheme, ensureValidTheme, getThemeClassNames } from "@budibase/shared-core"
+import type { Theme } from "@budibase/types"
+import type { PopoverAlignment } from "../constants"
+import Input from "../Form/Input.svelte"
+import { capitalise } from "../helpers"
+import Icon from "../Icon/Icon.svelte"
 
-  export let value: string | undefined = undefined
-  export let size: "S" | "M" | "L" = "M"
-  export let spectrumTheme: Theme | undefined = undefined
-  export let offset: number | undefined = undefined
-  export let align: PopoverAlignment | undefined = undefined
+export let value: string | undefined = undefined
+export let size: "S" | "M" | "L" = "M"
+export let spectrumTheme: Theme | undefined = undefined
+export let offset: number | undefined = undefined
+export let align: PopoverAlignment | undefined = undefined
 
-  let dropdown: Popover | undefined
-  let preview: HTMLElement | undefined
+let dropdown: Popover | undefined
+let preview: HTMLElement | undefined
 
-  $: customValue = getCustomValue(value)
-  $: checkColor = getCheckColor(value)
-  $: themeClasses = getThemeClasses(spectrumTheme)
+$: customValue = getCustomValue(value)
+$: checkColor = getCheckColor(value)
+$: themeClasses = getThemeClasses(spectrumTheme)
 
-  const dispatch = createEventDispatcher()
-  const categories = [
-    {
-      label: "Theme colors",
-      colors: [
-        "red-100",
-        "orange-100",
-        "yellow-100",
-        "green-100",
-        "seafoam-100",
-        "blue-100",
-        "indigo-100",
-        "magenta-100",
+const dispatch = createEventDispatcher()
+const categories = [
+  {
+    label: "Theme colors",
+    colors: [
+      "red-100",
+      "orange-100",
+      "yellow-100",
+      "green-100",
+      "seafoam-100",
+      "blue-100",
+      "indigo-100",
+      "magenta-100",
 
-        "red-400",
-        "orange-400",
-        "yellow-400",
-        "green-400",
-        "seafoam-400",
-        "blue-400",
-        "indigo-400",
-        "magenta-400",
+      "red-400",
+      "orange-400",
+      "yellow-400",
+      "green-400",
+      "seafoam-400",
+      "blue-400",
+      "indigo-400",
+      "magenta-400",
 
-        "red-500",
-        "orange-500",
-        "yellow-500",
-        "green-500",
-        "seafoam-500",
-        "blue-500",
-        "indigo-500",
-        "magenta-500",
+      "red-500",
+      "orange-500",
+      "yellow-500",
+      "green-500",
+      "seafoam-500",
+      "blue-500",
+      "indigo-500",
+      "magenta-500",
 
-        "red-600",
-        "orange-600",
-        "yellow-600",
-        "green-600",
-        "seafoam-600",
-        "blue-600",
-        "indigo-600",
-        "magenta-600",
+      "red-600",
+      "orange-600",
+      "yellow-600",
+      "green-600",
+      "seafoam-600",
+      "blue-600",
+      "indigo-600",
+      "magenta-600",
 
-        "red-700",
-        "orange-700",
-        "yellow-700",
-        "green-700",
-        "seafoam-700",
-        "blue-700",
-        "indigo-700",
-        "magenta-700",
+      "red-700",
+      "orange-700",
+      "yellow-700",
+      "green-700",
+      "seafoam-700",
+      "blue-700",
+      "indigo-700",
+      "magenta-700",
 
-        "gray-50",
-        "gray-75",
-        "gray-100",
-        "gray-200",
-        "gray-300",
-        "gray-400",
-        "gray-500",
-        "gray-600",
-        "gray-700",
-        "gray-800",
-        "gray-900",
-      ],
-    },
-    {
-      label: "Static colors",
-      colors: [
-        "static-red-400",
-        "static-orange-400",
-        "static-yellow-400",
-        "static-green-400",
-        "static-seafoam-400",
-        "static-blue-400",
-        "static-indigo-400",
-        "static-magenta-400",
+      "gray-50",
+      "gray-75",
+      "gray-100",
+      "gray-200",
+      "gray-300",
+      "gray-400",
+      "gray-500",
+      "gray-600",
+      "gray-700",
+      "gray-800",
+      "gray-900",
+    ],
+  },
+  {
+    label: "Static colors",
+    colors: [
+      "static-red-400",
+      "static-orange-400",
+      "static-yellow-400",
+      "static-green-400",
+      "static-seafoam-400",
+      "static-blue-400",
+      "static-indigo-400",
+      "static-magenta-400",
 
-        "static-red-800",
-        "static-orange-800",
-        "static-yellow-800",
-        "static-green-800",
-        "static-seafoam-800",
-        "static-blue-800",
-        "static-indigo-800",
-        "static-magenta-800",
+      "static-red-800",
+      "static-orange-800",
+      "static-yellow-800",
+      "static-green-800",
+      "static-seafoam-800",
+      "static-blue-800",
+      "static-indigo-800",
+      "static-magenta-800",
 
-        "static-red-1200",
-        "static-orange-1200",
-        "static-yellow-1200",
-        "static-green-1200",
-        "static-seafoam-1200",
-        "static-blue-1200",
-        "static-indigo-1200",
-        "static-magenta-1200",
+      "static-red-1200",
+      "static-orange-1200",
+      "static-yellow-1200",
+      "static-green-1200",
+      "static-seafoam-1200",
+      "static-blue-1200",
+      "static-indigo-1200",
+      "static-magenta-1200",
 
-        "static-white",
-        "static-black",
-      ],
-    },
-  ]
+      "static-white",
+      "static-black",
+    ],
+  },
+]
 
-  const getThemeClasses = (theme: Theme | undefined) => {
-    if (!theme) {
-      return ""
+const getThemeClasses = (theme: Theme | undefined) => {
+  if (!theme) {
+    return ""
+  }
+  theme = ensureValidTheme(theme, DefaultAppTheme)
+  return getThemeClassNames(theme)
+}
+
+const onChange = (value: string | undefined) => {
+  dispatch("change", value)
+  dropdown?.hide()
+}
+
+const getCustomValue = (value: string | undefined) => {
+  if (!value) {
+    return value
+  }
+  let found = false
+  const comparisonValue = value.substring(28, value.length - 1)
+  for (let category of categories) {
+    found = category.colors.includes(comparisonValue)
+    if (found) {
+      break
     }
-    theme = ensureValidTheme(theme, DefaultAppTheme)
-    return getThemeClassNames(theme)
+  }
+  return found ? null : value
+}
+
+const prettyPrint = (color: string) => {
+  return capitalise(color.split("-").join(" "))
+}
+
+const getCheckColor = (value: string | undefined) => {
+  // Use dynamic color for theme grays
+  if (value?.includes("-gray-")) {
+    return /^.*(gray-(50|75|100|200|300|400|500))\)$/.test(value)
+      ? "var(--spectrum-global-color-gray-900)"
+      : "var(--spectrum-global-color-gray-50)"
   }
 
-  const onChange = (value: string | undefined) => {
-    dispatch("change", value)
-    dropdown?.hide()
+  // Use contrasting check for the dim colours
+  if (value?.includes("-100")) {
+    return "var(--spectrum-global-color-gray-900)"
+  }
+  if (value?.includes("-1200") || value?.includes("-800")) {
+    return "var(--spectrum-global-color-static-gray-50)"
   }
 
-  const getCustomValue = (value: string | undefined) => {
-    if (!value) {
-      return value
-    }
-    let found = false
-    const comparisonValue = value.substring(28, value.length - 1)
-    for (let category of categories) {
-      found = category.colors.includes(comparisonValue)
-      if (found) {
-        break
-      }
-    }
-    return found ? null : value
+  // Use black check for static white
+  if (value?.includes("static-black")) {
+    return "var(--spectrum-global-color-static-gray-50)"
   }
 
-  const prettyPrint = (color: string) => {
-    return capitalise(color.split("-").join(" "))
-  }
-
-  const getCheckColor = (value: string | undefined) => {
-    // Use dynamic color for theme grays
-    if (value?.includes("-gray-")) {
-      return /^.*(gray-(50|75|100|200|300|400|500))\)$/.test(value)
-        ? "var(--spectrum-global-color-gray-900)"
-        : "var(--spectrum-global-color-gray-50)"
-    }
-
-    // Use contrasting check for the dim colours
-    if (value?.includes("-100")) {
-      return "var(--spectrum-global-color-gray-900)"
-    }
-    if (value?.includes("-1200") || value?.includes("-800")) {
-      return "var(--spectrum-global-color-static-gray-50)"
-    }
-
-    // Use black check for static white
-    if (value?.includes("static-black")) {
-      return "var(--spectrum-global-color-static-gray-50)"
-    }
-
-    return "var(--spectrum-global-color-static-gray-900)"
-  }
+  return "var(--spectrum-global-color-static-gray-900)"
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

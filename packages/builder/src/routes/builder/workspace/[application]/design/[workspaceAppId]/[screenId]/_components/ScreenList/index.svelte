@@ -1,49 +1,49 @@
 <script lang="ts">
-  import NavHeader from "@/components/common/NavHeader.svelte"
-  import { getVerticalResizeActions } from "@/components/common/resizable"
-  import { workspaceAppStore } from "@/stores/builder/workspaceApps"
-  import { Layout } from "@budibase/bbui"
-  import { type Screen } from "@budibase/types"
-  import NewScreenModal from "../../../../_components/NewScreen/index.svelte"
-  import ScreenNavItem from "./ScreenNavItem.svelte"
-  import { params } from "@roxi/routify"
+import { Layout } from "@budibase/bbui"
+import type { Screen } from "@budibase/types"
+import { params } from "@roxi/routify"
+import NavHeader from "@/components/common/NavHeader.svelte"
+import { getVerticalResizeActions } from "@/components/common/resizable"
+import { workspaceAppStore } from "@/stores/builder/workspaceApps"
+import type NewScreenModal from "../../../../_components/NewScreen/index.svelte"
+import ScreenNavItem from "./ScreenNavItem.svelte"
 
-  const [resizable, resizableHandle] = getVerticalResizeActions()
+const [resizable, resizableHandle] = getVerticalResizeActions()
 
-  let searching = false
-  let searchValue = ""
-  let screensContainer: HTMLDivElement
-  let scrolling = false
-  let newScreenModal: NewScreenModal
+let searching = false
+let searchValue = ""
+let screensContainer: HTMLDivElement
+let scrolling = false
+let newScreenModal: NewScreenModal
 
-  $: allScreens = $workspaceAppStore.selectedWorkspaceApp?.screens || []
-  $: filteredScreens = getFilteredScreens(allScreens, searchValue)
+$: allScreens = $workspaceAppStore.selectedWorkspaceApp?.screens || []
+$: filteredScreens = getFilteredScreens(allScreens, searchValue)
 
-  $: workspaceAppId = $workspaceAppStore.selectedWorkspaceApp?._id || ""
+$: workspaceAppId = $workspaceAppStore.selectedWorkspaceApp?._id || ""
 
-  const handleOpenSearch = async () => {
-    screensContainer.scroll({ top: 0, behavior: "smooth" })
+const handleOpenSearch = async () => {
+  screensContainer.scroll({ top: 0, behavior: "smooth" })
+}
+
+const isValidScreenRoute = (allScreens: Screen[], id: string) => {
+  return allScreens.some((screen) => screen._id === id)
+}
+
+$: {
+  if (searching) {
+    handleOpenSearch()
   }
+}
 
-  const isValidScreenRoute = (allScreens: Screen[], id: string) => {
-    return allScreens.some(screen => screen._id === id)
-  }
+const getFilteredScreens = (screens: Screen[], searchValue: string) => {
+  return screens.filter((screen) => {
+    return !searchValue || screen.routing.route.includes(searchValue)
+  })
+}
 
-  $: {
-    if (searching) {
-      handleOpenSearch()
-    }
-  }
-
-  const getFilteredScreens = (screens: Screen[], searchValue: string) => {
-    return screens.filter(screen => {
-      return !searchValue || screen.routing.route.includes(searchValue)
-    })
-  }
-
-  const handleScroll = (e: any) => {
-    scrolling = e.target.scrollTop !== 0
-  }
+const handleScroll = (e: any) => {
+  scrolling = e.target.scrollTop !== 0
+}
 </script>
 
 <div class="screens" class:searching use:resizable>

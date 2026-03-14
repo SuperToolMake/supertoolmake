@@ -1,4 +1,4 @@
-import { Ctx } from "@budibase/types"
+import type { Ctx } from "@budibase/types"
 
 export class ResourceIdGetter {
   parameter: string
@@ -27,7 +27,7 @@ export class ResourceIdGetter {
       main = this.main,
       sub = this.sub
     return (ctx: Ctx, next: () => void) => {
-      // @ts-ignore
+      // @ts-expect-error
       const request = ctx.request[parameter] || ctx[parameter]
       if (request == null) {
         return next()
@@ -49,10 +49,7 @@ export function paramResource(main: string) {
 }
 
 export function paramSubResource(main: string, sub: string) {
-  return new ResourceIdGetter("params")
-    .mainResource(main)
-    .subResource(sub)
-    .build()
+  return new ResourceIdGetter("params").mainResource(main).subResource(sub).build()
 }
 
 export function bodyResource(main: string) {
@@ -60,8 +57,5 @@ export function bodyResource(main: string) {
 }
 
 export function bodySubResource(main: string, sub: string) {
-  return new ResourceIdGetter("body")
-    .mainResource(main)
-    .subResource(sub)
-    .build()
+  return new ResourceIdGetter("body").mainResource(main).subResource(sub).build()
 }

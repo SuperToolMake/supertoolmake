@@ -4,7 +4,7 @@ export interface Routing {
   params?: Record<string, any>
 }
 
-export const enum Target {
+export enum Target {
   Self = "_self",
   Blank = "_blank",
 }
@@ -18,9 +18,7 @@ export const isRouteHREF = (href: string | RouteHREF): href is RouteHREF => {
   return typeof href === "object" && href !== null && "url" in href
 }
 
-export const isSettingIcon = (
-  icon: string | RouteIcon | undefined
-): icon is RouteIcon => {
+export const isSettingIcon = (icon: string | RouteIcon | undefined): icon is RouteIcon => {
   return typeof icon === "object" && icon && "comp" in icon && "props" in icon
 }
 
@@ -90,12 +88,12 @@ export const flatten = (
 
     if (entry.routes) {
       // Navigation sibling pages at this level - should have a comp defined
-      const pageSiblings = entry.routes.filter(r => r.comp)
+      const pageSiblings = entry.routes.filter((r) => r.comp)
 
       // Build nav only if there is more than one sibling page
       nav =
         pageSiblings.length > 1
-          ? pageSiblings.map(r => ({
+          ? pageSiblings.map((r) => ({
               path: `${currentPath}/${r.path}`,
               new: r.new,
               title: r.title,
@@ -103,15 +101,10 @@ export const flatten = (
             }))
           : []
 
-      const childRoutes = flatten(
-        entry.routes,
-        currentPath,
-        section || entry.section,
-        currentTrail
-      )
+      const childRoutes = flatten(entry.routes, currentPath, section || entry.section, currentTrail)
 
       // Add the sibling routes for the UI
-      children = childRoutes.map(child => {
+      children = childRoutes.map((child) => {
         if (!child.nav) {
           return { ...child, nav }
         }

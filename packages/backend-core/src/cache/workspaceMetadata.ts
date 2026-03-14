@@ -1,4 +1,4 @@
-import { Database, Workspace } from "@budibase/types"
+import type { Database, Workspace } from "@budibase/types"
 import { DocumentType, doWithDB } from "../db"
 import { getWorkspaceClient } from "../redis/init"
 
@@ -78,10 +78,7 @@ export async function getWorkspaceMetadata(
  * @param newMetadata optional - can simply provide the new metadata to update with.
  * @return will respond with success when cache is updated.
  */
-export async function invalidateWorkspaceMetadata(
-  workspaceId: string,
-  newMetadata?: any
-) {
+export async function invalidateWorkspaceMetadata(workspaceId: string, newMetadata?: any) {
   if (!workspaceId) {
     throw "Cannot invalidate if no app ID provided."
   }

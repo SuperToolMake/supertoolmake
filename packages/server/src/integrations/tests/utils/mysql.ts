@@ -1,9 +1,9 @@
-import { Datasource, SourceName } from "@budibase/types"
+import { generator, type testContainerUtils } from "@budibase/backend-core/tests"
+import { type Datasource, SourceName } from "@budibase/types"
+import knex, { type Knex } from "knex"
 import { GenericContainer, Wait } from "testcontainers"
 import { AbstractWaitStrategy } from "testcontainers/build/wait-strategies/wait-strategy"
-import { generator, testContainerUtils } from "@budibase/backend-core/tests"
 import { startContainer } from "."
-import knex, { Knex } from "knex"
 import { MYSQL_IMAGE } from "./images"
 
 let ports: Promise<testContainerUtils.Port[]>
@@ -15,10 +15,7 @@ class MySQLWaitStrategy extends AbstractWaitStrategy {
     // run against a MySQL that's mid-restart and fail. To get around this, we
     // wait for logs and then do a ping check.
 
-    const logs = Wait.forLogMessage(
-      "/usr/sbin/mysqld: ready for connections",
-      2
-    )
+    const logs = Wait.forLogMessage("/usr/sbin/mysqld: ready for connections", 2)
     await logs.waitUntilReady(container, boundPorts, startTime)
 
     const command = Wait.forSuccessfulCommand(
@@ -38,7 +35,7 @@ export async function getDatasource(): Promise<Datasource> {
     )
   }
 
-  const port = (await ports).find(x => x.container === 3306)?.host
+  const port = (await ports).find((x) => x.container === 3306)?.host
   if (!port) {
     throw new Error("MySQL port not found")
   }

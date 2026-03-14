@@ -1,4 +1,4 @@
-import SMTPTransport from "nodemailer/lib/smtp-transport"
+import type SMTPTransport from "nodemailer/lib/smtp-transport"
 
 export interface EmailInvite {
   startTime: Date

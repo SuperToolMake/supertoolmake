@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { PublishResourceState } from "@budibase/types"
+import { PublishResourceState } from "@budibase/types"
 
-  export let status: PublishResourceState
-  export let loading: boolean = false
+export let status: PublishResourceState
+export let loading: boolean = false
 
-  const statusDisplayName: Record<PublishResourceState, string> = {
-    [PublishResourceState.PUBLISHED]: "Live",
+const statusDisplayName: Record<PublishResourceState, string> = {
+  [PublishResourceState.PUBLISHED]: "Live",
 
-    [PublishResourceState.DISABLED]: "Off",
-  }
+  [PublishResourceState.DISABLED]: "Off",
+}
 </script>
 
 <div

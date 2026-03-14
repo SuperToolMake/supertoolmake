@@ -1,10 +1,10 @@
-import { Datasource, SourceName } from "@budibase/types"
+import { generator, type testContainerUtils } from "@budibase/backend-core/tests"
+import { type Datasource, SourceName } from "@budibase/types"
 import { GenericContainer, Wait } from "testcontainers"
 import { AbstractWaitStrategy } from "testcontainers/build/wait-strategies/wait-strategy"
-import { generator, testContainerUtils } from "@budibase/backend-core/tests"
 import { startContainer } from "."
-import { knexClient } from "./mysql"
 import { MARIADB_IMAGE } from "./images"
+import { knexClient } from "./mysql"
 
 let ports: Promise<testContainerUtils.Port[]>
 
@@ -18,9 +18,7 @@ class MariaDBWaitStrategy extends AbstractWaitStrategy {
     const logs = Wait.forLogMessage("mariadbd: ready for connections", 2)
     await logs.waitUntilReady(container, boundPorts, startTime)
 
-    const command = Wait.forSuccessfulCommand(
-      `/usr/local/bin/healthcheck.sh --innodb_initialized`
-    )
+    const command = Wait.forSuccessfulCommand(`/usr/local/bin/healthcheck.sh --innodb_initialized`)
     await command.waitUntilReady(container)
   }
 }
@@ -35,7 +33,7 @@ export async function getDatasource(): Promise<Datasource> {
     )
   }
 
-  const port = (await ports).find(x => x.container === 3306)?.host
+  const port = (await ports).find((x) => x.container === 3306)?.host
   if (!port) {
     throw new Error("MariaDB port not found")
   }

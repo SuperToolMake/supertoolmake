@@ -1,4 +1,4 @@
-import { Document } from "../documents"
+import type { Document } from "../documents"
 
 export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]

@@ -1,16 +1,16 @@
+import type { SSOAuthDetails, User } from "@budibase/types"
+import nock from "nock"
 import { structures } from "../../../../../tests"
 import { testEnv } from "../../../../../tests/extra"
-import { SSOAuthDetails, User } from "@budibase/types"
-
+import * as context from "../../../../context"
 import { HTTPError } from "../../../../errors"
 import * as sso from "../sso"
-import * as context from "../../../../context"
-import nock from "nock"
 
 const mockDone = jest.fn()
 const mockSaveUser = jest.fn()
 
 jest.mock("../../../../users")
+
 import * as _users from "../../../../users"
 
 const users = jest.mocked(_users)
@@ -28,10 +28,7 @@ describe("sso", () => {
     })
 
     describe("validation", () => {
-      const testValidation = async (
-        details: SSOAuthDetails,
-        message: string
-      ) => {
+      const testValidation = async (details: SSOAuthDetails, message: string) => {
         await sso.authenticate(details, false, mockDone, mockSaveUser)
 
         expect(mockDone.mock.calls.length).toBe(1)
@@ -137,9 +134,7 @@ describe("sso", () => {
           users.getById.mockImplementationOnce(() => {
             throw new HTTPError("", 404)
           })
-          users.getGlobalUserByEmail.mockReturnValueOnce(
-            Promise.resolve(existingUser)
-          )
+          users.getGlobalUserByEmail.mockReturnValueOnce(Promise.resolve(existingUser))
         })
 
         it("syncs and authenticates the user", async () => {

@@ -1,12 +1,12 @@
 import {
-  DatasourceFieldType,
-  Integration,
-  QueryType,
-  IntegrationBase,
+  type ConnectionInfo,
   DatasourceFeature,
-  ConnectionInfo,
+  DatasourceFieldType,
+  type Integration,
+  type IntegrationBase,
+  QueryType,
 } from "@budibase/types"
-import { Firestore, WhereFilterOp } from "@google-cloud/firestore"
+import { Firestore, type WhereFilterOp } from "@google-cloud/firestore"
 
 interface FirebaseConfig {
   email: string
@@ -129,9 +129,7 @@ class FirebaseIntegration implements IntegrationBase {
 
   async create(query: { json: object; extra: { [key: string]: string } }) {
     try {
-      const documentReference = this.client
-        .collection(query.extra.collection)
-        .doc()
+      const documentReference = this.client.collection(query.extra.collection).doc()
       await documentReference.set({ ...query.json, id: documentReference.id })
       const snapshot = await documentReference.get()
       return snapshot.data()
@@ -145,11 +143,7 @@ class FirebaseIntegration implements IntegrationBase {
     try {
       let snapshot
       const collectionRef = this.client.collection(query.extra.collection)
-      if (
-        query.extra.filterField &&
-        query.extra.filter &&
-        query.extra.filterValue
-      ) {
+      if (query.extra.filterField && query.extra.filter && query.extra.filterValue) {
         snapshot = await collectionRef
           .where(
             query.extra.filterField,
@@ -161,7 +155,7 @@ class FirebaseIntegration implements IntegrationBase {
         snapshot = await collectionRef.get()
       }
       const result: any[] = []
-      snapshot.forEach(doc => result.push(doc.data()))
+      snapshot.forEach((doc) => result.push(doc.data()))
 
       return result
     } catch (err) {
@@ -170,37 +164,20 @@ class FirebaseIntegration implements IntegrationBase {
     }
   }
 
-  async update(query: {
-    json: Record<string, any>
-    extra: { [key: string]: string }
-  }) {
+  async update(query: { json: Record<string, any>; extra: { [key: string]: string } }) {
     try {
-      await this.client
-        .collection(query.extra.collection)
-        .doc(query.json.id)
-        .update(query.json)
+      await this.client.collection(query.extra.collection).doc(query.json.id).update(query.json)
 
-      return (
-        await this.client
-          .collection(query.extra.collection)
-          .doc(query.json.id)
-          .get()
-      ).data()
+      return (await this.client.collection(query.extra.collection).doc(query.json.id).get()).data()
     } catch (err) {
       console.error("Error writing to Firestore", err)
       throw err
     }
   }
 
-  async delete(query: {
-    json: { id: string }
-    extra: { [key: string]: string }
-  }) {
+  async delete(query: { json: { id: string }; extra: { [key: string]: string } }) {
     try {
-      await this.client
-        .collection(query.extra.collection)
-        .doc(query.json.id)
-        .delete()
+      await this.client.collection(query.extra.collection).doc(query.json.id).delete()
       return true
     } catch (err) {
       console.error("Error deleting from Firestore", err)

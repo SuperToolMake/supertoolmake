@@ -1,4 +1,4 @@
-import { User } from "@budibase/types"
+import type { User } from "@budibase/types"
 
 /**
  * Gets a key within an object. The key supports dot syntax for retrieving deep
@@ -14,7 +14,7 @@ export const deepGet = (obj: Record<string, any> | undefined, key: string) => {
   if (!obj || !key) {
     return null
   }
-  if (Object.prototype.hasOwnProperty.call(obj, key)) {
+  if (Object.hasOwn(obj, key)) {
     return obj[key]
   }
   const split = key.split(".")
@@ -84,9 +84,7 @@ export const getUserLabel = (user: User) => {
   }
 }
 
-export function cancelableTimeout(
-  timeout: number
-): [Promise<unknown>, () => void] {
+export function cancelableTimeout(timeout: number): [Promise<unknown>, () => void] {
   let timeoutId: NodeJS.Timeout
   return [
     new Promise((_resolve, reject) => {
@@ -103,10 +101,7 @@ export function cancelableTimeout(
   ]
 }
 
-export async function withTimeout<T>(
-  timeout: number,
-  promise: () => Promise<T>
-): Promise<T> {
+export async function withTimeout<T>(timeout: number, promise: () => Promise<T>): Promise<T> {
   const [timeoutPromise, cancel] = cancelableTimeout(timeout)
   const result = (await Promise.race([promise(), timeoutPromise])) as T
   cancel()

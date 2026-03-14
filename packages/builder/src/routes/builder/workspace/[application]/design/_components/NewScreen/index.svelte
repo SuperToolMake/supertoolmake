@@ -1,78 +1,74 @@
 <script lang="ts">
-  import CreationPage from "@/components/common/CreationPage.svelte"
-  import { AutoScreenTypes } from "@/constants"
-  import { appStore, screenStore, workspaceAppStore } from "@/stores/builder"
-  import {
-    Body,
-    keepOpen,
-    Modal,
-    ModalCancelFrom,
-    ModalContent,
-    notifications,
-  } from "@budibase/bbui"
-  import CreateScreenModal from "./CreateScreenModal.svelte"
-  import blank from "./images/blank.svg"
-  import form from "./images/formUpdate.svg"
-  import table from "./images/tableInline.svg"
+import {
+  Body,
+  keepOpen,
+  type Modal,
+  ModalCancelFrom,
+  ModalContent,
+  notifications,
+} from "@budibase/bbui"
+import CreationPage from "@/components/common/CreationPage.svelte"
+import type { AutoScreenTypes } from "@/constants"
+import { appStore, screenStore, workspaceAppStore } from "@/stores/builder"
+import type CreateScreenModal from "./CreateScreenModal.svelte"
+import blank from "./images/blank.svg"
+import form from "./images/formUpdate.svg"
+import table from "./images/tableInline.svg"
 
-  export let onClose: (() => void) | null = null
-  export let inline: boolean = false
-  export let submitOnClick: boolean = false
-  export let workspaceAppId: string | undefined
+export let onClose: (() => void) | null = null
+export let inline: boolean = false
+export let submitOnClick: boolean = false
+export let workspaceAppId: string | undefined
 
-  let title: string
-  let rootModal: Modal
-  let createScreenModal: CreateScreenModal
-  let cancelHandler: (_e: CustomEvent<ModalCancelFrom>) => void = () => {}
-  let selectedType: AutoScreenTypes | undefined
-  let currentStepIndex: number
+let title: string
+let rootModal: Modal
+let createScreenModal: CreateScreenModal
+let cancelHandler: (_e: CustomEvent<ModalCancelFrom>) => void = () => {}
+let selectedType: AutoScreenTypes | undefined
+let currentStepIndex: number
 
-  $: hasScreens = $screenStore.screens?.length
-  $: title = hasScreens ? "Create new screen" : "Create your first screen"
+$: hasScreens = $screenStore.screens?.length
+$: title = hasScreens ? "Create new screen" : "Create your first screen"
 
-  export const open = () => {
-    currentStepIndex = 0
+export const open = () => {
+  currentStepIndex = 0
+  selectedType = undefined
+  rootModal.show()
+}
+
+function onSelect(screenType: AutoScreenTypes) {
+  if (submitOnClick) {
+    onConfirm(screenType)
+  } else if (selectedType === screenType) {
     selectedType = undefined
-    rootModal.show()
+  } else {
+    selectedType = screenType
   }
+}
 
-  function onSelect(screenType: AutoScreenTypes) {
-    if (submitOnClick) {
-      onConfirm(screenType)
-    } else if (selectedType === screenType) {
-      selectedType = undefined
-    } else {
-      selectedType = screenType
-    }
+async function onConfirm(type = selectedType) {
+  if (!type) {
+    notifications.error("Select screen type")
+    return
   }
+  rootModal.hide()
+  if (!workspaceAppId) {
+    const workspaceApp = await workspaceAppStore.add({
+      name: $appStore.name,
+      url: "/",
+    })
+    workspaceAppId = workspaceApp._id
+  }
+  createScreenModal.show(type, workspaceAppId)
 
-  async function onConfirm(type = selectedType) {
-    if (!type) {
-      notifications.error("Select screen type")
-      return
-    }
-    rootModal.hide()
-    if (!workspaceAppId) {
-      const workspaceApp = await workspaceAppStore.add({
-        name: $appStore.name,
-        url: "/",
-      })
-      workspaceAppId = workspaceApp._id
-    }
-    createScreenModal.show(type, workspaceAppId)
-
-    const selectedTypeSnapshot = selectedType
-    cancelHandler = e => {
-      if (
-        [ModalCancelFrom.CANCEL_BUTTON, ModalCancelFrom.ESCAPE_KEY].includes(
-          e.detail
-        )
-      ) {
-        selectedType = selectedTypeSnapshot
-        rootModal.show()
-      }
+  const selectedTypeSnapshot = selectedType
+  cancelHandler = (e) => {
+    if ([ModalCancelFrom.CANCEL_BUTTON, ModalCancelFrom.ESCAPE_KEY].includes(e.detail)) {
+      selectedType = selectedTypeSnapshot
+      rootModal.show()
     }
   }
+}
 </script>
 
 <Modal bind:this={rootModal} {inline}>

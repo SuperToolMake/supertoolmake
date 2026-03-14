@@ -1,40 +1,40 @@
 <script lang="ts">
-  import {
-    ActionButton,
-    Body,
-    ColorPicker,
-    Icon,
-    Label,
-    Layout,
-    PopoverAlignment,
-    notifications,
-  } from "@budibase/bbui"
-  import DetailPopover from "@/components/common/DetailPopover.svelte"
-  import { themeStore, appStore } from "@/stores/builder"
-  import { DefaultAppTheme } from "@/constants"
-  import AppThemeSelect from "./AppThemeSelect.svelte"
-  import ButtonRoundnessSelect from "./ButtonRoundnessSelect.svelte"
-  import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
+import {
+  ActionButton,
+  Body,
+  ColorPicker,
+  Icon,
+  Label,
+  Layout,
+  notifications,
+  PopoverAlignment,
+} from "@budibase/bbui"
+import DetailPopover from "@/components/common/DetailPopover.svelte"
+import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
+import { DefaultAppTheme } from "@/constants"
+import { appStore, themeStore } from "@/stores/builder"
+import AppThemeSelect from "./AppThemeSelect.svelte"
+import ButtonRoundnessSelect from "./ButtonRoundnessSelect.svelte"
 
-  let popover: any
+let popover: any
 
-  $: customTheme = $themeStore.customTheme || {}
+$: customTheme = $themeStore.customTheme || {}
 
-  export function show() {
-    popover?.show()
+export function show() {
+  popover?.show()
+}
+
+export function hide() {
+  popover?.hide()
+}
+
+const update = async (property: string, value: any) => {
+  try {
+    await themeStore.saveCustom({ [property]: value }, $appStore.appId)
+  } catch (error) {
+    notifications.error("Error updating custom theme")
   }
-
-  export function hide() {
-    popover?.hide()
-  }
-
-  const update = async (property: string, value: any) => {
-    try {
-      await themeStore.saveCustom({ [property]: value }, $appStore.appId)
-    } catch (error) {
-      notifications.error("Error updating custom theme")
-    }
-  }
+}
 </script>
 
 <DetailPopover

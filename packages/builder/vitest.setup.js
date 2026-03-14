@@ -4,7 +4,7 @@ import "@testing-library/jest-dom/vitest"
 global.ResizeObserver = require("resize-observer-polyfill")
 
 expect.extend({
-  toBeFunc: received => {
+  toBeFunc: (received) => {
     if (typeof received === "function") {
       return {
         pass: true,

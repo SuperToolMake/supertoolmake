@@ -1,11 +1,11 @@
+import { sdk } from "@budibase/shared-core"
+import type { UpdateWorkspaceRequest, Workspace } from "@budibase/types"
+import { derived } from "svelte/store"
 import { API } from "@/api"
 import { AppStatus } from "@/constants"
-import { EnrichedApp, StoreApp } from "@/types"
-import { UpdateWorkspaceRequest, Workspace } from "@budibase/types"
-import { derived } from "svelte/store"
+import type { EnrichedApp, StoreApp } from "@/types"
 import { BudiStore } from "../BudiStore"
 import { auth } from "./auth"
-import { sdk } from "@budibase/shared-core"
 
 export interface PortalAppsStore {
   apps: StoreApp[]
@@ -51,7 +51,7 @@ export class AppsStore extends BudiStore<PortalAppsStore> {
   }
 
   async updateSort(sortBy: string) {
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       sortBy,
     }))
@@ -67,18 +67,18 @@ export class AppsStore extends BudiStore<PortalAppsStore> {
   }
 
   async load() {
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
     }))
     const json = await API.getApps()
     if (Array.isArray(json)) {
       // Merge apps into one sensible list
-      let appMap: Record<string, StoreApp> = {}
-      let devApps = json.filter(app => app.status === AppStatus.DEV)
-      let deployedApps = json.filter(app => app.status === AppStatus.DEPLOYED)
+      const appMap: Record<string, StoreApp> = {}
+      const devApps = json.filter((app) => app.status === AppStatus.DEV)
+      const deployedApps = json.filter((app) => app.status === AppStatus.DEPLOYED)
 
       // First append all dev app version
-      devApps.forEach(app => {
+      devApps.forEach((app) => {
         const id = this.extractAppId(app.appId)
         if (!id) {
           return
@@ -91,7 +91,7 @@ export class AppsStore extends BudiStore<PortalAppsStore> {
       })
 
       // Then merge with all prod app versions
-      deployedApps.forEach(app => {
+      deployedApps.forEach((app) => {
         const id = this.extractAppId(app.appId)
         if (!id) {
           return
@@ -121,7 +121,7 @@ export class AppsStore extends BudiStore<PortalAppsStore> {
 
       // Transform into an array and clean up
       const apps = Object.values(appMap)
-      apps.forEach(app => {
+      apps.forEach((app) => {
         const appId = this.extractAppId(app.devId)
         if (appId) {
           app.appId = appId
@@ -129,12 +129,12 @@ export class AppsStore extends BudiStore<PortalAppsStore> {
         delete app._id
         delete app._rev
       })
-      this.update(state => ({
+      this.update((state) => ({
         ...state,
         apps,
       }))
     } else {
-      this.update(state => ({
+      this.update((state) => ({
         ...state,
         apps: [],
       }))
@@ -143,10 +143,8 @@ export class AppsStore extends BudiStore<PortalAppsStore> {
 
   async save(appId: string, value: UpdateWorkspaceRequest) {
     await API.saveAppMetadata(appId, value)
-    this.update(state => {
-      const updatedAppIndex = state.apps.findIndex(
-        app => app.instance._id === appId
-      )
+    this.update((state) => {
+      const updatedAppIndex = state.apps.findIndex((app) => app.instance._id === appId)
       if (updatedAppIndex !== -1) {
         let updatedApp = state.apps[updatedAppIndex]
         updatedApp = { ...updatedApp, ...value }
@@ -164,38 +162,35 @@ export const sortBy = derived([appsStore, auth], ([$store, $auth]) => {
 })
 
 // Centralise any logic that enriches the apps list
-export const enrichedApps = derived(
-  [appsStore, auth, sortBy],
-  ([$store, $auth, $sortBy]) => {
-    const enrichedApps: EnrichedApp[] = $store.apps.map(app => {
-      const user = $auth.user
-      return {
-        ...app,
-        deployed: app.status === AppStatus.DEPLOYED,
-        lockedYou: app.lockedBy != null && app.lockedBy.email === user?.email,
-        lockedOther: app.lockedBy != null && app.lockedBy.email !== user?.email,
-        favourite: !!user?.appFavourites?.includes(app.appId),
-        editable: sdk.users.isBuilder(user, app?.devId),
-      }
-    })
-
-    if ($sortBy === "status") {
-      return enrichedApps.sort((a, b) => {
-        if (a.status === b.status) {
-          return a.name?.toLowerCase() < b.name?.toLowerCase() ? -1 : 1
-        }
-        return a.status === AppStatus.DEPLOYED ? -1 : 1
-      })
-    } else if ($sortBy === "updated") {
-      return enrichedApps?.sort((a, b) => {
-        const aUpdated = a.updatedAt || "9999"
-        const bUpdated = b.updatedAt || "9999"
-        return aUpdated < bUpdated ? 1 : -1
-      })
-    } else {
-      return enrichedApps?.sort((a, b) => {
-        return a.name?.toLowerCase() < b.name?.toLowerCase() ? -1 : 1
-      })
+export const enrichedApps = derived([appsStore, auth, sortBy], ([$store, $auth, $sortBy]) => {
+  const enrichedApps: EnrichedApp[] = $store.apps.map((app) => {
+    const user = $auth.user
+    return {
+      ...app,
+      deployed: app.status === AppStatus.DEPLOYED,
+      lockedYou: app.lockedBy != null && app.lockedBy.email === user?.email,
+      lockedOther: app.lockedBy != null && app.lockedBy.email !== user?.email,
+      favourite: !!user?.appFavourites?.includes(app.appId),
+      editable: sdk.users.isBuilder(user, app?.devId),
     }
+  })
+
+  if ($sortBy === "status") {
+    return enrichedApps.sort((a, b) => {
+      if (a.status === b.status) {
+        return a.name?.toLowerCase() < b.name?.toLowerCase() ? -1 : 1
+      }
+      return a.status === AppStatus.DEPLOYED ? -1 : 1
+    })
+  } else if ($sortBy === "updated") {
+    return enrichedApps?.sort((a, b) => {
+      const aUpdated = a.updatedAt || "9999"
+      const bUpdated = b.updatedAt || "9999"
+      return aUpdated < bUpdated ? 1 : -1
+    })
+  } else {
+    return enrichedApps?.sort((a, b) => {
+      return a.name?.toLowerCase() < b.name?.toLowerCase() ? -1 : 1
+    })
   }
-)
+})

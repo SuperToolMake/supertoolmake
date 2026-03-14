@@ -1,30 +1,22 @@
 /* global hbs */
-import Handlebars from "handlebars"
-import type { Diagnostic } from "@codemirror/lint"
-import { CodeValidator } from "@/types"
 
-function isMustacheStatement(
-  node: hbs.AST.Statement
-): node is hbs.AST.MustacheStatement {
+import type { Diagnostic } from "@codemirror/lint"
+import Handlebars from "handlebars"
+import type { CodeValidator } from "@/types"
+
+function isMustacheStatement(node: hbs.AST.Statement): node is hbs.AST.MustacheStatement {
   return node.type === "MustacheStatement"
 }
 
-function isBlockStatement(
-  node: hbs.AST.Statement
-): node is hbs.AST.BlockStatement {
+function isBlockStatement(node: hbs.AST.Statement): node is hbs.AST.BlockStatement {
   return node.type === "BlockStatement"
 }
 
-function isPathExpression(
-  node: hbs.AST.Statement
-): node is hbs.AST.PathExpression {
+function isPathExpression(node: hbs.AST.Statement): node is hbs.AST.PathExpression {
   return node.type === "PathExpression"
 }
 
-export function validateHbsTemplate(
-  text: string,
-  validations: CodeValidator
-): Diagnostic[] {
+export function validateHbsTemplate(text: string, validations: CodeValidator): Diagnostic[] {
   const diagnostics: Diagnostic[] = []
 
   try {
@@ -44,15 +36,11 @@ export function validateHbsTemplate(
       }
     ) {
       const ignoreMissing = options?.ignoreMissing || false
-      nodes.forEach(node => {
-        if (
-          (isMustacheStatement(node) || isBlockStatement(node)) &&
-          isPathExpression(node.path)
-        ) {
+      nodes.forEach((node) => {
+        if ((isMustacheStatement(node) || isBlockStatement(node)) && isPathExpression(node.path)) {
           const helperName = node.path.original
 
-          const from =
-            lineOffsets[node.loc.start.line - 1] + node.loc.start.column
+          const from = lineOffsets[node.loc.start.line - 1] + node.loc.start.column
           const to = lineOffsets[node.loc.end.line - 1] + node.loc.end.column
 
           if (!(helperName in validations)) {
@@ -67,8 +55,7 @@ export function validateHbsTemplate(
             return
           }
 
-          const { arguments: expectedArguments = [], requiresBlock } =
-            validations[helperName]
+          const { arguments: expectedArguments = [], requiresBlock } = validations[helperName]
 
           if (requiresBlock && !isBlockStatement(node)) {
             diagnostics.push({
@@ -95,33 +82,23 @@ export function validateHbsTemplate(
           }
 
           const optionalArgMatcher = new RegExp(/^\[(.+)\]$/)
-          const optionalArgs = expectedArguments.filter(a =>
-            optionalArgMatcher.test(a)
-          )
+          const optionalArgs = expectedArguments.filter((a) => optionalArgMatcher.test(a))
 
-          if (
-            !optionalArgs.length &&
-            providedParamsCount !== expectedArguments.length
-          ) {
+          if (!optionalArgs.length && providedParamsCount !== expectedArguments.length) {
             diagnostics.push({
               from,
               to,
               severity: "error",
               message: `Helper "${helperName}" expects ${
                 expectedArguments.length
-              } parameters (${expectedArguments.join(
-                ", "
-              )}), but got ${providedParamsCount}.`,
+              } parameters (${expectedArguments.join(", ")}), but got ${providedParamsCount}.`,
             })
           } else if (optionalArgs.length) {
             const maxArgs = expectedArguments.length
             const minArgs = maxArgs - optionalArgs.length
-            if (
-              minArgs > providedParamsCount ||
-              maxArgs < providedParamsCount
-            ) {
+            if (minArgs > providedParamsCount || maxArgs < providedParamsCount) {
               const parameters = expectedArguments
-                .map(a => {
+                .map((a) => {
                   const test = optionalArgMatcher.exec(a)
                   if (!test?.[1]) {
                     return a

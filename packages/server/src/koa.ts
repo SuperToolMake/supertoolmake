@@ -1,13 +1,13 @@
-import env from "./environment"
+import { logging, middleware, timers } from "@budibase/backend-core"
+import http from "http"
+import gracefulShutdown from "http-graceful-shutdown"
 import Koa from "koa"
 import koaBody, { HttpMethodEnum } from "koa-body"
-import http from "http"
+import { userAgent } from "koa-useragent"
 import * as api from "./api"
+import env from "./environment"
 import { Thread } from "./threads"
 import * as redis from "./utilities/redis"
-import { logging, middleware, timers } from "@budibase/backend-core"
-import { userAgent } from "koa-useragent"
-import gracefulShutdown from "http-graceful-shutdown"
 
 export default function createKoaApp() {
   const app = new Koa()
@@ -38,10 +38,7 @@ export default function createKoaApp() {
     return await defaultBodyParser(ctx, async () => {
       // Koa 3 + koa-body can leave request.body undefined for empty payloads.
       // Preserve previous behavior expected across controllers/tests.
-      if (
-        ctx.request.body == null &&
-        parsedMethods.includes(ctx.method as HttpMethodEnum)
-      ) {
+      if (ctx.request.body == null && parsedMethods.includes(ctx.method as HttpMethodEnum)) {
         ctx.request.body = {}
       }
       await next()
@@ -78,8 +75,8 @@ export default function createKoaApp() {
     },
   })
 
-  process.on("uncaughtException", async err => {
-    // @ts-ignore
+  process.on("uncaughtException", async (err) => {
+    // @ts-expect-error
     // don't worry about this error, comes from zlib isn't important
     if (err?.["code"] === "ERR_INVALID_CHAR") {
       logging.logAlert("Uncaught exception.", err)
@@ -91,7 +88,7 @@ export default function createKoaApp() {
     }
   })
 
-  process.on("unhandledRejection", async reason => {
+  process.on("unhandledRejection", async (reason) => {
     logging.logAlert("Unhandled Promise Rejection", reason as Error)
     await shutdown()
     if (!env.isTest()) {

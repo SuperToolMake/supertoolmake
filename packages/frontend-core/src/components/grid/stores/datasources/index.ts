@@ -1,9 +1,4 @@
-import {
-  SaveRowRequest,
-  SaveTableRequest,
-  UIDatasource,
-  UIRow,
-} from "@budibase/types"
+import type { SaveRowRequest, SaveTableRequest, UIDatasource, UIRow } from "@budibase/types"
 
 interface DatasourceBaseActions<TSaveDefinitionRequest = SaveTableRequest> {
   saveDefinition: (newDefinition: TSaveDefinitionRequest) => Promise<void>
@@ -15,11 +10,8 @@ interface DatasourceBaseActions<TSaveDefinitionRequest = SaveTableRequest> {
   canUseColumn: (name: string) => boolean | void
 }
 
-export interface DatasourceTableActions
-  extends DatasourceBaseActions<SaveTableRequest> {}
+export interface DatasourceTableActions extends DatasourceBaseActions<SaveTableRequest> {}
 
-export interface DatasourceNonPlusActions
-  extends DatasourceBaseActions<never> {}
+export interface DatasourceNonPlusActions extends DatasourceBaseActions<never> {}
 
-export type DatasourceActions = DatasourceTableActions &
-  DatasourceNonPlusActions
+export type DatasourceActions = DatasourceTableActions & DatasourceNonPlusActions

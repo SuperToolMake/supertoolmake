@@ -1,18 +1,14 @@
+import { DesignDocuments, db as dbCore, HTTPError } from "@budibase/backend-core"
 import {
-  db as dbCore,
-  DesignDocuments,
-  HTTPError,
-} from "@budibase/backend-core"
-import {
-  Database,
-  Document,
+  type Database,
+  type Document,
   DocumentType,
   DocumentTypesToImport,
   InternalTable,
-  RowValue,
-  Table,
+  type RowValue,
+  type Table,
   TableSourceType,
-  Workspace,
+  type Workspace,
 } from "@budibase/types"
 import backups from "../backups"
 
@@ -29,10 +25,7 @@ export function isImportableTable(doc: Document): boolean {
     return true
   }
   const table = doc as Table
-  if (
-    table.sourceType === TableSourceType.INTERNAL ||
-    table.sourceType === undefined
-  ) {
+  if (table.sourceType === TableSourceType.INTERNAL || table.sourceType === undefined) {
     return table._id === InternalTable.USER_METADATA
   }
   return true
@@ -62,9 +55,7 @@ async function getNewWorkspaceMetadata(
       version: tempMetadata.version,
     }
   } catch (err: any) {
-    throw new Error(
-      `Unable to retrieve workspace metadata for import - ${err.message}`
-    )
+    throw new Error(`Unable to retrieve workspace metadata for import - ${err.message}`)
   }
 }
 
@@ -75,8 +66,8 @@ function mergeUpdateAndDeleteDocuments(
 ) {
   // compress the documents to create and to delete (if same ID, then just update the rev)
   const finalToDelete = []
-  for (let deleteDoc of deleteDocs) {
-    const found = updateDocs.find(doc => doc._id === deleteDoc._id)
+  for (const deleteDoc of deleteDocs) {
+    const found = updateDocs.find((doc) => doc._id === deleteDoc._id)
     if (found) {
       found._rev = deleteDoc._rev
     } else {
@@ -91,13 +82,13 @@ function mergeUpdateAndDeleteDocuments(
 async function removeImportableDocuments(db: Database) {
   // get the references to the documents, not the whole document
   const docPromises = []
-  for (let docType of DocumentTypesToImport) {
+  for (const docType of DocumentTypesToImport) {
     docPromises.push(db.allDocs(dbCore.getDocParams(docType)))
   }
   let documentRefs: { _id: string; _rev: string }[] = []
-  for (let response of await Promise.all(docPromises)) {
+  for (const response of await Promise.all(docPromises)) {
     documentRefs = documentRefs.concat(
-      response.rows.map(row => ({
+      response.rows.map((row) => ({
         _id: row.id,
         _rev: (row.value as RowValue).rev,
       }))
@@ -108,7 +99,7 @@ async function removeImportableDocuments(db: Database) {
     allowMissing: true,
   })
   documentRefs.push(
-    ...designDocs.map(doc => ({
+    ...designDocs.map((doc) => ({
       _id: doc._id!,
       _rev: doc._rev!,
     }))
@@ -116,27 +107,25 @@ async function removeImportableDocuments(db: Database) {
 
   // add deletion key
   const uniqueMap = new Map<string, Document>()
-  documentRefs.forEach(doc => {
+  documentRefs.forEach((doc) => {
     uniqueMap.set(doc._id!, doc)
   })
-  return Array.from(uniqueMap.values()).map(ref => ({ _deleted: true, ...ref }))
+  return Array.from(uniqueMap.values()).map((ref) => ({ _deleted: true, ...ref }))
 }
 
 async function getImportableDocuments(db: Database) {
   // get the whole document
   const docPromises = []
-  for (let docType of DocumentTypesToImport) {
+  for (const docType of DocumentTypesToImport) {
     docPromises.push(
-      db.allDocs<Document>(
-        dbCore.getDocParams(docType, null, { include_docs: true })
-      )
+      db.allDocs<Document>(dbCore.getDocParams(docType, null, { include_docs: true }))
     )
   }
 
   // map the responses to the document itself
   let documents: Document[] = []
-  for (let response of await Promise.all(docPromises)) {
-    documents = documents.concat(response.rows.map(row => row.doc!))
+  for (const response of await Promise.all(docPromises)) {
+    documents = documents.concat(response.rows.map((row) => row.doc!))
   }
 
   const isWorkspaceAppDoc = (doc: Document): doc is Workspace => {
@@ -156,14 +145,12 @@ async function getImportableDocuments(db: Database) {
 
   // remove the _rev, stops it being written
   const uniqueMap = new Map<string, Document>()
-  documents.forEach(doc => {
+  documents.forEach((doc) => {
     delete doc._rev
     uniqueMap.set(doc._id!, doc)
   })
   // Filter out internal tables (except ta_users) as they should not be imported
-  const filteredDocuments = Array.from(uniqueMap.values()).filter(
-    isImportableTable
-  )
+  const filteredDocuments = Array.from(uniqueMap.values()).filter(isImportableTable)
   return filteredDocuments
 }
 
@@ -196,7 +183,7 @@ export async function updateWithExport(
     const updateDocsResult = await workspaceDb.bulkDocs(
       mergeUpdateAndDeleteDocuments(toUpdate, toDelete, newMetadata)
     )
-    if (updateDocsResult.some(r => r.error)) {
+    if (updateDocsResult.some((r) => r.error)) {
       throw new HTTPError("Error importing documents", 500)
     }
   } finally {

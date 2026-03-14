@@ -1,22 +1,16 @@
-import {
-  Constants,
-  CookieUtils,
-  createAPIClient,
-} from "@budibase/frontend-core"
-import { appStore } from "@/stores/builder"
+import { Constants, CookieUtils, createAPIClient } from "@budibase/frontend-core"
+import { ClientHeader, Header, sdk } from "@budibase/shared-core"
 import { get } from "svelte/store"
+import { appStore } from "@/stores/builder"
 import { auth, navigation } from "./stores/portal"
-import { sdk, Header, ClientHeader } from "@budibase/shared-core"
 
 const newClient = (opts?: { production?: boolean }) =>
   createAPIClient({
-    attachHeaders: headers => {
+    attachHeaders: (headers) => {
       // Attach app ID header from store
-      let appId = get(appStore).appId
+      const appId = get(appStore).appId
       if (appId) {
-        headers[Header.APP_ID] = opts?.production
-          ? sdk.applications.getProdAppID(appId)
-          : appId
+        headers[Header.APP_ID] = opts?.production ? sdk.applications.getProdAppID(appId) : appId
         headers[Header.CLIENT] = ClientHeader.BUILDER
       }
 
@@ -27,7 +21,7 @@ const newClient = (opts?: { production?: boolean }) =>
       }
     },
 
-    onError: error => {
+    onError: (error) => {
       const { url, message, status, method, handled } = error || {}
 
       // Log any errors that we haven't manually handled
@@ -61,16 +55,12 @@ const newClient = (opts?: { production?: boolean }) =>
         }
 
         // Reload after removing cookie, go to login
-        if (
-          isAuthenticated &&
-          !url.includes("self") &&
-          !url.includes("login")
-        ) {
+        if (isAuthenticated && !url.includes("self") && !url.includes("login")) {
           location.reload()
         }
       }
     },
-    onMigrationDetected: appId => {
+    onMigrationDetected: (appId) => {
       const updatingUrl = `/builder/workspace/updating/${appId}`
 
       if (window.location.pathname === updatingUrl) {

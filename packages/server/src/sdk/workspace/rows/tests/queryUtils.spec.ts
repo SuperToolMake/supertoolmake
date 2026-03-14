@@ -1,15 +1,7 @@
-import {
-  FieldType,
-  RelationshipType,
-  SearchFilters,
-  Table,
-} from "@budibase/types"
+import { FieldType, RelationshipType, type SearchFilters, type Table } from "@budibase/types"
 import { structures } from "../../../../api/routes/tests/utilities"
+import { type DatabaseName, getDatasource } from "../../../../integrations/tests/utils"
 import TestConfiguration from "../../../../tests/utilities/TestConfiguration"
-import {
-  getDatasource,
-  DatabaseName,
-} from "../../../../integrations/tests/utils"
 import { getQueryableFields, validateFilters } from "../queryUtils"
 
 describe("query utils", () => {
@@ -42,15 +34,11 @@ describe("query utils", () => {
     })
 
     it("does not throw on valid fields", () => {
-      expect(() =>
-        validateFilters(fullFilters, ["one", "two", "three", "forth"])
-      ).not.toThrow()
+      expect(() => validateFilters(fullFilters, ["one", "two", "three", "forth"])).not.toThrow()
     })
 
     it("throws on invalid fields", () => {
-      expect(() =>
-        validateFilters(fullFilters, ["one", "three", "forth"])
-      ).toThrow()
+      expect(() => validateFilters(fullFilters, ["one", "three", "forth"])).toThrow()
     })
 
     it("can handle numbered fields", () => {
@@ -77,9 +65,7 @@ describe("query utils", () => {
         },
       }
 
-      expect(() =>
-        validateFilters(prefixedFilters, ["one", "two", "three", "forth"])
-      ).not.toThrow()
+      expect(() => validateFilters(prefixedFilters, ["one", "two", "three", "forth"])).not.toThrow()
     })
 
     it("can handle relationships", () => {
@@ -100,12 +86,7 @@ describe("query utils", () => {
       }
 
       expect(() =>
-        validateFilters(prefixedFilters, [
-          "other.one",
-          "other.two",
-          "other.three",
-          "another.three",
-        ])
+        validateFilters(prefixedFilters, ["other.one", "other.two", "other.three", "another.three"])
       ).not.toThrow()
     })
 
@@ -127,11 +108,7 @@ describe("query utils", () => {
       }
 
       expect(() =>
-        validateFilters(prefixedFilters, [
-          "other.one",
-          "other.two",
-          "other.three",
-        ])
+        validateFilters(prefixedFilters, ["other.one", "other.two", "other.three"])
       ).toThrow()
     })
   })
@@ -143,9 +120,7 @@ describe("query utils", () => {
     beforeAll(async () => {
       await config.init()
       process.env.DATASOURCE = "mariadb"
-      const rawDatasource = await getDatasource(
-        process.env.DATASOURCE as DatabaseName
-      )
+      const rawDatasource = await getDatasource(process.env.DATASOURCE as DatabaseName)
       datasource = await config.api.datasource.create(rawDatasource!)
     })
 
@@ -302,13 +277,7 @@ describe("query utils", () => {
       const result = await config.doInContext(config.devWorkspaceId, () => {
         return getQueryableFields(table)
       })
-      expect(result).toEqual([
-        "_id",
-        "name",
-        "description",
-        "id",
-        "fk_auxTable_hidden_all_table",
-      ])
+      expect(result).toEqual(["_id", "name", "description", "id", "fk_auxTable_hidden_all_table"])
     })
 
     describe("nested relationship", () => {

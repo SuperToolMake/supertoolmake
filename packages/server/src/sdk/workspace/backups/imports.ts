@@ -1,6 +1,6 @@
 import { db as dbCore, encryption, objectStore } from "@budibase/backend-core"
 import { utils } from "@budibase/shared-core"
-import { Database } from "@budibase/types"
+import type { Database } from "@budibase/types"
 import fs from "fs"
 import fsp from "fs/promises"
 import { join } from "path"
@@ -9,11 +9,7 @@ import { v4 as uuid } from "uuid"
 import { ObjectStoreBuckets } from "../../../constants"
 import { budibaseTempDir } from "../../../utilities/budibaseDir"
 import { downloadTemplate } from "../../../utilities/fileSystem"
-import {
-  ATTACHMENT_DIRECTORY,
-  DB_EXPORT_FILE,
-  GLOBAL_DB_EXPORT_FILE,
-} from "./constants"
+import { ATTACHMENT_DIRECTORY, DB_EXPORT_FILE, GLOBAL_DB_EXPORT_FILE } from "./constants"
 
 type TemplateType = {
   file?: {
@@ -58,7 +54,7 @@ export async function untarFile(file: { path: string }) {
 async function decryptFiles(path: string, password: string) {
   try {
     const processDirectory = async (dirPath: string) => {
-      for (let file of await fsp.readdir(dirPath)) {
+      for (const file of await fsp.readdir(dirPath)) {
         const inputPath = join(dirPath, file)
         if (!inputPath.endsWith(ATTACHMENT_DIRECTORY)) {
           const stats = await fsp.lstat(inputPath)
@@ -87,35 +83,28 @@ export function getGlobalDBFile(tmpPath: string) {
 }
 
 export function getListOfAppsInMulti(tmpPath: string) {
-  return fs.readdirSync(tmpPath).filter(dir => dir !== GLOBAL_DB_EXPORT_FILE)
+  return fs.readdirSync(tmpPath).filter((dir) => dir !== GLOBAL_DB_EXPORT_FILE)
 }
 
-export async function importApp(
-  appId: string,
-  db: Database,
-  template: TemplateType
-) {
-  let prodAppId = dbCore.getProdWorkspaceID(appId)
+export async function importApp(appId: string, db: Database, template: TemplateType) {
+  const prodAppId = dbCore.getProdWorkspaceID(appId)
   let dbStream: fs.ReadStream
   const isTar = template.file && template?.file?.type?.endsWith("gzip")
-  const isDirectory =
-    template.file && (await fsp.lstat(template.file.path)).isDirectory()
-  let tmpPath: string | undefined = undefined
+  const isDirectory = template.file && (await fsp.lstat(template.file.path)).isDirectory()
+  let tmpPath: string | undefined
   if (template.file && (isTar || isDirectory)) {
     tmpPath = isTar ? await untarFile(template.file) : template.file.path
     if (isTar && template.file.password) {
       await decryptFiles(tmpPath, template.file.password)
     }
     const contents = await fsp.readdir(tmpPath)
-    const stillEncrypted = !!contents.find(name => name.endsWith(".enc"))
+    const stillEncrypted = !!contents.find((name) => name.endsWith(".enc"))
     if (stillEncrypted) {
       throw new Error("Files are encrypted but no password has been supplied.")
     }
-    const isInvalid = !contents.find(name => name === DB_EXPORT_FILE)
+    const isInvalid = !contents.find((name) => name === DB_EXPORT_FILE)
     if (isInvalid) {
-      throw new Error(
-        "App export does not appear to be valid - no DB file found."
-      )
+      throw new Error("App export does not appear to be valid - no DB file found.")
     }
     // have to handle object import
     {
@@ -129,9 +118,7 @@ export async function importApp(
         }
         filename = join(prodAppId, filename)
         if ((await fsp.lstat(path)).isDirectory()) {
-          promises.push(
-            objectStore.uploadDirectory(ObjectStoreBuckets.APPS, path, filename)
-          )
+          promises.push(objectStore.uploadDirectory(ObjectStoreBuckets.APPS, path, filename))
         } else {
           promises.push(
             objectStore.upload({
@@ -147,16 +134,11 @@ export async function importApp(
 
       const filesToDelete: string[] = []
       await utils.parallelForeach(
-        objectStore.listAllObjects(
-          objectStore.ObjectStoreBuckets.APPS,
-          prodAppId
-        ),
-        async file => {
+        objectStore.listAllObjects(objectStore.ObjectStoreBuckets.APPS, prodAppId),
+        async (file) => {
           if (
             file.Key &&
-            !uploadedFiles.includes(
-              file.Key.replace(new RegExp(`^${prodAppId}/`), "")
-            )
+            !uploadedFiles.includes(file.Key.replace(new RegExp(`^${prodAppId}/`), ""))
           ) {
             filesToDelete.push(file.Key)
           }
@@ -165,17 +147,14 @@ export async function importApp(
       )
 
       if (filesToDelete.length) {
-        await objectStore.deleteFiles(
-          objectStore.ObjectStoreBuckets.APPS,
-          filesToDelete
-        )
+        await objectStore.deleteFiles(objectStore.ObjectStoreBuckets.APPS, filesToDelete)
       }
     }
     dbStream = fs.createReadStream(join(tmpPath, DB_EXPORT_FILE))
   } else {
     dbStream = await getTemplateStream(template)
   }
-  // @ts-ignore
+  // @ts-expect-error
   const { ok } = await db.load(dbStream)
   if (!ok) {
     throw "Error loading database dump from template."

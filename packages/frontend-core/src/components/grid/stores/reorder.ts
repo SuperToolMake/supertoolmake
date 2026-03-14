@@ -1,6 +1,6 @@
-import { get, writable, derived, Writable, Readable } from "svelte/store"
+import { derived, get, type Readable, type Writable, writable } from "svelte/store"
 import { parseEventLocation } from "../lib/utils"
-import { Store as StoreContext } from "."
+import type { Store as StoreContext } from "."
 
 interface Breakpoint {
   x: number
@@ -37,11 +37,7 @@ export type Store = ReorderInitialStore
 
 export const createStores = (): ReorderInitialStore => {
   const reorder = writable(reorderInitialState)
-  const isReordering = derived(
-    reorder,
-    $reorder => !!$reorder.sourceColumn,
-    false
-  )
+  const isReordering = derived(reorder, ($reorder) => !!$reorder.sourceColumn, false)
   return {
     reorder,
     isReordering,
@@ -74,7 +70,7 @@ export const createActions = (context: StoreContext) => {
     const $stickyWidth = get(stickyWidth)
 
     // Generate new breakpoints for the current columns
-    const breakpoints = $scrollableColumns.map(col => ({
+    const breakpoints = $scrollableColumns.map((col) => ({
       x: col.__left - $stickyWidth,
       column: col.name,
       insertAfter: false,
@@ -128,12 +124,12 @@ export const createActions = (context: StoreContext) => {
     if (rightProximity < proximityCutoff && $scrollLeft < $maxScrollLeft) {
       const weight = proximityCutoff - rightProximity
       const increment = (weight / proximityCutoff) * speedFactor
-      reorder.update(state => ({ ...state, increment }))
+      reorder.update((state) => ({ ...state, increment }))
       startAutoScroll()
     } else if (leftProximity < proximityCutoff && $scrollLeft > 0) {
       const weight = -1 * (proximityCutoff - leftProximity)
       const increment = (weight / proximityCutoff) * speedFactor
-      reorder.update(state => ({ ...state, increment }))
+      reorder.update((state) => ({ ...state, increment }))
       startAutoScroll()
     } else {
       stopAutoScroll()
@@ -149,7 +145,7 @@ export const createActions = (context: StoreContext) => {
     let breakpoint: Breakpoint | undefined
     let minDistance = Number.MAX_SAFE_INTEGER
     const mouseX = latestX - $reorder.gridLeft + $scrollLeft
-    $reorder.breakpoints.forEach(point => {
+    $reorder.breakpoints.forEach((point) => {
       const distance = Math.abs(point.x - mouseX)
       if (distance < minDistance) {
         minDistance = distance
@@ -161,7 +157,7 @@ export const createActions = (context: StoreContext) => {
       (breakpoint.column !== $reorder.targetColumn ||
         breakpoint.insertAfter !== $reorder.insertAfter)
     ) {
-      reorder.update(state => ({
+      reorder.update((state) => ({
         ...state,
         targetColumn: breakpoint!.column,
         insertAfter: breakpoint!.insertAfter,
@@ -179,7 +175,7 @@ export const createActions = (context: StoreContext) => {
     autoScrollInterval = setInterval(() => {
       const $maxLeft = get(maxScrollLeft)
       const { increment } = get(reorder)
-      scroll.update(state => ({
+      scroll.update((state) => ({
         ...state,
         left: Math.max(0, Math.min($maxLeft, state.left + increment!)),
       }))
@@ -230,14 +226,14 @@ export const createActions = (context: StoreContext) => {
   }) => {
     // Find the indices in the overall columns array
     const $columns = get(columns)
-    let sourceIdx = $columns.findIndex(col => col.name === sourceColumn)
-    let targetIdx = $columns.findIndex(col => col.name === targetColumn)
+    const sourceIdx = $columns.findIndex((col) => col.name === sourceColumn)
+    let targetIdx = $columns.findIndex((col) => col.name === targetColumn)
     if (insertAfter) {
       targetIdx++
     }
 
     // Reorder columns
-    columns.update(state => {
+    columns.update((state) => {
       const removed = state.splice(sourceIdx, 1)
       if (--targetIdx < sourceIdx) {
         targetIdx++
@@ -252,11 +248,7 @@ export const createActions = (context: StoreContext) => {
       if (!related) {
         datasource.actions.addSchemaMutation(column.name, mutation)
       } else {
-        datasource.actions.addSubSchemaMutation(
-          related.subField,
-          related.field,
-          mutation
-        )
+        datasource.actions.addSubSchemaMutation(related.subField, related.field, mutation)
       }
     })
 

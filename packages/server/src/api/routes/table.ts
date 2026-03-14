@@ -1,9 +1,9 @@
-import * as tableController from "../controllers/table"
-import { authorizedMiddleware as authorized } from "../../middleware/authorized"
-import { paramResource, bodyResource } from "../../middleware/resourceId"
 import { permissions } from "@budibase/backend-core"
-import { tableValidator } from "./utils/validators"
+import { authorizedMiddleware as authorized } from "../../middleware/authorized"
+import { bodyResource, paramResource } from "../../middleware/resourceId"
+import * as tableController from "../controllers/table"
 import { builderRoutes, endpointGroupList } from "./endpointGroups"
+import { tableValidator } from "./utils/validators"
 
 const { PermissionLevel, PermissionType } = permissions
 
@@ -14,11 +14,7 @@ const routes = endpointGroupList.group({
   first: false,
 })
 
-routes.get(
-  "/api/tables/:tableId",
-  paramResource("tableId"),
-  tableController.find
-)
+routes.get("/api/tables/:tableId", paramResource("tableId"), tableController.find)
 
 builderRoutes
   .get("/api/tables", tableController.fetch)
@@ -30,37 +26,11 @@ builderRoutes
     tableController.save
   )
   .post("/api/convert/csvToJson", tableController.csvToJson)
-  .post(
-    "/api/tables/validateNewTableImport",
-    tableController.validateNewTableImport
-  )
-  .post(
-    "/api/tables/validateExistingTableImport",
-    tableController.validateExistingTableImport
-  )
-  .delete(
-    "/api/tables/:tableId/:revId",
-    paramResource("tableId"),
-    tableController.destroy
-  )
-  .post(
-    "/api/tables/:tableId/import",
-    paramResource("tableId"),
-    tableController.bulkImport
-  )
+  .post("/api/tables/validateNewTableImport", tableController.validateNewTableImport)
+  .post("/api/tables/validateExistingTableImport", tableController.validateExistingTableImport)
+  .delete("/api/tables/:tableId/:revId", paramResource("tableId"), tableController.destroy)
+  .post("/api/tables/:tableId/import", paramResource("tableId"), tableController.bulkImport)
 
-  .post(
-    "/api/tables/:tableId/migrate",
-    paramResource("tableId"),
-    tableController.migrate
-  )
-  .post(
-    "/api/tables/:tableId/duplicate",
-    paramResource("tableId"),
-    tableController.duplicate
-  )
-  .post(
-    "/api/tables/:tableId/publish",
-    paramResource("tableId"),
-    tableController.publish
-  )
+  .post("/api/tables/:tableId/migrate", paramResource("tableId"), tableController.migrate)
+  .post("/api/tables/:tableId/duplicate", paramResource("tableId"), tableController.duplicate)
+  .post("/api/tables/:tableId/publish", paramResource("tableId"), tableController.publish)

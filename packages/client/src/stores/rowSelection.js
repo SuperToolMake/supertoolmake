@@ -4,7 +4,7 @@ const createRowSelectionStore = () => {
   const store = writable({})
 
   function updateSelection(componentId, tableId, selectedRows) {
-    store.update(state => {
+    store.update((state) => {
       state[componentId] = { tableId, selectedRows }
       return state
     })
@@ -13,7 +13,7 @@ const createRowSelectionStore = () => {
   function getSelection(tableComponentId) {
     const selection = get(store)
     const componentId = Object.keys(selection).find(
-      componentId => componentId === tableComponentId
+      (componentId) => componentId === tableComponentId
     )
     return selection[componentId]
   }

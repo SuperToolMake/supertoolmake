@@ -1,23 +1,17 @@
-import _ from "lodash"
 import * as backendCore from "@budibase/backend-core"
-import { BBReferenceFieldSubType, User } from "@budibase/types"
+import { DBTestConfiguration, generator, structures } from "@budibase/backend-core/tests"
+import { BBReferenceFieldSubType, type User } from "@budibase/types"
+import _ from "lodash"
 import {
   processInputBBReference,
   processInputBBReferences,
   processOutputBBReference,
   processOutputBBReferences,
 } from "../bbReferenceProcessor"
-import {
-  DBTestConfiguration,
-  generator,
-  structures,
-} from "@budibase/backend-core/tests"
 import { InvalidBBRefError } from "../errors"
 
 jest.mock("@budibase/backend-core", (): typeof backendCore => {
-  const actual: typeof backendCore = jest.requireActual(
-    "@budibase/backend-core"
-  )
+  const actual: typeof backendCore = jest.requireActual("@budibase/backend-core")
   return {
     ...actual,
     cache: {
@@ -37,8 +31,9 @@ describe("bbReferenceProcessor", () => {
   const cacheGetUserSpy = backendCore.cache.user.getUser as jest.MockedFunction<
     typeof backendCore.cache.user.getUser
   >
-  const cacheGetUsersSpy = backendCore.cache.user
-    .getUsers as jest.MockedFunction<typeof backendCore.cache.user.getUsers>
+  const cacheGetUsersSpy = backendCore.cache.user.getUsers as jest.MockedFunction<
+    typeof backendCore.cache.user.getUsers
+  >
 
   const users: User[] = []
   beforeAll(async () => {
@@ -83,12 +78,8 @@ describe("bbReferenceProcessor", () => {
         const userId = generator.guid()
 
         await expect(
-          config.doInTenant(() =>
-            processInputBBReference(userId, BBReferenceFieldSubType.USER)
-          )
-        ).rejects.toThrow(
-          new InvalidBBRefError(userId, BBReferenceFieldSubType.USER)
-        )
+          config.doInTenant(() => processInputBBReference(userId, BBReferenceFieldSubType.USER))
+        ).rejects.toThrow(new InvalidBBRefError(userId, BBReferenceFieldSubType.USER))
       })
 
       it("validate valid user object", async () => {
@@ -143,18 +134,14 @@ describe("bbReferenceProcessor", () => {
         const userId = generator.guid()
 
         await expect(
-          config.doInTenant(() =>
-            processInputBBReferences(userId, BBReferenceFieldSubType.USER)
-          )
-        ).rejects.toThrow(
-          new InvalidBBRefError(userId, BBReferenceFieldSubType.USER)
-        )
+          config.doInTenant(() => processInputBBReferences(userId, BBReferenceFieldSubType.USER))
+        ).rejects.toThrow(new InvalidBBRefError(userId, BBReferenceFieldSubType.USER))
         expect(cacheGetUsersSpy).toHaveBeenCalledTimes(1)
         expect(cacheGetUsersSpy).toHaveBeenCalledWith([userId])
       })
 
       it("validates valid user ids as csv", async () => {
-        const userIds = _.sampleSize(users, 5).map(x => x._id!)
+        const userIds = _.sampleSize(users, 5).map((x) => x._id!)
 
         const userIdCsv = userIds.join(" ,  ")
         const result = await config.doInTenant(() =>
@@ -167,27 +154,19 @@ describe("bbReferenceProcessor", () => {
       })
 
       it("throws an error given an invalid id in a csv", async () => {
-        const expectedUserIds = _.sampleSize(users, 2).map(x => x._id!)
+        const expectedUserIds = _.sampleSize(users, 2).map((x) => x._id!)
         const wrongId = generator.guid()
 
-        const userIdCsv = [
-          expectedUserIds[0],
-          wrongId,
-          expectedUserIds[1],
-        ].join(" ,  ")
+        const userIdCsv = [expectedUserIds[0], wrongId, expectedUserIds[1]].join(" ,  ")
 
         await expect(
-          config.doInTenant(() =>
-            processInputBBReferences(userIdCsv, BBReferenceFieldSubType.USER)
-          )
-        ).rejects.toThrow(
-          new InvalidBBRefError(wrongId, BBReferenceFieldSubType.USER)
-        )
+          config.doInTenant(() => processInputBBReferences(userIdCsv, BBReferenceFieldSubType.USER))
+        ).rejects.toThrow(new InvalidBBRefError(wrongId, BBReferenceFieldSubType.USER))
       })
 
       it("validate valid user object array", async () => {
-        const inputUsers = _.sampleSize(users, 3).map(u => ({ _id: u._id! }))
-        const userIds = inputUsers.map(u => u._id)
+        const inputUsers = _.sampleSize(users, 3).map((u) => ({ _id: u._id! }))
+        const userIds = inputUsers.map((u) => u._id)
 
         const result = await config.doInTenant(() =>
           processInputBBReferences(inputUsers, BBReferenceFieldSubType.USER)
@@ -297,16 +276,13 @@ describe("bbReferenceProcessor", () => {
         const userId2 = user2._id!
 
         const result = await config.doInTenant(() =>
-          processOutputBBReferences(
-            [userId1, userId2].join(","),
-            BBReferenceFieldSubType.USER
-          )
+          processOutputBBReferences([userId1, userId2].join(","), BBReferenceFieldSubType.USER)
         )
 
         expect(result).toHaveLength(2)
         expect(result).toEqual(
           expect.arrayContaining(
-            [user1, user2].map(u => ({
+            [user1, user2].map((u) => ({
               _id: u._id,
               primaryDisplay: u.email,
               email: u.email,
@@ -327,12 +303,7 @@ describe("bbReferenceProcessor", () => {
         const unexistingUserId1 = generator.guid()
         const unexistingUserId2 = generator.guid()
 
-        const input = [
-          unexistingUserId1,
-          userId1,
-          unexistingUserId2,
-          userId2,
-        ].join(",")
+        const input = [unexistingUserId1, userId1, unexistingUserId2, userId2].join(",")
 
         const result = await config.doInTenant(() =>
           processOutputBBReferences(input, BBReferenceFieldSubType.USER)
@@ -341,7 +312,7 @@ describe("bbReferenceProcessor", () => {
         expect(result).toHaveLength(2)
         expect(result).toEqual(
           expect.arrayContaining(
-            [user1, user2].map(u => ({
+            [user1, user2].map((u) => ({
               _id: u._id,
               primaryDisplay: u.email,
               email: u.email,

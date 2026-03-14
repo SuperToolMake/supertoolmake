@@ -1,4 +1,4 @@
-import * as Redis from "ioredis"
+import type * as Redis from "ioredis"
 import env from "../environment"
 
 export const SEPARATOR = "-"
@@ -106,7 +106,7 @@ export function getRedisOptions(): Redis.RedisOptions {
 }
 
 export function removeDbPrefix(key: string) {
-  let parts = key.split(SEPARATOR)
+  const parts = key.split(SEPARATOR)
   if (parts.length >= 2) {
     parts.shift()
     return parts.join(SEPARATOR)

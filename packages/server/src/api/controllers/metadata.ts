@@ -1,12 +1,12 @@
 import { context } from "@budibase/backend-core"
 import {
-  DeleteMetadataResponse,
-  FindMetadataResponse,
-  GetMetadataTypesResponse,
+  type DeleteMetadataResponse,
+  type FindMetadataResponse,
+  type GetMetadataTypesResponse,
   MetadataType,
-  SaveMetadataRequest,
-  SaveMetadataResponse,
-  UserCtx,
+  type SaveMetadataRequest,
+  type SaveMetadataResponse,
+  type UserCtx,
 } from "@budibase/types"
 import { generateMetadataID } from "../../db/utils"
 import { deleteEntityMetadata, saveEntityMetadata } from "../../utilities"
@@ -17,9 +17,7 @@ export async function getTypes(ctx: UserCtx<void, GetMetadataTypesResponse>) {
   }
 }
 
-export async function saveMetadata(
-  ctx: UserCtx<SaveMetadataRequest, SaveMetadataResponse>
-) {
+export async function saveMetadata(ctx: UserCtx<SaveMetadataRequest, SaveMetadataResponse>) {
   const { type, entityId } = ctx.params
   if (type === MetadataType.AUTOMATION_TEST_HISTORY) {
     ctx.throw(400, "Cannot save automation history type")
@@ -27,9 +25,7 @@ export async function saveMetadata(
   ctx.body = await saveEntityMetadata(type, entityId, ctx.request.body)
 }
 
-export async function deleteMetadata(
-  ctx: UserCtx<void, DeleteMetadataResponse>
-) {
+export async function deleteMetadata(ctx: UserCtx<void, DeleteMetadataResponse>) {
   const { type, entityId } = ctx.params
   await deleteEntityMetadata(type, entityId)
   ctx.body = {

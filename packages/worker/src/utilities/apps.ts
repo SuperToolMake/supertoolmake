@@ -1,5 +1,5 @@
-import fetch from "node-fetch"
 import { constants } from "@budibase/backend-core"
+import fetch from "node-fetch"
 import env from "../environment"
 import { checkSlashesInUrl } from "./"
 
@@ -11,9 +11,7 @@ export async function triggerAutomation(
   if (!env.INTERNAL_API_KEY) {
     throw new Error("No API key, cannot trigger automation")
   }
-  const url = checkSlashesInUrl(
-    `${env.APPS_URL}/api/automations/${automationId}/trigger`
-  )
+  const url = checkSlashesInUrl(`${env.APPS_URL}/api/automations/${automationId}/trigger`)
   const res = await fetch(url, {
     method: "POST",
     body: JSON.stringify(parameters),

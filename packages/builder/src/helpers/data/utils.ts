@@ -1,6 +1,6 @@
-import { IntegrationTypes } from "@/constants/backend"
 import { findHBSBlocks } from "@budibase/string-templates"
 import type { Query, QueryVerb } from "@budibase/types"
+import { IntegrationTypes } from "@/constants/backend"
 
 type QueryVerbSource = Query | string | undefined
 
@@ -20,8 +20,8 @@ export function breakQueryString(qs: string) {
     qs = qs.split("?")[1]
   }
   const params = qs.split("&")
-  let paramObj: Record<string, string> = {}
-  for (let param of params) {
+  const paramObj: Record<string, string> = {}
+  for (const param of params) {
     const split = param.split("=")
     paramObj[split[0]] = decodeURIComponent(split.slice(1).join("="))
   }
@@ -45,7 +45,7 @@ export function buildQueryString(obj: Record<string, any>) {
       const bindings = findHBSBlocks(value)
       let count = 0
       const bindingMarkers: Record<string, string> = {}
-      bindings.forEach(binding => {
+      bindings.forEach((binding) => {
         const marker = `BINDING...${count++}`
         value = value.replace(binding, marker)
         bindingMarkers[marker] = binding
@@ -61,21 +61,19 @@ export function buildQueryString(obj: Record<string, any>) {
 }
 
 export function keyValueToQueryParameters(obj: Record<string, string>) {
-  let array = []
+  const array = []
   if (obj && typeof obj === "object") {
-    for (let [key, value] of Object.entries(obj)) {
+    for (const [key, value] of Object.entries(obj)) {
       array.push({ name: key, default: value })
     }
   }
   return array
 }
 
-export function queryParametersToKeyValue(
-  array: { name: string; default: string }[]
-) {
-  let obj: Record<string, string> = {}
+export function queryParametersToKeyValue(array: { name: string; default: string }[]) {
+  const obj: Record<string, string> = {}
   if (Array.isArray(array)) {
-    for (let param of array) {
+    for (const param of array) {
       obj[param.name] = param.default
     }
   }
@@ -189,11 +187,11 @@ export function flipHeaderState(headersActivity: Record<string, any>) {
 }
 
 export const parseToCsv = (headers: string[], rows: Record<string, any>[]) => {
-  let csv = headers?.map(key => `"${key}"`)?.join(",") || ""
+  let csv = headers?.map((key) => `"${key}"`)?.join(",") || ""
 
-  for (let row of rows) {
+  for (const row of rows) {
     csv = `${csv}\n${headers
-      .map(header => {
+      .map((header) => {
         let val = row[header]
         val =
           typeof val === "object" && !(val instanceof Date)

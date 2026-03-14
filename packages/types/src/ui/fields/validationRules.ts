@@ -1,4 +1,4 @@
-import { FieldType } from "../../documents"
+import type { FieldType } from "../../documents"
 
 export interface UIFieldValidationRule {
   id?: string

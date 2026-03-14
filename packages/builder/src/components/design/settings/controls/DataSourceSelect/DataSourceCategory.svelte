@@ -1,55 +1,50 @@
 <script>
-  import { datasources } from "@/stores/builder"
-  import { Divider, Heading, Icon } from "@budibase/bbui"
-  import QueryVerbBadge from "@/components/common/QueryVerbBadge.svelte"
-  import {
-    customQueryIconColor,
-    customQueryIconText,
-  } from "@/helpers/data/utils"
-  import { IntegrationTypes } from "@/constants/backend"
+import { Divider, Heading, Icon } from "@budibase/bbui"
+import QueryVerbBadge from "@/components/common/QueryVerbBadge.svelte"
+import { IntegrationTypes } from "@/constants/backend"
+import { customQueryIconColor, customQueryIconText } from "@/helpers/data/utils"
+import { datasources } from "@/stores/builder"
 
-  export let dividerState
-  export let heading
-  export let dataSet
-  export let value
-  export let onSelect
-  export let identifiers = ["resourceId"]
+export let dividerState
+export let heading
+export let dataSet
+export let value
+export let onSelect
+export let identifiers = ["resourceId"]
 
-  $: displayDatasourceName = $datasources.list.length > 1
+$: displayDatasourceName = $datasources.list.length > 1
 
-  function isSelected(entry) {
-    if (!identifiers.length) {
+function isSelected(entry) {
+  if (!identifiers.length) {
+    return false
+  }
+  for (const identifier of identifiers) {
+    if (entry[identifier] !== value?.[identifier]) {
       return false
     }
-    for (const identifier of identifiers) {
-      if (entry[identifier] !== value?.[identifier]) {
-        return false
-      }
-    }
+  }
+  return true
+}
+
+const isRestQuery = (entry) => {
+  if (entry?.type !== "query") {
+    return false
+  }
+  const datasource = $datasources.list.find((ds) => ds._id === entry.datasourceId)
+  return datasource?.source === IntegrationTypes.REST
+}
+
+const shouldInclude = (entry) => {
+  if (entry?.type !== "query") {
     return true
   }
-
-  const isRestQuery = entry => {
-    if (entry?.type !== "query") {
-      return false
-    }
-    const datasource = $datasources.list.find(
-      ds => ds._id === entry.datasourceId
-    )
-    return datasource?.source === IntegrationTypes.REST
+  if (!isRestQuery(entry)) {
+    return true
   }
+  return entry.queryVerb === "create" || entry.queryVerb === "read"
+}
 
-  const shouldInclude = entry => {
-    if (entry?.type !== "query") {
-      return true
-    }
-    if (!isRestQuery(entry)) {
-      return true
-    }
-    return entry.queryVerb === "create" || entry.queryVerb === "read"
-  }
-
-  $: filteredDataSet = dataSet?.filter(shouldInclude) ?? []
+$: filteredDataSet = dataSet?.filter(shouldInclude) ?? []
 </script>
 
 {#if dividerState}

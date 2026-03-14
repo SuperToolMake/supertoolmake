@@ -11,10 +11,7 @@ export const getErrorMessage = (error: unknown) => {
     }
     const messageValue = errObject.message
 
-    if (
-      typeof messageValue === "string" &&
-      messageValue !== "[object Object]"
-    ) {
+    if (typeof messageValue === "string" && messageValue !== "[object Object]") {
       return messageValue
     }
 

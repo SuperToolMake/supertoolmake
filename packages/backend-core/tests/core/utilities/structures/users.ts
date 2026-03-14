@@ -1,15 +1,15 @@
-import {
-  AdminUser,
+import type {
   AdminOnlyUser,
+  AdminUser,
   BuilderUser,
   SSOAuthDetails,
   SSOUser,
   User,
 } from "@budibase/types"
-import { authDetails } from "./sso"
+import { tenant } from "."
 import { uuid } from "./common"
 import { generator } from "./generator"
-import { tenant } from "."
+import { authDetails } from "./sso"
 
 export const newEmail = () => {
   return `${uuid()}@example.com`
@@ -69,9 +69,7 @@ export const appBuilderUser = (appId: string, userProps?: any): BuilderUser => {
   }
 }
 
-export function ssoUser(
-  opts: { user?: any; details?: SSOAuthDetails } = {}
-): SSOUser {
+export function ssoUser(opts: { user?: any; details?: SSOAuthDetails } = {}): SSOUser {
   const base = user(opts.user)
   delete base.password
 

@@ -1,11 +1,12 @@
 import { cache, context, db as dbCore, queue } from "@budibase/backend-core"
 import {
-  DeploymentDoc,
-  DevRevertQueueData,
+  type DeploymentDoc,
+  type DevRevertQueueData,
   DocumentType,
-  Workspace,
+  type Workspace,
 } from "@budibase/types"
 import { isWorkspacePublished } from "../workspace/workspaces/utils"
+
 let _devRevertProcessor: DevRevertProcessor | undefined
 
 class DevRevertProcessor extends queue.QueuedProcessor<DevRevertQueueData> {
@@ -19,17 +20,11 @@ class DevRevertProcessor extends queue.QueuedProcessor<DevRevertQueueData> {
     })
   }
 
-  protected processFn = async (
-    data: DevRevertQueueData
-  ): Promise<{ message: string }> => {
-    return await context.doInWorkspaceContext(data.appId, () =>
-      this.revertApp(data)
-    )
+  protected processFn = async (data: DevRevertQueueData): Promise<{ message: string }> => {
+    return await context.doInWorkspaceContext(data.appId, () => this.revertApp(data))
   }
 
-  private async revertApp(
-    data: DevRevertQueueData
-  ): Promise<{ message: string }> {
+  private async revertApp(data: DevRevertQueueData): Promise<{ message: string }> {
     const { appId } = data
     const productionAppId = dbCore.getProdWorkspaceID(appId)
 
@@ -41,10 +36,7 @@ class DevRevertProcessor extends queue.QueuedProcessor<DevRevertQueueData> {
       throw new queue.UnretriableError("App must be deployed to be reverted.")
     }
     const deploymentDoc = await db.get<DeploymentDoc>(DocumentType.DEPLOYMENTS)
-    if (
-      !deploymentDoc.history ||
-      Object.keys(deploymentDoc.history).length === 0
-    ) {
+    if (!deploymentDoc.history || Object.keys(deploymentDoc.history).length === 0) {
       throw new queue.UnretriableError("No deployments for app")
     }
 

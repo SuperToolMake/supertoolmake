@@ -1,24 +1,20 @@
 import { auth, cache, context } from "@budibase/backend-core"
+import { findHBSBlocks, iifeWrapper, processStringSync } from "@budibase/string-templates"
 import {
-  findHBSBlocks,
-  iifeWrapper,
-  processStringSync,
-} from "@budibase/string-templates"
-import {
-  Datasource,
-  DatasourcePlus,
-  Query,
-  QueryVerb,
-  Row,
+  type Datasource,
+  type DatasourcePlus,
+  type Query,
+  type QueryVerb,
+  type Row,
   SourceName,
-  SSOUser,
+  type SSOUser,
 } from "@budibase/types"
 import { cloneDeep } from "lodash/fp"
 import { getGlobalIDFromUserMetadataID } from "../db/utils"
 import { getIntegration } from "../integrations"
 import { IsolatedVM } from "../jsRunner/vm"
 import sdk from "../sdk"
-import {
+import type {
   QueryEvent,
   QueryEventCtx,
   QueryResponse,
@@ -74,16 +70,9 @@ class QueryRunner {
   }
 
   async execute(): Promise<QueryResponse> {
-    let {
-      datasource,
-      fields,
-      queryVerb,
-      transformer,
-      schema,
-      nullDefaultSupport,
-    } = this
-    let datasourceClone = cloneDeep(datasource)
-    let fieldsClone = cloneDeep(fields)
+    let { datasource, fields, queryVerb, transformer, schema, nullDefaultSupport } = this
+    const datasourceClone = cloneDeep(datasource)
+    const fieldsClone = cloneDeep(fields)
 
     const Integration = await getIntegration(datasourceClone.source)
     if (!Integration) {
@@ -92,7 +81,7 @@ class QueryRunner {
 
     if (datasourceClone.config?.authConfigs) {
       const updatedConfigs = []
-      for (let config of datasourceClone.config.authConfigs) {
+      for (const config of datasourceClone.config.authConfigs) {
         updatedConfigs.push(await sdk.queries.enrichContext(config, this.ctx))
       }
       datasourceClone.config.authConfigs = updatedConfigs
@@ -108,10 +97,7 @@ class QueryRunner {
 
     // Enrich the parameters with the addition context items.
     // 'user' is now a reserved variable key in mapping parameters
-    const enrichedParameters = await sdk.queries.enrichContext(
-      parameters,
-      this.ctx
-    )
+    const enrichedParameters = await sdk.queries.enrichContext(parameters, this.ctx)
     const enrichedContext = { ...enrichedParameters, ...this.ctx }
 
     // Parse global headers
@@ -147,16 +133,14 @@ class QueryRunner {
 
     const fn = integration[queryVerb]
     if (!fn) {
-      throw new Error(
-        `Datasource integration does not support verb: ${queryVerb}`
-      )
+      throw new Error(`Datasource integration does not support verb: ${queryVerb}`)
     }
 
-    let output = threadUtils.formatResponse(await fn.bind(integration)(query))
+    const output = threadUtils.formatResponse(await fn.bind(integration)(query))
     let rows = output as Row[],
-      info = undefined,
-      extra = undefined,
-      pagination = undefined
+      info,
+      extra,
+      pagination
     if (threadUtils.hasExtraData(output)) {
       rows = output.data
       info = output.info
@@ -185,11 +169,7 @@ class QueryRunner {
 
     // if the request fails we retry once, invalidating the cached value
     if (info && info.code >= 400 && !this.hasRerun) {
-      if (
-        this.ctx?.user?.provider &&
-        info.code === 401 &&
-        !this.hasRefreshedOAuth
-      ) {
+      if (this.ctx?.user?.provider && info.code === 401 && !this.hasRefreshedOAuth) {
         await this.refreshOAuth2(this.ctx)
         this.hasRefreshedOAuth = true
       } else {
@@ -213,9 +193,9 @@ class QueryRunner {
 
     // get all the potential fields in the schema
     const keysSet: Set<string> = new Set()
-    rows.forEach(row => {
+    rows.forEach((row) => {
       const keys = Object.keys(row)
-      keys.forEach(key => keysSet.add(key))
+      keys.forEach((key) => keysSet.add(key))
     })
     const keys: string[] = [...keysSet]
 
@@ -226,10 +206,7 @@ class QueryRunner {
     return { rows, keys, info, extra, pagination }
   }
 
-  async runAnotherQuery(
-    queryId: string,
-    currentParameters: Record<string, any>
-  ) {
+  async runAnotherQuery(queryId: string, currentParameters: Record<string, any>) {
     const db = context.getWorkspaceDB()
     const query = await db.get<Query>(queryId)
     const datasource = await sdk.datasources.get(query.datasourceId, {
@@ -237,7 +214,7 @@ class QueryRunner {
     })
     // enrich parameters with dynamic queries defaults
     const defaultParams = query.parameters || []
-    for (let param of defaultParams) {
+    for (const param of defaultParams) {
       if (!currentParameters[param.name]) {
         currentParameters[param.name] = param.default
       }
@@ -266,11 +243,7 @@ class QueryRunner {
       throw new Error("No refresh token found for authenticated user")
     }
 
-    const resp = await auth.refreshOAuthToken(
-      oauth2.refreshToken,
-      providerType,
-      configId
-    )
+    const resp = await auth.refreshOAuthToken(oauth2.refreshToken, providerType, configId)
 
     // Refresh session flow. Should be in same location as refreshOAuthToken
     // There are several other properties available in 'resp'
@@ -286,17 +259,15 @@ class QueryRunner {
     } else {
       // In this event the user may have oAuth issues that
       // could require re-authenticating with their provider.
-      let errorMessage = resp.err.data ? resp.err.data : resp.err.toString()
-      throw new Error(
-        "OAuth2 access token could not be refreshed: " + errorMessage
-      )
+      const errorMessage = resp.err.data ? resp.err.data : resp.err.toString()
+      throw new Error("OAuth2 access token could not be refreshed: " + errorMessage)
     }
 
     return resp
   }
 
   async getDynamicVariable(variable: QueryVariable) {
-    let { parameters } = this
+    const { parameters } = this
     const queryId = variable.queryId,
       name = variable.name
     let value = await threadUtils.getCachedVariable(queryId, name)
@@ -314,15 +285,13 @@ class QueryRunner {
   }
 
   async addDatasourceVariables() {
-    let { datasource, parameters, fields } = this
+    const { datasource, parameters, fields } = this
     if (!datasource || !datasource.config) {
       return parameters
     }
     const staticVars = datasource.config.staticVariables || {}
     const dynamicVars = datasource.config.dynamicVariables || []
-    for (let [staticBindingKey, staticBindingValue] of Object.entries(
-      staticVars
-    )) {
+    for (const [staticBindingKey, staticBindingValue] of Object.entries(staticVars)) {
       const namedValue = parameters[staticBindingKey]
       const shouldOverrideNamed =
         namedValue == null ||
@@ -331,15 +300,11 @@ class QueryRunner {
       if (shouldOverrideNamed) {
         parameters[staticBindingKey] = staticBindingValue
       }
-      for (const [localBindingName, localBindingValue] of Object.entries(
-        parameters
-      )) {
+      for (const [localBindingName, localBindingValue] of Object.entries(parameters)) {
         if (localBindingName === staticBindingKey) {
           continue
         }
-        if (
-          this.doesStaticBindingMatchLocal(localBindingValue, staticBindingKey)
-        ) {
+        if (this.doesStaticBindingMatchLocal(localBindingValue, staticBindingKey)) {
           parameters[localBindingName] = staticBindingValue
         }
       }
@@ -356,9 +321,7 @@ class QueryRunner {
         const regex = new RegExp(`{{[ ]*${variable.name}[ ]*}}`)
         return regex.test(stringFields)
       })
-      const dynamics = foundVars.map((dynVar: QueryVariable) =>
-        this.getDynamicVariable(dynVar)
-      )
+      const dynamics = foundVars.map((dynVar: QueryVariable) => this.getDynamicVariable(dynVar))
       const responses = await Promise.all(dynamics)
       for (let i = 0; i < foundVars.length; i++) {
         const variable = foundVars[i]
@@ -393,9 +356,7 @@ class QueryRunner {
     if (block.length <= braceLength * 2) {
       return false
     }
-    const cleanedBinding = block
-      .slice(braceLength, -braceLength)
-      .replace(/\s+/g, "")
+    const cleanedBinding = block.slice(braceLength, -braceLength).replace(/\s+/g, "")
     const target = staticBindingName.replace(/\s+/g, "")
     return cleanedBinding === target
   }

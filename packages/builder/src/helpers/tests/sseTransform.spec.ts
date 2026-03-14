@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest"
 import { Utils } from "@budibase/frontend-core"
+import { describe, expect, it } from "vitest"
 
 const { createSseToJsonTransformStream } = Utils
 
@@ -60,10 +60,7 @@ describe("createSseToJsonTransformStream", () => {
 
   it("ignores [DONE] sentinel", async () => {
     const transform = createSseToJsonTransformStream<{ type: string }>()
-    const results = await transformStream(transform, [
-      'data: {"type":"hello"}\n',
-      "data: [DONE]\n",
-    ])
+    const results = await transformStream(transform, ['data: {"type":"hello"}\n', "data: [DONE]\n"])
 
     expect(results).toEqual([{ type: "hello" }])
   })
@@ -122,11 +119,7 @@ describe("createSseToJsonTransformStream", () => {
     const transform = createSseToJsonTransformStream<{
       nested: { value: number }
     }>()
-    const results = await transformStream(transform, [
-      'data: {"nested":',
-      '{"value":',
-      "42}}\n",
-    ])
+    const results = await transformStream(transform, ['data: {"nested":', '{"value":', "42}}\n"])
 
     expect(results).toEqual([{ nested: { value: 42 } }])
   })

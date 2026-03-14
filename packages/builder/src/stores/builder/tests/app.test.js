@@ -1,14 +1,14 @@
-import { it, expect, describe, beforeEach, vi } from "vitest"
 import { get } from "svelte/store"
-import { INITIAL_APP_META_STATE, AppMetaStore } from "@/stores/builder/app"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { API } from "@/api"
+import { AppMetaStore, INITIAL_APP_META_STATE } from "@/stores/builder/app"
 import {
   clientFeaturesResp,
   generateAppPackage,
   generateFakeRoutes,
-  getScreenFixture,
   getScreenDocId,
+  getScreenFixture,
 } from "./fixtures"
-import { API } from "@/api"
 
 vi.mock("@/api", () => {
   return {
@@ -31,7 +31,7 @@ vi.mock("@/stores/builder", async () => {
 })
 
 describe("Application Meta Store", () => {
-  beforeEach(async ctx => {
+  beforeEach(async (ctx) => {
     vi.clearAllMocks()
 
     const appStore = new AppMetaStore()
@@ -43,11 +43,11 @@ describe("Application Meta Store", () => {
     }
   })
 
-  it("Create base store with defaults", ctx => {
+  it("Create base store with defaults", (ctx) => {
     expect(ctx.test.store).toStrictEqual(INITIAL_APP_META_STATE)
   })
 
-  it("Reset the app metadata to default", ctx => {
+  it("Reset the app metadata to default", (ctx) => {
     const pkg = generateAppPackage({})
     ctx.test.appStore.syncAppPackage(pkg)
 
@@ -58,7 +58,7 @@ describe("Application Meta Store", () => {
     expect(ctx.test.store).toStrictEqual(INITIAL_APP_META_STATE)
   })
 
-  it("Sync app metadata from a new app package", async ctx => {
+  it("Sync app metadata from a new app package", async (ctx) => {
     const pkg = generateAppPackage({
       version: "2.5.0",
       revertableVersion: "2.5.6",
@@ -102,7 +102,7 @@ describe("Application Meta Store", () => {
     })
   })
 
-  it("Sync type support information to state", async ctx => {
+  it("Sync type support information to state", async (ctx) => {
     ctx.test.appStore.syncClientTypeSupportPresets({ preset: "information" })
 
     expect(ctx.test.store.typeSupportPresets).toStrictEqual({
@@ -110,21 +110,19 @@ describe("Application Meta Store", () => {
     })
   })
 
-  it("Sync component feature flags to state", async ctx => {
+  it("Sync component feature flags to state", async (ctx) => {
     ctx.test.appStore.syncClientFeatures(clientFeaturesResp)
 
     expect(ctx.test.store.clientFeatures).toStrictEqual(clientFeaturesResp)
   })
 
-  it("Sync app routes from the API", async ctx => {
+  it("Sync app routes from the API", async (ctx) => {
     const coreScreen = getScreenFixture()
     const existingDocId = getScreenDocId()
     coreScreen._json._id = existingDocId
 
     const fakeRoutes = generateFakeRoutes([coreScreen.json()])
-    const routeSpy = vi
-      .spyOn(API, "fetchAppRoutes")
-      .mockResolvedValue({ routes: fakeRoutes })
+    const routeSpy = vi.spyOn(API, "fetchAppRoutes").mockResolvedValue({ routes: fakeRoutes })
 
     await ctx.test.appStore.syncAppRoutes()
 
@@ -133,7 +131,7 @@ describe("Application Meta Store", () => {
     expect(ctx.test.store.routes).toStrictEqual(fakeRoutes)
   })
 
-  it("Sync app metadata after socket update", ctx => {
+  it("Sync app metadata after socket update", (ctx) => {
     const fakeMetadata = {
       name: "updated_name",
       url: "/update-url",

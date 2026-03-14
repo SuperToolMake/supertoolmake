@@ -1,5 +1,5 @@
+import type { Ctx } from "@budibase/types"
 import Joi from "joi"
-import { Ctx } from "@budibase/types"
 
 function validate(
   schema: Joi.ObjectSchema | Joi.ArraySchema,
@@ -13,8 +13,8 @@ function validate(
       return next()
     }
     let params = null
-    // @ts-ignore
-    let reqProp = ctx.request?.[property]
+    // @ts-expect-error
+    const reqProp = ctx.request?.[property]
     if (ctx[property] != null) {
       params = ctx[property]
     } else if (reqProp != null) {
@@ -50,9 +50,6 @@ export function body(
   return validate(schema, "body", opts)
 }
 
-export function params(
-  schema: Joi.ObjectSchema | Joi.ArraySchema,
-  opts?: { errorPrefix: string }
-) {
+export function params(schema: Joi.ObjectSchema | Joi.ArraySchema, opts?: { errorPrefix: string }) {
   return validate(schema, "params", opts)
 }

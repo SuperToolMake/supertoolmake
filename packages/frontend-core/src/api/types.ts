@@ -1,30 +1,30 @@
-import { AppEndpoints } from "./app"
-import { AuthEndpoints } from "./auth"
-import { BackupEndpoints } from "./backups"
-import { ConfigEndpoints } from "./configs"
-import { DatasourceEndpoints } from "./datasources"
-import { LayoutEndpoints } from "./layouts"
-import { LogEndpoints } from "./logs"
-import { MigrationEndpoints } from "./migrations"
-import { OAuth2Endpoints } from "./oauth2"
-import { OtherEndpoints } from "./other"
-import { PermissionEndpoints } from "./permissions"
-import { QueryEndpoints } from "./queries"
-import { RelationshipEndpoints } from "./relationships"
-import { RoleEndpoints } from "./roles"
-import { RouteEndpoints } from "./routes"
-import { RowActionEndpoints } from "./rowActions"
-import { RowEndpoints } from "./rows"
-import { ScreenEndpoints } from "./screens"
-import { SelfEndpoints } from "./self"
-import { TableEndpoints } from "./tables"
-import { TemplateEndpoints } from "./templates"
-import { UserEndpoints } from "./user"
-import { NavigationEndpoints } from "./navigation"
-import { WorkspaceAppEndpoints } from "./workspaceApps"
-import { ResourceEndpoints } from "./resource"
-import { DeploymentEndpoints } from "./deploy"
-import { WorkspaceFavouriteEndpoints } from "./workspaceFavourites"
+import type { AppEndpoints } from "./app"
+import type { AuthEndpoints } from "./auth"
+import type { BackupEndpoints } from "./backups"
+import type { ConfigEndpoints } from "./configs"
+import type { DatasourceEndpoints } from "./datasources"
+import type { DeploymentEndpoints } from "./deploy"
+import type { LayoutEndpoints } from "./layouts"
+import type { LogEndpoints } from "./logs"
+import type { MigrationEndpoints } from "./migrations"
+import type { NavigationEndpoints } from "./navigation"
+import type { OAuth2Endpoints } from "./oauth2"
+import type { OtherEndpoints } from "./other"
+import type { PermissionEndpoints } from "./permissions"
+import type { QueryEndpoints } from "./queries"
+import type { RelationshipEndpoints } from "./relationships"
+import type { ResourceEndpoints } from "./resource"
+import type { RoleEndpoints } from "./roles"
+import type { RouteEndpoints } from "./routes"
+import type { RowActionEndpoints } from "./rowActions"
+import type { RowEndpoints } from "./rows"
+import type { ScreenEndpoints } from "./screens"
+import type { SelfEndpoints } from "./self"
+import type { TableEndpoints } from "./tables"
+import type { TemplateEndpoints } from "./templates"
+import type { UserEndpoints } from "./user"
+import type { WorkspaceAppEndpoints } from "./workspaceApps"
+import type { WorkspaceFavouriteEndpoints } from "./workspaceFavourites"
 
 export enum HTTPMethod {
   POST = "POST",
@@ -54,12 +54,8 @@ export type APICallConfig<RequestT, ResponseT> = {
   parseResponse?: (response: Response) => Promise<ResponseT> | ResponseT
 }
 
-export type APICallParams<
-  RequestT = null,
-  ResponseT = void,
-> = RequestT extends null
-  ? Pick<APICallConfig<RequestT, ResponseT>, "url"> &
-      Partial<APICallConfig<RequestT, ResponseT>>
+export type APICallParams<RequestT = null, ResponseT = void> = RequestT extends null
+  ? Pick<APICallConfig<RequestT, ResponseT>, "url"> & Partial<APICallConfig<RequestT, ResponseT>>
   : Pick<APICallConfig<RequestT, ResponseT>, "url" | "body"> &
       Partial<APICallConfig<RequestT, ResponseT>>
 
@@ -67,9 +63,7 @@ export type BaseAPIClient = {
   post: <RequestT = null, ResponseT = void>(
     params: APICallParams<RequestT, ResponseT>
   ) => Promise<ResponseT>
-  get: <ResponseT = void>(
-    params: APICallParams<undefined | null, ResponseT>
-  ) => Promise<ResponseT>
+  get: <ResponseT = void>(params: APICallParams<undefined | null, ResponseT>) => Promise<ResponseT>
   put: <RequestT = null, ResponseT = void>(
     params: APICallParams<RequestT, ResponseT>
   ) => Promise<ResponseT>

@@ -1,4 +1,4 @@
-import { Row, TableSchema } from "../../documents"
+import type { Row, TableSchema } from "../../documents"
 
 export type DataFetchDatasource =
   | TableDatasource
@@ -56,9 +56,7 @@ export interface NestedProviderDatasource {
   }
 }
 
-interface BaseFieldDatasource<
-  TType extends "field" | "queryarray" | "jsonarray",
-> {
+interface BaseFieldDatasource<TType extends "field" | "queryarray" | "jsonarray"> {
   type: TType
   tableId: string
   fieldType: "attachment" | "array"

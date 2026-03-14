@@ -6,10 +6,7 @@ export interface CsvToJsonOptions {
   possibleDelimiters?: string[]
 }
 
-export async function jsonFromCsvString(
-  csvString: string,
-  options?: CsvToJsonOptions
-) {
+export async function jsonFromCsvString(csvString: string, options?: CsvToJsonOptions) {
   const {
     ignoreEmpty = false,
     allowSingleColumn = false,
@@ -17,7 +14,7 @@ export async function jsonFromCsvString(
   } = options || {}
 
   for (const delimiter of possibleDelimiters) {
-    let headers: string[] | undefined = undefined
+    let headers: string[] | undefined
     let headerMismatch = false
 
     try {
@@ -66,11 +63,7 @@ export async function jsonFromCsvString(
       }
 
       return result
-    } catch (err) {
-      // Splitting on the wrong delimiter sometimes throws CSV parsing error (eg
-      // unterminated strings), which tells us we've picked the wrong delimiter
-      continue
-    }
+    } catch (err) {}
   }
 
   throw new Error("Unable to determine delimiter")

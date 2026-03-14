@@ -9,28 +9,28 @@ import {
 } from "@budibase/backend-core"
 import { BUILDER_URLS } from "@budibase/shared-core"
 import {
-  Config,
-  ConfigChecklistResponse,
+  type Config,
+  type ConfigChecklistResponse,
   ConfigType,
-  Ctx,
-  DeleteConfigResponse,
-  FindConfigResponse,
-  GetPublicOIDCConfigResponse,
-  GetPublicSettingsResponse,
-  GoogleInnerConfig,
+  type Ctx,
+  type DeleteConfigResponse,
+  type FindConfigResponse,
+  type GetPublicOIDCConfigResponse,
+  type GetPublicSettingsResponse,
+  type GoogleInnerConfig,
   isGoogleConfig,
   isOIDCConfig,
   isSMTPConfig,
-  OIDCLogosConfig,
+  type OIDCLogosConfig,
   PASSWORD_REPLACEMENT,
-  SaveConfigRequest,
-  SaveConfigResponse,
-  SettingsInnerConfig,
-  SMTPInnerConfig,
-  SSOConfig,
-  SSOConfigType,
-  UploadConfigFileResponse,
-  UserCtx,
+  type SaveConfigRequest,
+  type SaveConfigResponse,
+  type SettingsInnerConfig,
+  type SMTPInnerConfig,
+  type SSOConfig,
+  type SSOConfigType,
+  type UploadConfigFileResponse,
+  type UserCtx,
 } from "@budibase/types"
 import env from "../../../environment"
 import * as email from "../../../utilities/email"
@@ -52,13 +52,10 @@ async function hasActivatedConfig(ssoConfigs?: SSOConfigs) {
   if (!ssoConfigs) {
     ssoConfigs = await getSSOConfigs()
   }
-  return !!Object.values(ssoConfigs).find(c => c?.activated)
+  return !!Object.values(ssoConfigs).find((c) => c?.activated)
 }
 
-async function processSMTPConfig(
-  config: SMTPInnerConfig,
-  existingConfig?: SMTPInnerConfig
-) {
+async function processSMTPConfig(config: SMTPInnerConfig, existingConfig?: SMTPInnerConfig) {
   await email.verifyConfig(config)
   if (config.auth?.pass === PASSWORD_REPLACEMENT) {
     // if the password is being replaced, use the existing password
@@ -105,17 +102,12 @@ async function verifySSOConfig(type: SSOConfigType, config: SSOConfig) {
 
     const activated = await hasActivatedConfig(ssoConfigs)
     if (!activated) {
-      throw new Error(
-        "Configuration cannot be deactivated while SSO is enforced"
-      )
+      throw new Error("Configuration cannot be deactivated while SSO is enforced")
     }
   }
 }
 
-async function processGoogleConfig(
-  config: GoogleInnerConfig,
-  existing?: GoogleInnerConfig
-) {
+async function processGoogleConfig(config: GoogleInnerConfig, existing?: GoogleInnerConfig) {
   await verifySSOConfig(ConfigType.GOOGLE, config)
 
   if (existing && config.clientSecret === PASSWORD_REPLACEMENT) {
@@ -123,9 +115,7 @@ async function processGoogleConfig(
   }
 }
 
-export async function save(
-  ctx: UserCtx<SaveConfigRequest, SaveConfigResponse>
-) {
+export async function save(ctx: UserCtx<SaveConfigRequest, SaveConfigResponse>) {
   const body = ctx.request.body
   const type = body.type
   const config = body.config
@@ -204,11 +194,7 @@ async function enrichOIDCLogos(oidcLogos: OIDCLogosConfig) {
   for (const key of keys) {
     if (!key.endsWith("Etag")) {
       const etag = oidcLogos.config[`${key}Etag`]
-      const objectStoreUrl = await objectStore.getGlobalFileUrl(
-        oidcLogos.type,
-        key,
-        etag
-      )
+      const objectStoreUrl = await objectStore.getGlobalFileUrl(oidcLogos.type, key, etag)
       newConfig[key] = objectStoreUrl
     } else {
       newConfig[key] = oidcLogos.config[key]
@@ -220,7 +206,7 @@ async function enrichOIDCLogos(oidcLogos: OIDCLogosConfig) {
 export async function find(ctx: UserCtx<void, FindConfigResponse>) {
   // Find the config with the most granular scope based on context
   const type = ctx.params.type
-  let config = await configs.getConfig(type)
+  const config = await configs.getConfig(type)
 
   if (!config) {
     ctx.body = {}
@@ -277,9 +263,7 @@ export async function publicOidc(ctx: Ctx<void, GetPublicOIDCConfigResponse>) {
   }
 }
 
-export async function publicSettings(
-  ctx: Ctx<void, GetPublicSettingsResponse>
-) {
+export async function publicSettings(ctx: Ctx<void, GetPublicSettingsResponse>) {
   try {
     // settings
     const [configDoc, googleConfig] = await Promise.all([
@@ -291,11 +275,7 @@ export async function publicSettings(
     const getLogoUrl = () => {
       // enrich the logo url - empty url means deleted
       if (config.logoUrl && config.logoUrl !== "") {
-        return objectStore.getGlobalFileUrl(
-          "settings",
-          "logoUrl",
-          config.logoUrlEtag
-        )
+        return objectStore.getGlobalFileUrl("settings", "logoUrl", config.logoUrlEtag)
       }
     }
 
@@ -311,19 +291,14 @@ export async function publicSettings(
 
     // performance all async work at same time, there is no need for all of these
     // operations to occur in sync, slowing the endpoint down significantly
-    const [
-      googleDatasource,
-      googleCallbackUrl,
-      oidcConfig,
-      oidcCallbackUrl,
-      logoUrl,
-    ] = await Promise.all([
-      googleDatasourcePromise,
-      googleCallbackUrlPromise,
-      oidcConfigPromise,
-      oidcCallbackUrlPromise,
-      getLogoUrl(),
-    ])
+    const [googleDatasource, googleCallbackUrl, oidcConfig, oidcCallbackUrl, logoUrl] =
+      await Promise.all([
+        googleDatasourcePromise,
+        googleCallbackUrlPromise,
+        oidcConfigPromise,
+        oidcCallbackUrlPromise,
+        getLogoUrl(),
+      ])
 
     const oidc = oidcConfig?.activated || false
     const googleDatasourceConfigured = !!googleDatasource
@@ -356,7 +331,7 @@ export async function upload(ctx: UserCtx<void, UploadConfigFileResponse>) {
   const file = ctx.request.files.file as any
   const { type, name } = ctx.params
 
-  let bucket = coreEnv.GLOBAL_BUCKET_NAME
+  const bucket = coreEnv.GLOBAL_BUCKET_NAME
   const key = objectStore.getGlobalFileS3Key(type, name)
 
   const result = await objectStore.upload({

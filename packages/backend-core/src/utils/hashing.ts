@@ -1,6 +1,7 @@
 import env from "../environment"
 
 export * from "../docIds/newid"
+
 const bcrypt = require("bcrypt")
 
 const SALT_ROUNDS = env.SALT_ROUNDS || 10

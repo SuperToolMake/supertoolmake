@@ -1,4 +1,4 @@
-import { writable, get } from "svelte/store"
+import { get, writable } from "svelte/store"
 import { API } from "@/api"
 import { FieldTypes, PeekMessages } from "@/constants"
 import { routeStore } from "./routes"
@@ -35,7 +35,7 @@ export const createDataSourceStore = () => {
 
     // Store configs for each relevant dataSource ID
     if (dataSourceId) {
-      store.update(state => {
+      store.update((state) => {
         state.push({
           dataSourceId,
           instanceId,
@@ -48,9 +48,9 @@ export const createDataSourceStore = () => {
 
   // Removes all registered dataSource instances belonging to a particular
   // instance ID
-  const unregisterInstance = instanceId => {
-    store.update(state => {
-      return state.filter(instance => instance.instanceId !== instanceId)
+  const unregisterInstance = (instanceId) => {
+    store.update((state) => {
+      return state.filter((instance) => instance.instanceId !== instanceId)
     })
   }
 
@@ -90,7 +90,7 @@ export const createDataSourceStore = () => {
       }
     }
     if (schema) {
-      Object.values(schema).forEach(fieldSchema => {
+      Object.values(schema).forEach((fieldSchema) => {
         if (
           fieldSchema.type === FieldTypes.LINK &&
           fieldSchema.tableId &&
@@ -105,18 +105,18 @@ export const createDataSourceStore = () => {
     invalidations = [...new Set(invalidations)]
 
     // Invalidate all sources
-    invalidations.forEach(id => {
-      const relatedInstances = get(store).filter(instance => {
+    invalidations.forEach((id) => {
+      const relatedInstances = get(store).filter((instance) => {
         return instance.dataSourceId === id
       })
-      relatedInstances?.forEach(instance => {
+      relatedInstances?.forEach((instance) => {
         instance.refresh()
       })
     })
   }
 
   const refreshAll = () => {
-    get(store).forEach(instance => instance.refresh())
+    get(store).forEach((instance) => instance.refresh())
 
     // Emit this as a window event, so parent screens which are iframing us in
     // can also refresh all datasources

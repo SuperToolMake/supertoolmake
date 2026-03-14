@@ -13,21 +13,13 @@ interface Handler {
 }
 
 // These class names will never trigger a callback if clicked, no matter what
-const ignoredClasses = [
-  ".download-js-link",
-  ".spectrum-Menu",
-  ".date-time-popover",
-]
+const ignoredClasses = [".download-js-link", ".spectrum-Menu", ".date-time-popover"]
 
 // These class names will only trigger a callback when clicked if the registered
 // component is not nested inside them. For example, clicking inside a modal
 // will not close the modal, or clicking inside a popover will not close the
 // popover.
-const conditionallyIgnoredClasses = [
-  ".spectrum-Underlay",
-  ".drawer-wrapper",
-  ".spectrum-Popover",
-]
+const conditionallyIgnoredClasses = [".spectrum-Underlay", ".drawer-wrapper", ".spectrum-Popover"]
 let clickHandlers: Handler[] = []
 let candidateTarget: HTMLElement | undefined
 
@@ -40,21 +32,21 @@ const handleClick = (e: MouseEvent) => {
   if (target.closest('[data-ignore-click-outside="true"]')) {
     return
   }
-  for (let className of ignoredClasses) {
+  for (const className of ignoredClasses) {
     if (target.closest(className)) {
       return
     }
   }
 
   // Process handlers
-  clickHandlers.forEach(handler => {
+  clickHandlers.forEach((handler) => {
     // Check that the click isn't inside the target
     if (handler.element.contains(target)) {
       return
     }
 
     // Ignore clicks for certain classes unless we're nested inside them
-    for (let className of conditionallyIgnoredClasses) {
+    for (const className of conditionallyIgnoredClasses) {
       const sourceInside = handler.anchor.closest(className) != null
       const clickInside = target.closest(className) != null
       if (clickInside && !sourceInside) {
@@ -93,13 +85,8 @@ const handleMouseDown = (e: MouseEvent) => {
 
 // Handle iframe clicks by detecting a loss of focus on the main window
 const handleBlur = () => {
-  if (
-    document.activeElement &&
-    ["IFRAME", "BODY"].includes(document.activeElement.tagName)
-  ) {
-    handleClick(
-      new MouseEvent("click", { relatedTarget: document.activeElement })
-    )
+  if (document.activeElement && ["IFRAME", "BODY"].includes(document.activeElement.tagName)) {
+    handleClick(new MouseEvent("click", { relatedTarget: document.activeElement }))
   }
 }
 
@@ -117,7 +104,7 @@ const updateHandler = (
   anchor: HTMLElement,
   callback: ClickOutsideCallback | undefined
 ) => {
-  let existingHandler = clickHandlers.find(x => x.id === id)
+  const existingHandler = clickHandlers.find((x) => x.id === id)
   if (!existingHandler) {
     clickHandlers.push({ id, element, anchor, callback })
   } else {
@@ -129,7 +116,7 @@ const updateHandler = (
  * Removes a click handler
  */
 const removeHandler = (id: number) => {
-  clickHandlers = clickHandlers.filter(x => x.id !== id)
+  clickHandlers = clickHandlers.filter((x) => x.id !== id)
 }
 
 /**
@@ -140,10 +127,7 @@ const removeHandler = (id: number) => {
  * rendered at the root of the DOM somewhere, whereas the popover anchor is the
  * element we actually want to consider when determining the source component.
  */
-export default (
-  element: HTMLElement,
-  opts?: ClickOutsideOpts | ClickOutsideCallback
-) => {
+export default (element: HTMLElement, opts?: ClickOutsideOpts | ClickOutsideCallback) => {
   const id = Math.random()
 
   const isCallback = (
@@ -152,9 +136,7 @@ export default (
     return typeof opts === "function"
   }
 
-  const isOpts = (
-    opts?: ClickOutsideOpts | ClickOutsideCallback
-  ): opts is ClickOutsideOpts => {
+  const isOpts = (opts?: ClickOutsideOpts | ClickOutsideCallback): opts is ClickOutsideOpts => {
     return opts != null && typeof opts === "object"
   }
 

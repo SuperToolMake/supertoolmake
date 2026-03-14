@@ -1,4 +1,1 @@
-export type FetchComponentDefinitionResponse = Record<
-  string,
-  Record<string, any>
->
+export type FetchComponentDefinitionResponse = Record<string, Record<string, any>>

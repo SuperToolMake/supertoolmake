@@ -1,4 +1,4 @@
-import { BodyType, Datasource, SourceName } from "@budibase/types"
+import { BodyType, type Datasource, SourceName } from "@budibase/types"
 import fs from "fs"
 import path from "path"
 import TestConfig from "../../../../../tests/utilities/TestConfiguration"
@@ -10,10 +10,7 @@ type Assertions = Record<
 >
 
 const getData = (file: string) => {
-  return fs.readFileSync(
-    path.join(__dirname, `../sources/tests/${file}`),
-    "utf8"
-  )
+  return fs.readFileSync(path.join(__dirname, `../sources/tests/${file}`), "utf8")
 }
 
 // openapi2 (swagger)
@@ -65,25 +62,17 @@ describe("Rest Importer", () => {
   }
 
   const runTest = async (
-    test: (
-      key: DatasetKey,
-      data: string,
-      assertions: Assertions
-    ) => Promise<void>,
+    test: (key: DatasetKey, data: string, assertions: Assertions) => Promise<void>,
     assertions: Assertions
   ) => {
     await config.doInContext(config.devWorkspaceId, async () => {
-      for (let [key, data] of Object.entries(datasets)) {
+      for (const [key, data] of Object.entries(datasets)) {
         await test(key as DatasetKey, data, assertions)
       }
     })
   }
 
-  const testGetInfo = async (
-    key: DatasetKey,
-    data: string,
-    assertions: Assertions
-  ) => {
+  const testGetInfo = async (key: DatasetKey, data: string, assertions: Assertions) => {
     await init(data)
     const info = await restImporter.getInfo()
     expect(info.name).toBe(assertions[key].name)
@@ -143,11 +132,7 @@ describe("Rest Importer", () => {
     await runTest(testGetInfo, assertions)
   })
 
-  const testImportQueries = async (
-    key: DatasetKey,
-    data: string,
-    assertions: Assertions
-  ) => {
+  const testImportQueries = async (key: DatasetKey, data: string, assertions: Assertions) => {
     await init(data)
     const datasource = await config.createDatasource()
     const importResult = await config.doInContext(config.devWorkspaceId, () =>
@@ -216,8 +201,8 @@ describe("Rest Importer", () => {
       restImporter.importQueries(datasource._id)
     )
 
-    const listQuery = queries.find(query => query.name === "listApps")
-    const createQuery = queries.find(query => query.name === "createApp")
+    const listQuery = queries.find((query) => query.name === "listApps")
+    const createQuery = queries.find((query) => query.name === "createApp")
 
     expect(listQuery).toBeDefined()
     expect(createQuery).toBeDefined()
@@ -232,9 +217,7 @@ describe("Rest Importer", () => {
     )
     expect(listQuery?.fields.headers?.["Okta-Version"]).toBe("{{Okta-Version}}")
     expect(listQuery?.fields.queryString).toBe("limit={{limit}}")
-    expect(listQuery?.fields.path).toContain(
-      "https://{{subdomain}}.okta.com/api/v1/apps"
-    )
+    expect(listQuery?.fields.path).toContain("https://{{subdomain}}.okta.com/api/v1/apps")
 
     const createParameters = createQuery?.parameters || []
     expect(createParameters).toEqual(
@@ -257,16 +240,12 @@ describe("Rest Importer", () => {
     )
 
     expect(createQuery?.fields.bodyType).toBe(BodyType.JSON)
-    expect(createQuery?.fields.path).toContain(
-      "https://{{subdomain}}.okta.com/api/v1/apps"
-    )
+    expect(createQuery?.fields.path).toContain("https://{{subdomain}}.okta.com/api/v1/apps")
     expect(createQuery?.fields.requestBody).toContain('"label": "{{ label }}"')
     expect(createQuery?.fields.requestBody).toContain(
       '"client_uri": "{{ settings_oauthClient_client_uri }}"'
     )
-    expect(createQuery?.fields.requestBody).toContain(
-      "{{ settings_oauthClient_redirect_uris }}"
-    )
+    expect(createQuery?.fields.requestBody).toContain("{{ settings_oauthClient_redirect_uris }}")
 
     expect(createQuery?.restTemplateMetadata?.defaultBindings).toMatchObject({
       label: "Example app",
@@ -403,14 +382,11 @@ describe("Rest Importer", () => {
 
     await init(JSON.stringify(openapi3Doc))
     const datasource = await config.createDatasource()
-    const { queries: importedQueries } = await config.doInContext(
-      config.devWorkspaceId,
-      () => restImporter.importQueries(datasource._id)
+    const { queries: importedQueries } = await config.doInContext(config.devWorkspaceId, () =>
+      restImporter.importQueries(datasource._id)
     )
 
-    const createQuery = importedQueries.find(
-      query => query.name === "createUser"
-    )
+    const createQuery = importedQueries.find((query) => query.name === "createUser")
 
     expect(createQuery).toBeDefined()
     expect(createQuery?.fields.requestBody).toBeDefined()
@@ -494,14 +470,11 @@ describe("Rest Importer", () => {
 
     await init(JSON.stringify(openapi2Doc))
     const datasource = await config.createDatasource()
-    const { queries: importedQueries } = await config.doInContext(
-      config.devWorkspaceId,
-      () => restImporter.importQueries(datasource._id)
+    const { queries: importedQueries } = await config.doInContext(config.devWorkspaceId, () =>
+      restImporter.importQueries(datasource._id)
     )
 
-    const createQuery = importedQueries.find(
-      query => query.name === "createUserV2"
-    )
+    const createQuery = importedQueries.find((query) => query.name === "createUserV2")
 
     expect(createQuery).toBeDefined()
     expect(createQuery?.fields.requestBody).toBeDefined()
@@ -621,9 +594,7 @@ describe("Rest Importer", () => {
 
     expect(importResult.queries.length).toBe(1)
     const [query] = importResult.queries
-    expect(query.parameters?.some(param => param.name === "x-apikey")).toBe(
-      false
-    )
+    expect(query.parameters?.some((param) => param.name === "x-apikey")).toBe(false)
     expect(query.fields.headers?.["X-Apikey"]).toBeUndefined()
   })
 

@@ -1,26 +1,26 @@
 <script lang="ts">
-  import { ModalContent, Layout, Body } from "@budibase/bbui"
+import { Body, Layout, ModalContent } from "@budibase/bbui"
 
-  type SelectableType = {
-    id: string
-    title: string
-    description: string
-    img: {
-      src: string
-      alt: string
-    }
+type SelectableType = {
+  id: string
+  title: string
+  description: string
+  img: {
+    src: string
+    alt: string
   }
+}
 
-  export let title: string
-  export let types: SelectableType[]
-  export let onConfirm: (_selectedType: string) => Promise<void>
-  export let showCancelButton: boolean = true
+export let title: string
+export let types: SelectableType[]
+export let onConfirm: (_selectedType: string) => Promise<void>
+export let showCancelButton: boolean = true
 
-  let selectedType: string | null = null
+let selectedType: string | null = null
 
-  function confirm() {
-    onConfirm(selectedType!)
-  }
+function confirm() {
+  onConfirm(selectedType!)
+}
 </script>
 
 <ModalContent

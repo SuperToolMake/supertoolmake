@@ -1,5 +1,5 @@
-import { Document, Snippet, Theme, User } from ".."
-import { SocketSession } from "../../sdk"
+import type { SocketSession } from "../../sdk"
+import type { Document, Snippet, Theme, User } from ".."
 
 export type WorkspaceMetadataErrors = { [key: string]: string[] }
 export type TranslationOverrides = Record<string, string>

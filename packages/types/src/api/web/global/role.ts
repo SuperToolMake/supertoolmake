@@ -1,4 +1,4 @@
-import { Role } from "../../../documents"
+import type { Role } from "../../../documents"
 
 interface GlobalRoleResponse {
   roles: Role[]
@@ -7,8 +7,7 @@ interface GlobalRoleResponse {
   url?: string
 }
 
-export interface FetchGlobalRolesResponse
-  extends Record<string, GlobalRoleResponse> {}
+export interface FetchGlobalRolesResponse extends Record<string, GlobalRoleResponse> {}
 
 export interface FindGlobalRoleResponse extends GlobalRoleResponse {}
 

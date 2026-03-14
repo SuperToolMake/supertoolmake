@@ -1,7 +1,7 @@
 <script>
-  import { Select } from "@budibase/bbui"
+import { Select } from "@budibase/bbui"
 
-  export let value = ""
+export let value = ""
 </script>
 
 <Select

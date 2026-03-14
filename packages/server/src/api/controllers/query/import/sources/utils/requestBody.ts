@@ -14,10 +14,7 @@ interface SchemaAugmentations {
   anyOf?: Array<SchemaObject | ReferenceObject>
 }
 
-type SchemaItems =
-  | SchemaObject
-  | ReferenceObject
-  | Array<SchemaObject | ReferenceObject>
+type SchemaItems = SchemaObject | ReferenceObject | Array<SchemaObject | ReferenceObject>
 
 type BindingPrimitiveType = "string" | "integer" | "number" | "boolean"
 
@@ -69,8 +66,8 @@ const toSchemaObject = (
 const buildBindingName = (path: string[]): string => {
   const sanitized = path
     .slice(1)
-    .map(segment => sanitizeSegment(segment))
-    .filter(segment => segment && segment !== "item")
+    .map((segment) => sanitizeSegment(segment))
+    .filter((segment) => segment && segment !== "item")
 
   if (sanitized.length === 0) {
     const last = path[path.length - 1] ?? "value"
@@ -84,10 +81,7 @@ const buildBindingName = (path: string[]): string => {
   return joined
 }
 
-const createBindingPlaceholder = (
-  key: string,
-  type: BindingPrimitiveType
-): BindingPlaceholder => {
+const createBindingPlaceholder = (key: string, type: BindingPrimitiveType): BindingPlaceholder => {
   return {
     toJSON() {
       return `${BINDING_TOKEN_PREFIX}${type}__${key}__`
@@ -116,46 +110,40 @@ const pickSchema = (
   }
 
   if (Array.isArray(resolvedSchema.allOf) && resolvedSchema.allOf.length > 0) {
-    const merged = resolvedSchema.allOf.reduce<SchemaObject | undefined>(
-      (accumulator, current) => {
-        const candidate = pickSchema(current)
-        if (!candidate) {
-          return accumulator
-        }
-        if (!accumulator) {
-          return { ...candidate }
-        }
+    const merged = resolvedSchema.allOf.reduce<SchemaObject | undefined>((accumulator, current) => {
+      const candidate = pickSchema(current)
+      if (!candidate) {
+        return accumulator
+      }
+      if (!accumulator) {
+        return { ...candidate }
+      }
 
-        const next: SchemaObject = { ...accumulator }
+      const next: SchemaObject = { ...accumulator }
 
-        const mergedProperties = {
-          ...getProperties(accumulator),
-          ...getProperties(candidate),
-        }
-        if (Object.keys(mergedProperties).length > 0) {
-          next.properties = mergedProperties as SchemaObject["properties"]
-        }
+      const mergedProperties = {
+        ...getProperties(accumulator),
+        ...getProperties(candidate),
+      }
+      if (Object.keys(mergedProperties).length > 0) {
+        next.properties = mergedProperties as SchemaObject["properties"]
+      }
 
-        const accumulatorRequired = accumulator.required ?? []
-        const candidateRequired = candidate.required ?? []
-        const mergedRequired = new Set([
-          ...accumulatorRequired,
-          ...candidateRequired,
-        ])
-        if (mergedRequired.size > 0) {
-          next.required = Array.from(mergedRequired)
-        }
+      const accumulatorRequired = accumulator.required ?? []
+      const candidateRequired = candidate.required ?? []
+      const mergedRequired = new Set([...accumulatorRequired, ...candidateRequired])
+      if (mergedRequired.size > 0) {
+        next.required = Array.from(mergedRequired)
+      }
 
-        if (!next.type && candidate.type) {
-          next.type = candidate.type
-        }
-        if (next.items === undefined && candidate.items !== undefined) {
-          next.items = candidate.items
-        }
-        return next
-      },
-      undefined
-    )
+      if (!next.type && candidate.type) {
+        next.type = candidate.type
+      }
+      if (next.items === undefined && candidate.items !== undefined) {
+        next.items = candidate.items
+      }
+      return next
+    }, undefined)
     if (merged) {
       return merged
     }
@@ -178,9 +166,7 @@ const pickSchema = (
   return resolvedSchema
 }
 
-const getSchemaType = (
-  schema: SchemaObject | undefined
-): string | undefined => {
+const getSchemaType = (schema: SchemaObject | undefined): string | undefined => {
   if (!schema) {
     return undefined
   }
@@ -206,9 +192,7 @@ const getRequiredProperties = (schema: SchemaObject | undefined): string[] => {
   return Array.isArray(schema.required) ? [...schema.required] : []
 }
 
-const getProperties = (
-  schema: SchemaObject | undefined
-): Record<string, SchemaObject> => {
+const getProperties = (schema: SchemaObject | undefined): Record<string, SchemaObject> => {
   if (!schema?.properties) {
     return {}
   }
@@ -223,9 +207,7 @@ const getProperties = (
   return result
 }
 
-const getItemsSchema = (
-  schema: SchemaObject | undefined
-): SchemaObject | undefined => {
+const getItemsSchema = (schema: SchemaObject | undefined): SchemaObject | undefined => {
   if (!schema) {
     return undefined
   }
@@ -246,9 +228,7 @@ const getItemsSchema = (
   return pickSchema(items as SchemaObject | ReferenceObject)
 }
 
-const normalisePrimitiveType = (
-  type: string | undefined
-): BindingPrimitiveType => {
+const normalisePrimitiveType = (type: string | undefined): BindingPrimitiveType => {
   if (type === "integer" || type === "number" || type === "boolean") {
     return type
   }
@@ -286,10 +266,7 @@ interface BuildResult {
   bindings: Record<string, string>
 }
 
-const mergeBindings = (
-  target: Record<string, string>,
-  source: Record<string, string>
-) => {
+const mergeBindings = (target: Record<string, string>, source: Record<string, string>) => {
   for (const [key, value] of Object.entries(source)) {
     if (!(key in target)) {
       target[key] = value
@@ -325,20 +302,12 @@ const buildFromSchema = (
 
   if (seen.has(resolved)) {
     const type = normalisePrimitiveType(getSchemaType(resolved))
-    return createPrimitiveBindingResult(
-      path,
-      type,
-      getPrimitiveDefaultFromSchema(resolved, type)
-    )
+    return createPrimitiveBindingResult(path, type, getPrimitiveDefaultFromSchema(resolved, type))
   }
 
   if (depth > MAX_DEPTH) {
     const type = normalisePrimitiveType(getSchemaType(resolved))
-    return createPrimitiveBindingResult(
-      path,
-      type,
-      getPrimitiveDefaultFromSchema(resolved, type)
-    )
+    return createPrimitiveBindingResult(path, type, getPrimitiveDefaultFromSchema(resolved, type))
   }
 
   seen.add(resolved)
@@ -353,20 +322,17 @@ const buildFromSchema = (
       return { value: {}, bindings: {} }
     }
 
-    const requiredProperties = getRequiredProperties(resolved).filter(
-      property => propertyNames.includes(property)
+    const requiredProperties = getRequiredProperties(resolved).filter((property) =>
+      propertyNames.includes(property)
     )
 
     const optionalProperties = propertyNames.filter(
-      property => !requiredProperties.includes(property)
+      (property) => !requiredProperties.includes(property)
     )
 
     let optionalSelection: string[] = []
     if (optionalProperties.length > 0) {
-      const remainingCapacity = Math.max(
-        totalLimit - requiredProperties.length,
-        0
-      )
+      const remainingCapacity = Math.max(totalLimit - requiredProperties.length, 0)
       if (remainingCapacity > 0) {
         optionalSelection = optionalProperties.slice(0, remainingCapacity)
       }
@@ -386,13 +352,7 @@ const buildFromSchema = (
 
     for (const property of selectedProperties) {
       const propertySchema = pickSchema(properties[property])
-      const child = buildFromSchema(
-        propertySchema,
-        [...path, property],
-        depth + 1,
-        seen,
-        options
-      )
+      const child = buildFromSchema(propertySchema, [...path, property], depth + 1, seen, options)
       if (child.value === undefined) {
         const fallback = createPrimitiveBindingResult(
           [...path, property],
@@ -413,13 +373,7 @@ const buildFromSchema = (
 
   if (type === "array") {
     const itemSchema = getItemsSchema(resolved)
-    const child = buildFromSchema(
-      itemSchema,
-      [...path, "item"],
-      depth + 1,
-      seen,
-      options
-    )
+    const child = buildFromSchema(itemSchema, [...path, "item"], depth + 1, seen, options)
     const arrayValue: unknown[] = child.value === undefined ? [] : [child.value]
     seen.delete(resolved)
     return { value: arrayValue, bindings: child.bindings }
@@ -442,11 +396,7 @@ const buildFromExample = (
   seen: WeakSet<object>
 ): BuildResult => {
   if (depth > MAX_DEPTH) {
-    return createPrimitiveBindingResult(
-      path,
-      "string",
-      defaultValueForType("string")
-    )
+    return createPrimitiveBindingResult(path, "string", defaultValueForType("string"))
   }
 
   if (
@@ -468,11 +418,7 @@ const buildFromExample = (
   }
 
   if (typeof example === "boolean") {
-    return createPrimitiveBindingResult(
-      path,
-      "boolean",
-      example ? "true" : "false"
-    )
+    return createPrimitiveBindingResult(path, "boolean", example ? "true" : "false")
   }
 
   if (typeof example !== "object") {
@@ -481,11 +427,7 @@ const buildFromExample = (
 
   const exampleObject = example as object
   if (seen.has(exampleObject)) {
-    return createPrimitiveBindingResult(
-      path,
-      "string",
-      defaultValueForType("string")
-    )
+    return createPrimitiveBindingResult(path, "string", defaultValueForType("string"))
   }
 
   seen.add(exampleObject)
@@ -495,12 +437,7 @@ const buildFromExample = (
       seen.delete(exampleObject)
       return { value: [], bindings: {} }
     }
-    const child = buildFromExample(
-      example[0],
-      [...path, "item"],
-      depth + 1,
-      seen
-    )
+    const child = buildFromExample(example[0], [...path, "item"], depth + 1, seen)
     seen.delete(exampleObject)
     return {
       value: child.value === undefined ? [] : [child.value],
@@ -527,17 +464,11 @@ const buildFromExample = (
 }
 
 export const generateRequestBodyFromSchema = (
-  schema:
-    | OpenAPIV2.SchemaObject
-    | OpenAPIV3.SchemaObject
-    | SchemaObject
-    | undefined,
+  schema: OpenAPIV2.SchemaObject | OpenAPIV3.SchemaObject | SchemaObject | undefined,
   rootName = "body",
   options: BuildOptions = {}
 ): GeneratedRequestBody | undefined => {
-  const resolvedSchema = pickSchema(
-    schema as SchemaObject | ReferenceObject | undefined
-  )
+  const resolvedSchema = pickSchema(schema as SchemaObject | ReferenceObject | undefined)
   if (!resolvedSchema) {
     return undefined
   }
@@ -545,13 +476,7 @@ export const generateRequestBodyFromSchema = (
   const buildOptions: BuildOptions = {
     totalLimit: options.totalLimit ?? 12,
   }
-  const result = buildFromSchema(
-    resolvedSchema,
-    [rootName],
-    0,
-    seen,
-    buildOptions
-  )
+  const result = buildFromSchema(resolvedSchema, [rootName], 0, seen, buildOptions)
   if (result.value === undefined) {
     return undefined
   }
@@ -599,7 +524,7 @@ const cloneSerializableRequestBody = (value: unknown): unknown => {
   }
 
   if (Array.isArray(value)) {
-    return value.map(item => cloneSerializableRequestBody(item))
+    return value.map((item) => cloneSerializableRequestBody(item))
   }
 
   if (typeof value === "object") {
@@ -671,9 +596,7 @@ const collectKeyValuePairs = (
   }
 
   if (Array.isArray(value)) {
-    value.forEach(item =>
-      collectKeyValuePairs(item, [...path, "item"], accumulator)
-    )
+    value.forEach((item) => collectKeyValuePairs(item, [...path, "item"], accumulator))
     return
   }
 
@@ -687,9 +610,7 @@ const collectKeyValuePairs = (
   }
 
   if (typeof value === "object") {
-    for (const [childKey, childValue] of Object.entries(
-      value as Record<string, unknown>
-    )) {
+    for (const [childKey, childValue] of Object.entries(value as Record<string, unknown>)) {
       collectKeyValuePairs(childValue, [...path, childKey], accumulator)
     }
     return
@@ -701,9 +622,7 @@ const collectKeyValuePairs = (
   }
 }
 
-export const buildKeyValueRequestBody = (
-  body: unknown
-): Record<string, string> | undefined => {
+export const buildKeyValueRequestBody = (body: unknown): Record<string, string> | undefined => {
   if (!body || typeof body !== "object") {
     return undefined
   }
@@ -746,9 +665,7 @@ export const buildRequestBodyFromFormDataParameters = (
       continue
     }
     const type = normalisePrimitiveType(normalized.type)
-    const defaultValue = normalized.default
-      ? String(normalized.default)
-      : defaultValueForType(type)
+    const defaultValue = normalized.default ? String(normalized.default) : defaultValueForType(type)
     const { value, bindings: paramBindings } = createPrimitiveBindingResult(
       ["form", normalized.name],
       type,

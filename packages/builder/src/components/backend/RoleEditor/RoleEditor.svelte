@@ -1,6 +1,6 @@
 <script>
-  import { SvelteFlowProvider } from "@xyflow/svelte"
-  import RoleFlow from "./RoleFlow.svelte"
+import { SvelteFlowProvider } from "@xyflow/svelte"
+import RoleFlow from "./RoleFlow.svelte"
 </script>
 
 <SvelteFlowProvider>

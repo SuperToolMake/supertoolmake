@@ -1,17 +1,14 @@
+import { ValidQueryNameRegex } from "@budibase/shared-core"
 import {
   BodyType,
-  ImportEndpoint,
-  Query,
-  QueryParameter,
-  QueryVerb,
-  RestTemplateQueryMetadata,
+  type ImportEndpoint,
+  type Query,
+  type QueryParameter,
+  type QueryVerb,
+  type RestTemplateQueryMetadata,
 } from "@budibase/types"
-import { ValidQueryNameRegex } from "@budibase/shared-core"
-import { URL } from "url"
-import {
-  buildKeyValueRequestBody,
-  serialiseRequestBody,
-} from "../utils/requestBody"
+import type { URL } from "url"
+import { buildKeyValueRequestBody, serialiseRequestBody } from "../utils/requestBody"
 
 export interface ImportInfo {
   name: string
@@ -43,10 +40,7 @@ const sanitizeQueryName = (name: string, fallback: string): string => {
   }
 
   const candidate = trimmed || fallback
-  const sanitized = candidate
-    .replace(INVALID_QUERY_NAME_CHARS, "")
-    .replace(/\s+/g, " ")
-    .trim()
+  const sanitized = candidate.replace(INVALID_QUERY_NAME_CHARS, "").replace(/\s+/g, " ").trim()
 
   return sanitized || "Query"
 }
@@ -54,10 +48,7 @@ const sanitizeQueryName = (name: string, fallback: string): string => {
 export abstract class ImportSource {
   abstract isSupported(data: string): Promise<boolean>
   abstract getInfo(): Promise<ImportInfo>
-  abstract getQueries(
-    datasourceId: string,
-    options?: GetQueriesOptions
-  ): Promise<Query[]>
+  abstract getQueries(datasourceId: string, options?: GetQueriesOptions): Promise<Query[]>
   abstract getImportSource(): string
 
   protected buildEndpointId = (method: string, path: string): string => {
@@ -90,7 +81,7 @@ export abstract class ImportSource {
     if (!normalized) {
       return false
     }
-    return Object.prototype.hasOwnProperty.call(MethodToVerb, normalized)
+    return Object.hasOwn(MethodToVerb, normalized)
   }
 
   protected methodHasRequestBody = (method: string): boolean => {
@@ -177,9 +168,7 @@ export abstract class ImportSource {
       if (!name) {
         continue
       }
-      const existing = combinedParameters.find(
-        parameter => parameter.name === name
-      )
+      const existing = combinedParameters.find((parameter) => parameter.name === name)
       if (existing) {
         continue
       }
@@ -196,13 +185,10 @@ export abstract class ImportSource {
     if (isKeyValueBodyType(explicitBodyType)) {
       requestBody = buildKeyValueRequestBody(body)
       if ((!requestBody || Object.keys(requestBody).length === 0) && body) {
-        requestBody = Object.keys(bodyBindings).reduce<Record<string, string>>(
-          (acc, key) => {
-            acc[key] = `{{ ${key} }}`
-            return acc
-          },
-          {}
-        )
+        requestBody = Object.keys(bodyBindings).reduce<Record<string, string>>((acc, key) => {
+          acc[key] = `{{ ${key} }}`
+          return acc
+        }, {})
       }
       resolvedBodyType = explicitBodyType as BodyType
     } else {
@@ -216,8 +202,7 @@ export abstract class ImportSource {
 
     if (
       (!requestBody ||
-        (typeof requestBody === "object" &&
-          Object.keys(requestBody).length === 0)) &&
+        (typeof requestBody === "object" && Object.keys(requestBody).length === 0)) &&
       isKeyValueBodyType(explicitBodyType)
     ) {
       requestBody = undefined

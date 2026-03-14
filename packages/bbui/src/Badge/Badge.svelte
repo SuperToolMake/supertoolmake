@@ -1,17 +1,17 @@
 <script>
-  import "@spectrum-css/label/dist/index-vars.css"
+import "@spectrum-css/label/dist/index-vars.css"
 
-  export let size = "M"
-  export let grey = false
-  export let red = false
-  export let orange = false
-  export let yellow = false
-  export let seafoam = false
-  export let green = false
-  export let active = false
-  export let inactive = false
-  export let hoverable = false
-  export let outlineColor = null
+export let size = "M"
+export let grey = false
+export let red = false
+export let orange = false
+export let yellow = false
+export let seafoam = false
+export let green = false
+export let active = false
+export let inactive = false
+export let hoverable = false
+export let outlineColor = null
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

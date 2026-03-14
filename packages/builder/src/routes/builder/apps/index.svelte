@@ -1,64 +1,60 @@
 <script lang="ts">
-  import { gradient } from "@/actions"
-  import { API } from "@/api"
-  import { admin, auth, clientAppsStore, organisation } from "@/stores/portal"
-  import type { EnrichedApp } from "@/types"
-  import {
-    ActionMenu,
-    Body,
-    Divider,
-    Heading,
-    Icon,
-    Layout,
-    MenuItem,
-    Modal,
-    notifications,
-    Page,
-  } from "@budibase/bbui"
-  import {
-    ChangePasswordModal,
-    ProfileModal,
-    UserAvatar,
-  } from "@budibase/frontend-core"
-  import { helpers, sdk } from "@budibase/shared-core"
-  import { processStringSync } from "@budibase/string-templates"
-  import type { PublishedWorkspaceData } from "@budibase/types"
-  import { goto } from "@roxi/routify"
-  import Logo from "assets/supertoolmake-emblem.svg"
-  import { onMount } from "svelte"
+import {
+  ActionMenu,
+  Body,
+  Divider,
+  Heading,
+  Icon,
+  Layout,
+  MenuItem,
+  type Modal,
+  notifications,
+  Page,
+} from "@budibase/bbui"
+import { ChangePasswordModal, ProfileModal, UserAvatar } from "@budibase/frontend-core"
+import { helpers, sdk } from "@budibase/shared-core"
+import { processStringSync } from "@budibase/string-templates"
+import type { PublishedWorkspaceData } from "@budibase/types"
+import { goto } from "@roxi/routify"
+import Logo from "assets/supertoolmake-emblem.svg"
+import { onMount } from "svelte"
+import { gradient } from "@/actions"
+import { API } from "@/api"
+import { admin, auth, clientAppsStore, organisation } from "@/stores/portal"
+import type { EnrichedApp } from "@/types"
 
-  $goto
+$goto
 
-  let loaded: boolean = false
-  let userInfoModal: Modal
-  let changePasswordModal: Modal
+let loaded: boolean = false
+let userInfoModal: Modal
+let changePasswordModal: Modal
 
-  $: userApps = $clientAppsStore.apps
+$: userApps = $clientAppsStore.apps
 
-  function getUrl(app: EnrichedApp | PublishedWorkspaceData) {
-    if (app.url) {
-      return `/app${app.url}`
-    } else {
-      return `/${app.prodId}`
-    }
+function getUrl(app: EnrichedApp | PublishedWorkspaceData) {
+  if (app.url) {
+    return `/app${app.url}`
+  } else {
+    return `/${app.prodId}`
   }
+}
 
-  const logout = async () => {
-    try {
-      await auth.logout()
-    } catch (error) {
-      // Swallow error and do nothing
-    }
+const logout = async () => {
+  try {
+    await auth.logout()
+  } catch (error) {
+    // Swallow error and do nothing
   }
+}
 
-  onMount(async () => {
-    try {
-      await clientAppsStore.load()
-    } catch (error) {
-      notifications.error("Error loading apps")
-    }
-    loaded = true
-  })
+onMount(async () => {
+  try {
+    await clientAppsStore.load()
+  } catch (error) {
+    notifications.error("Error loading apps")
+  }
+  loaded = true
+})
 </script>
 
 {#if $auth.user && loaded}

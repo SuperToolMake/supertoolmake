@@ -1,61 +1,58 @@
-<script lang="ts" generics="O extends Record<string, any> | string">
-  import { createEventDispatcher } from "svelte"
-  import Picker from "../Form/Core/Picker.svelte"
-  import Icon from "../Icon/Icon.svelte"
-  import StatusLight from "../StatusLight/StatusLight.svelte"
-  import FancyField from "./FancyField.svelte"
-  import FancyFieldLabel from "./FancyFieldLabel.svelte"
+<script lang="ts" generics="O extends Record<string, any>| string">
 
-  export let label: string | undefined
-  export let value: string | undefined
-  export let disabled: boolean = false
-  export let error: string | null = null
-  export let validate: ((_value: string | undefined) => string) | null = null
-  export let options: O[] = []
-  export let footer: string | undefined = undefined
-  export let isOptionEnabled = (_option: O) => true
-  export let getOptionLabel = (option: O, _index?: number) =>
-    extractProperty(option, "label")
-  export let getOptionValue = (option: O, _index?: number) =>
-    extractProperty(option, "value")
-  export let getOptionSubtitle = (option: O) =>
+import { createEventDispatcher } from "svelte"
+import Picker from "../Form/Core/Picker.svelte"
+import Icon from "../Icon/Icon.svelte"
+import StatusLight from "../StatusLight/StatusLight.svelte"
+import FancyField from "./FancyField.svelte"
+import FancyFieldLabel from "./FancyFieldLabel.svelte"
+
+export let label: string | undefined
+export let value: string | undefined
+export let disabled: boolean = false
+export let error: string | null = null
+export let validate: ((_value: string | undefined) => string) | null = null
+export let options: O[] = []
+export let footer: string | undefined = undefined
+export let isOptionEnabled = (_option: O) => true
+export let getOptionLabel = (option: O, _index?: number) => extractProperty(option, "label")
+export let getOptionValue = (option: O, _index?: number) => extractProperty(option, "value")
+export let getOptionSubtitle = (option: O) =>
     extractProperty(option, "subtitle")
-  export let getOptionColour: (
+export let getOptionColour: (
     _option: O,
     _index?: number
   ) => string | null = () => null
 
-  const dispatch = createEventDispatcher<{ change: string | undefined }>()
+const dispatch = createEventDispatcher<{ change: string | undefined }>()
 
-  let open = false
-  let wrapper: HTMLDivElement
+let open = false
+let wrapper: HTMLDivElement
 
-  $: placeholder = !value
-  $: selectedLabel = getSelectedLabel(value)
-  $: fieldColour = getFieldAttribute(getOptionColour, value, options)
+$: placeholder = !value
+$: selectedLabel = getSelectedLabel(value)
+$: fieldColour = getFieldAttribute(getOptionColour, value, options)
 
-  const getFieldAttribute = (
-    getAttribute: (_option: O, _index?: number) => string | null,
-    value: string | undefined,
-    options: O[]
-  ) => {
-    // Wait for options to load if there is a value but no options
-    if (!options?.length) {
-      return ""
-    }
-    const index = options.findIndex(
-      (option, idx) => getOptionValue(option, idx) === value
-    )
-    return index !== -1 ? getAttribute(options[index], index) : null
+const getFieldAttribute = (
+  getAttribute: (_option: O, _index?: number) => string | null,
+  value: string | undefined,
+  options: O[]
+) => {
+  // Wait for options to load if there is a value but no options
+  if (!options?.length) {
+    return ""
   }
-  const extractProperty = (value: O, property: string): string => {
+  const index = options.findIndex((option, idx) => getOptionValue(option, idx) === value)
+  return index !== -1 ? getAttribute(options[index], index) : null
+}
+const extractProperty = (value: O, property: string): string => {
     if (value && typeof value === "object") {
       return value[property]
     }
     return value
   }
 
-  const onChange = (newValue: string | undefined) => {
+const onChange = (newValue: string | undefined) => {
     dispatch("change", newValue)
     value = newValue
     if (validate) {
@@ -64,7 +61,7 @@
     open = false
   }
 
-  const getSelectedLabel = (value: string | undefined) => {
+const getSelectedLabel = (value: string | undefined) => {
     if (!value || !options?.length) {
       return ""
     }

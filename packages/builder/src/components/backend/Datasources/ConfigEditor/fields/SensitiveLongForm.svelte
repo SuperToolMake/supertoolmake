@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { Label, TextArea, Icon } from "@budibase/bbui"
-  import { onMount } from "svelte"
+import { Icon, Label, TextArea } from "@budibase/bbui"
+import { onMount } from "svelte"
 
-  export let name
-  export let value
-  export let error
-  export let placeholder
-  export let visible: boolean
+export let name
+export let value
+export let error
+export let placeholder
+export let visible: boolean
 
-  onMount(() => {
-    visible = !value
-  })
+onMount(() => {
+  visible = !value
+})
 </script>
 
 <div class="form-row">

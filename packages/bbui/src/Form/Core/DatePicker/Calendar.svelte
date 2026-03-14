@@ -1,96 +1,85 @@
 <script>
-  import { cleanInput } from "./utils"
-  import Select from "../../Select.svelte"
-  import dayjs from "dayjs"
-  import NumberInput from "./NumberInput.svelte"
-  import { createEventDispatcher } from "svelte"
-  import Icon from "../../../Icon/Icon.svelte"
+import dayjs from "dayjs"
+import { createEventDispatcher } from "svelte"
+import Icon from "../../../Icon/Icon.svelte"
+import Select from "../../Select.svelte"
+import NumberInput from "./NumberInput.svelte"
+import { cleanInput } from "./utils"
 
-  export let value
-  export let startDayOfWeek = "Monday"
+export let value
+export let startDayOfWeek = "Monday"
 
-  const dispatch = createEventDispatcher()
-  const DaysOfWeek = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ]
-  const DayIndex = {
-    Sunday: 0,
-    Monday: 1,
-    Tuesday: 2,
-    Wednesday: 3,
-    Thursday: 4,
-    Friday: 5,
-    Saturday: 6,
+const dispatch = createEventDispatcher()
+const DaysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+const DayIndex = {
+  Sunday: 0,
+  Monday: 1,
+  Tuesday: 2,
+  Wednesday: 3,
+  Thursday: 4,
+  Friday: 5,
+  Saturday: 6,
+}
+const MonthsOfYear = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+]
+
+const now = dayjs()
+let calendarDate
+
+$: calendarDate = dayjs(value || dayjs()).startOf("month")
+$: dayHeaders = getDayHeaders(startDayOfWeek)
+$: weekStarts = getWeekStarts(calendarDate, DayIndex[startDayOfWeek])
+
+const getWeekStarts = (monthStart, startDayIndex) => {
+  if (!monthStart?.isValid()) {
+    return []
   }
-  const MonthsOfYear = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ]
+  let monthEnd = monthStart.endOf("month")
+  const offset = (((monthStart.day() - startDayIndex) % 7) + 7) % 7
+  let calendarStart = monthStart.subtract(offset, "day")
+  const numWeeks = Math.ceil((monthEnd.diff(calendarStart, "day") + 1) / 7)
 
-  const now = dayjs()
-  let calendarDate
-
-  $: calendarDate = dayjs(value || dayjs()).startOf("month")
-  $: dayHeaders = getDayHeaders(startDayOfWeek)
-  $: weekStarts = getWeekStarts(calendarDate, DayIndex[startDayOfWeek])
-
-  const getWeekStarts = (monthStart, startDayIndex) => {
-    if (!monthStart?.isValid()) {
-      return []
-    }
-    let monthEnd = monthStart.endOf("month")
-    const offset = (((monthStart.day() - startDayIndex) % 7) + 7) % 7
-    let calendarStart = monthStart.subtract(offset, "day")
-    const numWeeks = Math.ceil((monthEnd.diff(calendarStart, "day") + 1) / 7)
-
-    let starts = []
-    for (let i = 0; i < numWeeks; i++) {
-      starts.push(calendarStart.add(i, "weeks"))
-    }
-    return starts
+  let starts = []
+  for (let i = 0; i < numWeeks; i++) {
+    starts.push(calendarStart.add(i, "weeks"))
   }
+  return starts
+}
 
-  const getDayHeaders = startDay => {
-    const index = DaysOfWeek.indexOf(startDay)
-    if (index === -1) {
-      return DaysOfWeek
-    }
-    return [...DaysOfWeek.slice(index), ...DaysOfWeek.slice(0, index)]
+const getDayHeaders = (startDay) => {
+  const index = DaysOfWeek.indexOf(startDay)
+  if (index === -1) {
+    return DaysOfWeek
   }
+  return [...DaysOfWeek.slice(index), ...DaysOfWeek.slice(0, index)]
+}
 
-  const handleCalendarYearChange = e => {
-    calendarDate = calendarDate.year(parseInt(e.target.value))
-  }
+const handleCalendarYearChange = (e) => {
+  calendarDate = calendarDate.year(parseInt(e.target.value))
+}
 
-  const handleDateChange = date => {
-    const base = value || now
-    dispatch(
-      "change",
-      base.year(date.year()).month(date.month()).date(date.date())
-    )
-  }
+const handleDateChange = (date) => {
+  const base = value || now
+  dispatch("change", base.year(date.year()).month(date.month()).date(date.date()))
+}
 
-  export const setDate = date => {
-    calendarDate = date
-  }
+export const setDate = (date) => {
+  calendarDate = date
+}
 
-  const cleanYear = cleanInput({ max: 9999, pad: 0, fallback: now.year() })
+const cleanYear = cleanInput({ max: 9999, pad: 0, fallback: now.year() })
 </script>
 
 <div class="spectrum-Calendar">

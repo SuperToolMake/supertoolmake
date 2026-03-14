@@ -1,21 +1,20 @@
-import env from "../environment"
-import { TemplateType } from "../constants"
-import { getTemplateByPurpose, EmailTemplates } from "../constants/templates"
-import { getSettingsTemplateContext } from "./templates"
+import { cache, configs, HTTPError } from "@budibase/backend-core"
 import { processString } from "@budibase/string-templates"
 import {
-  SendEmailOpts,
-  SMTPInnerConfig,
   EmailTemplatePurpose,
-  User,
+  type SendEmailOpts,
+  type SMTPInnerConfig,
+  type User,
 } from "@budibase/types"
-import { configs, cache, HTTPError } from "@budibase/backend-core"
 import ical from "ical-generator"
 import _ from "lodash"
 import { marked } from "marked"
-
 import nodemailer from "nodemailer"
-import SMTPTransport from "nodemailer/lib/smtp-transport"
+import type SMTPTransport from "nodemailer/lib/smtp-transport"
+import { TemplateType } from "../constants"
+import { EmailTemplates, getTemplateByPurpose } from "../constants/templates"
+import env from "../environment"
+import { getSettingsTemplateContext } from "./templates"
 
 const TEST_MODE = env.ENABLE_EMAIL_TEST_MODE && env.isDev()
 const TYPE = TemplateType.EMAIL
@@ -80,13 +79,13 @@ async function buildEmail(
   if (FULL_EMAIL_PURPOSES.indexOf(purpose) === -1) {
     throw `Unable to build an email of type ${purpose}`
   }
-  let [base, body] = await Promise.all([
+  const [base, body] = await Promise.all([
     getTemplateByPurpose(TYPE, EmailTemplatePurpose.BASE),
     getTemplateByPurpose(TYPE, purpose),
   ])
 
   // Change from branding to core
-  let core = EmailTemplates[EmailTemplatePurpose.CORE]
+  const core = EmailTemplates[EmailTemplatePurpose.CORE]
 
   if (!base || !body || !core) {
     throw "Unable to build email, missing base components"
@@ -98,10 +97,7 @@ async function buildEmail(
   }
   context = {
     ...context,
-    contents:
-      purpose === EmailTemplatePurpose.CUSTOM
-        ? marked.parse(contents || "")
-        : contents,
+    contents: purpose === EmailTemplatePurpose.CUSTOM ? marked.parse(contents || "") : contents,
     email,
     name,
     user: user || {},
@@ -136,11 +132,7 @@ export async function isEmailConfigured() {
  * @return returns details about the attempt to send email, e.g. if it is successful; based on
  * nodemailer response.
  */
-export async function sendEmail(
-  email: string,
-  purpose: EmailTemplatePurpose,
-  opts: SendEmailOpts
-) {
+export async function sendEmail(email: string, purpose: EmailTemplatePurpose, opts: SendEmailOpts) {
   const config = await configs.getSMTPConfig()
   if (!config && !TEST_MODE) {
     throw "Unable to find SMTP configuration."
@@ -159,7 +151,7 @@ export async function sendEmail(
       code = await cache.invite.createCode(email, opts.info)
       break
   }
-  let context = await getSettingsTemplateContext(purpose, code)
+  const context = await getSettingsTemplateContext(purpose, code)
 
   let message: Parameters<typeof transport.sendMail>[0] = {
     from: opts?.from || config?.from,
@@ -177,10 +169,7 @@ export async function sendEmail(
   }
 
   if (opts?.subject || config?.subject) {
-    message.subject = await processString(
-      (opts?.subject || config?.subject) as string,
-      context
-    )
+    message.subject = await processString((opts?.subject || config?.subject) as string, context)
   }
   if (opts?.invite) {
     const calendar = ical({

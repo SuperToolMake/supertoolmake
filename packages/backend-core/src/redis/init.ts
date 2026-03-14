@@ -21,10 +21,7 @@ export async function init() {
   writethroughClient = await Client.init(utils.Databases.WRITE_THROUGH)
   inviteListClient = await Client.init(utils.Databases.INVITATIONS_LIST)
   passwordResetClient = await Client.init(utils.Databases.PW_RESETS)
-  socketClient = await Client.init(
-    utils.Databases.SOCKET_IO,
-    utils.SelectableDatabase.SOCKET_IO
-  )
+  socketClient = await Client.init(utils.Databases.SOCKET_IO, utils.SelectableDatabase.SOCKET_IO)
   docWritethroughClient = await Client.init(utils.Databases.DOC_WRITE_THROUGH)
 }
 

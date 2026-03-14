@@ -4,10 +4,7 @@ interface RetryOpts {
   times?: number
 }
 
-export async function retry<T>(
-  fn: () => Promise<T>,
-  opts?: RetryOpts
-): Promise<T> {
+export async function retry<T>(fn: () => Promise<T>, opts?: RetryOpts): Promise<T> {
   const { times = 3 } = opts || {}
   if (times < 1) {
     throw new Error(`invalid retry count: ${times}`)

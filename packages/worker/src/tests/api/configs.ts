@@ -1,4 +1,4 @@
-import {
+import type {
   ConfigType,
   ConfigTypeToConfig,
   SaveConfigRequest,
@@ -45,9 +45,7 @@ export class ConfigAPI extends TestAPI {
       .expect("Content-Type", /json/)
 
     if (resp.status !== status) {
-      throw new Error(
-        `Expected status ${status}, got ${resp.status}: ${resp.text}`
-      )
+      throw new Error(`Expected status ${status}, got ${resp.status}: ${resp.text}`)
     }
 
     if (body) {
@@ -65,13 +63,9 @@ export class ConfigAPI extends TestAPI {
 
   OIDCCallback = (configId: string, preAuthRes: any) => {
     const cookie = this.config.cookieHeader(preAuthRes.get("set-cookie"))
-    const setKoaSession = cookie.Cookie.find((c: string) =>
-      c.includes("koa:sess")
-    )
+    const setKoaSession = cookie.Cookie.find((c: string) => c.includes("koa:sess"))
     const koaSession = setKoaSession.split("=")[1] + "=="
-    const sessionContent = JSON.parse(
-      Buffer.from(koaSession, "base64").toString("utf-8")
-    )
+    const sessionContent = JSON.parse(Buffer.from(koaSession, "base64").toString("utf-8"))
     const handle = sessionContent["openidconnect:example.com"].state.handle
     return this.request
       .get(`/api/global/auth/${this.config.getTenantId()}/oidc/callback`)

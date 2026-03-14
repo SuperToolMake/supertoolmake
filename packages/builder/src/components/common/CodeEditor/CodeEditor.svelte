@@ -1,8 +1,8 @@
 <script context="module" lang="ts">
-  export const DropdownPosition = {
-    Relative: "top",
-    Absolute: "right",
-  }
+export const DropdownPosition = {
+  Relative: "top",
+  Absolute: "right",
+}
 </script>
 
 <script lang="ts">

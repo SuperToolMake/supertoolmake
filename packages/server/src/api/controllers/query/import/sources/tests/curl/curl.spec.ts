@@ -1,6 +1,6 @@
-import { Curl } from "../../curl"
 import { readFileSync } from "fs"
 import { join } from "path"
+import { Curl } from "../../curl"
 
 const getData = (file: string) => {
   return readFileSync(join(__dirname, `./data/${file}.txt`), "utf8")
@@ -59,10 +59,7 @@ describe("Curl Import", () => {
       await testPath("path", "http://example.com/paths/abc")
     })
 
-    const testHeaders = async (
-      file: string,
-      headers: Record<string, string>
-    ) => {
+    const testHeaders = async (file: string, headers: Record<string, string>) => {
       const queries = await getQueries(file)
       expect(queries[0].fields.headers).toStrictEqual(headers)
     }
@@ -86,9 +83,7 @@ describe("Curl Import", () => {
 
     const testBody = async (file: string, body?: Record<string, any>) => {
       const queries = await getQueries(file)
-      expect(queries[0].fields.requestBody).toStrictEqual(
-        JSON.stringify(body, null, 2)
-      )
+      expect(queries[0].fields.requestBody).toStrictEqual(JSON.stringify(body, null, 2))
     }
 
     it("populates body", async () => {

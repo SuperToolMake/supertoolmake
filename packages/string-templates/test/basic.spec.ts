@@ -1,13 +1,13 @@
 import {
-  processObject,
-  processString,
+  disableEscaping,
+  doesContainString,
+  encodeJSBinding,
+  findHBSBlocks,
+  getManifest,
   isValid,
   makePropSafe,
-  getManifest,
-  encodeJSBinding,
-  doesContainString,
-  disableEscaping,
-  findHBSBlocks,
+  processObject,
+  processString,
 } from "../src/index"
 
 describe("Test that the string processing works correctly", () => {
@@ -63,12 +63,9 @@ describe("Test that the object processing works correctly", () => {
   })
 
   it("should be able to handle arrays of string templates", async () => {
-    const output = await processObject(
-      ["first {{ noun }}", "second {{ noun }}"],
-      {
-        noun: "person",
-      }
-    )
+    const output = await processObject(["first {{ noun }}", "second {{ noun }}"], {
+      noun: "person",
+    })
     expect(output[0]).toBe("first person")
     expect(output[1]).toBe("second person")
   })
@@ -232,9 +229,7 @@ describe("check manifest", () => {
   it("should be able to retrieve the manifest", () => {
     const manifest = getManifest()
     expect(manifest.math).not.toBeNull()
-    expect(manifest.math.abs.description).toBe(
-      "<p>Return the magnitude of <code>a</code>.</p>\n"
-    )
+    expect(manifest.math.abs.description).toBe("<p>Return the magnitude of <code>a</code>.</p>\n")
   })
 })
 
@@ -245,8 +240,7 @@ describe("check full stops that are safe", () => {
         "persons.firstname": "1",
       },
     }
-    const template =
-      "{{ [c53a4a604fa754d33baaafd5bca4d3658-YXuUBqt5vI].[persons.firstname] }}"
+    const template = "{{ [c53a4a604fa754d33baaafd5bca4d3658-YXuUBqt5vI].[persons.firstname] }}"
     const output = await processString(template, data)
     expect(output).toEqual("1")
   })
@@ -303,20 +297,13 @@ describe("check find hbs blocks function", () => {
   })
 
   it("should find two", () => {
-    expect(findHBSBlocks("{{ hello }} there {{{ name }}}")).toEqual([
-      "{{ hello }}",
-      "{{{ name }}}",
-    ])
+    expect(findHBSBlocks("{{ hello }} there {{{ name }}}")).toEqual(["{{ hello }}", "{{{ name }}}"])
   })
 })
 
 describe("should leave HBS blocks if not found using option", () => {
   it("should replace one, leave one", async () => {
-    const output = await processString(
-      "{{ a }}, {{ b }}",
-      { b: 1 },
-      { onlyFound: true }
-    )
+    const output = await processString("{{ a }}, {{ b }}", { b: 1 }, { onlyFound: true })
     expect(output).toBe("{{ a }}, 1")
   })
 })

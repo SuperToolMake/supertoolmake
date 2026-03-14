@@ -1,5 +1,5 @@
-import { Datasource } from "../../../documents"
-import { DatasourceRelationshipConfig } from "../../../sdk/datasources"
+import type { Datasource } from "../../../documents"
+import type { DatasourceRelationshipConfig } from "../../../sdk/datasources"
 
 export interface CreateDatasourceResponse {
   datasource: Datasource

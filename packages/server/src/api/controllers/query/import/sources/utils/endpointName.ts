@@ -35,8 +35,8 @@ const getShortText = (value?: string): string | undefined => {
   }
   const firstLine = trimmed
     .split(/\r?\n/)
-    .map(line => line.trim())
-    .find(line => line.length > 0)
+    .map((line) => line.trim())
+    .find((line) => line.length > 0)
   if (!firstLine) {
     return undefined
   }
@@ -48,11 +48,7 @@ const getShortText = (value?: string): string | undefined => {
 
 const isVersionSegment = (segment: string): boolean => {
   const lower = segment.toLowerCase()
-  return (
-    /^v\d+$/.test(lower) ||
-    /^\d{4}-\d{2}(-\d{2})?$/.test(lower) ||
-    /^\d+$/.test(lower)
-  )
+  return /^v\d+$/.test(lower) || /^\d{4}-\d{2}(-\d{2})?$/.test(lower) || /^\d+$/.test(lower)
 }
 
 const isPathParamSegment = (segment: string): boolean => {
@@ -60,13 +56,11 @@ const isPathParamSegment = (segment: string): boolean => {
 }
 
 const humanizeSegment = (segment: string): string => {
-  const spaced = segment
-    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
-    .replace(/[-_]/g, " ")
+  const spaced = segment.replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/[-_]/g, " ")
   return spaced
     .split(/\s+/)
     .filter(Boolean)
-    .map(word => `${word[0].toUpperCase()}${word.slice(1)}`)
+    .map((word) => `${word[0].toUpperCase()}${word.slice(1)}`)
     .join(" ")
 }
 
@@ -75,9 +69,7 @@ const buildResourceName = (segments: string[]): string => {
     return ""
   }
   const selected =
-    segments.length > RESOURCE_SEGMENTS_LIMIT
-      ? segments.slice(-RESOURCE_SEGMENTS_LIMIT)
-      : segments
+    segments.length > RESOURCE_SEGMENTS_LIMIT ? segments.slice(-RESOURCE_SEGMENTS_LIMIT) : segments
   return selected.map(humanizeSegment).join(" ")
 }
 
@@ -85,13 +77,11 @@ const buildFallbackName = (methodName: string, path: string): string => {
   const normalizedMethod = methodName.trim()
   let segments = path.split("/").filter(Boolean)
   segments = segments.filter(
-    segment => !isVersionSegment(segment) && !isPathParamSegment(segment)
+    (segment) => !isVersionSegment(segment) && !isPathParamSegment(segment)
   )
   const resource = buildResourceName(segments)
   const methodLabel = normalizedMethod
-    ? `${normalizedMethod[0].toUpperCase()}${normalizedMethod
-        .slice(1)
-        .toLowerCase()}`
+    ? `${normalizedMethod[0].toUpperCase()}${normalizedMethod.slice(1).toLowerCase()}`
     : "Call"
   if (!resource) {
     return methodLabel

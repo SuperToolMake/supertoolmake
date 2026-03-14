@@ -1,55 +1,36 @@
 import { context, HTTPError } from "@budibase/backend-core"
-import { Row, TableSchema, Table } from "@budibase/types"
-import sdk from "../../../.."
-import {
-  csv,
-  Format,
-  json,
-  jsonWithSchema,
-} from "../../../../../api/controllers/table/exporters"
+import type { Row, Table, TableSchema } from "@budibase/types"
+import { csv, Format, json, jsonWithSchema } from "../../../../../api/controllers/table/exporters"
 import { getRowParams, InternalTables } from "../../../../../db/utils"
 import { breakRowIdField } from "../../../../../integrations/utils"
 import { outputProcessing } from "../../../../../utilities/rowProcessor"
-import { ExportRowsParams, ExportRowsResult } from "../types"
+import sdk from "../../../.."
+import type { ExportRowsParams, ExportRowsResult } from "../types"
 
-export async function exportRows(
-  options: ExportRowsParams
-): Promise<ExportRowsResult> {
-  const {
-    tableId,
-    format,
-    rowIds,
-    columns,
-    query,
-    sort,
-    sortOrder,
-    delimiter,
-    customHeaders,
-  } = options
+export async function exportRows(options: ExportRowsParams): Promise<ExportRowsResult> {
+  const { tableId, format, rowIds, columns, query, sort, sortOrder, delimiter, customHeaders } =
+    options
   const db = context.getWorkspaceDB()
   const table = await sdk.tables.getTable(tableId)
 
   let result: Row[] = []
   if (rowIds) {
-    let response = (
+    const response = (
       await db.allDocs<Row>({
         include_docs: true,
         keys: rowIds.map((row: string) => {
           const ids = breakRowIdField(row)
           if (ids.length > 1) {
-            throw new HTTPError(
-              "Export data does not support composite keys.",
-              400
-            )
+            throw new HTTPError("Export data does not support composite keys.", 400)
           }
           return ids[0]
         }),
       })
-    ).rows.map(row => row.doc!)
+    ).rows.map((row) => row.doc!)
 
     result = await outputProcessing(table, response)
   } else {
-    let searchResponse = await sdk.rows.search({
+    const searchResponse = await sdk.rows.search({
       tableId,
       query: query || {},
       sort,
@@ -59,7 +40,7 @@ export async function exportRows(
   }
 
   let rows: Row[] = []
-  let schema = table.schema
+  const schema = table.schema
   let headers
 
   result = trimFields(result, schema)
@@ -68,7 +49,7 @@ export async function exportRows(
   if (columns && columns.length) {
     for (let i = 0; i < result.length; i++) {
       rows[i] = {}
-      for (let column of columns) {
+      for (const column of columns) {
         rows[i][column] = result[i][column]
       }
     }
@@ -77,22 +58,11 @@ export async function exportRows(
     rows = result
   }
 
-  let exportRows = sdk.rows.utils.cleanExportRows(
-    rows,
-    schema,
-    format,
-    columns,
-    customHeaders
-  )
+  const exportRows = sdk.rows.utils.cleanExportRows(rows, schema, format, columns, customHeaders)
   if (format === Format.CSV) {
     return {
       fileName: "export.csv",
-      content: csv(
-        headers ?? Object.keys(rows[0]),
-        exportRows,
-        delimiter,
-        customHeaders
-      ),
+      content: csv(headers ?? Object.keys(rows[0]), exportRows, delimiter, customHeaders),
     }
   } else if (format === Format.JSON) {
     return {
@@ -119,10 +89,7 @@ async function getTableForFetch(tableId: string): Promise<Table> {
   return await sdk.tables.getTable(tableId)
 }
 
-export async function fetchRaw(
-  tableId: string,
-  limit?: number
-): Promise<Row[]> {
+export async function fetchRaw(tableId: string, limit?: number): Promise<Row[]> {
   const db = context.getWorkspaceDB()
   let rows
   if (tableId === InternalTables.USER_METADATA) {
@@ -134,16 +101,16 @@ export async function fetchRaw(
         limit,
       })
     )
-    rows = response.rows.map(row => row.doc)
+    rows = response.rows.map((row) => row.doc)
   }
   return rows as Row[]
 }
 
 function trimFields(rows: Row[], schema: TableSchema) {
   const allowedFields = ["_id", ...Object.keys(schema)]
-  const result = rows.map(row =>
+  const result = rows.map((row) =>
     Object.keys(row)
-      .filter(key => allowedFields.includes(key))
+      .filter((key) => allowedFields.includes(key))
       .reduce((acc, key) => ({ ...acc, [key]: row[key] }), {} as Row)
   )
   return result

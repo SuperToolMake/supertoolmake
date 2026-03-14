@@ -1,251 +1,231 @@
 <script lang="ts">
-  import {
-    ActionButton,
-    Drawer,
-    Button,
-    Body,
-    DrawerContent,
-    Layout,
-    Select,
-    Icon,
-    DatePicker,
-  } from "@budibase/bbui"
-  import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
-  import { QueryUtils, Constants } from "@budibase/frontend-core"
-  import { generate } from "shortid"
-  import { dndzone } from "svelte-dnd-action"
-  import { flip } from "svelte/animate"
-  import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
-  import { componentStore } from "@/stores/builder"
-  import { getComponentForSetting } from "@/components/design/settings/componentSettings"
-  import { cloneDeep } from "lodash"
-  import { createEventDispatcher } from "svelte"
-  import { BasicOperator, FieldType } from "@budibase/types"
-  import type {
-    ArrayOperator,
-    ComponentCondition,
-    ComponentSetting,
-    EnrichedBinding,
-  } from "@budibase/types"
+import {
+  ActionButton,
+  Body,
+  Button,
+  DatePicker,
+  type Drawer,
+  DrawerContent,
+  Icon,
+  Layout,
+  Select,
+} from "@budibase/bbui"
+import { Constants, QueryUtils } from "@budibase/frontend-core"
+import type {
+  ArrayOperator,
+  ComponentCondition,
+  ComponentSetting,
+  EnrichedBinding,
+} from "@budibase/types"
+import { BasicOperator, FieldType } from "@budibase/types"
+import { cloneDeep } from "lodash"
+import { generate } from "shortid"
+import { createEventDispatcher } from "svelte"
+import { flip } from "svelte/animate"
+import { dndzone } from "svelte-dnd-action"
+import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import { getComponentForSetting } from "@/components/design/settings/componentSettings"
+import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
+import { componentStore } from "@/stores/builder"
 
-  interface ExtendedComponentSetting extends ComponentSetting {
-    options?: any[]
-    placeholder?: string
-    supportsConditions?: boolean
+interface ExtendedComponentSetting extends ComponentSetting {
+  options?: any[]
+  placeholder?: string
+  supportsConditions?: boolean
+}
+
+export let componentInstance
+export let value
+export let conditions: ComponentCondition[] = []
+export let bindings: EnrichedBinding[] = []
+export let componentBindings: EnrichedBinding[] = []
+
+let drawer: Drawer
+const dispatch = createEventDispatcher()
+const flipDurationMs = 150
+const zoneType = generate()
+const actionOptions = [
+  {
+    label: "Hide component",
+    value: "hide",
+  },
+  {
+    label: "Show component",
+    value: "show",
+  },
+  {
+    label: "Update setting",
+    value: "update",
+  },
+]
+const valueTypeOptions = [
+  {
+    value: "string",
+    label: "Binding",
+  },
+  {
+    value: "number",
+    label: "Number",
+  },
+  {
+    value: "datetime",
+    label: "Date",
+  },
+  {
+    value: "boolean",
+    label: "Boolean",
+  },
+]
+
+const valueTypeToFieldTypeMap: Record<ComponentCondition["valueType"], FieldType> = {
+  string: FieldType.STRING,
+  number: FieldType.NUMBER,
+  datetime: FieldType.DATETIME,
+  boolean: FieldType.BOOLEAN,
+}
+
+let dragDisabled = true
+
+let settings: ExtendedComponentSetting[] = []
+
+$: count = value?.length
+$: conditionText = `${count || "No"} condition${count !== 1 ? "s" : ""} set`
+
+$: settings = componentStore.getComponentSettings(componentInstance?._component).concat({
+  label: "Custom CSS",
+  key: "_css",
+  type: "text",
+})
+$: settingOptions = settings
+  .filter((setting) => setting.supportsConditions !== false && setting.key !== "conditions")
+  .map((setting) => ({
+    label: makeLabel(setting),
+    value: setting.key,
+  }))
+
+const makeLabel = (setting: ComponentSetting) => {
+  const { section, label } = setting
+  if (section) {
+    return label ? `${section} - ${label}` : section
+  } else {
+    return label
   }
+}
 
-  export let componentInstance
-  export let value
-  export let conditions: ComponentCondition[] = []
-  export let bindings: EnrichedBinding[] = []
-  export let componentBindings: EnrichedBinding[] = []
+const getSettingDefinition = (key: string | undefined): ExtendedComponentSetting | undefined => {
+  return settings.find((setting) => setting.key === key)
+}
 
-  let drawer: Drawer
-  const dispatch = createEventDispatcher()
-  const flipDurationMs = 150
-  const zoneType = generate()
-  const actionOptions = [
+const addCondition = () => {
+  conditions = [
+    ...conditions,
     {
-      label: "Hide component",
-      value: "hide",
-    },
-    {
-      label: "Show component",
-      value: "show",
-    },
-    {
-      label: "Update setting",
-      value: "update",
+      id: generate(),
+      action: "hide",
+      operator: BasicOperator.EQUAL,
+      valueType: "string",
+      type: FieldType.STRING,
     },
   ]
-  const valueTypeOptions = [
-    {
-      value: "string",
-      label: "Binding",
-    },
-    {
-      value: "number",
-      label: "Number",
-    },
-    {
-      value: "datetime",
-      label: "Date",
-    },
-    {
-      value: "boolean",
-      label: "Boolean",
-    },
+}
+
+const removeCondition = (id: string) => {
+  conditions = conditions.filter((link) => link.id !== id)
+}
+
+const duplicateCondition = (id: string) => {
+  const condition: ComponentCondition = conditions.find((link) => link.id === id)!
+  const duplicate = { ...condition, id: generate() }
+  conditions = [...conditions, duplicate]
+}
+
+const handleFinalize = (e: CustomEvent) => {
+  updateConditions(e)
+  dragDisabled = true
+}
+
+const updateConditions = (e: CustomEvent) => {
+  conditions = e.detail.items
+}
+
+const getOperatorOptions = (condition: ComponentCondition) => {
+  return QueryUtils.getValidOperatorsForType({
+    type: condition.type as FieldType,
+  })
+}
+
+const onOperatorChange = (
+  condition: ComponentCondition,
+  newOperator: ArrayOperator | BasicOperator
+) => {
+  const noValueOptions = [
+    Constants.OperatorOptions.Empty.value,
+    Constants.OperatorOptions.NotEmpty.value,
   ]
-
-  const valueTypeToFieldTypeMap: Record<
-    ComponentCondition["valueType"],
-    FieldType
-  > = {
-    string: FieldType.STRING,
-    number: FieldType.NUMBER,
-    datetime: FieldType.DATETIME,
-    boolean: FieldType.BOOLEAN,
-  }
-
-  let dragDisabled = true
-
-  let settings: ExtendedComponentSetting[] = []
-
-  $: count = value?.length
-  $: conditionText = `${count || "No"} condition${count !== 1 ? "s" : ""} set`
-
-  $: settings = componentStore
-    .getComponentSettings(componentInstance?._component)
-    .concat({
-      label: "Custom CSS",
-      key: "_css",
-      type: "text",
-    })
-  $: settingOptions = settings
-    .filter(
-      setting =>
-        setting.supportsConditions !== false && setting.key !== "conditions"
-    )
-    .map(setting => ({
-      label: makeLabel(setting),
-      value: setting.key,
-    }))
-
-  const makeLabel = (setting: ComponentSetting) => {
-    const { section, label } = setting
-    if (section) {
-      return label ? `${section} - ${label}` : section
-    } else {
-      return label
-    }
-  }
-
-  const getSettingDefinition = (
-    key: string | undefined
-  ): ExtendedComponentSetting | undefined => {
-    return settings.find(setting => setting.key === key)
-  }
-
-  const addCondition = () => {
-    conditions = [
-      ...conditions,
-      {
-        id: generate(),
-        action: "hide",
-        operator: BasicOperator.EQUAL,
-        valueType: "string",
-        type: FieldType.STRING,
-      },
-    ]
-  }
-
-  const removeCondition = (id: string) => {
-    conditions = conditions.filter(link => link.id !== id)
-  }
-
-  const duplicateCondition = (id: string) => {
-    const condition: ComponentCondition = conditions.find(
-      link => link.id === id
-    )!
-    const duplicate = { ...condition, id: generate() }
-    conditions = [...conditions, duplicate]
-  }
-
-  const handleFinalize = (e: CustomEvent) => {
-    updateConditions(e)
-    dragDisabled = true
-  }
-
-  const updateConditions = (e: CustomEvent) => {
-    conditions = e.detail.items
-  }
-
-  const getOperatorOptions = (condition: ComponentCondition) => {
-    return QueryUtils.getValidOperatorsForType({
-      type: condition.type as FieldType,
-    })
-  }
-
-  const onOperatorChange = (
-    condition: ComponentCondition,
-    newOperator: ArrayOperator | BasicOperator
-  ) => {
-    const noValueOptions = [
-      Constants.OperatorOptions.Empty.value,
-      Constants.OperatorOptions.NotEmpty.value,
-    ]
-    condition.noValue = noValueOptions.includes(newOperator)
-    if (condition.noValue || newOperator === "oneOf") {
-      condition.referenceValue = null
-      condition.valueType = "string"
-      condition.type = FieldType.STRING
-    }
-  }
-
-  const onValueTypeChange = (
-    condition: ComponentCondition,
-    newValueType: ComponentCondition["valueType"]
-  ) => {
+  condition.noValue = noValueOptions.includes(newOperator)
+  if (condition.noValue || newOperator === "oneOf") {
     condition.referenceValue = null
-    condition.valueType = newValueType
-
-    condition.type = valueTypeToFieldTypeMap[newValueType]
-
-    // Ensure a valid operator is set
-    const validOperators = QueryUtils.getValidOperatorsForType({
-      type: condition.type,
-    }).map(x => x.value)
-    if (!validOperators.includes(condition.operator)) {
-      condition.operator =
-        (validOperators[0] as ArrayOperator | BasicOperator) ??
-        BasicOperator.EQUAL
-      onOperatorChange(condition, condition.operator)
-    }
+    condition.valueType = "string"
+    condition.type = FieldType.STRING
   }
+}
 
-  const onSettingChange = (e: CustomEvent, condition: ComponentCondition) => {
-    const setting = settings.find(x => x.key === e.detail)
-    if (setting?.defaultValue != null) {
-      condition.settingValue = setting.defaultValue
-    } else {
-      delete condition.settingValue
-    }
+const onValueTypeChange = (
+  condition: ComponentCondition,
+  newValueType: ComponentCondition["valueType"]
+) => {
+  condition.referenceValue = null
+  condition.valueType = newValueType
+
+  condition.type = valueTypeToFieldTypeMap[newValueType]
+
+  // Ensure a valid operator is set
+  const validOperators = QueryUtils.getValidOperatorsForType({
+    type: condition.type,
+  }).map((x) => x.value)
+  if (!validOperators.includes(condition.operator)) {
+    condition.operator = (validOperators[0] as ArrayOperator | BasicOperator) ?? BasicOperator.EQUAL
+    onOperatorChange(condition, condition.operator)
   }
+}
 
-  const onSettingValueChange = (
-    val: unknown,
-    condition: ComponentCondition
-  ) => {
-    condition.settingValue = val
+const onSettingChange = (e: CustomEvent, condition: ComponentCondition) => {
+  const setting = settings.find((x) => x.key === e.detail)
+  if (setting?.defaultValue != null) {
+    condition.settingValue = setting.defaultValue
+  } else {
+    delete condition.settingValue
   }
+}
 
-  const propertyControlChangeHandler = (condition: ComponentCondition) => {
-    return (val: unknown) => onSettingValueChange(val, condition)
-  }
+const onSettingValueChange = (val: unknown, condition: ComponentCondition) => {
+  condition.settingValue = val
+}
 
-  const openDrawer = () => {
-    conditions = cloneDeep(value || []).map((condition: ComponentCondition) => {
-      // Migrate old conditions that only have 'type' to also have 'valueType'
-      if (condition.valueType === undefined && condition.type) {
-        const typeToValueTypeMap: Record<
-          string,
-          ComponentCondition["valueType"]
-        > = {
-          string: "string",
-          number: "number",
-          boolean: "boolean",
-          datetime: "datetime",
-        }
-        condition.valueType = typeToValueTypeMap[condition.type] || "string"
+const propertyControlChangeHandler = (condition: ComponentCondition) => {
+  return (val: unknown) => onSettingValueChange(val, condition)
+}
+
+const openDrawer = () => {
+  conditions = cloneDeep(value || []).map((condition: ComponentCondition) => {
+    // Migrate old conditions that only have 'type' to also have 'valueType'
+    if (condition.valueType === undefined && condition.type) {
+      const typeToValueTypeMap: Record<string, ComponentCondition["valueType"]> = {
+        string: "string",
+        number: "number",
+        boolean: "boolean",
+        datetime: "datetime",
       }
-      return condition
-    })
-    drawer.show()
-  }
-  const save = async () => {
-    dispatch("change", conditions)
-    drawer.hide()
-  }
+      condition.valueType = typeToValueTypeMap[condition.type] || "string"
+    }
+    return condition
+  })
+  drawer.show()
+}
+const save = async () => {
+  dispatch("change", conditions)
+  drawer.hide()
+}
 </script>
 
 <ActionButton on:click={openDrawer}>{conditionText}</ActionButton>

@@ -1,13 +1,11 @@
-import { GetMigrationStatus } from "@budibase/types"
-import { BaseAPIClient } from "./types"
+import type { GetMigrationStatus } from "@budibase/types"
+import type { BaseAPIClient } from "./types"
 
 export interface MigrationEndpoints {
   getMigrationStatus: () => Promise<GetMigrationStatus>
 }
 
-export const buildMigrationEndpoints = (
-  API: BaseAPIClient
-): MigrationEndpoints => ({
+export const buildMigrationEndpoints = (API: BaseAPIClient): MigrationEndpoints => ({
   /**
    * Gets the info about the current app migration
    */

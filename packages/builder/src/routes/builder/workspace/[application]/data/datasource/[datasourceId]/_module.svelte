@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { builderStore, datasources } from "@/stores/builder"
-  import { params } from "@roxi/routify"
+import { params } from "@roxi/routify"
+import { builderStore, datasources } from "@/stores/builder"
 
-  $: datasourceId = $datasources.selectedDatasourceId
-  $: builderStore.selectResource(datasourceId!)
+$: datasourceId = $datasources.selectedDatasourceId
+$: builderStore.selectResource(datasourceId!)
 </script>
 
 {#key $params.datasourceId}

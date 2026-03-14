@@ -1,16 +1,13 @@
-import { it, expect, describe, beforeEach, vi } from "vitest"
-import {
-  defaultStore,
-  createDatasourceCreationStore,
-} from "./datasourceCreation"
 import { get } from "svelte/store"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { createDatasourceCreationStore, defaultStore } from "./datasourceCreation"
 
 vi.mock("@/stores/selectors", () => ({
   shouldIntegrationFetchTableNames: vi.fn(),
 }))
 
 describe("datasource creation store", () => {
-  beforeEach(ctx => {
+  beforeEach((ctx) => {
     vi.clearAllMocks()
     ctx.store = createDatasourceCreationStore()
 
@@ -20,19 +17,19 @@ describe("datasource creation store", () => {
   })
 
   describe("store creation", () => {
-    it("returns the default values", ctx => {
+    it("returns the default values", (ctx) => {
       expect(get(ctx.store)).toEqual(defaultStore)
     })
   })
 
   describe("cancel", () => {
     describe("when at the `selectTables` stage", () => {
-      beforeEach(ctx => {
+      beforeEach((ctx) => {
         ctx.store.selectTablesStage()
         ctx.store.cancel()
       })
 
-      it("marks the store as finished", ctx => {
+      it("marks the store as finished", (ctx) => {
         expect(get(ctx.store)).toEqual({
           ...defaultStore,
           stage: "selectTables",
@@ -42,32 +39,32 @@ describe("datasource creation store", () => {
     })
 
     describe("When at any previous stage", () => {
-      beforeEach(ctx => {
+      beforeEach((ctx) => {
         ctx.store.cancel()
       })
 
-      it("resets to the default values", ctx => {
+      it("resets to the default values", (ctx) => {
         expect(get(ctx.store)).toEqual(defaultStore)
       })
     })
   })
 
   describe("googleAuthStage", () => {
-    beforeEach(ctx => {
+    beforeEach((ctx) => {
       ctx.store.googleAuthStage()
     })
 
-    it("sets the stage", ctx => {
+    it("sets the stage", (ctx) => {
       expect(get(ctx.store)).toEqual({ ...defaultStore, stage: "googleAuth" })
     })
   })
 
   describe("setIntegration", () => {
-    beforeEach(ctx => {
+    beforeEach((ctx) => {
       ctx.store.setIntegration(ctx.integration)
     })
 
-    it("sets the integration", ctx => {
+    it("sets the integration", (ctx) => {
       expect(get(ctx.store)).toEqual({
         ...defaultStore,
         integration: ctx.integration,
@@ -76,11 +73,11 @@ describe("datasource creation store", () => {
   })
 
   describe("setConfig", () => {
-    beforeEach(ctx => {
+    beforeEach((ctx) => {
       ctx.store.setConfig(ctx.config)
     })
 
-    it("sets the config", ctx => {
+    it("sets the config", (ctx) => {
       expect(get(ctx.store)).toEqual({
         ...defaultStore,
         config: ctx.config,
@@ -89,21 +86,21 @@ describe("datasource creation store", () => {
   })
 
   describe("editConfigStage", () => {
-    beforeEach(ctx => {
+    beforeEach((ctx) => {
       ctx.store.editConfigStage()
     })
 
-    it("sets the stage", ctx => {
+    it("sets the stage", (ctx) => {
       expect(get(ctx.store)).toEqual({ ...defaultStore, stage: "editConfig" })
     })
   })
 
   describe("markAsFinished", () => {
-    beforeEach(ctx => {
+    beforeEach((ctx) => {
       ctx.store.markAsFinished()
     })
 
-    it("marks the store as finished", ctx => {
+    it("marks the store as finished", (ctx) => {
       expect(get(ctx.store)).toEqual({
         ...defaultStore,
         finished: true,

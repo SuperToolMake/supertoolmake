@@ -1,35 +1,35 @@
-import {
+import type {
   RestTemplate,
   RestTemplateGroup,
   RestTemplateGroupName,
   RestTemplateName,
 } from "@budibase/types"
-import { BudiStore } from "../BudiStore"
 import AttioLogo from "assets/rest-template-icons/attio.svg"
 import BambooHRLogo from "assets/rest-template-icons/bamboohr.svg"
 import ConfluenceLogo from "assets/rest-template-icons/confluence.svg"
 import DiscordLogo from "assets/rest-template-icons/discord.svg"
 import FigmaLogo from "assets/rest-template-icons/figma.svg"
-import JiraLogo from "assets/rest-template-icons/jira.svg"
 import GitHubLogo from "assets/rest-template-icons/github.svg"
+import GitlabLogo from "assets/rest-template-icons/gitlab.svg"
+import HubSpotLogo from "assets/rest-template-icons/hubspot.svg"
+import IntercomLogo from "assets/rest-template-icons/intercom.svg"
+import JiraLogo from "assets/rest-template-icons/jira.svg"
+import MicrosoftSharepointLogo from "assets/rest-template-icons/microsoft-sharepoint.svg"
+import MicrosoftTeamsLogo from "assets/rest-template-icons/microsoft-teams.svg"
+import NotionLogo from "assets/rest-template-icons/notion.svg"
 import OktaLogo from "assets/rest-template-icons/okta.svg"
+import OpenRouterLogo from "assets/rest-template-icons/openrouter.svg"
 import PagerDutyLogo from "assets/rest-template-icons/pagerduty.svg"
 import ServiceNowLogo from "assets/rest-template-icons/servicenow.svg"
 import SlackLogo from "assets/rest-template-icons/slack.svg"
 import SplunkLogo from "assets/rest-template-icons/splunk.svg"
 import StripeLogo from "assets/rest-template-icons/stripe.svg"
+import TrelloLogo from "assets/rest-template-icons/trello.svg"
 import TwilioLogo from "assets/rest-template-icons/twilio.svg"
 import VirusTotalLogo from "assets/rest-template-icons/virustotal.svg"
-import GitlabLogo from "assets/rest-template-icons/gitlab.svg"
-import HubSpotLogo from "assets/rest-template-icons/hubspot.svg"
-import IntercomLogo from "assets/rest-template-icons/intercom.svg"
-import MicrosoftSharepointLogo from "assets/rest-template-icons/microsoft-sharepoint.svg"
-import MicrosoftTeamsLogo from "assets/rest-template-icons/microsoft-teams.svg"
-import NotionLogo from "assets/rest-template-icons/notion.svg"
-import OpenRouterLogo from "assets/rest-template-icons/openrouter.svg"
-import TrelloLogo from "assets/rest-template-icons/trello.svg"
 import XLogo from "assets/rest-template-icons/x.svg"
 import ZendeskLogo from "assets/rest-template-icons/zendesk.svg"
+import { BudiStore } from "../BudiStore"
 
 interface RestTemplatesState {
   templates: RestTemplate[]
@@ -39,8 +39,7 @@ interface RestTemplatesState {
 const hubspotRestTemplateGroup: RestTemplateGroup<"HubSpot"> = {
   name: "HubSpot",
   icon: HubSpotLogo,
-  description:
-    "CRM, marketing, CMS, and automation APIs for HubSpot's platform.",
+  description: "CRM, marketing, CMS, and automation APIs for HubSpot's platform.",
   operationsCount: 1274,
   templates: [
     {
@@ -754,8 +753,7 @@ const hubspotRestTemplateGroup: RestTemplateGroup<"HubSpot"> = {
     },
     {
       name: "HubSpot Pages",
-      description:
-        "Use these endpoints for interacting with Landing Pages and Site Pages",
+      description: "Use these endpoints for interacting with Landing Pages and Site Pages",
       specs: [
         {
           version: "v3",
@@ -999,8 +997,7 @@ const hubspotRestTemplateGroup: RestTemplateGroup<"HubSpot"> = {
     },
     {
       name: "HubSpot Source Code",
-      description:
-        "API for managing and retrieving source code files and metadata",
+      description: "API for managing and retrieving source code files and metadata",
       specs: [
         {
           version: "v3",
@@ -1211,14 +1208,12 @@ const hubspotRestTemplateGroup: RestTemplateGroup<"HubSpot"> = {
 const twilioRestTemplateGroup: RestTemplateGroup<"Twilio"> = {
   name: "Twilio",
   icon: TwilioLogo,
-  description:
-    "Combines powerful communications APIs with AI and first-party data.",
+  description: "Combines powerful communications APIs with AI and first-party data.",
   operationsCount: 795,
   templates: [
     {
       name: "Twilio Accounts",
-      description:
-        "Core account resources including usage, addresses, and credentials",
+      description: "Core account resources including usage, addresses, and credentials",
       specs: [
         {
           version: "1.0.0",
@@ -1240,8 +1235,7 @@ const twilioRestTemplateGroup: RestTemplateGroup<"Twilio"> = {
     },
     {
       name: "Twilio Bulk Exports",
-      description:
-        "BulkExports API for exporting messaging, voice, and usage data",
+      description: "BulkExports API for exporting messaging, voice, and usage data",
       specs: [
         {
           version: "1.0.0",
@@ -1285,8 +1279,7 @@ const twilioRestTemplateGroup: RestTemplateGroup<"Twilio"> = {
     },
     {
       name: "Twilio Events",
-      description:
-        "Event Streams resources for schema, sinks, and subscriptions",
+      description: "Event Streams resources for schema, sinks, and subscriptions",
       specs: [
         {
           version: "1.0.0",
@@ -1308,8 +1301,7 @@ const twilioRestTemplateGroup: RestTemplateGroup<"Twilio"> = {
     },
     {
       name: "Twilio Frontline",
-      description:
-        "Frontline mobile workforce accounts, users, and conversations",
+      description: "Frontline mobile workforce accounts, users, and conversations",
       specs: [
         {
           version: "1.0.0",
@@ -1430,8 +1422,7 @@ const twilioRestTemplateGroup: RestTemplateGroup<"Twilio"> = {
     },
     {
       name: "Twilio OAuth",
-      description:
-        "OAuth 2.0 API for authorization servers, clients, and tokens",
+      description: "OAuth 2.0 API for authorization servers, clients, and tokens",
       specs: [
         {
           version: "1.0.0",
@@ -1541,8 +1532,7 @@ const twilioRestTemplateGroup: RestTemplateGroup<"Twilio"> = {
     },
     {
       name: "Twilio Trunking",
-      description:
-        "Elastic SIP Trunking trunks, phone numbers, and credentials",
+      description: "Elastic SIP Trunking trunks, phone numbers, and credentials",
       specs: [
         {
           version: "1.0.0",
@@ -1618,55 +1608,52 @@ const zendeskRestTemplateGroup: RestTemplateGroup<"Zendesk"> = {
   ],
 }
 
-const microsoftSharepointRestTemplateGroup: RestTemplateGroup<"Microsoft SharePoint"> =
-  {
-    name: "Microsoft SharePoint",
-    icon: MicrosoftSharepointLogo,
-    description:
-      "Microsoft Graph SharePoint APIs for sites, drives, and shared items.",
-    operationsCount: 2826,
-    templates: [
-      {
-        name: "SharePoint Sites",
-        description: "SharePoint sites, lists, and content types.",
-        specs: [
-          {
-            version: "v1.0",
-            url: "https://raw.githubusercontent.com/Budibase/openapi-rest-templates/main/ms-sharepoint/sites/openapi.yaml",
-          },
-        ],
-        operationsCount: 650,
-      },
-      {
-        name: "SharePoint Drives",
-        description: "Drive items and file operations for SharePoint.",
-        specs: [
-          {
-            version: "v1.0",
-            url: "https://raw.githubusercontent.com/Budibase/openapi-rest-templates/main/ms-sharepoint/drives/openapi.yaml",
-          },
-        ],
-        operationsCount: 2024,
-      },
-      {
-        name: "SharePoint Shares",
-        description: "Shared items and sharing operations for SharePoint.",
-        specs: [
-          {
-            version: "v1.0",
-            url: "https://raw.githubusercontent.com/Budibase/openapi-rest-templates/main/ms-sharepoint/shares/openapi.yaml",
-          },
-        ],
-        operationsCount: 152,
-      },
-    ],
-  }
+const microsoftSharepointRestTemplateGroup: RestTemplateGroup<"Microsoft SharePoint"> = {
+  name: "Microsoft SharePoint",
+  icon: MicrosoftSharepointLogo,
+  description: "Microsoft Graph SharePoint APIs for sites, drives, and shared items.",
+  operationsCount: 2826,
+  templates: [
+    {
+      name: "SharePoint Sites",
+      description: "SharePoint sites, lists, and content types.",
+      specs: [
+        {
+          version: "v1.0",
+          url: "https://raw.githubusercontent.com/Budibase/openapi-rest-templates/main/ms-sharepoint/sites/openapi.yaml",
+        },
+      ],
+      operationsCount: 650,
+    },
+    {
+      name: "SharePoint Drives",
+      description: "Drive items and file operations for SharePoint.",
+      specs: [
+        {
+          version: "v1.0",
+          url: "https://raw.githubusercontent.com/Budibase/openapi-rest-templates/main/ms-sharepoint/drives/openapi.yaml",
+        },
+      ],
+      operationsCount: 2024,
+    },
+    {
+      name: "SharePoint Shares",
+      description: "Shared items and sharing operations for SharePoint.",
+      specs: [
+        {
+          version: "v1.0",
+          url: "https://raw.githubusercontent.com/Budibase/openapi-rest-templates/main/ms-sharepoint/shares/openapi.yaml",
+        },
+      ],
+      operationsCount: 152,
+    },
+  ],
+}
 
 const splunkRestTemplateGroup: RestTemplateGroup<"Splunk"> = {
   name: "Splunk",
   icon: SplunkLogo,
-  description:
-    "Official OpenAPI specifications for Splunk Cloud and Splunk Enterprise Security.",
+  description: "Official OpenAPI specifications for Splunk Cloud and Splunk Enterprise Security.",
   operationsCount: 151,
   templates: [
     {
@@ -1682,8 +1669,7 @@ const splunkRestTemplateGroup: RestTemplateGroup<"Splunk"> = {
     },
     {
       name: "Splunk Enterprise Security",
-      description:
-        "Enterprise Security API for managing detection and response data.",
+      description: "Enterprise Security API for managing detection and response data.",
       specs: [
         {
           version: "8.2.1",
@@ -1694,8 +1680,7 @@ const splunkRestTemplateGroup: RestTemplateGroup<"Splunk"> = {
     },
     {
       name: "Splunk Mission Control Automation",
-      description:
-        "Mission Control Automation API for SOAR playbook integrations.",
+      description: "Mission Control Automation API for SOAR playbook integrations.",
       specs: [
         {
           version: "3.1.0",
@@ -1711,8 +1696,7 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
   templates: [
     {
       name: "Attio",
-      description:
-        "CRM platform API for objects, records, lists, tasks, and webhooks",
+      description: "CRM platform API for objects, records, lists, tasks, and webhooks",
       specs: [
         {
           version: "2.0.0",
@@ -1724,8 +1708,7 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
     },
     {
       name: "BambooHR",
-      description:
-        "HRIS platform for employee records, time off, and performance management",
+      description: "HRIS platform for employee records, time off, and performance management",
       specs: [
         {
           version: "1.0",
@@ -1761,8 +1744,7 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
     },
     {
       name: "Figma",
-      description:
-        "Design platform API for files, projects, teams, and comments",
+      description: "Design platform API for files, projects, teams, and comments",
       specs: [
         {
           version: "0.35.0",
@@ -1774,8 +1756,7 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
     },
     {
       name: "GitHub",
-      description:
-        "GitHub REST API for repositories, issues, pull requests, and actions",
+      description: "GitHub REST API for repositories, issues, pull requests, and actions",
       specs: [
         {
           version: "1.1.4",
@@ -1813,8 +1794,7 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
     },
     {
       name: "PagerDuty",
-      description:
-        "PagerDuty REST resources for services, incidents, and incident automation",
+      description: "PagerDuty REST resources for services, incidents, and incident automation",
       specs: [
         {
           version: "2.0.0",
@@ -1877,8 +1857,7 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
     },
     {
       name: "Stripe",
-      description:
-        "Secure payment processing, subscriptions, billing, and reporting APIs",
+      description: "Secure payment processing, subscriptions, billing, and reporting APIs",
       specs: [
         {
           version: "2026-01-28.clover",
@@ -1903,8 +1882,7 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
     },
     {
       name: "Microsoft Teams",
-      description:
-        "Use Microsoft Graph to manage teams, channels, chats, and messages.",
+      description: "Use Microsoft Graph to manage teams, channels, chats, and messages.",
       specs: [
         {
           version: "v1.0",
@@ -1980,7 +1958,7 @@ export class RestTemplatesStore extends BudiStore<RestTemplatesState> {
 
   get templates(): RestTemplate[] {
     let templates: RestTemplate[] = []
-    this.subscribe(state => {
+    this.subscribe((state) => {
       templates = state.templates
     })()
     return templates
@@ -1988,7 +1966,7 @@ export class RestTemplatesStore extends BudiStore<RestTemplatesState> {
 
   get templateGroups(): RestTemplateGroup<RestTemplateGroupName>[] {
     let templateGroups: RestTemplateGroup<RestTemplateGroupName>[] = []
-    this.subscribe(state => {
+    this.subscribe((state) => {
       templateGroups = state.templateGroups
     })()
     return templateGroups
@@ -1998,14 +1976,12 @@ export class RestTemplatesStore extends BudiStore<RestTemplatesState> {
     if (!name) {
       return undefined
     }
-    const template = this.templates.find(template => template.name === name)
+    const template = this.templates.find((template) => template.name === name)
     if (template) {
       return template
     }
     for (const group of this.templateGroups) {
-      const groupTemplate = group.templates.find(
-        template => template.name === name
-      )
+      const groupTemplate = group.templates.find((template) => template.name === name)
       if (groupTemplate) {
         return {
           ...groupTemplate,

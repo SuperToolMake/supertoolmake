@@ -1,9 +1,9 @@
-import { checkBuilderEndpoint } from "./utilities/TestFunctions"
 import * as setup from "./utilities"
+import { checkBuilderEndpoint } from "./utilities/TestFunctions"
 
 describe("/integrations", () => {
-  let request = setup.getRequest()
-  let config = setup.getConfig()
+  const request = setup.getRequest()
+  const config = setup.getConfig()
 
   afterAll(setup.afterAll)
 

@@ -1,7 +1,7 @@
 export default function (url: string) {
   return url
     .split("/")
-    .map(part => {
+    .map((part) => {
       part = decodeURIComponent(part)
       part = part.replace(/ /g, "-")
 

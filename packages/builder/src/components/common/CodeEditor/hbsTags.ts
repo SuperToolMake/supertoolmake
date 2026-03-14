@@ -1,11 +1,5 @@
 import { FIND_ANY_HBS_REGEX } from "@budibase/string-templates"
-import {
-  Decoration,
-  EditorView,
-  ViewPlugin,
-  ViewUpdate,
-  WidgetType,
-} from "@codemirror/view"
+import { Decoration, EditorView, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view"
 
 export class HbsTagWidget extends WidgetType {
   text: string
@@ -50,7 +44,7 @@ const buildHbsTagDecorations = (
     !validBindings || validBindings.size === 0 || validBindings.has(binding)
 
   // Get all cursor/selection positions to check if cursor is inside a binding
-  const cursorPositions = view.state.selection.ranges.map(r => ({
+  const cursorPositions = view.state.selection.ranges.map((r) => ({
     from: r.from,
     to: r.to,
   }))
@@ -65,7 +59,7 @@ const buildHbsTagDecorations = (
 
       // Skip decoration if cursor is inside this binding range
       const cursorInside = cursorPositions.some(
-        cursor => cursor.from > start && cursor.from < end
+        (cursor) => cursor.from > start && cursor.from < end
       )
       if (cursorInside) {
         continue
@@ -77,9 +71,7 @@ const buildHbsTagDecorations = (
       }
       const icon = bindingIcons?.[clean]
       const widget = new HbsTagWidget(clean, icon)
-      decos.push(
-        Decoration.replace({ widget, inclusive: true }).range(start, end)
-      )
+      decos.push(Decoration.replace({ widget, inclusive: true }).range(start, end))
     }
   }
   return Decoration.set(decos, true)
@@ -93,32 +85,18 @@ export const hbsTagPlugin = (
     class {
       decorations
       constructor(view: EditorView) {
-        this.decorations = buildHbsTagDecorations(
-          view,
-          bindingIcons,
-          validBindings
-        )
+        this.decorations = buildHbsTagDecorations(view, bindingIcons, validBindings)
       }
       update(update: ViewUpdate) {
-        if (
-          update.docChanged ||
-          update.viewportChanged ||
-          update.selectionSet
-        ) {
-          this.decorations = buildHbsTagDecorations(
-            update.view,
-            bindingIcons,
-            validBindings
-          )
+        if (update.docChanged || update.viewportChanged || update.selectionSet) {
+          this.decorations = buildHbsTagDecorations(update.view, bindingIcons, validBindings)
         }
       }
     },
     {
-      decorations: v => v.decorations,
-      provide: plugin =>
-        EditorView.atomicRanges.of(
-          view => view.plugin(plugin)?.decorations || Decoration.none
-        ),
+      decorations: (v) => v.decorations,
+      provide: (plugin) =>
+        EditorView.atomicRanges.of((view) => view.plugin(plugin)?.decorations || Decoration.none),
     }
   )
 

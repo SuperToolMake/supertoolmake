@@ -1,4 +1,4 @@
-import { LockName, LockOptions, LockType } from "@budibase/types"
+import { LockName, type LockOptions, LockType } from "@budibase/types"
 import { DBTestConfiguration, generator } from "../../../tests"
 import { AUTO_EXTEND_POLLING_MS, doWithLock } from "../redlockImpl"
 
@@ -32,29 +32,28 @@ describe("redlockImpl", () => {
       )
     }
 
-    it.each(Object.values(LockType))(
-      "should return the task value and release the lock",
-      async (lockType: LockType) => {
-        const expectedResult = generator.guid()
-        const mockTask = jest.fn().mockResolvedValue(expectedResult)
+    it.each(
+      Object.values(LockType)
+    )("should return the task value and release the lock", async (lockType: LockType) => {
+      const expectedResult = generator.guid()
+      const mockTask = jest.fn().mockResolvedValue(expectedResult)
 
-        const opts: LockOptions = {
-          name: LockName.PERSIST_WRITETHROUGH,
-          type: lockType,
-          ttl: lockTtl,
-        }
-
-        const result = await runLockWithExecutionTime({
-          opts,
-          task: mockTask,
-          executionTimeMs: 0,
-        })
-
-        expect(result.executed).toBe(true)
-        expect(result.executed && result.result).toBe(expectedResult)
-        expect(mockTask).toHaveBeenCalledTimes(1)
+      const opts: LockOptions = {
+        name: LockName.PERSIST_WRITETHROUGH,
+        type: lockType,
+        ttl: lockTtl,
       }
-    )
+
+      const result = await runLockWithExecutionTime({
+        opts,
+        task: mockTask,
+        executionTimeMs: 0,
+      })
+
+      expect(result.executed).toBe(true)
+      expect(result.executed && result.result).toBe(expectedResult)
+      expect(mockTask).toHaveBeenCalledTimes(1)
+    })
 
     it("should extend when type is autoextend", async () => {
       const expectedResult = generator.guid()
@@ -79,27 +78,26 @@ describe("redlockImpl", () => {
       expect(mockOnExtend).toHaveBeenCalledTimes(5)
     })
 
-    it.each(Object.values(LockType).filter(t => t !== LockType.AUTO_EXTEND))(
-      "should timeout when type is %s",
-      async (lockType: LockType) => {
-        const mockTask = jest.fn().mockResolvedValue("mockResult")
+    it.each(
+      Object.values(LockType).filter((t) => t !== LockType.AUTO_EXTEND)
+    )("should timeout when type is %s", async (lockType: LockType) => {
+      const mockTask = jest.fn().mockResolvedValue("mockResult")
 
-        const opts: LockOptions = {
-          name: LockName.PERSIST_WRITETHROUGH,
-          type: lockType,
-          ttl: lockTtl,
-        }
-
-        await expect(
-          runLockWithExecutionTime({
-            opts,
-            task: mockTask,
-            executionTimeMs: lockTtl * 2,
-          })
-        ).rejects.toThrow(
-          `Unable to fully release the lock on resource "lock:${config.tenantId}_persist_writethrough".`
-        )
+      const opts: LockOptions = {
+        name: LockName.PERSIST_WRITETHROUGH,
+        type: lockType,
+        ttl: lockTtl,
       }
-    )
+
+      await expect(
+        runLockWithExecutionTime({
+          opts,
+          task: mockTask,
+          executionTimeMs: lockTtl * 2,
+        })
+      ).rejects.toThrow(
+        `Unable to fully release the lock on resource "lock:${config.tenantId}_persist_writethrough".`
+      )
+    })
   })
 })

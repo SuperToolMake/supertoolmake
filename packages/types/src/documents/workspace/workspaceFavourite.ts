@@ -1,5 +1,5 @@
-import { WorkspaceResource } from "../../api"
-import { Document } from "../document"
+import type { WorkspaceResource } from "../../api"
+import type { Document } from "../document"
 
 export interface WorkspaceFavourite extends Document {
   resourceType: WorkspaceResource

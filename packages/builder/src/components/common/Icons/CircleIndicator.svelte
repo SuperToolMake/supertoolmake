@@ -1,13 +1,13 @@
 <script lang="ts">
-  export let color = "currentColor"
-  export let size: "S" | "M" = "M"
+export let color = "currentColor"
+export let size: "S" | "M" = "M"
 
-  const sizes = {
-    S: 6,
-    M: 8,
-  }
+const sizes = {
+  S: 6,
+  M: 8,
+}
 
-  $: sizePx = sizes[size]
+$: sizePx = sizes[size]
 </script>
 
 <svg

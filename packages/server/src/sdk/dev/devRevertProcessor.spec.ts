@@ -1,6 +1,6 @@
 import { db } from "@budibase/backend-core"
 import { generator } from "@budibase/backend-core/tests"
-import { DevRevertQueueData } from "@budibase/types"
+import type { DevRevertQueueData } from "@budibase/types"
 import TestConfiguration from "../../tests/utilities/TestConfiguration"
 import { devRevertProcessor } from "./devRevertProcessor"
 

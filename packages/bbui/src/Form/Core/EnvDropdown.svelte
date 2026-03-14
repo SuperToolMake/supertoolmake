@@ -1,96 +1,96 @@
 <script lang="ts">
-  import "@spectrum-css/textfield/dist/index-vars.css"
-  import { createEventDispatcher, onMount } from "svelte"
-  import clickOutside from "../../Actions/clickOutside"
-  import Divider from "../../Divider/Divider.svelte"
-  import Icon from "../../Icon/Icon.svelte"
-  import type { EnvDropdownType } from "../../types"
+import "@spectrum-css/textfield/dist/index-vars.css"
+import { createEventDispatcher, onMount } from "svelte"
+import clickOutside from "../../Actions/clickOutside"
+import Divider from "../../Divider/Divider.svelte"
+import Icon from "../../Icon/Icon.svelte"
+import type { EnvDropdownType } from "../../types"
 
-  export let value: string | number | undefined = undefined
-  export let placeholder: string | undefined = undefined
-  export let type: EnvDropdownType = "text"
-  export let disabled: boolean = false
-  export let id: string | undefined = undefined
-  export let readonly: boolean = false
-  export let updateOnChange: boolean = true
-  export let align: string | undefined = undefined
-  export let autofocus: boolean = false
-  export let variables
-  export let showModal: () => void
-  export let environmentVariablesEnabled
-  export let handleUpgradePanel: () => void
-  const dispatch = createEventDispatcher()
+export let value: string | number | undefined = undefined
+export let placeholder: string | undefined = undefined
+export let type: EnvDropdownType = "text"
+export let disabled: boolean = false
+export let id: string | undefined = undefined
+export let readonly: boolean = false
+export let updateOnChange: boolean = true
+export let align: string | undefined = undefined
+export let autofocus: boolean = false
+export let variables
+export let showModal: () => void
+export let environmentVariablesEnabled
+export let handleUpgradePanel: () => void
+const dispatch = createEventDispatcher()
 
-  let field: HTMLInputElement
-  let focus = false
-  let open = false
+let field: HTMLInputElement
+let focus = false
+let open = false
 
-  const STRIP_NAME_REGEX = /{{\s*env\.([^\s]+)\s*}}/g
+const STRIP_NAME_REGEX = /{{\s*env\.([^\s]+)\s*}}/g
 
-  // Strips the name out of the value which is {{ env.Variable }} resulting in an array like ["Variable"]
-  $: hbsValue = (String(value) && STRIP_NAME_REGEX.exec(String(value))) || []
+// Strips the name out of the value which is {{ env.Variable }} resulting in an array like ["Variable"]
+$: hbsValue = (String(value) && STRIP_NAME_REGEX.exec(String(value))) || []
 
-  const updateValue = (newValue: any) => {
-    if (readonly) {
-      return
-    }
-    if (type === "number") {
-      const float = parseFloat(newValue)
-      newValue = isNaN(float) ? null : float
-    }
-    dispatch("change", newValue)
+const updateValue = (newValue: any) => {
+  if (readonly) {
+    return
   }
-
-  const onFocus = () => {
-    if (readonly) {
-      return
-    }
-    focus = true
+  if (type === "number") {
+    const float = parseFloat(newValue)
+    newValue = isNaN(float) ? null : float
   }
+  dispatch("change", newValue)
+}
 
-  const onBlur = (event: any) => {
-    if (readonly) {
-      return
-    }
-    focus = false
-    updateValue(event.target.value)
+const onFocus = () => {
+  if (readonly) {
+    return
   }
+  focus = true
+}
 
-  const onInput = (event: any) => {
-    if (readonly || !updateOnChange) {
-      return
-    }
-    updateValue(event.target.value)
+const onBlur = (event: any) => {
+  if (readonly) {
+    return
   }
+  focus = false
+  updateValue(event.target.value)
+}
 
-  const handleOutsideClick = (event: Event) => {
-    if (open) {
-      event.stopPropagation()
-      open = false
-      focus = false
-      dispatch("closed")
-    }
+const onInput = (event: any) => {
+  if (readonly || !updateOnChange) {
+    return
   }
+  updateValue(event.target.value)
+}
 
-  const handleVarSelect = (variable: string) => {
+const handleOutsideClick = (event: Event) => {
+  if (open) {
+    event.stopPropagation()
     open = false
     focus = false
-    updateValue(`{{ env.${variable} }}`)
+    dispatch("closed")
   }
+}
 
-  onMount(() => {
-    focus = autofocus
-    if (focus) field.focus()
-  })
+const handleVarSelect = (variable: string) => {
+  open = false
+  focus = false
+  updateValue(`{{ env.${variable} }}`)
+}
 
-  function removeVariable() {
-    updateValue("")
-  }
+onMount(() => {
+  focus = autofocus
+  if (focus) field.focus()
+})
 
-  function openPopover() {
-    open = true
-    focus = true
-  }
+function removeVariable() {
+  updateValue("")
+}
+
+function openPopover() {
+  open = true
+  focus = true
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

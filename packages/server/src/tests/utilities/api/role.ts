@@ -1,12 +1,12 @@
-import {
+import type {
   AccessibleRolesResponse,
   FetchRolesResponse,
   FindRoleResponse,
+  Role,
   SaveRoleRequest,
   SaveRoleResponse,
-  Role,
 } from "@budibase/types"
-import { Expectations, TestAPI } from "./base"
+import { type Expectations, TestAPI } from "./base"
 
 export class RoleAPI extends TestAPI {
   fetch = async (expectations?: Expectations) => {

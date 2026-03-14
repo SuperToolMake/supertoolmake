@@ -1,7 +1,7 @@
-import { processString, processObject, isValid } from "../src/index"
-import tableJson from "./examples/table.json"
 import dayjs from "dayjs"
+import { isValid, processObject, processString } from "../src/index"
 import { UUID_REGEX } from "./constants"
+import tableJson from "./examples/table.json"
 
 describe("test the custom helpers we have applied", () => {
   it("should be able to use the object helper", async () => {
@@ -14,11 +14,7 @@ describe("test the custom helpers we have applied", () => {
 
 describe("test that it can run without helpers", () => {
   it("should be able to run without helpers", async () => {
-    const output = await processString(
-      "{{ avg 1 1 1 }}",
-      {},
-      { noHelpers: true }
-    )
+    const output = await processString("{{ avg 1 1 1 }}", {}, { noHelpers: true })
     const valid = await processString("{{ avg 1 1 1 }}", {})
     expect(valid).toBe("1")
     expect(output).toBe("")
@@ -68,12 +64,9 @@ describe("test the array helpers", () => {
   })
 
   it("should allow use of the filter helper", async () => {
-    const output = await processString(
-      '{{#filter array "person"}}THING{{else}}OTHER{{/filter}}',
-      {
-        array,
-      }
-    )
+    const output = await processString('{{#filter array "person"}}THING{{else}}OTHER{{/filter}}', {
+      array,
+    })
     expect(output).toBe("THING")
   })
 
@@ -182,12 +175,9 @@ describe("test the date helpers", () => {
 
   it("should test the timezone capabilities", async () => {
     const date = new Date(1611577535000)
-    const output = await processString(
-      "{{ date time 'HH-mm-ss Z' 'America/New_York' }}",
-      {
-        time: date.toUTCString(),
-      }
-    )
+    const output = await processString("{{ date time 'HH-mm-ss Z' 'America/New_York' }}", {
+      time: date.toUTCString(),
+    })
     const formatted = dayjs(date).tz("America/New_York").format("HH-mm-ss Z")
     expect(output).toBe(formatted)
   })
@@ -272,13 +262,10 @@ describe("test the string helpers", () => {
 
 describe("test the comparison helpers", () => {
   async function compare(func: string, a: any, b: any) {
-    const output = await processString(
-      `{{ #${func} a b }}Success{{ else }}Fail{{ /${func} }}`,
-      {
-        a,
-        b,
-      }
-    )
+    const output = await processString(`{{ #${func} a b }}Success{{ else }}Fail{{ /${func} }}`, {
+      a,
+      b,
+    })
     expect(output).toBe("Success")
   }
 
@@ -299,12 +286,9 @@ describe("test the comparison helpers", () => {
   })
 
   it("should allow use of gte with a literal value", async () => {
-    const output = await processString(
-      `{{ #gte a "50" }}s{{ else }}f{{ /gte }}`,
-      {
-        a: 51,
-      }
-    )
+    const output = await processString(`{{ #gte a "50" }}s{{ else }}f{{ /gte }}`, {
+      a: 51,
+    })
     expect(output).toBe("s")
   })
 })
@@ -314,10 +298,7 @@ describe("Test the object/array helper", () => {
     const context = {
       items: [{ price: 20 }, { price: 30 }],
     }
-    const output = await processString(
-      "{{ literal ( sum ( pluck items 'price' ) ) }}",
-      context
-    )
+    const output = await processString("{{ literal ( sum ( pluck items 'price' ) ) }}", context)
     expect(output).toBe(50)
   })
 
@@ -431,7 +412,7 @@ describe("Cover a few complex use cases", () => {
 
   it("should confirm a bunch of invalid strings", () => {
     const invalids = ["{{ awd )", "{{ awdd () ", "{{ awdwad ", "{{ awddawd }"]
-    for (let invalid of invalids) {
+    for (const invalid of invalids) {
       const validity = isValid(invalid)
       expect(validity).toBe(false)
     }

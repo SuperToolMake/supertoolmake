@@ -1,6 +1,6 @@
 import * as controller from "../controllers/permission"
-import { permissionValidator } from "./utils/validators"
 import { builderRoutes } from "./endpointGroups"
+import { permissionValidator } from "./utils/validators"
 
 builderRoutes
   .get("/api/permission/builtin", controller.fetchBuiltin)

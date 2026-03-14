@@ -3,10 +3,10 @@ const LocalStrategy = require("passport-local").Strategy
 
 import {
   ConfigType,
-  GoogleInnerConfig,
-  OIDCInnerConfig,
-  PlatformLogoutOpts,
-  SessionCookie,
+  type GoogleInnerConfig,
+  type OIDCInnerConfig,
+  type PlatformLogoutOpts,
+  type SessionCookie,
   SSOProviderType,
 } from "@budibase/types"
 import * as userCache from "../cache/user"
@@ -14,14 +14,7 @@ import { invalidateUser } from "../cache/user"
 import * as configs from "../configs"
 import { Cookie } from "../constants"
 import { getGlobalDB } from "../context"
-import {
-  authenticated,
-  csrf,
-  google,
-  local,
-  oidc,
-  tenancy,
-} from "../middleware"
+import { authenticated, csrf, google, local, oidc, tenancy } from "../middleware"
 import { ssoSaveUserNoOp } from "../middleware/passport/sso/sso"
 import { getSessionsForUser, invalidateSessions } from "../security/sessions"
 import { clearCookie, getCookie } from "../utils"
@@ -72,7 +65,7 @@ async function refreshOIDCAccessToken(
     },
   })
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     refresh.requestNewAccessToken(
       ConfigType.OIDC,
       refreshToken,
@@ -87,24 +80,18 @@ async function refreshGoogleAccessToken(
   config: GoogleInnerConfig,
   refreshToken: any
 ): Promise<RefreshResponse> {
-  let callbackUrl = await google.getCallbackUrl(config)
+  const callbackUrl = await google.getCallbackUrl(config)
 
   let strategy
   try {
-    strategy = await google.strategyFactory(
-      config,
-      callbackUrl,
-      ssoSaveUserNoOp
-    )
+    strategy = await google.strategyFactory(config, callbackUrl, ssoSaveUserNoOp)
   } catch (err: any) {
-    throw new Error(
-      `Error constructing OIDC refresh strategy: message=${err.message}`
-    )
+    throw new Error(`Error constructing OIDC refresh strategy: message=${err.message}`)
   }
 
   refresh.use(strategy)
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     refresh.requestNewAccessToken(
       ConfigType.GOOGLE,
       refreshToken,
@@ -141,7 +128,7 @@ export async function refreshOAuthToken(
       return refreshOIDCAccessToken(oidcConfig, refreshToken)
     }
     case SSOProviderType.GOOGLE: {
-      let googleConfig = await configs.getGoogleConfig()
+      const googleConfig = await configs.getGoogleConfig()
       if (!googleConfig) {
         return { err: { data: "Google configuration not found" } }
       }
@@ -194,9 +181,7 @@ export async function platformLogout(opts: PlatformLogoutOpts) {
   let sessions = await getSessionsForUser(userId)
 
   if (currentSession && keepActiveSession) {
-    sessions = sessions.filter(
-      session => session.sessionId !== currentSession.sessionId
-    )
+    sessions = sessions.filter((session) => session.sessionId !== currentSession.sessionId)
   } else {
     // clear cookies
     clearCookie(ctx, Cookie.Auth)

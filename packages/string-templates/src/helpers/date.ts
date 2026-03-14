@@ -1,13 +1,12 @@
-import dayjs, { UnitType } from "dayjs"
-
-import dayjsDurationPlugin from "dayjs/plugin/duration"
+import dayjs, { type UnitType } from "dayjs"
 import dayjsAdvancedFormatPlugin from "dayjs/plugin/advancedFormat"
+import dayjsDurationPlugin from "dayjs/plugin/duration"
 import dayjsIsoWeekPlugin from "dayjs/plugin/isoWeek"
-import dayjsWeekYearPlugin from "dayjs/plugin/weekYear"
-import dayjsWeekOfYearPlugin from "dayjs/plugin/weekOfYear"
 import dayjsRelativeTimePlugin from "dayjs/plugin/relativeTime"
-import dayjsUtcPlugin from "dayjs/plugin/utc"
 import dayjsTimezonePlugin from "dayjs/plugin/timezone"
+import dayjsUtcPlugin from "dayjs/plugin/utc"
+import dayjsWeekOfYearPlugin from "dayjs/plugin/weekOfYear"
+import dayjsWeekYearPlugin from "dayjs/plugin/weekYear"
 
 dayjs.extend(dayjsDurationPlugin)
 dayjs.extend(dayjsAdvancedFormatPlugin)
@@ -108,10 +107,7 @@ export const date = (str: any, pattern: any, options: any) => {
 
   let date = dayjs(new Date(config.str))
   if (typeof config.options === "string") {
-    date =
-      config.options.toLowerCase() === "utc"
-        ? date.utc()
-        : date.tz(config.options)
+    date = config.options.toLowerCase() === "utc" ? date.utc() : date.tz(config.options)
   } else {
     date = date.tz(dayjs.tz.guess())
   }

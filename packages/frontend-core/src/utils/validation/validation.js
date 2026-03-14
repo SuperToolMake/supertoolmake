@@ -1,4 +1,4 @@
-import { writable, derived } from "svelte/store"
+import { derived, writable } from "svelte/store"
 
 // DEPRECATED - Use the yup based validators for future validation
 
@@ -13,16 +13,13 @@ export function createValidationStore(initialValue, ...validators) {
     }
     return touched
   })
-  const error = derived(
-    [value, touchedStore],
-    ([$v, $t]) => $t && validate($v, validators)
-  )
+  const error = derived([value, touchedStore], ([$v, $t]) => $t && validate($v, validators))
 
   return [value, error, touchedStore]
 }
 
 function validate(value, validators) {
-  const failing = validators.find(v => v(value) !== true)
+  const failing = validators.find((v) => v(value) !== true)
 
   return failing && failing(value)
 }

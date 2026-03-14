@@ -1,17 +1,16 @@
 <script lang="ts">
-  import { StatusLight, AbsTooltip } from "@budibase/bbui"
-  import { roles } from "@/stores/builder"
-  import { Roles } from "@/constants/backend"
+import { AbsTooltip, StatusLight } from "@budibase/bbui"
+import { Roles } from "@/constants/backend"
+import { roles } from "@/stores/builder"
 
-  export let roleId: string
+export let roleId: string
 
-  $: role = $roles.find(role => role._id === roleId)
-  $: color =
-    role?.uiMetadata?.color || "var(--spectrum-global-color-static-magenta-400)"
-  $: tooltip =
-    roleId === Roles.PUBLIC
-      ? "Open to the public"
-      : `Requires ${role?.uiMetadata?.displayName || "Unknown role"} access`
+$: role = $roles.find((role) => role._id === roleId)
+$: color = role?.uiMetadata?.color || "var(--spectrum-global-color-static-magenta-400)"
+$: tooltip =
+  roleId === Roles.PUBLIC
+    ? "Open to the public"
+    : `Requires ${role?.uiMetadata?.displayName || "Unknown role"} access`
 </script>
 
 <AbsTooltip text={tooltip} {color}>

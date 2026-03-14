@@ -1,4 +1,4 @@
-import { Document, Component } from "@budibase/types"
+import type { Component, Document } from "@budibase/types"
 import { cloneDeep } from "lodash/fp"
 
 export class BaseStructure<T extends Document> {
@@ -18,7 +18,7 @@ export class BaseStructure<T extends Document> {
   }
 
   customProps(props: Record<string, any>) {
-    for (let key of Object.keys(props)) {
+    for (const key of Object.keys(props)) {
       this._json[key as keyof T] = props[key]
     }
     return this
@@ -27,7 +27,7 @@ export class BaseStructure<T extends Document> {
   json() {
     const structure = cloneDeep(this._json)
     if (this._children.length !== 0) {
-      for (let child of this._children) {
+      for (const child of this._children) {
         if (this._isScreen) {
           ;(structure as any).props._children.push(child.json?.() || child)
         } else {

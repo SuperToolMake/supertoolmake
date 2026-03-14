@@ -53,9 +53,7 @@ describe("objectExists", () => {
     error.statusCode = 403
     mockHeadObject.mockRejectedValue(error)
 
-    await expect(objectExists("test-bucket", "test-key")).rejects.toThrow(
-      "Access Denied"
-    )
+    await expect(objectExists("test-bucket", "test-key")).rejects.toThrow("Access Denied")
   })
 
   it("should sanitize bucket and path", async () => {

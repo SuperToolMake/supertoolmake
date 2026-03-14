@@ -1,46 +1,44 @@
 <script>
-  import { ActionButton, Button, Drawer, notifications } from "@budibase/bbui"
-  import { createEventDispatcher } from "svelte"
-  import ButtonActionDrawer from "./ButtonActionDrawer.svelte"
-  import { cloneDeep } from "lodash/fp"
+import { ActionButton, Button, Drawer, notifications } from "@budibase/bbui"
+import { cloneDeep } from "lodash/fp"
+import { createEventDispatcher } from "svelte"
+import ButtonActionDrawer from "./ButtonActionDrawer.svelte"
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  export let key
-  export let value = []
-  export let name
-  export let bindings
-  export let nested
-  export let componentInstance
-  export let title = "Actions"
+export let key
+export let value = []
+export let name
+export let bindings
+export let nested
+export let componentInstance
+export let title = "Actions"
 
-  let drawer
-  let tmpValue
+let drawer
+let tmpValue
 
-  const openDrawer = () => {
-    tmpValue = cloneDeep(value)
-    drawer.show()
+const openDrawer = () => {
+  tmpValue = cloneDeep(value)
+  drawer.show()
+}
+
+const saveEventData = async () => {
+  dispatch("change", tmpValue)
+  notifications.success("Component actions saved.")
+  drawer.hide()
+}
+
+$: actionCount = value?.length
+$: actionText = `${actionCount || "No"} action${actionCount !== 1 ? "s" : ""} set`
+$: active = getActive(value)
+
+const getActive = (rules) => {
+  if (!rules?.length) {
+    return ""
+  } else {
+    return `active`
   }
-
-  const saveEventData = async () => {
-    dispatch("change", tmpValue)
-    notifications.success("Component actions saved.")
-    drawer.hide()
-  }
-
-  $: actionCount = value?.length
-  $: actionText = `${actionCount || "No"} action${
-    actionCount !== 1 ? "s" : ""
-  } set`
-  $: active = getActive(value)
-
-  const getActive = rules => {
-    if (!rules?.length) {
-      return ""
-    } else {
-      return `active`
-    }
-  }
+}
 </script>
 
 <div class="action-editor">

@@ -1,237 +1,213 @@
 <script>
-  import { getContext, setContext } from "svelte"
-  import { writable } from "svelte/store"
-  import { Heading, Icon, clickOutside } from "@budibase/bbui"
-  import { Constants } from "@budibase/frontend-core"
-  import NavItem from "./NavItem.svelte"
-  import UserMenu from "./UserMenu.svelte"
-  import Logo from "./Logo.svelte"
-  import {
-    getActiveConditions,
-    reduceConditionActions,
-  } from "@/utils/conditions"
+import { clickOutside, Heading, Icon } from "@budibase/bbui"
+import { Constants } from "@budibase/frontend-core"
+import { getContext, setContext } from "svelte"
+import { writable } from "svelte/store"
+import { getActiveConditions, reduceConditionActions } from "@/utils/conditions"
+import Logo from "./Logo.svelte"
+import NavItem from "./NavItem.svelte"
+import UserMenu from "./UserMenu.svelte"
 
-  const sdk = getContext("sdk")
-  const {
-    routeStore,
-    roleStore,
-    linkable,
-    builderStore,
-    sidePanelStore,
-    modalStore,
-  } = sdk
-  const context = getContext("context")
-  const navStateStore = writable({})
+const sdk = getContext("sdk")
+const { routeStore, roleStore, linkable, builderStore, sidePanelStore, modalStore } = sdk
+const context = getContext("context")
+const navStateStore = writable({})
 
-  // Legacy props which must remain unchanged for backwards compatibility
-  export let title
-  export let hideTitle = false
-  export let logoUrl
-  export let hideLogo = false
-  export let navigation = "Top"
-  export let sticky = false
-  export let links
-  export let width = "Large"
+// Legacy props which must remain unchanged for backwards compatibility
+export let title
+export let hideTitle = false
+export let logoUrl
+export let hideLogo = false
+export let navigation = "Top"
+export let sticky = false
+export let links
+export let width = "Large"
 
-  // New props from new design UI
-  export let navBackground
-  export let navTextColor
-  export let navWidth
-  export let pageWidth
-  export let logoLinkUrl
-  export let logoHeight
-  export let openLogoLinkInNewTab
-  export let textAlign
-  export let embedded = false
+// New props from new design UI
+export let navBackground
+export let navTextColor
+export let navWidth
+export let pageWidth
+export let logoLinkUrl
+export let logoHeight
+export let openLogoLinkInNewTab
+export let textAlign
+export let embedded = false
 
-  export let collapsible = false
+export let collapsible = false
 
-  const NavigationClasses = {
-    Top: "top",
-    Left: "left",
-    None: "none",
+const NavigationClasses = {
+  Top: "top",
+  Left: "left",
+  None: "none",
+}
+const WidthClasses = {
+  Max: "max",
+  Large: "l",
+  Medium: "m",
+  Small: "s",
+  "Extra small": "xs",
+}
+
+export let logoPosition = "top" // "top" or "bottom"
+export let titleSize = "S"
+export let titleColor // CSS color string, only affects title
+
+let mobileOpen = false
+let navCollapsed = false
+
+// Set some layout context. This isn't used in bindings but can be used
+// determine things about the current app layout.
+$: mobile = $context.device.mobile
+const store = writable({ headerHeight: 0 })
+$: store.set({
+  screenXOffset: getScreenXOffset(navigation, mobile),
+  screenYOffset: getScreenYOffset(navigation, mobile),
+})
+setContext("layout", store)
+
+$: enrichedNavItems = enrichNavItems(links, $roleStore)
+$: typeClass = NavigationClasses[navigation] || NavigationClasses.None
+$: navWidthClass = WidthClasses[navWidth || width] || WidthClasses.Large
+$: pageWidthClass = WidthClasses[pageWidth || width] || WidthClasses.Large
+$: navStyle = getNavStyle(
+  navBackground,
+  navTextColor,
+  logoHeight,
+  $context.device.width,
+  $context.device.height
+)
+$: autoCloseSidePanel =
+  !$builderStore.inBuilder && $sidePanelStore.open && !$sidePanelStore.ignoreClicksOutside
+
+$: screenId = $builderStore.inBuilder ? `${$builderStore.screen?._id}-screen` : "screen"
+$: navigationId = $builderStore.inBuilder ? `${$builderStore.screen?._id}-navigation` : "navigation"
+
+// Scroll navigation into view if selected.
+// Memoize into a primitive to avoid spamming this whenever builder store
+// changes.
+$: selected = $builderStore.inBuilder && $builderStore.selectedComponentId?.endsWith("-navigation")
+$: {
+  if (selected) {
+    const node = document.getElementsByClassName("nav-wrapper")?.[0]
+    if (node) {
+      node.style.scrollMargin = "100px"
+      node.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "start",
+      })
+    }
   }
-  const WidthClasses = {
-    Max: "max",
-    Large: "l",
-    Medium: "m",
-    Small: "s",
-    "Extra small": "xs",
+}
+
+const enrichNavItem = (navItem) => {
+  const internalLink = isInternal(navItem.url)
+  return {
+    ...navItem,
+    internalLink,
+    url: internalLink ? navItem.url : ensureExternal(navItem.url),
   }
+}
 
-  export let logoPosition = "top" // "top" or "bottom"
-  export let titleSize = "S"
-  export let titleColor // CSS color string, only affects title
-
-  let mobileOpen = false
-  let navCollapsed = false
-
-  // Set some layout context. This isn't used in bindings but can be used
-  // determine things about the current app layout.
-  $: mobile = $context.device.mobile
-  const store = writable({ headerHeight: 0 })
-  $: store.set({
-    screenXOffset: getScreenXOffset(navigation, mobile),
-    screenYOffset: getScreenYOffset(navigation, mobile),
-  })
-  setContext("layout", store)
-
-  $: enrichedNavItems = enrichNavItems(links, $roleStore)
-  $: typeClass = NavigationClasses[navigation] || NavigationClasses.None
-  $: navWidthClass = WidthClasses[navWidth || width] || WidthClasses.Large
-  $: pageWidthClass = WidthClasses[pageWidth || width] || WidthClasses.Large
-  $: navStyle = getNavStyle(
-    navBackground,
-    navTextColor,
-    logoHeight,
-    $context.device.width,
-    $context.device.height
-  )
-  $: autoCloseSidePanel =
-    !$builderStore.inBuilder &&
-    $sidePanelStore.open &&
-    !$sidePanelStore.ignoreClicksOutside
-
-  $: screenId = $builderStore.inBuilder
-    ? `${$builderStore.screen?._id}-screen`
-    : "screen"
-  $: navigationId = $builderStore.inBuilder
-    ? `${$builderStore.screen?._id}-navigation`
-    : "navigation"
-
-  // Scroll navigation into view if selected.
-  // Memoize into a primitive to avoid spamming this whenever builder store
-  // changes.
-  $: selected =
-    $builderStore.inBuilder &&
-    $builderStore.selectedComponentId?.endsWith("-navigation")
-  $: {
-    if (selected) {
-      const node = document.getElementsByClassName("nav-wrapper")?.[0]
-      if (node) {
-        node.style.scrollMargin = "100px"
-        node.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest",
-          inline: "start",
-        })
+const enrichNavItems = (navItems, userRoleHierarchy) => {
+  if (!navItems?.length) {
+    return []
+  }
+  return navItems
+    .filter((navItem) => {
+      // Strip nav items without text
+      if (!navItem.text) {
+        return false
       }
-    }
+
+      // Strip out links without URLs
+      if (navItem.type !== "sublinks" && !navItem.url) {
+        return false
+      }
+
+      // Filter to only links allowed by the current role
+      const role = navItem.roleId || Constants.Roles.BASIC
+      return userRoleHierarchy?.find((roleId) => roleId === role)
+    })
+    .map((navItem) => {
+      const enrichedNavItem = enrichNavItem(navItem)
+      if (navItem.type === "sublinks" && navItem.subLinks?.length) {
+        enrichedNavItem.subLinks = navItem.subLinks
+          .filter((subLink) => subLink.text && subLink.url)
+          .map(enrichNavItem)
+      }
+      return enrichedNavItem
+    })
+}
+
+function evaluateNavItemConditions(conditions = []) {
+  if (!conditions?.length) return true
+
+  // Get only the active (matching) conditions
+  const activeConditions = getActiveConditions(conditions)
+  const { visible } = reduceConditionActions(activeConditions)
+
+  if (visible == null) {
+    // If any show condition exists, default to hidden unless one matches
+    const hasShow = conditions.some((cond) => cond.action === "show")
+    return hasShow ? false : true
   }
+  return visible
+}
 
-  const enrichNavItem = navItem => {
-    const internalLink = isInternal(navItem.url)
-    return {
-      ...navItem,
-      internalLink,
-      url: internalLink ? navItem.url : ensureExternal(navItem.url),
-    }
-  }
+const isInternal = (url) => {
+  return url?.startsWith("/")
+}
 
-  const enrichNavItems = (navItems, userRoleHierarchy) => {
-    if (!navItems?.length) {
-      return []
-    }
-    return navItems
-      .filter(navItem => {
-        // Strip nav items without text
-        if (!navItem.text) {
-          return false
-        }
-
-        // Strip out links without URLs
-        if (navItem.type !== "sublinks" && !navItem.url) {
-          return false
-        }
-
-        // Filter to only links allowed by the current role
-        const role = navItem.roleId || Constants.Roles.BASIC
-        return userRoleHierarchy?.find(roleId => roleId === role)
-      })
-      .map(navItem => {
-        const enrichedNavItem = enrichNavItem(navItem)
-        if (navItem.type === "sublinks" && navItem.subLinks?.length) {
-          enrichedNavItem.subLinks = navItem.subLinks
-            .filter(subLink => subLink.text && subLink.url)
-            .map(enrichNavItem)
-        }
-        return enrichedNavItem
-      })
-  }
-
-  function evaluateNavItemConditions(conditions = []) {
-    if (!conditions?.length) return true
-
-    // Get only the active (matching) conditions
-    const activeConditions = getActiveConditions(conditions)
-    const { visible } = reduceConditionActions(activeConditions)
-
-    if (visible == null) {
-      // If any show condition exists, default to hidden unless one matches
-      const hasShow = conditions.some(cond => cond.action === "show")
-      return hasShow ? false : true
-    }
-    return visible
-  }
-
-  const isInternal = url => {
-    return url?.startsWith("/")
-  }
-
-  const ensureExternal = url => {
-    if (!url?.length) {
-      return url
-    }
-    return !url.startsWith("http") ? `http://${url}` : url
-  }
-
-  const getScreenXOffset = (navigation, mobile) => {
-    if (navigation !== "Left") {
-      return 0
-    }
-    return mobile ? "0px" : "250px"
-  }
-  const getScreenYOffset = (navigation, mobile) => {
-    if (mobile) {
-      return !navigation || navigation === "None" ? 0 : "61px"
-    } else {
-      return navigation === "Top" ? "137px" : "0px"
-    }
-  }
-
-  const getNavStyle = (
-    backgroundColor,
-    textColor,
-    logoHeight,
-    width,
-    height
-  ) => {
-    let style = `--width:${width}px; --height:${height}px;`
-    if (backgroundColor) {
-      style += `--navBackground:${backgroundColor};`
-    }
-    if (textColor) {
-      style += `--navTextColor:${textColor};`
-    }
-    style += `--logoHeight:${logoHeight || 24}px;`
-    return style
-  }
-
-  const getSanitizedUrl = (url, openInNewTab) => {
-    if (!isInternal(url)) {
-      return ensureExternal(url)
-    }
-    if (openInNewTab) {
-      return `#${url}`
-    }
+const ensureExternal = (url) => {
+  if (!url?.length) {
     return url
   }
+  return !url.startsWith("http") ? `http://${url}` : url
+}
 
-  const handleClickLink = () => {
-    mobileOpen = false
-    sidePanelStore.actions.close()
-    modalStore.actions.close()
+const getScreenXOffset = (navigation, mobile) => {
+  if (navigation !== "Left") {
+    return 0
   }
+  return mobile ? "0px" : "250px"
+}
+const getScreenYOffset = (navigation, mobile) => {
+  if (mobile) {
+    return !navigation || navigation === "None" ? 0 : "61px"
+  } else {
+    return navigation === "Top" ? "137px" : "0px"
+  }
+}
+
+const getNavStyle = (backgroundColor, textColor, logoHeight, width, height) => {
+  let style = `--width:${width}px; --height:${height}px;`
+  if (backgroundColor) {
+    style += `--navBackground:${backgroundColor};`
+  }
+  if (textColor) {
+    style += `--navTextColor:${textColor};`
+  }
+  style += `--logoHeight:${logoHeight || 24}px;`
+  return style
+}
+
+const getSanitizedUrl = (url, openInNewTab) => {
+  if (!isInternal(url)) {
+    return ensureExternal(url)
+  }
+  if (openInNewTab) {
+    return `#${url}`
+  }
+  return url
+}
+
+const handleClickLink = () => {
+  mobileOpen = false
+  sidePanelStore.actions.close()
+  modalStore.actions.close()
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

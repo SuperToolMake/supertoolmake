@@ -1,4 +1,4 @@
-import { Hosting } from ".."
+import type { Hosting } from ".."
 
 // GROUPS
 
@@ -292,10 +292,7 @@ export const WorkspaceResourceEvents: Event[] = [
   Event.VIEW_DELETED,
 ]
 
-export const AsyncEvents: Event[] = [
-  ...WorkspaceUserSyncEvents,
-  ...WorkspaceResourceEvents,
-]
+export const AsyncEvents: Event[] = [...WorkspaceUserSyncEvents, ...WorkspaceResourceEvents]
 
 // all events that are not audited have been added to this record as undefined, this means
 // that Typescript can protect us against new events being added and auditing of those

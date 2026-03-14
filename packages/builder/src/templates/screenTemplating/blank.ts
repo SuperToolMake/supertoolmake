@@ -1,8 +1,8 @@
-import { Screen } from "./Screen"
+import type { Screen as ScreenDoc } from "@budibase/types"
+import { Roles } from "@/constants/backend"
 import { capitalise } from "@/helpers"
 import getValidRoute from "./getValidRoute"
-import { Roles } from "@/constants/backend"
-import { Screen as ScreenDoc } from "@budibase/types"
+import { Screen } from "./Screen"
 
 const blank = ({
   route,
@@ -25,8 +25,7 @@ const blank = ({
   return [
     {
       data: template,
-      navigationLinkLabel:
-        validRoute === "/" ? null : capitalise(validRoute.split("/")[1]),
+      navigationLinkLabel: validRoute === "/" ? null : capitalise(validRoute.split("/")[1]),
     },
   ]
 }

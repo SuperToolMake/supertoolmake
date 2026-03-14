@@ -1,5 +1,5 @@
-import { PlatformUser, StrippedUser, User } from "../../documents"
-import { SearchFilters } from "../../sdk"
+import type { PlatformUser, StrippedUser, User } from "../../documents"
+import type { SearchFilters } from "../../sdk"
 
 interface InviteInfo {
   tenantId?: string

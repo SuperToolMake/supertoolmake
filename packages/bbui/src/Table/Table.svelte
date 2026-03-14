@@ -1,14 +1,14 @@
 <script lang="ts">
-  import "@spectrum-css/table/dist/index-vars.css"
-  import { createEventDispatcher, onMount } from "svelte"
-  import Checkbox from "../Form/Checkbox.svelte"
-  import { cloneDeep, deepGet } from "../helpers"
-  import Icon from "../Icon/Icon.svelte"
-  import ProgressCircle from "../ProgressCircle/ProgressCircle.svelte"
-  import CellRenderer from "./CellRenderer.svelte"
-  import SelectEditRenderer from "./SelectEditRenderer.svelte"
+import "@spectrum-css/table/dist/index-vars.css"
+import { createEventDispatcher, onMount } from "svelte"
+import Checkbox from "../Form/Checkbox.svelte"
+import { cloneDeep, deepGet } from "../helpers"
+import Icon from "../Icon/Icon.svelte"
+import ProgressCircle from "../ProgressCircle/ProgressCircle.svelte"
+import CellRenderer from "./CellRenderer.svelte"
+import SelectEditRenderer from "./SelectEditRenderer.svelte"
 
-  /**
+/**
    /**
    * The expected schema is our normal couch schemas for our tables.
    * Each field schema can be enriched with a few extra properties to customise
@@ -26,345 +26,326 @@
    * borderLeft: show a left border
    * borderRight: show a right border
    */
-  export let data: any[] = []
-  export let schema: Record<string, any> = {}
-  export let showAutoColumns: boolean = false
-  export let rowCount: number = 0
-  export let quiet: boolean = false
-  export let loading: boolean = false
-  export let allowSelectRows: boolean = false
-  export let allowEditRows: boolean = true
-  export let allowEditColumns: boolean = true
-  export let allowClickRows: boolean = true
-  export let selectOnRowClick: boolean = true
-  export let selectedRows: any[] = []
-  export let customRenderers: any[] = []
-  export let disableSorting: boolean = false
-  export let autoSortColumns: boolean = true
-  export let compact: boolean = false
-  export let customPlaceholder: boolean = false
-  export let showHeaderBorder: boolean = true
-  export let hideHeader: boolean = false
-  export let placeholderText: string = "No rows found"
-  export let snippets: any[] = []
-  export let defaultSortColumn: string | undefined = undefined
-  export let defaultSortOrder: "Ascending" | "Descending" = "Ascending"
-  export let rounded: boolean = false
-  export let stickyHeader: boolean = true
+export let data: any[] = []
+export let schema: Record<string, any> = {}
+export let showAutoColumns: boolean = false
+export let rowCount: number = 0
+export let quiet: boolean = false
+export let loading: boolean = false
+export let allowSelectRows: boolean = false
+export let allowEditRows: boolean = true
+export let allowEditColumns: boolean = true
+export let allowClickRows: boolean = true
+export let selectOnRowClick: boolean = true
+export let selectedRows: any[] = []
+export let customRenderers: any[] = []
+export let disableSorting: boolean = false
+export let autoSortColumns: boolean = true
+export let compact: boolean = false
+export let customPlaceholder: boolean = false
+export let showHeaderBorder: boolean = true
+export let hideHeader: boolean = false
+export let placeholderText: string = "No rows found"
+export let snippets: any[] = []
+export let defaultSortColumn: string | undefined = undefined
+export let defaultSortOrder: "Ascending" | "Descending" = "Ascending"
+export let rounded: boolean = false
+export let stickyHeader: boolean = true
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  let ref: HTMLDivElement
+let ref: HTMLDivElement
 
-  // Config
-  const headerHeight: number = 36
-  $: rowHeight = compact ? 46 : 55
+// Config
+const headerHeight: number = 36
+$: rowHeight = compact ? 46 : 55
 
-  // Sorting state
-  let sortColumn: string | undefined
-  let sortOrder: "Ascending" | "Descending" | undefined
+// Sorting state
+let sortColumn: string | undefined
+let sortOrder: "Ascending" | "Descending" | undefined
 
-  // Table state
-  let height: number = 0
-  let loaded: boolean = false
-  let checkboxStatus: boolean = false
+// Table state
+let height: number = 0
+let loaded: boolean = false
+let checkboxStatus: boolean = false
 
-  $: schema = fixSchema(schema)
-  $: if (!loading) loaded = true
-  $: fields = getFields(schema, showAutoColumns, autoSortColumns)
-  $: rows = fields?.length ? data || [] : []
-  $: totalRowCount = rows?.length || 0
-  $: visibleRowCount = getVisibleRowCount(
-    loaded,
-    height,
-    rows.length,
-    rowCount,
-    rowHeight
-  )
-  $: effectiveHeaderHeight = hideHeader ? 0 : headerHeight
-  $: heightStyle = getHeightStyle(
-    visibleRowCount,
-    rowCount,
-    totalRowCount,
-    rowHeight,
-    loading,
-    effectiveHeaderHeight
-  )
-  $: sortedRows = sortRows(rows, sortColumn, sortOrder)
-  $: gridStyle = getGridStyle(fields, schema, showEditColumn)
-  $: showEditColumn = allowEditRows || allowSelectRows
-  $: cellStyles = computeCellStyles(schema)
+$: schema = fixSchema(schema)
+$: if (!loading) loaded = true
+$: fields = getFields(schema, showAutoColumns, autoSortColumns)
+$: rows = fields?.length ? data || [] : []
+$: totalRowCount = rows?.length || 0
+$: visibleRowCount = getVisibleRowCount(loaded, height, rows.length, rowCount, rowHeight)
+$: effectiveHeaderHeight = hideHeader ? 0 : headerHeight
+$: heightStyle = getHeightStyle(
+  visibleRowCount,
+  rowCount,
+  totalRowCount,
+  rowHeight,
+  loading,
+  effectiveHeaderHeight
+)
+$: sortedRows = sortRows(rows, sortColumn, sortOrder)
+$: gridStyle = getGridStyle(fields, schema, showEditColumn)
+$: showEditColumn = allowEditRows || allowSelectRows
+$: cellStyles = computeCellStyles(schema)
 
-  // Deselect the "select all" checkbox when the user navigates to a new page
-  $: {
-    let checkRowCount = rows.filter(o1 =>
-      selectedRows.some(o2 => o1._id === o2._id)
-    )
-    if (checkRowCount.length === 0) {
-      checkboxStatus = false
-    }
+// Deselect the "select all" checkbox when the user navigates to a new page
+$: {
+  let checkRowCount = rows.filter((o1) => selectedRows.some((o2) => o1._id === o2._id))
+  if (checkRowCount.length === 0) {
+    checkboxStatus = false
   }
+}
 
-  const fixSchema = (schema: Record<string, any>): Record<string, any> => {
-    let fixedSchema: Record<string, any> = {}
-    Object.entries(schema || {}).forEach(([fieldName, fieldSchema]) => {
-      if (typeof fieldSchema === "string") {
-        fixedSchema[fieldName] = {
-          type: fieldSchema,
-          name: fieldName,
-        }
-      } else {
-        fixedSchema[fieldName] = {
-          ...fieldSchema,
-          name: fieldName,
-        }
+const fixSchema = (schema: Record<string, any>): Record<string, any> => {
+  let fixedSchema: Record<string, any> = {}
+  Object.entries(schema || {}).forEach(([fieldName, fieldSchema]) => {
+    if (typeof fieldSchema === "string") {
+      fixedSchema[fieldName] = {
+        type: fieldSchema,
+        name: fieldName,
       }
-
-      // Delete numeric only widths as these are grid widths and should be
-      // ignored
-      const width = fixedSchema[fieldName].width
-      if (width != null && `${width}`.trim().match(/^[0-9]+$/)) {
-        delete fixedSchema[fieldName].width
-      }
-    })
-    return fixedSchema
-  }
-
-  const getVisibleRowCount = (
-    loaded: boolean,
-    height: number,
-    allRows: number,
-    rowCount: number,
-    rowHeight: number
-  ): number => {
-    if (!loaded) {
-      return rowCount || 0
-    }
-    if (rowCount) {
-      return Math.min(allRows, rowCount)
-    }
-    return Math.min(allRows, Math.ceil(height / rowHeight))
-  }
-
-  const getHeightStyle = (
-    visibleRowCount: number,
-    rowCount: number,
-    totalRowCount: number,
-    rowHeight: number,
-    loading: boolean,
-    effectiveHeaderHeight: number
-  ): string => {
-    if (loading) {
-      return `height: ${effectiveHeaderHeight + visibleRowCount * rowHeight}px;`
-    }
-    if (!rowCount || !visibleRowCount || totalRowCount <= rowCount) {
-      return ""
-    }
-    return `height: ${effectiveHeaderHeight + visibleRowCount * rowHeight}px;`
-  }
-
-  const getGridStyle = (
-    fields: string[],
-    schema: Record<string, any>,
-    showEditColumn: boolean
-  ): string => {
-    let style = "grid-template-columns:"
-    if (showEditColumn) {
-      style += " auto"
-    }
-    fields?.forEach(field => {
-      const fieldSchema = schema[field]
-      if (fieldSchema.width && typeof fieldSchema.width === "string") {
-        style += ` ${fieldSchema.width}`
-      } else {
-        style += " minmax(auto, 1fr)"
-      }
-    })
-    style += ";"
-    return style
-  }
-
-  const sortRows = (
-    rows: any[],
-    sortColumn: string | undefined,
-    sortOrder: string | undefined
-  ): any[] => {
-    sortColumn = sortColumn ?? defaultSortColumn
-    sortOrder = sortOrder ?? defaultSortOrder
-    if (!sortColumn || !sortOrder || disableSorting) {
-      return rows
-    }
-    return rows.slice().sort((a, b) => {
-      const colA = a[sortColumn]
-      const colB = b[sortColumn]
-      if (sortOrder === "Descending") {
-        return colA > colB ? -1 : 1
-      } else {
-        return colA > colB ? 1 : -1
-      }
-    })
-  }
-
-  const sortBy = (fieldSchema: Record<string, any>): void => {
-    if (disableSorting) {
-      return
-    }
-    if (fieldSchema.sortable === false) {
-      return
-    }
-    if (fieldSchema.name === sortColumn) {
-      sortOrder = sortOrder === "Descending" ? "Ascending" : "Descending"
     } else {
-      sortColumn = fieldSchema.name
-      sortOrder = "Descending"
+      fixedSchema[fieldName] = {
+        ...fieldSchema,
+        name: fieldName,
+      }
     }
-    dispatch("sort", { column: sortColumn, order: sortOrder })
-  }
 
-  const getDisplayName = (schema: Record<string, any>): string => {
-    let name = schema?.displayName
-    if (schema && name === undefined) {
-      name = schema.name
-    }
-    return name || ""
-  }
-
-  const getFields = (
-    schema: Record<string, any>,
-    showAutoColumns: boolean,
-    autoSortColumns: boolean
-  ): string[] => {
-    let columns: any[] = []
-    let autoColumns: any[] = []
-    Object.entries(schema || {}).forEach(([field, fieldSchema]) => {
-      if (!field || !fieldSchema) {
-        return
-      }
-      if (!autoSortColumns || !fieldSchema?.autocolumn) {
-        columns.push(fieldSchema)
-      } else if (showAutoColumns) {
-        autoColumns.push(fieldSchema)
-      }
-    })
-    return columns
-      .sort((a, b) => {
-        if (a.divider) {
-          return a
-        }
-        if (b.divider) {
-          return b
-        }
-        const orderA = a.order || Number.MAX_SAFE_INTEGER
-        const orderB = b.order || Number.MAX_SAFE_INTEGER
-        const nameA = getDisplayName(a)
-        const nameB = getDisplayName(b)
-        if (orderA !== orderB) {
-          return orderA < orderB ? a : b
-        }
-        return nameA < nameB ? a : b
-      })
-      .concat(autoColumns)
-      .map(column => column.name)
-  }
-
-  const editColumn = (e: Event, field: any): void => {
-    e.stopPropagation()
-    dispatch("editcolumn", field)
-  }
-
-  const editRow = (e: Event, row: any): void => {
-    e.stopPropagation()
-    dispatch("editrow", cloneDeep(row))
-  }
-
-  const toggleSelectRow = (row: any): void => {
-    if (!allowSelectRows) {
-      return
-    }
-    if (selectedRows.some(selectedRow => selectedRow._id === row._id)) {
-      selectedRows = selectedRows.filter(
-        selectedRow => selectedRow._id !== row._id
-      )
-    } else {
-      selectedRows = [...selectedRows, row]
-    }
-  }
-
-  const toggleSelectAll = (e: CustomEvent): void => {
-    const select = !!e.detail
-    if (select) {
-      const next = [...selectedRows]
-      // Add any rows which are not already in selected rows
-      rows.forEach(row => {
-        if (
-          row.__selectable !== false &&
-          next.findIndex(x => x._id === row._id) === -1
-        ) {
-          next.push(row)
-        }
-      })
-      selectedRows = next
-    } else {
-      // Remove any rows from selected rows that are in the current data set
-      selectedRows = selectedRows.filter(el =>
-        rows.every(f => f._id !== el._id)
-      )
-    }
-  }
-
-  const computeCellStyles = (
-    schema: Record<string, any>
-  ): Record<string, string> => {
-    let styles: Record<string, string> = {}
-    Object.keys(schema || {}).forEach(field => {
-      styles[field] = ""
-      if (schema[field].color) {
-        styles[field] += `color: ${schema[field].color};`
-      }
-      if (schema[field].background) {
-        styles[field] += `background-color: ${schema[field].background};`
-      }
-      if (schema[field].align === "Center") {
-        styles[field] += "justify-content: center; text-align: center;"
-      }
-      if (schema[field].align === "Right") {
-        styles[field] += "justify-content: flex-end; text-align: right;"
-      }
-      if (schema[field].borderLeft) {
-        styles[field] +=
-          "border-left: 1px solid var(--spectrum-global-color-gray-200);"
-      }
-      if (schema[field].borderLeft) {
-        styles[field] +=
-          "border-right: 1px solid var(--spectrum-global-color-gray-200);"
-      }
-      if (schema[field].minWidth) {
-        styles[field] += `min-width: ${schema[field].minWidth};`
-      }
-    })
-    return styles
-  }
-
-  // Instead of svelte bind:offsetWidth
-  // Svelte injects an iframe causing issues with CSP, this avoids it
-  const setupResizeObserver = (element: HTMLElement) => {
-    const resizeObserver = new ResizeObserver(entries => {
-      if (!entries?.[0]) {
-        return
-      }
-      const bounds = entries[0].target.getBoundingClientRect()
-      height = bounds.height //the offsetHeight
-    })
-    resizeObserver.observe(element)
-    return resizeObserver
-  }
-
-  onMount(() => {
-    let resizeObserver = setupResizeObserver(ref)
-    return () => {
-      resizeObserver.disconnect()
+    // Delete numeric only widths as these are grid widths and should be
+    // ignored
+    const width = fixedSchema[fieldName].width
+    if (width != null && `${width}`.trim().match(/^[0-9]+$/)) {
+      delete fixedSchema[fieldName].width
     }
   })
+  return fixedSchema
+}
+
+const getVisibleRowCount = (
+  loaded: boolean,
+  height: number,
+  allRows: number,
+  rowCount: number,
+  rowHeight: number
+): number => {
+  if (!loaded) {
+    return rowCount || 0
+  }
+  if (rowCount) {
+    return Math.min(allRows, rowCount)
+  }
+  return Math.min(allRows, Math.ceil(height / rowHeight))
+}
+
+const getHeightStyle = (
+  visibleRowCount: number,
+  rowCount: number,
+  totalRowCount: number,
+  rowHeight: number,
+  loading: boolean,
+  effectiveHeaderHeight: number
+): string => {
+  if (loading) {
+    return `height: ${effectiveHeaderHeight + visibleRowCount * rowHeight}px;`
+  }
+  if (!rowCount || !visibleRowCount || totalRowCount <= rowCount) {
+    return ""
+  }
+  return `height: ${effectiveHeaderHeight + visibleRowCount * rowHeight}px;`
+}
+
+const getGridStyle = (
+  fields: string[],
+  schema: Record<string, any>,
+  showEditColumn: boolean
+): string => {
+  let style = "grid-template-columns:"
+  if (showEditColumn) {
+    style += " auto"
+  }
+  fields?.forEach((field) => {
+    const fieldSchema = schema[field]
+    if (fieldSchema.width && typeof fieldSchema.width === "string") {
+      style += ` ${fieldSchema.width}`
+    } else {
+      style += " minmax(auto, 1fr)"
+    }
+  })
+  style += ";"
+  return style
+}
+
+const sortRows = (
+  rows: any[],
+  sortColumn: string | undefined,
+  sortOrder: string | undefined
+): any[] => {
+  sortColumn = sortColumn ?? defaultSortColumn
+  sortOrder = sortOrder ?? defaultSortOrder
+  if (!sortColumn || !sortOrder || disableSorting) {
+    return rows
+  }
+  return rows.slice().sort((a, b) => {
+    const colA = a[sortColumn]
+    const colB = b[sortColumn]
+    if (sortOrder === "Descending") {
+      return colA > colB ? -1 : 1
+    } else {
+      return colA > colB ? 1 : -1
+    }
+  })
+}
+
+const sortBy = (fieldSchema: Record<string, any>): void => {
+  if (disableSorting) {
+    return
+  }
+  if (fieldSchema.sortable === false) {
+    return
+  }
+  if (fieldSchema.name === sortColumn) {
+    sortOrder = sortOrder === "Descending" ? "Ascending" : "Descending"
+  } else {
+    sortColumn = fieldSchema.name
+    sortOrder = "Descending"
+  }
+  dispatch("sort", { column: sortColumn, order: sortOrder })
+}
+
+const getDisplayName = (schema: Record<string, any>): string => {
+  let name = schema?.displayName
+  if (schema && name === undefined) {
+    name = schema.name
+  }
+  return name || ""
+}
+
+const getFields = (
+  schema: Record<string, any>,
+  showAutoColumns: boolean,
+  autoSortColumns: boolean
+): string[] => {
+  let columns: any[] = []
+  let autoColumns: any[] = []
+  Object.entries(schema || {}).forEach(([field, fieldSchema]) => {
+    if (!field || !fieldSchema) {
+      return
+    }
+    if (!autoSortColumns || !fieldSchema?.autocolumn) {
+      columns.push(fieldSchema)
+    } else if (showAutoColumns) {
+      autoColumns.push(fieldSchema)
+    }
+  })
+  return columns
+    .sort((a, b) => {
+      if (a.divider) {
+        return a
+      }
+      if (b.divider) {
+        return b
+      }
+      const orderA = a.order || Number.MAX_SAFE_INTEGER
+      const orderB = b.order || Number.MAX_SAFE_INTEGER
+      const nameA = getDisplayName(a)
+      const nameB = getDisplayName(b)
+      if (orderA !== orderB) {
+        return orderA < orderB ? a : b
+      }
+      return nameA < nameB ? a : b
+    })
+    .concat(autoColumns)
+    .map((column) => column.name)
+}
+
+const editColumn = (e: Event, field: any): void => {
+  e.stopPropagation()
+  dispatch("editcolumn", field)
+}
+
+const editRow = (e: Event, row: any): void => {
+  e.stopPropagation()
+  dispatch("editrow", cloneDeep(row))
+}
+
+const toggleSelectRow = (row: any): void => {
+  if (!allowSelectRows) {
+    return
+  }
+  if (selectedRows.some((selectedRow) => selectedRow._id === row._id)) {
+    selectedRows = selectedRows.filter((selectedRow) => selectedRow._id !== row._id)
+  } else {
+    selectedRows = [...selectedRows, row]
+  }
+}
+
+const toggleSelectAll = (e: CustomEvent): void => {
+  const select = !!e.detail
+  if (select) {
+    const next = [...selectedRows]
+    // Add any rows which are not already in selected rows
+    rows.forEach((row) => {
+      if (row.__selectable !== false && next.findIndex((x) => x._id === row._id) === -1) {
+        next.push(row)
+      }
+    })
+    selectedRows = next
+  } else {
+    // Remove any rows from selected rows that are in the current data set
+    selectedRows = selectedRows.filter((el) => rows.every((f) => f._id !== el._id))
+  }
+}
+
+const computeCellStyles = (schema: Record<string, any>): Record<string, string> => {
+  let styles: Record<string, string> = {}
+  Object.keys(schema || {}).forEach((field) => {
+    styles[field] = ""
+    if (schema[field].color) {
+      styles[field] += `color: ${schema[field].color};`
+    }
+    if (schema[field].background) {
+      styles[field] += `background-color: ${schema[field].background};`
+    }
+    if (schema[field].align === "Center") {
+      styles[field] += "justify-content: center; text-align: center;"
+    }
+    if (schema[field].align === "Right") {
+      styles[field] += "justify-content: flex-end; text-align: right;"
+    }
+    if (schema[field].borderLeft) {
+      styles[field] += "border-left: 1px solid var(--spectrum-global-color-gray-200);"
+    }
+    if (schema[field].borderLeft) {
+      styles[field] += "border-right: 1px solid var(--spectrum-global-color-gray-200);"
+    }
+    if (schema[field].minWidth) {
+      styles[field] += `min-width: ${schema[field].minWidth};`
+    }
+  })
+  return styles
+}
+
+// Instead of svelte bind:offsetWidth
+// Svelte injects an iframe causing issues with CSP, this avoids it
+const setupResizeObserver = (element: HTMLElement) => {
+  const resizeObserver = new ResizeObserver((entries) => {
+    if (!entries?.[0]) {
+      return
+    }
+    const bounds = entries[0].target.getBoundingClientRect()
+    height = bounds.height //the offsetHeight
+  })
+  resizeObserver.observe(element)
+  return resizeObserver
+}
+
+onMount(() => {
+  let resizeObserver = setupResizeObserver(ref)
+  return () => {
+    resizeObserver.disconnect()
+  }
+})
 </script>
 
 {#key fields?.length}

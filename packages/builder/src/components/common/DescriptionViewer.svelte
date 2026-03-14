@@ -1,165 +1,161 @@
 <script lang="ts">
-  import { onMount } from "svelte"
-  import "@spectrum-css/link/dist/index-vars.css"
-  import { MarkdownViewer } from "@budibase/bbui"
+import { onMount } from "svelte"
+import "@spectrum-css/link/dist/index-vars.css"
+import { MarkdownViewer } from "@budibase/bbui"
 
-  const COLLAPSED_HEIGHT_EM = 5
+const COLLAPSED_HEIGHT_EM = 5
 
-  export let description: string | undefined = undefined
-  export let label: string | undefined = "Description"
-  export let placeholder = "No description provided"
-  export let baseUrl: string | undefined = undefined
+export let description: string | undefined = undefined
+export let label: string | undefined = "Description"
+export let placeholder = "No description provided"
+export let baseUrl: string | undefined = undefined
 
-  let contentEl: HTMLDivElement | null = null
-  let collapsible = false
-  let expanded = false
-  let resizeObserver: ResizeObserver | undefined
+let contentEl: HTMLDivElement | null = null
+let collapsible = false
+let expanded = false
+let resizeObserver: ResizeObserver | undefined
 
-  const resolveBaseUrl = (value: string | undefined) => {
-    const url = (value || "").trim()
-    if (!url) {
-      return undefined
-    }
-    try {
-      return new URL(url).toString()
-    } catch (_error) {
-      return undefined
-    }
+const resolveBaseUrl = (value: string | undefined) => {
+  const url = (value || "").trim()
+  if (!url) {
+    return undefined
   }
+  try {
+    return new URL(url).toString()
+  } catch (_error) {
+    return undefined
+  }
+}
 
-  const toAbsoluteUrl = (
-    href: string | null | undefined,
-    resolvedBase?: string
-  ) => {
-    if (!href) {
-      return undefined
+const toAbsoluteUrl = (href: string | null | undefined, resolvedBase?: string) => {
+  if (!href) {
+    return undefined
+  }
+  try {
+    if (resolvedBase) {
+      return new URL(href, resolvedBase).toString()
     }
-    try {
-      if (resolvedBase) {
+    return new URL(href).toString()
+  } catch (_error) {
+    if (resolvedBase) {
+      try {
         return new URL(href, resolvedBase).toString()
+      } catch (_err) {
+        return undefined
       }
-      return new URL(href).toString()
-    } catch (_error) {
-      if (resolvedBase) {
-        try {
-          return new URL(href, resolvedBase).toString()
-        } catch (_err) {
-          return undefined
-        }
-      }
-      return undefined
     }
+    return undefined
   }
+}
 
-  interface LinkEnhancerParams {
-    baseUrl?: string
-    contentKey?: string
-    onMutate?: () => void
+interface LinkEnhancerParams {
+  baseUrl?: string
+  contentKey?: string
+  onMutate?: () => void
+}
+
+const getCollapsedHeightPx = () => {
+  if (!contentEl) {
+    return COLLAPSED_HEIGHT_EM * 16
   }
-
-  const getCollapsedHeightPx = () => {
-    if (!contentEl) {
-      return COLLAPSED_HEIGHT_EM * 16
-    }
-    const fontSize = parseFloat(getComputedStyle(contentEl).fontSize || "16")
-    if (Number.isNaN(fontSize)) {
-      return COLLAPSED_HEIGHT_EM * 16
-    }
-    return fontSize * COLLAPSED_HEIGHT_EM
+  const fontSize = parseFloat(getComputedStyle(contentEl).fontSize || "16")
+  if (Number.isNaN(fontSize)) {
+    return COLLAPSED_HEIGHT_EM * 16
   }
+  return fontSize * COLLAPSED_HEIGHT_EM
+}
 
-  const updateCollapsible = () => {
-    if (!contentEl) {
-      collapsible = false
-      expanded = false
-      return
-    }
-    const shouldCollapse = contentEl.scrollHeight > getCollapsedHeightPx()
-    if (shouldCollapse !== collapsible) {
-      collapsible = shouldCollapse
-    }
-    if (!shouldCollapse) {
-      expanded = false
-    }
+const updateCollapsible = () => {
+  if (!contentEl) {
+    collapsible = false
+    expanded = false
+    return
   }
-
-  const toggleExpanded = () => {
-    if (!collapsible) {
-      return
-    }
-    expanded = !expanded
+  const shouldCollapse = contentEl.scrollHeight > getCollapsedHeightPx()
+  if (shouldCollapse !== collapsible) {
+    collapsible = shouldCollapse
   }
+  if (!shouldCollapse) {
+    expanded = false
+  }
+}
 
-  onMount(() => {
-    resizeObserver = new ResizeObserver(() => updateCollapsible())
-    if (contentEl) {
-      resizeObserver.observe(contentEl)
-      updateCollapsible()
-    }
-    return () => {
-      resizeObserver?.disconnect()
-    }
-  })
+const toggleExpanded = () => {
+  if (!collapsible) {
+    return
+  }
+  expanded = !expanded
+}
 
-  $: if (resizeObserver && contentEl) {
-    resizeObserver.disconnect()
+onMount(() => {
+  resizeObserver = new ResizeObserver(() => updateCollapsible())
+  if (contentEl) {
     resizeObserver.observe(contentEl)
     updateCollapsible()
   }
+  return () => {
+    resizeObserver?.disconnect()
+  }
+})
 
-  const replaceWithSpan = (anchor: HTMLAnchorElement) => {
-    const span = anchor.ownerDocument?.createElement("span")
-    if (!span) {
-      return
-    }
-    while (anchor.firstChild) {
-      span.appendChild(anchor.firstChild)
-    }
-    anchor.replaceWith(span)
+$: if (resizeObserver && contentEl) {
+  resizeObserver.disconnect()
+  resizeObserver.observe(contentEl)
+  updateCollapsible()
+}
+
+const replaceWithSpan = (anchor: HTMLAnchorElement) => {
+  const span = anchor.ownerDocument?.createElement("span")
+  if (!span) {
+    return
+  }
+  while (anchor.firstChild) {
+    span.appendChild(anchor.firstChild)
+  }
+  anchor.replaceWith(span)
+}
+
+const isHashLink = (href?: string | null) => typeof href === "string" && href.trim().startsWith("#")
+
+const enhanceLinks = (node: HTMLElement, params: LinkEnhancerParams = {}) => {
+  let { baseUrl: currentBase, onMutate } = params
+
+  const apply = () => {
+    const resolvedBase = resolveBaseUrl(currentBase)
+    node.querySelectorAll("a").forEach((anchor) => {
+      const href = anchor.getAttribute("href") || undefined
+      if (isHashLink(href)) {
+        replaceWithSpan(anchor)
+        return
+      }
+      if (resolvedBase) {
+        const absolute = toAbsoluteUrl(href, resolvedBase)
+        if (absolute) {
+          anchor.setAttribute("href", absolute)
+        }
+      }
+      anchor.setAttribute("target", "_blank")
+      anchor.setAttribute("rel", "noopener noreferrer")
+      anchor.classList.add("spectrum-Link", "spectrum-Link--sizeM")
+    })
+    onMutate?.()
   }
 
-  const isHashLink = (href?: string | null) =>
-    typeof href === "string" && href.trim().startsWith("#")
+  const observer = new MutationObserver(apply)
+  observer.observe(node, { childList: true, subtree: true })
+  apply()
 
-  const enhanceLinks = (node: HTMLElement, params: LinkEnhancerParams = {}) => {
-    let { baseUrl: currentBase, onMutate } = params
-
-    const apply = () => {
-      const resolvedBase = resolveBaseUrl(currentBase)
-      node.querySelectorAll("a").forEach(anchor => {
-        const href = anchor.getAttribute("href") || undefined
-        if (isHashLink(href)) {
-          replaceWithSpan(anchor)
-          return
-        }
-        if (resolvedBase) {
-          const absolute = toAbsoluteUrl(href, resolvedBase)
-          if (absolute) {
-            anchor.setAttribute("href", absolute)
-          }
-        }
-        anchor.setAttribute("target", "_blank")
-        anchor.setAttribute("rel", "noopener noreferrer")
-        anchor.classList.add("spectrum-Link", "spectrum-Link--sizeM")
-      })
-      onMutate?.()
-    }
-
-    const observer = new MutationObserver(apply)
-    observer.observe(node, { childList: true, subtree: true })
-    apply()
-
-    return {
-      update(newParams?: LinkEnhancerParams) {
-        currentBase = newParams?.baseUrl
-        onMutate = newParams?.onMutate
-        apply()
-      },
-      destroy() {
-        observer.disconnect()
-      },
-    }
+  return {
+    update(newParams?: LinkEnhancerParams) {
+      currentBase = newParams?.baseUrl
+      onMutate = newParams?.onMutate
+      apply()
+    },
+    destroy() {
+      observer.disconnect()
+    },
   }
+}
 </script>
 
 <div>

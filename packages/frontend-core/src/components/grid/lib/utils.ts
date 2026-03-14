@@ -1,5 +1,5 @@
-import { GeneratedIDPrefix, CellIDSeparator } from "./constants"
 import { Helpers } from "@budibase/bbui"
+import { CellIDSeparator, GeneratedIDPrefix } from "./constants"
 
 export const parseCellID = (cellId: string | null) => {
   if (!cellId) {

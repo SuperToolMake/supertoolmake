@@ -1,10 +1,10 @@
 import { context, db as dbCore, logging, roles } from "@budibase/backend-core"
 import { utils } from "@budibase/shared-core"
-import { ContextUser, User } from "@budibase/types"
-import sdk from "../.."
+import type { ContextUser, User } from "@budibase/types"
 import { generateUserMetadataID, InternalTables } from "../../../db/utils"
 import env from "../../../environment"
 import { getRawGlobalUsers, processUser } from "../../../utilities/global"
+import sdk from "../.."
 
 type DeletedUser = { _id: string; deleted: boolean }
 
@@ -12,10 +12,7 @@ function userSyncEnabled() {
   return !env.DISABLE_USER_SYNC
 }
 
-async function syncUsersToWorkspace(
-  workspaceId: string,
-  users: (User | DeletedUser)[]
-) {
+async function syncUsersToWorkspace(workspaceId: string, users: (User | DeletedUser)[]) {
   if (!(await dbCore.dbExists(workspaceId))) {
     return
   }
@@ -69,7 +66,7 @@ async function syncUsersToWorkspace(
         ctxUser.roleId = roleId
       }
 
-      let combined = sdk.users.combineMetadataAndUser(ctxUser, metadata)
+      const combined = sdk.users.combineMetadataAndUser(ctxUser, metadata)
       // if no combined returned, there are no updates to make
       if (combined) {
         await db.put(combined)
@@ -82,8 +79,8 @@ async function buildSyncUsers(userIds: string[]) {
   // list of users, if one has been deleted it will be undefined in array
   const users = await getRawGlobalUsers(userIds)
   const finalUsers: (User | DeletedUser)[] = []
-  for (let userId of userIds) {
-    const user = users.find(user => user._id === userId)
+  for (const userId of userIds) {
+    const user = users.find((user) => user._id === userId)
     if (!user) {
       finalUsers.push({ _id: userId, deleted: true })
     } else {
@@ -93,10 +90,7 @@ async function buildSyncUsers(userIds: string[]) {
   return { finalUsers }
 }
 
-export async function syncUsersAgainstWorkspaces(
-  userIds: string[],
-  workspaceIdsToCheck: string[]
-) {
+export async function syncUsersAgainstWorkspaces(userIds: string[], workspaceIdsToCheck: string[]) {
   if (!workspaceIdsToCheck.length) {
     return
   }
@@ -121,10 +115,10 @@ export async function syncUsersAgainstWorkspaces(
   }
 
   const { finalUsers } = await buildSyncUsers(userIds)
-  let promises: Promise<void>[] = []
+  const promises: Promise<void>[] = []
   await utils.parallelForeach(
     [...workspaceIds],
-    async id => {
+    async (id) => {
       if (!id) {
         return
       }
@@ -139,10 +133,10 @@ export async function syncUsersAgainstWorkspaces(
     10
   )
   const resp = await Promise.allSettled(promises)
-  const failed = resp.filter(promise => promise.status === "rejected")
+  const failed = resp.filter((promise) => promise.status === "rejected")
   const reasons = failed
-    .map(fail => (fail as PromiseRejectedResult).reason)
-    .filter(reason => !dbCore.isDocumentConflictError(reason))
+    .map((fail) => (fail as PromiseRejectedResult).reason)
+    .filter((reason) => !dbCore.isDocumentConflictError(reason))
   if (reasons.length > 0) {
     logging.logWarn("Failed to sync users to workspaces", reasons)
   }
@@ -153,9 +147,7 @@ export async function syncUsersAcrossWorkspaces(userIds: string[]) {
   await syncUsersAgainstWorkspaces(userIds, devWorkspaceIds)
 }
 
-export async function syncWorkspace(
-  workspaceId: string
-): Promise<{ message: string }> {
+export async function syncWorkspace(workspaceId: string): Promise<{ message: string }> {
   if (env.DISABLE_AUTO_PROD_APP_SYNC) {
     return {
       message:

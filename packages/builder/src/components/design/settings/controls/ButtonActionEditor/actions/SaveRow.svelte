@@ -1,47 +1,40 @@
 <script lang="ts">
-  import { Select, Label, Body, Checkbox } from "@budibase/bbui"
-  import {
-    selectedScreen,
-    componentStore,
-    tables,
-    datasources,
-  } from "@/stores/builder"
-  import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
-  import { getSchemaForDatasourcePlus } from "@/dataBinding"
-  import SaveFields from "./SaveFields.svelte"
-  import { getDatasourceLikeProviders } from "@/components/design/settings/controls/ButtonActionEditor/actions/utils"
-  import type { EnrichedBinding } from "@budibase/types"
+import { Body, Checkbox, Label, Select } from "@budibase/bbui"
+import type { EnrichedBinding } from "@budibase/types"
+import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import { getDatasourceLikeProviders } from "@/components/design/settings/controls/ButtonActionEditor/actions/utils"
+import { getSchemaForDatasourcePlus } from "@/dataBinding"
+import { componentStore, datasources, selectedScreen, tables } from "@/stores/builder"
+import SaveFields from "./SaveFields.svelte"
 
-  export let parameters
-  export let bindings: EnrichedBinding[] = []
-  export let nested
+export let parameters
+export let bindings: EnrichedBinding[] = []
+export let nested
 
-  $: providerOptions = getDatasourceLikeProviders({
-    asset: $selectedScreen,
-    componentId: $componentStore.selectedComponentId,
-    nested,
-  })
-  $: schemaFields = getSchemaFields(parameters?.tableId)
-  $: datasourceMap = Object.fromEntries(
-    ($datasources.list || []).map(ds => [ds._id, ds.name])
-  )
-  $: tableOptions = $tables.list.map(table => {
-    const datasourceName = datasourceMap[table.sourceId] || "Unknown"
-    return {
-      label: `${datasourceName} - ${table.name}`,
-      resourceId: table._id,
-    }
-  })
-  $: options = [...(tableOptions || [])]
-
-  const getSchemaFields = (resourceId: string) => {
-    const { schema } = getSchemaForDatasourcePlus(resourceId, {})
-    return Object.values(schema || {}).filter(field => !field.readonly)
+$: providerOptions = getDatasourceLikeProviders({
+  asset: $selectedScreen,
+  componentId: $componentStore.selectedComponentId,
+  nested,
+})
+$: schemaFields = getSchemaFields(parameters?.tableId)
+$: datasourceMap = Object.fromEntries(($datasources.list || []).map((ds) => [ds._id, ds.name]))
+$: tableOptions = $tables.list.map((table) => {
+  const datasourceName = datasourceMap[table.sourceId] || "Unknown"
+  return {
+    label: `${datasourceName} - ${table.name}`,
+    resourceId: table._id,
   }
+})
+$: options = [...(tableOptions || [])]
 
-  const onFieldsChanged = (e: CustomEvent) => {
-    parameters.fields = e.detail
-  }
+const getSchemaFields = (resourceId: string) => {
+  const { schema } = getSchemaForDatasourcePlus(resourceId, {})
+  return Object.values(schema || {}).filter((field) => !field.readonly)
+}
+
+const onFieldsChanged = (e: CustomEvent) => {
+  parameters.fields = e.detail
+}
 </script>
 
 <div class="root">

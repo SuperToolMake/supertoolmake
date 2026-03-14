@@ -1,167 +1,156 @@
 <script>
-  import {
-    Button,
-    Body,
-    Icon,
-    DrawerContent,
-    Layout,
-    Select,
-    DatePicker,
-  } from "@budibase/bbui"
-  import { flip } from "svelte/animate"
-  import { dndzone } from "svelte-dnd-action"
-  import { generate } from "shortid"
-  import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
-  import { QueryUtils, Constants } from "@budibase/frontend-core"
-  import { selectedComponent, componentStore } from "@/stores/builder"
-  import { getComponentForSetting } from "@/components/design/settings/componentSettings"
-  import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
+import { Body, Button, DatePicker, DrawerContent, Icon, Layout, Select } from "@budibase/bbui"
+import { Constants, QueryUtils } from "@budibase/frontend-core"
+import { generate } from "shortid"
+import { flip } from "svelte/animate"
+import { dndzone } from "svelte-dnd-action"
+import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import { getComponentForSetting } from "@/components/design/settings/componentSettings"
+import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
+import { componentStore, selectedComponent } from "@/stores/builder"
 
-  export let conditions = []
-  export let bindings = []
-  export let componentBindings = []
-  export let actionOptions = null
+export let conditions = []
+export let bindings = []
+export let componentBindings = []
+export let actionOptions = null
 
-  const flipDurationMs = 150
-  const zoneType = generate()
-  const defaultActionOptions = [
+const flipDurationMs = 150
+const zoneType = generate()
+const defaultActionOptions = [
+  {
+    label: "Hide component",
+    value: "hide",
+  },
+  {
+    label: "Show component",
+    value: "show",
+  },
+  {
+    label: "Update setting",
+    value: "update",
+  },
+]
+const valueTypeOptions = [
+  {
+    value: "string",
+    label: "Binding",
+  },
+  {
+    value: "number",
+    label: "Number",
+  },
+  {
+    value: "datetime",
+    label: "Date",
+  },
+  {
+    value: "boolean",
+    label: "Boolean",
+  },
+]
+
+let dragDisabled = true
+
+$: finalActionOptions = actionOptions ?? defaultActionOptions
+
+$: settings = componentStore.getComponentSettings($selectedComponent?._component)?.concat({
+  label: "Custom CSS",
+  key: "_css",
+  type: "text",
+})
+$: settingOptions = settings
+  .filter((setting) => setting.supportsConditions !== false)
+  .map((setting) => ({
+    label: makeLabel(setting),
+    value: setting.key,
+  }))
+$: conditions.forEach((link) => {
+  if (!link.id) {
+    link.id = generate()
+  }
+})
+
+const makeLabel = (setting) => {
+  const { section, label } = setting
+  if (section) {
+    return label ? `${section} - ${label}` : section
+  } else {
+    return label
+  }
+}
+
+const getSettingDefinition = (key) => {
+  return settings.find((setting) => setting.key === key)
+}
+
+const addCondition = () => {
+  conditions = [
+    ...conditions,
     {
-      label: "Hide component",
-      value: "hide",
-    },
-    {
-      label: "Show component",
-      value: "show",
-    },
-    {
-      label: "Update setting",
-      value: "update",
+      valueType: "string",
+      id: generate(),
+      action: "hide",
+      operator: Constants.OperatorOptions.Equals.value,
     },
   ]
-  const valueTypeOptions = [
-    {
-      value: "string",
-      label: "Binding",
-    },
-    {
-      value: "number",
-      label: "Number",
-    },
-    {
-      value: "datetime",
-      label: "Date",
-    },
-    {
-      value: "boolean",
-      label: "Boolean",
-    },
+}
+
+const removeCondition = (id) => {
+  conditions = conditions.filter((link) => link.id !== id)
+}
+
+const duplicateCondition = (id) => {
+  const condition = conditions.find((link) => link.id === id)
+  const duplicate = { ...condition, id: generate() }
+  conditions = [...conditions, duplicate]
+}
+
+const handleFinalize = (e) => {
+  updateConditions(e)
+  dragDisabled = true
+}
+
+const updateConditions = (e) => {
+  conditions = e.detail.items
+}
+
+const getOperatorOptions = (condition) => {
+  return QueryUtils.getValidOperatorsForType({ type: condition.valueType })
+}
+
+const onOperatorChange = (condition, newOperator) => {
+  const noValueOptions = [
+    Constants.OperatorOptions.Empty.value,
+    Constants.OperatorOptions.NotEmpty.value,
   ]
-
-  let dragDisabled = true
-
-  $: finalActionOptions = actionOptions ?? defaultActionOptions
-
-  $: settings = componentStore
-    .getComponentSettings($selectedComponent?._component)
-    ?.concat({
-      label: "Custom CSS",
-      key: "_css",
-      type: "text",
-    })
-  $: settingOptions = settings
-    .filter(setting => setting.supportsConditions !== false)
-    .map(setting => ({
-      label: makeLabel(setting),
-      value: setting.key,
-    }))
-  $: conditions.forEach(link => {
-    if (!link.id) {
-      link.id = generate()
-    }
-  })
-
-  const makeLabel = setting => {
-    const { section, label } = setting
-    if (section) {
-      return label ? `${section} - ${label}` : section
-    } else {
-      return label
-    }
-  }
-
-  const getSettingDefinition = key => {
-    return settings.find(setting => setting.key === key)
-  }
-
-  const addCondition = () => {
-    conditions = [
-      ...conditions,
-      {
-        valueType: "string",
-        id: generate(),
-        action: "hide",
-        operator: Constants.OperatorOptions.Equals.value,
-      },
-    ]
-  }
-
-  const removeCondition = id => {
-    conditions = conditions.filter(link => link.id !== id)
-  }
-
-  const duplicateCondition = id => {
-    const condition = conditions.find(link => link.id === id)
-    const duplicate = { ...condition, id: generate() }
-    conditions = [...conditions, duplicate]
-  }
-
-  const handleFinalize = e => {
-    updateConditions(e)
-    dragDisabled = true
-  }
-
-  const updateConditions = e => {
-    conditions = e.detail.items
-  }
-
-  const getOperatorOptions = condition => {
-    return QueryUtils.getValidOperatorsForType({ type: condition.valueType })
-  }
-
-  const onOperatorChange = (condition, newOperator) => {
-    const noValueOptions = [
-      Constants.OperatorOptions.Empty.value,
-      Constants.OperatorOptions.NotEmpty.value,
-    ]
-    condition.noValue = noValueOptions.includes(newOperator)
-    if (condition.noValue || newOperator === "oneOf") {
-      condition.referenceValue = null
-      condition.valueType = "string"
-    }
-  }
-
-  const onValueTypeChange = (condition, newType) => {
+  condition.noValue = noValueOptions.includes(newOperator)
+  if (condition.noValue || newOperator === "oneOf") {
     condition.referenceValue = null
-
-    // Ensure a valid operator is set
-    const validOperators = QueryUtils.getValidOperatorsForType({
-      type: newType,
-    }).map(x => x.value)
-    if (!validOperators.includes(condition.operator)) {
-      condition.operator =
-        validOperators[0] ?? Constants.OperatorOptions.Equals.value
-      onOperatorChange(condition, condition.operator)
-    }
+    condition.valueType = "string"
   }
+}
 
-  const onSettingChange = (e, condition) => {
-    const setting = settings.find(x => x.key === e.detail)
-    if (setting?.defaultValue != null) {
-      condition.settingValue = setting.defaultValue
-    } else {
-      delete condition.settingValue
-    }
+const onValueTypeChange = (condition, newType) => {
+  condition.referenceValue = null
+
+  // Ensure a valid operator is set
+  const validOperators = QueryUtils.getValidOperatorsForType({
+    type: newType,
+  }).map((x) => x.value)
+  if (!validOperators.includes(condition.operator)) {
+    condition.operator = validOperators[0] ?? Constants.OperatorOptions.Equals.value
+    onOperatorChange(condition, condition.operator)
   }
+}
+
+const onSettingChange = (e, condition) => {
+  const setting = settings.find((x) => x.key === e.detail)
+  if (setting?.defaultValue != null) {
+    condition.settingValue = setting.defaultValue
+  } else {
+    delete condition.settingValue
+  }
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

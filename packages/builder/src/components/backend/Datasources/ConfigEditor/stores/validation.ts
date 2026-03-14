@@ -1,8 +1,4 @@
-import {
-  DatasourceConfig,
-  DatasourceFieldType,
-  UIIntegration,
-} from "@budibase/types"
+import { type DatasourceConfig, DatasourceFieldType, type UIIntegration } from "@budibase/types"
 import { type AnySchema, number, object, string } from "yup"
 
 const propertyValidator = (type: string) => {
@@ -22,18 +18,12 @@ const propertyValidator = (type: string) => {
 }
 
 export const getValidatorFields = (integration: UIIntegration) => {
-  function handleFieldValidators(
-    datasourceConfig: DatasourceConfig
-  ): Record<string, AnySchema> {
+  function handleFieldValidators(datasourceConfig: DatasourceConfig): Record<string, AnySchema> {
     const result: Record<string, AnySchema> = {}
     Object.entries(datasourceConfig).forEach(([key, properties]) => {
       if (properties.type === DatasourceFieldType.FIELD_GROUP) {
-        const fieldGroupValidator = handleFieldValidators(
-          properties.fields || {}
-        )
-        for (const [fieldKey, fieldValidator] of Object.entries(
-          fieldGroupValidator
-        )) {
+        const fieldGroupValidator = handleFieldValidators(properties.fields || {})
+        for (const [fieldKey, fieldValidator] of Object.entries(fieldGroupValidator)) {
           result[`${key}.${fieldKey}`] = fieldValidator
         }
         return

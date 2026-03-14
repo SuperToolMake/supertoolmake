@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
 const mockGetComponentDefinition = vi.fn()
 const mockGetSettingsDefinition = vi.fn()
@@ -37,9 +37,7 @@ describe("resolveCollapsedButtons", () => {
     vi.resetModules()
     vi.clearAllMocks()
     mockGetComponentDefinition.mockReturnValue({ name: "Button" })
-    mockGetSettingsDefinition.mockReturnValue([
-      { key: "onClick", type: "event" },
-    ])
+    mockGetSettingsDefinition.mockReturnValue([{ key: "onClick", type: "event" }])
   })
 
   it("returns an empty array when buttons are missing", async () => {
@@ -49,7 +47,7 @@ describe("resolveCollapsedButtons", () => {
 
   it("filters out hidden buttons based on conditions", async () => {
     const resolveCollapsedButtons = await setupResolver()
-    mockEnrichProps.mockImplementation(props => ({
+    mockEnrichProps.mockImplementation((props) => ({
       ...props,
       _conditions: [{ action: "hide" }],
     }))
@@ -65,7 +63,7 @@ describe("resolveCollapsedButtons", () => {
 
   it("applies conditional setting updates to resolved buttons", async () => {
     const resolveCollapsedButtons = await setupResolver()
-    mockEnrichProps.mockImplementation(props => ({
+    mockEnrichProps.mockImplementation((props) => ({
       ...props,
       _conditions: [{ action: "show" }],
       text: "Before",
@@ -85,7 +83,7 @@ describe("resolveCollapsedButtons", () => {
   it("uses the enriched onClick handler when provided", async () => {
     const resolveCollapsedButtons = await setupResolver()
     const enrichedHandler = vi.fn()
-    mockEnrichProps.mockImplementation(props => ({
+    mockEnrichProps.mockImplementation((props) => ({
       ...props,
       _conditions: [],
       onClick: enrichedHandler,
@@ -104,7 +102,7 @@ describe("resolveCollapsedButtons", () => {
   it("falls back to enrichButtonActions when no enriched handler exists", async () => {
     const resolveCollapsedButtons = await setupResolver()
     const enrichButtonActions = vi.fn(() => vi.fn())
-    mockEnrichProps.mockImplementation(props => ({
+    mockEnrichProps.mockImplementation((props) => ({
       ...props,
       _conditions: [],
       onClick: undefined,

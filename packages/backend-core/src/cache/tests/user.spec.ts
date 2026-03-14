@@ -1,12 +1,11 @@
-import { User } from "@budibase/types"
+import type { User } from "@budibase/types"
+import _ from "lodash"
 import { generator, structures } from "../../../tests"
 import { DBTestConfiguration } from "../../../tests/extra"
-import { getUsers } from "../user"
 import { getGlobalDB } from "../../context"
-import _ from "lodash"
-
 import * as redis from "../../redis/init"
 import { UserDB } from "../../users"
+import { getUsers } from "../user"
 
 const config = new DBTestConfiguration()
 
@@ -40,7 +39,7 @@ describe("user cache", () => {
     it("when no user is in cache, all of them are retrieved from db", async () => {
       const usersToRequest = _.sampleSize(users, 5)
 
-      const userIdsToRequest = usersToRequest.map(x => x._id!)
+      const userIdsToRequest = usersToRequest.map((x) => x._id!)
 
       jest.spyOn(UserDB, "bulkGet")
 
@@ -48,7 +47,7 @@ describe("user cache", () => {
 
       expect(results.users).toHaveLength(5)
       expect(results).toEqual({
-        users: usersToRequest.map(u => ({
+        users: usersToRequest.map((u) => ({
           ...u,
           budibaseAccess: true,
           _rev: expect.any(String),
@@ -62,19 +61,17 @@ describe("user cache", () => {
     it("on a second all, all of them are retrieved from cache", async () => {
       const usersToRequest = _.sampleSize(users, 5)
 
-      const userIdsToRequest = usersToRequest.map(x => x._id!)
+      const userIdsToRequest = usersToRequest.map((x) => x._id!)
 
       jest.spyOn(UserDB, "bulkGet")
 
       await config.doInTenant(() => getUsers(userIdsToRequest))
-      const resultsFromCache = await config.doInTenant(() =>
-        getUsers(userIdsToRequest)
-      )
+      const resultsFromCache = await config.doInTenant(() => getUsers(userIdsToRequest))
 
       expect(resultsFromCache.users).toHaveLength(5)
       expect(resultsFromCache).toEqual({
         users: expect.arrayContaining(
-          usersToRequest.map(u => ({
+          usersToRequest.map((u) => ({
             ...u,
             budibaseAccess: true,
             _rev: expect.any(String),
@@ -88,13 +85,11 @@ describe("user cache", () => {
     it("when some users are cached, only the missing ones are retrieved from db", async () => {
       const usersToRequest = _.sampleSize(users, 5)
 
-      const userIdsToRequest = usersToRequest.map(x => x._id!)
+      const userIdsToRequest = usersToRequest.map((x) => x._id!)
 
       jest.spyOn(UserDB, "bulkGet")
 
-      await config.doInTenant(() =>
-        getUsers([userIdsToRequest[0], userIdsToRequest[3]])
-      )
+      await config.doInTenant(() => getUsers([userIdsToRequest[0], userIdsToRequest[3]]))
       ;(UserDB.bulkGet as jest.Mock).mockClear()
 
       const results = await config.doInTenant(() => getUsers(userIdsToRequest))
@@ -102,7 +97,7 @@ describe("user cache", () => {
       expect(results.users).toHaveLength(5)
       expect(results).toEqual({
         users: expect.arrayContaining(
-          usersToRequest.map(u => ({
+          usersToRequest.map((u) => ({
             ...u,
             budibaseAccess: true,
             _rev: expect.any(String),
@@ -122,17 +117,14 @@ describe("user cache", () => {
       const usersToRequest = _.sampleSize(users, 3)
       const missingIds = [generator.guid(), generator.guid()]
 
-      const userIdsToRequest = _.shuffle([
-        ...missingIds,
-        ...usersToRequest.map(x => x._id!),
-      ])
+      const userIdsToRequest = _.shuffle([...missingIds, ...usersToRequest.map((x) => x._id!)])
 
       const results = await config.doInTenant(() => getUsers(userIdsToRequest))
 
       expect(results.users).toHaveLength(3)
       expect(results).toEqual({
         users: expect.arrayContaining(
-          usersToRequest.map(u => ({
+          usersToRequest.map((u) => ({
             ...u,
             budibaseAccess: true,
             _rev: expect.any(String),

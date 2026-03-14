@@ -2,16 +2,16 @@ import { context, db as dbCore } from "@budibase/backend-core"
 import { helpers } from "@budibase/shared-core"
 import { findHBSBlocks, processObjectSync } from "@budibase/string-templates"
 import {
-  Datasource,
+  type Datasource,
   DatasourceFieldType,
-  Integration,
   INTERNAL_TABLE_SOURCE_ID,
+  type Integration,
   PASSWORD_REPLACEMENT,
-  RestAuthConfig,
+  type RestAuthConfig,
   RestAuthType,
-  RestBasicAuthConfig,
-  RestConfig,
-  Row,
+  type RestBasicAuthConfig,
+  type RestConfig,
+  type Row,
   SourceName,
 } from "@budibase/types"
 import { cloneDeep } from "lodash/fp"
@@ -22,11 +22,7 @@ import {
   getDatasourceParams,
   getTableParams,
 } from "../../../db/utils"
-import {
-  getDefinition,
-  getDefinitions,
-  getIntegration,
-} from "../../../integrations"
+import { getDefinition, getDefinitions, getIntegration } from "../../../integrations"
 import sdk from "../../index"
 import { getEnvironmentVariables } from "../../utils"
 
@@ -34,14 +30,11 @@ const ENV_VAR_PREFIX = "env."
 
 export function addDatasourceFlags(datasource: Datasource) {
   datasource.isSQL = helpers.isSQL(datasource)
-  datasource.usesEnvironmentVariables =
-    datasourceUsesEnvironmentVariables(datasource)
+  datasource.usesEnvironmentVariables = datasourceUsesEnvironmentVariables(datasource)
   return datasource
 }
 
-export async function fetch(opts?: {
-  enriched: boolean
-}): Promise<Datasource[]> {
+export async function fetch(opts?: { enriched: boolean }): Promise<Datasource[]> {
   // Get internal tables
   const db = context.getWorkspaceDB()
   const internalTables = await db.allDocs(
@@ -64,26 +57,20 @@ export async function fetch(opts?: {
         include_docs: true,
       })
     )
-  ).rows.map(row => row.doc!)
+  ).rows.map((row) => row.doc!)
 
-  const allDatasources: Datasource[] = await sdk.datasources.removeSecrets([
-    ...datasources,
-  ])
+  const allDatasources: Datasource[] = await sdk.datasources.removeSecrets([...datasources])
 
-  for (let datasource of allDatasources) {
+  for (const datasource of allDatasources) {
     if (datasource.type === dbCore.BUDIBASE_DATASOURCE_TYPE) {
       datasource.entities = internal[datasource._id!]
     }
   }
 
-  datasources = datasources.map(datasource => addDatasourceFlags(datasource))
+  datasources = datasources.map((datasource) => addDatasourceFlags(datasource))
   if (opts?.enriched) {
-    const promises = datasources.map(datasource =>
-      enrichDatasourceWithValues(datasource)
-    )
-    const enriched = (await Promise.all(promises)).map(
-      result => result.datasource
-    )
+    const promises = datasources.map((datasource) => enrichDatasourceWithValues(datasource))
+    const enriched = (await Promise.all(promises)).map((result) => result.datasource)
     return [...enriched]
   } else {
     return [...datasources]
@@ -94,7 +81,7 @@ export function areRESTVariablesValid(datasource: Datasource) {
   const restConfig = datasource.config as RestConfig
   const varNames: string[] = []
   if (restConfig.dynamicVariables) {
-    for (let variable of restConfig.dynamicVariables) {
+    for (const variable of restConfig.dynamicVariables) {
       if (varNames.includes(variable.name)) {
         return false
       }
@@ -102,7 +89,7 @@ export function areRESTVariablesValid(datasource: Datasource) {
     }
   }
   if (restConfig.staticVariables) {
-    for (let name of Object.keys(restConfig.staticVariables)) {
+    for (const name of Object.keys(restConfig.staticVariables)) {
       if (varNames.includes(name)) {
         return false
       }
@@ -113,15 +100,12 @@ export function areRESTVariablesValid(datasource: Datasource) {
 }
 
 export function checkDatasourceTypes(schema: Integration, config: any) {
-  for (let key of Object.keys(config)) {
+  for (const key of Object.keys(config)) {
     if (!schema.datasource?.[key]) {
       continue
     }
     const type = schema.datasource[key].type
-    if (
-      type === DatasourceFieldType.NUMBER &&
-      typeof config[key] === "string"
-    ) {
+    if (type === DatasourceFieldType.NUMBER && typeof config[key] === "string") {
       config[key] = parseFloat(config[key])
     }
   }
@@ -158,10 +142,7 @@ export async function enrich(datasource: Datasource) {
   return response
 }
 
-export async function get(
-  datasourceId: string,
-  opts?: { enriched: boolean }
-): Promise<Datasource> {
+export async function get(datasourceId: string, opts?: { enriched: boolean }): Promise<Datasource> {
   const appDb = context.getWorkspaceDB()
   let datasource = await appDb.get<Datasource>(datasourceId)
   datasource = addDatasourceFlags(datasource)
@@ -187,7 +168,7 @@ function useEnvVars(str: any) {
     return false
   }
   const blocks = findHBSBlocks(str)
-  return blocks.find(block => block.includes(ENV_VAR_PREFIX)) != null
+  return blocks.find((block) => block.includes(ENV_VAR_PREFIX)) != null
 }
 
 function datasourceUsesEnvironmentVariables(datasource: Datasource): boolean {
@@ -210,7 +191,7 @@ function datasourceUsesEnvironmentVariables(datasource: Datasource): boolean {
 
 export async function removeSecrets(datasources: Datasource[]) {
   const definitions = await getDefinitions()
-  for (let datasource of datasources) {
+  for (const datasource of datasources) {
     const schema = definitions[datasource.source]
     if (!schema) {
       continue
@@ -223,7 +204,7 @@ export async function removeSecrets(datasources: Datasource[]) {
       // specific to REST datasources, contains passwords
       if (hasAuthConfigs(datasource)) {
         const configs = datasource.config.authConfigs as RestAuthConfig[]
-        for (let config of configs) {
+        for (const config of configs) {
           if (config.type !== RestAuthType.BASIC) {
             continue
           }
@@ -234,7 +215,7 @@ export async function removeSecrets(datasources: Datasource[]) {
         }
       }
       // remove general passwords
-      for (let key of Object.keys(datasource.config)) {
+      for (const key of Object.keys(datasource.config)) {
         if (
           schema.datasource?.[key]?.type === DatasourceFieldType.PASSWORD &&
           !useEnvVars(datasource.config[key])
@@ -259,12 +240,12 @@ export function mergeConfigs(update: Datasource, old: Datasource) {
   if (hasAuthConfigs(update)) {
     const configs = update.config.authConfigs as RestAuthConfig[]
     const oldConfigs = (old.config?.authConfigs as RestAuthConfig[]) || []
-    for (let config of configs) {
+    for (const config of configs) {
       if (config.type !== RestAuthType.BASIC) {
         continue
       }
       const basic = config.config as RestBasicAuthConfig
-      const oldBasic = oldConfigs.find(old => old.name === config.name)
+      const oldBasic = oldConfigs.find((old) => old.name === config.name)
         ?.config as RestBasicAuthConfig
       if (basic.password === PASSWORD_REPLACEMENT) {
         basic.password = oldBasic.password
@@ -277,7 +258,7 @@ export function mergeConfigs(update: Datasource, old: Datasource) {
   }
 
   // update back to actual passwords for everything else
-  for (let [key, value] of Object.entries(update.config)) {
+  for (const [key, value] of Object.entries(update.config)) {
     if (value !== PASSWORD_REPLACEMENT) {
       continue
     }
@@ -294,14 +275,14 @@ export function mergeConfigs(update: Datasource, old: Datasource) {
 export async function getExternalDatasources(): Promise<Datasource[]> {
   const db = context.getWorkspaceDB()
 
-  let dsResponse = await db.allDocs<Datasource>(
+  const dsResponse = await db.allDocs<Datasource>(
     getDatasourceParams(undefined, {
       include_docs: true,
     })
   )
 
-  const externalDatasources = dsResponse.rows.map(r => r.doc!)
-  return externalDatasources.map(datasource => addDatasourceFlags(datasource))
+  const externalDatasources = dsResponse.rows.map((r) => r.doc!)
+  return externalDatasources.map((datasource) => addDatasourceFlags(datasource))
 }
 
 export async function save(
@@ -325,18 +306,13 @@ export async function save(
 
   let errors: Record<string, string> = {}
   if (fetchSchema) {
-    const schema = await sdk.datasources.buildFilteredSchema(
-      datasource,
-      tablesFilter
-    )
+    const schema = await sdk.datasources.buildFilteredSchema(datasource, tablesFilter)
     datasource.entities = schema.tables
     setDefaultDisplayColumns(datasource)
     errors = schema.errors
   }
 
-  const dbResp = await db.put(
-    sdk.tables.populateExternalTableSchemas(datasource)
-  )
+  const dbResp = await db.put(sdk.tables.populateExternalTableSchemas(datasource))
   datasource._rev = dbResp.rev
 
   return { datasource, errors }
@@ -350,9 +326,7 @@ export function setDefaultDisplayColumns(datasource: Datasource) {
     if (entity.primaryDisplay) {
       continue
     }
-    const notAutoColumn = Object.values(entity.schema).find(
-      schema => !schema.autocolumn
-    )
+    const notAutoColumn = Object.values(entity.schema).find((schema) => !schema.autocolumn)
     if (notAutoColumn) {
       entity.primaryDisplay = notAutoColumn.name
     }

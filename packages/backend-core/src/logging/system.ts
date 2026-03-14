@@ -69,15 +69,13 @@ export function getLogReadStream() {
   if (fs.existsSync(historyFile)) {
     const fileContent = fs.readFileSync(historyFile, "utf-8")
     const historyFiles = fileContent.split("\n")
-    for (const historyFile of historyFiles.filter(x => x)) {
+    for (const historyFile of historyFiles.filter((x) => x)) {
       streams.push(fs.readFileSync(historyFile))
     }
   }
 
   streams.push(fs.readFileSync(getFullPath(logsFileName)))
 
-  const combinedContent = Buffer.concat(
-    streams.map(stream => new Uint8Array(stream))
-  )
+  const combinedContent = Buffer.concat(streams.map((stream) => new Uint8Array(stream)))
   return combinedContent
 }

@@ -1,38 +1,28 @@
 <script>
-  import { getContext, onMount } from "svelte"
-  import { Icon } from "@budibase/bbui"
-  import GridPopover from "../overlays/GridPopover.svelte"
+import { Icon } from "@budibase/bbui"
+import { getContext, onMount } from "svelte"
+import GridPopover from "../overlays/GridPopover.svelte"
 
-  const {
-    scrollableColumns,
-    scrollLeft,
-    width,
-    subscribe,
-    ui,
-    keyboardBlocked,
-  } = getContext("grid")
+const { scrollableColumns, scrollLeft, width, subscribe, ui, keyboardBlocked } = getContext("grid")
 
-  let anchor
-  let isOpen = false
+let anchor
+let isOpen = false
 
-  $: columnsWidth = $scrollableColumns.reduce(
-    (total, col) => (total += col.width),
-    0
-  )
-  $: end = columnsWidth - 1 - $scrollLeft
-  $: left = Math.min($width - 40, end)
-  $: keyboardBlocked.set(isOpen)
+$: columnsWidth = $scrollableColumns.reduce((total, col) => (total += col.width), 0)
+$: end = columnsWidth - 1 - $scrollLeft
+$: left = Math.min($width - 40, end)
+$: keyboardBlocked.set(isOpen)
 
-  const open = () => {
-    ui.actions.blur()
-    isOpen = true
-  }
+const open = () => {
+  ui.actions.blur()
+  isOpen = true
+}
 
-  const close = () => {
-    isOpen = false
-  }
+const close = () => {
+  isOpen = false
+}
 
-  onMount(() => subscribe("close-edit-column", close))
+onMount(() => subscribe("close-edit-column", close))
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

@@ -1,8 +1,8 @@
-import { Socket } from "socket.io"
+import { Header } from "@budibase/backend-core"
 import Cookies from "cookies"
 import http from "http"
-import Koa from "koa"
-import { Header } from "@budibase/backend-core"
+import type Koa from "koa"
+import type { Socket } from "socket.io"
 
 /**
  * Constructs a fake Koa context to use for manually running middlewares in
@@ -11,11 +11,7 @@ import { Header } from "@budibase/backend-core"
  * @param socket the socket.io socket instance
  * @param options additional metadata to populate the context with
  */
-export const createContext = (
-  app: Koa,
-  socket: Socket,
-  options?: WebsocketContextOptions
-) => {
+export const createContext = (app: Koa, socket: Socket, options?: WebsocketContextOptions) => {
   const res = new http.ServerResponse(socket.request)
   const context: WebsocketContext = {
     ...app.createContext(socket.request, res),
@@ -35,9 +31,7 @@ export const createContext = (
     throw: (...params: string[]) => {
       // Throw has a bunch of different signatures, so we'll just stringify
       // whatever params we get given
-      throw new Error(
-        ...(params?.join(" ") || "Unknown error in socket middleware")
-      )
+      throw new Error(...(params?.join(" ") || "Unknown error in socket middleware"))
     },
 
     // Needed for koa-useragent middleware

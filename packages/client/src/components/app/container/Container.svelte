@@ -1,10 +1,10 @@
 <script>
-  import GridContainer from "./GridContainer.svelte"
-  import FlexContainer from "./FlexContainer.svelte"
+import FlexContainer from "./FlexContainer.svelte"
+import GridContainer from "./GridContainer.svelte"
 
-  export let layout = "flex"
+export let layout = "flex"
 
-  $: component = layout === "grid" ? GridContainer : FlexContainer
+$: component = layout === "grid" ? GridContainer : FlexContainer
 </script>
 
 <svelte:component this={component} {...$$props}>

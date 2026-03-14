@@ -1,10 +1,10 @@
-import { FieldType } from "../../documents"
-import {
-  EmptyFilterOption,
-  UILogicalOperator,
-  BasicOperator,
-  RangeOperator,
+import type { FieldType } from "../../documents"
+import type {
   ArrayOperator,
+  BasicOperator,
+  EmptyFilterOption,
+  RangeOperator,
+  UILogicalOperator,
 } from "../../sdk"
 
 type AllOr = {
@@ -17,12 +17,7 @@ type OnEmptyFilter = {
 
 // TODO(samwho): this could be broken down further
 export type SearchFilter = {
-  operator:
-    | BasicOperator
-    | RangeOperator
-    | ArrayOperator
-    | "rangeLow"
-    | "rangeHigh"
+  operator: BasicOperator | RangeOperator | ArrayOperator | "rangeLow" | "rangeHigh"
   // Field name will often have a numerical prefix when coming from the frontend,
   // use the ColumnSplitter class to remove it.
   field: string

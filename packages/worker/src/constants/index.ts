@@ -119,8 +119,7 @@ export const TemplateMetadata = {
       bindings: [
         {
           name: InternalTemplateBinding.RESET_URL,
-          description:
-            "The URL the recipient must click to reset their password.",
+          description: "The URL the recipient must click to reset their password.",
         },
         {
           name: InternalTemplateBinding.RESET_CODE,
@@ -139,8 +138,7 @@ export const TemplateMetadata = {
     },
     {
       name: TemplateMetadataNames.INVITATION,
-      description:
-        "When inviting a user via the email on-boarding this template will be used.",
+      description: "When inviting a user via the email on-boarding this template will be used.",
       category: "user management",
       purpose: EmailTemplatePurpose.INVITATION,
       bindings: [
@@ -151,8 +149,7 @@ export const TemplateMetadata = {
         },
         {
           name: InternalTemplateBinding.INVITE_CODE,
-          description:
-            "The temporary invite code used in the recipients invitation URL.",
+          description: "The temporary invite code used in the recipients invitation URL.",
         },
       ],
     },

@@ -1,12 +1,12 @@
-import { serializeError } from "serialize-error"
-import env from "../environment"
+import { context, logging } from "@budibase/backend-core"
 import {
   JsTimeoutError,
   setJSRunner,
   setOnErrorLog,
   setTestingBackendJS,
 } from "@budibase/string-templates"
-import { context, logging } from "@budibase/backend-core"
+import { serializeError } from "serialize-error"
+import env from "../environment"
 import { IsolatedVM } from "./vm"
 
 export function init() {
@@ -51,9 +51,7 @@ export function init() {
 
   if (env.LOG_JS_ERRORS) {
     setOnErrorLog((error: Error) => {
-      logging.logWarn(
-        `Error while executing js: ${JSON.stringify(serializeError(error))}`
-      )
+      logging.logWarn(`Error while executing js: ${JSON.stringify(serializeError(error))}`)
     })
   }
 }

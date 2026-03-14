@@ -1,7 +1,7 @@
 const { isDatasourceTest } = require(".")
 
-module.exports = paths => {
+module.exports = (paths) => {
   return {
-    filtered: paths.filter(path => !isDatasourceTest(path)),
+    filtered: paths.filter((path) => !isDatasourceTest(path)),
   }
 }

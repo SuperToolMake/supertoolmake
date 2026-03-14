@@ -1,71 +1,58 @@
 <script>
-  import {
-    Button,
-    Label,
-    notifications,
-    Layout,
-    Input,
-    Select,
-    Checkbox,
-  } from "@budibase/bbui"
-  import { admin } from "@/stores/portal/admin"
-  import { API } from "@/api"
-  import { cloneDeep } from "lodash/fp"
-  import { onMount } from "svelte"
-  import { fetchSmtp } from "@/settings/pages/email/utils"
+import { Button, Checkbox, Input, Label, Layout, notifications, Select } from "@budibase/bbui"
+import { cloneDeep } from "lodash/fp"
+import { onMount } from "svelte"
+import { API } from "@/api"
+import { fetchSmtp } from "@/settings/pages/email/utils"
+import { admin } from "@/stores/portal/admin"
 
-  const ConfigTypes = {
-    SMTP: "smtp",
+const ConfigTypes = {
+  SMTP: "smtp",
+}
+
+let smtpConfig
+let requireAuth = false
+
+async function saveSmtp() {
+  // clone it so we can remove stuff if required
+  const smtp = cloneDeep(smtpConfig)
+  if (!requireAuth) {
+    delete smtp.config.auth
   }
-
-  let smtpConfig
-  let requireAuth = false
-
-  async function saveSmtp() {
-    // clone it so we can remove stuff if required
-    const smtp = cloneDeep(smtpConfig)
-    if (!requireAuth) {
-      delete smtp.config.auth
-    }
-    // Save your SMTP config
-    try {
-      const savedConfig = await API.saveConfig(smtp)
-      smtpConfig._rev = savedConfig._rev
-      smtpConfig._id = savedConfig._id
-      await admin.getChecklist()
-      notifications.success(`Settings saved`)
-    } catch (error) {
-      notifications.error(
-        `Failed to save email settings, reason: ${error?.message || "Unknown"}`
-      )
-    }
+  // Save your SMTP config
+  try {
+    const savedConfig = await API.saveConfig(smtp)
+    smtpConfig._rev = savedConfig._rev
+    smtpConfig._id = savedConfig._id
+    await admin.getChecklist()
+    notifications.success(`Settings saved`)
+  } catch (error) {
+    notifications.error(`Failed to save email settings, reason: ${error?.message || "Unknown"}`)
   }
+}
 
-  async function deleteSmtp() {
-    // Delete the SMTP config
-    try {
-      await API.deleteConfig(smtpConfig._id, smtpConfig._rev)
-      smtpConfig = {
-        type: ConfigTypes.SMTP,
-        config: {
-          secure: true,
-        },
-      }
-      await admin.getChecklist()
-      notifications.success(`Settings cleared`)
-    } catch (error) {
-      notifications.error(
-        `Failed to clear email settings, reason: ${error?.message || "Unknown"}`
-      )
+async function deleteSmtp() {
+  // Delete the SMTP config
+  try {
+    await API.deleteConfig(smtpConfig._id, smtpConfig._rev)
+    smtpConfig = {
+      type: ConfigTypes.SMTP,
+      config: {
+        secure: true,
+      },
     }
+    await admin.getChecklist()
+    notifications.success(`Settings cleared`)
+  } catch (error) {
+    notifications.error(`Failed to clear email settings, reason: ${error?.message || "Unknown"}`)
   }
+}
 
-  onMount(async () => {
-    smtpConfig = await fetchSmtp()
+onMount(async () => {
+  smtpConfig = await fetchSmtp()
 
-    requireAuth =
-      smtpConfig && "config" in smtpConfig && smtpConfig.config.auth != null
-  })
+  requireAuth = smtpConfig && "config" in smtpConfig && smtpConfig.config.auth != null
+})
 </script>
 
 <Layout noPadding gap="S">

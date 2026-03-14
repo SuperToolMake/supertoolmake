@@ -1,14 +1,13 @@
-import * as utils from "../utils"
-import { Duration } from "../utils"
+import { type Invite, type InviteWithCode, LockName, LockType } from "@budibase/types"
 import { getTenantId } from "../context"
 import * as redis from "../redis/init"
 import * as locks from "../redis/redlockImpl"
-import { Invite, InviteWithCode, LockName, LockType } from "@budibase/types"
+import * as utils from "../utils"
+import { Duration } from "../utils"
 
 const TTL_SECONDS = Duration.fromDays(7).toSeconds()
 const INVITE_LIST_LOCK_TTL_MS = Duration.fromSeconds(10).toMs()
-const INVALID_INVITE_MESSAGE =
-  "Invitation is not valid or has expired, please request a new one."
+const INVALID_INVITE_MESSAGE = "Invitation is not valid or has expired, please request a new one."
 
 interface InviteListEntry {
   email: string
@@ -61,10 +60,7 @@ async function saveInviteList(tenantId: string, list: InviteListPayload) {
   await client.store(tenantId, list)
 }
 
-async function withInviteListLock<T>(
-  tenantId: string,
-  fn: () => Promise<T>
-): Promise<T> {
+async function withInviteListLock<T>(tenantId: string, fn: () => Promise<T>): Promise<T> {
   const { result } = await locks.doWithLock(
     {
       type: LockType.DEFAULT,
@@ -78,10 +74,7 @@ async function withInviteListLock<T>(
   return result
 }
 
-function toInviteWithCode(
-  code: string,
-  invite: InviteListEntry
-): InviteWithCode {
+function toInviteWithCode(code: string, invite: InviteListEntry): InviteWithCode {
   return {
     code,
     email: invite.email,
@@ -167,10 +160,7 @@ export async function createCode(email: string, info: any): Promise<string> {
  * @param code the invite code that was provided as part of the link.
  * @return If the code is valid then an email address will be returned.
  */
-export async function getCode(
-  code: string,
-  tenantId?: string
-): Promise<Invite> {
+export async function getCode(code: string, tenantId?: string): Promise<Invite> {
   const resolvedTenantId = tenantId || getTenantId()
   return await withInviteListLock(resolvedTenantId, async () => {
     const found = await findInviteInList(code, resolvedTenantId)
@@ -232,11 +222,7 @@ export async function getInviteCodes(): Promise<InviteWithCode[]> {
   return Array.from(results.values())
 }
 
-export async function getExistingInvites(
-  emails: string[]
-): Promise<InviteWithCode[]> {
-  const lcEmails = new Set(emails.map(email => email.toLowerCase()))
-  return (await getInviteCodes()).filter(invite =>
-    lcEmails.has(invite.email.toLowerCase())
-  )
+export async function getExistingInvites(emails: string[]): Promise<InviteWithCode[]> {
+  const lcEmails = new Set(emails.map((email) => email.toLowerCase()))
+  return (await getInviteCodes()).filter((invite) => lcEmails.has(invite.email.toLowerCase()))
 }

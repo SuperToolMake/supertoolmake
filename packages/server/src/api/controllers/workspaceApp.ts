@@ -1,4 +1,4 @@
-import {
+import type {
   Ctx,
   FetchWorkspaceAppResponse,
   FindWorkspaceAppResponse,
@@ -10,12 +10,10 @@ import {
   WorkspaceApp,
   WorkspaceAppResponse,
 } from "@budibase/types"
-import sdk from "../../sdk"
 import { defaultAppNavigator } from "../../constants/definitions"
+import sdk from "../../sdk"
 
-function toWorkspaceAppResponse(
-  workspaceApp: WorkspaceApp
-): WorkspaceAppResponse {
+function toWorkspaceAppResponse(workspaceApp: WorkspaceApp): WorkspaceAppResponse {
   return {
     _id: workspaceApp._id!,
     _rev: workspaceApp._rev!,
@@ -36,9 +34,7 @@ export async function fetch(ctx: Ctx<void, FetchWorkspaceAppResponse>) {
   }
 }
 
-export async function duplicate(
-  ctx: Ctx<void, InsertWorkspaceAppResponse, { id: string }>
-) {
+export async function duplicate(ctx: Ctx<void, InsertWorkspaceAppResponse, { id: string }>) {
   const { id } = ctx.params
   const workspaceApp = await sdk.workspaceApps.get(id)
   if (!workspaceApp) {
@@ -52,9 +48,7 @@ export async function duplicate(
   ctx.status = 201
 }
 
-export async function find(
-  ctx: Ctx<void, FindWorkspaceAppResponse, { id: string }>
-) {
+export async function find(ctx: Ctx<void, FindWorkspaceAppResponse, { id: string }>) {
   const { id } = ctx.params
   const workspaceApp = await sdk.workspaceApps.get(id)
   if (!workspaceApp) {
@@ -64,9 +58,7 @@ export async function find(
   ctx.body = toWorkspaceAppResponse(workspaceApp)
 }
 
-export async function create(
-  ctx: Ctx<InsertWorkspaceAppRequest, InsertWorkspaceAppResponse>
-) {
+export async function create(ctx: Ctx<InsertWorkspaceAppRequest, InsertWorkspaceAppResponse>) {
   const { body } = ctx.request
   const newWorkspaceApp: WithoutDocMetadata<WorkspaceApp> = {
     name: body.name,
@@ -83,9 +75,7 @@ export async function create(
   }
 }
 
-export async function edit(
-  ctx: Ctx<UpdateWorkspaceAppRequest, UpdateWorkspaceAppResponse>
-) {
+export async function edit(ctx: Ctx<UpdateWorkspaceAppRequest, UpdateWorkspaceAppResponse>) {
   const { body } = ctx.request
 
   if (ctx.params.id !== body._id) {

@@ -1,9 +1,9 @@
-import { derived, get, Writable } from "svelte/store"
+import { notifications } from "@budibase/bbui"
+import type { AppNavigation, AppNavigationLink, UIObject } from "@budibase/types"
+import { derived, get, type Writable } from "svelte/store"
 import { API } from "@/api"
 import { appStore, workspaceAppStore } from "@/stores/builder"
 import { DerivedBudiStore } from "../BudiStore"
-import { AppNavigation, AppNavigationLink, UIObject } from "@budibase/types"
-import { notifications } from "@budibase/bbui"
 
 export interface DerivedAppNavigationStore extends AppNavigation {}
 
@@ -13,39 +13,33 @@ export const INITIAL_NAVIGATION_STATE: DerivedAppNavigationStore = {
   textAlign: "Left",
 }
 
-export class NavigationStore extends DerivedBudiStore<
-  {},
-  DerivedAppNavigationStore
-> {
+export class NavigationStore extends DerivedBudiStore<{}, DerivedAppNavigationStore> {
   constructor() {
     const makeDerivedStore = (store: Writable<{}>) => {
-      return derived(
-        [store, workspaceAppStore],
-        ([$store, $workspaceAppStore]) => {
-          const navigation = $workspaceAppStore.selectedWorkspaceApp?.navigation
+      return derived([store, workspaceAppStore], ([$store, $workspaceAppStore]) => {
+        const navigation = $workspaceAppStore.selectedWorkspaceApp?.navigation
 
-          return {
-            ...$store,
-            ...(navigation ?? INITIAL_NAVIGATION_STATE),
-          }
+        return {
+          ...$store,
+          ...(navigation ?? INITIAL_NAVIGATION_STATE),
         }
-      )
+      })
     }
 
     super(INITIAL_NAVIGATION_STATE, makeDerivedStore)
   }
 
   syncAppNavigation(nav?: AppNavigation) {
-    workspaceAppStore.update(state => {
+    workspaceAppStore.update((state) => {
       const selectedWorkspaceApp = state.workspaceApps.find(
-        a => a._id === state.selectedWorkspaceAppId
+        (a) => a._id === state.selectedWorkspaceAppId
       )
       if (selectedWorkspaceApp && nav) {
         selectedWorkspaceApp.navigation = nav
       }
       return state
     })
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
     }))
   }
@@ -67,20 +61,12 @@ export class NavigationStore extends DerivedBudiStore<
     this.syncAppNavigation(navigation)
   }
 
-  async addLink({
-    url,
-    title,
-    roleId,
-  }: {
-    url: string
-    title: string
-    roleId: string
-  }) {
+  async addLink({ url, title, roleId }: { url: string; title: string; roleId: string }) {
     const navigation = get(this.derivedStore)
-    let links: AppNavigationLink[] = [...(navigation?.links ?? [])]
+    const links: AppNavigationLink[] = [...(navigation?.links ?? [])]
 
     // Skip if we have an identical link
-    if (links.find(link => link.url === url && link.text === title)) {
+    if (links.find((link) => link.url === url && link.text === title)) {
       return
     }
 
@@ -106,14 +92,12 @@ export class NavigationStore extends DerivedBudiStore<
     urls = Array.isArray(urls) ? urls : [urls]
 
     // Filter out top level links pointing to these URLs
-    links = links.filter(link => !urls.includes(link.url))
+    links = links.filter((link) => !urls.includes(link.url))
 
     // Filter out nested links pointing to these URLs
-    links.forEach(link => {
+    links.forEach((link) => {
       if (link.type === "sublinks" && link.subLinks?.length) {
-        link.subLinks = link.subLinks.filter(
-          subLink => !urls.includes(subLink.url)
-        )
+        link.subLinks = link.subLinks.filter((subLink) => !urls.includes(subLink.url))
       }
     })
 

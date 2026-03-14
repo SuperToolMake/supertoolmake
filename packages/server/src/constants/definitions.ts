@@ -1,4 +1,4 @@
-import { AppNavigation } from "@budibase/types"
+import type { AppNavigation } from "@budibase/types"
 
 export interface Table {
   _id: string

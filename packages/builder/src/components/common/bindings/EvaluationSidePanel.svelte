@@ -1,67 +1,66 @@
 <script lang="ts">
-  import { JsonFormatter } from "@budibase/frontend-core"
-  import { Icon, ProgressCircle, notifications } from "@budibase/bbui"
-  import { Helpers } from "@budibase/bbui"
-  import { fade } from "svelte/transition"
-  import { UserScriptError } from "@budibase/string-templates"
-  import type { Log } from "@budibase/string-templates"
-  import type { JSONValue } from "@budibase/types"
+import { Helpers, Icon, notifications, ProgressCircle } from "@budibase/bbui"
+import { JsonFormatter } from "@budibase/frontend-core"
+import type { Log } from "@budibase/string-templates"
+import { UserScriptError } from "@budibase/string-templates"
+import type { JSONValue } from "@budibase/types"
+import { fade } from "svelte/transition"
 
-  // this can be essentially any primitive response from the JS function
-  export let expressionResult: JSONValue | undefined = undefined
-  export let expressionError: string | undefined = undefined
-  export let expressionLogs: Log[] = []
-  export let evaluating = false
-  export let expression: string | null = null
+// this can be essentially any primitive response from the JS function
+export let expressionResult: JSONValue | undefined = undefined
+export let expressionError: string | undefined = undefined
+export let expressionLogs: Log[] = []
+export let evaluating = false
+export let expression: string | null = null
 
-  $: error = expressionError != null
-  $: empty = expression == null || expression?.trim() === ""
-  $: success = !error && !empty
-  $: highlightedResult = highlight(expressionResult)
-  $: highlightedLogs = expressionLogs.map(l => ({
-    log: l.log.map(part => highlight(part)).join(", "),
-    line: l.line,
-    type: l.type,
-  }))
+$: error = expressionError != null
+$: empty = expression == null || expression?.trim() === ""
+$: success = !error && !empty
+$: highlightedResult = highlight(expressionResult)
+$: highlightedLogs = expressionLogs.map((l) => ({
+  log: l.log.map((part) => highlight(part)).join(", "),
+  line: l.line,
+  type: l.type,
+}))
 
-  const formatError = (err: any) => {
-    if (err.code === UserScriptError.code) {
-      return err.userScriptError.toString()
-    }
-    return err.toString()
+const formatError = (err: any) => {
+  if (err.code === UserScriptError.code) {
+    return err.userScriptError.toString()
+  }
+  return err.toString()
+}
+
+// json can be any primitive type
+const highlight = (json?: JSONValue | null) => {
+  if (json == null) {
+    return ""
   }
 
-  // json can be any primitive type
-  const highlight = (json?: JSONValue | null) => {
-    if (json == null) {
-      return ""
-    }
-
-    // Attempt to parse and then stringify, in case this is valid result
-    try {
-      json = JSON.stringify(JSON.parse(json as any), null, 2)
-    } catch (err) {
-      // couldn't parse/stringify, just treat it as the raw input
-    }
-
-    return JsonFormatter.format(json, {
-      keyColor: "#e06c75",
-      numberColor: "#e5c07b",
-      stringColor: "#98c379",
-      trueColor: "#d19a66",
-      falseColor: "#d19a66",
-      nullColor: "#c678dd",
-    })
+  // Attempt to parse and then stringify, in case this is valid result
+  try {
+    json = JSON.stringify(JSON.parse(json as any), null, 2)
+  } catch (err) {
+    // couldn't parse/stringify, just treat it as the raw input
   }
 
-  const copy = () => {
-    let clipboardVal = expressionResult
-    if (typeof clipboardVal === "object") {
-      clipboardVal = JSON.stringify(clipboardVal, null, 2)
-    }
-    Helpers.copyToClipboard(clipboardVal)
-    notifications.success("Value copied to clipboard")
+  return JsonFormatter.format(json, {
+    keyColor: "#e06c75",
+    numberColor: "#e5c07b",
+    stringColor: "#98c379",
+    trueColor: "#d19a66",
+    falseColor: "#d19a66",
+    nullColor: "#c678dd",
+  })
+}
+
+const copy = () => {
+  let clipboardVal = expressionResult
+  if (typeof clipboardVal === "object") {
+    clipboardVal = JSON.stringify(clipboardVal, null, 2)
   }
+  Helpers.copyToClipboard(clipboardVal)
+  notifications.success("Value copied to clipboard")
+}
 </script>
 
 <div class="evaluation-side-panel">

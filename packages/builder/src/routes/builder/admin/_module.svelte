@@ -1,19 +1,19 @@
 <script>
-  import { admin } from "@/stores/portal"
-  import { onMount } from "svelte"
-  import { goto } from "@roxi/routify"
+import { goto } from "@roxi/routify"
+import { onMount } from "svelte"
+import { admin } from "@/stores/portal"
 
-  let loaded = false
+let loaded = false
 
-  $goto
+$goto
 
-  onMount(() => {
-    if ($admin?.checklist?.adminUser?.checked) {
-      $goto("../")
-    } else {
-      loaded = true
-    }
-  })
+onMount(() => {
+  if ($admin?.checklist?.adminUser?.checked) {
+    $goto("../")
+  } else {
+    loaded = true
+  }
+})
 </script>
 
 {#if loaded}

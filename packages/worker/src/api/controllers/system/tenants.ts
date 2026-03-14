@@ -1,9 +1,10 @@
 import {
-  ActivationRequest,
-  GetTenantInfoResponse,
-  UserCtx,
+  type ActivationRequest,
+  type GetTenantInfoResponse,
+  LockReason,
+  type LockRequest,
+  type UserCtx,
 } from "@budibase/types"
-import { LockRequest, LockReason } from "@budibase/types"
 import * as tenantSdk from "../../../sdk/tenants"
 
 export async function destroy(ctx: UserCtx<void, void>) {
@@ -30,10 +31,7 @@ export async function lock(ctx: UserCtx<LockRequest, void>) {
 
   const { reason } = ctx.request.body
   if (reason !== undefined && !Object.values(LockReason).includes(reason)) {
-    ctx.throw(
-      400,
-      `Invalid lock reason. Valid values: ${Object.values(LockReason).join(", ")}`
-    )
+    ctx.throw(400, `Invalid lock reason. Valid values: ${Object.values(LockReason).join(", ")}`)
   }
 
   const tenantId = ctx.params.tenantId

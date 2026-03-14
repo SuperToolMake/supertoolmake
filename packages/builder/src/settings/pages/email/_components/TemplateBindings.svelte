@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { Body, Detail } from "@budibase/bbui"
-  import { type GlobalTemplateBinding } from "@budibase/types"
+import { Body, Detail } from "@budibase/bbui"
+import type { GlobalTemplateBinding } from "@budibase/types"
 
-  export let bindings: GlobalTemplateBinding[] | undefined
-  export let onBindingClick = (_: GlobalTemplateBinding) => {}
+export let bindings: GlobalTemplateBinding[] | undefined
+export let onBindingClick = (_: GlobalTemplateBinding) => {}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

@@ -1,12 +1,12 @@
 <script lang="ts">
-  import Icon from "../Icon/Icon.svelte"
-  import AbsTooltip from "./AbsTooltip.svelte"
-  import type { TooltipPosition } from "../constants"
+import type { TooltipPosition } from "../constants"
+import Icon from "../Icon/Icon.svelte"
+import AbsTooltip from "./AbsTooltip.svelte"
 
-  export let tooltip: string = ""
-  export let size: "S" | "M" | "L" = "M"
-  export let disabled: boolean = true
-  export let position: TooltipPosition | undefined = undefined
+export let tooltip: string = ""
+export let size: "S" | "M" | "L" = "M"
+export let disabled: boolean = true
+export let position: TooltipPosition | undefined = undefined
 </script>
 
 <div class:container={!!tooltip}>

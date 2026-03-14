@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { getContext } from "svelte"
-  import type { UIComponentError } from "@budibase/types"
+import type { UIComponentError } from "@budibase/types"
+import { getContext } from "svelte"
 
-  export let error: UIComponentError | undefined
+export let error: UIComponentError | undefined
 
-  const component = getContext("component")
-  const { builderStore } = getContext("sdk")
+const component = getContext("component")
+const { builderStore } = getContext("sdk")
 </script>
 
 {#if error}

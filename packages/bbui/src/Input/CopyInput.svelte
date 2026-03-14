@@ -1,22 +1,22 @@
 <script lang="ts">
-  import Input from "../Form/Input.svelte"
-  import Icon from "../Icon/Icon.svelte"
-  import { notifications } from "../Stores/notifications"
+import Input from "../Form/Input.svelte"
+import Icon from "../Icon/Icon.svelte"
+import { notifications } from "../Stores/notifications"
 
-  export let label: string | undefined = undefined
-  export let value: string | undefined = undefined
+export let label: string | undefined = undefined
+export let value: string | undefined = undefined
 
-  const copyToClipboard = (val: string | undefined) => {
-    if (val) {
-      const dummy = document.createElement("textarea")
-      document.body.appendChild(dummy)
-      dummy.value = val
-      dummy.select()
-      document.execCommand("copy")
-      document.body.removeChild(dummy)
-      notifications.success(`Copied to clipboard`)
-    }
+const copyToClipboard = (val: string | undefined) => {
+  if (val) {
+    const dummy = document.createElement("textarea")
+    document.body.appendChild(dummy)
+    dummy.value = val
+    dummy.select()
+    document.execCommand("copy")
+    document.body.removeChild(dummy)
+    notifications.success(`Copied to clipboard`)
   }
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

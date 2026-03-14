@@ -1,25 +1,25 @@
 import {
-  Integration,
-  DatasourceFieldType,
-  QueryType,
-  IntegrationBase,
+  type ConnectionInfo,
   DatasourceFeature,
-  ConnectionInfo,
+  DatasourceFieldType,
+  type Integration,
+  type IntegrationBase,
+  QueryType,
 } from "@budibase/types"
 import {
-  Document,
+  type DeleteResult,
+  type Document,
+  type Filter,
+  type FindOneAndUpdateOptions,
+  type InsertManyResult,
+  type InsertOneResult,
   MongoClient,
+  type MongoClientOptions,
   ObjectId,
-  Filter,
-  UpdateFilter,
-  FindOneAndUpdateOptions,
-  UpdateOptions,
-  OperationOptions,
-  MongoClientOptions,
-  DeleteResult,
-  UpdateResult,
-  InsertOneResult,
-  InsertManyResult,
+  type OperationOptions,
+  type UpdateFilter,
+  type UpdateOptions,
+  type UpdateResult,
 } from "mongodb"
 import environment from "../environment"
 import { HOST_ADDRESS } from "./utils"
@@ -39,7 +39,7 @@ interface MongoDBQuery {
 }
 
 const getSchema = () => {
-  let schema = {
+  const schema = {
     docs: "https://github.com/mongodb/node-mongodb-native",
     friendlyName: "MongoDB",
     type: "Non-relational",
@@ -325,7 +325,7 @@ const getSchema = () => {
   if (environment.SELF_HOSTED) {
     schema.datasource = {
       ...schema.datasource,
-      // @ts-ignore
+      // @ts-expect-error
       tls: {
         type: DatasourceFieldType.FIELD_GROUP,
         display: "Configure SSL",
@@ -386,16 +386,14 @@ export class MongoIntegration implements IntegrationBase {
   }
 
   hasObjectId(value?: any): boolean {
-    return (
-      typeof value === "string" && value.toLowerCase().startsWith("objectid")
-    )
+    return typeof value === "string" && value.toLowerCase().startsWith("objectid")
   }
 
   createObjectIds(json: any): any {
     const self = this
 
     function interpolateObjectIds(json: any) {
-      for (let field of Object.keys(json || {})) {
+      for (const field of Object.keys(json || {})) {
         if (json[field] instanceof Object) {
           json[field] = self.createObjectIds(json[field])
         }
@@ -426,12 +424,12 @@ export class MongoIntegration implements IntegrationBase {
   }
 
   parseQueryParams(params: string, mode: string) {
-    let queryParams = []
+    const queryParams = []
     let openCount = 0
     let inQuotes = false
     let i = 0
     let startIndex = 0
-    for (let c of params) {
+    for (const c of params) {
       if (c === '"' && i > 0 && params[i - 1] !== "\\") {
         inQuotes = !inQuotes
       }
@@ -448,9 +446,9 @@ export class MongoIntegration implements IntegrationBase {
       }
       i++
     }
-    let group1 = queryParams[0] ?? {}
-    let group2 = queryParams[1] ?? {}
-    let group3 = queryParams[2] ?? {}
+    const group1 = queryParams[0] ?? {}
+    const group2 = queryParams[1] ?? {}
+    const group3 = queryParams[2] ?? {}
     if (mode === "update") {
       return {
         filter: group1,
@@ -464,14 +462,12 @@ export class MongoIntegration implements IntegrationBase {
     }
   }
 
-  async create(
-    query: MongoDBQuery
-  ): Promise<InsertOneResult | InsertManyResult> {
+  async create(query: MongoDBQuery): Promise<InsertOneResult | InsertManyResult> {
     try {
       await this.connect()
       const db = this.client.db(this.config.db)
       const collection = db.collection(query.extra.collection)
-      let json = this.createObjectIds(query.json)
+      const json = this.createObjectIds(query.json)
 
       // For mongodb we add an extra actionType to specify
       // which method we want to call on the collection
@@ -483,9 +479,7 @@ export class MongoIntegration implements IntegrationBase {
           return await collection.insertMany(json)
         }
         default: {
-          throw new Error(
-            `actionType ${query.extra.actionType} does not exist on DB for create`
-          )
+          throw new Error(`actionType ${query.extra.actionType} does not exist on DB for create`)
         }
       }
     } catch (err) {
@@ -518,7 +512,7 @@ export class MongoIntegration implements IntegrationBase {
           if (typeof query.json === "string") {
             json = this.parseQueryParams(query.json, "update")
           }
-          let findAndUpdateJson = this.createObjectIds(json) as {
+          const findAndUpdateJson = this.createObjectIds(json) as {
             filter: Filter<any>
             update: UpdateFilter<any>
             options: FindOneAndUpdateOptions
@@ -539,9 +533,7 @@ export class MongoIntegration implements IntegrationBase {
           return await collection.distinct(json)
         }
         default: {
-          throw new Error(
-            `actionType ${query.extra.actionType} does not exist on DB for read`
-          )
+          throw new Error(`actionType ${query.extra.actionType} does not exist on DB for read`)
         }
       }
     } catch (err) {
@@ -561,7 +553,7 @@ export class MongoIntegration implements IntegrationBase {
       if (typeof queryJson === "string") {
         queryJson = this.parseQueryParams(queryJson, "update")
       }
-      let json = this.createObjectIds(queryJson) as {
+      const json = this.createObjectIds(queryJson) as {
         filter: Filter<any>
         update: UpdateFilter<any>
         options: object
@@ -569,11 +561,7 @@ export class MongoIntegration implements IntegrationBase {
 
       switch (query.extra.actionType) {
         case "updateOne": {
-          return await collection.updateOne(
-            json.filter,
-            json.update,
-            json.options as UpdateOptions
-          )
+          return await collection.updateOne(json.filter, json.update, json.options as UpdateOptions)
         }
         case "updateMany": {
           return await collection.updateMany(
@@ -583,9 +571,7 @@ export class MongoIntegration implements IntegrationBase {
           )
         }
         default: {
-          throw new Error(
-            `actionType ${query.extra.actionType} does not exist on DB for update`
-          )
+          throw new Error(`actionType ${query.extra.actionType} does not exist on DB for update`)
         }
       }
     } catch (err) {
@@ -624,9 +610,7 @@ export class MongoIntegration implements IntegrationBase {
           return await collection.deleteMany(json.filter, json.options)
         }
         default: {
-          throw new Error(
-            `actionType ${query.extra.actionType} does not exist on DB for delete`
-          )
+          throw new Error(`actionType ${query.extra.actionType} does not exist on DB for delete`)
         }
       }
     } catch (err) {
@@ -646,11 +630,11 @@ export class MongoIntegration implements IntegrationBase {
       await this.connect()
       const db = this.client.db(this.config.db)
       const collection = db.collection(query.extra.collection)
-      let response = []
+      const response = []
       if (query.extra?.actionType === "pipeline") {
         for await (const doc of collection.aggregate(
           query.steps.map(({ key, value }) => {
-            let temp: any = {}
+            const temp: any = {}
             temp[key] = JSON.parse(value.value)
             return this.createObjectIds(temp)
           })
@@ -659,9 +643,7 @@ export class MongoIntegration implements IntegrationBase {
         }
       } else {
         const stages: Array<any> = query.json as Array<any>
-        for await (const doc of collection.aggregate(
-          stages ? this.createObjectIds(stages) : []
-        )) {
+        for await (const doc of collection.aggregate(stages ? this.createObjectIds(stages) : [])) {
           response.push(doc)
         }
       }

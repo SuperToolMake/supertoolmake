@@ -1,71 +1,70 @@
 <script>
-  import { getContext } from "svelte"
-  import "@spectrum-css/button/dist/index-vars.css"
-  import { loadPhosphorIconWeight } from "../../utils/phosphorIconLoader.js"
+import { getContext } from "svelte"
+import "@spectrum-css/button/dist/index-vars.css"
+import { loadPhosphorIconWeight } from "../../utils/phosphorIconLoader.js"
 
-  const { styleable, builderStore } = getContext("sdk")
-  const component = getContext("component")
+const { styleable, builderStore } = getContext("sdk")
+const component = getContext("component")
 
-  export let disabled = false
-  export let text = ""
-  export let onClick
-  export let size = "M"
-  export let type = "cta"
-  export let quiet = false
-  export let icon = null
-  export let gap = "M"
+export let disabled = false
+export let text = ""
+export let onClick
+export let size = "M"
+export let type = "cta"
+export let quiet = false
+export let icon = null
+export let gap = "M"
 
-  // For internal use only for now - not defined in the manifest
-  export let active = false
+// For internal use only for now - not defined in the manifest
+export let active = false
 
-  let node
-  let touched = false
-  let handlingOnClick = false
+let node
+let touched = false
+let handlingOnClick = false
 
-  // Backwards compatibility: detect if icon is old RemixIcon format or new Phosphor format
-  $: isLegacyIcon = icon && (icon.startsWith("ri-") || icon.includes("remix"))
-  $: isPhosphorIcon = icon && !isLegacyIcon
+// Backwards compatibility: detect if icon is old RemixIcon format or new Phosphor format
+$: isLegacyIcon = icon && (icon.startsWith("ri-") || icon.includes("remix"))
+$: isPhosphorIcon = icon && !isLegacyIcon
 
-  // Load Phosphor icon weight for new icons
-  $: if (isPhosphorIcon) {
-    loadPhosphorIconWeight("regular")
+// Load Phosphor icon weight for new icons
+$: if (isPhosphorIcon) {
+  loadPhosphorIconWeight("regular")
+}
+
+// Generate appropriate icon class
+$: iconClass = isPhosphorIcon
+  ? (() => {
+      const iconName = icon.replace(/^ph-/, "")
+      return `ph ph-${iconName}`
+    })()
+  : icon
+
+$: $component.editing && node?.focus()
+$: componentText = getComponentText(text, $builderStore, $component)
+$: customBg =
+  $component.styles?.normal?.background || $component.styles?.normal?.["background-image"]
+
+const getComponentText = (text, builderState, componentState) => {
+  if (componentState.editing) {
+    return text || " "
   }
+  return text || componentState.name || "Placeholder text"
+}
 
-  // Generate appropriate icon class
-  $: iconClass = isPhosphorIcon
-    ? (() => {
-        const iconName = icon.replace(/^ph-/, "")
-        return `ph ph-${iconName}`
-      })()
-    : icon
-
-  $: $component.editing && node?.focus()
-  $: componentText = getComponentText(text, $builderStore, $component)
-  $: customBg =
-    $component.styles?.normal?.background ||
-    $component.styles?.normal?.["background-image"]
-
-  const getComponentText = (text, builderState, componentState) => {
-    if (componentState.editing) {
-      return text || " "
-    }
-    return text || componentState.name || "Placeholder text"
+const updateText = (e) => {
+  if (touched) {
+    builderStore.actions.updateProp("text", e.target.textContent)
   }
+  touched = false
+}
 
-  const updateText = e => {
-    if (touched) {
-      builderStore.actions.updateProp("text", e.target.textContent)
-    }
-    touched = false
+const handleOnClick = async () => {
+  handlingOnClick = true
+  if (onClick) {
+    await onClick()
   }
-
-  const handleOnClick = async () => {
-    handlingOnClick = true
-    if (onClick) {
-      await onClick()
-    }
-    handlingOnClick = false
-  }
+  handlingOnClick = false
+}
 </script>
 
 {#key $component.editing}

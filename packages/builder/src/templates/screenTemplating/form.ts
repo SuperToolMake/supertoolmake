@@ -1,18 +1,15 @@
+import { Helpers } from "@budibase/bbui"
+import { utils } from "@budibase/shared-core"
+import type { Screen as ScreenDoc, UIPermissions } from "@budibase/types"
 import { componentStore } from "@/stores/builder"
 import { getRowActionButtonTemplates } from "@/templates/rowActions"
-import { Helpers } from "@budibase/bbui"
-import { Screen as ScreenDoc, UIPermissions } from "@budibase/types"
 import { Component } from "../Component"
 import getValidRoute from "./getValidRoute"
 import { Screen } from "./Screen"
-import { utils } from "@budibase/shared-core"
 
 type FormType = "create" | "update" | "view"
 
-export const getTypeSpecificRoute = (
-  tableOrView: { name: string },
-  type: FormType
-) => {
+export const getTypeSpecificRoute = (tableOrView: { name: string }, type: FormType) => {
   if (type === "create") {
     return `/${tableOrView.name}/new`
   } else if (type === "update") {
@@ -70,7 +67,7 @@ const form = async ({
   const typeSpecificRoute = getTypeSpecificRoute(tableOrView, type)
   const role = getRole(permissions, type)
 
-  let formBlock = new Component("@budibase/standard-components/formblock", id)
+  const formBlock = new Component("@budibase/standard-components/formblock", id)
     .customProps({
       dataSource: tableOrView.tableSelectFormat,
       actionType: getActionType(type),
@@ -110,8 +107,7 @@ const form = async ({
   return [
     {
       data: template,
-      navigationLinkLabel:
-        type === "create" ? `Create ${tableOrView.name}` : null,
+      navigationLinkLabel: type === "create" ? `Create ${tableOrView.name}` : null,
     },
   ]
 }

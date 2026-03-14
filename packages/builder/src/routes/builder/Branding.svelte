@@ -1,19 +1,18 @@
 <script>
-  import { organisation, auth } from "@/stores/portal"
-  import { onMount } from "svelte"
+import { onMount } from "svelte"
+import { auth, organisation } from "@/stores/portal"
 
-  let loaded = false
+let loaded = false
 
-  $: platformTitleText = $organisation.platformTitle
-  $: platformTitle =
-    !$auth.user && platformTitleText ? platformTitleText : "SuperToolMake"
+$: platformTitleText = $organisation.platformTitle
+$: platformTitle = !$auth.user && platformTitleText ? platformTitleText : "SuperToolMake"
 
-  $: faviconUrl = $organisation.faviconUrl || "/builder/logo_supertoolmake.png"
+$: faviconUrl = $organisation.faviconUrl || "/builder/logo_supertoolmake.png"
 
-  onMount(async () => {
-    await organisation.init()
-    loaded = true
-  })
+onMount(async () => {
+  await organisation.init()
+  loaded = true
+})
 </script>
 
 <!--

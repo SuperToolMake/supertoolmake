@@ -1,21 +1,21 @@
 import dagre from "@dagrejs/dagre"
-import {
-  NodeWidth,
-  NodeHeight,
-  GridResolution,
-  NodeHSpacing,
-  NodeVSpacing,
-  MinHeight,
-  EmptyStateID,
-} from "./constants"
 import { getNodesBounds, Position } from "@xyflow/svelte"
+import { get } from "svelte/store"
 import { Roles } from "@/constants/backend"
 import { roles } from "@/stores/builder"
-import { get } from "svelte/store"
+import {
+  EmptyStateID,
+  GridResolution,
+  MinHeight,
+  NodeHeight,
+  NodeHSpacing,
+  NodeVSpacing,
+  NodeWidth,
+} from "./constants"
 
 // Calculates the bounds of all custom nodes
-export const getBounds = nodes => {
-  const interactiveNodes = nodes.filter(node => node.data.interactive)
+export const getBounds = (nodes) => {
+  const interactiveNodes = nodes.filter((node) => node.data.interactive)
 
   // Empty state bounds which line up with bounds after adding first node
   if (!interactiveNodes.length) {
@@ -26,7 +26,7 @@ export const getBounds = nodes => {
       height: 10 * GridResolution,
     }
   }
-  let bounds = getNodesBounds(interactiveNodes)
+  const bounds = getNodesBounds(interactiveNodes)
 
   // Enforce a min size
   if (bounds.height < MinHeight) {
@@ -38,13 +38,13 @@ export const getBounds = nodes => {
 }
 
 // Gets the position of the basic role
-export const getBasicPosition = bounds => ({
+export const getBasicPosition = (bounds) => ({
   x: bounds.x - NodeHSpacing - NodeWidth,
   y: bounds.y + bounds.height / 2 - NodeHeight / 2,
 })
 
 // Gets the position of the admin role
-export const getAdminPosition = bounds => ({
+export const getAdminPosition = (bounds) => ({
   x: bounds.x + bounds.width + NodeHSpacing,
   y: bounds.y + bounds.height / 2 - NodeHeight / 2,
 })
@@ -54,19 +54,16 @@ const preProcessLayout = ({ nodes, edges }) => {
   const ignoredIds = [Roles.PUBLIC, Roles.BASIC, Roles.ADMIN, EmptyStateID]
   const targetlessIds = [Roles.POWER]
   return {
-    nodes: nodes.filter(node => {
+    nodes: nodes.filter((node) => {
       // Filter out ignored IDs
       if (ignoredIds.includes(node.id)) {
         return false
       }
       return true
     }),
-    edges: edges.filter(edge => {
+    edges: edges.filter((edge) => {
       // Filter out edges from ignored IDs
-      if (
-        ignoredIds.includes(edge.source) ||
-        ignoredIds.includes(edge.target)
-      ) {
+      if (ignoredIds.includes(edge.source) || ignoredIds.includes(edge.target)) {
         return false
       }
       // Filter out edges which have the same source and target
@@ -91,14 +88,14 @@ export const dagreLayout = ({ nodes, edges }) => {
     ranksep: NodeHSpacing,
     nodesep: NodeVSpacing,
   })
-  nodes.forEach(node => {
+  nodes.forEach((node) => {
     dagreGraph.setNode(node.id, { width: NodeWidth, height: NodeHeight })
   })
-  edges.forEach(edge => {
+  edges.forEach((edge) => {
     dagreGraph.setEdge(edge.source, edge.target)
   })
   dagre.layout(dagreGraph)
-  nodes.forEach(node => {
+  nodes.forEach((node) => {
     const pos = dagreGraph.node(node.id)
     node.targetPosition = Position.Left
     node.sourcePosition = Position.Right
@@ -115,11 +112,11 @@ const postProcessLayout = ({ nodes, edges }) => {
   const bounds = getBounds(nodes)
   const $roles = get(roles)
   nodes.push({
-    ...roleToNode($roles.find(role => role._id === Roles.BASIC)),
+    ...roleToNode($roles.find((role) => role._id === Roles.BASIC)),
     position: getBasicPosition(bounds),
   })
   nodes.push({
-    ...roleToNode($roles.find(role => role._id === Roles.ADMIN)),
+    ...roleToNode($roles.find((role) => role._id === Roles.ADMIN)),
     position: getAdminPosition(bounds),
   })
 
@@ -138,7 +135,7 @@ const postProcessLayout = ({ nodes, edges }) => {
   })
 
   // Add empty state node if required
-  if (!nodes.some(node => node.data.interactive)) {
+  if (!nodes.some((node) => node.data.interactive)) {
     nodes.push({
       id: EmptyStateID,
       type: "empty",
@@ -167,14 +164,10 @@ export const autoLayout = ({ nodes, edges }) => {
 }
 
 // Converts a role doc into a node structure
-export const roleToNode = role => {
-  const custom = ![
-    Roles.PUBLIC,
-    Roles.BASIC,
-    Roles.POWER,
-    Roles.ADMIN,
-    Roles.BUILDER,
-  ].includes(role._id)
+export const roleToNode = (role) => {
+  const custom = ![Roles.PUBLIC, Roles.BASIC, Roles.POWER, Roles.ADMIN, Roles.BUILDER].includes(
+    role._id
+  )
   const interactive = custom || role._id === Roles.POWER
   return {
     id: role._id,
@@ -200,10 +193,10 @@ export const roleToNode = role => {
 
 // Converts a node structure back into a role doc
 export const nodeToRole = ({ node, edges }) => ({
-  ...get(roles).find(role => role._id === node.id),
+  ...get(roles).find((role) => role._id === node.id),
   inherits: edges
-    .filter(x => x.target === node.id)
-    .map(x => x.source)
+    .filter((x) => x.target === node.id)
+    .map((x) => x.source)
     .concat(Roles.BASIC),
   uiMetadata: {
     displayName: node.data.displayName,
@@ -213,12 +206,12 @@ export const nodeToRole = ({ node, edges }) => ({
 })
 
 // Builds a default layout from an array of roles
-export const rolesToLayout = roles => {
-  let nodes = []
-  let edges = []
+export const rolesToLayout = (roles) => {
+  const nodes = []
+  const edges = []
 
   // Add all nodes and edges
-  for (let role of roles) {
+  for (const role of roles) {
     // Add node for this role
     nodes.push(roleToNode(role))
 
@@ -227,8 +220,8 @@ export const rolesToLayout = roles => {
     if (role.inherits) {
       inherits = Array.isArray(role.inherits) ? role.inherits : [role.inherits]
     }
-    for (let sourceRole of inherits) {
-      if (!roles.some(x => x._id === sourceRole)) {
+    for (const sourceRole of inherits) {
+      if (!roles.some((x) => x._id === sourceRole)) {
         continue
       }
       edges.push({

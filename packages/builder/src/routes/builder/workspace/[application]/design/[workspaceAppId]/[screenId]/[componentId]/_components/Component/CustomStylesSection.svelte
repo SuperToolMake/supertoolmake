@@ -1,62 +1,55 @@
 <script>
-  import {
-    DetailSummary,
-    ActionButton,
-    Drawer,
-    Button,
-    notifications,
-    AbsTooltip,
-    Icon,
-    Body,
-  } from "@budibase/bbui"
-  import { selectedScreen, componentStore } from "@/stores/builder"
-  import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
-  import {
-    getBindableProperties,
-    readableToRuntimeBinding,
-    runtimeToReadableBinding,
-  } from "@/dataBinding"
-  import { builderStore } from "@/stores/builder"
+import {
+  AbsTooltip,
+  ActionButton,
+  Body,
+  Button,
+  DetailSummary,
+  Drawer,
+  Icon,
+  notifications,
+} from "@budibase/bbui"
+import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
+import {
+  getBindableProperties,
+  readableToRuntimeBinding,
+  runtimeToReadableBinding,
+} from "@/dataBinding"
+import { builderStore, componentStore, selectedScreen } from "@/stores/builder"
 
-  export let componentInstance
-  export let componentDefinition
-  export let iconTooltip
-  export let componentTitle
-  export let onSave = null
+export let componentInstance
+export let componentDefinition
+export let iconTooltip
+export let componentTitle
+export let onSave = null
 
-  let tempValue
-  let drawer
+let tempValue
+let drawer
 
-  $: bindings = getBindableProperties(
-    $selectedScreen,
-    $componentStore.selectedComponentId
-  )
+$: bindings = getBindableProperties($selectedScreen, $componentStore.selectedComponentId)
 
-  $: icon = componentDefinition?.icon
+$: icon = componentDefinition?.icon
 
-  $: highlighted = $builderStore.highlightedSetting?.key === "_styles"
+$: highlighted = $builderStore.highlightedSetting?.key === "_styles"
 
-  const openDrawer = () => {
-    tempValue = runtimeToReadableBinding(
-      bindings,
-      componentInstance?._styles?.custom
-    )
-    drawer.show()
-  }
+const openDrawer = () => {
+  tempValue = runtimeToReadableBinding(bindings, componentInstance?._styles?.custom)
+  drawer.show()
+}
 
-  const save = async () => {
-    try {
-      const value = readableToRuntimeBinding(bindings, tempValue)
-      if (onSave) {
-        await onSave(value)
-      } else {
-        await componentStore.updateCustomStyle(value)
-      }
-    } catch (error) {
-      notifications.error("Error updating custom style")
+const save = async () => {
+  try {
+    const value = readableToRuntimeBinding(bindings, tempValue)
+    if (onSave) {
+      await onSave(value)
+    } else {
+      await componentStore.updateCustomStyle(value)
     }
-    drawer.hide()
+  } catch (error) {
+    notifications.error("Error updating custom style")
   }
+  drawer.hide()
+}
 </script>
 
 <DetailSummary

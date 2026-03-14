@@ -1,12 +1,6 @@
+import type { ContextEmitter, EventType, Row, Table, UserBindings } from "@budibase/types"
 import { EventEmitter } from "events"
 import { rowEmission, tableEmission } from "./utils"
-import {
-  Table,
-  Row,
-  UserBindings,
-  EventType,
-  ContextEmitter,
-} from "@budibase/types"
 
 /**
  * keeping event emitter in one central location as it might be used for things other than

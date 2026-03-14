@@ -2,7 +2,7 @@ export const suppressWarnings = (warnings: string[]) => {
   if (!warnings?.length) {
     return
   }
-  const regex = new RegExp(warnings.map(x => `(${x})`).join("|"), "gi")
+  const regex = new RegExp(warnings.map((x) => `(${x})`).join("|"), "gi")
   const warn = console.warn
   console.warn = (...params) => {
     const msg = params[0]

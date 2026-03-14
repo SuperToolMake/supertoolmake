@@ -1,236 +1,230 @@
 <script lang="ts">
-  import {
-    keepOpen,
-    Label,
-    ActionButton,
-    ModalContent,
-    InputDropdown,
-    Select,
-    RadioGroup,
-    PillInput,
-    Layout,
-    Icon,
-  } from "@budibase/bbui"
-  import { organisation } from "@/stores/portal/organisation"
-  import { roles } from "@/stores/builder"
-  import { Constants, emailValidator } from "@budibase/frontend-core"
-  import { admin } from "@/stores/portal"
-  import GlobalRoleSelect from "@/components/common/GlobalRoleSelect.svelte"
-  import { OnboardingType } from "@/constants"
+import {
+  ActionButton,
+  Icon,
+  InputDropdown,
+  keepOpen,
+  Label,
+  Layout,
+  ModalContent,
+  PillInput,
+  RadioGroup,
+  Select,
+} from "@budibase/bbui"
+import { Constants, emailValidator } from "@budibase/frontend-core"
+import GlobalRoleSelect from "@/components/common/GlobalRoleSelect.svelte"
+import { OnboardingType } from "@/constants"
+import { roles } from "@/stores/builder"
+import { admin } from "@/stores/portal"
+import { organisation } from "@/stores/portal/organisation"
 
-  export let showOnboardingTypeModal
-  export let workspaceOnly = false
-  export let useWorkspaceInviteModal = workspaceOnly
-  export let assignToWorkspace = workspaceOnly
-  export let inviteTitle = "Invite users to workspace"
+export let showOnboardingTypeModal
+export let workspaceOnly = false
+export let useWorkspaceInviteModal = workspaceOnly
+export let assignToWorkspace = workspaceOnly
+export let inviteTitle = "Invite users to workspace"
 
-  const password = generatePassword(12)
-  let emailsInput: string[] = []
-  let emailError: string | null = null
-  const maxItems = 15
-  let selectedRole = Constants.BudibaseRoles.Creator
-  const builtInEndUserRoles = [Constants.Roles.BASIC, Constants.Roles.ADMIN]
-  const excludedRoleIds = [
-    ...builtInEndUserRoles,
-    Constants.Roles.PUBLIC,
-    Constants.Roles.POWER,
-    Constants.Roles.CREATOR,
-    Constants.Roles.GROUP,
-  ]
-  let roleColorLookup: Record<string, string | undefined> = {}
-  $: roleColorLookup = ($roles || []).reduce(
-    (acc: Record<string, string | undefined>, role) => {
-      acc[role._id] = role.uiMetadata?.color
-      return acc
-    },
-    {} as Record<string, string | undefined>
-  )
-  $: customEndUserRoleOptions = ($roles || [])
-    .filter(role => !excludedRoleIds.includes(role._id))
-    .map(role => ({
-      label: role.uiMetadata?.displayName || role.name || "Custom role",
-      value: role._id,
-      color:
-        role.uiMetadata?.color ||
-        "var(--spectrum-global-color-static-magenta-400)",
-    }))
-  $: endUserRoleOptions = [
-    {
-      label: "Basic user",
-      value: Constants.Roles.BASIC,
-      color: roleColorLookup[Constants.Roles.BASIC],
-    },
-    {
-      label: "Admin user",
-      value: Constants.Roles.ADMIN,
-      color: roleColorLookup[Constants.Roles.ADMIN],
-    },
-    ...customEndUserRoleOptions,
-  ]
-  let endUserRole = Constants.Roles.BASIC
-  let onboardingType:
-    | (typeof OnboardingType)[keyof typeof OnboardingType]
-    | null = OnboardingType.EMAIL
+const password = generatePassword(12)
+let emailsInput: string[] = []
+let emailError: string | null = null
+const maxItems = 15
+let selectedRole = Constants.BudibaseRoles.Creator
+const builtInEndUserRoles = [Constants.Roles.BASIC, Constants.Roles.ADMIN]
+const excludedRoleIds = [
+  ...builtInEndUserRoles,
+  Constants.Roles.PUBLIC,
+  Constants.Roles.POWER,
+  Constants.Roles.CREATOR,
+  Constants.Roles.GROUP,
+]
+let roleColorLookup: Record<string, string | undefined> = {}
+$: roleColorLookup = ($roles || []).reduce(
+  (acc: Record<string, string | undefined>, role) => {
+    acc[role._id] = role.uiMetadata?.color
+    return acc
+  },
+  {} as Record<string, string | undefined>
+)
+$: customEndUserRoleOptions = ($roles || [])
+  .filter((role) => !excludedRoleIds.includes(role._id))
+  .map((role) => ({
+    label: role.uiMetadata?.displayName || role.name || "Custom role",
+    value: role._id,
+    color: role.uiMetadata?.color || "var(--spectrum-global-color-static-magenta-400)",
+  }))
+$: endUserRoleOptions = [
+  {
+    label: "Basic user",
+    value: Constants.Roles.BASIC,
+    color: roleColorLookup[Constants.Roles.BASIC],
+  },
+  {
+    label: "Admin user",
+    value: Constants.Roles.ADMIN,
+    color: roleColorLookup[Constants.Roles.ADMIN],
+  },
+  ...customEndUserRoleOptions,
+]
+let endUserRole = Constants.Roles.BASIC
+let onboardingType: (typeof OnboardingType)[keyof typeof OnboardingType] | null =
+  OnboardingType.EMAIL
 
-  type UserData = {
-    email: string
-    role: string
-    password: string
-    forceResetPassword: boolean
-    error: string | null
-  }
+type UserData = {
+  email: string
+  role: string
+  password: string
+  forceResetPassword: boolean
+  error: string | null
+}
 
-  let userData: UserData[] = [
+let userData: UserData[] = [
+  {
+    email: "",
+    role: "appUser",
+    password,
+    forceResetPassword: true,
+    error: null,
+  },
+]
+$: hasError = userData.find((x) => x.error != null)
+$: parsedEmails = useWorkspaceInviteModal ? emailsInput : []
+$: smtpConfigured = $admin.loaded && ($admin.cloud || !!$admin.checklist?.smtp?.checked)
+$: emailInviteDisabled = $admin.loaded ? !smtpConfigured : false
+$: passwordInviteDisabled = $organisation.isSSOEnforced
+$: onboardingOptions = [
+  {
+    label: "Send email invites",
+    subtitle: emailInviteDisabled ? "Requires SMTP setup" : undefined,
+    value: OnboardingType.EMAIL,
+    disabled: emailInviteDisabled,
+  },
+  {
+    label: "Generate passwords for each user",
+    value: OnboardingType.PASSWORD,
+    disabled: passwordInviteDisabled,
+  },
+]
+$: if (emailInviteDisabled && passwordInviteDisabled) {
+  onboardingType = null
+} else if (emailInviteDisabled) {
+  onboardingType = OnboardingType.PASSWORD
+} else if (passwordInviteDisabled) {
+  onboardingType = OnboardingType.EMAIL
+} else if (!onboardingType) {
+  onboardingType = OnboardingType.EMAIL
+}
+
+function removeInput(idx: number) {
+  userData = userData.filter((e, i) => i !== idx)
+}
+function addNewInput() {
+  userData = [
+    ...userData,
     {
       email: "",
       role: "appUser",
-      password,
+      password: generatePassword(12),
       forceResetPassword: true,
       error: null,
     },
   ]
-  $: hasError = userData.find(x => x.error != null)
-  $: parsedEmails = useWorkspaceInviteModal ? emailsInput : []
-  $: smtpConfigured =
-    $admin.loaded && ($admin.cloud || !!$admin.checklist?.smtp?.checked)
-  $: emailInviteDisabled = $admin.loaded ? !smtpConfigured : false
-  $: passwordInviteDisabled = $organisation.isSSOEnforced
-  $: onboardingOptions = [
-    {
-      label: "Send email invites",
-      subtitle: emailInviteDisabled ? "Requires SMTP setup" : undefined,
-      value: OnboardingType.EMAIL,
-      disabled: emailInviteDisabled,
-    },
-    {
-      label: "Generate passwords for each user",
-      value: OnboardingType.PASSWORD,
-      disabled: passwordInviteDisabled,
-    },
-  ]
-  $: if (emailInviteDisabled && passwordInviteDisabled) {
-    onboardingType = null
-  } else if (emailInviteDisabled) {
-    onboardingType = OnboardingType.PASSWORD
-  } else if (passwordInviteDisabled) {
-    onboardingType = OnboardingType.EMAIL
-  } else if (!onboardingType) {
-    onboardingType = OnboardingType.EMAIL
-  }
+}
 
-  function removeInput(idx: number) {
-    userData = userData.filter((e, i) => i !== idx)
+function validateInput(input: UserData, index: number) {
+  if (input.email) {
+    input.email = input.email.trim()
   }
-  function addNewInput() {
-    userData = [
-      ...userData,
-      {
-        email: "",
-        role: "appUser",
-        password: generatePassword(12),
-        forceResetPassword: true,
-        error: null,
-      },
-    ]
-  }
-
-  function validateInput(input: UserData, index: number) {
-    if (input.email) {
-      input.email = input.email.trim()
-    }
-    const email = input.email
-    if (email) {
-      const res = emailValidator(email)
-      if (res === true) {
-        userData[index].error = null
-      } else {
-        userData[index].error = res
-      }
+  const email = input.email
+  if (email) {
+    const res = emailValidator(email)
+    if (res === true) {
+      userData[index].error = null
     } else {
-      userData[index].error = "Please enter an email address"
+      userData[index].error = res
     }
-    return userData[index].error == null
+  } else {
+    userData[index].error = "Please enter an email address"
   }
+  return userData[index].error == null
+}
 
-  function validateWorkspaceEmails() {
-    const emails = emailsInput
-    if (!emails.length) {
-      emailError = null
-      return false
-    }
-
-    if (emails.length > maxItems) {
-      emailError = `Max ${maxItems} users can be invited at once`
-      return false
-    }
-
-    const invalidEmails = emails.filter(email => emailValidator(email) !== true)
-
-    if (invalidEmails.length) {
-      emailError =
-        invalidEmails.length === 1
-          ? `Invalid email address: ${invalidEmails[0]}`
-          : `Invalid email addresses: ${invalidEmails.join(", ")}`
-      return false
-    }
-
+function validateWorkspaceEmails() {
+  const emails = emailsInput
+  if (!emails.length) {
     emailError = null
-    return true
+    return false
   }
 
-  const handleEmailsChange = () => {
-    validateWorkspaceEmails()
+  if (emails.length > maxItems) {
+    emailError = `Max ${maxItems} users can be invited at once`
+    return false
   }
 
-  function buildWorkspaceUsers() {
-    return emailsInput.map(email => ({
-      email,
-      role: selectedRole,
-      appRole:
-        workspaceOnly && selectedRole === Constants.BudibaseRoles.AppUser
-          ? endUserRole
-          : undefined,
-      password: generatePassword(12),
-      forceResetPassword: true,
-    }))
+  const invalidEmails = emails.filter((email) => emailValidator(email) !== true)
+
+  if (invalidEmails.length) {
+    emailError =
+      invalidEmails.length === 1
+        ? `Invalid email address: ${invalidEmails[0]}`
+        : `Invalid email addresses: ${invalidEmails.join(", ")}`
+    return false
   }
 
-  function generatePassword(length: number) {
-    const array = new Uint8Array(length)
-    window.crypto.getRandomValues(array)
-    return Array.from(array, byte => byte.toString(36).padStart(2, "0"))
-      .join("")
-      .slice(0, length)
-  }
+  emailError = null
+  return true
+}
 
-  const onConfirm = () => {
-    if (useWorkspaceInviteModal) {
-      const isValid = validateWorkspaceEmails()
-      if (!isValid || !onboardingType) {
-        return keepOpen
-      }
+const handleEmailsChange = () => {
+  validateWorkspaceEmails()
+}
 
-      return showOnboardingTypeModal(
-        {
-          users: buildWorkspaceUsers(),
-          assignToWorkspace,
-        },
-        onboardingType
-      )
-    }
+function buildWorkspaceUsers() {
+  return emailsInput.map((email) => ({
+    email,
+    role: selectedRole,
+    appRole:
+      workspaceOnly && selectedRole === Constants.BudibaseRoles.AppUser ? endUserRole : undefined,
+    password: generatePassword(12),
+    forceResetPassword: true,
+  }))
+}
 
-    let valid = true
-    userData.forEach((input, index) => {
-      valid = validateInput(input, index) && valid
-    })
-    if (!valid) {
+function generatePassword(length: number) {
+  const array = new Uint8Array(length)
+  window.crypto.getRandomValues(array)
+  return Array.from(array, (byte) => byte.toString(36).padStart(2, "0"))
+    .join("")
+    .slice(0, length)
+}
+
+const onConfirm = () => {
+  if (useWorkspaceInviteModal) {
+    const isValid = validateWorkspaceEmails()
+    if (!isValid || !onboardingType) {
       return keepOpen
     }
-    showOnboardingTypeModal({
-      users: userData,
-      assignToWorkspace,
-    })
+
+    return showOnboardingTypeModal(
+      {
+        users: buildWorkspaceUsers(),
+        assignToWorkspace,
+      },
+      onboardingType
+    )
   }
+
+  let valid = true
+  userData.forEach((input, index) => {
+    valid = validateInput(input, index) && valid
+  })
+  if (!valid) {
+    return keepOpen
+  }
+  showOnboardingTypeModal({
+    users: userData,
+    assignToWorkspace,
+  })
+}
 </script>
 
 <ModalContent

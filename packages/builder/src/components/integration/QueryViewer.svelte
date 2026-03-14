@@ -1,156 +1,156 @@
 <script>
-  import { goto } from "@roxi/routify"
-  import { datasources, integrations, queries } from "@/stores/builder"
-  import {
-    Icon,
-    Select,
-    Input,
-    Label,
-    notifications,
-    Heading,
-    Body,
-    Divider,
-    Button,
-    ActionButton,
-  } from "@budibase/bbui"
-  import { capitalise } from "@/helpers"
-  import AccessLevelSelect from "./AccessLevelSelect.svelte"
-  import IntegrationQueryEditor from "@/components/integration/index.svelte"
-  import QueryViewerSidePanel from "./QueryViewerSidePanel/index.svelte"
-  import { cloneDeep } from "lodash/fp"
-  import BindingBuilder from "@/components/integration/QueryViewerBindingBuilder.svelte"
-  import CodeMirrorEditor from "@/components/common/CodeMirrorEditor.svelte"
-  import { ValidQueryNameRegex } from "@budibase/shared-core"
-  import ExtraQueryConfig from "./ExtraQueryConfig.svelte"
-  import QueryViewerSavePromptModal from "./QueryViewerSavePromptModal.svelte"
-  import { Utils } from "@budibase/frontend-core"
-  import ConnectedQueryScreens from "./ConnectedQueryScreens.svelte"
-  import { getErrorMessage } from "@/helpers/errors"
+import {
+  ActionButton,
+  Body,
+  Button,
+  Divider,
+  Heading,
+  Icon,
+  Input,
+  Label,
+  notifications,
+  Select,
+} from "@budibase/bbui"
+import { Utils } from "@budibase/frontend-core"
+import { ValidQueryNameRegex } from "@budibase/shared-core"
+import { goto } from "@roxi/routify"
+import { cloneDeep } from "lodash/fp"
+import CodeMirrorEditor from "@/components/common/CodeMirrorEditor.svelte"
+import IntegrationQueryEditor from "@/components/integration/index.svelte"
+import BindingBuilder from "@/components/integration/QueryViewerBindingBuilder.svelte"
+import { capitalise } from "@/helpers"
+import { getErrorMessage } from "@/helpers/errors"
+import { datasources, integrations, queries } from "@/stores/builder"
+import AccessLevelSelect from "./AccessLevelSelect.svelte"
+import ConnectedQueryScreens from "./ConnectedQueryScreens.svelte"
+import ExtraQueryConfig from "./ExtraQueryConfig.svelte"
+import QueryViewerSavePromptModal from "./QueryViewerSavePromptModal.svelte"
+import QueryViewerSidePanel from "./QueryViewerSidePanel/index.svelte"
 
-  $goto
+$goto
 
-  export let query
-  let queryHash
+export let query
+let queryHash
 
-  let loading = false
-  let modified = false
-  let scrolling = false
-  let showSidePanel = false
-  let nameError
+let loading = false
+let modified = false
+let scrolling = false
+let showSidePanel = false
+let nameError
 
-  let newQuery
+let newQuery
 
-  let datasource
-  let integration
-  let schemaType
+let datasource
+let integration
+let schemaType
 
-  let schema = {}
-  let nestedSchemaFields = {}
-  let rows = []
-  let keys = {}
+let schema = {}
+let nestedSchemaFields = {}
+let rows = []
+let keys = {}
 
-  const parseQuery = query => {
-    modified = false
+const parseQuery = (query) => {
+  modified = false
 
-    datasource = $datasources.list.find(ds => ds._id === query.datasourceId)
-    integration = $integrations[datasource.source]
-    schemaType = integration.query[query.queryVerb].type
+  datasource = $datasources.list.find((ds) => ds._id === query.datasourceId)
+  integration = $integrations[datasource.source]
+  schemaType = integration.query[query.queryVerb].type
 
-    newQuery = cloneDeep(query)
-    // init schema from the query if one already exists
-    schema = newQuery.schema
-    // Set the location where the query code will be written to an empty string so that it doesn't
-    // get changed from undefined -> "" by the input, breaking our unsaved changes checks
-    newQuery.fields[schemaType] ??= ""
+  newQuery = cloneDeep(query)
+  // init schema from the query if one already exists
+  schema = newQuery.schema
+  // Set the location where the query code will be written to an empty string so that it doesn't
+  // get changed from undefined -> "" by the input, breaking our unsaved changes checks
+  newQuery.fields[schemaType] ??= ""
 
-    queryHash = JSON.stringify(newQuery)
-  }
+  queryHash = JSON.stringify(newQuery)
+}
 
-  $: parseQuery(query)
+$: parseQuery(query)
 
-  const checkIsModified = newQuery => {
-    const newQueryHash = JSON.stringify(newQuery)
-    modified = newQueryHash !== queryHash
+const checkIsModified = (newQuery) => {
+  const newQueryHash = JSON.stringify(newQuery)
+  modified = newQueryHash !== queryHash
 
-    return modified
-  }
+  return modified
+}
 
-  const debouncedCheckIsModified = Utils.debounce(checkIsModified, 1000)
+const debouncedCheckIsModified = Utils.debounce(checkIsModified, 1000)
 
-  $: debouncedCheckIsModified(newQuery)
+$: debouncedCheckIsModified(newQuery)
 
-  async function runQuery({ suppressErrors = true }) {
-    try {
-      showSidePanel = true
-      loading = true
-      const response = await queries.preview(newQuery)
-      if (response.rows.length === 0) {
-        notifications.info(
-          "Query results empty. Please execute a query with results to create your schema."
-        )
-        return
-      }
-
-      nestedSchemaFields = response.nestedSchemaFields
-
-      schema = response.schema
-      rows = response.rows
-
-      notifications.success("Query executed successfully")
-    } catch (error) {
-      notifications.error(`Query Error: ${getErrorMessage(error)}`)
-
-      if (!suppressErrors) {
-        throw error
-      }
-    } finally {
-      loading = false
+async function runQuery({ suppressErrors = true }) {
+  try {
+    showSidePanel = true
+    loading = true
+    const response = await queries.preview(newQuery)
+    if (response.rows.length === 0) {
+      notifications.info(
+        "Query results empty. Please execute a query with results to create your schema."
+      )
+      return
     }
-  }
 
-  async function saveQuery() {
-    try {
-      showSidePanel = true
-      loading = true
-      const response = await queries.save(newQuery.datasourceId, {
-        ...newQuery,
-        schema,
-        nestedSchemaFields,
-      })
+    nestedSchemaFields = response.nestedSchemaFields
 
-      notifications.success("Query saved successfully")
-      return response
-    } catch (error) {
-      notifications.error(error.message || "Error saving query")
-    } finally {
-      loading = false
+    schema = response.schema
+    rows = response.rows
+
+    notifications.success("Query executed successfully")
+  } catch (error) {
+    notifications.error(`Query Error: ${getErrorMessage(error)}`)
+
+    if (!suppressErrors) {
+      throw error
     }
+  } finally {
+    loading = false
   }
+}
 
-  function resetDependentFields() {
-    if (newQuery.fields.extra) {
-      newQuery.fields.extra = {}
-    }
-  }
+async function saveQuery() {
+  try {
+    showSidePanel = true
+    loading = true
+    const response = await queries.save(newQuery.datasourceId, {
+      ...newQuery,
+      schema,
+      nestedSchemaFields,
+    })
 
-  function populateExtraQuery(extraQueryFields) {
-    newQuery.fields.extra = extraQueryFields
+    notifications.success("Query saved successfully")
+    return response
+  } catch (error) {
+    notifications.error(error.message || "Error saving query")
+  } finally {
+    loading = false
   }
+}
 
-  const handleScroll = e => {
-    scrolling = e.target.scrollTop !== 0
+function resetDependentFields() {
+  if (newQuery.fields.extra) {
+    newQuery.fields.extra = {}
   }
+}
 
-  async function handleKeyDown(evt) {
-    keys[evt.key] = true
-    if ((keys["Meta"] || keys["Control"]) && keys["Enter"]) {
-      await runQuery({ suppressErrors: false })
-    }
-  }
+function populateExtraQuery(extraQueryFields) {
+  newQuery.fields.extra = extraQueryFields
+}
 
-  function handleKeyUp(evt) {
-    delete keys[evt.key]
+const handleScroll = (e) => {
+  scrolling = e.target.scrollTop !== 0
+}
+
+async function handleKeyDown(evt) {
+  keys[evt.key] = true
+  if ((keys["Meta"] || keys["Control"]) && keys["Enter"]) {
+    await runQuery({ suppressErrors: false })
   }
+}
+
+function handleKeyUp(evt) {
+  delete keys[evt.key]
+}
 </script>
 
 <svelte:window on:keydown={handleKeyDown} on:keyup={handleKeyUp} />

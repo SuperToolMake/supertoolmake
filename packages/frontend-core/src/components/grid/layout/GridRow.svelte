@@ -1,39 +1,38 @@
 <script>
-  import { getContext } from "svelte"
-  import DataCell from "../cells/DataCell.svelte"
-  import GridCell from "../cells/GridCell.svelte"
-  import { getCellID } from "../lib/utils"
+import { getContext } from "svelte"
+import DataCell from "../cells/DataCell.svelte"
+import GridCell from "../cells/GridCell.svelte"
+import { getCellID } from "../lib/utils"
 
-  export let row
-  export let top = false
+export let row
+export let top = false
 
-  const {
-    focusedCellId,
-    reorder,
-    selectedRows,
-    scrollableColumns,
-    hoveredRowId,
-    focusedRow,
-    contentLines,
-    isDragging,
-    dispatch,
-    rows,
-    columnRenderMap,
-    userCellMap,
-    isSelectingCells,
-    selectedCellMap,
-    selectedCellCount,
-    props: gridProps,
-    buttonColumnWidth,
-  } = getContext("grid")
+const {
+  focusedCellId,
+  reorder,
+  selectedRows,
+  scrollableColumns,
+  hoveredRowId,
+  focusedRow,
+  contentLines,
+  isDragging,
+  dispatch,
+  rows,
+  columnRenderMap,
+  userCellMap,
+  isSelectingCells,
+  selectedCellMap,
+  selectedCellCount,
+  props: gridProps,
+  buttonColumnWidth,
+} = getContext("grid")
 
-  $: rowSelected = !!$selectedRows[row._id]
-  $: rowHovered =
-    $hoveredRowId === row._id && (!$selectedCellCount || !$isSelectingCells)
-  $: rowFocused = $focusedRow?._id === row._id
-  $: reorderSource = $reorder.sourceColumn
-  $: hasButtons = $gridProps?.buttons?.length > 0
-  $: needsButtonSpacer = hasButtons && $buttonColumnWidth > 0
+$: rowSelected = !!$selectedRows[row._id]
+$: rowHovered = $hoveredRowId === row._id && (!$selectedCellCount || !$isSelectingCells)
+$: rowFocused = $focusedRow?._id === row._id
+$: reorderSource = $reorder.sourceColumn
+$: hasButtons = $gridProps?.buttons?.length > 0
+$: needsButtonSpacer = hasButtons && $buttonColumnWidth > 0
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

@@ -1,11 +1,11 @@
-import { getRoutingInfo } from "../../utilities/routing"
 import { roles } from "@budibase/backend-core"
-import {
+import type {
   FetchClientScreenRoutingResponse,
   FetchScreenRoutingResponse,
   ScreenRoutingJson,
   UserCtx,
 } from "@budibase/types"
+import { getRoutingInfo } from "../../utilities/routing"
 
 const URL_SEPARATOR = "/"
 
@@ -49,14 +49,12 @@ class Routing {
  * @returns The routing structure, this is the full structure designed for use in the builder,
  * if the client routing is required then the updateRoutingStructureForUserRole should be used.
  */
-async function getRoutingStructure(
-  urlPath: string
-): Promise<{ routes: ScreenRoutingJson }> {
+async function getRoutingStructure(urlPath: string): Promise<{ routes: ScreenRoutingJson }> {
   const screenRoutes = await getRoutingInfo(urlPath)
   const routing = new Routing()
 
-  for (let screenRoute of screenRoutes) {
-    let fullpath = screenRoute.routing.route
+  for (const screenRoute of screenRoutes) {
+    const fullpath = screenRoute.routing.route
     const roleId = screenRoute.routing.roleId
     routing.addScreenId(fullpath, roleId, screenRoute.id)
   }
@@ -73,18 +71,14 @@ export async function fetch(ctx: UserCtx<void, FetchScreenRoutingResponse>) {
   ctx.body = await getRoutingStructure(urlPath)
 }
 
-export async function clientFetch(
-  ctx: UserCtx<void, FetchClientScreenRoutingResponse>
-) {
-  const embedPath: string | undefined = ctx.request.get(
-    "x-budibase-embed-location"
-  )
+export async function clientFetch(ctx: UserCtx<void, FetchClientScreenRoutingResponse>) {
+  const embedPath: string | undefined = ctx.request.get("x-budibase-embed-location")
   const urlPath = embedPath || getReferer(ctx)
   const routing = await getRoutingStructure(urlPath)
-  let roleId = ctx.user?.role?._id
+  const roleId = ctx.user?.role?._id
   const roleIds = roleId ? await roles.getUserRoleIdHierarchy(roleId) : []
-  for (let topLevel of Object.values(routing.routes) as any) {
-    for (let subpathKey of Object.keys(topLevel.subpaths)) {
+  for (const topLevel of Object.values(routing.routes) as any) {
+    for (const subpathKey of Object.keys(topLevel.subpaths)) {
       let found = false
       const subpath = topLevel.subpaths[subpathKey]
       const roleOptions = Object.keys(subpath.screens)
@@ -93,7 +87,7 @@ export async function clientFetch(
         subpath.roleId = roles.BUILTIN_ROLE_IDS.BASIC
         found = true
       } else {
-        for (let roleId of roleIds) {
+        for (const roleId of roleIds) {
           if (roleId && roleOptions.indexOf(roleId) !== -1) {
             subpath.screenId = subpath.screens[roleId]
             subpath.roleId = roleId

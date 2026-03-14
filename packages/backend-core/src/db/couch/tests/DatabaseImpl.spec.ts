@@ -1,8 +1,6 @@
 import tk from "timekeeper"
-
-import { CouchDatabase } from ".."
-
 import { generator, structures } from "../../../../tests"
+import { CouchDatabase } from ".."
 
 const initialTime = new Date()
 tk.freeze(initialTime)
@@ -114,7 +112,7 @@ describe("DatabaseImpl", () => {
   describe("bulkDocs", () => {
     it("persists createdAt and updatedAt fields", async () => {
       const ids = generator.unique(() => generator.guid(), 5)
-      await db.bulkDocs(ids.map(id => ({ _id: id })))
+      await db.bulkDocs(ids.map((id) => ({ _id: id })))
 
       for (const id of ids) {
         expect(await db.get(id)).toEqual({
@@ -129,11 +127,11 @@ describe("DatabaseImpl", () => {
     it("updates updated at fields", async () => {
       const ids = generator.unique(() => generator.guid(), 5)
 
-      await db.bulkDocs(ids.map(id => ({ _id: id })))
+      await db.bulkDocs(ids.map((id) => ({ _id: id })))
       tk.travel(100)
 
       const docsToUpdate = await Promise.all(
-        ids.map(async id => ({ ...(await db.get(id)), newValue: 123 }))
+        ids.map(async (id) => ({ ...(await db.get(id)), newValue: 123 }))
       )
       await db.bulkDocs(docsToUpdate)
 
@@ -151,14 +149,12 @@ describe("DatabaseImpl", () => {
     it("keeps existing createdAt", async () => {
       const ids = generator.unique(() => generator.guid(), 2)
 
-      await db.bulkDocs(ids.map(id => ({ _id: id })))
+      await db.bulkDocs(ids.map((id) => ({ _id: id })))
       tk.travel(100)
 
-      const newDocs = generator
-        .unique(() => generator.guid(), 3)
-        .map(id => ({ _id: id }))
+      const newDocs = generator.unique(() => generator.guid(), 3).map((id) => ({ _id: id }))
       const docsToUpdate = await Promise.all(
-        ids.map(async id => ({ ...(await db.get(id)), newValue: 123 }))
+        ids.map(async (id) => ({ ...(await db.get(id)), newValue: 123 }))
       )
       await db.bulkDocs([...newDocs, ...docsToUpdate])
 

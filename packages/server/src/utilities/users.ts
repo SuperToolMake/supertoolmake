@@ -1,13 +1,11 @@
 import { context, roles } from "@budibase/backend-core"
-import { ContextUserMetadata, UserCtx, UserMetadata } from "@budibase/types"
+import type { ContextUserMetadata, UserCtx, UserMetadata } from "@budibase/types"
 import { InternalTables } from "../db/utils"
 import { getGlobalUser } from "./global"
 
-export async function getFullUser(
-  userId: string
-): Promise<ContextUserMetadata> {
+export async function getFullUser(userId: string): Promise<ContextUserMetadata> {
   const global = await getGlobalUser(userId)
-  let metadata: UserMetadata | undefined = undefined
+  let metadata: UserMetadata | undefined
 
   // always prefer the user metadata _id and _rev
   delete global._id

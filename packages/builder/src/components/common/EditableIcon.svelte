@@ -1,16 +1,16 @@
 <script lang="ts">
-  import ChooseIconModal from "@/components/start/ChooseIconModal.svelte"
-  import { Icon, Modal } from "@budibase/bbui"
+import { Icon, type Modal } from "@budibase/bbui"
+import ChooseIconModal from "@/components/start/ChooseIconModal.svelte"
 
-  export let name: string
-  export let size: "M" | "L" | "XL" = "M"
-  export let color: string
-  export let disabled: boolean = false
-  export let defaultValue = "squares-four"
+export let name: string
+export let size: "M" | "L" | "XL" = "M"
+export let color: string
+export let disabled: boolean = false
+export let defaultValue = "squares-four"
 
-  let modal: Modal
+let modal: Modal
 
-  $: icon = name || defaultValue
+$: icon = name || defaultValue
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

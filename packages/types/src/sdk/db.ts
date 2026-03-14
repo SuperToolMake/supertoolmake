@@ -1,7 +1,8 @@
+import type { ReadStream } from "fs"
 import type Nano from "nano"
-import { ReadStream } from "fs"
-import { Writable } from "stream"
-import {
+import type { DocumentListParams } from "nano"
+import type { Writable } from "stream"
+import type {
   AllDocsResponse,
   AnyDocument,
   Document,
@@ -10,7 +11,6 @@ import {
   ViewTemplateOpts,
   WithDocMetadata,
 } from "../"
-import { DocumentListParams } from "nano"
 
 export enum SearchIndex {
   ROWS = "rows",
@@ -134,10 +134,7 @@ export interface Database {
   ): Promise<WithDocMetadata<T>[]>
   remove(idOrDoc: Document): Promise<Nano.DocumentDestroyResponse>
   remove(idOrDoc: string, rev?: string): Promise<Nano.DocumentDestroyResponse>
-  bulkRemove(
-    documents: Document[],
-    opts?: { silenceErrors?: boolean }
-  ): Promise<void>
+  bulkRemove(documents: Document[], opts?: { silenceErrors?: boolean }): Promise<void>
   put<T extends AnyDocument>(
     document: T,
     opts: DatabasePutOpts & { returnDoc: true }
@@ -147,12 +144,8 @@ export interface Database {
     opts?: DatabasePutOpts & { returnDoc?: false }
   ): Promise<Nano.DocumentInsertResponse>
   bulkDocs(documents: AnyDocument[]): Promise<Nano.DocumentBulkResponse[]>
-  find<T extends Document>(
-    params: Nano.MangoQuery
-  ): Promise<Nano.MangoResponse<T>>
-  allDocs<T extends Document | RowValue>(
-    params: DocumentListParams
-  ): Promise<AllDocsResponse<T>>
+  find<T extends Document>(params: Nano.MangoQuery): Promise<Nano.MangoResponse<T>>
+  allDocs<T extends Document | RowValue>(params: DocumentListParams): Promise<AllDocsResponse<T>>
   query<T extends Document>(
     viewName: string,
     params: DatabaseQueryOpts
@@ -166,10 +159,7 @@ export interface Database {
 }
 
 export interface SqlDatabase extends Database {
-  sql<T extends Document>(
-    sql: string,
-    parameters?: SqlQueryBinding
-  ): Promise<T[]>
+  sql<T extends Document>(sql: string, parameters?: SqlQueryBinding): Promise<T[]>
   sqlPurgeDocument(docIds: string[] | string): Promise<void>
   sqlDiskCleanup(): Promise<void>
 }

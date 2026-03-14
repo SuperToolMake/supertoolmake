@@ -1,8 +1,8 @@
+import type { Component, Screen } from "@budibase/types"
 import { get } from "svelte/store"
-import { selectedScreen as selectedScreenStore } from "./screens"
 import { findComponentPath } from "@/helpers/components"
-import { Component, Screen } from "@budibase/types"
 import { BudiStore, PersistenceType } from "@/stores/BudiStore"
+import { selectedScreen as selectedScreenStore } from "./screens"
 
 interface OpenNodesState {
   [key: string]: boolean
@@ -20,8 +20,7 @@ export class ComponentTreeNodesStore extends BudiStore<OpenNodesState> {
 
   toggleNode(componentId: string) {
     this.update((openNodes: OpenNodesState) => {
-      openNodes[`nodeOpen-${componentId}`] =
-        !openNodes[`nodeOpen-${componentId}`]
+      openNodes[`nodeOpen-${componentId}`] = !openNodes[`nodeOpen-${componentId}`]
 
       return openNodes
     })
@@ -29,9 +28,7 @@ export class ComponentTreeNodesStore extends BudiStore<OpenNodesState> {
 
   expandNodes(componentIds: string[]) {
     this.update((openNodes: OpenNodesState) => {
-      const newNodes = Object.fromEntries(
-        componentIds.map(id => [`nodeOpen-${id}`, true])
-      )
+      const newNodes = Object.fromEntries(componentIds.map((id) => [`nodeOpen-${id}`, true]))
 
       return { ...openNodes, ...newNodes }
     })
@@ -39,9 +36,7 @@ export class ComponentTreeNodesStore extends BudiStore<OpenNodesState> {
 
   collapseNodes(componentIds: string[]) {
     this.update((openNodes: OpenNodesState) => {
-      const newNodes = Object.fromEntries(
-        componentIds.map(id => [`nodeOpen-${id}`, false])
-      )
+      const newNodes = Object.fromEntries(componentIds.map((id) => [`nodeOpen-${id}`, false]))
 
       return { ...openNodes, ...newNodes }
     })

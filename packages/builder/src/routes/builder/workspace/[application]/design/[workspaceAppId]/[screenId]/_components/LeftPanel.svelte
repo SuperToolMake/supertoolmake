@@ -1,21 +1,21 @@
 <script>
-  import ScreenList from "./ScreenList/index.svelte"
-  import ComponentList from "./ComponentList/index.svelte"
-  import { getHorizontalResizeActions } from "@/components/common/resizable"
-  import { ActionButton } from "@budibase/bbui"
-  import StatePanel from "./StatePanel.svelte"
-  import BindingsPanel from "./BindingsPanel.svelte"
-  import ComponentKeyHandler from "./ComponentKeyHandler.svelte"
+import { ActionButton } from "@budibase/bbui"
+import { getHorizontalResizeActions } from "@/components/common/resizable"
+import BindingsPanel from "./BindingsPanel.svelte"
+import ComponentKeyHandler from "./ComponentKeyHandler.svelte"
+import ComponentList from "./ComponentList/index.svelte"
+import ScreenList from "./ScreenList/index.svelte"
+import StatePanel from "./StatePanel.svelte"
 
-  const [resizable, resizableHandle] = getHorizontalResizeActions()
+const [resizable, resizableHandle] = getHorizontalResizeActions()
 
-  const Tabs = {
-    Components: "Components",
-    Bindings: "Bindings",
-    State: "State",
-  }
+const Tabs = {
+  Components: "Components",
+  Bindings: "Bindings",
+  State: "State",
+}
 
-  let activeTab = Tabs.Components
+let activeTab = Tabs.Components
 </script>
 
 <div class="panel" use:resizable>

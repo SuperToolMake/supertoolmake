@@ -1,30 +1,20 @@
 import {
-  breakExternalTableId,
-  breakRowIdField,
-} from "../../../integrations/utils"
-import {
-  ExternalRequest,
-  ExternalRequestReturnType,
-  RunConfig,
-} from "./ExternalRequest"
-import {
+  type Datasource,
   FieldType,
-  Datasource,
   IncludeRelationship,
   Operation,
-  PatchRowRequest,
-  PatchRowResponse,
-  Row,
-  Table,
-  UserCtx,
+  type PatchRowRequest,
+  type PatchRowResponse,
+  type Row,
+  type Table,
+  type UserCtx,
 } from "@budibase/types"
-import sdk from "../../../sdk"
-import * as utils from "./utils"
-import {
-  inputProcessing,
-  outputProcessing,
-} from "../../../utilities/rowProcessor"
 import { cloneDeep } from "lodash"
+import { breakExternalTableId, breakRowIdField } from "../../../integrations/utils"
+import sdk from "../../../sdk"
+import { inputProcessing, outputProcessing } from "../../../utilities/rowProcessor"
+import { ExternalRequest, type ExternalRequestReturnType, type RunConfig } from "./ExternalRequest"
+import * as utils from "./utils"
 import { generateIdForRow } from "./utils"
 
 export async function handleRequest<T extends Operation>(
@@ -60,11 +50,7 @@ export async function patch(ctx: UserCtx<PatchRowRequest, PatchRowResponse>) {
     dataToUpdate[key] = rowData[key]
   }
 
-  dataToUpdate = await inputProcessing(
-    ctx.user?._id,
-    cloneDeep(source),
-    dataToUpdate
-  )
+  dataToUpdate = await inputProcessing(ctx.user?._id, cloneDeep(source), dataToUpdate)
 
   const validateResult = await sdk.rows.utils.validate({
     row: dataToUpdate,
@@ -80,8 +66,7 @@ export async function patch(ctx: UserCtx<PatchRowRequest, PatchRowResponse>) {
   })
 
   // The id might have been changed, so the refetching would fail. Recalculating the id just in case
-  const updatedId =
-    generateIdForRow({ ...beforeRow, ...dataToUpdate }, table) || _id
+  const updatedId = generateIdForRow({ ...beforeRow, ...dataToUpdate }, table) || _id
   const row = await sdk.rows.external.getRow(sourceId, updatedId, {
     relationships: true,
   })
@@ -119,8 +104,8 @@ export async function destroy(ctx: UserCtx) {
 export async function bulkDestroy(ctx: UserCtx) {
   const { rows } = ctx.request.body
   const source = await utils.getSource(ctx)
-  let promises: Promise<{ row: Row; table: Table }>[] = []
-  for (let row of rows) {
+  const promises: Promise<{ row: Row; table: Table }>[] = []
+  for (const row of rows) {
     promises.push(
       handleRequest(Operation.DELETE, source, {
         id: breakRowIdField(row._id),
@@ -129,9 +114,7 @@ export async function bulkDestroy(ctx: UserCtx) {
     )
   }
   const responses = await Promise.all(promises)
-  const finalRows = responses
-    .map(resp => resp.row)
-    .filter(row => row && row._id)
+  const finalRows = responses.map((resp) => resp.row).filter((row) => row && row._id)
   return { response: { ok: true }, rows: finalRows }
 }
 
@@ -154,12 +137,8 @@ export async function fetchEnrichedRow(ctx: UserCtx) {
   const row = response.rows[0]
   // this seems like a lot of work, but basically we need to dig deeper for the enrich
   // for a single row, there is probably a better way to do this with some smart multi-layer joins
-  for (let [fieldName, field] of Object.entries(table.schema)) {
-    if (
-      field.type !== FieldType.LINK ||
-      !row[fieldName] ||
-      row[fieldName].length === 0
-    ) {
+  for (const [fieldName, field] of Object.entries(table.schema)) {
+    if (field.type !== FieldType.LINK || !row[fieldName] || row[fieldName].length === 0) {
       continue
     }
     const links = row[fieldName]

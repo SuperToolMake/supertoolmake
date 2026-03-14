@@ -1,10 +1,10 @@
 <script lang="ts">
-  import ColumnEditor from "./ColumnEditor.svelte"
-  import type { TableSchema } from "@budibase/types"
+import type { TableSchema } from "@budibase/types"
+import ColumnEditor from "./ColumnEditor.svelte"
 
-  const getTopLevelSchemaFields = (schema: TableSchema) => {
-    return Object.values(schema).filter(fieldSchema => !fieldSchema.nestedJSON)
-  }
+const getTopLevelSchemaFields = (schema: TableSchema) => {
+  return Object.values(schema).filter((fieldSchema) => !fieldSchema.nestedJSON)
+}
 </script>
 
 <ColumnEditor

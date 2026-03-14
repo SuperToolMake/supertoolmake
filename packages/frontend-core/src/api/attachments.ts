@@ -1,10 +1,10 @@
-import {
+import type {
   DownloadAttachmentResponse,
   GetSignedUploadUrlRequest,
   GetSignedUploadUrlResponse,
   ProcessAttachmentResponse,
 } from "@budibase/types"
-import { BaseAPIClient } from "./types"
+import type { BaseAPIClient } from "./types"
 
 export interface AttachmentEndpoints {
   downloadAttachment: (
@@ -17,10 +17,7 @@ export interface AttachmentEndpoints {
     bucket: string,
     key: string
   ) => Promise<GetSignedUploadUrlResponse>
-  uploadAttachment: (
-    tableId: string,
-    data: any
-  ) => Promise<ProcessAttachmentResponse>
+  uploadAttachment: (tableId: string, data: any) => Promise<ProcessAttachmentResponse>
   uploadBuilderAttachment: (data: any) => Promise<ProcessAttachmentResponse>
   externalUpload: (
     datasourceId: string,
@@ -30,9 +27,7 @@ export interface AttachmentEndpoints {
   ) => Promise<{ publicUrl: string | undefined }>
 }
 
-export const buildAttachmentEndpoints = (
-  API: BaseAPIClient
-): AttachmentEndpoints => {
+export const buildAttachmentEndpoints = (API: BaseAPIClient): AttachmentEndpoints => {
   const endpoints: Pick<AttachmentEndpoints, "getSignedDatasourceURL"> = {
     /**
      * Generates a signed URL to upload a file to an external datasource.
@@ -41,10 +36,7 @@ export const buildAttachmentEndpoints = (
      * @param key the name of the file to upload to
      */
     getSignedDatasourceURL: async (datasourceId, bucket, key) => {
-      return await API.post<
-        GetSignedUploadUrlRequest,
-        GetSignedUploadUrlResponse
-      >({
+      return await API.post<GetSignedUploadUrlRequest, GetSignedUploadUrlResponse>({
         url: `/api/attachments/${datasourceId}/url`,
         body: { bucket, key },
       })
@@ -71,7 +63,7 @@ export const buildAttachmentEndpoints = (
      * Uploads an attachment to the server as a builder user from the builder.
      * @param data the data to upload
      */
-    uploadBuilderAttachment: async data => {
+    uploadBuilderAttachment: async (data) => {
       return await API.post({
         url: "/api/attachments/process",
         body: data,
@@ -100,7 +92,7 @@ export const buildAttachmentEndpoints = (
         body: data,
         json: false,
         external: true,
-        parseResponse: response => response as any,
+        parseResponse: (response) => response as any,
       })
       return { publicUrl }
     },
@@ -114,7 +106,7 @@ export const buildAttachmentEndpoints = (
     downloadAttachment: async (datasourceId, rowId, columnName) => {
       return await API.get({
         url: `/api/${datasourceId}/rows/${rowId}/attachment/${columnName}`,
-        parseResponse: response => response as any,
+        parseResponse: (response) => response as any,
         suppressErrors: true,
       })
     },

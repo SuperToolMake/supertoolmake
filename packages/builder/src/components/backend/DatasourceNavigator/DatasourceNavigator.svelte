@@ -1,73 +1,73 @@
 <script>
-  import { goto, isActive, params } from "@roxi/routify"
-  import { Layout } from "@budibase/bbui"
-  import {
-    datasources,
-    queries,
-    tables,
-    dataEnvironmentStore,
-    workspaceDeploymentStore,
-  } from "@/stores/builder"
-  import QueryNavItem from "./QueryNavItem.svelte"
-  import TableNavigator from "@/components/backend/TableNavigator/TableNavigator.svelte"
-  import DatasourceNavItem from "./DatasourceNavItem/DatasourceNavItem.svelte"
-  import { enrichDatasources } from "./datasourceUtils"
-  import { onMount } from "svelte"
-  import { DataEnvironmentMode } from "@budibase/types"
+import { Layout } from "@budibase/bbui"
+import { DataEnvironmentMode } from "@budibase/types"
+import { goto, isActive, params } from "@roxi/routify"
+import { onMount } from "svelte"
+import TableNavigator from "@/components/backend/TableNavigator/TableNavigator.svelte"
+import {
+  dataEnvironmentStore,
+  datasources,
+  queries,
+  tables,
+  workspaceDeploymentStore,
+} from "@/stores/builder"
+import DatasourceNavItem from "./DatasourceNavItem/DatasourceNavItem.svelte"
+import { enrichDatasources } from "./datasourceUtils"
+import QueryNavItem from "./QueryNavItem.svelte"
 
-  $goto
-  $isActive
-  $params
+$goto
+$isActive
+$params
 
-  export let searchTerm
-  export let datasourceFilter = _ => true
-  export let datasourceSort
-  let toggledDatasources = {}
+export let searchTerm
+export let datasourceFilter = (_) => true
+export let datasourceSort
+let toggledDatasources = {}
 
-  $: enrichedDataSources = enrichDatasources(
-    $datasources,
-    $params,
-    $isActive,
-    $tables,
-    $queries,
-    toggledDatasources,
-    searchTerm,
-    datasourceFilter
-  )
+$: enrichedDataSources = enrichDatasources(
+  $datasources,
+  $params,
+  $isActive,
+  $tables,
+  $queries,
+  toggledDatasources,
+  searchTerm,
+  datasourceFilter
+)
 
-  $: displayedDatasources = datasourceSort
-    ? enrichedDataSources.slice().sort(datasourceSort)
-    : enrichedDataSources
+$: displayedDatasources = datasourceSort
+  ? enrichedDataSources.slice().sort(datasourceSort)
+  : enrichedDataSources
 
-  function selectDatasource(datasource) {
-    openNode(datasource)
-    $goto("./datasource/[datasourceId]", { datasourceId: datasource._id })
+function selectDatasource(datasource) {
+  openNode(datasource)
+  $goto("./datasource/[datasourceId]", { datasourceId: datasource._id })
+}
+
+const selectTable = (tableId) => {
+  // Always use DEVELOPMENT environment if table is not published
+  if (!$workspaceDeploymentStore.tables[tableId]?.published) {
+    dataEnvironmentStore.setMode(DataEnvironmentMode.DEVELOPMENT)
   }
+  tables.select(tableId)
+  $goto("./table/[tableId]", { tableId })
+}
 
-  const selectTable = tableId => {
-    // Always use DEVELOPMENT environment if table is not published
-    if (!$workspaceDeploymentStore.tables[tableId]?.published) {
-      dataEnvironmentStore.setMode(DataEnvironmentMode.DEVELOPMENT)
-    }
-    tables.select(tableId)
-    $goto("./table/[tableId]", { tableId })
+function openNode(datasource) {
+  toggledDatasources[datasource._id] = true
+}
+
+function toggleNode(datasource) {
+  toggledDatasources[datasource._id] = !datasource.open
+}
+
+onMount(() => {
+  if ($tables.selected) {
+    toggledDatasources[$tables.selected.sourceId] = true
   }
+})
 
-  function openNode(datasource) {
-    toggledDatasources[datasource._id] = true
-  }
-
-  function toggleNode(datasource) {
-    toggledDatasources[datasource._id] = !datasource.open
-  }
-
-  onMount(() => {
-    if ($tables.selected) {
-      toggledDatasources[$tables.selected.sourceId] = true
-    }
-  })
-
-  $: showNoResults = searchTerm && !enrichedDataSources.find(ds => ds.show)
+$: showNoResults = searchTerm && !enrichedDataSources.find((ds) => ds.show)
 </script>
 
 <div class="hierarchy-items-container">

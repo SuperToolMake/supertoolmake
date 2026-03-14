@@ -1,6 +1,6 @@
 import { context, roles } from "@budibase/backend-core"
 import { sdk as sharedSdk } from "@budibase/shared-core"
-import {
+import type {
   DeleteScreenResponse,
   FetchScreenResponse,
   SaveScreenRequest,
@@ -20,15 +20,10 @@ export async function fetch(ctx: UserCtx<void, FetchScreenResponse>) {
   if (!roleId) {
     ctx.throw("Unable to retrieve users role ID.")
   }
-  ctx.body = await new roles.AccessController().checkScreensAccess(
-    screens,
-    roleId
-  )
+  ctx.body = await new roles.AccessController().checkScreensAccess(screens, roleId)
 }
 
-export async function save(
-  ctx: UserCtx<SaveScreenRequest, SaveScreenResponse>
-) {
+export async function save(ctx: UserCtx<SaveScreenRequest, SaveScreenResponse>) {
   const { navigationLinkLabel, ...screen } = ctx.request.body
 
   if (!(await sdk.workspaceApps.get(screen.workspaceAppId))) {
@@ -90,7 +85,7 @@ export async function usage(ctx: UserCtx<void, UsageInScreensResponse>) {
   const sourceType = sdk.common.getSourceType(sourceId)
   const allScreens = await sdk.screens.fetch()
   const response: ScreenUsage[] = []
-  for (let screen of allScreens) {
+  for (const screen of allScreens) {
     const found = sharedSdk.screens.findInSettings(screen, sourceId)
     if (found.length !== 0) {
       response.push({

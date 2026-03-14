@@ -1,75 +1,68 @@
 <script lang="ts">
-  import { Body, ModalContent, Layout, Link } from "@budibase/bbui"
-  import { appStore, datasources as datasourcesStore } from "@/stores/builder"
-  import ICONS from "@/components/backend/DatasourceNavigator/icons"
-  import { IntegrationNames } from "@/constants"
-  import { createEventDispatcher } from "svelte"
-  import TableOrViewOption from "./TableOrViewOption.svelte"
-  import type { SourceOption } from "./utils"
-  import { makeTableOption } from "./utils"
-  import type { Datasource, UIInternalDatasource } from "@budibase/types"
+import { Body, Layout, Link, ModalContent } from "@budibase/bbui"
+import type { Datasource, UIInternalDatasource } from "@budibase/types"
+import { createEventDispatcher } from "svelte"
+import ICONS from "@/components/backend/DatasourceNavigator/icons"
+import { IntegrationNames } from "@/constants"
+import { appStore, datasources as datasourcesStore } from "@/stores/builder"
+import TableOrViewOption from "./TableOrViewOption.svelte"
+import type { SourceOption } from "./utils"
+import { makeTableOption } from "./utils"
 
-  export let onConfirm: () => Promise<void> | void
-  export let selectedTablesAndViews: SourceOption[]
+export let onConfirm: () => Promise<void> | void
+export let selectedTablesAndViews: SourceOption[]
 
-  const dispatch = createEventDispatcher()
-  const getTablesAndViews = (
-    datasource: Datasource | UIInternalDatasource,
-    datasources: (Datasource | UIInternalDatasource)[]
-  ) => {
-    let tablesAndViews: SourceOption[] = []
-    const tables = Array.isArray(datasource.entities)
-      ? datasource.entities
-      : Object.values(datasource.entities ?? {})
+const dispatch = createEventDispatcher()
+const getTablesAndViews = (
+  datasource: Datasource | UIInternalDatasource,
+  datasources: (Datasource | UIInternalDatasource)[]
+) => {
+  let tablesAndViews: SourceOption[] = []
+  const tables = Array.isArray(datasource.entities)
+    ? datasource.entities
+    : Object.values(datasource.entities ?? {})
 
-    for (const table of tables) {
-      if (table._id === "ta_users") {
-        continue
-      }
-
-      const formattedTable = makeTableOption(table, datasources)
-
-      tablesAndViews = tablesAndViews.concat([formattedTable])
+  for (const table of tables) {
+    if (table._id === "ta_users") {
+      continue
     }
 
-    return tablesAndViews
+    const formattedTable = makeTableOption(table, datasources)
+
+    tablesAndViews = tablesAndViews.concat([formattedTable])
   }
 
-  const getDatasources = (
-    rawDatasources: (Datasource | UIInternalDatasource)[]
-  ) => {
-    const datasources = []
+  return tablesAndViews
+}
 
-    for (const rawDatasource of rawDatasources) {
-      if (
-        rawDatasource.source === IntegrationNames.REST ||
-        !rawDatasource["entities"]
-      ) {
-        continue
-      }
+const getDatasources = (rawDatasources: (Datasource | UIInternalDatasource)[]) => {
+  const datasources = []
 
-      const datasource = {
-        name: rawDatasource.name,
-        iconComponent: ICONS[rawDatasource.source],
-        tablesAndViews: getTablesAndViews(rawDatasource, rawDatasources),
-      }
-
-      datasources.push(datasource)
+  for (const rawDatasource of rawDatasources) {
+    if (rawDatasource.source === IntegrationNames.REST || !rawDatasource["entities"]) {
+      continue
     }
 
-    return datasources
+    const datasource = {
+      name: rawDatasource.name,
+      iconComponent: ICONS[rawDatasource.source],
+      tablesAndViews: getTablesAndViews(rawDatasource, rawDatasources),
+    }
+
+    datasources.push(datasource)
   }
 
-  $: datasources = getDatasources($datasourcesStore.list)
+  return datasources
+}
 
-  const toggleSelection = (tableOrView: SourceOption) => {
-    dispatch("toggle", tableOrView)
-  }
+$: datasources = getDatasources($datasourcesStore.list)
 
-  let dataUrl = ""
-  $: dataUrl = $appStore.appId
-    ? `/builder/workspace/${$appStore.appId}/data`
-    : ""
+const toggleSelection = (tableOrView: SourceOption) => {
+  dispatch("toggle", tableOrView)
+}
+
+let dataUrl = ""
+$: dataUrl = $appStore.appId ? `/builder/workspace/${$appStore.appId}/data` : ""
 </script>
 
 <ModalContent

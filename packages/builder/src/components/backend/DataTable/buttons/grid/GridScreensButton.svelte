@@ -1,39 +1,37 @@
 <script lang="ts">
-  import { Button } from "@budibase/bbui"
-  import ScreensPopover from "@/components/common/ScreensPopover.svelte"
-  import { screenStore } from "@/stores/builder"
-  import { getContext, createEventDispatcher } from "svelte"
-  import type { Screen, ScreenUsage } from "@budibase/types"
-  const dispatch = createEventDispatcher<{ generate: void }>()
+import { Button } from "@budibase/bbui"
+import type { Screen, ScreenUsage } from "@budibase/types"
+import { createEventDispatcher, getContext } from "svelte"
+import type ScreensPopover from "@/components/common/ScreensPopover.svelte"
+import { screenStore } from "@/stores/builder"
 
-  const { datasource } = getContext("grid")
+const dispatch = createEventDispatcher<{ generate: void }>()
 
-  let popover: ScreensPopover
+const { datasource } = getContext("grid")
 
-  $: ds = $datasource
-  $: resourceId = ds?.type === "table" ? ds.tableId : ds?.id
-  $: connectedScreens = findConnectedScreens($screenStore.screens, resourceId)
-  $: screenUsage = connectedScreens.map(
-    (screen: Screen): ScreenUsage => ({
-      url: screen.routing?.route,
-      _id: screen._id!,
-      workspaceAppId: screen.workspaceAppId,
-    })
-  )
+let popover: ScreensPopover
 
-  const findConnectedScreens = (
-    screens: Screen[],
-    resourceId: string
-  ): Screen[] => {
-    return screens.filter(screen => {
-      return JSON.stringify(screen).includes(`"${resourceId}"`)
-    })
-  }
+$: ds = $datasource
+$: resourceId = ds?.type === "table" ? ds.tableId : ds?.id
+$: connectedScreens = findConnectedScreens($screenStore.screens, resourceId)
+$: screenUsage = connectedScreens.map(
+  (screen: Screen): ScreenUsage => ({
+    url: screen.routing?.route,
+    _id: screen._id!,
+    workspaceAppId: screen.workspaceAppId,
+  })
+)
 
-  const generateScreen = () => {
-    popover?.hide()
-    dispatch("generate")
-  }
+const findConnectedScreens = (screens: Screen[], resourceId: string): Screen[] => {
+  return screens.filter((screen) => {
+    return JSON.stringify(screen).includes(`"${resourceId}"`)
+  })
+}
+
+const generateScreen = () => {
+  popover?.hide()
+  dispatch("generate")
+}
 </script>
 
 <ScreensPopover

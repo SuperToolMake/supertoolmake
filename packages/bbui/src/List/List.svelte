@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Detail from "../Typography/Detail.svelte"
+import Detail from "../Typography/Detail.svelte"
 
-  export let title: string | null = null
+export let title: string | null = null
 </script>
 
 <div>

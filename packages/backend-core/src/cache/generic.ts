@@ -18,17 +18,12 @@ export enum TTL {
   ONE_DAY = 86400,
 }
 
-export const keys = (...args: Parameters<typeof GENERIC.keys>) =>
-  GENERIC.keys(...args)
-export const get = (...args: Parameters<typeof GENERIC.get>) =>
-  GENERIC.get(...args)
-export const store = (...args: Parameters<typeof GENERIC.store>) =>
-  GENERIC.store(...args)
-export const destroy = (...args: Parameters<typeof GENERIC.delete>) =>
-  GENERIC.delete(...args)
-export const withCache = <T>(
-  ...args: Parameters<typeof GENERIC.withCache<T>>
-) => GENERIC.withCache(...args)
+export const keys = (...args: Parameters<typeof GENERIC.keys>) => GENERIC.keys(...args)
+export const get = (...args: Parameters<typeof GENERIC.get>) => GENERIC.get(...args)
+export const store = (...args: Parameters<typeof GENERIC.store>) => GENERIC.store(...args)
+export const destroy = (...args: Parameters<typeof GENERIC.delete>) => GENERIC.delete(...args)
+export const withCache = <T>(...args: Parameters<typeof GENERIC.withCache<T>>) =>
+  GENERIC.withCache(...args)
 export const withCacheWithDynamicTTL = <T>(
   ...args: Parameters<typeof GENERIC.withCacheWithDynamicTTL<T>>
 ) => GENERIC.withCacheWithDynamicTTL(...args)

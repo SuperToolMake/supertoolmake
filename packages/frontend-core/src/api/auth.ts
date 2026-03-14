@@ -1,4 +1,4 @@
-import {
+import type {
   GetInitInfoResponse,
   LoginRequest,
   LoginResponse,
@@ -10,23 +10,16 @@ import {
   SetInitInfoRequest,
   SetInitInfoResponse,
 } from "@budibase/types"
-import { BaseAPIClient } from "./types"
+import type { BaseAPIClient } from "./types"
 
 export interface ExtendedLoginResponse extends LoginResponse {
   invalidatedSessionCount?: number
 }
 
 export interface AuthEndpoints {
-  logIn: (
-    tenantId: string,
-    username: string,
-    password: string
-  ) => Promise<ExtendedLoginResponse>
+  logIn: (tenantId: string, username: string, password: string) => Promise<ExtendedLoginResponse>
   logOut: () => Promise<LogoutResponse>
-  requestForgotPassword: (
-    tenantId: string,
-    email: string
-  ) => Promise<PasswordResetResponse>
+  requestForgotPassword: (tenantId: string, email: string) => Promise<PasswordResetResponse>
   resetPassword: (
     tenantId: string,
     password: string,
@@ -50,16 +43,12 @@ export const buildAuthEndpoints = (API: BaseAPIClient): AuthEndpoints => ({
         username,
         password,
       },
-      parseResponse: async response => {
+      parseResponse: async (response) => {
         const data = (await response.json()) as LoginResponse
-        const invalidatedSessionCount = response.headers.get(
-          "X-Session-Invalidated-Count"
-        )
+        const invalidatedSessionCount = response.headers.get("X-Session-Invalidated-Count")
         return {
           ...data,
-          invalidatedSessionCount: invalidatedSessionCount
-            ? parseInt(invalidatedSessionCount)
-            : 0,
+          invalidatedSessionCount: invalidatedSessionCount ? parseInt(invalidatedSessionCount) : 0,
         } as ExtendedLoginResponse
       },
     })
@@ -78,7 +67,7 @@ export const buildAuthEndpoints = (API: BaseAPIClient): AuthEndpoints => ({
    * Sets initialisation info.
    * @param info the info to set
    */
-  setInitInfo: async info => {
+  setInitInfo: async (info) => {
     return await API.post({
       url: "/api/global/auth/init",
       body: info,
@@ -115,10 +104,7 @@ export const buildAuthEndpoints = (API: BaseAPIClient): AuthEndpoints => ({
    * @param resetCode the reset code to authenticate the request
    */
   resetPassword: async (tenantId, password, resetCode) => {
-    return await API.post<
-      PasswordResetUpdateRequest,
-      PasswordResetUpdateResponse
-    >({
+    return await API.post<PasswordResetUpdateRequest, PasswordResetUpdateResponse>({
       url: `/api/global/auth/${tenantId}/reset/update`,
       body: {
         password,

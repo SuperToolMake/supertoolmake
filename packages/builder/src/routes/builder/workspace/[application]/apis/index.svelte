@@ -1,22 +1,22 @@
 <script lang="ts">
-  import { onMount } from "svelte"
-  import { goto } from "@roxi/routify"
-  import { datasources } from "@/stores/builder"
-  import { IntegrationTypes } from "@/constants/backend"
+import { goto } from "@roxi/routify"
+import { onMount } from "svelte"
+import { IntegrationTypes } from "@/constants/backend"
+import { datasources } from "@/stores/builder"
 
-  $goto
+$goto
 
-  onMount(() => {
-    const restDatasources = ($datasources.list || []).filter(
-      datasource => datasource.source === IntegrationTypes.REST
-    )
+onMount(() => {
+  const restDatasources = ($datasources.list || []).filter(
+    (datasource) => datasource.source === IntegrationTypes.REST
+  )
 
-    if (restDatasources.length) {
-      $goto(`../datasource/[datasourceId]`, {
-        datasourceId: restDatasources[0]._id ?? "",
-      })
-    } else {
-      $goto("../new")
-    }
-  })
+  if (restDatasources.length) {
+    $goto(`../datasource/[datasourceId]`, {
+      datasourceId: restDatasources[0]._id ?? "",
+    })
+  } else {
+    $goto("../new")
+  }
+})
 </script>

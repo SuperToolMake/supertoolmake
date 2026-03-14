@@ -1,11 +1,11 @@
 import { context } from "@budibase/backend-core"
 import {
   PublishResourceState,
-  PublishStatusResource,
-  Screen,
-  Table,
-  Workspace,
-  WorkspaceApp,
+  type PublishStatusResource,
+  type Screen,
+  type Table,
+  type Workspace,
+  type WorkspaceApp,
 } from "@budibase/types"
 import sdk from "../.."
 
@@ -22,8 +22,7 @@ function getPublishedState(
 
 export async function status() {
   const prodWorkspaceId = context.getProdWorkspaceId()
-  const productionExists =
-    await sdk.workspaces.isWorkspacePublished(prodWorkspaceId)
+  const productionExists = await sdk.workspaces.isWorkspacePublished(prodWorkspaceId)
   type State = {
     workspaceApps: WorkspaceApp[]
     screens: Screen[]
@@ -65,10 +64,8 @@ export async function status() {
   }
 
   // Create maps of production state for quick lookup
-  const prodWorkspaceAppIds = new Set(
-    productionState.workspaceApps.map(w => w._id)
-  )
-  const prodTableIds = new Set(productionState.tables.map(t => t._id))
+  const prodWorkspaceAppIds = new Set(productionState.workspaceApps.map((w) => w._id))
+  const prodTableIds = new Set(productionState.tables.map((t) => t._id))
 
   const processResource = (
     map: Record<string, PublishStatusResource>,
@@ -88,8 +85,7 @@ export async function status() {
       published: isPublished,
       name: resource.name,
       publishedAt: resourcePublishedAt,
-      unpublishedChanges:
-        !resourcePublishedAt || resource.updatedAt! > resourcePublishedAt,
+      unpublishedChanges: !resourcePublishedAt || resource.updatedAt! > resourcePublishedAt,
       state: getPublishedState(resource, resourcePublishedAt),
     }
   }
@@ -101,10 +97,9 @@ export async function status() {
 
   const workspaceApps: Record<string, PublishStatusResource> = {}
   for (const workspaceApp of developmentState.workspaceApps) {
-    const resourcePublishedAt =
-      metadata?.resourcesPublishedAt?.[workspaceApp._id!]
+    const resourcePublishedAt = metadata?.resourcesPublishedAt?.[workspaceApp._id!]
     const workspaceScreens = developmentState.screens.filter(
-      screen => screen.workspaceAppId === workspaceApp._id
+      (screen) => screen.workspaceAppId === workspaceApp._id
     )
     workspaceApps[workspaceApp._id!] = {
       published: prodWorkspaceAppIds.has(workspaceApp._id!),
@@ -112,9 +107,7 @@ export async function status() {
       publishedAt: resourcePublishedAt,
       unpublishedChanges:
         !resourcePublishedAt ||
-        !!workspaceScreens.find(
-          screen => screen.updatedAt! > resourcePublishedAt
-        ),
+        !!workspaceScreens.find((screen) => screen.updatedAt! > resourcePublishedAt),
       state: getPublishedState(workspaceApp, resourcePublishedAt),
     }
   }

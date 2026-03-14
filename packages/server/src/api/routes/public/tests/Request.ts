@@ -1,6 +1,6 @@
-import { User, Table, SearchFilters, Row } from "@budibase/types"
-import { HttpMethod, MakeRequestResponse, generateMakeRequest } from "./utils"
-import TestConfiguration from "../../../../tests/utilities/TestConfiguration"
+import type { Row, SearchFilters, Table, User } from "@budibase/types"
+import type TestConfiguration from "../../../../tests/utilities/TestConfiguration"
+import { generateMakeRequest, type HttpMethod, type MakeRequestResponse } from "./utils"
 
 type RequestOpts = { internal?: boolean; appId?: string }
 
@@ -20,11 +20,7 @@ export class PublicAPIRequest {
   rows: PublicRowAPI
   apiKey: string
 
-  private constructor(
-    apiKey: string,
-    makeRequest: MakeRequestResponse,
-    appId?: string
-  ) {
+  private constructor(apiKey: string, makeRequest: MakeRequestResponse, appId?: string) {
     this.apiKey = apiKey
     this.makeRequest = makeRequest
     this.appId = appId
@@ -35,7 +31,7 @@ export class PublicAPIRequest {
   static async init(config: TestConfiguration, user: User, opts?: RequestOpts) {
     const apiKey = await config.generateApiKey(user._id)
     const makeRequest = generateMakeRequest(apiKey, opts)
-    return new this(apiKey, makeRequest, opts?.appId)
+    return new PublicAPIRequest(apiKey, makeRequest, opts?.appId)
   }
 
   opts(opts: RequestOpts) {
@@ -62,7 +58,7 @@ export class PublicAPIRequest {
       expect(res.body).toEqual(expectations?.body)
     }
     if (expectations?.headers) {
-      for (let [header, value] of Object.entries(expectations.headers)) {
+      for (const [header, value] of Object.entries(expectations.headers)) {
         const found = res.headers[header]
         expect(found?.toLowerCase()).toEqual(value)
       }
@@ -78,17 +74,11 @@ export class PublicTableAPI {
     this.request = request
   }
 
-  async create(
-    table: Table,
-    expectations?: PublicAPIExpectations
-  ): Promise<Response<Table>> {
+  async create(table: Table, expectations?: PublicAPIExpectations): Promise<Response<Table>> {
     return this.request.send("post", "/tables", table, expectations)
   }
 
-  async search(
-    name: string,
-    expectations?: PublicAPIExpectations
-  ): Promise<Response<Table[]>> {
+  async search(name: string, expectations?: PublicAPIExpectations): Promise<Response<Table[]>> {
     return this.request.send("post", "/tables/search", { name }, expectations)
   }
 }
@@ -105,12 +95,7 @@ export class PublicRowAPI {
     row: Row,
     expectations?: PublicAPIExpectations
   ): Promise<Response<Row>> {
-    return this.request.send(
-      "post",
-      `/tables/${tableId}/rows`,
-      row,
-      expectations
-    )
+    return this.request.send("post", `/tables/${tableId}/rows`, row, expectations)
   }
 
   async search(

@@ -1,40 +1,29 @@
-import {
+import type {
   AddWorkspaceFavouriteResponse,
   DeleteWorkspaceFavouriteResponse,
   WithoutDocMetadata,
   WorkspaceFavourite,
   WorkspaceFavouriteResponse,
 } from "@budibase/types"
-import { Expectations, TestAPI } from "./base"
+import { type Expectations, TestAPI } from "./base"
 
-export type CreateRequestRaw = Omit<
-  WithoutDocMetadata<WorkspaceFavourite>,
-  "createdBy"
->
+export type CreateRequestRaw = Omit<WithoutDocMetadata<WorkspaceFavourite>, "createdBy">
 
 export class WorkspaceFavouriteAPI extends TestAPI {
   save = async (
     body: CreateRequestRaw,
     expectations?: Expectations
   ): Promise<AddWorkspaceFavouriteResponse> => {
-    const result = await this._post<AddWorkspaceFavouriteResponse>(
-      `/api/workspace/favourites`,
-      {
-        body,
-        expectations: { status: 201, ...(expectations || {}) },
-      }
-    )
+    const result = await this._post<AddWorkspaceFavouriteResponse>(`/api/workspace/favourites`, {
+      body,
+      expectations: { status: 201, ...(expectations || {}) },
+    })
     return result
   }
-  fetchAll = async (
-    expectations?: Expectations
-  ): Promise<WorkspaceFavouriteResponse> => {
-    return await this._get<WorkspaceFavouriteResponse>(
-      `/api/workspace/favourites`,
-      {
-        expectations,
-      }
-    )
+  fetchAll = async (expectations?: Expectations): Promise<WorkspaceFavouriteResponse> => {
+    return await this._get<WorkspaceFavouriteResponse>(`/api/workspace/favourites`, {
+      expectations,
+    })
   }
   delete = async (
     favourite: WorkspaceFavourite,

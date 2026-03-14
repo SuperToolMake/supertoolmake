@@ -1,6 +1,6 @@
 import { derived, get, writable } from "svelte/store"
-import { capitalise } from "@/helpers"
 import { string } from "yup"
+import { capitalise } from "@/helpers"
 
 export const createValidatedNameStore = (name: string, isVisible: boolean) => {
   const nameStore = writable(name)

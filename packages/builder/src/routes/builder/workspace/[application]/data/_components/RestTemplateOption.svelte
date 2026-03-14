@@ -1,13 +1,9 @@
 <script lang="ts">
-  import { Body } from "@budibase/bbui"
-  import type {
-    RestTemplate,
-    RestTemplateGroup,
-    RestTemplateGroupName,
-  } from "@budibase/types"
+import { Body } from "@budibase/bbui"
+import type { RestTemplate, RestTemplateGroup, RestTemplateGroupName } from "@budibase/types"
 
-  export let template: RestTemplate | RestTemplateGroup<RestTemplateGroupName>
-  export let disabled = false
+export let template: RestTemplate | RestTemplateGroup<RestTemplateGroupName>
+export let disabled = false
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

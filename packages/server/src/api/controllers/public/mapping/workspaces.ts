@@ -1,8 +1,8 @@
-import { Application } from "./types"
-import { RequiredKeys } from "@budibase/types"
+import type { RequiredKeys } from "@budibase/types"
+import type { Application } from "./types"
 
 function application(body: any): RequiredKeys<Application> {
-  let app = body?.application ? body.application : body
+  const app = body?.application ? body.application : body
   return {
     _id: app.appId,
     name: app.name,

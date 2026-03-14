@@ -1,50 +1,41 @@
 <script>
-  import {
-    DetailSummary,
-    ActionButton,
-    Drawer,
-    Button,
-    notifications,
-  } from "@budibase/bbui"
-  import { componentStore } from "@/stores/builder"
-  import ConditionalUIDrawer from "./ConditionalUIDrawer.svelte"
-  import ComponentSettingsSection from "./ComponentSettingsSection.svelte"
-  import { builderStore } from "@/stores/builder"
+import { ActionButton, Button, DetailSummary, Drawer, notifications } from "@budibase/bbui"
+import { builderStore, componentStore } from "@/stores/builder"
+import ComponentSettingsSection from "./ComponentSettingsSection.svelte"
+import ConditionalUIDrawer from "./ConditionalUIDrawer.svelte"
 
-  export let componentInstance
-  export let componentDefinition
-  export let componentBindings
-  export let bindings
-  export let onSave = null
-  export let actionOptions
+export let componentInstance
+export let componentDefinition
+export let componentBindings
+export let bindings
+export let onSave = null
+export let actionOptions
 
-  let tempValue
-  let drawer
+let tempValue
+let drawer
 
-  $: highlighted = $builderStore.highlightedSetting?.key === "_conditions"
+$: highlighted = $builderStore.highlightedSetting?.key === "_conditions"
 
-  const openDrawer = () => {
-    tempValue = JSON.parse(JSON.stringify(componentInstance?._conditions ?? []))
-    drawer.show()
-  }
+const openDrawer = () => {
+  tempValue = JSON.parse(JSON.stringify(componentInstance?._conditions ?? []))
+  drawer.show()
+}
 
-  const save = async () => {
-    try {
-      if (onSave) {
-        await onSave(tempValue)
-      } else {
-        await componentStore.updateConditions(tempValue)
-      }
-    } catch (error) {
-      notifications.error("Error updating conditions")
+const save = async () => {
+  try {
+    if (onSave) {
+      await onSave(tempValue)
+    } else {
+      await componentStore.updateConditions(tempValue)
     }
-    drawer.hide()
+  } catch (error) {
+    notifications.error("Error updating conditions")
   }
+  drawer.hide()
+}
 
-  $: conditionCount = componentInstance?._conditions?.length
-  $: conditionText = `${conditionCount || "No"} condition${
-    conditionCount !== 1 ? "s" : ""
-  } set`
+$: conditionCount = componentInstance?._conditions?.length
+$: conditionText = `${conditionCount || "No"} condition${conditionCount !== 1 ? "s" : ""} set`
 </script>
 
 <!--

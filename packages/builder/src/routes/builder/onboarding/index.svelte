@@ -1,68 +1,63 @@
 <script lang="ts">
-  import { goto as gotoStore } from "@roxi/routify"
-  import { Body, notifications, Layout, Button } from "@budibase/bbui"
-  import { API } from "@/api"
-  import { onMount } from "svelte"
-  import Spinner from "@/components/common/Spinner.svelte"
-  import BBLogo from "assets/BBLogo.svelte"
-  import { appsStore, auth } from "@/stores/portal"
-  import { sdk } from "@budibase/shared-core"
+import { Body, Button, Layout, notifications } from "@budibase/bbui"
+import { sdk } from "@budibase/shared-core"
+import { goto as gotoStore } from "@roxi/routify"
+import BBLogo from "assets/BBLogo.svelte"
+import { onMount } from "svelte"
+import { API } from "@/api"
+import Spinner from "@/components/common/Spinner.svelte"
+import { appsStore, auth } from "@/stores/portal"
 
-  $: goto = $gotoStore
+$: goto = $gotoStore
 
-  let loading = false
-  let onboardingFailed = false
+let loading = false
+let onboardingFailed = false
 
-  const createDefaultWorkspace = async () => {
-    if (loading) {
-      return
-    }
-    loading = true
-    try {
-      const data = new FormData()
-      data.append("isOnboarding", "true")
-
-      // Build the default workspace
-      const createdWorkspace = await API.createApp(data)
-
-      if (!sdk.users.isBuilder($auth.user, createdWorkspace?.appId)) {
-        await auth.getSelf()
-      }
-
-      // Ensure the apps are reloaded.
-      await appsStore.load()
-
-      const pkg = await API.fetchAppPackage(createdWorkspace.instance._id)
-      const homeScreen = pkg.screens.find(screen => screen.routing?.homeScreen)
-
-      notifications.success(`Workspace created successfully`)
-      if (homeScreen?.workspaceAppId && homeScreen?._id) {
-        const screenId = homeScreen._id
-        goto(
-          `/builder/workspace/[application]/design/[workspaceAppId]/[screenId]`,
-          {
-            application: createdWorkspace.instance._id,
-            workspaceAppId: homeScreen.workspaceAppId,
-            screenId,
-          }
-        )
-      } else {
-        goto(`/builder/workspace/[application]`, {
-          application: createdWorkspace.instance._id,
-        })
-      }
-    } catch (e: any) {
-      loading = false
-      onboardingFailed = true
-      notifications.error(
-        e.message || "There was a problem creating your workspace"
-      )
-    }
+const createDefaultWorkspace = async () => {
+  if (loading) {
+    return
   }
+  loading = true
+  try {
+    const data = new FormData()
+    data.append("isOnboarding", "true")
 
-  onMount(() => {
-    createDefaultWorkspace()
-  })
+    // Build the default workspace
+    const createdWorkspace = await API.createApp(data)
+
+    if (!sdk.users.isBuilder($auth.user, createdWorkspace?.appId)) {
+      await auth.getSelf()
+    }
+
+    // Ensure the apps are reloaded.
+    await appsStore.load()
+
+    const pkg = await API.fetchAppPackage(createdWorkspace.instance._id)
+    const homeScreen = pkg.screens.find((screen) => screen.routing?.homeScreen)
+
+    notifications.success(`Workspace created successfully`)
+    if (homeScreen?.workspaceAppId && homeScreen?._id) {
+      const screenId = homeScreen._id
+      goto(`/builder/workspace/[application]/design/[workspaceAppId]/[screenId]`, {
+        application: createdWorkspace.instance._id,
+        workspaceAppId: homeScreen.workspaceAppId,
+        screenId,
+      })
+    } else {
+      goto(`/builder/workspace/[application]`, {
+        application: createdWorkspace.instance._id,
+      })
+    }
+  } catch (e: any) {
+    loading = false
+    onboardingFailed = true
+    notifications.error(e.message || "There was a problem creating your workspace")
+  }
+}
+
+onMount(() => {
+  createDefaultWorkspace()
+})
 </script>
 
 <div class="content">

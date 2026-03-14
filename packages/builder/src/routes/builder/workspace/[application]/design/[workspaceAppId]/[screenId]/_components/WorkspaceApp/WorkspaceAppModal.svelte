@@ -1,175 +1,170 @@
 <script lang="ts">
-  import { buildLiveUrl } from "@/helpers/urls"
-  import { screenStore, workspaceAppStore } from "@/stores/builder"
-  import * as screenTemplating from "@/templates/screenTemplating"
-  import {
-    Body,
-    Icon,
-    Input,
-    keepOpen,
-    Modal,
-    ModalContent,
-    notifications,
-  } from "@budibase/bbui"
-  import {
-    PublishResourceState,
-    type UIWorkspaceApp,
-    type WorkspaceApp,
-  } from "@budibase/types"
-  import { goto } from "@roxi/routify"
-  import type { ZodType } from "zod"
-  import { z } from "zod"
+import {
+  Body,
+  Icon,
+  Input,
+  keepOpen,
+  type Modal,
+  ModalContent,
+  notifications,
+} from "@budibase/bbui"
+import { PublishResourceState, type UIWorkspaceApp, type WorkspaceApp } from "@budibase/types"
+import { goto } from "@roxi/routify"
+import type { ZodType } from "zod"
+import { z } from "zod"
+import { buildLiveUrl } from "@/helpers/urls"
+import { screenStore, workspaceAppStore } from "@/stores/builder"
+import * as screenTemplating from "@/templates/screenTemplating"
 
-  $goto
+$goto
 
-  export let workspaceApp: UIWorkspaceApp | null = null
+export let workspaceApp: UIWorkspaceApp | null = null
 
-  let modal: Modal
-  export const show = () => modal.show()
+let modal: Modal
+export const show = () => modal.show()
 
-  let data: WorkspaceApp
+let data: WorkspaceApp
 
-  $: isNew = !workspaceApp
+$: isNew = !workspaceApp
 
-  $: title = isNew ? "Create new app" : "Edit app"
+$: title = isNew ? "Create new app" : "Edit app"
 
-  const requiredString = (errorMessage: string) =>
-    z.string({ required_error: errorMessage }).trim().min(1, errorMessage)
+const requiredString = (errorMessage: string) =>
+  z.string({ required_error: errorMessage }).trim().min(1, errorMessage)
 
-  let validationState: {
-    errors: Partial<Record<keyof WorkspaceApp, string>>
-    touched: Partial<Record<keyof WorkspaceApp, boolean>>
-  }
+let validationState: {
+  errors: Partial<Record<keyof WorkspaceApp, string>>
+  touched: Partial<Record<keyof WorkspaceApp, boolean>>
+}
 
-  const validateWorkspaceApp = (workspaceApp: Partial<WorkspaceApp>) => {
-    const validator = z.object({
-      name: requiredString("Name is required.").refine(
-        val =>
+const validateWorkspaceApp = (workspaceApp: Partial<WorkspaceApp>) => {
+  const validator = z.object({
+    name: requiredString("Name is required.").refine(
+      (val) =>
+        !$workspaceAppStore.workspaceApps
+          .filter((a) => a._id !== workspaceApp._id)
+          .map((a) => a.name.toLowerCase())
+          .includes(val.toLowerCase()),
+      {
+        message: "This name is already taken.",
+      }
+    ),
+    url: requiredString("Url prefix is required.")
+      .regex(/^\/[\w-]*$/, {
+        message:
+          "Url prefix must start with a slash and can only contain alphanumeric characters, hyphens, and underscores.",
+      })
+      .refine(
+        (val) =>
           !$workspaceAppStore.workspaceApps
-            .filter(a => a._id !== workspaceApp._id)
-            .map(a => a.name.toLowerCase())
+            .filter((a) => a._id !== workspaceApp._id)
+            .map((a) => a.url.toLowerCase())
             .includes(val.toLowerCase()),
         {
-          message: "This name is already taken.",
+          message: "This url is already taken.",
         }
       ),
-      url: requiredString("Url prefix is required.")
-        .regex(/^\/[\w-]*$/, {
-          message:
-            "Url prefix must start with a slash and can only contain alphanumeric characters, hyphens, and underscores.",
-        })
-        .refine(
-          val =>
-            !$workspaceAppStore.workspaceApps
-              .filter(a => a._id !== workspaceApp._id)
-              .map(a => a.url.toLowerCase())
-              .includes(val.toLowerCase()),
-          {
-            message: "This url is already taken.",
-          }
-        ),
-    }) satisfies ZodType<Omit<WorkspaceApp, "navigation" | "isDefault">>
+  }) satisfies ZodType<Omit<WorkspaceApp, "navigation" | "isDefault">>
 
-    const validationResult = validator.safeParse(workspaceApp)
-    validationState.errors = {}
-    if (!validationResult.success) {
-      validationState.errors = Object.entries(
-        validationResult.error.formErrors.fieldErrors
-      ).reduce<Record<string, string>>((acc, [field, errors]) => {
-        if (errors[0]) {
-          acc[field] = errors[0]
-        }
-        return acc
-      }, {})
-    }
-
-    return validationResult
-  }
-
-  function onShow() {
-    data = {
-      _id: workspaceApp?._id,
-      _rev: workspaceApp?._rev,
-      name: workspaceApp?.name ?? "",
-      url: workspaceApp?.url ?? "",
-      navigation: workspaceApp?.navigation ?? { navigation: "Top" },
-      isDefault: workspaceApp?.isDefault ?? false,
-    }
-    validationState = { errors: {}, touched: {} }
-  }
-
-  async function onConfirm() {
-    const validationResult = validateWorkspaceApp({
-      ...data,
-    })
-    if (validationResult.error) {
-      return keepOpen
-    }
-
-    const { data: workspaceAppData } = validationResult
-
-    try {
-      if (isNew) {
-        const workspaceApp = await workspaceAppStore.add({
-          ...workspaceAppData,
-          disabled: true,
-        })
-
-        const newScreen = await screenStore.save({
-          ...screenTemplating.blank({
-            route: "/",
-            screens: [],
-            workspaceAppId: workspaceApp._id,
-          })[0].data,
-          workspaceAppId: workspaceApp._id,
-        })
-        notifications.success("App created successfully")
-        $goto("../[workspaceAppId]/[screenId]", {
-          workspaceAppId: workspaceApp._id,
-          screenId: newScreen._id!,
-        })
-      } else {
-        await workspaceAppStore.edit({
-          ...workspaceAppData,
-          navigation: workspaceApp!.navigation,
-          isDefault: workspaceApp!.isDefault,
-          _id: workspaceApp!._id!,
-          _rev: workspaceApp!._rev!,
-        })
-        notifications.success("App updated successfully")
+  const validationResult = validator.safeParse(workspaceApp)
+  validationState.errors = {}
+  if (!validationResult.success) {
+    validationState.errors = Object.entries(validationResult.error.formErrors.fieldErrors).reduce<
+      Record<string, string>
+    >((acc, [field, errors]) => {
+      if (errors[0]) {
+        acc[field] = errors[0]
       }
-    } catch (e: any) {
-      console.error("Error saving app", e)
-      notifications.error(`Error saving app: ${e.message}`)
+      return acc
+    }, {})
+  }
+
+  return validationResult
+}
+
+function onShow() {
+  data = {
+    _id: workspaceApp?._id,
+    _rev: workspaceApp?._rev,
+    name: workspaceApp?.name ?? "",
+    url: workspaceApp?.url ?? "",
+    navigation: workspaceApp?.navigation ?? { navigation: "Top" },
+    isDefault: workspaceApp?.isDefault ?? false,
+  }
+  validationState = { errors: {}, touched: {} }
+}
+
+async function onConfirm() {
+  const validationResult = validateWorkspaceApp({
+    ...data,
+  })
+  if (validationResult.error) {
+    return keepOpen
+  }
+
+  const { data: workspaceAppData } = validationResult
+
+  try {
+    if (isNew) {
+      const workspaceApp = await workspaceAppStore.add({
+        ...workspaceAppData,
+        disabled: true,
+      })
+
+      const newScreen = await screenStore.save({
+        ...screenTemplating.blank({
+          route: "/",
+          screens: [],
+          workspaceAppId: workspaceApp._id,
+        })[0].data,
+        workspaceAppId: workspaceApp._id,
+      })
+      notifications.success("App created successfully")
+      $goto("../[workspaceAppId]/[screenId]", {
+        workspaceAppId: workspaceApp._id,
+        screenId: newScreen._id!,
+      })
+    } else {
+      await workspaceAppStore.edit({
+        ...workspaceAppData,
+        navigation: workspaceApp!.navigation,
+        isDefault: workspaceApp!.isDefault,
+        _id: workspaceApp!._id!,
+        _rev: workspaceApp!._rev!,
+      })
+      notifications.success("App updated successfully")
     }
+  } catch (e: any) {
+    console.error("Error saving app", e)
+    notifications.error(`Error saving app: ${e.message}`)
+  }
+}
+
+async function onEnterKey() {
+  const result = await onConfirm()
+  if (result === keepOpen) {
+    return result
   }
 
-  async function onEnterKey() {
-    const result = await onConfirm()
-    if (result === keepOpen) {
-      return result
-    }
+  modal.hide()
+}
 
-    modal.hide()
+$: {
+  if (data && !data.url.startsWith("/")) {
+    data.url = `/${data.url}`
   }
+}
 
-  $: {
-    if (data && !data.url.startsWith("/")) {
-      data.url = `/${data.url}`
-    }
-  }
+$: if (isNew && data?.name && !validationState.touched.url) {
+  data.url = `/${data.name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-zA-Z0-9- ]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")}`
+}
 
-  $: if (isNew && data?.name && !validationState.touched.url) {
-    data.url = `/${data.name
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-zA-Z0-9- ]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")}`
-  }
-
-  $: editingPublishedApp =
-    workspaceApp?.publishStatus.state === PublishResourceState.PUBLISHED
+$: editingPublishedApp = workspaceApp?.publishStatus.state === PublishResourceState.PUBLISHED
 </script>
 
 <Modal bind:this={modal} on:show={onShow} on:hide>

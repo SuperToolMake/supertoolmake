@@ -1,5 +1,5 @@
 import { utils } from "@budibase/shared-core"
-import {
+import type {
   SearchFilters,
   SearchUsersRequest,
   StrippedUser,
@@ -7,7 +7,7 @@ import {
   UserDatasource,
 } from "@budibase/types"
 import { get } from "svelte/store"
-import BaseDataFetch, { DataFetchParams } from "./DataFetch"
+import BaseDataFetch, { type DataFetchParams } from "./DataFetch"
 
 interface UserFetchQuery {
   appId?: string
@@ -60,9 +60,7 @@ export default class UserFetch extends BaseDataFetch<
     // Convert old format to new one - we now allow use of the lucene format
     const { appId, paginated, workspaceId, ...rest } = query
 
-    const finalQuery: SearchFilters = utils.isSupportedUserSearch(rest)
-      ? rest
-      : {}
+    const finalQuery: SearchFilters = utils.isSupportedUserSearch(rest) ? rest : {}
 
     try {
       const opts: SearchUsersRequest = {

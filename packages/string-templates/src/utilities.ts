@@ -46,25 +46,17 @@ export const isAlphaNumeric = (char: string) => {
   return char.match(ALPHA_NUMERIC_REGEX)
 }
 
-export const swapStrings = (
-  string: string,
-  start: number,
-  length: number,
-  swap: string
-) => {
+export const swapStrings = (string: string, start: number, length: number, swap: string) => {
   return string.slice(0, start) + swap + string.slice(start + length)
 }
 
-export const removeHandlebarsStatements = (
-  string: string,
-  replacement = "Invalid binding"
-) => {
-  let regexp = new RegExp(FIND_HBS_REGEX)
-  let matches = string.match(regexp)
+export const removeHandlebarsStatements = (string: string, replacement = "Invalid binding") => {
+  const regexp = new RegExp(FIND_HBS_REGEX)
+  const matches = string.match(regexp)
   if (matches == null) {
     return string
   }
-  for (let match of matches) {
+  for (const match of matches) {
     const idx = string.indexOf(match)
     string = swapStrings(string, idx, match.length, replacement)
   }
@@ -79,15 +71,9 @@ export const atob = (base64: string) => {
   return Buffer.from(base64, "base64").toString("utf-8")
 }
 
-export const prefixStrings = (
-  baseString: string,
-  strings: string[],
-  prefix: string
-) => {
+export const prefixStrings = (baseString: string, strings: string[], prefix: string) => {
   // Escape any special characters in the strings to avoid regex errors
-  const escapedStrings = strings.map(str =>
-    str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-  )
+  const escapedStrings = strings.map((str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
   const regexPattern = new RegExp(`\\b(${escapedStrings.join("|")})\\b`, "g")
   return baseString.replace(regexPattern, `${prefix}$1`)
 }

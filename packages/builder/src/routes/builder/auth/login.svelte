@@ -1,66 +1,63 @@
 <script>
-  import {
-    ActionButton,
-    Button,
-    Divider,
-    Heading,
-    Layout,
-    notifications,
-    FancyForm,
-    FancyInput,
-  } from "@budibase/bbui"
-  import { goto as gotoStore } from "@roxi/routify"
-  import { auth, organisation, oidc } from "@/stores/portal"
-  import GoogleButton from "./_components/GoogleButton.svelte"
-  import OIDCButton from "./_components/OIDCButton.svelte"
-  import { handleError } from "./_components/utils"
-  import Logo from "assets/supertoolmake-emblem.svg"
-  import { onMount } from "svelte"
-  import { pushNumSessionsInvalidated } from "../../../../../frontend-core/src"
+import {
+  ActionButton,
+  Button,
+  Divider,
+  FancyForm,
+  FancyInput,
+  Heading,
+  Layout,
+  notifications,
+} from "@budibase/bbui"
+import { goto as gotoStore } from "@roxi/routify"
+import Logo from "assets/supertoolmake-emblem.svg"
+import { onMount } from "svelte"
+import { auth, oidc, organisation } from "@/stores/portal"
+import { pushNumSessionsInvalidated } from "../../../../../frontend-core/src"
+import GoogleButton from "./_components/GoogleButton.svelte"
+import OIDCButton from "./_components/OIDCButton.svelte"
+import { handleError } from "./_components/utils"
 
-  $: goto = $gotoStore
+$: goto = $gotoStore
 
-  let loaded = false
-  let form
-  let errors = {}
-  let formData = {}
+let loaded = false
+let form
+let errors = {}
+let formData = {}
 
-  $: company = $organisation.company || "SuperToolMake"
+$: company = $organisation.company || "SuperToolMake"
 
-  async function login() {
-    form.validate()
-    if (Object.keys(errors).length > 0) {
-      console.error("errors", errors)
-      return
-    }
-    try {
-      const loginResult = await auth.login(
-        formData?.username.trim(),
-        formData?.password
-      )
-      if ($auth?.user?.forceResetPassword) {
-        goto("../reset")
-      } else {
-        notifications.success("Logged in successfully")
-        pushNumSessionsInvalidated(loginResult.invalidatedSessionCount || 0)
-      }
-    } catch (err) {
-      notifications.error(err.message ? err.message : "Invalid credentials")
-    }
+async function login() {
+  form.validate()
+  if (Object.keys(errors).length > 0) {
+    console.error("errors", errors)
+    return
   }
-
-  function handleKeydown(evt) {
-    if (evt.key === "Enter") login()
-  }
-
-  onMount(async () => {
-    try {
-      await organisation.init()
-    } catch (error) {
-      notifications.error("Error getting org config")
+  try {
+    const loginResult = await auth.login(formData?.username.trim(), formData?.password)
+    if ($auth?.user?.forceResetPassword) {
+      goto("../reset")
+    } else {
+      notifications.success("Logged in successfully")
+      pushNumSessionsInvalidated(loginResult.invalidatedSessionCount || 0)
     }
-    loaded = true
-  })
+  } catch (err) {
+    notifications.error(err.message ? err.message : "Invalid credentials")
+  }
+}
+
+function handleKeydown(evt) {
+  if (evt.key === "Enter") login()
+}
+
+onMount(async () => {
+  try {
+    await organisation.init()
+  } catch (error) {
+    notifications.error("Error getting org config")
+  }
+  loaded = true
+})
 </script>
 
 <svelte:window on:keydown={handleKeydown} />

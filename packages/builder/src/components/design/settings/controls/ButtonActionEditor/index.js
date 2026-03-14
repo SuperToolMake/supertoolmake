@@ -1,7 +1,7 @@
-import * as ActionComponents from "./actions"
 import { get } from "svelte/store"
 import { appStore } from "@/stores/builder"
-// @ts-ignore
+import * as ActionComponents from "./actions"
+// @ts-expect-error
 import ActionDefinitions from "./manifest.json"
 
 // Defines which actions are available to configure in the front end.
@@ -13,21 +13,21 @@ import ActionDefinitions from "./manifest.json"
 // across the packages but it's a breaking change to existing apps.
 export const getAvailableActions = (getAllActions = false) => {
   return ActionDefinitions.actions
-    .filter(action => {
+    .filter((action) => {
       // Filter down actions to those supported by the current client lib version
       if (getAllActions || !action.dependsOnFeature) {
         return true
       }
       return get(appStore).clientFeatures?.[action.dependsOnFeature] === true
     })
-    .map(action => {
+    .map((action) => {
       // Then enrich the actions with real components
       return {
         ...action,
         component: ActionComponents[action.component],
       }
     })
-    .filter(action => {
+    .filter((action) => {
       // Then strip any old actions for which we don't have constructors
       return action.component != null
     })

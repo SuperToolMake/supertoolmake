@@ -1,11 +1,11 @@
+import type { IncomingMessage } from "http"
 import env from "../../environment"
 import { logger } from "./logger"
-import { IncomingMessage } from "http"
 
 const pino = require("koa-pino-logger")
 
-import { Options } from "pino-http"
-import { Ctx } from "@budibase/types"
+import type { Ctx } from "@budibase/types"
+import type { Options } from "pino-http"
 
 const correlator = require("correlation-id")
 
@@ -17,14 +17,14 @@ export function pinoSettings(): Options {
       ignore: (req: IncomingMessage) => !!req.url?.includes("/health"),
     },
     serializers: {
-      req: req => {
+      req: (req) => {
         return {
           method: req.method,
           url: req.url,
           correlationId: req.id,
         }
       },
-      res: res => {
+      res: (res) => {
         return {
           status: res.statusCode,
         }

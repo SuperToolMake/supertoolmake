@@ -1,55 +1,51 @@
 <script lang="ts">
-  import AppPreview from "./AppPreview.svelte"
-  import {
-    screenStore,
-    appStore,
-    selectedScreen,
-    previewStore,
-    selectedAppUrls,
-    workspaceAppStore,
-  } from "@/stores/builder"
-  import UndoRedoControl from "@/components/common/UndoRedoControl.svelte"
-  import ScreenErrorsButton from "./ScreenErrorsButton.svelte"
-  import { ActionButton, Divider, Icon, Toggle } from "@budibase/bbui"
-  import { PublishResourceState, ScreenVariant } from "@budibase/types"
-  import ThemeSettings from "./Theme/ThemeSettings.svelte"
-  import PublishStatusBadge from "@/components/common/PublishStatusBadge.svelte"
+import { ActionButton, Divider, Icon, Toggle } from "@budibase/bbui"
+import { PublishResourceState, ScreenVariant } from "@budibase/types"
+import PublishStatusBadge from "@/components/common/PublishStatusBadge.svelte"
+import UndoRedoControl from "@/components/common/UndoRedoControl.svelte"
+import {
+  appStore,
+  previewStore,
+  screenStore,
+  selectedAppUrls,
+  selectedScreen,
+  workspaceAppStore,
+} from "@/stores/builder"
+import AppPreview from "./AppPreview.svelte"
+import ScreenErrorsButton from "./ScreenErrorsButton.svelte"
+import ThemeSettings from "./Theme/ThemeSettings.svelte"
 
-  let changingStatus = false
+let changingStatus = false
 
-  $: mobile = $previewStore.previewDevice === "mobile"
-  $: isPDF = $selectedScreen?.variant === ScreenVariant.PDF
-  $: selectedWorkspaceApp = $workspaceAppStore.selectedWorkspaceApp
+$: mobile = $previewStore.previewDevice === "mobile"
+$: isPDF = $selectedScreen?.variant === ScreenVariant.PDF
+$: selectedWorkspaceApp = $workspaceAppStore.selectedWorkspaceApp
 
-  $: liveUrl = $selectedAppUrls.liveUrl
+$: liveUrl = $selectedAppUrls.liveUrl
 
-  $: toggleValue =
-    selectedWorkspaceApp?.publishStatus.state === PublishResourceState.PUBLISHED
+$: toggleValue = selectedWorkspaceApp?.publishStatus.state === PublishResourceState.PUBLISHED
 
-  const previewApp = () => {
-    previewStore.showPreview(true)
+const previewApp = () => {
+  previewStore.showPreview(true)
+}
+
+const togglePreviewDevice = () => {
+  previewStore.setDevice(mobile ? "desktop" : "mobile")
+}
+
+const handleToggleChange = async (e: CustomEvent<boolean>) => {
+  if (!selectedWorkspaceApp) {
+    return
   }
 
-  const togglePreviewDevice = () => {
-    previewStore.setDevice(mobile ? "desktop" : "mobile")
+  try {
+    changingStatus = true
+
+    await workspaceAppStore.toggleDisabled(selectedWorkspaceApp._id!, !e.detail)
+  } finally {
+    changingStatus = false
   }
-
-  const handleToggleChange = async (e: CustomEvent<boolean>) => {
-    if (!selectedWorkspaceApp) {
-      return
-    }
-
-    try {
-      changingStatus = true
-
-      await workspaceAppStore.toggleDisabled(
-        selectedWorkspaceApp._id!,
-        !e.detail
-      )
-    } finally {
-      changingStatus = false
-    }
-  }
+}
 </script>
 
 {#if selectedWorkspaceApp}

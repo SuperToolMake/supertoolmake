@@ -1,75 +1,69 @@
 <script>
-  import {
-    ActionButton,
-    List,
-    ListItem,
-    Button,
-    Toggle,
-    notifications,
-    Modal,
-    ModalContent,
-    Input,
-  } from "@budibase/bbui"
-  import DetailPopover from "@/components/common/DetailPopover.svelte"
-  import { getContext } from "svelte"
-  import { appStore, rowActions } from "@/stores/builder"
-  import { goto, url } from "@roxi/routify"
-  import { derived } from "svelte/store"
+import {
+  ActionButton,
+  Button,
+  Input,
+  List,
+  ListItem,
+  Modal,
+  ModalContent,
+  notifications,
+  Toggle,
+} from "@budibase/bbui"
+import { goto, url } from "@roxi/routify"
+import { getContext } from "svelte"
+import { derived } from "svelte/store"
+import DetailPopover from "@/components/common/DetailPopover.svelte"
+import { appStore, rowActions } from "@/stores/builder"
 
-  $goto
-  $url
+$goto
+$url
 
-  const { datasource } = getContext("grid")
+const { datasource } = getContext("grid")
 
-  let popover
-  let createModal
-  let newName
+let popover
+let createModal
+let newName
 
-  $: ds = $datasource
-  $: tableId = ds?.tableId
-  $: viewId = ds?.id
-  $: isView = ds?.type === "viewV2"
-  $: tableRowActions = $rowActions[tableId] || []
-  $: viewRowActions = $rowActions[viewId] || []
-  $: actionCount = isView ? viewRowActions.length : tableRowActions.length
-  $: newNameInvalid = newName && tableRowActions.some(x => x.name === newName)
+$: ds = $datasource
+$: tableId = ds?.tableId
+$: viewId = ds?.id
+$: isView = ds?.type === "viewV2"
+$: tableRowActions = $rowActions[tableId] || []
+$: viewRowActions = $rowActions[viewId] || []
+$: actionCount = isView ? viewRowActions.length : tableRowActions.length
+$: newNameInvalid = newName && tableRowActions.some((x) => x.name === newName)
 
-  const rowActionUrl = derived([url, appStore], ([$url, $appStore]) => {
-    return ({ automationId }) => {
-      return $url(
-        `/builder/workspace/${$appStore.appId}/automation/${automationId}`
-      )
-    }
-  })
-
-  const toggleAction = async (action, enabled) => {
-    if (enabled) {
-      await rowActions.enableView(tableId, action.id, viewId)
-    } else {
-      await rowActions.disableView(tableId, action.id, viewId)
-    }
+const rowActionUrl = derived([url, appStore], ([$url, $appStore]) => {
+  return ({ automationId }) => {
+    return $url(`/builder/workspace/${$appStore.appId}/automation/${automationId}`)
   }
+})
 
-  const showCreateModal = () => {
-    newName = null
-    popover.hide()
-    createModal.show()
+const toggleAction = async (action, enabled) => {
+  if (enabled) {
+    await rowActions.enableView(tableId, action.id, viewId)
+  } else {
+    await rowActions.disableView(tableId, action.id, viewId)
   }
+}
 
-  const createRowAction = async () => {
-    try {
-      const newRowAction = await rowActions.createRowAction(
-        tableId,
-        viewId,
-        newName
-      )
-      notifications.success("Row action created successfully")
-      $goto($rowActionUrl(newRowAction))
-    } catch (error) {
-      console.error(error)
-      notifications.error("Error creating row action")
-    }
+const showCreateModal = () => {
+  newName = null
+  popover.hide()
+  createModal.show()
+}
+
+const createRowAction = async () => {
+  try {
+    const newRowAction = await rowActions.createRowAction(tableId, viewId, newName)
+    notifications.success("Row action created successfully")
+    $goto($rowActionUrl(newRowAction))
+  } catch (error) {
+    console.error(error)
+    notifications.error("Error creating row action")
   }
+}
 </script>
 
 <DetailPopover title="Row actions" bind:this={popover}>

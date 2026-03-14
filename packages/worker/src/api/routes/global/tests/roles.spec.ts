@@ -1,9 +1,9 @@
 import { context, db, roles } from "@budibase/backend-core"
 import {
   BuiltinPermissionID,
-  Database,
-  WithoutDocMetadata,
-  Workspace,
+  type Database,
+  type WithoutDocMetadata,
+  type Workspace,
 } from "@budibase/types"
 import { structures, TestConfiguration } from "../../../../tests"
 
@@ -35,9 +35,7 @@ async function addAppMetadata() {
   })
 }
 
-async function updateAppMetadata(
-  update: Partial<WithoutDocMetadata<Workspace>>
-) {
+async function updateAppMetadata(update: Partial<WithoutDocMetadata<Workspace>>) {
   const app = await workspaceDb.get("app_metadata")
   await workspaceDb.put({
     ...app,
@@ -85,57 +83,59 @@ describe("/api/global/roles", () => {
       const res = await config.api.roles.get()
       expect(res.body).toBeDefined()
       expect(res.body[workspaceId].roles.length).toEqual(5)
-      expect(res.body[workspaceId].roles.map((r: any) => r._id)).toContain(
-        ROLE_NAME
-      )
+      expect(res.body[workspaceId].roles.map((r: any) => r._id)).toContain(ROLE_NAME)
     })
 
-    it.each(["3.0.0", "3.0.1", "3.1.0", "3.0.0+2146.b125a7c"])(
-      "exclude POWER roles after v3 (%s)",
-      async creationVersion => {
-        await updateAppMetadata({ creationVersion })
-        const res = await config.api.roles.get()
-        expect(res.body).toBeDefined()
-        expect(res.body[workspaceId].roles.map((r: any) => r._id)).toEqual([
-          ROLE_NAME,
-          roles.BUILTIN_ROLE_IDS.ADMIN,
-          roles.BUILTIN_ROLE_IDS.BASIC,
-          roles.BUILTIN_ROLE_IDS.PUBLIC,
-        ])
-      }
-    )
+    it.each([
+      "3.0.0",
+      "3.0.1",
+      "3.1.0",
+      "3.0.0+2146.b125a7c",
+    ])("exclude POWER roles after v3 (%s)", async (creationVersion) => {
+      await updateAppMetadata({ creationVersion })
+      const res = await config.api.roles.get()
+      expect(res.body).toBeDefined()
+      expect(res.body[workspaceId].roles.map((r: any) => r._id)).toEqual([
+        ROLE_NAME,
+        roles.BUILTIN_ROLE_IDS.ADMIN,
+        roles.BUILTIN_ROLE_IDS.BASIC,
+        roles.BUILTIN_ROLE_IDS.PUBLIC,
+      ])
+    })
 
-    it.each(["2.9.0", "1.0.0", "0.0.0", "2.32.17+2146.b125a7c"])(
-      "include POWER roles before v3 (%s)",
-      async creationVersion => {
-        await updateAppMetadata({ creationVersion })
-        const res = await config.api.roles.get()
-        expect(res.body).toBeDefined()
-        expect(res.body[workspaceId].roles.map((r: any) => r._id)).toEqual([
-          ROLE_NAME,
-          roles.BUILTIN_ROLE_IDS.ADMIN,
-          roles.BUILTIN_ROLE_IDS.POWER,
-          roles.BUILTIN_ROLE_IDS.BASIC,
-          roles.BUILTIN_ROLE_IDS.PUBLIC,
-        ])
-      }
-    )
+    it.each([
+      "2.9.0",
+      "1.0.0",
+      "0.0.0",
+      "2.32.17+2146.b125a7c",
+    ])("include POWER roles before v3 (%s)", async (creationVersion) => {
+      await updateAppMetadata({ creationVersion })
+      const res = await config.api.roles.get()
+      expect(res.body).toBeDefined()
+      expect(res.body[workspaceId].roles.map((r: any) => r._id)).toEqual([
+        ROLE_NAME,
+        roles.BUILTIN_ROLE_IDS.ADMIN,
+        roles.BUILTIN_ROLE_IDS.POWER,
+        roles.BUILTIN_ROLE_IDS.BASIC,
+        roles.BUILTIN_ROLE_IDS.PUBLIC,
+      ])
+    })
 
-    it.each(["invalid", ""])(
-      "include POWER roles when the version is corrupted (%s)",
-      async creationVersion => {
-        await updateAppMetadata({ creationVersion })
-        const res = await config.api.roles.get()
+    it.each([
+      "invalid",
+      "",
+    ])("include POWER roles when the version is corrupted (%s)", async (creationVersion) => {
+      await updateAppMetadata({ creationVersion })
+      const res = await config.api.roles.get()
 
-        expect(res.body[workspaceId].roles.map((r: any) => r._id)).toEqual([
-          ROLE_NAME,
-          roles.BUILTIN_ROLE_IDS.ADMIN,
-          roles.BUILTIN_ROLE_IDS.POWER,
-          roles.BUILTIN_ROLE_IDS.BASIC,
-          roles.BUILTIN_ROLE_IDS.PUBLIC,
-        ])
-      }
-    )
+      expect(res.body[workspaceId].roles.map((r: any) => r._id)).toEqual([
+        ROLE_NAME,
+        roles.BUILTIN_ROLE_IDS.ADMIN,
+        roles.BUILTIN_ROLE_IDS.POWER,
+        roles.BUILTIN_ROLE_IDS.BASIC,
+        roles.BUILTIN_ROLE_IDS.PUBLIC,
+      ])
+    })
   })
 
   describe("GET api/global/roles/:appId", () => {
@@ -149,21 +149,16 @@ describe("/api/global/roles", () => {
   describe("DELETE /api/global/roles/:appId", () => {
     async function createBuilderUser(forWorkspaces: string[] = []) {
       const builderUser = structures.users.builderUser()
-      builderUser.builder.apps = [
-        ...(builderUser.builder.apps || []),
-        ...forWorkspaces,
-      ]
+      builderUser.builder.apps = [...(builderUser.builder.apps || []), ...forWorkspaces]
 
       const saveResponse = await config.api.users.saveUser(builderUser, 200)
-      const { body: user } = await config.api.users.getUser(
-        saveResponse.body._id
-      )
+      const { body: user } = await config.api.users.getUser(saveResponse.body._id)
       await config.login(user)
       return user
     }
 
     it("removes an app role", async () => {
-      let user = structures.users.user()
+      const user = structures.users.user()
       user.roles = {
         app_test: "role1",
       }
@@ -189,9 +184,7 @@ describe("/api/global/roles", () => {
       const res = await config.withUser(builderUser, () =>
         config.api.roles.remove(workspaceId, { status: 403 })
       )
-      expect(res.body.message).toBe(
-        "Workspace Admin/Builder user only endpoint."
-      )
+      expect(res.body.message).toBe("Workspace Admin/Builder user only endpoint.")
     })
   })
 })

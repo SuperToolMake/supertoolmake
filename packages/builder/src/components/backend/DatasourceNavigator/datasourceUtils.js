@@ -1,5 +1,5 @@
-import { TableNames } from "@/constants"
 import { INTERNAL_TABLE_SOURCE_ID } from "@budibase/types"
+import { TableNames } from "@/constants"
 
 const showDatasourceOpen = ({
   selected,
@@ -25,13 +25,7 @@ const showDatasourceOpen = ({
   return selected || containsSelected
 }
 
-const containsActiveEntity = (
-  datasource,
-  params,
-  isActive,
-  tables,
-  queries
-) => {
+const containsActiveEntity = (datasource, params, isActive, tables, queries) => {
   // Check for being on a datasource page
   if (params.datasourceId === datasource._id) {
     return true
@@ -47,7 +41,7 @@ const containsActiveEntity = (
 
   // Check for a matching query
   if (params.queryId) {
-    const query = queries.list?.find(q => q._id === params.queryId)
+    const query = queries.list?.find((q) => q._id === params.queryId)
     return datasource._id === query?.datasourceId
   }
 
@@ -65,7 +59,7 @@ const containsActiveEntity = (
   // Check for a matching table
   if (params.tableId) {
     const selectedTable = tables.selected?._id
-    return options.find(x => x._id === selectedTable) != null
+    return options.find((x) => x._id === selectedTable) != null
   }
 }
 
@@ -77,7 +71,7 @@ export const enrichDatasources = (
   queries,
   toggledDatasources,
   searchTerm,
-  datasourceFilter = _ => true
+  datasourceFilter = (_) => true
 ) => {
   if (!datasources?.list?.length) {
     return []
@@ -89,25 +83,14 @@ export const enrichDatasources = (
   }
 
   const onlySource = datasourceList.length === 1
-  return datasourceList.map(datasource => {
-    const selected =
-      isActive("./datasource") &&
-      datasources.selectedDatasourceId === datasource._id
-    const containsSelected = containsActiveEntity(
-      datasource,
-      params,
-      isActive,
-      tables,
-      queries
-    )
+  return datasourceList.map((datasource) => {
+    const selected = isActive("./datasource") && datasources.selectedDatasourceId === datasource._id
+    const containsSelected = containsActiveEntity(datasource, params, isActive, tables, queries)
 
     const dsTables = tables.list.filter(
-      table =>
-        table.sourceId === datasource._id && table._id !== TableNames.USERS
+      (table) => table.sourceId === datasource._id && table._id !== TableNames.USERS
     )
-    const dsQueries = queries.list.filter(
-      query => query.datasourceId === datasource._id
-    )
+    const dsQueries = queries.list.filter((query) => query.datasourceId === datasource._id)
 
     const open = showDatasourceOpen({
       selected,
@@ -118,26 +101,18 @@ export const enrichDatasources = (
     })
 
     const visibleDsQueries = dsQueries.filter(
-      q =>
-        !searchTerm ||
-        q.name?.toLowerCase()?.indexOf(searchTerm.toLowerCase()) > -1
+      (q) => !searchTerm || q.name?.toLowerCase()?.indexOf(searchTerm.toLowerCase()) > -1
     )
 
     const visibleDsTables = dsTables
-      .map(t => ({
+      .map((t) => ({
         ...t,
       }))
       .filter(
-        table =>
-          !searchTerm ||
-          table.name?.toLowerCase()?.indexOf(searchTerm.toLowerCase()) > -1
+        (table) => !searchTerm || table.name?.toLowerCase()?.indexOf(searchTerm.toLowerCase()) > -1
       )
 
-    const show = !!(
-      !searchTerm ||
-      visibleDsQueries.length ||
-      visibleDsTables.length
-    )
+    const show = !!(!searchTerm || visibleDsQueries.length || visibleDsTables.length)
     return {
       ...datasource,
       selected,

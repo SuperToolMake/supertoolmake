@@ -1,18 +1,18 @@
 import {
-  DataFetchOptions,
+  type DataFetchOptions,
   FieldType,
-  Row,
-  SearchFilters,
+  type Row,
+  type SearchFilters,
   SortOrder,
   SortType,
-  TableSchema,
+  type TableSchema,
 } from "@budibase/types"
 import cloneDeep from "lodash/fp/cloneDeep"
-import { derived, get, Readable, writable, Writable } from "svelte/store"
-import { DataFetchType } from "."
-import { APIClient } from "../api/types"
+import { derived, get, type Readable, type Writable, writable } from "svelte/store"
+import type { APIClient } from "../api/types"
 import { QueryUtils } from "../utils"
 import { convertJSONSchemaToTableSchema } from "../utils/json"
+import type { DataFetchType } from "."
 
 const { buildQuery, limit: queryLimit, runQuery, sort } = QueryUtils
 
@@ -157,7 +157,7 @@ export default abstract class BaseDataFetch<
     this.prevPage = this.prevPage.bind(this)
 
     // Derive certain properties to return
-    this.derivedStore = derived(this.store, $store => {
+    this.derivedStore = derived(this.store, ($store) => {
       return {
         ...$store,
         ...this.features,
@@ -168,7 +168,7 @@ export default abstract class BaseDataFetch<
 
     // Mark as loaded if we have no datasource
     if (!this.options.datasource) {
-      this.store.update($store => ({ ...$store, loaded: true }))
+      this.store.update(($store) => ({ ...$store, loaded: true }))
       return
     }
   }
@@ -238,10 +238,7 @@ export default abstract class BaseDataFetch<
       // Otherwise determine what sort type to use base on sort column
       this.options.sortType = SortType.STRING
       const fieldSchema = schema?.[this.options.sortColumn]
-      if (
-        fieldSchema?.type === FieldType.NUMBER ||
-        fieldSchema?.type === FieldType.BIGINT
-      ) {
+      if (fieldSchema?.type === FieldType.NUMBER || fieldSchema?.type === FieldType.BIGINT) {
         this.options.sortType = SortType.NUMBER
       }
 
@@ -250,8 +247,7 @@ export default abstract class BaseDataFetch<
         this.options.sortOrder = SortOrder.ASCENDING
       } else {
         // Ensure sortOrder matches the enum
-        this.options.sortOrder =
-          this.options.sortOrder.toLowerCase() as SortOrder
+        this.options.sortOrder = this.options.sortOrder.toLowerCase() as SortOrder
       }
     }
 
@@ -263,7 +259,7 @@ export default abstract class BaseDataFetch<
     }
 
     // Update store
-    this.store.update($store => ({
+    this.store.update(($store) => ({
       ...$store,
       definition,
       schema,
@@ -275,7 +271,7 @@ export default abstract class BaseDataFetch<
 
     // Actually fetch data
     const page = await this.getPage()
-    this.store.update($store => ({
+    this.store.update(($store) => ({
       ...$store,
       loading: false,
       loaded: true,
@@ -362,7 +358,7 @@ export default abstract class BaseDataFetch<
    */
   enrichSchema(schema: TableSchema): TableSchema {
     // Check for any JSON fields so we can add any top level properties
-    let jsonAdditions: Record<string, { type: string; nestedJSON: true }> = {}
+    const jsonAdditions: Record<string, { type: string; nestedJSON: true }> = {}
     for (const fieldKey of Object.keys(schema)) {
       const fieldSchema = schema[fieldKey]
       if (fieldSchema.type === FieldType.JSON) {
@@ -381,23 +377,21 @@ export default abstract class BaseDataFetch<
     }
 
     // Ensure schema is in the correct structure
-    let enrichedSchema: TableSchema = {}
-    Object.entries({ ...schema, ...jsonAdditions }).forEach(
-      ([fieldName, fieldSchema]) => {
-        if (typeof fieldSchema === "string") {
-          enrichedSchema[fieldName] = {
-            type: fieldSchema,
-            name: fieldName,
-          }
-        } else {
-          enrichedSchema[fieldName] = {
-            ...fieldSchema,
-            type: fieldSchema.type as any, // TODO: check type union definition conflicts
-            name: fieldName,
-          }
+    const enrichedSchema: TableSchema = {}
+    Object.entries({ ...schema, ...jsonAdditions }).forEach(([fieldName, fieldSchema]) => {
+      if (typeof fieldSchema === "string") {
+        enrichedSchema[fieldName] = {
+          type: fieldSchema,
+          name: fieldName,
+        }
+      } else {
+        enrichedSchema[fieldName] = {
+          ...fieldSchema,
+          type: fieldSchema.type as any, // TODO: check type union definition conflicts
+          name: fieldName,
         }
       }
-    )
+    })
 
     return enrichedSchema
   }
@@ -453,7 +447,7 @@ export default abstract class BaseDataFetch<
     if (get(this.store).loading) {
       return
     }
-    this.store.update($store => ({ ...$store, loading: true }))
+    this.store.update(($store) => ({ ...$store, loading: true }))
     const { rows, info, error, cursor } = await this.getPage()
 
     let { cursors } = get(this.store)
@@ -461,7 +455,7 @@ export default abstract class BaseDataFetch<
 
     if (!rows.length && pageNumber > 0) {
       // If the full page is gone but we have previous pages, navigate to the previous page
-      this.store.update($store => ({
+      this.store.update(($store) => ({
         ...$store,
         loading: false,
         cursors: cursors.slice(0, pageNumber),
@@ -476,7 +470,7 @@ export default abstract class BaseDataFetch<
       cursors[pageNumber + 1] = cursor
     }
 
-    this.store.update($store => ({
+    this.store.update(($store) => ({
       ...$store,
       rows,
       info,
@@ -492,9 +486,7 @@ export default abstract class BaseDataFetch<
    * @param state the current store state
    * @return {boolean} whether there is a next page of data or not
    */
-  private hasNextPage(
-    state: DataFetchStore<TDefinition, TQuery, TRow>
-  ): boolean {
+  private hasNextPage(state: DataFetchStore<TDefinition, TQuery, TRow>): boolean {
     return state.cursors[state.pageNumber + 1] != null
   }
 
@@ -519,7 +511,7 @@ export default abstract class BaseDataFetch<
 
     // Fetch next page
     const nextCursor = state.cursors[state.pageNumber + 1]
-    this.store.update($store => ({
+    this.store.update(($store) => ({
       ...$store,
       loading: true,
       cursor: nextCursor,
@@ -528,8 +520,8 @@ export default abstract class BaseDataFetch<
     const { rows, info, hasNextPage, cursor, error } = await this.getPage()
 
     // Update state
-    this.store.update($store => {
-      let { cursors, pageNumber } = $store
+    this.store.update(($store) => {
+      const { cursors, pageNumber } = $store
       if (hasNextPage) {
         cursors[pageNumber + 1] = cursor
       }
@@ -555,7 +547,7 @@ export default abstract class BaseDataFetch<
 
     // Fetch previous page
     const prevCursor = state.cursors[state.pageNumber - 1]
-    this.store.update($store => ({
+    this.store.update(($store) => ({
       ...$store,
       loading: true,
       cursor: prevCursor,
@@ -564,7 +556,7 @@ export default abstract class BaseDataFetch<
     const { rows, info, error } = await this.getPage()
 
     // Update state
-    this.store.update($store => {
+    this.store.update(($store) => {
       return {
         ...$store,
         rows,

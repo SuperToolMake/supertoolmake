@@ -1,11 +1,11 @@
+import { Helpers } from "@budibase/bbui"
 import {
   BBReferenceFieldSubType,
-  FieldSchema,
+  type FieldSchema,
   FieldType,
-  Row,
-  TableSchema,
+  type Row,
+  type TableSchema,
 } from "@budibase/types"
-import { Helpers } from "@budibase/bbui"
 
 // Singleton formatter to save us creating one every time
 const NumberFormatter = Intl.NumberFormat()
@@ -57,8 +57,8 @@ const stringifyField = (value: any, schema: FieldSchema): string => {
       }
       const arrayValue = Array.isArray(value) ? value : [value]
       return arrayValue
-        .map(x => x.primaryDisplay)
-        .filter(x => !!x)
+        .map((x) => x.primaryDisplay)
+        .filter((x) => !!x)
         .join(", ")
     }
 
@@ -117,12 +117,9 @@ const stringifyField = (value: any, schema: FieldSchema): string => {
 // Stringifies every property of a row, ensuring they are all human-readable
 // strings for display
 export const stringifyRow = (row: Row, schema: TableSchema): StringifiedRow => {
-  let stringified: StringifiedRow = {}
+  const stringified: StringifiedRow = {}
   Object.entries(schema).forEach(([field, fieldSchema]) => {
-    stringified[field] = stringifyField(
-      Helpers.deepGet(row, field),
-      fieldSchema
-    )
+    stringified[field] = stringifyField(Helpers.deepGet(row, field), fieldSchema)
   })
   return stringified
 }

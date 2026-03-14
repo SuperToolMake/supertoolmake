@@ -1,59 +1,55 @@
 <script>
-  import { Heading, Layout } from "@budibase/bbui"
-  import KeyValueBuilder from "@/components/integration/KeyValueBuilder.svelte"
-  import ViewDynamicVariables from "./ViewDynamicVariables.svelte"
-  import { queries } from "@/stores/builder"
-  import { cloneDeep, isEqual } from "lodash/fp"
-  import Panel from "../Panel.svelte"
+import { Heading, Layout } from "@budibase/bbui"
+import { cloneDeep, isEqual } from "lodash/fp"
+import KeyValueBuilder from "@/components/integration/KeyValueBuilder.svelte"
+import { queries } from "@/stores/builder"
+import Panel from "../Panel.svelte"
+import ViewDynamicVariables from "./ViewDynamicVariables.svelte"
 
-  export let datasource
-  export let updatedDatasource
-  export let markDirty
+export let datasource
+export let updatedDatasource
+export let markDirty
 
-  // Use parent-provided updatedDatasource when available
-  $: localUpdatedDatasource = updatedDatasource ?? cloneDeep(datasource)
+// Use parent-provided updatedDatasource when available
+$: localUpdatedDatasource = updatedDatasource ?? cloneDeep(datasource)
 
-  $: queriesForDatasource = $queries.list.filter(
-    query => query.datasourceId === datasource?._id
-  )
+$: queriesForDatasource = $queries.list.filter((query) => query.datasourceId === datasource?._id)
 
-  const getTemplateStaticVariableKeys = datasource => {
-    if (!datasource?.restTemplate) {
-      return []
-    }
-    const configured = datasource?.config?.templateStaticVariables || []
-    return Array.from(new Set(configured.filter(Boolean)))
+const getTemplateStaticVariableKeys = (datasource) => {
+  if (!datasource?.restTemplate) {
+    return []
   }
+  const configured = datasource?.config?.templateStaticVariables || []
+  return Array.from(new Set(configured.filter(Boolean)))
+}
 
-  const buildStaticVariablesObject = values => {
-    const next = {}
-    values.forEach(({ name, value }) => {
-      const key = (name ?? "").toString().trim()
-      const valStr = value?.toString?.() || ""
-      const val = valStr.trim()
-      if (key !== "" || val !== "") {
-        next[key] = value
-      }
-    })
-    return next
-  }
-
-  const handleStaticChange = newUnparsedStaticVariables => {
-    if (!localUpdatedDatasource) {
-      return
+const buildStaticVariablesObject = (values) => {
+  const next = {}
+  values.forEach(({ name, value }) => {
+    const key = (name ?? "").toString().trim()
+    const valStr = value?.toString?.() || ""
+    const val = valStr.trim()
+    if (key !== "" || val !== "") {
+      next[key] = value
     }
-    localUpdatedDatasource.config = localUpdatedDatasource.config || {}
-    const prev = localUpdatedDatasource.config.staticVariables || {}
-    const newStaticVariables = buildStaticVariablesObject(
-      newUnparsedStaticVariables
-    )
-    if (!isEqual(prev, newStaticVariables)) {
-      localUpdatedDatasource.config.staticVariables = newStaticVariables
-      markDirty && markDirty()
-    }
-  }
+  })
+  return next
+}
 
-  $: templateStaticVariableKeys = getTemplateStaticVariableKeys(datasource)
+const handleStaticChange = (newUnparsedStaticVariables) => {
+  if (!localUpdatedDatasource) {
+    return
+  }
+  localUpdatedDatasource.config = localUpdatedDatasource.config || {}
+  const prev = localUpdatedDatasource.config.staticVariables || {}
+  const newStaticVariables = buildStaticVariablesObject(newUnparsedStaticVariables)
+  if (!isEqual(prev, newStaticVariables)) {
+    localUpdatedDatasource.config.staticVariables = newStaticVariables
+    markDirty && markDirty()
+  }
+}
+
+$: templateStaticVariableKeys = getTemplateStaticVariableKeys(datasource)
 </script>
 
 <Panel>

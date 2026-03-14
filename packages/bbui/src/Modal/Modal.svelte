@@ -1,10 +1,10 @@
 <script lang="ts" context="module">
-  export interface ModalAPI {
-    show: () => void
-    hide: () => void
-    toggle: () => void
-    cancel: (_: ModalCancelFrom) => void
-  }
+export interface ModalAPI {
+  show: () => void
+  hide: () => void
+  toggle: () => void
+  cancel: (_: ModalCancelFrom) => void
+}
 </script>
 
 <script lang="ts">

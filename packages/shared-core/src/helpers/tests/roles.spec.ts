@@ -1,5 +1,5 @@
+import { BuiltinPermissionID, type Role } from "@budibase/types"
 import { checkForRoleInheritanceLoops } from "../roles"
-import { BuiltinPermissionID, Role } from "@budibase/types"
 
 /**
  * This unit test exists as this utility will be used in the frontend and backend, confirmation
@@ -51,10 +51,7 @@ describe("role utilities", () => {
     it("should confirm there is a loop", () => {
       const role3 = role("role_3", [role2._id])
       const role4 = role("role_4", [role3._id, role2._id, role1._id])
-      role3.inherits = [
-        ...(Array.isArray(role3.inherits) ? role3.inherits : []),
-        role4._id,
-      ]
+      role3.inherits = [...(Array.isArray(role3.inherits) ? role3.inherits : []), role4._id]
       check(true)
     })
 

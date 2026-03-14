@@ -1,50 +1,50 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte"
-  import IndicatorSet from "./IndicatorSet.svelte"
-  import { dndIsDragging, hoverStore, builderStore } from "@/stores"
+import { onDestroy, onMount } from "svelte"
+import { builderStore, dndIsDragging, hoverStore } from "@/stores"
+import IndicatorSet from "./IndicatorSet.svelte"
 
-  $: componentId = $hoverStore.hoveredComponentId
-  $: selectedComponentId = $builderStore.selectedComponentId
-  $: selected = componentId === selectedComponentId
+$: componentId = $hoverStore.hoveredComponentId
+$: selectedComponentId = $builderStore.selectedComponentId
+$: selected = componentId === selectedComponentId
 
-  const onMouseOver = (e: MouseEvent) => {
-    const target = e.target as HTMLElement
+const onMouseOver = (e: MouseEvent) => {
+  const target = e.target as HTMLElement
 
-    // Ignore if dragging
-    if (e.buttons > 0) {
-      return
-    }
+  // Ignore if dragging
+  if (e.buttons > 0) {
+    return
+  }
 
-    let newId
-    if (target.classList.contains("anchor")) {
-      // Handle resize anchors
-      newId = target.dataset.id
-    } else {
-      // Handle normal components
-      const element = target.closest(".interactive.component:not(.root)")
-      if (element instanceof HTMLElement) {
-        newId = element.dataset?.id
-      }
-    }
-
-    if (newId !== componentId) {
-      hoverStore.actions.hoverComponent(newId)
+  let newId
+  if (target.classList.contains("anchor")) {
+    // Handle resize anchors
+    newId = target.dataset.id
+  } else {
+    // Handle normal components
+    const element = target.closest(".interactive.component:not(.root)")
+    if (element instanceof HTMLElement) {
+      newId = element.dataset?.id
     }
   }
 
-  const onMouseLeave = () => {
-    hoverStore.actions.hoverComponent(null)
+  if (newId !== componentId) {
+    hoverStore.actions.hoverComponent(newId)
   }
+}
 
-  onMount(() => {
-    document.addEventListener("mouseover", onMouseOver)
-    document.body.addEventListener("mouseleave", onMouseLeave)
-  })
+const onMouseLeave = () => {
+  hoverStore.actions.hoverComponent(null)
+}
 
-  onDestroy(() => {
-    document.removeEventListener("mouseover", onMouseOver)
-    document.body.removeEventListener("mouseleave", onMouseLeave)
-  })
+onMount(() => {
+  document.addEventListener("mouseover", onMouseOver)
+  document.body.addEventListener("mouseleave", onMouseLeave)
+})
+
+onDestroy(() => {
+  document.removeEventListener("mouseover", onMouseOver)
+  document.body.removeEventListener("mouseleave", onMouseLeave)
+})
 </script>
 
 {#if !$dndIsDragging && componentId}

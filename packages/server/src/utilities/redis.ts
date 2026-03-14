@@ -1,14 +1,13 @@
-import { redis, RedisClient } from "@budibase/backend-core"
+import { type RedisClient, redis } from "@budibase/backend-core"
+import type { ContextUser } from "@budibase/types"
+import type Redis from "ioredis"
+import type { Cluster } from "ioredis"
 import { getGlobalIDFromUserMetadataID } from "../db/utils"
-import { ContextUser } from "@budibase/types"
 import env from "../environment"
-import Redis, { Cluster } from "ioredis"
 
 const APP_DEV_LOCK_SECONDS = 600
 const AUTOMATION_TEST_FLAG_SECONDS = 60
-let devAppClient: RedisClient,
-  debounceClient: RedisClient,
-  flagClient: RedisClient
+let devAppClient: RedisClient, debounceClient: RedisClient, flagClient: RedisClient
 
 // We need to maintain a duplicate client for socket.io pub/sub
 let socketClient: RedisClient
@@ -17,14 +16,12 @@ let socketSubClient: Redis | Cluster
 // We init this as we want to keep the connection open all the time
 // reduces the performance hit
 export async function init() {
-  ;[devAppClient, debounceClient, flagClient, socketClient] = await Promise.all(
-    [
-      redis.Client.init(redis.utils.Databases.DEV_LOCKS),
-      redis.Client.init(redis.utils.Databases.DEBOUNCE),
-      redis.Client.init(redis.utils.Databases.FLAGS),
-      redis.clients.getSocketClient(),
-    ]
-  )
+  ;[devAppClient, debounceClient, flagClient, socketClient] = await Promise.all([
+    redis.Client.init(redis.utils.Databases.DEV_LOCKS),
+    redis.Client.init(redis.utils.Databases.DEBOUNCE),
+    redis.Client.init(redis.utils.Databases.FLAGS),
+    redis.clients.getSocketClient(),
+  ])
 
   // Duplicate the socket client for pub/sub
   if (!env.isTest()) {

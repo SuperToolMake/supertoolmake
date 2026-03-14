@@ -1,13 +1,10 @@
 import { HTTPError } from "@budibase/backend-core"
-import { IncludeRelationship, Operation, Row, Table } from "@budibase/types"
+import { IncludeRelationship, Operation, type Row, type Table } from "@budibase/types"
 import cloneDeep from "lodash/fp/cloneDeep"
-import sdk from "../.."
 import { handleRequest } from "../../../api/controllers/row/external"
 import { breakRowIdField } from "../../../integrations/utils"
-import {
-  inputProcessing,
-  outputProcessing,
-} from "../../../utilities/rowProcessor"
+import { inputProcessing, outputProcessing } from "../../../utilities/rowProcessor"
+import sdk from "../.."
 
 export async function getRow(
   sourceId: string | Table,
@@ -30,13 +27,9 @@ export async function getRow(
   return rows[0]
 }
 
-export async function save(
-  sourceId: string,
-  inputs: Row,
-  userId: string | undefined
-) {
+export async function save(sourceId: string, inputs: Row, userId: string | undefined) {
   const tableId = sourceId
-  let source: Table = await sdk.tables.getTable(tableId)
+  const source: Table = await sdk.tables.getTable(tableId)
 
   const row = await inputProcessing(userId, cloneDeep(source), inputs)
 
@@ -70,7 +63,7 @@ export async function save(
 }
 
 export async function find(tableId: string, rowId: string): Promise<Row> {
-  let source: Table = await sdk.tables.getTable(tableId)
+  const source: Table = await sdk.tables.getTable(tableId)
   const row = await getRow(source, rowId, {
     relationships: true,
   })

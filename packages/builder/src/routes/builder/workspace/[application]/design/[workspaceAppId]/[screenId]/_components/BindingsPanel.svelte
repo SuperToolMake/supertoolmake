@@ -1,70 +1,60 @@
 <script lang="ts">
-  import { onMount } from "svelte"
-  import { Helpers, notifications } from "@budibase/bbui"
-  import { processObjectSync } from "@budibase/string-templates"
-  import {
-    previewStore,
-    selectedScreen,
-    componentStore,
-    snippets,
-  } from "@/stores/builder"
-  import { getBindableProperties } from "@/dataBinding"
-  import JSONViewer, {
-    type JSONViewerClickEvent,
-  } from "@/components/common/JSONViewer.svelte"
+import { Helpers, notifications } from "@budibase/bbui"
+import { processObjectSync } from "@budibase/string-templates"
+import { onMount } from "svelte"
+import JSONViewer, { type JSONViewerClickEvent } from "@/components/common/JSONViewer.svelte"
+import { getBindableProperties } from "@/dataBinding"
+import { componentStore, previewStore, selectedScreen, snippets } from "@/stores/builder"
 
-  // Minimal typing for the real data binding structure, as none exists
-  type DataBinding = {
-    category: string
-    runtimeBinding: string
-    readableBinding: string
-  }
+// Minimal typing for the real data binding structure, as none exists
+type DataBinding = {
+  category: string
+  runtimeBinding: string
+  readableBinding: string
+}
 
-  $: previewContext = $previewStore.selectedComponentContext || {}
-  $: selectedComponentId = $componentStore.selectedComponentId
-  $: context = makeContext(previewContext, bindings)
-  $: bindings = getBindableProperties($selectedScreen, selectedComponentId)
+$: previewContext = $previewStore.selectedComponentContext || {}
+$: selectedComponentId = $componentStore.selectedComponentId
+$: context = makeContext(previewContext, bindings)
+$: bindings = getBindableProperties($selectedScreen, selectedComponentId)
 
-  const makeContext = (
-    previewContext: Record<string, any>,
-    bindings: DataBinding[]
-  ) => {
-    // Create a single big array to enrich in one go
-    const bindingStrings = bindings.map(binding => {
-      if (binding.runtimeBinding.startsWith('trim "')) {
-        // Account for nasty hardcoded HBS bindings for roles, for legacy
-        // compatibility
-        return `{{ ${binding.runtimeBinding} }}`
-      } else {
-        return `{{ literal ${binding.runtimeBinding} }}`
-      }
-    })
-    const bindingEvaluations = processObjectSync(bindingStrings, {
-      ...previewContext,
-      snippets: $snippets,
-    }) as any[]
-
-    // Deeply set values for all readable bindings
-    const enrichedBindings: any[] = bindings.map((binding, idx) => {
-      return {
-        ...binding,
-        value: bindingEvaluations[idx],
-      }
-    })
-    let context = {}
-    for (let binding of enrichedBindings) {
-      Helpers.deepSet(context, binding.readableBinding, binding.value)
+const makeContext = (previewContext: Record<string, any>, bindings: DataBinding[]) => {
+  // Create a single big array to enrich in one go
+  const bindingStrings = bindings.map((binding) => {
+    if (binding.runtimeBinding.startsWith('trim "')) {
+      // Account for nasty hardcoded HBS bindings for roles, for legacy
+      // compatibility
+      return `{{ ${binding.runtimeBinding} }}`
+    } else {
+      return `{{ literal ${binding.runtimeBinding} }}`
     }
-    return context
-  }
+  })
+  const bindingEvaluations = processObjectSync(bindingStrings, {
+    ...previewContext,
+    snippets: $snippets,
+  }) as any[]
 
-  const copyBinding = (e: JSONViewerClickEvent) => {
-    const readableBinding = `{{ ${e.detail.path.join(".")} }}`
-    Helpers.copyToClipboard(readableBinding)
-    notifications.success("Binding copied to clipboard")
+  // Deeply set values for all readable bindings
+  const enrichedBindings: any[] = bindings.map((binding, idx) => {
+    return {
+      ...binding,
+      value: bindingEvaluations[idx],
+    }
+  })
+  let context = {}
+  for (let binding of enrichedBindings) {
+    Helpers.deepSet(context, binding.readableBinding, binding.value)
   }
+  return context
+}
 
-  onMount(previewStore.requestComponentContext)
+const copyBinding = (e: JSONViewerClickEvent) => {
+  const readableBinding = `{{ ${e.detail.path.join(".")} }}`
+  Helpers.copyToClipboard(readableBinding)
+  notifications.success("Binding copied to clipboard")
+}
+
+onMount(previewStore.requestComponentContext)
 </script>
 
 <div class="bindings-panel">

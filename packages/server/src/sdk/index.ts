@@ -1,5 +1,6 @@
 import * as dev from "./dev"
 import { default as users } from "./users"
+import { default as backups } from "./workspace/backups"
 import * as common from "./workspace/common"
 import { default as datasources } from "./workspace/datasources"
 import { default as deployment } from "./workspace/deployment"
@@ -15,7 +16,6 @@ import * as screens from "./workspace/screens"
 import { default as tables } from "./workspace/tables"
 import * as workspaceApps from "./workspace/workspaceApps"
 import { default as workspaces } from "./workspace/workspaces"
-import { default as backups } from "./workspace/backups"
 
 const sdk = {
   backups,

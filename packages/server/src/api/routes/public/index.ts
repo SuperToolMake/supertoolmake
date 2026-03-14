@@ -1,4 +1,4 @@
-import { CtxFn, middleware, redis } from "@budibase/backend-core"
+import { type CtxFn, middleware, redis } from "@budibase/backend-core"
 import { SelectableDatabase } from "@budibase/backend-core/src/redis/utils"
 import { PermissionLevel, PermissionType } from "@budibase/types"
 import cors from "@koa/cors"
@@ -15,6 +15,7 @@ import rowEndpoints from "./rows"
 import tableEndpoints from "./tables"
 import userEndpoints from "./users"
 import workspaceEndpoints from "./workspaces"
+
 // below imports don't have declaration files
 const Router = require("@koa/router")
 const { RateLimit, Stores } = require("koa2-ratelimit")
@@ -45,7 +46,7 @@ if (!env.DISABLE_RATE_LIMITING) {
 
   if (!env.isTest()) {
     const { password, host, port } = redis.utils.getRedisConnectionDetails()
-    let options: KoaRateLimitOptions = {
+    const options: KoaRateLimitOptions = {
       socket: {
         host: host,
         port: port,
@@ -95,7 +96,7 @@ function addMiddleware(
   if (!Array.isArray(endpoints)) {
     endpoints = [endpoints]
   }
-  for (let endpoint of endpoints) {
+  for (const endpoint of endpoints) {
     if (opts?.output) {
       endpoint.addOutputMiddleware(middleware)
     } else {
@@ -106,7 +107,7 @@ function addMiddleware(
 
 function addToRouter(endpoints: any) {
   if (endpoints) {
-    for (let endpoint of endpoints) {
+    for (const endpoint of endpoints) {
       endpoint.apply(publicRouter)
     }
   }
@@ -129,8 +130,7 @@ function applyRoutes(
     ? paramSubResource(resource, subResource)
     : paramResource(resource)
   const publicApiMiddleware = publicApi({
-    requiresAppId:
-      permType !== PermissionType.WORKSPACE && permType !== PermissionType.USER,
+    requiresAppId: permType !== PermissionType.WORKSPACE && permType !== PermissionType.USER,
   })
   addMiddleware(endpoints.read, publicApiMiddleware)
   addMiddleware(endpoints.write, publicApiMiddleware)

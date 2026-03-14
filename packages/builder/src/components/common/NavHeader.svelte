@@ -1,42 +1,42 @@
 <script lang="ts">
-  import { tick } from "svelte"
-  import { Icon, Body } from "@budibase/bbui"
-  import { keyUtils } from "@/helpers/keyUtils"
+import { Body, Icon } from "@budibase/bbui"
+import { tick } from "svelte"
+import { keyUtils } from "@/helpers/keyUtils"
 
-  export let title: string
-  export let placeholder: string = ""
-  export let value: string | undefined = undefined
-  export let onAdd: (_e: Event) => void
-  export let search: boolean = false
-  export let searchable = true
-  export let showAddIcon = true
+export let title: string
+export let placeholder: string = ""
+export let value: string | undefined = undefined
+export let onAdd: (_e: Event) => void
+export let search: boolean = false
+export let searchable = true
+export let showAddIcon = true
 
-  let searchInput: HTMLInputElement
+let searchInput: HTMLInputElement
 
-  const openSearch = async () => {
-    search = true
-    await tick()
-    searchInput.focus()
+const openSearch = async () => {
+  search = true
+  await tick()
+  searchInput.focus()
+}
+
+const closeSearch = async () => {
+  search = false
+  value = ""
+}
+
+const onKeyDown = (e: KeyboardEvent) => {
+  if (e.key === "Escape") {
+    closeSearch()
   }
+}
 
-  const closeSearch = async () => {
-    search = false
-    value = ""
+const handleAddButton = (e: Event) => {
+  if (search) {
+    closeSearch()
+  } else {
+    onAdd(e)
   }
-
-  const onKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Escape") {
-      closeSearch()
-    }
-  }
-
-  const handleAddButton = (e: Event) => {
-    if (search) {
-      closeSearch()
-    } else {
-      onAdd(e)
-    }
-  }
+}
 </script>
 
 <svelte:window on:keydown={onKeyDown} />

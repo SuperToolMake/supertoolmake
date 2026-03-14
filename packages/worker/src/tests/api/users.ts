@@ -1,5 +1,5 @@
 import { generator } from "@budibase/backend-core/tests"
-import {
+import type {
   BulkUserRequest,
   BulkUserResponse,
   CreateAdminUserRequest,
@@ -9,7 +9,7 @@ import {
   User,
 } from "@budibase/types"
 import structures from "../structures"
-import { TestAPI, TestAPIOpts } from "./base"
+import { TestAPI, type TestAPIOpts } from "./base"
 
 export class UserAPI extends TestAPI {
   // INVITE
@@ -32,9 +32,7 @@ export class UserAPI extends TestAPI {
 
     const emailCall = sendMailMock.mock.calls[0][0]
     // after this URL there should be a code
-    const parts = emailCall.html.split(
-      "http://localhost:10000/builder/invite?code="
-    )
+    const parts = emailCall.html.split("http://localhost:10000/builder/invite?code=")
     const code = parts[1].split('"')[0].split("&")[0]
     return { code, res }
   }
@@ -96,10 +94,7 @@ export class UserAPI extends TestAPI {
 
   // USER
 
-  createAdminUser = async (
-    request?: CreateAdminUserRequest,
-    opts?: TestAPIOpts
-  ) => {
+  createAdminUser = async (request?: CreateAdminUserRequest, opts?: TestAPIOpts) => {
     if (!request) {
       request = {
         email: structures.email(),
@@ -180,9 +175,7 @@ export class UserAPI extends TestAPI {
       .expect(opts?.status ? opts.status : 200)
   }
 
-  onboardUser = async (
-    req: InviteUsersRequest
-  ): Promise<InviteUsersResponse> => {
+  onboardUser = async (req: InviteUsersRequest): Promise<InviteUsersResponse> => {
     const resp = await this.request
       .post(`/api/global/users/onboard`)
       .send(req)
@@ -191,9 +184,7 @@ export class UserAPI extends TestAPI {
 
     if (resp.status !== 200) {
       throw new Error(
-        `request failed with status ${resp.status} and body ${JSON.stringify(
-          resp.body
-        )}`
+        `request failed with status ${resp.status} and body ${JSON.stringify(resp.body)}`
       )
     }
 
@@ -229,12 +220,7 @@ export class UserAPI extends TestAPI {
       .expect(status)
   }
 
-  addUserToWorkspace = (
-    userId: string,
-    _rev: string,
-    role: string,
-    status = 200
-  ) => {
+  addUserToWorkspace = (userId: string, _rev: string, role: string, status = 200) => {
     return this.request
       .post(`/api/global/users/${userId}/permission/${role}`)
       .send({ _rev })

@@ -3,8 +3,8 @@ import {
   FieldType,
   isRelationshipField,
   RelationshipType,
-  Row,
-  UIFieldSchema,
+  type Row,
+  type UIFieldSchema,
 } from "@budibase/types"
 
 const columnTypeManyTypeOverrides: Partial<Record<FieldType, FieldType>> = {
@@ -31,55 +31,44 @@ const columnTypeManyParser = {
       return parsed
     }
 
-    return value.map(v => parseDate(v))
+    return value.map((v) => parseDate(v))
   },
-  [FieldType.BOOLEAN]: (value: any[]) => value.map(v => !!v),
+  [FieldType.BOOLEAN]: (value: any[]) => value.map((v) => !!v),
   [FieldType.BB_REFERENCE_SINGLE]: (value: any[]) => [
-    ...new Map(value.map(i => [i._id, i])).values(),
+    ...new Map(value.map((i) => [i._id, i])).values(),
   ],
-  [FieldType.BB_REFERENCE]: (value: any[]) => [
-    ...new Map(value.map(i => [i._id, i])).values(),
-  ],
+  [FieldType.BB_REFERENCE]: (value: any[]) => [...new Map(value.map((i) => [i._id, i])).values()],
   [FieldType.ARRAY]: (value: any[]) => Array.from(new Set(value)),
 }
 
 export function enrichSchemaWithRelColumns(
   schema: Record<string, UIFieldSchema>
 ): Record<string, UIFieldSchema> {
-  const result = Object.keys(schema).reduce<Record<string, UIFieldSchema>>(
-    (result, fieldName) => {
-      const field = schema[fieldName]
-      result[fieldName] = field
+  const result = Object.keys(schema).reduce<Record<string, UIFieldSchema>>((result, fieldName) => {
+    const field = schema[fieldName]
+    result[fieldName] = field
 
-      if (
-        field.visible !== false &&
-        isRelationshipField(field) &&
-        field.columns
-      ) {
-        const fromSingle =
-          field?.relationshipType === RelationshipType.ONE_TO_MANY
+    if (field.visible !== false && isRelationshipField(field) && field.columns) {
+      const fromSingle = field?.relationshipType === RelationshipType.ONE_TO_MANY
 
-        for (const relColumn of Object.keys(field.columns)) {
-          const relField = field.columns[relColumn]
-          if (!relField.visible) {
-            continue
-          }
-          const name = `${field.name}.${relColumn}`
-          result[name] = {
-            ...relField,
-            type: relField.type as any, // TODO
-            name,
-            related: { field: fieldName, subField: relColumn },
-            cellRenderType:
-              (!fromSingle && columnTypeManyTypeOverrides[relField.type]) ||
-              relField.type,
-          }
+      for (const relColumn of Object.keys(field.columns)) {
+        const relField = field.columns[relColumn]
+        if (!relField.visible) {
+          continue
+        }
+        const name = `${field.name}.${relColumn}`
+        result[name] = {
+          ...relField,
+          type: relField.type as any, // TODO
+          name,
+          related: { field: fieldName, subField: relColumn },
+          cellRenderType:
+            (!fromSingle && columnTypeManyTypeOverrides[relField.type]) || relField.type,
         }
       }
-      return result
-    },
-    {}
-  )
+    }
+    return result
+  }, {})
 
   return result
 }
@@ -90,8 +79,7 @@ export function getRelatedTableValues(
   fromField: UIFieldSchema
 ) {
   const fromSingle =
-    isRelationshipField(fromField) &&
-    fromField?.relationshipType === RelationshipType.ONE_TO_MANY
+    isRelationshipField(fromField) && fromField?.relationshipType === RelationshipType.ONE_TO_MANY
 
   let result = ""
 

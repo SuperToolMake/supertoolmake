@@ -1,52 +1,52 @@
 <script lang="ts">
-  import { createEventDispatcher, tick } from "svelte"
-  import Icon from "../Icon/Icon.svelte"
-  import Search from "./Search.svelte"
+import { createEventDispatcher, tick } from "svelte"
+import Icon from "../Icon/Icon.svelte"
+import Search from "./Search.svelte"
 
-  export let value: string | undefined = undefined
-  export let placeholder: string | undefined = undefined
-  export let disabled = false
-  export let quiet = false
-  export let updateOnChange = true
-  export let width: string = "220px"
-  export let open = false
-  export let collapseOnBlur = true
-  export let inputRef: HTMLInputElement | undefined = undefined
+export let value: string | undefined = undefined
+export let placeholder: string | undefined = undefined
+export let disabled = false
+export let quiet = false
+export let updateOnChange = true
+export let width: string = "220px"
+export let open = false
+export let collapseOnBlur = true
+export let inputRef: HTMLInputElement | undefined = undefined
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  const handleChange = (event: CustomEvent<string>) => {
-    value = event.detail
-    dispatch("change", event.detail)
+const handleChange = (event: CustomEvent<string>) => {
+  value = event.detail
+  dispatch("change", event.detail)
+}
+
+const handleClear = () => {
+  open = false
+  dispatch("clear")
+}
+
+const openSearch = async () => {
+  if (disabled) {
+    return
   }
+  open = true
+  await tick()
+  inputRef?.focus()
+}
 
-  const handleClear = () => {
-    open = false
-    dispatch("clear")
-  }
-
-  const openSearch = async () => {
-    if (disabled) {
-      return
+const handleBlur = (event: FocusEvent) => {
+  if (collapseOnBlur) {
+    const inputValue = (event.target as HTMLInputElement | null)?.value || ""
+    if (!inputValue.trim()) {
+      open = false
     }
-    open = true
-    await tick()
-    inputRef?.focus()
   }
+  dispatch("blur", event)
+}
 
-  const handleBlur = (event: FocusEvent) => {
-    if (collapseOnBlur) {
-      const inputValue = (event.target as HTMLInputElement | null)?.value || ""
-      if (!inputValue.trim()) {
-        open = false
-      }
-    }
-    dispatch("blur", event)
-  }
-
-  const forwardEvent = (event: Event) => {
-    dispatch(event.type, event)
-  }
+const forwardEvent = (event: Event) => {
+  dispatch(event.type, event)
+}
 </script>
 
 <div class="collapsible-search" style={`--collapsible-search-width: ${width}`}>

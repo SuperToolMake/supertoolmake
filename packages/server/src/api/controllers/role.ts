@@ -1,18 +1,18 @@
 import { context, db as dbCore, Header, roles } from "@budibase/backend-core"
 import { helpers, RoleColor, sdk as sharedSdk } from "@budibase/shared-core"
 import {
-  AccessibleRolesResponse,
+  type AccessibleRolesResponse,
   BuiltinPermissionID,
-  Database,
-  DeleteRoleResponse,
+  type Database,
+  type DeleteRoleResponse,
   DocumentType,
-  FetchRolesResponse,
-  FindRoleResponse,
-  Role,
-  SaveRoleRequest,
-  SaveRoleResponse,
-  UserCtx,
-  UserMetadata,
+  type FetchRolesResponse,
+  type FindRoleResponse,
+  type Role,
+  type SaveRoleRequest,
+  type SaveRoleResponse,
+  type UserCtx,
+  type UserMetadata,
 } from "@budibase/types"
 import { getUserMetadataParams, InternalTables } from "../../db/utils"
 import sdk from "../../sdk"
@@ -26,12 +26,10 @@ const UpdateRolesOptions = {
 async function removeRoleFromOthers(roleId: string) {
   const allOtherRoles = await roles.getAllRoles()
   const updated: Role[] = []
-  for (let role of allOtherRoles) {
+  for (const role of allOtherRoles) {
     let changed = false
     if (Array.isArray(role.inherits)) {
-      const newInherits = role.inherits.filter(
-        id => !roles.roleIDsAreEqual(id, roleId)
-      )
+      const newInherits = role.inherits.filter((id) => !roles.roleIDsAreEqual(id, roleId))
       changed = role.inherits.length !== newInherits.length
       role.inherits = newInherits
     } else if (role.inherits && roles.roleIDsAreEqual(role.inherits, roleId)) {
@@ -59,9 +57,7 @@ async function updateRolesOnUserTable(
     return
   }
   const updatedRoleId =
-    roleVersion === roles.RoleIDVersion.NAME
-      ? roles.getExternalRoleID(roleId, roleVersion)
-      : roleId
+    roleVersion === roles.RoleIDVersion.NAME ? roles.getExternalRoleID(roleId, roleVersion) : roleId
   const indexOfRoleId = constraints.inclusion!.indexOf(updatedRoleId)
   const remove = updateOption === UpdateRolesOptions.REMOVED
   if (remove && indexOfRoleId !== -1) {
@@ -73,7 +69,7 @@ async function updateRolesOnUserTable(
 }
 
 export async function fetch(ctx: UserCtx<void, FetchRolesResponse>) {
-  ctx.body = (await roles.getAllRoles()).map(role => roles.externalRole(role))
+  ctx.body = (await roles.getAllRoles()).map((role) => roles.externalRole(role))
 }
 
 export async function find(ctx: UserCtx<void, FindRoleResponse>) {
@@ -86,8 +82,7 @@ export async function find(ctx: UserCtx<void, FindRoleResponse>) {
 
 export async function save(ctx: UserCtx<SaveRoleRequest, SaveRoleResponse>) {
   const db = context.getWorkspaceDB()
-  let { _id, _rev, name, inherits, permissionId, version, uiMetadata } =
-    ctx.request.body
+  let { _id, _rev, name, inherits, permissionId, version, uiMetadata } = ctx.request.body
   let isCreate = false
   if (!_rev && !version) {
     version = roles.RoleIDVersion.NAME
@@ -108,13 +103,13 @@ export async function save(ctx: UserCtx<SaveRoleRequest, SaveRoleResponse>) {
     _id = dbCore.prefixRoleID(_id)
   }
 
-  const allRoles = (await roles.getAllRoles()).map(role => ({
+  const allRoles = (await roles.getAllRoles()).map((role) => ({
     ...role,
     _id: dbCore.prefixRoleID(role._id!),
   }))
   let dbRole: Role | undefined
   if (!isCreate && _id?.startsWith(DocumentType.ROLE)) {
-    dbRole = allRoles.find(role => role._id === _id)
+    dbRole = allRoles.find((role) => role._id === _id)
   }
   if (dbRole && dbRole.name !== name && isNewVersion) {
     ctx.throw(400, "Cannot change custom role name")
@@ -147,7 +142,7 @@ export async function save(ctx: UserCtx<SaveRoleRequest, SaveRoleResponse>) {
   }
 
   // add the new role to the list and check for loops
-  const index = allRoles.findIndex(r => r._id === role._id)
+  const index = allRoles.findIndex((r) => r._id === role._id)
   if (index === -1) {
     allRoles.push(role)
   } else {
@@ -162,12 +157,7 @@ export async function save(ctx: UserCtx<SaveRoleRequest, SaveRoleResponse>) {
     role._rev = foundRev
   }
   const result = await db.put(role)
-  await updateRolesOnUserTable(
-    db,
-    _id,
-    UpdateRolesOptions.CREATED,
-    role.version
-  )
+  await updateRolesOnUserTable(db, _id, UpdateRolesOptions.CREATED, role.version)
   role._rev = result.rev
   ctx.body = roles.externalRole(role)
 
@@ -180,7 +170,7 @@ export async function save(ctx: UserCtx<SaveRoleRequest, SaveRoleResponse>) {
       target: prodDb.name,
     })
     await replication.replicate({
-      filter: doc => {
+      filter: (doc) => {
         return doc._id && doc._id.startsWith("role_")
       },
     })
@@ -205,19 +195,14 @@ export async function destroy(ctx: UserCtx<void, DeleteRoleResponse>) {
         include_docs: true,
       })
     )
-  ).rows.map(row => row.doc!)
-  const usersWithRole = users.filter(user => user.roleId === roleId)
+  ).rows.map((row) => row.doc!)
+  const usersWithRole = users.filter((user) => user.roleId === roleId)
   if (usersWithRole.length !== 0) {
     ctx.throw(400, "Cannot delete role when it is in use.")
   }
 
   await db.remove(roleId, ctx.params.rev)
-  await updateRolesOnUserTable(
-    db,
-    ctx.params.roleId,
-    UpdateRolesOptions.REMOVED,
-    role.version
-  )
+  await updateRolesOnUserTable(db, ctx.params.roleId, UpdateRolesOptions.REMOVED, role.version)
 
   // clean up inherits
   await removeRoleFromOthers(roleId)
@@ -249,5 +234,5 @@ export async function accessible(ctx: UserCtx<void, AccessibleRolesResponse>) {
     roleIds = await roles.getUserRoleIdHierarchy(roleId!)
   }
 
-  ctx.body = roleIds.map(roleId => roles.getExternalRoleID(roleId))
+  ctx.body = roleIds.map((roleId) => roles.getExternalRoleID(roleId))
 }

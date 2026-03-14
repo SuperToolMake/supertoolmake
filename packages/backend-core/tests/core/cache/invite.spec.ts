@@ -20,7 +20,7 @@ describe("invite cache", () => {
   })
 
   it("stores invites in tenant list and retrieves", async () => {
-    await testEnv.withTenant(async tenantId => {
+    await testEnv.withTenant(async (tenantId) => {
       const code = await inviteCache.createCode("alpha@budibase.com", {
         tenantId,
       })
@@ -30,12 +30,12 @@ describe("invite cache", () => {
       expect(invite.info.tenantId).toBe(tenantId)
 
       const invites = await inviteCache.getInviteCodes()
-      expect(invites.some(inv => inv.code === code)).toBe(true)
+      expect(invites.some((inv) => inv.code === code)).toBe(true)
     })
   })
 
   it("deletes list invites", async () => {
-    await testEnv.withTenant(async tenantId => {
+    await testEnv.withTenant(async (tenantId) => {
       const code = await inviteCache.createCode("delete@budibase.com", {
         tenantId,
       })
@@ -51,14 +51,12 @@ describe("invite cache", () => {
   })
 
   it("matches existing invites regardless of email casing", async () => {
-    await testEnv.withTenant(async tenantId => {
+    await testEnv.withTenant(async (tenantId) => {
       await inviteCache.createCode("mixed.case@budibase.com", {
         tenantId,
       })
 
-      const invites = await inviteCache.getExistingInvites([
-        "MIXED.CASE@BUDIBASE.COM",
-      ])
+      const invites = await inviteCache.getExistingInvites(["MIXED.CASE@BUDIBASE.COM"])
 
       expect(invites).toHaveLength(1)
       expect(invites[0].email).toBe("mixed.case@budibase.com")

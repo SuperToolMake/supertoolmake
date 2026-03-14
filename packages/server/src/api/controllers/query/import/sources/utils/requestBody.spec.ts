@@ -3,16 +3,13 @@ import {
   buildKeyValueRequestBody,
   buildRequestBodyFromFormDataParameters,
   buildSerializableRequestBody,
+  type FormDataParameter,
   generateRequestBodyFromExample,
   generateRequestBodyFromSchema,
   serialiseRequestBody,
-  type FormDataParameter,
 } from "./requestBody"
 
-const createPlaceholder = (
-  key: string,
-  type: "string" | "integer" = "string"
-) => ({
+const createPlaceholder = (key: string, type: "string" | "integer" = "string") => ({
   toJSON: () => `${BINDING_TOKEN_PREFIX}${type}__${key}__`,
 })
 

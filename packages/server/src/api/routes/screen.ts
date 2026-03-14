@@ -1,6 +1,6 @@
 import * as controller from "../controllers/screen"
-import { screenValidator } from "./utils/validators"
 import { builderRoutes } from "./endpointGroups"
+import { screenValidator } from "./utils/validators"
 
 builderRoutes
   .get("/api/screens", controller.fetch)

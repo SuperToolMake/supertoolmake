@@ -1,17 +1,12 @@
 <script lang="ts">
-  export let horizontal: boolean = false
-  export let paddingX: "none" | "S" | "M" | "L" | "XL" | "XXL" = "M"
-  export let paddingY: "none" | "S" | "M" | "L" | "XL" | "XXL" = "M"
-  export let noPadding: boolean = false
-  export let gap: "XXS" | "XS" | "S" | "M" | "L" | "XL" = "M"
-  export let noGap: boolean = false
-  export let alignContent:
-    | "start"
-    | "center"
-    | "space-between"
-    | "space-around"
-    | "normal" = "normal"
-  export let justifyItems: "stretch" | "start" | "center" | "end" = "stretch"
+export let horizontal: boolean = false
+export let paddingX: "none" | "S" | "M" | "L" | "XL" | "XXL" = "M"
+export let paddingY: "none" | "S" | "M" | "L" | "XL" | "XXL" = "M"
+export let noPadding: boolean = false
+export let gap: "XXS" | "XS" | "S" | "M" | "L" | "XL" = "M"
+export let noGap: boolean = false
+export let alignContent: "start" | "center" | "space-between" | "space-around" | "normal" = "normal"
+export let justifyItems: "stretch" | "start" | "center" | "end" = "stretch"
 </script>
 
 <div

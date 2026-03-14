@@ -1,23 +1,23 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte"
-  import AbsTooltip from "../Tooltip/AbsTooltip.svelte"
-  import ActionButton from "../ActionButton/ActionButton.svelte"
+import { createEventDispatcher } from "svelte"
+import ActionButton from "../ActionButton/ActionButton.svelte"
+import AbsTooltip from "../Tooltip/AbsTooltip.svelte"
 
-  export let leftIcon: string
-  export let leftNotificationTooltip: string | undefined = undefined
-  export let leftNotificationCount: number | undefined = undefined
-  export let leftText: string
-  export let rightIcon: string
-  export let rightNotificationTooltip: string | undefined = undefined
-  export let rightNotificationCount: number | undefined = undefined
-  export let rightText: string
-  export let selected: "left" | "right" = "left"
-  export let disabled = false
+export let leftIcon: string
+export let leftNotificationTooltip: string | undefined = undefined
+export let leftNotificationCount: number | undefined = undefined
+export let leftText: string
+export let rightIcon: string
+export let rightNotificationTooltip: string | undefined = undefined
+export let rightNotificationCount: number | undefined = undefined
+export let rightText: string
+export let selected: "left" | "right" = "left"
+export let disabled = false
 
-  const dispatch = createEventDispatcher<{
-    left: void
-    right: void
-  }>()
+const dispatch = createEventDispatcher<{
+  left: void
+  right: void
+}>()
 </script>
 
 <div class="view-mode-toggle" class:disabled>

@@ -1,168 +1,149 @@
 <script lang="ts" generics="Value extends UIFile|File">
-  import type { UIFile } from "@budibase/types"
-  import "@spectrum-css/dropzone/dist/index-vars.css"
-  import "@spectrum-css/illustratedmessage/dist/index-vars.css"
-  import "@spectrum-css/typography/dist/index-vars.css"
-  import { createEventDispatcher } from "svelte"
-  import { uuid } from "../../helpers"
-  import Icon from "../../Icon/Icon.svelte"
-  import Link from "../../Link/Link.svelte"
-  import ProgressCircle from "../../ProgressCircle/ProgressCircle.svelte"
-  import Tag from "../../Tags/Tag.svelte"
-  import Tags from "../../Tags/Tags.svelte"
+import type { UIFile } from "@budibase/types"
+import "@spectrum-css/dropzone/dist/index-vars.css"
+import "@spectrum-css/illustratedmessage/dist/index-vars.css"
+import "@spectrum-css/typography/dist/index-vars.css"
+import { createEventDispatcher } from "svelte"
+import { uuid } from "../../helpers"
+import Icon from "../../Icon/Icon.svelte"
+import Link from "../../Link/Link.svelte"
+import ProgressCircle from "../../ProgressCircle/ProgressCircle.svelte"
+import Tag from "../../Tags/Tag.svelte"
+import Tags from "../../Tags/Tags.svelte"
 
-  const BYTES_IN_KB = 1000
-  const BYTES_IN_MB = 1000000
+const BYTES_IN_KB = 1000
+const BYTES_IN_MB = 1000000
 
-  export let value: Value[] = []
-  export let id: string | null = null
-  export let disabled: boolean = false
-  export let compact: boolean = false
-  export let fileSizeLimit: number = BYTES_IN_MB * 20
-  export let processFiles: ((_files: FileList) => Promise<Value[]>) | null =
-    null
-  export let deleteAttachments: ((_keys: string[]) => Promise<void>) | null =
-    null
-  export let handleFileTooLarge:
-    | ((_limit: number, _currentFiles: Value[]) => void)
-    | null = null
-  export let handleTooManyFiles: ((_maximum: number) => void) | null = null
-  export let gallery: boolean = true
-  export let fileTags: string[] = []
-  export let maximum: number | undefined = undefined
-  export let extensions: string = "*"
-  export let titleText: string | null = null
-  export let clickText: string | null = null
-  export let addText: string | null = null
+export let value: Value[] = []
+export let id: string | null = null
+export let disabled: boolean = false
+export let compact: boolean = false
+export let fileSizeLimit: number = BYTES_IN_MB * 20
+export let processFiles: ((_files: FileList) => Promise<Value[]>) | null = null
+export let deleteAttachments: ((_keys: string[]) => Promise<void>) | null = null
+export let handleFileTooLarge: ((_limit: number, _currentFiles: Value[]) => void) | null = null
+export let handleTooManyFiles: ((_maximum: number) => void) | null = null
+export let gallery: boolean = true
+export let fileTags: string[] = []
+export let maximum: number | undefined = undefined
+export let extensions: string = "*"
+export let titleText: string | null = null
+export let clickText: string | null = null
+export let addText: string | null = null
 
-  const dispatch = createEventDispatcher<{ change: Value[] }>()
-  const imageExtensions = [
-    "png",
-    "tiff",
-    "gif",
-    "raw",
-    "jpg",
-    "jpeg",
-    "svg",
-    "bmp",
-    "jfif",
-    "webp",
-  ]
-  const fieldId = id || uuid()
+const dispatch = createEventDispatcher<{ change: Value[] }>()
+const imageExtensions = ["png", "tiff", "gif", "raw", "jpg", "jpeg", "svg", "bmp", "jfif", "webp"]
+const fieldId = id || uuid()
 
-  let selectedImageIdx = 0
-  let fileDragged = false
-  let selectedUrl: string | undefined
-  let fileInput: HTMLInputElement
-  let loading = false
+let selectedImageIdx = 0
+let fileDragged = false
+let selectedUrl: string | undefined
+let fileInput: HTMLInputElement
+let loading = false
 
-  $: selectedImage = value?.[selectedImageIdx] ?? null
-  $: fileCount = value?.length ?? 0
-  $: isImage =
-    (selectedImage &&
-      "extension" in selectedImage &&
-      imageExtensions.includes(selectedImage?.extension?.toLowerCase())) ||
-    selectedImage?.type?.startsWith("image")
+$: selectedImage = value?.[selectedImageIdx] ?? null
+$: fileCount = value?.length ?? 0
+$: isImage =
+  (selectedImage &&
+    "extension" in selectedImage &&
+    imageExtensions.includes(selectedImage?.extension?.toLowerCase())) ||
+  selectedImage?.type?.startsWith("image")
 
-  $: {
-    if (selectedImage && "url" in selectedImage && selectedImage?.url) {
-      selectedUrl = selectedImage?.url
-    } else if (selectedImage && isImage) {
-      try {
-        let reader = new FileReader()
-        reader.readAsDataURL(selectedImage as any)
-        reader.onload = e => {
-          selectedUrl = e.target?.result as string
-        }
-      } catch (error) {
-        selectedUrl = undefined
+$: {
+  if (selectedImage && "url" in selectedImage && selectedImage?.url) {
+    selectedUrl = selectedImage?.url
+  } else if (selectedImage && isImage) {
+    try {
+      let reader = new FileReader()
+      reader.readAsDataURL(selectedImage as any)
+      reader.onload = (e) => {
+        selectedUrl = e.target?.result as string
       }
+    } catch (error) {
+      selectedUrl = undefined
     }
   }
+}
 
-  $: showDropzone =
-    (!maximum || (maximum && (value?.length || 0) < maximum)) && !disabled
+$: showDropzone = (!maximum || (maximum && (value?.length || 0) < maximum)) && !disabled
 
-  async function processFileList(fileList: FileList) {
-    if (
-      handleFileTooLarge &&
-      Array.from(fileList).some(file => file.size >= fileSizeLimit)
-    ) {
-      handleFileTooLarge(fileSizeLimit, value)
-      return
-    }
-
-    const fileCount = fileList.length + value.length
-    if (handleTooManyFiles && maximum && fileCount > maximum) {
-      handleTooManyFiles(maximum)
-      return
-    }
-
-    if (processFiles) {
-      loading = true
-      try {
-        const processedFiles = await processFiles(fileList)
-        const newValue = [...value, ...processedFiles]
-        dispatch("change", newValue)
-        selectedImageIdx = newValue.length - 1
-      } finally {
-        loading = false
-      }
-    } else {
-      // TODO: this type should be inferred correctly, but it needs a much bigger refactor around all the usages and dynamic types
-      dispatch("change", Array.from(fileList) as Value[])
-    }
+async function processFileList(fileList: FileList) {
+  if (handleFileTooLarge && Array.from(fileList).some((file) => file.size >= fileSizeLimit)) {
+    handleFileTooLarge(fileSizeLimit, value)
+    return
   }
 
-  async function removeFile() {
-    dispatch(
-      "change",
-      value.filter((_x, idx) => idx !== selectedImageIdx)
+  const fileCount = fileList.length + value.length
+  if (handleTooManyFiles && maximum && fileCount > maximum) {
+    handleTooManyFiles(maximum)
+    return
+  }
+
+  if (processFiles) {
+    loading = true
+    try {
+      const processedFiles = await processFiles(fileList)
+      const newValue = [...value, ...processedFiles]
+      dispatch("change", newValue)
+      selectedImageIdx = newValue.length - 1
+    } finally {
+      loading = false
+    }
+  } else {
+    // TODO: this type should be inferred correctly, but it needs a much bigger refactor around all the usages and dynamic types
+    dispatch("change", Array.from(fileList) as Value[])
+  }
+}
+
+async function removeFile() {
+  dispatch(
+    "change",
+    value.filter((_x, idx) => idx !== selectedImageIdx)
+  )
+  if (deleteAttachments) {
+    await deleteAttachments(
+      value
+        .filter((_x, idx) => idx === selectedImageIdx)
+        .map((item) => ("key" in item && item.key) || "")
     )
-    if (deleteAttachments) {
-      await deleteAttachments(
-        value
-          .filter((_x, idx) => idx === selectedImageIdx)
-          .map(item => ("key" in item && item.key) || "")
-      )
-      fileInput.value = ""
-    }
-    selectedImageIdx = 0
+    fileInput.value = ""
   }
+  selectedImageIdx = 0
+}
 
-  function navigateLeft() {
-    selectedImageIdx -= 1
+function navigateLeft() {
+  selectedImageIdx -= 1
+}
+
+function navigateRight() {
+  selectedImageIdx += 1
+}
+
+function handleFile(evt: Event) {
+  const target = evt.target as HTMLInputElement
+
+  if (target?.files) {
+    processFileList(target.files)
   }
+}
 
-  function navigateRight() {
-    selectedImageIdx += 1
+function handleDragOver(evt: DragEvent) {
+  evt.preventDefault()
+  fileDragged = true
+}
+
+function handleDragLeave(evt: DragEvent) {
+  evt.preventDefault()
+  fileDragged = false
+}
+
+function handleDrop(evt: DragEvent) {
+  evt.preventDefault()
+  if (evt.dataTransfer?.files) {
+    processFileList(evt.dataTransfer.files)
   }
-
-  function handleFile(evt: Event) {
-    const target = evt.target as HTMLInputElement
-
-    if (target?.files) {
-      processFileList(target.files)
-    }
-  }
-
-  function handleDragOver(evt: DragEvent) {
-    evt.preventDefault()
-    fileDragged = true
-  }
-
-  function handleDragLeave(evt: DragEvent) {
-    evt.preventDefault()
-    fileDragged = false
-  }
-
-  function handleDrop(evt: DragEvent) {
-    evt.preventDefault()
-    if (evt.dataTransfer?.files) {
-      processFileList(evt.dataTransfer.files)
-    }
-    fileDragged = false
-  }
+  fileDragged = false
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

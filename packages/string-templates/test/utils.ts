@@ -1,7 +1,7 @@
 import { getManifest } from "../src"
 import { getJsHelperList } from "../src/helpers"
 
-import { convertToJS, processStringSync, encodeJSBinding } from "../src/index"
+import { convertToJS, encodeJSBinding, processStringSync } from "../src/index"
 
 function tryParseJson(str: string) {
   if (typeof str !== "string") {
@@ -34,13 +34,10 @@ export const getParsedManifest = () => {
         example: string
         requiresBlock: boolean
       }>(manifest[collection])
-        .filter(
-          ([, details]) =>
-            details.example?.split("->").map(x => x.trim()).length > 1
-        )
+        .filter(([, details]) => details.example?.split("->").map((x) => x.trim()).length > 1)
         .map(([name, details]): ExampleType => {
           const example = details.example
-          let [hbs, js] = example.split("->").map(x => x.trim())
+          let [hbs, js] = example.split("->").map((x) => x.trim())
 
           // Trim 's
           js = js.replace(/^'|'$/g, "")
@@ -97,7 +94,7 @@ export const runJsHelpersTests = ({
       {} as typeof manifest
     )
 
-    describe.each(Object.keys(jsExamples))("%s", collection => {
+    describe.each(Object.keys(jsExamples))("%s", (collection) => {
       const examplesToRun = jsExamples[collection]
         .filter(([, { requiresHbsBody }]) => !requiresHbsBody)
         .filter(([key]) => !testsToSkip?.includes(key))
@@ -111,14 +108,11 @@ export const runJsHelpersTests = ({
 
           const arrays = hbs.match(/\[[^/\]]+\]/)
           arrays?.forEach((arrayString, i) => {
-            hbs = hbs.replace(
-              new RegExp(escapeRegExp(arrayString)),
-              `array${i}`
-            )
+            hbs = hbs.replace(new RegExp(escapeRegExp(arrayString)), `array${i}`)
             context[`array${i}`] = JSON.parse(arrayString.replace(/'/g, '"'))
           })
 
-          let convertedJs = convertToJS(hbs)
+          const convertedJs = convertToJS(hbs)
 
           let result = await processJS(convertedJs, context)
           result = result.replace(/&nbsp;/g, " ")

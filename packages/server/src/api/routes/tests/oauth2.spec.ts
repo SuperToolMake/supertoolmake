@@ -1,19 +1,19 @@
+import { cache } from "@budibase/backend-core"
+import { generator } from "@budibase/backend-core/tests"
 import {
   DocumentType,
-  InsertOAuth2ConfigRequest,
-  OAuth2ConfigResponse,
+  type InsertOAuth2ConfigRequest,
+  type OAuth2ConfigResponse,
   OAuth2CredentialsMethod,
   OAuth2GrantType,
   PASSWORD_REPLACEMENT,
 } from "@budibase/types"
-import * as setup from "./utilities"
-import { generator } from "@budibase/backend-core/tests"
 import _ from "lodash/fp"
 import nock from "nock"
-import { cache } from "@budibase/backend-core"
+import * as setup from "./utilities"
 
 describe("/oauth2", () => {
-  let config = setup.getConfig()
+  const config = setup.getConfig()
 
   function makeOAuth2Config({
     ...data
@@ -36,9 +36,7 @@ describe("/oauth2", () => {
     await config.newTenant()
   })
 
-  const expectOAuth2ConfigId = expect.stringMatching(
-    `^${DocumentType.OAUTH2_CONFIG}_.+$`
-  )
+  const expectOAuth2ConfigId = expect.stringMatching(`^${DocumentType.OAUTH2_CONFIG}_.+$`)
 
   describe("fetch", () => {
     it("returns empty when no oauth are created", async () => {
@@ -60,7 +58,7 @@ describe("/oauth2", () => {
       expect(response.configs).toHaveLength(existingConfigs.length)
       expect(response).toEqual({
         configs: expect.arrayContaining(
-          existingConfigs.map(c => ({
+          existingConfigs.map((c) => ({
             _id: c._id,
             _rev: c._rev,
             name: c.name,
@@ -287,9 +285,7 @@ describe("/oauth2", () => {
       await config.api.oauth2.update(configWithoutScope)
 
       const response = await config.api.oauth2.fetch()
-      const updatedConfig = response.configs.find(
-        c => c._id === createdConfig.config._id
-      )
+      const updatedConfig = response.configs.find((c) => c._id === createdConfig.config._id)
       expect(updatedConfig).not.toHaveProperty("scope")
     })
 
@@ -306,9 +302,7 @@ describe("/oauth2", () => {
       })
 
       const response = await config.api.oauth2.fetch()
-      const updatedConfig = response.configs.find(
-        c => c._id === createdConfig.config._id
-      )
+      const updatedConfig = response.configs.find((c) => c._id === createdConfig.config._id)
       expect(updatedConfig?.scope).toBe(newScope)
     })
 
@@ -333,9 +327,7 @@ describe("/oauth2", () => {
       })
 
       // Verify cached token is removed
-      const tokenAfterUpdate = await config.doInTenant(() =>
-        cache.get(cacheKey)
-      )
+      const tokenAfterUpdate = await config.doInTenant(() => cache.get(cacheKey))
       expect(tokenAfterUpdate).toBeNull()
     })
   })
@@ -362,9 +354,7 @@ describe("/oauth2", () => {
 
       const response = await config.api.oauth2.fetch()
       expect(response.configs).toHaveLength(existingConfigs.length - 1)
-      expect(
-        response.configs.find(c => c._id === configToDelete._id)
-      ).toBeUndefined()
+      expect(response.configs.find((c) => c._id === configToDelete._id)).toBeUndefined()
     })
 
     it("throw if config not found", async () => {
@@ -394,9 +384,7 @@ describe("/oauth2", () => {
       })
 
       // Verify cached token is removed
-      const tokenAfterDelete = await config.doInTenant(() =>
-        cache.get(cacheKey)
-      )
+      const tokenAfterDelete = await config.doInTenant(() => cache.get(cacheKey))
       expect(tokenAfterDelete).toBeNull()
     })
   })
@@ -419,13 +407,12 @@ describe("/oauth2", () => {
       const token = generator.guid()
 
       // Token request nock
-      const tokenRequestNock = nock(url.origin).post(url.pathname, body => {
+      const tokenRequestNock = nock(url.origin).post(url.pathname, (body) => {
         return (
           body.grant_type === "client_credentials" &&
           (request.scope === undefined || body.scope === request.scope) &&
           (request.grantType !== OAuth2CredentialsMethod.BODY ||
-            (body.client_id === request.clientId &&
-              body.client_secret === request.password))
+            (body.client_id === request.clientId && body.client_secret === request.password))
         )
       })
       if (request.grantType === OAuth2CredentialsMethod.HEADER) {

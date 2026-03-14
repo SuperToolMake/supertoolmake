@@ -1,14 +1,14 @@
 import { utils } from "@budibase/backend-core"
 import {
-  SettingsConfig,
   ConfigType,
-  SMTPConfig,
-  GoogleConfig,
-  OIDCConfig,
-  GoogleInnerConfig,
-  OIDCInnerConfig,
-  SMTPInnerConfig,
-  SettingsInnerConfig,
+  type GoogleConfig,
+  type GoogleInnerConfig,
+  type OIDCConfig,
+  type OIDCInnerConfig,
+  type SettingsConfig,
+  type SettingsInnerConfig,
+  type SMTPConfig,
+  type SMTPInnerConfig,
 } from "@budibase/types"
 
 export function oidc(conf?: Partial<OIDCInnerConfig>): OIDCConfig {

@@ -1,6 +1,6 @@
-import { API } from "@/api"
 import { notifications } from "@budibase/bbui"
-import { Config, ConfigType, FindConfigResponse } from "@budibase/types"
+import { type Config, ConfigType, type FindConfigResponse } from "@budibase/types"
+import { API } from "@/api"
 
 export function hasConfig<T = any>(doc: any): doc is Config<T> {
   return doc && typeof doc === "object" && "config" in doc

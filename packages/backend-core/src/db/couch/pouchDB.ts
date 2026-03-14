@@ -1,6 +1,6 @@
+import type { PouchOptions } from "@budibase/types"
 import PouchDB from "pouchdb"
 import env from "../../environment"
-import { PouchOptions } from "@budibase/types"
 import { getCouchInfo } from "./connections"
 
 let Pouch: any
@@ -12,7 +12,7 @@ let initialised = false
  * Exposed for exceptional cases such as in-memory views.
  */
 export const getPouch = (opts: PouchOptions = {}) => {
-  let { url, cookie } = getCouchInfo()
+  const { url, cookie } = getCouchInfo()
   let POUCH_DB_DEFAULTS = {
     prefix: url,
     fetch: (url: string, opts: any) => {
@@ -26,14 +26,14 @@ export const getPouch = (opts: PouchOptions = {}) => {
     const inMemory = require("pouchdb-adapter-memory")
     PouchDB.plugin(inMemory)
     POUCH_DB_DEFAULTS = {
-      // @ts-ignore
+      // @ts-expect-error
       adapter: "memory",
     }
   }
 
   if (opts.onDisk) {
     POUCH_DB_DEFAULTS = {
-      // @ts-ignore
+      // @ts-expect-error
       adapter: "leveldb",
     }
   }
@@ -41,7 +41,7 @@ export const getPouch = (opts: PouchOptions = {}) => {
   if (opts.replication) {
     const replicationStream = require("@budibase/pouchdb-replication-stream")
     PouchDB.plugin(replicationStream.plugin)
-    // @ts-ignore
+    // @ts-expect-error
     PouchDB.adapter("writableStream", replicationStream.adapters.writableStream)
   }
 

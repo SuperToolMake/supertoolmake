@@ -1,14 +1,14 @@
 <script>
-  import KeyValueBuilder from "../KeyValueBuilder.svelte"
-  import { SchemaTypeOptionsExpanded } from "@/constants/backend"
-  import { keyValueArrayToRecord } from "../query"
+import { SchemaTypeOptionsExpanded } from "@/constants/backend"
+import KeyValueBuilder from "../KeyValueBuilder.svelte"
+import { keyValueArrayToRecord } from "../query"
 
-  export let schema
-  export let onSchemaChange = () => {}
+export let schema
+export let onSchemaChange = () => {}
 
-  const handleChange = e => {
-    onSchemaChange(keyValueArrayToRecord(e.detail))
-  }
+const handleChange = (e) => {
+  onSchemaChange(keyValueArrayToRecord(e.detail))
+}
 </script>
 
 {#key schema}

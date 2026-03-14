@@ -1,41 +1,25 @@
 import { context, roles } from "@budibase/backend-core"
-import {
-  Database,
-  PermissionLevel,
-  PermissionSource,
-  Role,
-} from "@budibase/types"
+import { type Database, PermissionLevel, PermissionSource, type Role } from "@budibase/types"
 import { getRoleParams } from "../../../db/utils"
 import { removeFromArray } from "../../../utilities"
-import {
-  CURRENTLY_SUPPORTED_LEVELS,
-  getBasePermissions,
-} from "../../../utilities/security"
+import { CURRENTLY_SUPPORTED_LEVELS, getBasePermissions } from "../../../utilities/security"
 
-type ResourcePermissions = Record<
-  string,
-  { role: string; type: PermissionSource }
->
+type ResourcePermissions = Record<string, { role: string; type: PermissionSource }>
 
-export const enum PermissionUpdateType {
+export enum PermissionUpdateType {
   REMOVE = "remove",
   ADD = "add",
 }
 
-export async function getResourcePerms(
-  resourceId: string
-): Promise<ResourcePermissions> {
+export async function getResourcePerms(resourceId: string): Promise<ResourcePermissions> {
   const rolesList = await roles.getAllRoles()
 
-  let permissions: ResourcePermissions = {}
+  const permissions: ResourcePermissions = {}
 
-  for (let level of CURRENTLY_SUPPORTED_LEVELS) {
+  for (const level of CURRENTLY_SUPPORTED_LEVELS) {
     // update the various roleIds in the resource permissions
-    for (let role of rolesList) {
-      const rolePerms = roles.checkForRoleResourceArray(
-        role.permissions || {},
-        resourceId
-      )
+    for (const role of rolesList) {
+      const rolePerms = roles.checkForRoleResourceArray(role.permissions || {}, resourceId)
       if (rolePerms[resourceId]?.indexOf(level as PermissionLevel) > -1) {
         permissions[level] = {
           role: roles.getExternalRoleID(role._id!, role.version),
@@ -55,11 +39,7 @@ export async function getResourcePerms(
 }
 
 export async function updatePermissionOnRole(
-  {
-    roleId,
-    resourceId,
-    level,
-  }: { roleId: string; resourceId: string; level: PermissionLevel },
+  { roleId, resourceId, level }: { roleId: string; resourceId: string; level: PermissionLevel },
   updateType: PermissionUpdateType
 ) {
   const db = context.getWorkspaceDB()
@@ -70,7 +50,7 @@ export async function updatePermissionOnRole(
   const docUpdates: Role[] = []
 
   // the permission is for a built in, make sure it exists
-  if (isABuiltin && !dbRoles.some(role => role._id === dbRoleId)) {
+  if (isABuiltin && !dbRoles.some((role) => role._id === dbRoleId)) {
     const builtin = roles.getBuiltinRoles()[roleId]
     builtin._id = roles.getDBRoleID(builtin._id!)
     dbRoles.push(builtin)
@@ -78,16 +58,13 @@ export async function updatePermissionOnRole(
 
   // now try to find any roles which need updated, e.g. removing the
   // resource from another role and then adding to the new role
-  for (let role of dbRoles) {
+  for (const role of dbRoles) {
     let updated = false
     const rolePermissions: Record<string, PermissionLevel[]> = role.permissions
       ? role.permissions
       : {}
     // make sure its an array, also handle migrating
-    if (
-      !rolePermissions[resourceId] ||
-      !Array.isArray(rolePermissions[resourceId])
-    ) {
+    if (!rolePermissions[resourceId] || !Array.isArray(rolePermissions[resourceId])) {
       rolePermissions[resourceId] =
         typeof rolePermissions[resourceId] === "string"
           ? [rolePermissions[resourceId] as unknown as PermissionLevel]
@@ -97,10 +74,7 @@ export async function updatePermissionOnRole(
     // the updating (role._id !== dbRoleId) is required because a resource/level can
     // only be permitted in a single role (this reduces hierarchy confusion and simplifies
     // the general UI for this, rather than needing to show everywhere it is used)
-    if (
-      (role._id !== dbRoleId || remove) &&
-      rolePermissions[resourceId].indexOf(level) !== -1
-    ) {
+    if ((role._id !== dbRoleId || remove) && rolePermissions[resourceId].indexOf(level) !== -1) {
       removeFromArray(rolePermissions[resourceId], level)
       updated = true
     }
@@ -118,8 +92,8 @@ export async function updatePermissionOnRole(
   }
 
   const response = await db.bulkDocs(docUpdates)
-  return response.map(resp => {
-    const version = docUpdates.find(role => role._id === resp.id)?.version
+  return response.map((resp) => {
+    const version = docUpdates.find((role) => role._id === resp.id)?.version
     const _id = roles.getExternalRoleID(resp.id, version)
     return {
       _id,
@@ -157,5 +131,5 @@ export async function getAllDBRoles(db: Database) {
       include_docs: true,
     })
   )
-  return body.rows.map(row => row.doc!)
+  return body.rows.map((row) => row.doc!)
 }

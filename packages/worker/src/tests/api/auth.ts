@@ -1,11 +1,7 @@
-import { TestAPI, TestAPIOpts } from "./base"
+import { TestAPI, type TestAPIOpts } from "./base"
 
 export class AuthAPI extends TestAPI {
-  updatePassword = (
-    resetCode: string,
-    password: string,
-    opts?: TestAPIOpts
-  ) => {
+  updatePassword = (resetCode: string, password: string, opts?: TestAPIOpts) => {
     return this.request
       .post(`/api/global/auth/${this.config.getTenantId()}/reset/update`)
       .send({
@@ -16,12 +12,7 @@ export class AuthAPI extends TestAPI {
       .expect(opts?.status ? opts.status : 200)
   }
 
-  login = (
-    tenantId: string,
-    email: string,
-    password: string,
-    opts?: TestAPIOpts
-  ) => {
+  login = (tenantId: string, email: string, password: string, opts?: TestAPIOpts) => {
     return this.request
       .post(`/api/global/auth/${tenantId}/login`)
       .send({
@@ -38,11 +29,7 @@ export class AuthAPI extends TestAPI {
       .expect(200)
   }
 
-  requestPasswordReset = async (
-    sendMailMock: any,
-    email: string,
-    opts?: TestAPIOpts
-  ) => {
+  requestPasswordReset = async (sendMailMock: any, email: string, opts?: TestAPIOpts) => {
     await this.config.saveSmtpConfig()
     await this.config.saveSettingsConfig()
 
@@ -58,9 +45,7 @@ export class AuthAPI extends TestAPI {
     if (res.status === 200) {
       if (sendMailMock.mock.calls.length) {
         const emailCall = sendMailMock.mock.calls[0][0]
-        const parts = emailCall.html.split(
-          `http://localhost:10000/builder/auth/reset?code=`
-        )
+        const parts = emailCall.html.split(`http://localhost:10000/builder/auth/reset?code=`)
         code = parts[1].split('"')[0].split("&")[0]
       }
     }

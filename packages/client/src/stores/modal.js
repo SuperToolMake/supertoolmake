@@ -6,15 +6,15 @@ export const createModalStore = () => {
   }
   const store = writable(initialState)
 
-  const open = id => {
-    store.update(state => {
+  const open = (id) => {
+    store.update((state) => {
       state.contentId = id
       return state
     })
   }
 
   const close = () => {
-    store.update(state => {
+    store.update((state) => {
       state.contentId = null
       return state
     })

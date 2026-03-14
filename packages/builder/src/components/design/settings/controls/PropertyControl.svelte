@@ -1,123 +1,107 @@
 <script>
-  import { Label } from "@budibase/bbui"
-  import {
-    readableToRuntimeBinding,
-    runtimeToReadableBinding,
-  } from "@/dataBinding"
-  import { builderStore } from "@/stores/builder"
-  import { createEventDispatcher } from "svelte"
+import { Label } from "@budibase/bbui"
+import { createEventDispatcher } from "svelte"
+import { readableToRuntimeBinding, runtimeToReadableBinding } from "@/dataBinding"
+import { builderStore } from "@/stores/builder"
 
-  export let label = ""
-  export let labelHidden = false
-  export let componentInstance = {}
-  export let control = undefined
-  export let key = ""
-  export let type = ""
-  export let value = undefined
-  export let defaultValue = undefined
-  export let props = {}
-  export let onChange = undefined
-  export let bindings = []
-  export let componentBindings = []
-  export let nested = false
-  export let propertyFocus = false
-  export let info = undefined
-  export let disableBindings = false
-  export let wide = false
-  export let contextAccess = undefined
+export let label = ""
+export let labelHidden = false
+export let componentInstance = {}
+export let control = undefined
+export let key = ""
+export let type = ""
+export let value = undefined
+export let defaultValue = undefined
+export let props = {}
+export let onChange = undefined
+export let bindings = []
+export let componentBindings = []
+export let nested = false
+export let propertyFocus = false
+export let info = undefined
+export let disableBindings = false
+export let wide = false
+export let contextAccess = undefined
 
-  const dispatch = createEventDispatcher()
-  let highlightType
-  let domElement
+const dispatch = createEventDispatcher()
+let highlightType
+let domElement
 
-  $: highlightedProp = $builderStore.highlightedSetting
-  $: allBindings = getAllBindings(
-    bindings,
-    componentBindings,
-    nested,
-    contextAccess
-  )
-  $: safeValue = getSafeValue(value, defaultValue, allBindings)
-  $: replaceBindings = val => readableToRuntimeBinding(allBindings, val)
-  $: isHighlighted = highlightedProp?.key === key
-  $: highlightType = isHighlighted ? `highlighted-${highlightedProp?.type}` : ""
-  $: highlightedProp && isHighlighted && scrollToElement(domElement)
+$: highlightedProp = $builderStore.highlightedSetting
+$: allBindings = getAllBindings(bindings, componentBindings, nested, contextAccess)
+$: safeValue = getSafeValue(value, defaultValue, allBindings)
+$: replaceBindings = (val) => readableToRuntimeBinding(allBindings, val)
+$: isHighlighted = highlightedProp?.key === key
+$: highlightType = isHighlighted ? `highlighted-${highlightedProp?.type}` : ""
+$: highlightedProp && isHighlighted && scrollToElement(domElement)
 
-  const getAllBindings = (
-    bindings,
-    componentBindings,
-    nested,
-    contextAccess
-  ) => {
-    // contextAccess is a bit of an escape hatch to get around how we render
-    // certain settings types by using a pseudo component definition, leading
-    // to problems with the nested flag
-    if (contextAccess != null) {
-      // Optionally include global bindings
-      let allBindings = contextAccess.global ? bindings : []
+const getAllBindings = (bindings, componentBindings, nested, contextAccess) => {
+  // contextAccess is a bit of an escape hatch to get around how we render
+  // certain settings types by using a pseudo component definition, leading
+  // to problems with the nested flag
+  if (contextAccess != null) {
+    // Optionally include global bindings
+    let allBindings = contextAccess.global ? bindings : []
 
-      // Optionally include or exclude self (component) bindings.
-      // If this is a nested setting then we will already have our own context
-      // bindings mixed in, so if we don't want self context we need to filter
-      // them out.
-      if (contextAccess.self) {
-        return [...allBindings, ...componentBindings]
-      } else {
-        return allBindings.filter(binding => {
-          return !componentBindings.some(componentBinding => {
-            return componentBinding.runtimeBinding === binding.runtimeBinding
-          })
-        })
-      }
-    }
-
-    // Otherwise just honour the normal nested flag
-    if (nested) {
-      return [...bindings, ...componentBindings]
+    // Optionally include or exclude self (component) bindings.
+    // If this is a nested setting then we will already have our own context
+    // bindings mixed in, so if we don't want self context we need to filter
+    // them out.
+    if (contextAccess.self) {
+      return [...allBindings, ...componentBindings]
     } else {
-      return bindings
+      return allBindings.filter((binding) => {
+        return !componentBindings.some((componentBinding) => {
+          return componentBinding.runtimeBinding === binding.runtimeBinding
+        })
+      })
     }
   }
 
-  // Handle a value change of any type
-  // String values have any bindings handled
-  const handleChange = value => {
-    let innerVal = value
-    if (value && typeof value === "object") {
-      if ("detail" in value) {
-        innerVal = value.detail
-      } else if ("target" in value) {
-        innerVal = value.target.value
-      }
-    }
+  // Otherwise just honour the normal nested flag
+  if (nested) {
+    return [...bindings, ...componentBindings]
+  } else {
+    return bindings
+  }
+}
 
-    if (type === "number") {
-      innerVal = parseInt(innerVal)
-    }
-
-    const dispatchVal =
-      typeof innerVal === "string" ? replaceBindings(innerVal) : innerVal
-    dispatch("change", dispatchVal)
-    if (onChange) {
-      onChange(dispatchVal)
+// Handle a value change of any type
+// String values have any bindings handled
+const handleChange = (value) => {
+  let innerVal = value
+  if (value && typeof value === "object") {
+    if ("detail" in value) {
+      innerVal = value.detail
+    } else if ("target" in value) {
+      innerVal = value.target.value
     }
   }
 
-  // The "safe" value is the value with any bindings made readable
-  // If there is no value set, any default value is used
-  const getSafeValue = (value, defaultValue, bindings) => {
-    const enriched = runtimeToReadableBinding(bindings, value)
-    return enriched == null && defaultValue !== undefined
-      ? defaultValue
-      : enriched
+  if (type === "number") {
+    innerVal = parseInt(innerVal)
   }
 
-  function scrollToElement(element) {
-    element?.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    })
+  const dispatchVal = typeof innerVal === "string" ? replaceBindings(innerVal) : innerVal
+  dispatch("change", dispatchVal)
+  if (onChange) {
+    onChange(dispatchVal)
   }
+}
+
+// The "safe" value is the value with any bindings made readable
+// If there is no value set, any default value is used
+const getSafeValue = (value, defaultValue, bindings) => {
+  const enriched = runtimeToReadableBinding(bindings, value)
+  return enriched == null && defaultValue !== undefined ? defaultValue : enriched
+}
+
+function scrollToElement(element) {
+  element?.scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+  })
+}
 </script>
 
 <div

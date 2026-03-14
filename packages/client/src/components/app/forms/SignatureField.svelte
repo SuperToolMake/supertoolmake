@@ -1,70 +1,68 @@
 <script>
-  import { CoreSignature, ActionButton } from "@budibase/bbui"
-  import { getContext } from "svelte"
-  import Field from "./Field.svelte"
-  import { SignatureModal } from "@budibase/frontend-core/src/components"
+import { ActionButton, CoreSignature } from "@budibase/bbui"
+import { SignatureModal } from "@budibase/frontend-core/src/components"
+import { getContext } from "svelte"
+import Field from "./Field.svelte"
 
-  export let field
-  export let label
-  export let disabled = false
-  export let readonly = false
-  export let validation
-  export let onChange
-  export let span
-  export let helpText = null
-  export let buttonText = "Add signature"
+export let field
+export let label
+export let disabled = false
+export let readonly = false
+export let validation
+export let onChange
+export let span
+export let helpText = null
+export let buttonText = "Add signature"
 
-  let fieldState
-  let fieldApi
-  let fieldSchema
-  let modal
+let fieldState
+let fieldApi
+let fieldSchema
+let modal
 
-  const { API, notificationStore, builderStore } = getContext("sdk")
-  const context = getContext("context")
-  const formContext = getContext("form")
+const { API, notificationStore, builderStore } = getContext("sdk")
+const context = getContext("context")
+const formContext = getContext("form")
 
-  const saveSignature = async canvas => {
-    try {
-      const signatureFile = canvas.toFile()
-      let updateValue
+const saveSignature = async (canvas) => {
+  try {
+    const signatureFile = canvas.toFile()
+    let updateValue
 
-      if (signatureFile) {
-        let attachRequest = new FormData()
-        attachRequest.append("file", signatureFile)
+    if (signatureFile) {
+      let attachRequest = new FormData()
+      attachRequest.append("file", signatureFile)
 
-        let sourceId = formContext?.dataSource?.tableId
-        if (formContext?.dataSource?.type === "viewV2") {
-          sourceId = formContext.dataSource.id
-        }
-
-        const resp = await API.uploadAttachment(sourceId, attachRequest)
-        const [signatureAttachment] = resp
-        updateValue = signatureAttachment
-      } else {
-        updateValue = null
+      let sourceId = formContext?.dataSource?.tableId
+      if (formContext?.dataSource?.type === "viewV2") {
+        sourceId = formContext.dataSource.id
       }
 
-      const changed = fieldApi.setValue(updateValue)
-      if (onChange && changed) {
-        onChange({ value: updateValue })
-      }
-    } catch (error) {
-      notificationStore.actions.error(
-        `There was a problem saving your signature`
-      )
-      console.error(error)
+      const resp = await API.uploadAttachment(sourceId, attachRequest)
+      const [signatureAttachment] = resp
+      updateValue = signatureAttachment
+    } else {
+      updateValue = null
     }
-  }
 
-  const deleteSignature = async () => {
-    const changed = fieldApi.setValue(null)
+    const changed = fieldApi.setValue(updateValue)
     if (onChange && changed) {
-      onChange({ value: null })
+      onChange({ value: updateValue })
     }
+  } catch (error) {
+    notificationStore.actions.error(`There was a problem saving your signature`)
+    console.error(error)
   }
+}
 
-  $: currentTheme = $context?.device?.theme
-  $: darkMode = !currentTheme?.includes("light")
+const deleteSignature = async () => {
+  const changed = fieldApi.setValue(null)
+  if (onChange && changed) {
+    onChange({ value: null })
+  }
+}
+
+$: currentTheme = $context?.device?.theme
+$: darkMode = !currentTheme?.includes("light")
 </script>
 
 <SignatureModal

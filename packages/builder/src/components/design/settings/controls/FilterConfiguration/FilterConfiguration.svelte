@@ -1,113 +1,105 @@
 <script lang="ts">
-  import { search } from "@budibase/frontend-core"
-  import { Toggle } from "@budibase/bbui"
-  import {
-    getSchemaForDatasource,
-    extractLiteralHandlebarsID,
-    getDatasourceForProvider,
-  } from "@/dataBinding"
-  import { selectedScreen } from "@/stores/builder"
-  import DraggableList from "../DraggableList.svelte"
-  import { createEventDispatcher } from "svelte"
-  import FilterSetting from "./FilterSetting.svelte"
-  import { removeInvalidAddMissing } from "../GridColumnConfiguration/getColumns.js"
-  import {
-    type UIFieldSchema,
-    type Component,
-    type FilterConfig,
-    type Screen,
-    type TableSchema,
-    type Table,
-  } from "@budibase/types"
-  import InfoDisplay from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
-  import { findComponent } from "@/helpers/components"
-  import { tables } from "@/stores/builder"
+import { Toggle } from "@budibase/bbui"
+import { search } from "@budibase/frontend-core"
+import type {
+  Component,
+  FilterConfig,
+  Screen,
+  Table,
+  TableSchema,
+  UIFieldSchema,
+} from "@budibase/types"
+import { createEventDispatcher } from "svelte"
+import {
+  extractLiteralHandlebarsID,
+  getDatasourceForProvider,
+  getSchemaForDatasource,
+} from "@/dataBinding"
+import { findComponent } from "@/helpers/components"
+import InfoDisplay from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
+import { selectedScreen, tables } from "@/stores/builder"
+import DraggableList from "../DraggableList.svelte"
+import { removeInvalidAddMissing } from "../GridColumnConfiguration/getColumns.js"
+import FilterSetting from "./FilterSetting.svelte"
 
-  export let value
-  export let componentInstance
-  export let bindings
+export let value
+export let componentInstance
+export let bindings
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  let selectedAll = false
+let selectedAll = false
 
-  // Load the component for processing
-  $: targetId = extractLiteralHandlebarsID(componentInstance.targetComponent)
-  $: targetComponent =
-    $selectedScreen && targetId
-      ? findComponent($selectedScreen?.props, targetId)
-      : null
+// Load the component for processing
+$: targetId = extractLiteralHandlebarsID(componentInstance.targetComponent)
+$: targetComponent =
+  $selectedScreen && targetId ? findComponent($selectedScreen?.props, targetId) : null
 
-  $: contextDS = getDatasourceForProvider($selectedScreen, targetComponent)
+$: contextDS = getDatasourceForProvider($selectedScreen, targetComponent)
 
-  $: schema = $selectedScreen
-    ? getSchema($selectedScreen, contextDS)
-    : undefined
+$: schema = $selectedScreen ? getSchema($selectedScreen, contextDS) : undefined
 
-  $: searchable = getSearchableFields(schema, $tables.list)
+$: searchable = getSearchableFields(schema, $tables.list)
 
-  $: defaultValues = searchable
-    .filter((column: UIFieldSchema) => !column.nestedJSON)
-    .map(
-      (column: UIFieldSchema): FilterConfig => ({
-        field: column.name,
-        active: !!value == false ? false : !!column.visible,
-        columnType: column.type,
-      })
-    )
-
-  $: parsedColumns = schema
-    ? removeInvalidAddMissing(value || [], [...defaultValues]).map(column => ({
-        ...column,
-      }))
-    : []
-
-  const itemUpdate = (e: CustomEvent) => {
-    // The item is a component instance. '_instanceName' === 'field'
-    const item: Component = e.detail
-    const { label, defaultOperator } = item
-
-    const updated = parsedColumns.map(entry => {
-      if (item._instanceName === entry.field) {
-        return { ...entry, label, defaultOperator }
-      }
-      return entry
+$: defaultValues = searchable
+  .filter((column: UIFieldSchema) => !column.nestedJSON)
+  .map(
+    (column: UIFieldSchema): FilterConfig => ({
+      field: column.name,
+      active: !!value == false ? false : !!column.visible,
+      columnType: column.type,
     })
+  )
 
-    dispatch("change", updated)
-  }
+$: parsedColumns = schema
+  ? removeInvalidAddMissing(value || [], [...defaultValues]).map((column) => ({
+      ...column,
+    }))
+  : []
 
-  const listUpdate = (list: FilterConfig[]) => {
-    dispatch("change", list)
-  }
+const itemUpdate = (e: CustomEvent) => {
+  // The item is a component instance. '_instanceName' === 'field'
+  const item: Component = e.detail
+  const { label, defaultOperator } = item
 
-  const getSearchableFields = (
-    schema: TableSchema | undefined,
-    tableList: Table[]
-  ) => {
-    // Omit calculated fields
-    const filtered = Object.values(schema || {}).filter(
-      field => !("calculationType" in field)
-    )
-    return search.getFields(tableList, filtered)
-  }
-
-  const getSchema = (screen: Screen, datasource: any) => {
-    const schema = getSchemaForDatasource(screen, datasource, null)
-      .schema as Record<string, UIFieldSchema>
-
-    if (!schema) {
-      return
+  const updated = parsedColumns.map((entry) => {
+    if (item._instanceName === entry.field) {
+      return { ...entry, label, defaultOperator }
     }
+    return entry
+  })
 
-    // Don't show ID and rev in tables
-    delete schema._id
-    delete schema._rev
+  dispatch("change", updated)
+}
 
-    const filteredSchema = Object.entries(schema || {})
+const listUpdate = (list: FilterConfig[]) => {
+  dispatch("change", list)
+}
 
-    return Object.fromEntries(filteredSchema)
+const getSearchableFields = (schema: TableSchema | undefined, tableList: Table[]) => {
+  // Omit calculated fields
+  const filtered = Object.values(schema || {}).filter((field) => !("calculationType" in field))
+  return search.getFields(tableList, filtered)
+}
+
+const getSchema = (screen: Screen, datasource: any) => {
+  const schema = getSchemaForDatasource(screen, datasource, null).schema as Record<
+    string,
+    UIFieldSchema
+  >
+
+  if (!schema) {
+    return
   }
+
+  // Don't show ID and rev in tables
+  delete schema._id
+  delete schema._rev
+
+  const filteredSchema = Object.entries(schema || {})
+
+  return Object.fromEntries(filteredSchema)
+}
 </script>
 
 <div class="filter-configuration">

@@ -1,7 +1,7 @@
-import { derived, writable, get } from "svelte/store"
 import { keepOpen, notifications } from "@budibase/bbui"
+import type { Datasource, Query } from "@budibase/types"
+import { derived, get, writable } from "svelte/store"
 import { datasources, queries } from "@/stores/builder"
-import { Datasource, Query } from "@budibase/types"
 
 export const createViewSelectionStore = (datasource: Datasource) => {
   const viewNamesStore = writable<string[]>([])
@@ -9,15 +9,14 @@ export const createViewSelectionStore = (datasource: Datasource) => {
   const errorStore = writable<Error | null>(null)
   const loadingStore = writable<boolean>(true)
 
-  datasources.getViewNames(datasource).then(viewNames => {
+  datasources.getViewNames(datasource).then((viewNames) => {
     viewNamesStore.set(viewNames)
     selectedViewNamesStore.set(
-      viewNames.filter(viewName => {
+      viewNames.filter((viewName) => {
         // Check if a query already exists for this view
         const queryList = get(queries).list
         return queryList.some(
-          (query: Query) =>
-            query.datasourceId === datasource._id && query.name === viewName
+          (query: Query) => query.datasourceId === datasource._id && query.name === viewName
         )
       })
     )
@@ -32,16 +31,14 @@ export const createViewSelectionStore = (datasource: Datasource) => {
     errorStore.set(null)
 
     try {
-      const selectedViews = get(selectedViewNamesStore).filter(
-        Boolean
-      ) as string[]
+      const selectedViews = get(selectedViewNamesStore).filter(Boolean) as string[]
       const existingQueries = get(queries).list.filter(
         (query: Query) => query.datasourceId === datasource._id
       )
 
       // Find views that need new queries (selected but no query exists)
       const viewsToCreate = selectedViews.filter(
-        viewName => !existingQueries.some(query => query.name === viewName)
+        (viewName) => !existingQueries.some((query) => query.name === viewName)
       )
 
       // Create new queries
@@ -60,12 +57,7 @@ export const createViewSelectionStore = (datasource: Datasource) => {
 
   const combined = derived(
     [viewNamesStore, selectedViewNamesStore, errorStore, loadingStore],
-    ([
-      $viewNamesStore,
-      $selectedViewNamesStore,
-      $errorStore,
-      $loadingStore,
-    ]) => {
+    ([$viewNamesStore, $selectedViewNamesStore, $errorStore, $loadingStore]) => {
       return {
         viewNames: $viewNamesStore,
         selectedViewNames: $selectedViewNamesStore,

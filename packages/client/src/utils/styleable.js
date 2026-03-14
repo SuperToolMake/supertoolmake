@@ -5,7 +5,7 @@ import { builderStore } from "@/stores"
  */
 export const buildStyleString = (styleObject, customStyles) => {
   let str = ""
-  for (let key of Object.keys(styleObject || {})) {
+  for (const key of Object.keys(styleObject || {})) {
     if (styleObject[key] != null) {
       str += `${key}:${styleObject[key]};`
     }
@@ -27,7 +27,7 @@ export const styleable = (node, styles = {}) => {
   const setupStyles = (newStyles = {}) => {
     node.classList.add(`${newStyles.id}-dom`)
 
-    let baseStyles = {}
+    const baseStyles = {}
     if (newStyles.empty) {
       baseStyles.padding = "var(--spacing-l)"
       baseStyles.overflow = "hidden"
@@ -51,7 +51,7 @@ export const styleable = (node, styles = {}) => {
     node.setAttribute("draggable", !!newStyles.draggable)
 
     // Applies a style string to a DOM node
-    const applyStyles = styleString => {
+    const applyStyles = (styleString) => {
       node.style = styleString
     }
 
@@ -67,7 +67,7 @@ export const styleable = (node, styles = {}) => {
 
     // Handler to select a component in the builder when clicking it in the
     // builder preview
-    selectComponent = event => {
+    selectComponent = (event) => {
       builderStore.actions.selectComponent(componentId)
       event.preventDefault()
       event.stopPropagation()
@@ -76,7 +76,7 @@ export const styleable = (node, styles = {}) => {
 
     // Handler to start editing a component (if applicable) when double
     // clicking in the builder preview
-    editComponent = event => {
+    editComponent = (event) => {
       if (isBlock) {
         return
       }
@@ -115,7 +115,7 @@ export const styleable = (node, styles = {}) => {
 
   return {
     // Clean up old listeners and apply new ones on update
-    update: newStyles => {
+    update: (newStyles) => {
       removeListeners()
       setupStyles(newStyles)
     },

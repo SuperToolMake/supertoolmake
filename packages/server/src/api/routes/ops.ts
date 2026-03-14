@@ -1,7 +1,7 @@
-import * as controller from "../controllers/ops"
 import { middleware } from "@budibase/backend-core"
-import { publicRoutes } from "./endpointGroups"
 import Joi from "joi"
+import * as controller from "../controllers/ops"
+import { publicRoutes } from "./endpointGroups"
 
 export function logsValidator() {
   return middleware.joiValidator.body(

@@ -1,33 +1,33 @@
 <script lang="ts">
-  import type { Routing, MatchedRoute } from "@/types/routing"
-  import type { Component } from "svelte"
-  import { setContext } from "svelte"
-  import { writable } from "svelte/store"
-  import { memo } from "@budibase/frontend-core"
+import { memo } from "@budibase/frontend-core"
+import type { Component } from "svelte"
+import { setContext } from "svelte"
+import { writable } from "svelte/store"
+import type { MatchedRoute, Routing } from "@/types/routing"
 
-  export let route: MatchedRoute | undefined = undefined
+export let route: MatchedRoute | undefined = undefined
 
-  const memoRoute = memo<MatchedRoute | undefined>(route)
+const memoRoute = memo<MatchedRoute | undefined>(route)
 
-  // Routing context
-  const routing = writable<Routing>({})
-  setContext("routing", routing)
+// Routing context
+const routing = writable<Routing>({})
+setContext("routing", routing)
 
-  // Load the comp
-  let page: Component<Record<string, unknown>> | undefined
+// Load the comp
+let page: Component<Record<string, unknown>> | undefined
 
-  $: memoRoute.set(route)
+$: memoRoute.set(route)
 
-  $: entry = $memoRoute?.entry
-  $: path = entry?.path
-  $: comp = entry?.comp
+$: entry = $memoRoute?.entry
+$: path = entry?.path
+$: comp = entry?.comp
 
-  $: params = { ...($memoRoute?.params || {}) }
-  $: routing.update(state => ({ ...state, params: { ...params } }))
+$: params = { ...($memoRoute?.params || {}) }
+$: routing.update((state) => ({ ...state, params: { ...params } }))
 
-  $: if (path && comp) {
-    page = comp
-  }
+$: if (path && comp) {
+  page = comp
+}
 </script>
 
 {#if page}

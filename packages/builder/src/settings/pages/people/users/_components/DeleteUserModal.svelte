@@ -1,21 +1,21 @@
 <script>
-  import { goto } from "@roxi/routify"
-  import { Body, ModalContent, notifications } from "@budibase/bbui"
-  import { users } from "@/stores/portal/users"
+import { Body, ModalContent, notifications } from "@budibase/bbui"
+import { goto } from "@roxi/routify"
+import { users } from "@/stores/portal/users"
 
-  $goto
+$goto
 
-  export let user
+export let user
 
-  async function deleteUser() {
-    try {
-      await users.delete(user._id)
-      notifications.success(`User ${user?.email} deleted.`)
-      $goto("./")
-    } catch (error) {
-      notifications.error("Error deleting user")
-    }
+async function deleteUser() {
+  try {
+    await users.delete(user._id)
+    notifications.success(`User ${user?.email} deleted.`)
+    $goto("./")
+  } catch (error) {
+    notifications.error("Error deleting user")
   }
+}
 </script>
 
 <ModalContent

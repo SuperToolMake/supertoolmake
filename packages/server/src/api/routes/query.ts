@@ -1,14 +1,10 @@
-import * as queryController from "../controllers/query"
-import { authorizedMiddleware as authorized } from "../../middleware/authorized"
 import { permissions } from "@budibase/backend-core"
+import { authorizedMiddleware as authorized } from "../../middleware/authorized"
+import { bodyResource, bodySubResource, paramResource } from "../../middleware/resourceId"
+import * as queryController from "../controllers/query"
 import {
-  bodyResource,
-  bodySubResource,
-  paramResource,
-} from "../../middleware/resourceId"
-import {
-  generateQueryValidation,
   generateQueryPreviewValidation,
+  generateQueryValidation,
 } from "../controllers/query/validation"
 import { builderRoutes, endpointGroupList } from "./endpointGroups"
 
@@ -39,27 +35,11 @@ builderRoutes
     generateQueryPreviewValidation(),
     queryController.preview
   )
-  .delete(
-    "/api/queries/:queryId/:revId",
-    paramResource("queryId"),
-    queryController.destroy
-  )
+  .delete("/api/queries/:queryId/:revId", paramResource("queryId"), queryController.destroy)
 
 writeRoutes
   // DEPRECATED - use new query endpoint for future work
-  .post(
-    "/api/queries/:queryId",
-    paramResource("queryId"),
-    queryController.executeV1
-  )
-  .post(
-    "/api/v2/queries/:queryId",
-    paramResource("queryId"),
-    queryController.executeV2
-  )
+  .post("/api/queries/:queryId", paramResource("queryId"), queryController.executeV1)
+  .post("/api/v2/queries/:queryId", paramResource("queryId"), queryController.executeV2)
 
-readRoutes.get(
-  "/api/queries/:queryId",
-  paramResource("queryId"),
-  queryController.find
-)
+readRoutes.get("/api/queries/:queryId", paramResource("queryId"), queryController.find)

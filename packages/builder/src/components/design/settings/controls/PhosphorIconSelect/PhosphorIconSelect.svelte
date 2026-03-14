@@ -1,98 +1,97 @@
 <script lang="ts">
-  import { Popover, ActionButton, Button, Input } from "@budibase/bbui"
-  import { createEventDispatcher } from "svelte"
-  import phosphorIcons from "./phosphorIcons"
+import { ActionButton, Button, Input, type Popover } from "@budibase/bbui"
+import { createEventDispatcher } from "svelte"
+import phosphorIcons from "./phosphorIcons"
 
-  interface PhosphorIconSelectEvents {
-    change: string
+interface PhosphorIconSelectEvents {
+  change: string
+}
+
+const dispatch = createEventDispatcher<PhosphorIconSelectEvents>()
+
+export let value: string = ""
+export let maxIconsPerPage: number = 72
+
+let searchTerm: string = ""
+let currentPage: number = 1
+
+let buttonAnchor: HTMLDivElement
+let dropdown: Popover
+let loading: boolean = false
+let loadedWeights: Set<string> = new Set()
+let isLoadingWeight: boolean = false
+
+// Load phosphor icon weights dynamically when dropdown is opened
+async function loadRegularWeight(): Promise<void> {
+  if (loadedWeights.has("regular") || isLoadingWeight) return
+
+  isLoadingWeight = true
+  try {
+    // Load from CDN instead of bundled package
+    const link = document.createElement("link")
+    link.rel = "stylesheet"
+    link.href = "https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css"
+
+    await new Promise<void>((resolve, reject) => {
+      link.onload = () => resolve()
+      link.onerror = () => reject()
+      document.head.appendChild(link)
+    })
+
+    loadedWeights.add("regular")
+  } catch (error) {
+    console.error("Failed to load phosphor regular icons", error)
+  } finally {
+    isLoadingWeight = false
+  }
+}
+
+// Load regular weight when dropdown opens
+async function onDropdownShow(): Promise<void> {
+  await loadRegularWeight()
+  dropdown.show()
+}
+
+// Reactive search - automatically filter icons when searchTerm changes
+$: filteredIcons = searchTerm
+  ? phosphorIcons.filter((icon: string) =>
+      icon.toLowerCase().includes(searchTerm.toLowerCase().trim())
+    )
+  : phosphorIcons
+
+// Reset to first page when search changes
+$: if (searchTerm !== undefined) {
+  currentPage = 1
+}
+
+function pageClick(direction: "next" | "back"): void {
+  if (
+    (direction === "next" && currentPage >= totalPages) ||
+    (direction === "back" && currentPage <= 1)
+  ) {
+    return
   }
 
-  const dispatch = createEventDispatcher<PhosphorIconSelectEvents>()
-
-  export let value: string = ""
-  export let maxIconsPerPage: number = 72
-
-  let searchTerm: string = ""
-  let currentPage: number = 1
-
-  let buttonAnchor: HTMLDivElement
-  let dropdown: Popover
-  let loading: boolean = false
-  let loadedWeights: Set<string> = new Set()
-  let isLoadingWeight: boolean = false
-
-  // Load phosphor icon weights dynamically when dropdown is opened
-  async function loadRegularWeight(): Promise<void> {
-    if (loadedWeights.has("regular") || isLoadingWeight) return
-
-    isLoadingWeight = true
-    try {
-      // Load from CDN instead of bundled package
-      const link = document.createElement("link")
-      link.rel = "stylesheet"
-      link.href =
-        "https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css"
-
-      await new Promise<void>((resolve, reject) => {
-        link.onload = () => resolve()
-        link.onerror = () => reject()
-        document.head.appendChild(link)
-      })
-
-      loadedWeights.add("regular")
-    } catch (error) {
-      console.error("Failed to load phosphor regular icons", error)
-    } finally {
-      isLoadingWeight = false
-    }
+  loading = true
+  if (direction === "next") {
+    currentPage++
+  } else {
+    currentPage--
   }
+  loading = false
+}
 
-  // Load regular weight when dropdown opens
-  async function onDropdownShow(): Promise<void> {
-    await loadRegularWeight()
-    dropdown.show()
-  }
+const select = (icon: string): void => {
+  value = icon
+  dispatch("change", icon)
+  dropdown.hide()
+}
 
-  // Reactive search - automatically filter icons when searchTerm changes
-  $: filteredIcons = searchTerm
-    ? phosphorIcons.filter((icon: string) =>
-        icon.toLowerCase().includes(searchTerm.toLowerCase().trim())
-      )
-    : phosphorIcons
-
-  // Reset to first page when search changes
-  $: if (searchTerm !== undefined) {
-    currentPage = 1
-  }
-
-  function pageClick(direction: "next" | "back"): void {
-    if (
-      (direction === "next" && currentPage >= totalPages) ||
-      (direction === "back" && currentPage <= 1)
-    ) {
-      return
-    }
-
-    loading = true
-    if (direction === "next") {
-      currentPage++
-    } else {
-      currentPage--
-    }
-    loading = false
-  }
-
-  const select = (icon: string): void => {
-    value = icon
-    dispatch("change", icon)
-    dropdown.hide()
-  }
-
-  $: displayValue = value || "Pick icon"
-  $: totalPages = Math.max(1, Math.ceil(filteredIcons.length / maxIconsPerPage))
-  $: pageEndIdx = maxIconsPerPage * currentPage
-  $: pagedIcons = filteredIcons.slice(pageEndIdx - maxIconsPerPage, pageEndIdx)
-  $: pagerText = `Page ${currentPage} of ${totalPages} (${filteredIcons.length} icons)`
+$: displayValue = value || "Pick icon"
+$: totalPages = Math.max(1, Math.ceil(filteredIcons.length / maxIconsPerPage))
+$: pageEndIdx = maxIconsPerPage * currentPage
+$: pagedIcons = filteredIcons.slice(pageEndIdx - maxIconsPerPage, pageEndIdx)
+$: pagerText = `Page ${currentPage} of ${totalPages} (${filteredIcons.length} icons)`
 </script>
 
 <div class="picker-wrap" bind:this={buttonAnchor}>

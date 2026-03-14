@@ -1,6 +1,6 @@
-import { API } from "@/api"
 import { get, writable } from "svelte/store"
 import { beforeEach, describe, expect, it, vi } from "vitest"
+import { API } from "@/api"
 import { AdminStore } from "./admin"
 import { auth } from "./auth"
 
@@ -39,7 +39,7 @@ vi.mock("@budibase/bbui", () => {
 })
 
 describe("admin store", () => {
-  beforeEach(ctx => {
+  beforeEach((ctx) => {
     vi.clearAllMocks()
 
     ctx.writableReturn = { update: vi.fn(), subscribe: vi.fn() }
@@ -49,7 +49,7 @@ describe("admin store", () => {
   })
 
   describe("init method", () => {
-    beforeEach(async ctx => {
+    beforeEach(async (ctx) => {
       let getMockIndex = 0
 
       ctx.getMockValues = [
@@ -78,17 +78,15 @@ describe("admin store", () => {
     })
 
     describe("getCheckList", () => {
-      beforeEach(async ctx => {
+      beforeEach(async (ctx) => {
         await ctx.returnedStore.init()
       })
 
-      it("adds the checklist to the store", ctx => {
+      it("adds the checklist to the store", (ctx) => {
         expect(get).toHaveBeenNthCalledWith(1, auth)
         expect(API.getChecklist).toHaveBeenCalledTimes(1)
         expect(API.getChecklist).toHaveBeenCalledWith("tenantId")
-        expect(
-          ctx.writableReturn.update.mock.calls[0][0]({ foo: "foo" })
-        ).toEqual({
+        expect(ctx.writableReturn.update.mock.calls[0][0]({ foo: "foo" })).toEqual({
           foo: "foo",
           checklist: "checklist",
         })
@@ -96,16 +94,14 @@ describe("admin store", () => {
     })
 
     describe("getEnvironment", () => {
-      beforeEach(async ctx => {
+      beforeEach(async (ctx) => {
         await ctx.returnedStore.init()
       })
 
-      it("adds the environment to the store", ctx => {
+      it("adds the environment to the store", (ctx) => {
         expect(API.getEnvironment).toHaveBeenCalledTimes(1)
         expect(API.getEnvironment).toHaveBeenCalledWith()
-        expect(
-          ctx.writableReturn.update.mock.calls[1][0]({ foo: "foo" })
-        ).toEqual({
+        expect(ctx.writableReturn.update.mock.calls[1][0]({ foo: "foo" })).toEqual({
           foo: "foo",
           multiTenancy: true,
           cloud: true,
@@ -116,7 +112,7 @@ describe("admin store", () => {
 
     describe("system status", () => {
       describe("non cloud", () => {
-        beforeEach(async ctx => {
+        beforeEach(async (ctx) => {
           ctx.getMockValues[1].cloud = false
           await ctx.returnedStore.init()
         })
@@ -127,49 +123,49 @@ describe("admin store", () => {
       })
 
       describe("cloud with healthy admin status", () => {
-        beforeEach(async ctx => {
+        beforeEach(async (ctx) => {
           ctx.getMockValues[1].cloud = true
           ctx.getMockValues[2].status.health.passing = true
           await ctx.returnedStore.init()
         })
 
-        it("getSystemStatus", ctx => {
+        it("getSystemStatus", (ctx) => {
           expect(get).toHaveBeenNthCalledWith(2, ctx.writableReturn)
           expect(API.getSystemStatus).toHaveBeenCalledTimes(1)
           expect(API.getEnvironment).toHaveBeenCalledWith()
-          expect(
-            ctx.writableReturn.update.mock.calls[2][0]({ foo: "foo" })
-          ).toEqual({ foo: "foo", status: "status" })
+          expect(ctx.writableReturn.update.mock.calls[2][0]({ foo: "foo" })).toEqual({
+            foo: "foo",
+            status: "status",
+          })
         })
       })
 
       describe("cloud with unhealthy admin status", () => {
-        beforeEach(async ctx => {
+        beforeEach(async (ctx) => {
           ctx.getMockValues[1].cloud = true
           ctx.getMockValues[2].status.health.passing = false
           await ctx.returnedStore.init()
         })
 
-        it("getSystemStatus", ctx => {
+        it("getSystemStatus", (ctx) => {
           expect(get).toHaveBeenNthCalledWith(2, ctx.writableReturn)
           expect(API.getSystemStatus).toHaveBeenCalledTimes(1)
           expect(API.getEnvironment).toHaveBeenCalledWith()
-          expect(
-            ctx.writableReturn.update.mock.calls[2][0]({ foo: "foo" })
-          ).toEqual({ foo: "foo", status: "status" })
+          expect(ctx.writableReturn.update.mock.calls[2][0]({ foo: "foo" })).toEqual({
+            foo: "foo",
+            status: "status",
+          })
         })
       })
     })
 
     describe("getEnvironment", () => {
-      beforeEach(async ctx => {
+      beforeEach(async (ctx) => {
         await ctx.returnedStore.init()
       })
 
-      it("marks the store as loaded", ctx => {
-        expect(
-          ctx.writableReturn.update.mock.calls[3][0]({ foo: "foo" })
-        ).toEqual({
+      it("marks the store as loaded", (ctx) => {
+        expect(ctx.writableReturn.update.mock.calls[3][0]({ foo: "foo" })).toEqual({
           foo: "foo",
           loaded: true,
         })
@@ -178,33 +174,29 @@ describe("admin store", () => {
   })
 
   describe("unload", () => {
-    beforeEach(ctx => {
+    beforeEach((ctx) => {
       ctx.returnedStore.unload()
     })
 
-    it("sets the store's loaded parameter to false", ctx => {
-      expect(
-        ctx.writableReturn.update.mock.calls[0][0]({ loaded: true })
-      ).toEqual({
+    it("sets the store's loaded parameter to false", (ctx) => {
+      expect(ctx.writableReturn.update.mock.calls[0][0]({ loaded: true })).toEqual({
         loaded: false,
       })
     })
   })
 
   describe("getChecklist", () => {
-    beforeEach(async ctx => {
+    beforeEach(async (ctx) => {
       get.mockReturnValue({ tenantId: "tenantId" })
       API.getChecklist.mockReturnValue("checklist")
       await ctx.returnedStore.getChecklist()
     })
 
-    it("updates the store with the new checklist", ctx => {
+    it("updates the store with the new checklist", (ctx) => {
       expect(get).toHaveBeenNthCalledWith(1, auth)
       expect(API.getChecklist).toHaveBeenCalledTimes(1)
       expect(API.getChecklist).toHaveBeenCalledWith("tenantId")
-      expect(
-        ctx.writableReturn.update.mock.calls[0][0]({ foo: "foo" })
-      ).toEqual({
+      expect(ctx.writableReturn.update.mock.calls[0][0]({ foo: "foo" })).toEqual({
         foo: "foo",
         checklist: "checklist",
       })

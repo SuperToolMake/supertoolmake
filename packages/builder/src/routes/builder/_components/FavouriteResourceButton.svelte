@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { Icon, TooltipPosition, TooltipType } from "@budibase/bbui"
-  import { API } from "@/api"
-  import { type WorkspaceFavourite } from "@budibase/types"
-  import { workspaceFavouriteStore } from "@/stores/builder"
+import { Icon, TooltipPosition, TooltipType } from "@budibase/bbui"
+import type { WorkspaceFavourite } from "@budibase/types"
+import { API } from "@/api"
+import { workspaceFavouriteStore } from "@/stores/builder"
 
-  export let favourite: WorkspaceFavourite | undefined = undefined
-  export let size: "S" | "XS" | "M" | "L" | "XL" | "XXL" | "XXXL" = "XS"
-  export let position: TooltipPosition = TooltipPosition.Top
-  export let noWrap = false
+export let favourite: WorkspaceFavourite | undefined = undefined
+export let size: "S" | "XS" | "M" | "L" | "XL" | "XXL" | "XXXL" = "XS"
+export let position: TooltipPosition = TooltipPosition.Top
+export let noWrap = false
 
-  let waiting = false
+let waiting = false
 </script>
 
 {#if favourite}

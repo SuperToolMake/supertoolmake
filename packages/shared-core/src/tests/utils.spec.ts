@@ -26,7 +26,7 @@ describe("parallelForeach", () => {
 
     await utils.parallelForeach(
       items,
-      async item => {
+      async (item) => {
         results.push(item * 2)
       },
       2
@@ -58,7 +58,7 @@ describe("parallelForeach", () => {
     await expect(
       utils.parallelForeach(
         items,
-        async item => {
+        async (item) => {
           if (item === 5) {
             throw new Error(`Task ${item} failed`)
           }
@@ -79,7 +79,7 @@ describe("parallelForeach", () => {
       async () => {
         runningTasks++
         expect(runningTasks).toBeLessThanOrEqual(3) // maxConcurrency is 3
-        await new Promise(resolve => setTimeout(resolve, 20)) // Simulate work
+        await new Promise((resolve) => setTimeout(resolve, 20)) // Simulate work
         runningTasks--
       },
       3

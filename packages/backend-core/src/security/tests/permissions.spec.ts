@@ -5,9 +5,7 @@ import { BUILTIN_ROLE_IDS } from "../roles"
 
 describe("levelToNumber", () => {
   it("should return 0 for EXECUTE", () => {
-    expect(permissions.levelToNumber(permissions.PermissionLevel.EXECUTE)).toBe(
-      0
-    )
+    expect(permissions.levelToNumber(permissions.PermissionLevel.EXECUTE)).toBe(0)
   })
 
   it("should return 1 for READ", () => {
@@ -23,31 +21,25 @@ describe("levelToNumber", () => {
   })
 
   it("should return -1 for an unknown permission level", () => {
-    expect(
-      permissions.levelToNumber("unknown" as permissions.PermissionLevel)
-    ).toBe(-1)
+    expect(permissions.levelToNumber("unknown" as permissions.PermissionLevel)).toBe(-1)
   })
 })
 describe("getAllowedLevels", () => {
   it('should return ["execute"] for EXECUTE', () => {
-    expect(
-      permissions.getAllowedLevels(permissions.PermissionLevel.EXECUTE)
-    ).toEqual([permissions.PermissionLevel.EXECUTE])
+    expect(permissions.getAllowedLevels(permissions.PermissionLevel.EXECUTE)).toEqual([
+      permissions.PermissionLevel.EXECUTE,
+    ])
   })
 
   it('should return ["execute", "read"] for READ', () => {
-    expect(
-      permissions.getAllowedLevels(permissions.PermissionLevel.READ)
-    ).toEqual([
+    expect(permissions.getAllowedLevels(permissions.PermissionLevel.READ)).toEqual([
       permissions.PermissionLevel.EXECUTE,
       permissions.PermissionLevel.READ,
     ])
   })
 
   it('should return ["execute", "read", "write"] for WRITE', () => {
-    expect(
-      permissions.getAllowedLevels(permissions.PermissionLevel.WRITE)
-    ).toEqual([
+    expect(permissions.getAllowedLevels(permissions.PermissionLevel.WRITE)).toEqual([
       permissions.PermissionLevel.EXECUTE,
       permissions.PermissionLevel.READ,
       permissions.PermissionLevel.WRITE,
@@ -55,9 +47,7 @@ describe("getAllowedLevels", () => {
   })
 
   it('should return ["execute", "read", "write"] for ADMIN', () => {
-    expect(
-      permissions.getAllowedLevels(permissions.PermissionLevel.ADMIN)
-    ).toEqual([
+    expect(permissions.getAllowedLevels(permissions.PermissionLevel.ADMIN)).toEqual([
       permissions.PermissionLevel.EXECUTE,
       permissions.PermissionLevel.READ,
       permissions.PermissionLevel.WRITE,
@@ -65,9 +55,7 @@ describe("getAllowedLevels", () => {
   })
 
   it("should return [] for an unknown permission level", () => {
-    expect(
-      permissions.getAllowedLevels("unknown" as permissions.PermissionLevel)
-    ).toEqual([])
+    expect(permissions.getAllowedLevels("unknown" as permissions.PermissionLevel)).toEqual([])
   })
 })
 
@@ -81,9 +69,7 @@ describe("doesHaveBasePermission", () => {
         permissionId: BuiltinPermissionID.ADMIN,
       },
     ]
-    expect(
-      permissions.doesHaveBasePermission(permType, permLevel, rolesHierarchy)
-    ).toBe(true)
+    expect(permissions.doesHaveBasePermission(permType, permLevel, rolesHierarchy)).toBe(true)
   })
 
   it("should return false if base permission does not have the required level", () => {
@@ -95,27 +81,21 @@ describe("doesHaveBasePermission", () => {
         permissionId: BuiltinPermissionID.PUBLIC,
       },
     ]
-    expect(
-      permissions.doesHaveBasePermission(permType, permLevel, rolesHierarchy)
-    ).toBe(false)
+    expect(permissions.doesHaveBasePermission(permType, permLevel, rolesHierarchy)).toBe(false)
   })
 })
 
 describe("isPermissionLevelHigherThanRead", () => {
   it("should return true if level is higher than read", () => {
-    expect(
-      permissions.isPermissionLevelHigherThanRead(
-        permissions.PermissionLevel.WRITE
-      )
-    ).toBe(true)
+    expect(permissions.isPermissionLevelHigherThanRead(permissions.PermissionLevel.WRITE)).toBe(
+      true
+    )
   })
 
   it("should return false if level is read or lower", () => {
-    expect(
-      permissions.isPermissionLevelHigherThanRead(
-        permissions.PermissionLevel.READ
-      )
-    ).toBe(false)
+    expect(permissions.isPermissionLevelHigherThanRead(permissions.PermissionLevel.READ)).toBe(
+      false
+    )
   })
 })
 
@@ -129,7 +109,7 @@ describe("getBuiltinPermissions", () => {
 
 describe("getBuiltinPermissionByID", () => {
   test.each(
-    Object.values(permissions.BUILTIN_PERMISSIONS).map(p => [p.name, p])
+    Object.values(permissions.BUILTIN_PERMISSIONS).map((p) => [p.name, p])
   )("returns correct permission object for %s", (_name, expected) => {
     expect(permissions.getBuiltinPermissionByID(expected._id)).toEqual(expected)
   })

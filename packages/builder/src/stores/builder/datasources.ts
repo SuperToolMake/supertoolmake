@@ -1,19 +1,19 @@
+import {
+  type Datasource,
+  DatasourceFeature,
+  type Integration,
+  type RestTemplateName,
+  type RestTemplateSpecVersion,
+  SourceName,
+  type Table,
+  type UIIntegration,
+  type UIInternalDatasource,
+} from "@budibase/types"
+import { derived, get, type Readable, type Writable } from "svelte/store"
 import { API } from "@/api"
 import { TableNames } from "@/constants"
 import { BUDIBASE_INTERNAL_DB_ID } from "@/constants/backend"
 import { DerivedBudiStore } from "@/stores/BudiStore"
-import {
-  Datasource,
-  DatasourceFeature,
-  Integration,
-  RestTemplateName,
-  RestTemplateSpecVersion,
-  SourceName,
-  Table,
-  UIIntegration,
-  UIInternalDatasource,
-} from "@budibase/types"
-import { derived, get, Readable, Writable } from "svelte/store"
 import { queries } from "./queries"
 import { tables } from "./tables"
 
@@ -60,17 +60,13 @@ export class DatasourceStore extends DerivedBudiStore<
         // Set the internal datasource entities from the table list, which we're
         // able to keep updated unlike the egress generated definition of the
         // internal datasource
-        let internalDS: Datasource | UIInternalDatasource | undefined =
-          $store.rawList?.find(ds => ds._id === BUDIBASE_INTERNAL_DB_ID)
-        let otherDS = $store.rawList?.filter(
-          ds => ds._id !== BUDIBASE_INTERNAL_DB_ID
+        let internalDS: Datasource | UIInternalDatasource | undefined = $store.rawList?.find(
+          (ds) => ds._id === BUDIBASE_INTERNAL_DB_ID
         )
+        const otherDS = $store.rawList?.filter((ds) => ds._id !== BUDIBASE_INTERNAL_DB_ID)
         if (internalDS) {
           const tables: Table[] = $tables.list?.filter((table: Table) => {
-            return (
-              table.sourceId === BUDIBASE_INTERNAL_DB_ID &&
-              table._id !== TableNames.USERS
-            )
+            return table.sourceId === BUDIBASE_INTERNAL_DB_ID && table._id !== TableNames.USERS
           })
           internalDS = {
             ...internalDS,
@@ -89,7 +85,7 @@ export class DatasourceStore extends DerivedBudiStore<
         return {
           ...$store,
           list,
-          selected: list?.find(ds => ds._id === $store.selectedDatasourceId),
+          selected: list?.find((ds) => ds._id === $store.selectedDatasourceId),
           hasData: list?.length > 0,
         }
       })
@@ -121,19 +117,16 @@ export class DatasourceStore extends DerivedBudiStore<
 
   generateLookup() {
     return derived([this.store], ([$data]): DatasourceLookupState => {
-      return $data.rawList.reduce(
-        (acc: DatasourceLookupState, d: Datasource) => {
-          acc[d._id!] = d
-          return acc
-        },
-        {} as DatasourceLookupState
-      )
+      return $data.rawList.reduce((acc: DatasourceLookupState, d: Datasource) => {
+        acc[d._id!] = d
+        return acc
+      }, {} as DatasourceLookupState)
     })
   }
 
   async fetch() {
     const datasources = await API.getDatasources()
-    this.store.update(state => ({
+    this.store.update((state) => ({
       ...state,
       rawList: datasources,
     }))
@@ -144,7 +137,7 @@ export class DatasourceStore extends DerivedBudiStore<
   }
 
   select(id: string) {
-    this.store.update(state => ({
+    this.store.update((state) => ({
       ...state,
       selectedDatasourceId: id,
     }))
@@ -164,20 +157,15 @@ export class DatasourceStore extends DerivedBudiStore<
   }
 
   async updateSchema(datasource: Datasource, tablesFilter: string[]) {
-    const response = await API.buildDatasourceSchema(
-      datasource?._id!,
-      tablesFilter
-    )
+    const response = await API.buildDatasourceSchema(datasource?._id!, tablesFilter)
     this.updateDatasourceInStore(response)
   }
 
   sourceCount(source: string, restTemplate?: string) {
     return get(this.store).rawList.filter(
-      datasource =>
+      (datasource) =>
         datasource.source === source &&
-        (restTemplate !== undefined
-          ? datasource.restTemplate === restTemplate
-          : true)
+        (restTemplate !== undefined ? datasource.restTemplate === restTemplate : true)
     ).length
   }
 
@@ -223,10 +211,7 @@ export class DatasourceStore extends DerivedBudiStore<
       ...(restTemplateVersion && { restTemplateVersion }),
     }
 
-    const { valid, error } = await this.checkDatasourceValidity(
-      integration,
-      datasource
-    )
+    const { valid, error } = await this.checkDatasourceValidity(integration, datasource)
     if (!valid) {
       throw new Error(`Unable to connect - ${error}`)
     }
@@ -239,13 +224,7 @@ export class DatasourceStore extends DerivedBudiStore<
     return this.updateDatasourceInStore(response, { ignoreErrors: true })
   }
 
-  async save({
-    integration,
-    datasource,
-  }: {
-    integration: Integration
-    datasource: Datasource
-  }) {
+  async save({ integration, datasource }: { integration: Integration; datasource: Datasource }) {
     if (!(await this.checkDatasourceValidity(integration, datasource)).valid) {
       throw new Error("Unable to connect")
     }
@@ -274,9 +253,9 @@ export class DatasourceStore extends DerivedBudiStore<
 
     // Handle deletion
     if (!datasource) {
-      this.store.update(state => ({
+      this.store.update((state) => ({
         ...state,
-        rawList: state.rawList.filter(x => x._id !== datasourceId),
+        rawList: state.rawList.filter((x) => x._id !== datasourceId),
       }))
       tables.removeDatasourceTables(datasourceId)
       queries.removeDatasourceQueries(datasourceId)
@@ -284,11 +263,9 @@ export class DatasourceStore extends DerivedBudiStore<
     }
 
     // Add new datasource
-    const index = get(this.store).rawList.findIndex(
-      x => x._id === datasource._id
-    )
+    const index = get(this.store).rawList.findIndex((x) => x._id === datasource._id)
     if (index === -1) {
-      this.store.update(state => ({
+      this.store.update((state) => ({
         ...state,
         rawList: [...state.rawList, datasource],
       }))
@@ -300,7 +277,7 @@ export class DatasourceStore extends DerivedBudiStore<
 
     // Update existing datasource
     else if (datasource) {
-      this.store.update(state => {
+      this.store.update((state) => {
         state.rawList[index] = datasource
         return state
       })
@@ -324,10 +301,7 @@ export class DatasourceStore extends DerivedBudiStore<
 
   async createViewQuery(datasource: Datasource, viewName: string) {
     try {
-      const sql =
-        "SELECT * FROM " +
-        viewName +
-        " \nLIMIT {{ limit }} \nOFFSET {{ offset }}"
+      const sql = "SELECT * FROM " + viewName + " \nLIMIT {{ limit }} \nOFFSET {{ offset }}"
 
       const query = {
         datasourceId: datasource._id!,

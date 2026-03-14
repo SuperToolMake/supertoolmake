@@ -1,4 +1,4 @@
-import { Ctx } from "@budibase/types"
+import type { Ctx } from "@budibase/types"
 import mapping from "../../../controllers/public/mapping"
 
 enum Resource {

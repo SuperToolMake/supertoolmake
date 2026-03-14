@@ -1,4 +1,4 @@
-import { tenancy, configs } from "@budibase/backend-core"
+import { configs, tenancy } from "@budibase/backend-core"
 import { EmailTemplatePurpose } from "@budibase/types"
 import { InternalTemplateBinding, LOGO_URL } from "../constants"
 import { checkSlashesInUrl } from "./index"
@@ -12,14 +12,11 @@ export async function getSettingsTemplateContext(
   const settings = await configs.getSettingsConfig()
   const URL = settings.platformUrl
   const context: any = {
-    [InternalTemplateBinding.LOGO_URL]:
-      checkSlashesInUrl(`${URL}/${settings.logoUrl}`) || LOGO_URL,
+    [InternalTemplateBinding.LOGO_URL]: checkSlashesInUrl(`${URL}/${settings.logoUrl}`) || LOGO_URL,
     [InternalTemplateBinding.PLATFORM_URL]: URL,
     [InternalTemplateBinding.COMPANY]: settings.company || BASE_COMPANY,
     [InternalTemplateBinding.DOCS_URL]: "https://docs.budibase.com/",
-    [InternalTemplateBinding.LOGIN_URL]: checkSlashesInUrl(
-      tenancy.addTenantToUrl(`${URL}/login`)
-    ),
+    [InternalTemplateBinding.LOGIN_URL]: checkSlashesInUrl(tenancy.addTenantToUrl(`${URL}/login`)),
     [InternalTemplateBinding.CURRENT_DATE]: new Date().toISOString(),
     [InternalTemplateBinding.CURRENT_YEAR]: new Date().getFullYear(),
   }

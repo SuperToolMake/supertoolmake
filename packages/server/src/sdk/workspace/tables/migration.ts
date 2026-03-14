@@ -1,23 +1,22 @@
 import { BadRequestError, context, db as dbCore } from "@budibase/backend-core"
 import { isInternalColumnName } from "@budibase/shared-core"
 import {
-  BBReferenceFieldMetadata,
+  type BBReferenceFieldMetadata,
   BBReferenceFieldSubType,
-  BBReferenceSingleFieldMetadata,
-  FieldSchema,
+  type BBReferenceSingleFieldMetadata,
+  type FieldSchema,
   FieldType,
   InternalTable,
   isRelationshipField,
-  LinkDocument,
-  LinkInfo,
-  RelationshipFieldMetadata,
+  type LinkDocument,
+  type LinkInfo,
+  type RelationshipFieldMetadata,
   RelationshipType,
-  Row,
-  Table,
+  type Row,
+  type Table,
 } from "@budibase/types"
-
-import sdk from "../.."
 import { isExternalTableID } from "../../../integrations/utils"
+import sdk from "../.."
 
 export interface MigrationResult {
   tablesUpdated: Table[]
@@ -43,18 +42,11 @@ export async function migrate(
   const oldColumn = table.schema[oldColumnName]
 
   if (!oldColumn) {
-    throw new BadRequestError(
-      `Column "${oldColumnName}" does not exist on table "${table.name}"`
-    )
+    throw new BadRequestError(`Column "${oldColumnName}" does not exist on table "${table.name}"`)
   }
 
-  if (
-    oldColumn.type !== FieldType.LINK ||
-    oldColumn.tableId !== InternalTable.USER_METADATA
-  ) {
-    throw new BadRequestError(
-      `Only user relationship migration columns is currently supported`
-    )
+  if (oldColumn.type !== FieldType.LINK || oldColumn.tableId !== InternalTable.USER_METADATA) {
+    throw new BadRequestError(`Only user relationship migration columns is currently supported`)
   }
 
   const type =
@@ -121,15 +113,11 @@ function getColumnMigrator(
   }
 
   if (!isRelationshipField(oldColumn)) {
-    throw new BadRequestError(
-      `Column "${oldColumn.name}" is not a user relationship`
-    )
+    throw new BadRequestError(`Column "${oldColumn.name}" is not a user relationship`)
   }
 
   if (oldColumn.tableId !== InternalTable.USER_METADATA) {
-    throw new BadRequestError(
-      `Column "${oldColumn.name}" is not a user relationship`
-    )
+    throw new BadRequestError(`Column "${oldColumn.name}" is not a user relationship`)
   }
 
   if (oldColumn.relationshipType === RelationshipType.ONE_TO_MANY) {
@@ -182,8 +170,8 @@ abstract class UserColumnMigrator<T> implements ColumnMigrator {
   }
 
   async doMigration(): Promise<MigrationResult> {
-    let rows = await sdk.rows.fetchRaw(this.table._id!)
-    let rowsById = rows.reduce(
+    const rows = await sdk.rows.fetchRaw(this.table._id!)
+    const rowsById = rows.reduce(
       (acc, row) => {
         acc[row._id!] = row
         return acc
@@ -191,8 +179,8 @@ abstract class UserColumnMigrator<T> implements ColumnMigrator {
       {} as Record<string, Row>
     )
 
-    let links = await sdk.links.fetchWithDocument(this.table._id!)
-    for (let link of links) {
+    const links = await sdk.links.fetchWithDocument(this.table._id!)
+    for (const link of links) {
       const userSide = this.pickUserTableLinkSide(link)
       const otherSide = this.pickOtherTableLinkSide(link)
       if (
@@ -203,7 +191,7 @@ abstract class UserColumnMigrator<T> implements ColumnMigrator {
         continue
       }
 
-      let row = rowsById[otherSide.rowId]
+      const row = rowsById[otherSide.rowId]
       if (!row) {
         // This can happen if the row has been deleted but the link hasn't,
         // which was a state that was found during the initial testing of this
@@ -214,13 +202,13 @@ abstract class UserColumnMigrator<T> implements ColumnMigrator {
       this.updateRow(row, userSide)
     }
 
-    let db = context.getWorkspaceDB()
+    const db = context.getWorkspaceDB()
     await db.bulkDocs(rows)
 
     delete this.table.schema[this.oldColumn.name]
     this.table = await sdk.tables.saveTable(this.table)
 
-    let otherTable = await sdk.tables.getTable(this.oldColumn.tableId)
+    const otherTable = await sdk.tables.getTable(this.oldColumn.tableId)
     return {
       tablesUpdated: [this.table, otherTable],
     }
@@ -229,9 +217,7 @@ abstract class UserColumnMigrator<T> implements ColumnMigrator {
 
 class SingleUserColumnMigrator extends UserColumnMigrator<BBReferenceSingleFieldMetadata> {
   updateRow(row: Row, linkInfo: LinkInfo): void {
-    row[this.newColumn.name] = dbCore.getGlobalIDFromUserMetadataID(
-      linkInfo.rowId
-    )
+    row[this.newColumn.name] = dbCore.getGlobalIDFromUserMetadataID(linkInfo.rowId)
   }
 }
 
@@ -240,8 +226,6 @@ class MultiUserColumnMigrator extends UserColumnMigrator<BBReferenceFieldMetadat
     if (!row[this.newColumn.name]) {
       row[this.newColumn.name] = []
     }
-    row[this.newColumn.name].push(
-      dbCore.getGlobalIDFromUserMetadataID(linkInfo.rowId)
-    )
+    row[this.newColumn.name].push(dbCore.getGlobalIDFromUserMetadataID(linkInfo.rowId))
   }
 }

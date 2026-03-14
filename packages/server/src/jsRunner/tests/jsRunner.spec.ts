@@ -1,11 +1,9 @@
 import { encodeJSBinding, processStringSync } from "@budibase/string-templates"
-import { validate as isValidUUID } from "uuid"
-
 import { runJsHelpersTests } from "@budibase/string-templates/test/utils"
-
 import tk from "timekeeper"
-import { init } from ".."
+import { validate as isValidUUID } from "uuid"
 import TestConfiguration from "../../tests/utilities/TestConfiguration"
+import { init } from ".."
 
 const DATE = "2021-01-21T12:00:00"
 tk.freeze(DATE)
@@ -63,11 +61,9 @@ describe("jsRunner (using isolated-vm)", () => {
   })
 
   it("should prevent sandbox escape", async () => {
-    expect(
-      await processJS(
-        `return this.constructor.constructor("return process.env")()`
-      )
-    ).toEqual("ReferenceError: process is not defined")
+    expect(await processJS(`return this.constructor.constructor("return process.env")()`)).toEqual(
+      "ReferenceError: process is not defined"
+    )
   })
 
   it("should not allow the context to be mutated", async () => {
@@ -129,9 +125,7 @@ describe("jsRunner (using isolated-vm)", () => {
     describe("buffer", () => {
       it("handle a buffer", async () => {
         const base64 = Buffer.from("hello").toString("base64")
-        const result = await processJS(
-          `return Buffer.from("${base64}", "base64").toString("utf8")`
-        )
+        const result = await processJS(`return Buffer.from("${base64}", "base64").toString("utf8")`)
         expect(result).toBeDefined()
         expect(result).toEqual("hello")
       })

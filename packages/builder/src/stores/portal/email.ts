@@ -1,9 +1,6 @@
+import type { FetchGlobalTemplateDefinitionResponse, Template } from "@budibase/types"
 import { API } from "@/api"
 import { BudiStore } from "../BudiStore"
-import {
-  FetchGlobalTemplateDefinitionResponse,
-  Template,
-} from "@budibase/types"
 
 interface EmailState {
   definitions?: FetchGlobalTemplateDefinitionResponse
@@ -30,9 +27,9 @@ class EmailStore extends BudiStore<EmailState> {
     const savedTemplate = await API.saveEmailTemplate(template)
     template._rev = savedTemplate._rev
     template._id = savedTemplate._id
-    this.update(state => {
+    this.update((state) => {
       const currentIdx = state.templates.findIndex(
-        template => template.purpose === savedTemplate.purpose
+        (template) => template.purpose === savedTemplate.purpose
       )
       state.templates.splice(currentIdx, 1, template)
       return state

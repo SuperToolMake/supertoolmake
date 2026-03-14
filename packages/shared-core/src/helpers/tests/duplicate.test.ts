@@ -93,7 +93,7 @@ describe("getSequentialName", () => {
 
   it("handles deep getters", async () => {
     const name = getSequentialName([{ a: "foo 1" }], "foo ", {
-      getName: x => x.a,
+      getName: (x) => x.a,
     })
     expect(name).toBe("foo 2")
   })

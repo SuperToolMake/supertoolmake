@@ -1,6 +1,6 @@
 import fs from "fs"
 
-export const enum BundleType {
+export enum BundleType {
   HELPERS = "helpers",
   BSON = "bson",
   SNIPPETS = "snippets",

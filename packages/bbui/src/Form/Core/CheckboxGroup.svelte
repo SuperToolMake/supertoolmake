@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
-  type O = any
-  type V = any
+type O = any
+type V = any
 </script>
 
 <script lang="ts" generics="O, V">

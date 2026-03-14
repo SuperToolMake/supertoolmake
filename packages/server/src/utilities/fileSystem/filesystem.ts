@@ -1,10 +1,9 @@
-import fs, { PathLike } from "fs"
-import { budibaseTempDir } from "../budibaseDir"
+import fs, { type PathLike } from "fs"
 import { join } from "path"
-import env from "../../environment"
 import * as tar from "tar"
-
 import { v4 as uuid } from "uuid"
+import env from "../../environment"
+import { budibaseTempDir } from "../budibaseDir"
 
 export const TOP_LEVEL_PATH = env.TOP_LEVEL_PATH
 export const DEV_ASSET_PATH = join(TOP_LEVEL_PATH, "packages", "server")
@@ -100,17 +99,14 @@ export const extractTarball = async (fromFilePath: string, toPath: string) => {
 /**
  * Find for a file recursively from start path applying filter, return first match
  */
-export const findFileRec = (
-  startPath: PathLike,
-  filter: string
-): string | undefined => {
+export const findFileRec = (startPath: PathLike, filter: string): string | undefined => {
   if (!fs.existsSync(startPath)) {
     return
   }
 
   const files = fs.readdirSync(startPath)
   for (let i = 0, len = files.length; i < len; i++) {
-    // @ts-ignore
+    // @ts-expect-error
     const filename = join(startPath, files[i])
     const stat = fs.lstatSync(filename)
 

@@ -1,7 +1,7 @@
-import { BudibaseQueue } from "./queue"
-import * as logging from "../logging"
-import { JobQueue } from "./constants"
 import { helpers } from "@budibase/shared-core"
+import * as logging from "../logging"
+import type { JobQueue } from "./constants"
+import { BudibaseQueue } from "./queue"
 
 export class UnretriableError extends Error {
   constructor(message: string) {
@@ -63,14 +63,10 @@ export abstract class QueuedProcessor<T> {
 
   async execute(
     data: T
-  ): Promise<
-    { success: true; result: any } | { success: false; reason: "timeout" }
-  > {
+  ): Promise<{ success: true; result: any } | { success: false; reason: "timeout" }> {
     try {
       const job = await this._queue.add(data)
-      const result = await helpers.withTimeout(this.waitForCompletionMs, () =>
-        job.finished()
-      )
+      const result = await helpers.withTimeout(this.waitForCompletionMs, () => job.finished())
       return { success: true, result }
     } catch (err: any) {
       if (err.errno !== "ETIME") {

@@ -1,7 +1,19 @@
-import { derived, get } from "svelte/store"
-import { cloneDeep } from "lodash/fp"
 import { Helpers } from "@budibase/bbui"
 import { RoleUtils, Utils } from "@budibase/frontend-core"
+import {
+  type Component,
+  type ComponentDefinition,
+  type DeleteScreenResponse,
+  type FetchAppPackageResponse,
+  type SaveScreenRequest,
+  type SaveScreenResponse,
+  type Screen,
+  ScreenVariant,
+  type WithRequired,
+} from "@budibase/types"
+import { cloneDeep } from "lodash/fp"
+import { derived, get } from "svelte/store"
+import { API } from "@/api"
 import { findAllMatchingComponents } from "@/helpers/components"
 import {
   appStore,
@@ -11,20 +23,8 @@ import {
   selectedComponent,
   workspaceAppStore,
 } from "@/stores/builder"
-import { createHistoryStore, HistoryStore } from "@/stores/builder/history"
-import { API } from "@/api"
+import { createHistoryStore, type HistoryStore } from "@/stores/builder/history"
 import { BudiStore } from "../BudiStore"
-import {
-  Component,
-  ComponentDefinition,
-  DeleteScreenResponse,
-  FetchAppPackageResponse,
-  SaveScreenRequest,
-  SaveScreenResponse,
-  Screen,
-  ScreenVariant,
-  WithRequired,
-} from "@budibase/types"
 import { RoutesStore } from "./routes"
 
 interface ScreenState {
@@ -40,9 +40,7 @@ export class ScreenStore extends BudiStore<ScreenState> {
   private _routes: RoutesStore | null = null
   history: HistoryStore<Screen>
   delete: (screens: Screen) => Promise<void>
-  save: (
-    screen: WithRequired<SaveScreenRequest, "workspaceAppId">
-  ) => Promise<Screen>
+  save: (screen: WithRequired<SaveScreenRequest, "workspaceAppId">) => Promise<Screen>
 
   /**
     List all availables screen routes in the current app
@@ -72,13 +70,12 @@ export class ScreenStore extends BudiStore<ScreenState> {
     this.removeCustomLayout = this.removeCustomLayout.bind(this)
 
     this.history = createHistoryStore({
-      getDoc: (id: string) =>
-        get(this.store).screens?.find(screen => screen._id === id),
+      getDoc: (id: string) => get(this.store).screens?.find((screen) => screen._id === id),
       selectDoc: this.select,
       afterAction: () => {
         // Ensure a valid component is selected
         if (!get(selectedComponent)) {
-          componentStore.update(state => ({
+          componentStore.update((state) => ({
             ...state,
             selectedComponentId: get(selectedScreen)?._id,
           }))
@@ -102,9 +99,9 @@ export class ScreenStore extends BudiStore<ScreenState> {
    */
   syncAppScreens(pkg: FetchAppPackageResponse) {
     const screens = [...pkg.screens]
-    this.update(state => {
+    this.update((state) => {
       const { selectedScreenId } = state
-      if (selectedScreenId && !screens.some(s => s._id === selectedScreenId)) {
+      if (selectedScreenId && !screens.some((s) => s._id === selectedScreenId)) {
         delete state.selectedScreenId
       }
       return {
@@ -123,7 +120,7 @@ export class ScreenStore extends BudiStore<ScreenState> {
   select(screenId: string) {
     // Check this screen exists
     const state = get(this.store)
-    const screen = state.screens.find(screen => screen._id === screenId)
+    const screen = state.screens.find((screen) => screen._id === screenId)
     if (!screen) {
       return
     }
@@ -134,16 +131,13 @@ export class ScreenStore extends BudiStore<ScreenState> {
     }
 
     // Select new screen
-    this.update(state => {
+    this.update((state) => {
       state.selectedScreenId = screen._id
       return state
     })
 
     // If this is a PDF screen, ensure we're on desktop
-    if (
-      screen.variant === ScreenVariant.PDF &&
-      get(previewStore).previewDevice !== "desktop"
-    ) {
+    if (screen.variant === ScreenVariant.PDF && get(previewStore).previewDevice !== "desktop") {
       previewStore.setDevice("desktop")
     }
   }
@@ -178,16 +172,16 @@ export class ScreenStore extends BudiStore<ScreenState> {
       // Sidepanels and modals can be nested anywhere in the component tree, but really they are always rendered at the top level.
       // Because of this, it doesn't make sense to carry over any parent illegal children to them, so the array is reset here.
       if (
-        [
-          "@budibase/standard-components/sidepanel",
-          "@budibase/standard-components/modal",
-        ].includes(type)
+        ["@budibase/standard-components/sidepanel", "@budibase/standard-components/modal"].includes(
+          type
+        )
       ) {
         illegalChildren = []
       }
 
-      const definition: ComponentDefinition | null =
-        componentStore.getDefinition(component._component)
+      const definition: ComponentDefinition | null = componentStore.getDefinition(
+        component._component
+      )
 
       if (definition == null) {
         throw `Invalid defintion ${component._component}`
@@ -196,26 +190,22 @@ export class ScreenStore extends BudiStore<ScreenState> {
       // Reset whitelist for direct children
       legalDirectChildren = []
       if (definition?.legalDirectChildren?.length) {
-        legalDirectChildren = definition.legalDirectChildren.map(x => {
+        legalDirectChildren = definition.legalDirectChildren.map((x) => {
           return `@budibase/standard-components/${x}`
         })
       }
 
       // Append blacklisted components and remove duplicates
       if (definition?.illegalChildren?.length) {
-        const blacklist = definition.illegalChildren.map(x => {
+        const blacklist = definition.illegalChildren.map((x) => {
           return `@budibase/standard-components/${x}`
         })
         illegalChildren = [...new Set([...illegalChildren, ...blacklist])]
       }
 
       // Recurse on all children
-      for (let child of component._children) {
-        const illegalChild = findIllegalChild(
-          child,
-          illegalChildren,
-          legalDirectChildren
-        )
+      for (const child of component._children) {
+        const illegalChild = findIllegalChild(child, illegalChildren, legalDirectChildren)
         if (illegalChild) {
           return illegalChild
         }
@@ -254,9 +244,9 @@ export class ScreenStore extends BudiStore<ScreenState> {
     const savedScreen = await API.saveScreen({ ...screen, navigationLinkLabel })
 
     // Update state
-    this.update(state => {
+    this.update((state) => {
       // Update screen object
-      const idx = state.screens.findIndex(x => x._id === savedScreen._id)
+      const idx = state.screens.findIndex((x) => x._id === savedScreen._id)
       if (idx !== -1) {
         state.screens.splice(idx, 1, savedScreen)
       } else {
@@ -267,7 +257,7 @@ export class ScreenStore extends BudiStore<ScreenState> {
       if (creatingNewScreen) {
         state.selectedScreenId = savedScreen._id
 
-        componentStore.update(state => ({
+        componentStore.update((state) => ({
           ...state,
           selectedComponentId: savedScreen.props._id,
         }))
@@ -290,16 +280,13 @@ export class ScreenStore extends BudiStore<ScreenState> {
    * supports deeply mutating the current doc rather than just appending data.
    */
   sequentialScreenPatch = Utils.sequential(
-    async (
-      patchFn: (screen: Screen) => boolean,
-      screenId: string
-    ): Promise<Screen | void> => {
+    async (patchFn: (screen: Screen) => boolean, screenId: string): Promise<Screen | void> => {
       const state = get(this.store)
-      const screen = state.screens.find(screen => screen._id === screenId)
+      const screen = state.screens.find((screen) => screen._id === screenId)
       if (!screen) {
         return
       }
-      let clone = cloneDeep(screen)
+      const clone = cloneDeep(screen)
       const result = patchFn(clone)
 
       // An explicit false result means skip this change
@@ -347,21 +334,21 @@ export class ScreenStore extends BudiStore<ScreenState> {
     }
     if (!screen) {
       // Screen deletion
-      this.update(state => ({
+      this.update((state) => ({
         ...state,
-        screens: state.screens.filter(x => x._id !== screenId),
+        screens: state.screens.filter((x) => x._id !== screenId),
       }))
     } else {
-      const index = get(this.store).screens.findIndex(x => x._id === screen._id)
+      const index = get(this.store).screens.findIndex((x) => x._id === screen._id)
       if (index === -1) {
         // Screen addition
-        this.update(state => ({
+        this.update((state) => ({
           ...state,
           screens: [...state.screens, screen],
         }))
       } else {
         // Screen update
-        this.update(state => {
+        this.update((state) => {
           state.screens[index] = screen
           return state
         })
@@ -382,17 +369,16 @@ export class ScreenStore extends BudiStore<ScreenState> {
   async deleteScreen(screen: Screen) {
     const screensToDelete = [screen]
     // Build array of promises to speed up bulk deletions
-    let promises: Promise<DeleteScreenResponse>[] = []
-    let deleteUrls: string[] = []
+    const promises: Promise<DeleteScreenResponse>[] = []
+    const deleteUrls: string[] = []
 
     // In this instance _id will have been set
     // Underline the expectation that _id and _rev will be set after filtering
     screensToDelete
       .filter(
-        (screen): screen is Screen & { _id: string; _rev: string } =>
-          !!screen._id || !!screen._rev
+        (screen): screen is Screen & { _id: string; _rev: string } => !!screen._id || !!screen._rev
       )
-      .forEach(screen => {
+      .forEach((screen) => {
         // Delete the screen
         promises.push(API.deleteScreen(screen._id, screen._rev))
         // Remove links to this screen
@@ -402,28 +388,25 @@ export class ScreenStore extends BudiStore<ScreenState> {
 
     await appStore.refreshAppNav()
     await workspaceAppStore.refresh()
-    const deletedIds = screensToDelete.map(screen => screen._id)
+    const deletedIds = screensToDelete.map((screen) => screen._id)
     const routesResponse = await API.fetchAppRoutes()
-    this.update(state => {
+    this.update((state) => {
       // Remove deleted screens from state
-      state.screens = state.screens.filter(screen => {
+      state.screens = state.screens.filter((screen) => {
         return !deletedIds.includes(screen._id)
       })
 
       // Deselect the current screen if it was deleted
-      if (
-        state.selectedScreenId &&
-        deletedIds.includes(state.selectedScreenId)
-      ) {
+      if (state.selectedScreenId && deletedIds.includes(state.selectedScreenId)) {
         delete state.selectedScreenId
-        componentStore.update(state => {
+        componentStore.update((state) => {
           delete state.selectedComponentId
           return state
         })
       }
 
       // Update routing
-      appStore.update(state => ({
+      appStore.update((state) => ({
         ...state,
         routes: routesResponse.routes,
       }))
@@ -462,8 +445,8 @@ export class ScreenStore extends BudiStore<ScreenState> {
 
     // Ensure we don't have more than one home screen for this new role.
     // This could happen after updating multiple different settings.
-    this.store.update(state => {
-      const otherHomeScreens = state.screens.filter(s => {
+    this.store.update((state) => {
+      const otherHomeScreens = state.screens.filter((s) => {
         return (
           s.workspaceAppId === screen.workspaceAppId &&
           s.routing.roleId === screen.routing.roleId &&
@@ -483,7 +466,7 @@ export class ScreenStore extends BudiStore<ScreenState> {
   // Move to layouts store
   async removeCustomLayout(screen: Screen) {
     // Pull relevant settings from old layout, if required
-    const layout = get(layoutStore).layouts.find(x => x._id === screen.layoutId)
+    const layout = get(layoutStore).layouts.find((x) => x._id === screen.layoutId)
     const patchFn = (screen: Screen) => {
       delete screen.layoutId
       screen.showNavigation = layout?.props.navigation !== "None"
@@ -499,13 +482,10 @@ export class ScreenStore extends BudiStore<ScreenState> {
    */
   async enrichEmptySettings(screen: Screen) {
     // Flatten the recursive component tree
-    const components = findAllMatchingComponents(
-      screen.props,
-      (x: Component) => !!x
-    )
+    const components = findAllMatchingComponents(screen.props, (x: Component) => !!x)
 
     // Iterate over all components and run checks
-    components.forEach(component => {
+    components.forEach((component) => {
       componentStore.enrichEmptySettings(component, {
         screen,
       })
@@ -522,11 +502,11 @@ export class ScreenStore extends BudiStore<ScreenState> {
 
 export const screenStore = new ScreenStore()
 
-export const selectedScreen = derived(screenStore, $store => {
-  return $store.screens.find(screen => screen._id === $store.selectedScreenId)
+export const selectedScreen = derived(screenStore, ($store) => {
+  return $store.screens.find((screen) => screen._id === $store.selectedScreenId)
 })
 
-export const sortedScreens = derived(screenStore, $screenStore => {
+export const sortedScreens = derived(screenStore, ($screenStore) => {
   return $screenStore.screens.slice().sort((a, b) => {
     // Sort by role first
     const roleA = RoleUtils.getRolePriority(a.routing.roleId)
@@ -543,7 +523,7 @@ export const sortedScreens = derived(screenStore, $screenStore => {
     // Then sort alphabetically by each URL param
     const aParams = a.routing.route.split("/")
     const bParams = b.routing.route.split("/")
-    let minParams = Math.min(aParams.length, bParams.length)
+    const minParams = Math.min(aParams.length, bParams.length)
     for (let i = 0; i < minParams; i++) {
       if (aParams[i] === bParams[i]) {
         continue

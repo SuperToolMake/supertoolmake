@@ -1,25 +1,24 @@
 <script>
-  import { goto as gotoStore, params as paramsStore } from "@roxi/routify"
-  import { datasources } from "@/stores/builder"
-  import { Modal, ModalContent, Body, Heading } from "@budibase/bbui"
+import { Body, Heading, Modal, ModalContent } from "@budibase/bbui"
+import { goto as gotoStore, params as paramsStore } from "@roxi/routify"
+import { datasources } from "@/stores/builder"
 
-  $goto
-  $params
+$goto
+$params
 
-  const handleOpen = (modal, params) => {
-    if (params["?promptQuery"] && modal?.show) {
-      modal.show()
-      history.replaceState({}, null, window.location.pathname)
-    }
+const handleOpen = (modal, params) => {
+  if (params["?promptQuery"] && modal?.show) {
+    modal.show()
+    history.replaceState({}, null, window.location.pathname)
   }
+}
 
-  let modal
-  $: params = $paramsStore
-  $: goto = $gotoStore
-  $: handleOpen(modal, params)
-  $: selectedDatasource = $datasources.selected
-  $: confirmText =
-    selectedDatasource?.source === "REST" ? "Add action" : "Create new query"
+let modal
+$: params = $paramsStore
+$: goto = $gotoStore
+$: handleOpen(modal, params)
+$: selectedDatasource = $datasources.selected
+$: confirmText = selectedDatasource?.source === "REST" ? "Add action" : "Create new query"
 </script>
 
 <Modal bind:this={modal}>

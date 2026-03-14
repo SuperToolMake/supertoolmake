@@ -5,19 +5,17 @@ const columnBeingUsed = "Column name cannot be an existing column"
 const mustBeDifferentTables = "From/to/through tables must be different"
 const mustBeDifferentColumns = "Foreign keys must be different"
 const primaryKeyNotSet = "Please pick the primary key"
-const throughNotNullable =
-  "Ensure non-key columns are nullable or auto-generated"
+const throughNotNullable = "Ensure non-key columns are nullable or auto-generated"
 const noRelationshipType = "Please specify a relationship type"
 const tableNotSet = "Please specify a table"
 const foreignKeyNotSet = "Please pick a foreign key"
-const relationshipAlreadyExists =
-  "A relationship between these tables already exists"
+const relationshipAlreadyExists = "A relationship between these tables already exists"
 
 function isColumnNameBeingUsed(table, columnName, originalName) {
   if (!table || !columnName || columnName === originalName) {
     return false
   }
-  const keys = Object.keys(table.schema).map(key => key.toLowerCase())
+  const keys = Object.keys(table.schema).map((key) => key.toLowerCase())
   return keys.indexOf(columnName.toLowerCase()) !== -1
 }
 
@@ -73,9 +71,7 @@ export class RelationshipErrorChecker {
   }
 
   doesRelationshipExists() {
-    return this.isMany() && this.manyToManyRelationshipExists()
-      ? relationshipAlreadyExists
-      : null
+    return this.isMany() && this.manyToManyRelationshipExists() ? relationshipAlreadyExists : null
   }
 
   differentTables(table1, table2, table3) {

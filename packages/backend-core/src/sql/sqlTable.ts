@@ -1,18 +1,19 @@
-import { Knex, knex } from "knex"
+import { helpers, utils } from "@budibase/shared-core"
 import {
+  type EnrichedQueryJson,
   FieldType,
-  NumberFieldMetadata,
+  type NumberFieldMetadata,
   Operation,
   RelationshipType,
-  RenameColumn,
-  SqlQuery,
-  Table,
-  TableSourceType,
+  type RenameColumn,
   SqlClient,
-  EnrichedQueryJson,
+  type SqlQuery,
+  type Table,
+  TableSourceType,
 } from "@budibase/types"
+import { Knex, knex } from "knex"
 import { breakExternalTableId, getNativeSql } from "./utils"
-import { helpers, utils } from "@budibase/shared-core"
+
 import SchemaBuilder = Knex.SchemaBuilder
 import CreateTableBuilder = Knex.CreateTableBuilder
 
@@ -28,18 +29,18 @@ function generateSchema(
   oldTable?: Table,
   renamed?: RenameColumn
 ) {
-  let primaryKeys = table && table.primary ? table.primary : []
+  const primaryKeys = table && table.primary ? table.primary : []
   const columns = Object.values(table.schema)
   // all columns in a junction table will be meta
-  let metaCols = columns.filter(col => (col as NumberFieldMetadata).meta)
-  let isJunction = metaCols.length === columns.length
-  let columnTypeSet: string[] = []
+  const metaCols = columns.filter((col) => (col as NumberFieldMetadata).meta)
+  const isJunction = metaCols.length === columns.length
+  const columnTypeSet: string[] = []
 
   // can't change primary once its set for now
   if (!oldTable) {
     // junction tables are special - we have an expected format
     if (isJunction) {
-      schema.primary(metaCols.map(col => col.name))
+      schema.primary(metaCols.map((col) => col.name))
     } else if (primaryKeys.length === 1) {
       schema.increments(primaryKeys[0]).primary()
       // note that we've set its type
@@ -50,17 +51,11 @@ function generateSchema(
   }
 
   // check if any columns need added
-  const foreignKeys = Object.values(table.schema).map(
-    col => (col as any).foreignKey
-  )
-  for (let [key, column] of Object.entries(table.schema)) {
+  const foreignKeys = Object.values(table.schema).map((col) => (col as any).foreignKey)
+  for (const [key, column] of Object.entries(table.schema)) {
     // skip things that are already correct
     const oldColumn = oldTable?.schema[key]
-    if (
-      (oldColumn && oldColumn.type) ||
-      columnTypeSet.includes(key) ||
-      renamed?.updated === key
-    ) {
+    if ((oldColumn && oldColumn.type) || columnTypeSet.includes(key) || renamed?.updated === key) {
       continue
     }
     const columnType = column.type
@@ -120,12 +115,10 @@ function generateSchema(
             throw new Error("Invalid relationship schema")
           }
           const { tableName } = breakExternalTableId(column.tableId)
-          // @ts-ignore
+          // @ts-expect-error
           const relatedTable = tables[tableName]
           if (!relatedTable || !relatedTable.primary) {
-            throw new Error(
-              "Referenced table doesn't exist or has no primary keys"
-            )
+            throw new Error("Referenced table doesn't exist or has no primary keys")
           }
           const relatedPrimary = relatedTable.primary[0]
           const externalType = relatedTable.schema[relatedPrimary].externalType
@@ -135,9 +128,7 @@ function generateSchema(
             schema.integer(column.foreignKey).unsigned()
           }
 
-          schema
-            .foreign(column.foreignKey)
-            .references(`${tableName}.${relatedPrimary}`)
+          schema.foreign(column.foreignKey).references(`${tableName}.${relatedPrimary}`)
         }
         break
       case FieldType.AUTO:
@@ -157,8 +148,7 @@ function generateSchema(
   // need to check if any columns have been deleted
   if (oldTable) {
     const deletedColumns = Object.entries(oldTable.schema).filter(
-      ([key, column]) =>
-        !isIgnoredType(column.type) && table.schema[key] == null
+      ([key, column]) => !isIgnoredType(column.type) && table.schema[key] == null
     )
     deletedColumns.forEach(([key, column]) => {
       if (renamed?.old === key || isIgnoredType(column.type)) {
@@ -179,7 +169,7 @@ function buildCreateTable(
   table: Table,
   tables: Record<string, Table>
 ): SchemaBuilder {
-  return knex.createTable(table.name, schema => {
+  return knex.createTable(table.name, (schema) => {
     generateSchema(schema, table, tables)
   })
 }
@@ -191,7 +181,7 @@ function buildUpdateTable(
   oldTable?: Table,
   renamed?: RenameColumn
 ): SchemaBuilder {
-  return knex.alterTable(table.name, schema => {
+  return knex.alterTable(table.name, (schema) => {
     generateSchema(schema, table, tables, oldTable, renamed)
   })
 }

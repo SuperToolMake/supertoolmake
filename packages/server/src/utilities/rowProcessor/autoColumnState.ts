@@ -1,5 +1,5 @@
 import { context } from "@budibase/backend-core"
-import { Document, DocumentType, Row, Table, SEPARATOR } from "@budibase/types"
+import { type Document, DocumentType, type Row, SEPARATOR, type Table } from "@budibase/types"
 import { getRowParams } from "../../db/utils"
 
 const AUTO_COLUMN_STATE_DOC_PREFIX = `${DocumentType.AUTO_COLUMN_STATE}${SEPARATOR}`
@@ -10,8 +10,7 @@ interface AutoColumnStateDoc extends Document {
   columns: Record<string, number>
 }
 
-const isConflictError = (err: any) =>
-  err?.status === 409 || err?.statusCode === 409
+const isConflictError = (err: any) => err?.status === 409 || err?.statusCode === 409
 
 function buildDocId(tableId: string) {
   return `${AUTO_COLUMN_STATE_DOC_PREFIX}${tableId}`
@@ -76,9 +75,7 @@ async function initialiseMissingColumns(
   table: Table,
   columnNames: string[]
 ) {
-  const missing = columnNames.filter(
-    columnName => state.columns[columnName] == null
-  )
+  const missing = columnNames.filter((columnName) => state.columns[columnName] == null)
   if (!missing.length) {
     return
   }
@@ -100,9 +97,7 @@ export async function allocateAutoColumnValues(
     return {}
   }
   if (!table._id) {
-    throw new Error(
-      "Unable to allocate auto column values for table without an _id."
-    )
+    throw new Error("Unable to allocate auto column values for table without an _id.")
   }
 
   const db = context.getWorkspaceDB()
@@ -111,7 +106,7 @@ export async function allocateAutoColumnValues(
 
   let attempt = 0
   while (attempt < MAX_ALLOCATE_ATTEMPTS) {
-    let state =
+    const state =
       (await db.tryGet<AutoColumnStateDoc>(docId)) ||
       ({
         _id: docId,

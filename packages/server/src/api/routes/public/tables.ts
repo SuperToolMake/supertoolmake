@@ -1,6 +1,6 @@
-import controller from "../../controllers/public/tables"
 import { Endpoint } from "@budibase/backend-core"
-import { tableValidator, nameValidator } from "../utils/validators"
+import controller from "../../controllers/public/tables"
+import { nameValidator, tableValidator } from "../utils/validators"
 
 const read = [],
   write = []
@@ -36,11 +36,7 @@ const read = [],
  *               table:
  *                 $ref: '#/components/examples/table'
  */
-write.push(
-  new Endpoint("post", "/tables", controller.create).addMiddleware(
-    tableValidator()
-  )
-)
+write.push(new Endpoint("post", "/tables", controller.create).addMiddleware(tableValidator()))
 
 /**
  * @openapi
@@ -74,9 +70,7 @@ write.push(
  *                 $ref: '#/components/examples/table'
  */
 write.push(
-  new Endpoint("put", "/tables/:tableId", controller.update).addMiddleware(
-    tableValidator()
-  )
+  new Endpoint("put", "/tables/:tableId", controller.update).addMiddleware(tableValidator())
 )
 
 /**
@@ -158,10 +152,6 @@ read.push(new Endpoint("get", "/tables/:tableId", controller.read))
  *               tables:
  *                 $ref: '#/components/examples/tables'
  */
-read.push(
-  new Endpoint("post", "/tables/search", controller.search).addMiddleware(
-    nameValidator()
-  )
-)
+read.push(new Endpoint("post", "/tables/search", controller.search).addMiddleware(nameValidator()))
 
 export default { read, write }

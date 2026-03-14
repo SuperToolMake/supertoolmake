@@ -1,17 +1,17 @@
 import {
-  LegacyFilter,
-  UISearchFilter,
-  UILogicalOperator,
-  SearchFilters,
-  BasicOperator,
   ArrayOperator,
-  isLogicalSearchOperator,
-  SearchFilter,
+  BasicOperator,
   EmptyFilterOption,
+  isLogicalSearchOperator,
+  type LegacyFilter,
+  type SearchFilter,
+  type SearchFilters,
+  UILogicalOperator,
+  type UISearchFilter,
 } from "@budibase/types"
+import pick from "lodash/pick"
 import * as Constants from "./constants"
 import { removeKeyNumbering, splitFiltersArray } from "./filters"
-import pick from "lodash/pick"
 
 const FILTER_ALLOWED_KEYS: (keyof SearchFilter)[] = [
   "field",
@@ -95,17 +95,12 @@ export function hasSchema(test: any) {
 
 export function trimOtherProps(object: any, allowedProps: string[]) {
   const result = Object.keys(object)
-    .filter(key => allowedProps.includes(key))
-    .reduce<Record<string, any>>(
-      (acc, key) => ({ ...acc, [key]: object[key] }),
-      {}
-    )
+    .filter((key) => allowedProps.includes(key))
+    .reduce<Record<string, any>>((acc, key) => ({ ...acc, [key]: object[key] }), {})
   return result
 }
 
-export function isSupportedUserSearch(
-  query: SearchFilters
-): query is SearchFilters {
+export function isSupportedUserSearch(query: SearchFilters): query is SearchFilters {
   const allowed = [
     { op: BasicOperator.STRING, key: "email" },
     { op: BasicOperator.FUZZY, key: "email" },
@@ -133,8 +128,7 @@ export function isSupportedUserSearch(
       continue
     }
     const allowedOperation = allowed.find(
-      allow =>
-        allow.op === key && fields.length === 1 && fields[0] === allow.key
+      (allow) => allow.op === key && fields.length === 1 && fields[0] === allow.key
     )
     if (!allowedOperation) {
       return false
@@ -157,11 +151,8 @@ export function processSearchFilters(
     groups: [
       {
         logicalOperator: allOr ? UILogicalOperator.ANY : UILogicalOperator.ALL,
-        filters: filters.map(filter => {
-          const trimmedFilter = pick(
-            filter,
-            FILTER_ALLOWED_KEYS
-          ) as SearchFilter
+        filters: filters.map((filter) => {
+          const trimmedFilter = pick(filter, FILTER_ALLOWED_KEYS) as SearchFilter
           trimmedFilter.field = removeKeyNumbering(trimmedFilter.field)
           return trimmedFilter
         }),
@@ -193,7 +184,7 @@ const resolveWorkspaceUrl = (name: string) => {
 }
 
 export const nameToUrl = (workspaceName: string) => {
-  let resolvedUrl = resolveWorkspaceUrl(workspaceName)
+  const resolvedUrl = resolveWorkspaceUrl(workspaceName)
   return tidyUrl(resolvedUrl)
 }
 

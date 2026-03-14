@@ -1,7 +1,7 @@
+import { derived, get } from "svelte/store"
 import { API } from "@/api"
 import { getSequentialName } from "@/helpers/duplicate"
 import { BudiStore } from "@/stores/BudiStore"
-import { derived, get } from "svelte/store"
 import { tables } from "./tables"
 
 interface RowAction {
@@ -32,7 +32,7 @@ export class RowActionStore extends BudiStore<RowActionState> {
     }
 
     // Get the underlying table ID for this source ID
-    let tableId = get(tables).list.find(table => table._id === sourceId)?._id
+    const tableId = get(tables).list.find((table) => table._id === sourceId)?._id
     if (!tableId) {
       return
     }
@@ -40,7 +40,7 @@ export class RowActionStore extends BudiStore<RowActionState> {
     // Fetch row actions for this table
     const res = await API.rowActions.fetch(tableId)
     const actions = Object.values(res || {}) as RowAction[]
-    this.update(state => ({
+    this.update((state) => ({
       ...state,
       [tableId]: actions,
     }))
@@ -55,7 +55,7 @@ export class RowActionStore extends BudiStore<RowActionState> {
     if (!name) {
       const existingRowActions = get(this)[tableId] || []
       name = getSequentialName(existingRowActions, "New row action ", {
-        getName: x => x.name,
+        getName: (x) => x.name,
       })!
     }
 
@@ -81,11 +81,7 @@ export class RowActionStore extends BudiStore<RowActionState> {
     await this.refreshRowActions(tableId)
   }
 
-  disableView = async (
-    tableId: string,
-    rowActionId: string,
-    viewId: string
-  ) => {
+  disableView = async (tableId: string, rowActionId: string, viewId: string) => {
     await API.rowActions.disableView(tableId, rowActionId, viewId)
     await this.refreshRowActions(tableId)
   }
@@ -103,18 +99,18 @@ export class RowActionStore extends BudiStore<RowActionState> {
 }
 
 const store = new RowActionStore()
-const derivedStore = derived<RowActionStore, RowActionState>(store, $store => {
+const derivedStore = derived<RowActionStore, RowActionState>(store, ($store) => {
   const map: RowActionState = {}
 
   // Generate an entry for every view as well
-  Object.keys($store || {}).forEach(tableId => {
+  Object.keys($store || {}).forEach((tableId) => {
     // We need to have all the actions for the table in order to be displayed in the crud section
     map[tableId] = $store[tableId]
-    for (let action of $store[tableId]) {
+    for (const action of $store[tableId]) {
       const otherSources = (action.allowedSources || []).filter(
         (sourceId: string) => sourceId !== tableId
       )
-      for (let source of otherSources) {
+      for (const source of otherSources) {
         map[source] ??= []
         map[source].push(action)
       }

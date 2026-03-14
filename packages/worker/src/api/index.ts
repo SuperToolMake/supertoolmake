@@ -2,9 +2,9 @@ import Router from "@koa/router"
 
 const compress = require("koa-compress")
 
+import { auth, middleware } from "@budibase/backend-core"
 import zlib from "zlib"
 import { routes } from "./routes"
-import { auth, middleware } from "@budibase/backend-core"
 
 const PUBLIC_ENDPOINTS = [
   // deprecated single tenant sso callback
@@ -145,7 +145,7 @@ router
       br: false,
     })
   )
-  .use("/health", ctx => (ctx.status = 200))
+  .use("/health", (ctx) => (ctx.status = 200))
   .use(auth.buildAuthMiddleware(PUBLIC_ENDPOINTS))
   .use(auth.buildTenancyMiddleware(PUBLIC_ENDPOINTS, NO_TENANCY_ENDPOINTS))
   .use(middleware.activeTenant())
@@ -155,19 +155,16 @@ router
     if (ctx.publicEndpoint) {
       return next()
     }
-    if (
-      (!ctx.isAuthenticated || (ctx.user && !ctx.user.budibaseAccess)) &&
-      !ctx.internal
-    ) {
+    if ((!ctx.isAuthenticated || (ctx.user && !ctx.user.budibaseAccess)) && !ctx.internal) {
       ctx.throw(403, "Unauthorized")
     }
     return next()
   })
 
-router.get("/health", ctx => (ctx.status = 200))
+router.get("/health", (ctx) => (ctx.status = 200))
 
 // authenticated routes
-for (let route of routes) {
+for (const route of routes) {
   router.use(route.routes())
   router.use(route.allowedMethods())
 }

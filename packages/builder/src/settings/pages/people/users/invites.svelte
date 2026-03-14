@@ -1,102 +1,97 @@
 <script lang="ts">
-  import DeleteRowsButton from "@/components/backend/DataTable/buttons/DeleteRowsButton.svelte"
-  import { auth } from "@/stores/portal/auth"
-  import { users } from "@/stores/portal/users"
-  import { Layout, Table, notifications } from "@budibase/bbui"
-  import { sdk } from "@budibase/shared-core"
-  import {
-    type GetUserInvitesResponse,
-    type InviteWithCode,
-  } from "@budibase/types"
-  import { onMount } from "svelte"
-  import { routeActions } from "../.."
-  import EmailTableRenderer from "./_components/EmailTableRenderer.svelte"
-  import RoleTableRenderer from "./_components/RoleTableRenderer.svelte"
+import { Layout, notifications, Table } from "@budibase/bbui"
+import { sdk } from "@budibase/shared-core"
+import type { GetUserInvitesResponse, InviteWithCode } from "@budibase/types"
+import { onMount } from "svelte"
+import DeleteRowsButton from "@/components/backend/DataTable/buttons/DeleteRowsButton.svelte"
+import { auth } from "@/stores/portal/auth"
+import { users } from "@/stores/portal/users"
+import { routeActions } from "../.."
+import EmailTableRenderer from "./_components/EmailTableRenderer.svelte"
+import RoleTableRenderer from "./_components/RoleTableRenderer.svelte"
 
-  type ParsedInvite = {
-    _id: string
-    email: string
-    builder?: InviteWithCode["info"]["builder"]
-    admin?: InviteWithCode["info"]["admin"]
-  }
+type ParsedInvite = {
+  _id: string
+  email: string
+  builder?: InviteWithCode["info"]["builder"]
+  admin?: InviteWithCode["info"]["admin"]
+}
 
-  let selectedInvites: ParsedInvite[] = []
-  let invitesLoaded = false
-  let pendingInvites: GetUserInvitesResponse = []
-  let parsedInvites: ParsedInvite[] = []
-  let customRenderers = [
-    { column: "email", component: EmailTableRenderer },
-    // { column: "apps", component: AppsTableRenderer },
-    { column: "role", component: RoleTableRenderer },
-  ]
+let selectedInvites: ParsedInvite[] = []
+let invitesLoaded = false
+let pendingInvites: GetUserInvitesResponse = []
+let parsedInvites: ParsedInvite[] = []
+let customRenderers = [
+  { column: "email", component: EmailTableRenderer },
+  // { column: "apps", component: AppsTableRenderer },
+  { column: "role", component: RoleTableRenderer },
+]
 
-  $: schema = {
-    email: {
-      sortable: false,
-      width: "1fr",
-      minWidth: "200px",
-    },
-    role: {
-      displayName: "Access",
-      sortable: false,
-      width: "1fr",
-    },
-  }
+$: schema = {
+  email: {
+    sortable: false,
+    width: "1fr",
+    minWidth: "200px",
+  },
+  role: {
+    displayName: "Access",
+    sortable: false,
+    width: "1fr",
+  },
+}
 
-  $: pendingSchema = getPendingSchema(schema)
-  $: readonly = $auth.user ? !sdk.users.isAdmin($auth.user) : false
-  $: parsedInvites = invitesToSchema(pendingInvites)
+$: pendingSchema = getPendingSchema(schema)
+$: readonly = $auth.user ? !sdk.users.isAdmin($auth.user) : false
+$: parsedInvites = invitesToSchema(pendingInvites)
 
-  const invitesToSchema = (invites: InviteWithCode[]): ParsedInvite[] => {
-    return invites.map(invite => {
-      const { admin, builder } = invite.info
+const invitesToSchema = (invites: InviteWithCode[]): ParsedInvite[] => {
+  return invites.map((invite) => {
+    const { admin, builder } = invite.info
 
-      return {
-        _id: invite.code,
-        email: invite.email,
-        builder: builder ? { ...builder } : undefined,
-        admin: admin ? { ...admin } : undefined,
-      }
-    })
-  }
-
-  const getPendingSchema = (tblSchema: any) => {
-    if (!tblSchema) {
-      return {}
-    }
-    let pendingSchema = JSON.parse(JSON.stringify(tblSchema))
-    pendingSchema.email.displayName = "Pending Users"
-    return pendingSchema
-  }
-
-  const deleteUsers = async () => {
-    try {
-      if (selectedInvites.length > 0) {
-        await users.removeInvites(
-          selectedInvites.map(invite => ({
-            code: invite._id,
-          }))
-        )
-        selectedInvites = []
-        pendingInvites = await users.getInvites()
-      }
-
-      notifications.success(
-        `Successfully deleted ${selectedInvites.length} users`
-      )
-    } catch (error) {
-      notifications.error("Error deleting users")
-    }
-  }
-
-  onMount(async () => {
-    try {
-      pendingInvites = await users.getInvites()
-      invitesLoaded = true
-    } catch (err) {
-      notifications.error("Error fetching user invitations")
+    return {
+      _id: invite.code,
+      email: invite.email,
+      builder: builder ? { ...builder } : undefined,
+      admin: admin ? { ...admin } : undefined,
     }
   })
+}
+
+const getPendingSchema = (tblSchema: any) => {
+  if (!tblSchema) {
+    return {}
+  }
+  let pendingSchema = JSON.parse(JSON.stringify(tblSchema))
+  pendingSchema.email.displayName = "Pending Users"
+  return pendingSchema
+}
+
+const deleteUsers = async () => {
+  try {
+    if (selectedInvites.length > 0) {
+      await users.removeInvites(
+        selectedInvites.map((invite) => ({
+          code: invite._id,
+        }))
+      )
+      selectedInvites = []
+      pendingInvites = await users.getInvites()
+    }
+
+    notifications.success(`Successfully deleted ${selectedInvites.length} users`)
+  } catch (error) {
+    notifications.error("Error deleting users")
+  }
+}
+
+onMount(async () => {
+  try {
+    pendingInvites = await users.getInvites()
+    invitesLoaded = true
+  } catch (err) {
+    notifications.error("Error fetching user invitations")
+  }
+})
 </script>
 
 <Layout noPadding>

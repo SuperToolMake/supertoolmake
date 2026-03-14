@@ -1,56 +1,55 @@
 <script>
-  import { getContext } from "svelte"
-  import Placeholder from "../Placeholder.svelte"
-  import { onMount } from "svelte"
+import { getContext, onMount } from "svelte"
+import Placeholder from "../Placeholder.svelte"
 
-  const { styleable, builderStore } = getContext("sdk")
-  const component = getContext("component")
+const { styleable, builderStore } = getContext("sdk")
+const component = getContext("component")
 
-  export let type = "mainSidebar"
-  export let minSize = 250
+export let type = "mainSidebar"
+export let minSize = 250
 
-  let layoutMap = {
-    mainSidebar: 2,
-    sidebarMain: 2,
-    oneColumn: 1,
-    twoColumns: 2,
-    threeColumns: 3,
-  }
+let layoutMap = {
+  mainSidebar: 2,
+  sidebarMain: 2,
+  oneColumn: 1,
+  twoColumns: 2,
+  threeColumns: 3,
+}
 
-  let container
-  let containerWidth
-  $: columnsDependingOnSize = calculateColumns(containerWidth)
+let container
+let containerWidth
+$: columnsDependingOnSize = calculateColumns(containerWidth)
 
-  // Instead of svelte bind:clientWidth
-  // Svelte injects an iframe causing issues with CSP, this avoids it
-  const setupResizeObserver = element => {
-    const resizeObserver = new ResizeObserver(entries => {
-      if (!entries?.[0]) {
-        return
-      }
-      const element = entries[0].target
-      containerWidth = element.clientWidth
-    })
-
-    resizeObserver.observe(element)
-    return resizeObserver
-  }
-
-  function calculateColumns(parentWidth) {
-    const numberOfAllowedColumns = Math.floor(parentWidth / minSize) || 100
-    if (layoutMap[type] <= numberOfAllowedColumns) {
-      return false
-    } else if (layoutMap[type] > numberOfAllowedColumns) {
-      return numberOfAllowedColumns
+// Instead of svelte bind:clientWidth
+// Svelte injects an iframe causing issues with CSP, this avoids it
+const setupResizeObserver = (element) => {
+  const resizeObserver = new ResizeObserver((entries) => {
+    if (!entries?.[0]) {
+      return
     }
-  }
-
-  onMount(() => {
-    let resizeObserver = setupResizeObserver(container)
-    return () => {
-      resizeObserver.disconnect()
-    }
+    const element = entries[0].target
+    containerWidth = element.clientWidth
   })
+
+  resizeObserver.observe(element)
+  return resizeObserver
+}
+
+function calculateColumns(parentWidth) {
+  const numberOfAllowedColumns = Math.floor(parentWidth / minSize) || 100
+  if (layoutMap[type] <= numberOfAllowedColumns) {
+    return false
+  } else if (layoutMap[type] > numberOfAllowedColumns) {
+    return numberOfAllowedColumns
+  }
+}
+
+onMount(() => {
+  let resizeObserver = setupResizeObserver(container)
+  return () => {
+    resizeObserver.disconnect()
+  }
+})
 </script>
 
 <div

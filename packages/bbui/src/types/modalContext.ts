@@ -1,4 +1,4 @@
-import { ModalCancelFrom } from "../constants"
+import type { ModalCancelFrom } from "../constants"
 
 export interface ModalContext {
   cancel: (from: ModalCancelFrom) => void

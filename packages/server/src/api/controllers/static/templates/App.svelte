@@ -1,7 +1,7 @@
 <script>
-  import ClientAppSkeleton from "@budibase/frontend-core/src/components/ClientAppSkeleton.svelte"
+import ClientAppSkeleton from "@budibase/frontend-core/src/components/ClientAppSkeleton.svelte"
 
-  export let props
+export let props
 </script>
 
 <svelte:head>

@@ -1,6 +1,6 @@
 import { testContainerUtils } from "@budibase/backend-core/tests"
-import { Datasource, SourceName } from "@budibase/types"
-import { Knex } from "knex"
+import { type Datasource, SourceName } from "@budibase/types"
+import type { Knex } from "knex"
 import TestConfiguration from "../../../tests/utilities/TestConfiguration"
 import "./images"
 import * as mariadb from "./mariadb"
@@ -130,14 +130,14 @@ export function datasourceDescribe(opts: DatasourceDescribeOpts) {
     databases = opts.only
   } else if ("plus" in opts) {
     databases = Object.values(DatabaseName)
-      .filter(db => DATASOURCE_PLUS.includes(db))
-      .filter(db => !opts.exclude?.includes(db))
+      .filter((db) => DATASOURCE_PLUS.includes(db))
+      .filter((db) => !opts.exclude?.includes(db))
   } else {
     throw new Error("invalid options")
   }
 
   if (process.env.DATASOURCE) {
-    databases = databases.filter(db => db === process.env.DATASOURCE)
+    databases = databases.filter((db) => db === process.env.DATASOURCE)
   }
 
   if (databases.length === 0) {
@@ -145,7 +145,7 @@ export function datasourceDescribe(opts: DatasourceDescribeOpts) {
   }
 
   const config = new TestConfiguration()
-  return databases.map(dbName => ({
+  return databases.map((dbName) => ({
     dbName,
     config,
     dsProvider: () => createDatasources(config, dbName),
@@ -159,9 +159,7 @@ export function datasourceDescribe(opts: DatasourceDescribeOpts) {
       DatabaseName.SQL_SERVER,
     ].includes(dbName),
     isMySQL: dbName === DatabaseName.MYSQL,
-    isPostgres:
-      dbName === DatabaseName.POSTGRES ||
-      dbName === DatabaseName.POSTGRES_LEGACY,
+    isPostgres: dbName === DatabaseName.POSTGRES || dbName === DatabaseName.POSTGRES_LEGACY,
     // check if any of the legacy tags
     isLegacy: dbName === DatabaseName.POSTGRES_LEGACY,
     isMongodb: dbName === DatabaseName.MONGODB,
@@ -170,9 +168,7 @@ export function datasourceDescribe(opts: DatasourceDescribeOpts) {
   }))
 }
 
-export function getDatasource(
-  sourceName: DatabaseName
-): Promise<Datasource | undefined> {
+export function getDatasource(sourceName: DatabaseName): Promise<Datasource | undefined> {
   return providers[sourceName]()
 }
 

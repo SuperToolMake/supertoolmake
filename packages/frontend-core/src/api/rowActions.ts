@@ -1,11 +1,11 @@
-import {
-  RowActionsResponse,
-  RowActionResponse,
+import type {
   CreateRowActionRequest,
   RowActionPermissionsResponse,
+  RowActionResponse,
+  RowActionsResponse,
   RowActionTriggerRequest,
 } from "@budibase/types"
-import { BaseAPIClient } from "./types"
+import type { BaseAPIClient } from "./types"
 
 export interface RowActionEndpoints {
   fetch: (tableId: string) => Promise<Record<string, RowActionResponse>>
@@ -21,21 +21,15 @@ export interface RowActionEndpoints {
     rowActionId: string,
     viewId: string
   ) => Promise<RowActionPermissionsResponse>
-  trigger: (
-    sourceId: string,
-    rowActionId: string,
-    rowId: string
-  ) => Promise<void>
+  trigger: (sourceId: string, rowActionId: string, rowId: string) => Promise<void>
 }
 
-export const buildRowActionEndpoints = (
-  API: BaseAPIClient
-): RowActionEndpoints => ({
+export const buildRowActionEndpoints = (API: BaseAPIClient): RowActionEndpoints => ({
   /**
    * Gets the available row actions for a table.
    * @param tableId the ID of the table
    */
-  fetch: async tableId => {
+  fetch: async (tableId) => {
     return (
       await API.get<RowActionsResponse>({
         url: `/api/tables/${tableId}/actions`,

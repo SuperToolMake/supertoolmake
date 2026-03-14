@@ -1,8 +1,8 @@
 <script>
-  import { Body } from "@budibase/bbui"
+import { Body } from "@budibase/bbui"
 
-  export let title
-  export let disabled
+export let title
+export let disabled
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

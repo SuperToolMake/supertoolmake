@@ -1,12 +1,12 @@
-import { writable, get, derived } from "svelte/store"
+import { derived, get, writable } from "svelte/store"
 
 // A simple svelte store which deeply compares all changes and ensures that
 // subscribed children will only fire when a new value is actually set
-export const memo = initialValue => {
+export const memo = (initialValue) => {
   const store = writable(initialValue)
   let currentJSON = JSON.stringify(initialValue)
 
-  const tryUpdateValue = newValue => {
+  const tryUpdateValue = (newValue) => {
     const newJSON = JSON.stringify(newValue)
     if (newJSON !== currentJSON) {
       store.set(newValue)
@@ -17,8 +17,8 @@ export const memo = initialValue => {
   return {
     subscribe: store.subscribe,
     set: tryUpdateValue,
-    update: updateFn => {
-      let mutableCurrentValue = JSON.parse(currentJSON)
+    update: (updateFn) => {
+      const mutableCurrentValue = JSON.parse(currentJSON)
       const newValue = updateFn(mutableCurrentValue)
       tryUpdateValue(newValue)
     },

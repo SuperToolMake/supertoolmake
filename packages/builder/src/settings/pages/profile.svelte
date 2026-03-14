@@ -1,80 +1,80 @@
 <script lang="ts">
-  import { onMount } from "svelte"
-  import { writable } from "svelte/store"
-  import { API } from "@/api"
-  import {
-    Body,
-    Input,
-    notifications,
-    Layout,
-    Button,
-    Select,
-    Heading,
-    CopyInput,
-    Divider,
-    Label,
-    ButtonGroup,
-    Modal,
-  } from "@budibase/bbui"
-  import { auth } from "@/stores/portal/auth"
-  import { admin } from "@/stores/portal/admin"
-  import { themeStore } from "@/stores/portal/theme"
-  import { type UpdateSelfRequest } from "@budibase/types"
-  import { ThemeOptions } from "@budibase/shared-core"
-  import ChangePasswordModal from "@budibase/frontend-core/src/components/ChangePasswordModal.svelte"
+import {
+  Body,
+  Button,
+  ButtonGroup,
+  CopyInput,
+  Divider,
+  Heading,
+  Input,
+  Label,
+  Layout,
+  type Modal,
+  notifications,
+  Select,
+} from "@budibase/bbui"
+import ChangePasswordModal from "@budibase/frontend-core/src/components/ChangePasswordModal.svelte"
+import { ThemeOptions } from "@budibase/shared-core"
+import type { UpdateSelfRequest } from "@budibase/types"
+import { onMount } from "svelte"
+import { writable } from "svelte/store"
+import { API } from "@/api"
+import { admin } from "@/stores/portal/admin"
+import { auth } from "@/stores/portal/auth"
+import { themeStore } from "@/stores/portal/theme"
 
-  const values = writable<UpdateSelfRequest>({})
-  let updating = false
-  let apiKey: string | undefined = undefined
-  let updatePasswordModal: Modal
+const values = writable<UpdateSelfRequest>({})
+let updating = false
+let apiKey: string | undefined
+let updatePasswordModal: Modal
 
-  $: user = $auth.user
-  $: first = user?.firstName
-  $: last = user?.lastName
+$: user = $auth.user
+$: first = user?.firstName
+$: last = user?.lastName
 
-  $: if (first || last) {
-    values.set({
-      firstName: first,
-      lastName: last,
-    })
-  }
-
-  $: altered = isAltered($values)
-
-  const isAltered = (vals: UpdateSelfRequest) => {
-    return vals && (vals.firstName !== first || vals.lastName !== last)
-  }
-
-  const updateInfo = async () => {
-    updating = true
-    try {
-      await API.updateSelf($values)
-      notifications.success("Information updated successfully")
-      // Refresh cached user
-      await auth.getSelf()
-    } catch (error) {
-      console.error(error)
-      notifications.error("Failed to update information")
-    }
-    updating = false
-  }
-
-  async function generateAPIKey() {
-    try {
-      apiKey = await auth.generateAPIKey()
-      notifications.success("New API key generated")
-    } catch (err) {
-      notifications.error("Unable to generate new API key")
-    }
-  }
-
-  onMount(async () => {
-    try {
-      apiKey = await auth.fetchAPIKey()
-    } catch (err) {
-      notifications.error("Unable to fetch API key")
-    }
+$: if (first || last) {
+  values.set({
+    firstName: first,
+    lastName: last,
   })
+}
+
+$: altered = isAltered($values)
+
+const isAltered = (vals: UpdateSelfRequest) => {
+  return vals && (vals.firstName !== first || vals.lastName !== last)
+}
+
+const updateInfo = async () => {
+  updating = true
+  try {
+    await API.updateSelf($values)
+    notifications.success("Information updated successfully")
+    // Refresh cached user
+    await auth.getSelf()
+  } catch (error) {
+    console.error(error)
+    notifications.error("Failed to update information")
+  }
+  updating = false
+}
+
+async function generateAPIKey() {
+  try {
+    apiKey = await auth.generateAPIKey()
+    notifications.success("New API key generated")
+  } catch (err) {
+    notifications.error("Unable to generate new API key")
+  }
+}
+
+onMount(async () => {
+  try {
+    apiKey = await auth.fetchAPIKey()
+  } catch (err) {
+    notifications.error("Unable to fetch API key")
+  }
+})
 </script>
 
 <Layout gap="S" noPadding>

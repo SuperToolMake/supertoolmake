@@ -1,24 +1,24 @@
 <script>
-  import { createEventDispatcher } from "svelte"
-  import Icon from "../Icon/Icon.svelte"
+import { createEventDispatcher } from "svelte"
+import Icon from "../Icon/Icon.svelte"
 
-  let dispatch = createEventDispatcher()
+let dispatch = createEventDispatcher()
 
-  export let type = "info"
-  export let icon = "info"
-  export let size = "S"
-  export let extraButtonText = undefined
-  export let extraButtonAction = undefined
-  export let extraLinkText = undefined
-  export let extraLinkAction = undefined
-  export let showCloseButton = true
+export let type = "info"
+export let icon = "info"
+export let size = "S"
+export let extraButtonText = undefined
+export let extraButtonAction = undefined
+export let extraLinkText = undefined
+export let extraLinkAction = undefined
+export let showCloseButton = true
 
-  let show = true
+let show = true
 
-  function clear() {
-    show = false
-    dispatch("change")
-  }
+function clear() {
+  show = false
+  dispatch("change")
+}
 </script>
 
 {#if show}

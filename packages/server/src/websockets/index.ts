@@ -1,9 +1,9 @@
-import http from "http"
-import Koa from "koa"
+import type http from "http"
+import type Koa from "koa"
+import env from "../environment"
+import BuilderSocket from "./builder"
 import ClientAppSocket from "./client"
 import GridSocket from "./grid"
-import BuilderSocket from "./builder"
-import env from "../environment"
 
 let clientAppSocket: ClientAppSocket | undefined
 let gridSocket: GridSocket | undefined
@@ -18,4 +18,4 @@ export const initialise = (app: Koa, server: http.Server) => {
   }
 }
 
-export { clientAppSocket, gridSocket, builderSocket }
+export { builderSocket, clientAppSocket, gridSocket }

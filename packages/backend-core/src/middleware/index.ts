@@ -1,5 +1,6 @@
 export { correlationMiddleware as correlation } from "../logging/correlation/middleware"
 export { pinoMiddleware as pino } from "../logging/pino/middleware"
+export { activeTenant } from "./activation"
 export { adminOnly } from "./adminOnly"
 export { authenticated } from "./authenticated"
 export { builderOnly } from "./builderOnly"
@@ -16,8 +17,8 @@ export * as oidc from "./passport/sso/oidc"
 export { authError, ssoCallbackUrl } from "./passport/utils"
 export { querystringToBody } from "./querystringToBody"
 export { tenancy } from "./tenancy"
-export { activeTenant } from "./activation"
 export { workspaceBuilderOrAdmin } from "./workspaceBuilderOrAdmin"
+
 import * as datasourceGoogle from "./passport/datasource/google"
 
 export const datasource = {

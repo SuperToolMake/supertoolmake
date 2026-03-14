@@ -1,7 +1,7 @@
-import { derived, Readable } from "svelte/store"
+import type { Row } from "@budibase/types"
+import { derived, type Readable } from "svelte/store"
 import { MinColumnWidth } from "../lib/constants"
-import { Store as StoreContext } from "."
-import { Row } from "@budibase/types"
+import type { Store as StoreContext } from "."
 
 interface ViewportDerivedStore {
   scrolledRowCount: Readable<number>
@@ -28,39 +28,25 @@ export const deriveStores = (context: StoreContext): ViewportDerivedStore => {
   // Derive visible rows
   // Split into multiple stores containing primitives to optimise invalidation
   // as much as possible
-  const scrolledRowCount = derived(
-    [scrollTop, rowHeight],
-    ([$scrollTop, $rowHeight]) => {
-      return Math.floor($scrollTop / $rowHeight)
-    }
-  )
-  const visualRowCapacity = derived(
-    [height, rowHeight],
-    ([$height, $rowHeight]) => {
-      return Math.ceil($height / $rowHeight) + 1
-    }
-  )
+  const scrolledRowCount = derived([scrollTop, rowHeight], ([$scrollTop, $rowHeight]) => {
+    return Math.floor($scrollTop / $rowHeight)
+  })
+  const visualRowCapacity = derived([height, rowHeight], ([$height, $rowHeight]) => {
+    return Math.ceil($height / $rowHeight) + 1
+  })
   const renderedRows = derived(
     [rows, scrolledRowCount, visualRowCapacity, rowChangeCache, metadata],
-    ([
-      $rows,
-      $scrolledRowCount,
-      $visualRowCapacity,
-      $rowChangeCache,
-      $metadata,
-    ]) => {
-      return $rows
-        .slice($scrolledRowCount, $scrolledRowCount + $visualRowCapacity)
-        .map(row => ({
-          ...row,
-          ...$rowChangeCache[row._id],
-          __metadata: $metadata[row._id],
-        }))
+    ([$rows, $scrolledRowCount, $visualRowCapacity, $rowChangeCache, $metadata]) => {
+      return $rows.slice($scrolledRowCount, $scrolledRowCount + $visualRowCapacity).map((row) => ({
+        ...row,
+        ...$rowChangeCache[row._id],
+        __metadata: $metadata[row._id],
+      }))
     }
   )
 
   // Derive visible columns
-  const scrollLeftRounded = derived(scrollLeft, $scrollLeft => {
+  const scrollLeftRounded = derived(scrollLeft, ($scrollLeft) => {
     const interval = MinColumnWidth
     return Math.round($scrollLeft / interval) * interval
   })
@@ -72,28 +58,20 @@ export const deriveStores = (context: StoreContext): ViewportDerivedStore => {
       }
       let startColIdx = 0
       let rightEdge = $scrollableColumns[0].width
-      while (
-        rightEdge < $scrollLeft &&
-        startColIdx < $scrollableColumns.length - 1
-      ) {
+      while (rightEdge < $scrollLeft && startColIdx < $scrollableColumns.length - 1) {
         startColIdx++
         rightEdge += $scrollableColumns[startColIdx].width
       }
       let endColIdx = startColIdx + 1
       let leftEdge = rightEdge
-      while (
-        leftEdge < $width + $scrollLeft &&
-        endColIdx < $scrollableColumns.length
-      ) {
+      while (leftEdge < $width + $scrollLeft && endColIdx < $scrollableColumns.length) {
         leftEdge += $scrollableColumns[endColIdx].width
         endColIdx++
       }
-      let next: Record<string, true> = {}
-      $scrollableColumns
-        .slice(Math.max(0, startColIdx), endColIdx)
-        .forEach(col => {
-          next[col.name] = true
-        })
+      const next: Record<string, true> = {}
+      $scrollableColumns.slice(Math.max(0, startColIdx), endColIdx).forEach((col) => {
+        next[col.name] = true
+      })
       return next
     }
   )

@@ -1,9 +1,9 @@
+import type { Log, ProcessOptions } from "../types"
 import { FIND_HBS_REGEX } from "../utilities"
-import * as preprocessor from "./preprocessor"
-import type { Preprocessor } from "./preprocessor"
-import * as postprocessor from "./postprocessor"
 import type { Postprocessor } from "./postprocessor"
-import { Log, ProcessOptions } from "../types"
+import * as postprocessor from "./postprocessor"
+import type { Preprocessor } from "./preprocessor"
+import * as preprocessor from "./preprocessor"
 
 function process(
   output: string,
@@ -11,18 +11,18 @@ function process(
   opts?: ProcessOptions
 ) {
   let logs: Log[] = []
-  for (let processor of processors) {
+  for (const processor of processors) {
     // if a literal statement has occurred stop
     if (typeof output !== "string") {
       break
     }
     // re-run search each time incase previous processor updated/removed a match
-    let regexp = new RegExp(FIND_HBS_REGEX)
-    let matches = output.match(regexp)
+    const regexp = new RegExp(FIND_HBS_REGEX)
+    const matches = output.match(regexp)
     if (matches == null) {
       continue
     }
-    for (let match of matches) {
+    for (const match of matches) {
       const res = processor.process(output, match, opts || {})
       if (typeof res === "object") {
         if ("logs" in res && res.logs) {
@@ -41,7 +41,7 @@ export function preprocess(string: string, opts: ProcessOptions) {
   let processors = preprocessor.processors
   if (opts.noFinalise) {
     processors = processors.filter(
-      processor => processor.name !== preprocessor.PreprocessorNames.FINALISE
+      (processor) => processor.name !== preprocessor.PreprocessorNames.FINALISE
     )
   }
 

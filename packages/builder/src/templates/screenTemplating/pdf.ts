@@ -1,8 +1,8 @@
-import { PDFScreen } from "./Screen"
+import type { Screen } from "@budibase/types"
+import { Roles } from "@/constants/backend"
 import { capitalise } from "@/helpers"
 import getValidRoute from "./getValidRoute"
-import { Roles } from "@/constants/backend"
-import { Screen } from "@budibase/types"
+import { PDFScreen } from "./Screen"
 
 const pdf = ({
   route,
@@ -15,16 +15,12 @@ const pdf = ({
 }) => {
   const validRoute = getValidRoute(screens, route, Roles.BASIC, workspaceAppId)
 
-  const template = new PDFScreen(workspaceAppId)
-    .role(Roles.BASIC)
-    .route(validRoute)
-    .json()
+  const template = new PDFScreen(workspaceAppId).role(Roles.BASIC).route(validRoute).json()
 
   return [
     {
       data: template,
-      navigationLinkLabel:
-        validRoute === "/" ? null : capitalise(validRoute.split("/")[1]),
+      navigationLinkLabel: validRoute === "/" ? null : capitalise(validRoute.split("/")[1]),
     },
   ]
 }

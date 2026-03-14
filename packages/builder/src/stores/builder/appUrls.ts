@@ -1,7 +1,6 @@
 import { derived } from "svelte/store"
-import { appStore, selectedScreen, workspaceAppStore } from "."
-
 import { buildLiveUrl, buildPreviewUrl } from "@/helpers/urls"
+import { appStore, selectedScreen, workspaceAppStore } from "."
 
 export const selectedAppUrls = derived(
   [workspaceAppStore, selectedScreen, appStore],

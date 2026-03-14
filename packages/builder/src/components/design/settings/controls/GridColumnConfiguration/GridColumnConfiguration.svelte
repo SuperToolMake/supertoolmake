@@ -1,56 +1,51 @@
 <script>
-  import { enrichSchemaWithRelColumns } from "@budibase/frontend-core"
-  import {
-    getDatasourceForProvider,
-    getSchemaForDatasource,
-  } from "@/dataBinding"
-  import { selectedScreen, componentStore } from "@/stores/builder"
-  import DraggableList from "../DraggableList.svelte"
-  import { createEventDispatcher } from "svelte"
-  import FieldSetting from "./FieldSetting.svelte"
-  import PrimaryColumnFieldSetting from "./PrimaryColumnFieldSetting.svelte"
-  import { getColumns } from "./getColumns.js"
-  import InfoDisplay from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
+import { enrichSchemaWithRelColumns } from "@budibase/frontend-core"
+import { createEventDispatcher } from "svelte"
+import { getDatasourceForProvider, getSchemaForDatasource } from "@/dataBinding"
+import InfoDisplay from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
+import { componentStore, selectedScreen } from "@/stores/builder"
+import DraggableList from "../DraggableList.svelte"
+import FieldSetting from "./FieldSetting.svelte"
+import { getColumns } from "./getColumns.js"
+import PrimaryColumnFieldSetting from "./PrimaryColumnFieldSetting.svelte"
 
-  export let value
-  export let componentInstance
-  export let bindings
+export let value
+export let componentInstance
+export let bindings
 
-  const dispatch = createEventDispatcher()
-  let primaryDisplayColumnAnchor
+const dispatch = createEventDispatcher()
+let primaryDisplayColumnAnchor
 
-  const handleChange = newValues => {
-    dispatch("change", newValues)
+const handleChange = (newValues) => {
+  dispatch("change", newValues)
+}
+
+const getSchema = (asset, datasource) => {
+  const schema = getSchemaForDatasource(asset, datasource).schema
+
+  if (!schema) {
+    return
   }
 
-  const getSchema = (asset, datasource) => {
-    const schema = getSchemaForDatasource(asset, datasource).schema
+  // Don't show ID and rev in tables
+  delete schema._id
+  delete schema._rev
 
-    if (!schema) {
-      return
-    }
+  const result = enrichSchemaWithRelColumns(schema)
+  return result
+}
 
-    // Don't show ID and rev in tables
-    delete schema._id
-    delete schema._rev
-
-    const result = enrichSchemaWithRelColumns(schema)
-    return result
-  }
-
-  $: datasource = getDatasourceForProvider($selectedScreen, componentInstance)
-  $: primaryDisplayColumnName = getSchemaForDatasource(
-    $selectedScreen,
-    datasource
-  )?.table?.primaryDisplay
-  $: schema = getSchema($selectedScreen, datasource)
-  $: columns = getColumns({
-    columns: value,
-    schema,
-    primaryDisplayColumnName,
-    onChange: handleChange,
-    createComponent: componentStore.createInstance,
-  })
+$: datasource = getDatasourceForProvider($selectedScreen, componentInstance)
+$: primaryDisplayColumnName = getSchemaForDatasource($selectedScreen, datasource)?.table
+  ?.primaryDisplay
+$: schema = getSchema($selectedScreen, datasource)
+$: columns = getColumns({
+  columns: value,
+  schema,
+  primaryDisplayColumnName,
+  onChange: handleChange,
+  createComponent: componentStore.createInstance,
+})
 </script>
 
 {#if columns.primary}

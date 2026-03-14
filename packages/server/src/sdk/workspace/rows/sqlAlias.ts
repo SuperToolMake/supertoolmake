@@ -1,26 +1,20 @@
-import {
-  Datasource,
-  DatasourcePlusQueryResponse,
-  EnrichedQueryJson,
-  Operation,
-  Row,
-  SearchFilters,
-  SqlClient,
-  Table,
-} from "@budibase/types"
-import { getSQLClient } from "./utils"
-import { cloneDeep } from "lodash"
 import { dataFilters } from "@budibase/shared-core"
+import {
+  type Datasource,
+  type DatasourcePlusQueryResponse,
+  type EnrichedQueryJson,
+  Operation,
+  type Row,
+  type SearchFilters,
+  SqlClient,
+  type Table,
+} from "@budibase/types"
+import { cloneDeep } from "lodash"
+import { getSQLClient } from "./utils"
 
-type PerformQueryFunction = (
-  json: EnrichedQueryJson
-) => Promise<DatasourcePlusQueryResponse>
+type PerformQueryFunction = (json: EnrichedQueryJson) => Promise<DatasourcePlusQueryResponse>
 
-const WRITE_OPERATIONS: Operation[] = [
-  Operation.CREATE,
-  Operation.UPDATE,
-  Operation.DELETE,
-]
+const WRITE_OPERATIONS: Operation[] = [Operation.CREATE, Operation.UPDATE, Operation.DELETE]
 const DISABLED_WRITE_CLIENTS: SqlClient[] = [SqlClient.MY_SQL, SqlClient.MS_SQL]
 
 const DISABLED_OPERATIONS: Operation[] = [
@@ -38,7 +32,7 @@ class CharSequence {
   }
 
   getCharacter(): string {
-    const char = this.counters.map(i => CharSequence.alphabet[i]).join("")
+    const char = this.counters.map((i) => CharSequence.alphabet[i]).join("")
     for (let i = this.counters.length - 1; i >= 0; i--) {
       if (this.counters[i] < CharSequence.alphabet.length - 1) {
         this.counters[i]++
@@ -66,11 +60,7 @@ export default class AliasTables {
 
   isAliasingEnabled(json: EnrichedQueryJson, datasource: Datasource) {
     const fieldLength = json.resource?.fields?.length
-    if (
-      !fieldLength ||
-      fieldLength <= 0 ||
-      DISABLED_OPERATIONS.includes(json.operation)
-    ) {
+    if (!fieldLength || fieldLength <= 0 || DISABLED_OPERATIONS.includes(json.operation)) {
       return false
     }
     try {
@@ -106,7 +96,7 @@ export default class AliasTables {
     if (field.includes(".")) {
       const [tableName, ...rest] = field.split(".")
       const column = rest.join(".")
-      const foundTableName = tableNames.find(name => {
+      const foundTableName = tableNames.find((name) => {
         const idx = tableName.indexOf(name)
         if (idx === -1 || idx > 1) {
           return
@@ -118,10 +108,7 @@ export default class AliasTables {
         return Math.abs(tableName.length - name.length) <= allowedCharacterDiff
       })
       if (foundTableName) {
-        const aliasedTableName = tableName.replace(
-          foundTableName,
-          this.getAlias(foundTableName)
-        )
+        const aliasedTableName = tableName.replace(foundTableName, this.getAlias(foundTableName))
         field = `${aliasedTableName}.${column}`
       }
     }
@@ -152,7 +139,7 @@ export default class AliasTables {
       return final
     }
     if (Array.isArray(rows)) {
-      return rows.map(row => process(row)) as T
+      return rows.map((row) => process(row)) as T
     } else {
       return process(rows) as T
     }
@@ -160,7 +147,7 @@ export default class AliasTables {
 
   aliasMap(tableNames: (string | undefined)[]) {
     const map: Record<string, string> = {}
-    for (let tableName of tableNames) {
+    for (const tableName of tableNames) {
       if (tableName) {
         map[tableName] = this.getAlias(tableName)
       }
@@ -173,24 +160,22 @@ export default class AliasTables {
     queryFn: PerformQueryFunction
   ): Promise<DatasourcePlusQueryResponse> {
     const datasource = json.datasource
-    let aliasingEnabled = this.isAliasingEnabled(json, datasource)
+    const aliasingEnabled = this.isAliasingEnabled(json, datasource)
 
     if (aliasingEnabled) {
       json = cloneDeep(json)
       // run through the query json to update anywhere a table may be used
       if (json.resource?.fields) {
-        json.resource.fields = json.resource.fields.map(field =>
-          this.aliasField(field)
-        )
+        json.resource.fields = json.resource.fields.map((field) => this.aliasField(field))
       }
       if (json.filters) {
         const aliasFilters = (filters: SearchFilters): SearchFilters => {
-          for (let [filterKey, filter] of Object.entries(filters)) {
+          for (const [filterKey, filter] of Object.entries(filters)) {
             if (typeof filter !== "object") {
               continue
             }
             const aliasedFilters: typeof filter = {}
-            for (let key of Object.keys(filter)) {
+            for (const key of Object.keys(filter)) {
               aliasedFilters[this.aliasField(key)] = filter[key]
             }
             filters[filterKey as keyof SearchFilters] = aliasedFilters
@@ -201,13 +186,9 @@ export default class AliasTables {
       }
 
       if (json.relationships) {
-        json.relationships = json.relationships.map(relationship => ({
+        json.relationships = json.relationships.map((relationship) => ({
           ...relationship,
-          aliases: this.aliasMap([
-            relationship.through,
-            relationship.tableName,
-            json.table.name,
-          ]),
+          aliases: this.aliasMap([relationship.through, relationship.tableName, json.table.name]),
         }))
       }
 
@@ -218,13 +199,13 @@ export default class AliasTables {
 
       // invert and return
       const invertedTableAliases: Record<string, string> = {}
-      for (let [key, value] of Object.entries(this.tableAliases)) {
+      for (const [key, value] of Object.entries(this.tableAliases)) {
         invertedTableAliases[value] = key
       }
       json.tableAliases = invertedTableAliases
     }
 
-    let response = await queryFn(json)
+    const response = await queryFn(json)
     if (Array.isArray(response) && aliasingEnabled) {
       return this.reverse(response)
     } else {

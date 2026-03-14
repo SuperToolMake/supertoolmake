@@ -1,12 +1,12 @@
 <script>
-  import { ColorPicker } from "@budibase/bbui"
-  import { builderStore } from "@/stores"
+import { ColorPicker } from "@budibase/bbui"
+import { builderStore } from "@/stores"
 
-  export let prop
-  export let component
-  export let disabled = false
+export let prop
+export let component
+export let disabled = false
 
-  $: currentValue = component?.[prop]
+$: currentValue = component?.[prop]
 </script>
 
 <div class:disabled>

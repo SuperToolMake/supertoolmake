@@ -1,6 +1,6 @@
+import { DataFetchMap, type DataFetchType } from "@budibase/frontend-core"
+import { FieldType, type TableSchema } from "@budibase/types"
 import { API } from "@/api"
-import { DataFetchMap, DataFetchType } from "@budibase/frontend-core"
-import { FieldType, TableSchema } from "@budibase/types"
 
 /**
  * Constructs a fetch instance for a given datasource.
@@ -9,9 +9,7 @@ import { FieldType, TableSchema } from "@budibase/types"
  * @param datasource the datasource
  * @returns
  */
-const getDatasourceFetchInstance = <
-  TDatasource extends { type: DataFetchType },
->(
+const getDatasourceFetchInstance = <TDatasource extends { type: DataFetchType }>(
   datasource: TDatasource
 ) => {
   const handler = DataFetchMap[datasource?.type]
@@ -30,9 +28,7 @@ const getDatasourceFetchInstance = <
  * @param datasource the datasource to fetch the schema for
  * @param options options for enriching the schema
  */
-export const fetchDatasourceSchema = async <
-  TDatasource extends { type: DataFetchType },
->(
+export const fetchDatasourceSchema = async <TDatasource extends { type: DataFetchType }>(
   datasource: TDatasource,
   options = { enrichRelationships: false, formSchema: false }
 ) => {
@@ -57,12 +53,7 @@ export const fetchDatasourceSchema = async <
   }
 
   // Enrich schema with relationships if required
-  if (
-    definition &&
-    "sql" in definition &&
-    definition.sql &&
-    options?.enrichRelationships
-  ) {
+  if (definition && "sql" in definition && definition.sql && options?.enrichRelationships) {
     const relationshipAdditions = await getRelationshipSchemaAdditions(schema)
     schema = {
       ...schema,
@@ -78,9 +69,7 @@ export const fetchDatasourceSchema = async <
  * Fetches the definition of any kind of datasource.
  * @param datasource the datasource to fetch the schema for
  */
-export const fetchDatasourceDefinition = async <
-  TDatasource extends { type: DataFetchType },
->(
+export const fetchDatasourceDefinition = async <TDatasource extends { type: DataFetchType }>(
   datasource: TDatasource
 ) => {
   const instance = getDatasourceFetchInstance(datasource)
@@ -91,14 +80,12 @@ export const fetchDatasourceDefinition = async <
  * Fetches the schema of relationship fields for a SQL table schema
  * @param schema the schema to enrich
  */
-export const getRelationshipSchemaAdditions = async (
-  schema: Record<string, any>
-) => {
+export const getRelationshipSchemaAdditions = async (schema: Record<string, any>) => {
   if (!schema) {
     return null
   }
-  let relationshipAdditions: Record<string, any> = {}
-  for (let fieldKey of Object.keys(schema)) {
+  const relationshipAdditions: Record<string, any> = {}
+  for (const fieldKey of Object.keys(schema)) {
     const fieldSchema = schema[fieldKey]
     if (fieldSchema?.type === "link") {
       const linkSchema = await fetchDatasourceSchema({
@@ -108,7 +95,7 @@ export const getRelationshipSchemaAdditions = async (
       if (!linkSchema) {
         continue
       }
-      Object.keys(linkSchema).forEach(linkKey => {
+      Object.keys(linkSchema).forEach((linkKey) => {
         relationshipAdditions[`${fieldKey}.${linkKey}`] = {
           type: linkSchema[linkKey].type,
           externalType: linkSchema[linkKey].externalType,

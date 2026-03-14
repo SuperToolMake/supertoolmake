@@ -1,63 +1,63 @@
 <script lang="ts">
-  import { Icon, TooltipType, TooltipPosition } from "@budibase/bbui"
-  import { createEventDispatcher, getContext } from "svelte"
-  import { UserAvatars } from "@budibase/frontend-core"
-  import type { UIUser } from "@budibase/types"
+import { Icon, TooltipPosition, TooltipType } from "@budibase/bbui"
+import { UserAvatars } from "@budibase/frontend-core"
+import type { UIUser } from "@budibase/types"
+import { createEventDispatcher, getContext } from "svelte"
 
-  export let icon: string | null = null
-  export let iconTooltip: string = ""
-  export let withArrow: boolean = false
-  export let withActions: boolean = true
-  export let showActions: boolean = false
-  export let indentLevel: number = 0
-  export let text: string
-  export let subtext: string | undefined = undefined
-  export let border: boolean = true
-  export let selected: boolean = false
-  export let opened: boolean = false
-  export let draggable: boolean = false
-  export let iconText: string = ""
-  export let iconColor: string = ""
-  export let scrollable: boolean = false
-  export let highlighted: boolean = false
-  export let rightAlignIcon: boolean = false
-  export let id: string = ""
-  export let showTooltip: boolean = false
-  export let selectedBy: UIUser[] | null = null
-  export let compact: boolean = false
-  export let hovering: boolean = false
-  export let disabled: boolean = false
-  export let nonSelectable: boolean = false
+export let icon: string | null = null
+export let iconTooltip: string = ""
+export let withArrow: boolean = false
+export let withActions: boolean = true
+export let showActions: boolean = false
+export let indentLevel: number = 0
+export let text: string
+export let subtext: string | undefined = undefined
+export let border: boolean = true
+export let selected: boolean = false
+export let opened: boolean = false
+export let draggable: boolean = false
+export let iconText: string = ""
+export let iconColor: string = ""
+export let scrollable: boolean = false
+export let highlighted: boolean = false
+export let rightAlignIcon: boolean = false
+export let id: string = ""
+export let showTooltip: boolean = false
+export let selectedBy: UIUser[] | null = null
+export let compact: boolean = false
+export let hovering: boolean = false
+export let disabled: boolean = false
+export let nonSelectable: boolean = false
 
-  const scrollApi = getContext("scroll")
-  const dispatch = createEventDispatcher()
+const scrollApi = getContext("scroll")
+const dispatch = createEventDispatcher()
 
-  let contentRef: HTMLDivElement
-  $: selected && contentRef && scrollToView()
-  $: style = getStyle(indentLevel)
+let contentRef: HTMLDivElement
+$: selected && contentRef && scrollToView()
+$: style = getStyle(indentLevel)
 
-  const onClick = () => {
-    scrollToView()
-    dispatch("click")
+const onClick = () => {
+  scrollToView()
+  dispatch("click")
+}
+
+const onIconClick = (e: Event) => {
+  e.stopPropagation()
+  dispatch("iconClick")
+}
+
+const scrollToView = () => {
+  if (!scrollApi || !contentRef) {
+    return
   }
+  const bounds = contentRef.getBoundingClientRect()
+  scrollApi.scrollTo(bounds)
+}
 
-  const onIconClick = (e: Event) => {
-    e.stopPropagation()
-    dispatch("iconClick")
-  }
-
-  const scrollToView = () => {
-    if (!scrollApi || !contentRef) {
-      return
-    }
-    const bounds = contentRef.getBoundingClientRect()
-    scrollApi.scrollTo(bounds)
-  }
-
-  const getStyle = (indentLevel: number) => {
-    let style = `padding-left:calc(${indentLevel * 14}px);`
-    return style
-  }
+const getStyle = (indentLevel: number) => {
+  let style = `padding-left:calc(${indentLevel * 14}px);`
+  return style
+}
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

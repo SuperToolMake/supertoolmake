@@ -1,5 +1,5 @@
-import { Document } from "../document"
-import { DBView } from "../../sdk"
+import type { DBView } from "../../sdk"
+import type { Document } from "../document"
 
 export type ViewTemplateOpts = {
   field: string

@@ -4,26 +4,26 @@ import { processObjectSync } from "@budibase/string-templates"
 import {
   AutoFieldSubType,
   AutoReason,
-  Datasource,
-  DatasourcePlusQueryResponse,
-  FieldSchema,
+  type Datasource,
+  type DatasourcePlusQueryResponse,
+  type FieldSchema,
   FieldType,
   FilterType,
   IncludeRelationship,
   InternalSearchFilterOperator,
   isManyToOne,
   isOneToMany,
-  OneToManyRelationshipFieldMetadata,
+  type OneToManyRelationshipFieldMetadata,
   Operation,
-  PaginationJson,
-  QueryJson,
-  RelationshipFieldMetadata,
+  type PaginationJson,
+  type QueryJson,
+  type RelationshipFieldMetadata,
   RelationshipType,
-  Row,
-  SearchFilters,
-  SortJson,
+  type Row,
+  type SearchFilters,
+  type SortJson,
   SortType,
-  Table,
+  type Table,
 } from "@budibase/types"
 import dayjs from "dayjs"
 import { isEqual, omit } from "lodash"
@@ -40,10 +40,7 @@ import {
   isSQL,
 } from "../../../integrations/utils"
 import sdk from "../../../sdk"
-import {
-  enrichQueryJson,
-  processRowCountResponse,
-} from "../../../sdk/workspace/rows/utils"
+import { enrichQueryJson, processRowCountResponse } from "../../../sdk/workspace/rows/utils"
 import {
   buildExternalRelationships,
   buildSqlFieldList,
@@ -79,12 +76,11 @@ export type ExternalReadRequestReturnType = {
   rawResponseSize: number
 }
 
-export type ExternalRequestReturnType<T extends Operation> =
-  T extends Operation.READ
-    ? ExternalReadRequestReturnType
-    : T extends Operation.COUNT
-      ? number
-      : { row: Row; table: Table }
+export type ExternalRequestReturnType<T extends Operation> = T extends Operation.READ
+  ? ExternalReadRequestReturnType
+  : T extends Operation.COUNT
+    ? number
+    : { row: Row; table: Table }
 
 /**
  * This function checks the incoming parameters to make sure all the inputs are
@@ -95,27 +91,22 @@ export type ExternalRequestReturnType<T extends Operation> =
  * relatively restrictive over what types of columns we will perform this action for.
  */
 function cleanupConfig(config: RunConfig, table: Table): RunConfig {
-  const primaryOptions = [
-    FieldType.STRING,
-    FieldType.LONGFORM,
-    FieldType.OPTIONS,
-    FieldType.NUMBER,
-  ]
+  const primaryOptions = [FieldType.STRING, FieldType.LONGFORM, FieldType.OPTIONS, FieldType.NUMBER]
   // filter out fields which cannot be keys
   const fieldNames = Object.entries(table.schema)
-    .filter(schema => primaryOptions.find(val => val === schema[1].type))
+    .filter((schema) => primaryOptions.find((val) => val === schema[1].type))
     // map to fieldName
-    .map(entry => entry[0])
+    .map((entry) => entry[0])
   const iterateObject = (obj: { [key: string]: any }) => {
-    for (let [field, value] of Object.entries(obj)) {
-      if (fieldNames.find(name => name === field) && isRowId(value)) {
+    for (const [field, value] of Object.entries(obj)) {
+      if (fieldNames.find((name) => name === field) && isRowId(value)) {
         obj[field] = convertRowId(value)
       }
     }
   }
   // check the row and filters to make sure they aren't a key of some sort
   if (config.filters) {
-    for (let [key, filter] of Object.entries(config.filters)) {
+    for (const [key, filter] of Object.entries(config.filters)) {
       // oneOf is an array, don't iterate it
       if (
         typeof filter !== "object" ||
@@ -139,12 +130,8 @@ function getEndpoint(tableId: string, operation: Operation) {
   return { datasourceId, entityId: tableName, operation }
 }
 
-function isOneSide(
-  field: RelationshipFieldMetadata
-): field is OneToManyRelationshipFieldMetadata {
-  return (
-    field.relationshipType && field.relationshipType.split("-")[0] === "one"
-  )
+function isOneSide(field: RelationshipFieldMetadata): field is OneToManyRelationshipFieldMetadata {
+  return field.relationshipType && field.relationshipType.split("-")[0] === "one"
 }
 
 function isEditableColumn(column: FieldSchema) {
@@ -209,7 +196,7 @@ export class ExternalRequest<T extends Operation> {
                     values: parts[0],
                   }
                 } else {
-                  for (let field of primary) {
+                  for (const field of primary) {
                     operator[`${prefix}:${field}`] = parts.shift()
                   }
                   prefix++
@@ -234,7 +221,7 @@ export class ExternalRequest<T extends Operation> {
     }
     const equal: SearchFilters["equal"] = {}
     if (primary && idCopy) {
-      for (let field of primary) {
+      for (const field of primary) {
         // work through the ID and get the parts
         equal[field] = idCopy.shift()
       }
@@ -254,11 +241,7 @@ export class ExternalRequest<T extends Operation> {
     }
   }
 
-  private async removeOneToManyRelationships(
-    rowId: string,
-    table: Table,
-    colName: string
-  ) {
+  private async removeOneToManyRelationships(rowId: string, table: Table, colName: string) {
     const tableId = table._id!
     const filters = this.prepareFilters(rowId, {}, table)
     // safety check, if there are no filters on deletion bad things happen
@@ -299,19 +282,16 @@ export class ExternalRequest<T extends Operation> {
       return { row, manyRelationships: [] }
     }
     // we don't really support composite keys for relationships, this is why [0] is used
-    // @ts-ignore
+    // @ts-expect-error
     const tablePrimary: string = table.primary[0]
-    let newRow: Row = {},
+    const newRow: Row = {},
       manyRelationships: ManyRelationship[] = []
-    for (let [key, field] of Object.entries(table.schema)) {
+    for (const [key, field] of Object.entries(table.schema)) {
       // if set already, or not set just skip it
       if (row[key] === undefined || newRow[key]) {
         continue
       }
-      if (
-        !(this.operation === Operation.BULK_UPSERT) &&
-        !isEditableColumn(field)
-      ) {
+      if (!(this.operation === Operation.BULK_UPSERT) && !isEditableColumn(field)) {
         continue
       }
       // parse floats/numbers
@@ -324,7 +304,7 @@ export class ExternalRequest<T extends Operation> {
           continue
         }
         const linkTable = this.tables[linkTableName]
-        // @ts-ignore
+        // @ts-expect-error
         const linkTablePrimary = linkTable.primary[0]
         // one to many
         if (isOneSide(field)) {
@@ -333,8 +313,7 @@ export class ExternalRequest<T extends Operation> {
             if (typeof row[key] === "string") {
               id = decodeURIComponent(row[key]).match(/\[(.*?)\]/)?.[1]
             }
-            newRow[field.foreignKey || linkTablePrimary] =
-              breakRowIdField(id)[0]
+            newRow[field.foreignKey || linkTablePrimary] = breakRowIdField(id)[0]
           } else {
             // Removing from both new and row, as we don't know if it has already been processed
             row[field.foreignKey || linkTablePrimary] = null
@@ -418,11 +397,7 @@ export class ExternalRequest<T extends Operation> {
     // make a new request to get the row with all its relationships
     // we need this to work out if any relationships need removed
     for (const field of Object.values(table.schema)) {
-      if (
-        field.type !== FieldType.LINK ||
-        !field.fieldName ||
-        isOneSide(field)
-      ) {
+      if (field.type !== FieldType.LINK || !field.fieldName || isOneSide(field)) {
         continue
       }
       let relatedTableId: string | undefined,
@@ -438,9 +413,7 @@ export class ExternalRequest<T extends Operation> {
         fieldName = field.fieldName
       }
       if (!relatedTableId || !lookupField || !fieldName) {
-        throw new Error(
-          "Unable to lookup relationships - undefined column properties."
-        )
+        throw new Error("Unable to lookup relationships - undefined column properties.")
       }
 
       if (!lookupField || !row?.[lookupField]) {
@@ -461,9 +434,7 @@ export class ExternalRequest<T extends Operation> {
       })
       // this is the response from knex if no rows found
       const rows: Row[] =
-        !Array.isArray(response) || isKnexEmptyReadResponse(response)
-          ? []
-          : response
+        !Array.isArray(response) || isKnexEmptyReadResponse(response) ? [] : response
 
       const relatedKey = this.getLookupRelationsKey(field)
       related[relatedKey] = {
@@ -485,15 +456,10 @@ export class ExternalRequest<T extends Operation> {
    * isn't supposed to exist anymore and delete those. This is better than the usual method of delete them
    * all and then re-create, as theres no chance of losing data (e.g. delete succeed, but write fail).
    */
-  async handleManyRelationships(
-    mainTableId: string,
-    row: Row,
-    relationships: ManyRelationship[]
-  ) {
+  async handleManyRelationships(mainTableId: string, row: Row, relationships: ManyRelationship[]) {
     const related = await this.lookupRelations(mainTableId, row)
-    for (let relationship of relationships) {
-      const { key, tableId, isUpdate, id, relationshipType, ...rest } =
-        relationship
+    for (const relationship of relationships) {
+      const { key, tableId, isUpdate, id, relationshipType, ...rest } = relationship
 
       if (!tableId) {
         throw new Error("Table ID is unknown, cannot find table")
@@ -536,18 +502,16 @@ export class ExternalRequest<T extends Operation> {
         }
 
         const matchesPrimaryLink =
-          row[linkPrimary] === relationship.id ||
-          row[linkPrimary] === body?.[linkPrimary]
+          row[linkPrimary] === relationship.id || row[linkPrimary] === body?.[linkPrimary]
         if (!matchesPrimaryLink || !linkSecondary) {
           return matchesPrimaryLink
         }
 
-        const matchesSecondaryLink =
-          row[linkSecondary] === body?.[linkSecondary]
+        const matchesSecondaryLink = row[linkSecondary] === body?.[linkSecondary]
         return matchesPrimaryLink && matchesSecondaryLink
       }
 
-      const existingRelationship = rows.find(row =>
+      const existingRelationship = rows.find((row) =>
         relationshipMatchPredicate({
           row,
           linkPrimary,
@@ -578,10 +542,7 @@ export class ExternalRequest<T extends Operation> {
     for (const [field, { isMany, rows, tableId }] of Object.entries(related)) {
       const table: Table | undefined = this.getTable(tableId)
       // if it's not the foreign key skip it, nothing to do
-      if (
-        !table ||
-        (!isMany && table.primary && table.primary.indexOf(field) !== -1)
-      ) {
+      if (!table || (!isMany && table.primary && table.primary.indexOf(field) !== -1)) {
         continue
       }
       for (const row of rows) {
@@ -617,9 +578,7 @@ export class ExternalRequest<T extends Operation> {
         if (isMany) {
           promises.push(this.removeManyToManyRelationships(rowId, table))
         } else {
-          promises.push(
-            this.removeOneToManyRelationships(rowId, table, column.fieldName)
-          )
+          promises.push(this.removeOneToManyRelationships(rowId, table, column.fieldName))
         }
       }
     }
@@ -628,17 +587,14 @@ export class ExternalRequest<T extends Operation> {
 
   async run(config: RunConfig): Promise<ExternalRequestReturnType<T>> {
     const { operation } = this
-    let table: Table = this.source
+    const table: Table = this.source
 
-    let isSql = isSQL(this.datasource)
+    const isSql = isSQL(this.datasource)
 
     // look for specific components of config which may not be considered acceptable
-    let { id, row, filters, sort, paginate, rows } = cleanupConfig(
-      config,
-      table
-    )
+    let { id, row, filters, sort, paginate, rows } = cleanupConfig(config, table)
     //if the sort column is a formula, remove it
-    for (let sortColumn of Object.keys(sort || {})) {
+    for (const sortColumn of Object.keys(sort || {})) {
       if (!sort?.[sortColumn]) {
         continue
       }
@@ -653,8 +609,7 @@ export class ExternalRequest<T extends Operation> {
     filters = this.prepareFilters(id, filters || {}, table)
     const relationships = buildExternalRelationships(table, this.tables)
 
-    const incRelationships =
-      config.includeSqlRelationships === IncludeRelationship.INCLUDE
+    const incRelationships = config.includeSqlRelationships === IncludeRelationship.INCLUDE
 
     // clean up row on ingress using schema
     const unprocessedRow = config.row
@@ -673,14 +628,11 @@ export class ExternalRequest<T extends Operation> {
       }
     }
 
-    if (
-      operation === Operation.DELETE &&
-      (filters == null || Object.keys(filters).length === 0)
-    ) {
+    if (operation === Operation.DELETE && (filters == null || Object.keys(filters).length === 0)) {
       throw "Deletion must be filtered"
     }
 
-    let json: QueryJson = {
+    const json: QueryJson = {
       endpoint: {
         datasourceId: this.datasource,
         entityId: table,
@@ -701,11 +653,7 @@ export class ExternalRequest<T extends Operation> {
       body: row || rows,
       // pass an id filter into extra, purely for mysql/returning
       extra: {
-        idFilter: this.prepareFilters(
-          id || generateIdForRow(row, table),
-          {},
-          table
-        ),
+        idFilter: this.prepareFilters(id || generateIdForRow(row, table), {}, table),
       },
     }
 
@@ -728,10 +676,7 @@ export class ExternalRequest<T extends Operation> {
     } else {
       response = env.SQL_ALIASING_DISABLE
         ? await makeExternalQuery(json)
-        : await aliasing.queryWithAliasing(
-            await enrichQueryJson(json),
-            makeExternalQuery
-          )
+        : await aliasing.queryWithAliasing(await enrichQueryJson(json), makeExternalQuery)
     }
 
     // if it's a counting operation there will be no more processing, just return the number
@@ -748,12 +693,7 @@ export class ExternalRequest<T extends Operation> {
         processed.manyRelationships
       )
     }
-    const output = await sqlOutputProcessing(
-      response,
-      this.source,
-      this.tables,
-      relationships
-    )
+    const output = await sqlOutputProcessing(response, this.source, this.tables, relationships)
     // if reading it'll just be an array of rows, return whole thing
     if (operation === Operation.READ) {
       const rows = Array.isArray(output) ? output : [output]

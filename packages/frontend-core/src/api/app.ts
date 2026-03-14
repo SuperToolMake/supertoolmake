@@ -1,5 +1,5 @@
 import { sdk } from "@budibase/shared-core"
-import {
+import type {
   ClearDevLockResponse,
   CreateWorkspaceRequest,
   CreateWorkspaceResponse,
@@ -22,7 +22,7 @@ import {
   UpdateWorkspaceRequest,
   UpdateWorkspaceResponse,
 } from "@budibase/types"
-import { BaseAPIClient } from "./types"
+import type { BaseAPIClient } from "./types"
 
 export interface AppEndpoints {
   fetchAppPackage: (appId: string) => Promise<FetchAppPackageResponse>
@@ -40,9 +40,7 @@ export interface AppEndpoints {
   revertAppClientVersion: (appId: string) => Promise<RevertAppClientResponse>
   releaseAppLock: (appId: string) => Promise<ClearDevLockResponse>
   getAppDeployments: () => Promise<FetchDeploymentResponse>
-  createApp: (
-    app: CreateWorkspaceRequest | FormData
-  ) => Promise<CreateWorkspaceResponse>
+  createApp: (app: CreateWorkspaceRequest | FormData) => Promise<CreateWorkspaceResponse>
   duplicateApp: (
     appId: string,
     app: DuplicateWorkspaceRequest
@@ -54,9 +52,7 @@ export interface AppEndpoints {
   ) => Promise<ImportToUpdateWorkspaceResponse>
   fetchSystemDebugInfo: () => Promise<GetDiagnosticsResponse>
   getApps: () => Promise<FetchWorkspacesResponse>
-  fetchComponentLibDefinitions: (
-    workspaceId: string
-  ) => Promise<FetchAppDefinitionResponse>
+  fetchComponentLibDefinitions: (workspaceId: string) => Promise<FetchAppDefinitionResponse>
   getPublishedApps: () => Promise<FetchPublishedAppsResponse["apps"]>
 
   // Missing request or response types
@@ -68,7 +64,7 @@ export const buildAppEndpoints = (API: BaseAPIClient): AppEndpoints => ({
    * Fetches screen definition for an app.
    * @param appId the ID of the app to fetch from
    */
-  fetchAppPackage: async appId => {
+  fetchAppPackage: async (appId) => {
     return await API.get({
       url: `/api/applications/${appId}/appPackage`,
     })
@@ -100,7 +96,7 @@ export const buildAppEndpoints = (API: BaseAPIClient): AppEndpoints => ({
    * Reverts an app to a previous version.
    * @param appId the app ID to revert
    */
-  revertAppChanges: async appId => {
+  revertAppChanges: async (appId) => {
     return await API.post({
       url: `/api/dev/${appId}/revert`,
     })
@@ -110,7 +106,7 @@ export const buildAppEndpoints = (API: BaseAPIClient): AppEndpoints => ({
    * Updates an app's version of the client library.
    * @param appId the app ID to update
    */
-  updateAppClientVersion: async appId => {
+  updateAppClientVersion: async (appId) => {
     return await API.post({
       url: `/api/applications/${appId}/client/update`,
     })
@@ -120,7 +116,7 @@ export const buildAppEndpoints = (API: BaseAPIClient): AppEndpoints => ({
    * Reverts an app's version of the client library to the previous version.
    * @param appId the app ID to revert
    */
-  revertAppClientVersion: async appId => {
+  revertAppClientVersion: async (appId) => {
     return await API.post({
       url: `/api/applications/${appId}/client/revert`,
     })
@@ -139,7 +135,7 @@ export const buildAppEndpoints = (API: BaseAPIClient): AppEndpoints => ({
    * Creates an app.
    * @param app the app to create
    */
-  createApp: async app => {
+  createApp: async (app) => {
     if (app instanceof FormData) {
       return await API.post({
         url: "/api/applications",
@@ -190,7 +186,7 @@ export const buildAppEndpoints = (API: BaseAPIClient): AppEndpoints => ({
    * Imports an export of all apps.
    * @param apps the FormData containing the apps to import
    */
-  importApps: async apps => {
+  importApps: async (apps) => {
     return await API.post({
       url: "/api/cloud/import",
       body: apps,
@@ -202,7 +198,7 @@ export const buildAppEndpoints = (API: BaseAPIClient): AppEndpoints => ({
    * Unpublishes a published app.
    * @param appId the production ID of the app to unpublish
    */
-  unpublishApp: async appId => {
+  unpublishApp: async (appId) => {
     return await API.post({
       url: `/api/applications/${appId}/unpublish`,
     })
@@ -212,7 +208,7 @@ export const buildAppEndpoints = (API: BaseAPIClient): AppEndpoints => ({
    * Releases the lock on a dev app.
    * @param appId the dev app ID to unlock
    */
-  releaseAppLock: async appId => {
+  releaseAppLock: async (appId) => {
     return await API.delete({
       url: `/api/dev/${appId}/lock`,
     })
@@ -241,7 +237,7 @@ export const buildAppEndpoints = (API: BaseAPIClient): AppEndpoints => ({
    * their props and other metadata from components.json.
    * @param appId ID of the currently running app
    */
-  fetchComponentLibDefinitions: async appId => {
+  fetchComponentLibDefinitions: async (appId) => {
     return await API.get({
       url: `/api/${appId}/components/definitions`,
     })

@@ -1,4 +1,4 @@
-import {
+import type {
   AcceptUserInviteRequest,
   AcceptUserInviteResponse,
   BulkUserCreated,
@@ -27,50 +27,29 @@ import {
   UpdateSelfMetadataResponse,
   UserIdentifier,
 } from "@budibase/types"
-import { BaseAPIClient } from "./types"
+import type { BaseAPIClient } from "./types"
 
 export interface UserEndpoints {
   getUsers: () => Promise<FetchUsersResponse>
   getUser: (userId: string) => Promise<FindUserResponse>
-  updateOwnMetadata: (
-    metadata: UpdateSelfMetadataRequest
-  ) => Promise<UpdateSelfMetadataResponse>
-  createAdminUser: (
-    user: CreateAdminUserRequest
-  ) => Promise<CreateAdminUserResponse>
+  updateOwnMetadata: (metadata: UpdateSelfMetadataRequest) => Promise<UpdateSelfMetadataResponse>
+  createAdminUser: (user: CreateAdminUserRequest) => Promise<CreateAdminUserResponse>
   saveUser: (user: UnsavedUser) => Promise<SaveUserResponse>
   deleteUser: (userId: string) => Promise<DeleteUserResponse>
   deleteUsers: (users: UserIdentifier[]) => Promise<BulkUserDeleted | undefined>
   onboardUsers: (data: InviteUsersRequest) => Promise<InviteUsersResponse>
-  getUserInvite: (
-    code: string,
-    tenantId?: string
-  ) => Promise<CheckInviteResponse>
+  getUserInvite: (code: string, tenantId?: string) => Promise<CheckInviteResponse>
   getUserInvites: () => Promise<GetUserInvitesResponse>
   inviteUsers: (users: InviteUsersRequest) => Promise<InviteUsersResponse>
-  removeUserInvites: (
-    data: DeleteInviteUsersRequest
-  ) => Promise<DeleteInviteUsersResponse>
-  acceptInvite: (
-    data: AcceptUserInviteRequest
-  ) => Promise<AcceptUserInviteResponse>
+  removeUserInvites: (data: DeleteInviteUsersRequest) => Promise<DeleteInviteUsersResponse>
+  acceptInvite: (data: AcceptUserInviteRequest) => Promise<AcceptUserInviteResponse>
   getUserCountByApp: (appId: string) => Promise<number>
   searchUsers: (data: SearchUsersRequest) => Promise<SearchUsersResponse>
   createUsers: (users: UnsavedUser[]) => Promise<BulkUserCreated | undefined>
-  addWorkspaceIdToInvite: (
-    code: string,
-    role: string
-  ) => Promise<UpdateInviteResponse>
+  addWorkspaceIdToInvite: (code: string, role: string) => Promise<UpdateInviteResponse>
   removeWorkspaceIdFromInvite: (code: string) => Promise<UpdateInviteResponse>
-  addUserToWorkspace: (
-    userId: string,
-    role: string,
-    rev: string
-  ) => Promise<SaveUserResponse>
-  removeUserFromWorkspace: (
-    userId: string,
-    rev: string
-  ) => Promise<SaveUserResponse>
+  addUserToWorkspace: (userId: string, role: string, rev: string) => Promise<SaveUserResponse>
+  removeUserFromWorkspace: (userId: string, rev: string) => Promise<SaveUserResponse>
 }
 
 export const buildUserEndpoints = (API: BaseAPIClient): UserEndpoints => ({
@@ -86,7 +65,7 @@ export const buildUserEndpoints = (API: BaseAPIClient): UserEndpoints => ({
   /**
    * Searches a list of users in the current tenant.
    */
-  searchUsers: async data => {
+  searchUsers: async (data) => {
     return await API.post({
       url: `/api/global/users/search`,
       body: data,
@@ -96,7 +75,7 @@ export const buildUserEndpoints = (API: BaseAPIClient): UserEndpoints => ({
   /**
    * Get a single user by ID.
    */
-  getUser: async userId => {
+  getUser: async (userId) => {
     return await API.get({
       url: `/api/global/users/${userId}`,
     })
@@ -106,7 +85,7 @@ export const buildUserEndpoints = (API: BaseAPIClient): UserEndpoints => ({
    * Updates the current user metadata.
    * @param metadata the metadata to save
    */
-  updateOwnMetadata: async metadata => {
+  updateOwnMetadata: async (metadata) => {
     return await API.post({
       url: "/api/users/metadata/self",
       body: metadata,
@@ -117,7 +96,7 @@ export const buildUserEndpoints = (API: BaseAPIClient): UserEndpoints => ({
    * Creates an admin user.
    * @param user the admin user to create
    */
-  createAdminUser: async user => {
+  createAdminUser: async (user) => {
     return await API.post({
       url: "/api/global/users/init",
       body: user,
@@ -128,7 +107,7 @@ export const buildUserEndpoints = (API: BaseAPIClient): UserEndpoints => ({
    * Creates or updates a user in the current tenant.
    * @param user the new user to create
    */
-  saveUser: async user => {
+  saveUser: async (user) => {
     return await API.post({
       url: "/api/global/users",
       body: user,
@@ -139,7 +118,7 @@ export const buildUserEndpoints = (API: BaseAPIClient): UserEndpoints => ({
    * Creates multiple users.
    * @param users the array of user objects to create
    */
-  createUsers: async users => {
+  createUsers: async (users) => {
     const res = await API.post<BulkUserRequest, BulkUserResponse>({
       url: "/api/global/users/bulk",
       body: {
@@ -155,7 +134,7 @@ export const buildUserEndpoints = (API: BaseAPIClient): UserEndpoints => ({
    * Deletes a user from the curernt tenant.
    * @param userId the ID of the user to delete
    */
-  deleteUser: async userId => {
+  deleteUser: async (userId) => {
     return await API.delete({
       url: `/api/global/users/${userId}`,
     })
@@ -165,7 +144,7 @@ export const buildUserEndpoints = (API: BaseAPIClient): UserEndpoints => ({
    * Deletes multiple users
    * @param users the ID/email pair of the user to delete
    */
-  deleteUsers: async users => {
+  deleteUsers: async (users) => {
     const res = await API.post<BulkUserRequest, BulkUserResponse>({
       url: `/api/global/users/bulk`,
       body: {
@@ -180,7 +159,7 @@ export const buildUserEndpoints = (API: BaseAPIClient): UserEndpoints => ({
   /**
    * Onboards multiple users
    */
-  onboardUsers: async data => {
+  onboardUsers: async (data) => {
     return await API.post({
       url: "/api/global/users/onboard",
       body: data,
@@ -192,7 +171,7 @@ export const buildUserEndpoints = (API: BaseAPIClient): UserEndpoints => ({
       url: `/api/global/users/invite/${code}/${role}`,
     })
   },
-  removeWorkspaceIdFromInvite: async code => {
+  removeWorkspaceIdFromInvite: async (code) => {
     return await API.delete<void, UpdateInviteResponse>({
       url: `/api/global/users/invite/${code}`,
     })
@@ -239,7 +218,7 @@ export const buildUserEndpoints = (API: BaseAPIClient): UserEndpoints => ({
    * Invites multiple users to the current tenant.
    * @param users An array of users to invite
    */
-  inviteUsers: async users => {
+  inviteUsers: async (users) => {
     return await API.post({
       url: "/api/global/users/multi/invite",
       body: users,
@@ -249,7 +228,7 @@ export const buildUserEndpoints = (API: BaseAPIClient): UserEndpoints => ({
   /**
    * Removes multiple user invites from Redis cache
    */
-  removeUserInvites: async data => {
+  removeUserInvites: async (data) => {
     return await API.post({
       url: "/api/global/users/multi/invite/delete",
       body: data,
@@ -259,7 +238,7 @@ export const buildUserEndpoints = (API: BaseAPIClient): UserEndpoints => ({
   /**
    * Accepts an invite to join the platform and creates a user.
    */
-  acceptInvite: async data => {
+  acceptInvite: async (data) => {
     return await API.post({
       url: "/api/global/users/invite/accept",
       body: data,
@@ -269,7 +248,7 @@ export const buildUserEndpoints = (API: BaseAPIClient): UserEndpoints => ({
   /**
    * Counts the number of users in an app
    */
-  getUserCountByApp: async appId => {
+  getUserCountByApp: async (appId) => {
     const res = await API.get<CountUserResponse>({
       url: `/api/global/users/count/${appId}`,
     })

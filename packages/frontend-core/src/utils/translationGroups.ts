@@ -1,11 +1,11 @@
-import { getContext } from "svelte"
-import { get, type Readable } from "svelte/store"
 import {
   resolveTranslationGroup,
   resolveWorkspaceTranslations,
   type TranslationCategory,
   type TranslationOverrides,
 } from "@budibase/shared-core"
+import { getContext } from "svelte"
+import { get, type Readable } from "svelte/store"
 
 type TranslationStoreValue = {
   translationOverrides?: TranslationOverrides | null
@@ -32,8 +32,7 @@ export const loadTranslationsByGroup = (
   const overrides = options?.overrides
     ? resolveWorkspaceTranslations(options.overrides)
     : resolveWorkspaceTranslations(
-        storeValue?.translationOverrides ??
-          storeValue?.application?.translationOverrides
+        storeValue?.translationOverrides ?? storeValue?.application?.translationOverrides
       )
 
   return resolveTranslationGroup(category, overrides)

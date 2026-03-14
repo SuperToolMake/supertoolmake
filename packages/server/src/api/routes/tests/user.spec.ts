@@ -1,7 +1,7 @@
 import { roles, utils } from "@budibase/backend-core"
-import { checkPermissionsEndpoint } from "./utilities/TestFunctions"
+import type { UserMetadata } from "@budibase/types"
 import * as setup from "./utilities"
-import { UserMetadata } from "@budibase/types"
+import { checkPermissionsEndpoint } from "./utilities/TestFunctions"
 
 jest.mock("../../../utilities/workerRequests", () => ({
   getGlobalUsers: jest.fn(() => {
@@ -14,8 +14,8 @@ jest.mock("../../../utilities/workerRequests", () => ({
 }))
 
 describe("/users", () => {
-  let request = setup.getRequest()
-  let config = setup.getConfig()
+  const request = setup.getRequest()
+  const config = setup.getConfig()
 
   afterAll(setup.afterAll)
 
@@ -33,7 +33,7 @@ describe("/users", () => {
       const res = await config.api.user.fetch()
       expect(res.length).toBe(3)
 
-      const ids = res.map(u => u._id)
+      const ids = res.map((u) => u._id)
       expect(ids).toContain(`ro_ta_users_${id1}`)
       expect(ids).toContain(`ro_ta_users_${id2}`)
     })

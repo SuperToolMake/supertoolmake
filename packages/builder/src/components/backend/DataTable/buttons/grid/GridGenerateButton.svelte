@@ -1,28 +1,28 @@
 <script lang="ts">
-  import { ActionButton, ListItem } from "@budibase/bbui"
-  import { getContext } from "svelte"
-  import { tables } from "@/stores/builder"
-  import DetailPopover from "@/components/common/DetailPopover.svelte"
-  import MagicWand from "./magic-wand.svg"
-  import { AutoScreenTypes } from "@/constants"
-  import CreateScreenModal from "@/routes/builder/workspace/[application]/design/_components/NewScreen/CreateScreenModal.svelte"
+import { ActionButton, ListItem } from "@budibase/bbui"
+import { getContext } from "svelte"
+import type DetailPopover from "@/components/common/DetailPopover.svelte"
+import type { AutoScreenTypes } from "@/constants"
+import type CreateScreenModal from "@/routes/builder/workspace/[application]/design/_components/NewScreen/CreateScreenModal.svelte"
+import { tables } from "@/stores/builder"
+import MagicWand from "./magic-wand.svg"
 
-  const { datasource } = getContext("grid")
+const { datasource } = getContext("grid")
 
-  let popover: DetailPopover
-  let createScreenModal: CreateScreenModal
+let popover: DetailPopover
+let createScreenModal: CreateScreenModal
 
-  export const show = () => popover?.show()
-  export const hide = () => popover?.hide()
+export const show = () => popover?.show()
+export const hide = () => popover?.hide()
 
-  const startScreenWizard = (autoScreenType: AutoScreenTypes) => {
-    popover.hide()
-    let preSelected
-    if ($datasource.type === "table") {
-      preSelected = $tables.list.find(x => x._id === $datasource.tableId)
-    }
-    createScreenModal.show(autoScreenType, undefined, preSelected)
+const startScreenWizard = (autoScreenType: AutoScreenTypes) => {
+  popover.hide()
+  let preSelected
+  if ($datasource.type === "table") {
+    preSelected = $tables.list.find((x) => x._id === $datasource.tableId)
   }
+  createScreenModal.show(autoScreenType, undefined, preSelected)
+}
 </script>
 
 <DetailPopover title="Generate" bind:this={popover}>

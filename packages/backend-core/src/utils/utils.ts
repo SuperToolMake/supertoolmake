@@ -1,12 +1,12 @@
 import {
   AuditedEventFriendlyName,
-  Ctx,
-  Event,
+  type Ctx,
+  type Event,
   TenantResolutionStrategy,
-  Workspace,
+  type Workspace,
 } from "@budibase/types"
 import type { SetOption } from "cookies"
-import jwt, { Secret } from "jsonwebtoken"
+import jwt, { type Secret } from "jsonwebtoken"
 import { DocumentType, Header, MAX_VALID_DATE, SEPARATOR } from "../constants"
 import * as context from "../context"
 import { getAllWorkspaces } from "../db"
@@ -18,7 +18,7 @@ const PROD_APP_PREFIX = "/app/"
 
 async function resolveAppUrl(ctx: Ctx) {
   const workspaceUrl = ctx.path.split("/")[2]
-  let possibleUrl = `/${workspaceUrl.toLowerCase()}`
+  const possibleUrl = `/${workspaceUrl.toLowerCase()}`
 
   let tenantId: string | undefined = context.getTenantId()
   if (!env.isDev() && env.MULTI_TENANCY) {
@@ -34,9 +34,7 @@ async function resolveAppUrl(ctx: Ctx) {
   const workspaces: Workspace[] = await context.doInTenant(tenantId, () =>
     getAllWorkspaces({ dev: false })
   )
-  const workspace = workspaces.filter(
-    a => a.url && a.url.toLowerCase() === possibleUrl
-  )[0]
+  const workspace = workspaces.filter((a) => a.url && a.url.toLowerCase() === possibleUrl)[0]
 
   // Multi-workspace functionality has been removed, so assume a default
   return workspace && workspace.appId ? workspace.appId : "app_workspace"
@@ -122,8 +120,7 @@ export async function getWorkspaceIdFromCtx(ctx: Ctx) {
   // filter out the builder preview path which collides with the prod app path
   // to ensure we don't load all apps excessively
   const isBuilderPreview = isBuilderPreviewUrl(ctx.path)
-  const isViewingProdApp =
-    ctx.path.startsWith(PROD_APP_PREFIX) && !isBuilderPreview
+  const isViewingProdApp = ctx.path.startsWith(PROD_APP_PREFIX) && !isBuilderPreview
   if (isViewingProdApp) {
     setWorkspaceIdIfValid(await resolveAppUrl(ctx))
   }
@@ -138,7 +135,7 @@ function parseWorkspaceIdFromUrlPath(url?: string) {
   return url
     .split("?")[0] // Remove any possible query string
     .split("/")
-    .find(subPath => subPath.startsWith(WORKSPACE_PREFIX))
+    .find((subPath) => subPath.startsWith(WORKSPACE_PREFIX))
 }
 
 /**
@@ -166,9 +163,7 @@ export function isValidInternalAPIKey(apiKey: string) {
     return true
   }
   // fallback to enable rotation
-  return !!(
-    env.INTERNAL_API_KEY_FALLBACK && env.INTERNAL_API_KEY_FALLBACK === apiKey
-  )
+  return !!(env.INTERNAL_API_KEY_FALLBACK && env.INTERNAL_API_KEY_FALLBACK === apiKey)
 }
 
 /**
@@ -193,12 +188,7 @@ export function getCookie<T>(ctx: Ctx, name: string) {
  * @param value The value of cookie which will be set.
  * @param opts options like whether to sign.
  */
-export function setCookie(
-  ctx: Ctx,
-  value: any,
-  name = "builder",
-  opts = { sign: true }
-) {
+export function setCookie(ctx: Ctx, value: any, name = "builder", opts = { sign: true }) {
   if (value && opts && opts.sign) {
     value = jwt.sign(value, env.JWT_SECRET as Secret)
   }
@@ -235,7 +225,7 @@ export function isClient(ctx: Ctx) {
 }
 
 export function timeout(timeMs: number) {
-  return new Promise(resolve => setTimeout(resolve, timeMs))
+  return new Promise((resolve) => setTimeout(resolve, timeMs))
 }
 
 export function isAudited(event: Event) {
