@@ -174,7 +174,6 @@ export function coerce(value: string | Date | string[], type: FieldType) {
   if (!TYPE_TRANSFORM_MAP[type]) {
     return value
   }
-  // eslint-disable-next-line no-prototype-builtins
   if (Object.hasOwn(TYPE_TRANSFORM_MAP[type], value as PropertyKey)) {
     // @ts-expect-error
     return TYPE_TRANSFORM_MAP[type][value]

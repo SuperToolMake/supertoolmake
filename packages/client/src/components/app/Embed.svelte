@@ -10,7 +10,7 @@ export let embed
 
 {#if embed}
   <div class="embed" use:styleable={$component.styles}>
-    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+    <!-- biome-ignore lint: migrated from eslint svelte/no-at-html-tags -->
     {@html embed}
   </div>
 {:else if $builderStore.inBuilder}

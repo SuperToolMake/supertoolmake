@@ -15,13 +15,13 @@ export let error = false
       <Icon name={icon} />
       {title || ""}
     </div>
-    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+    <!-- biome-ignore lint: migrated from eslint svelte/no-at-html-tags -->
     {@html body}
   {:else}
     <span class="icon">
       <Icon size="S" name={icon} />
     </span>
-    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+    <!-- biome-ignore lint: migrated from eslint svelte/no-at-html-tags -->
     {@html body}
   {/if}
 </div>

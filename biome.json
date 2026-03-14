@@ -44,7 +44,7 @@
         "noAssignInExpressions": "error",
         "noDoubleEquals": "off",
         "noExplicitAny": "off",
-        "noGlobalAssign": "warn",
+        "noGlobalAssign": "off",
         "noImplicitAnyLet": "off",
         "noImportAssign": "warn",
         "noNonNullAssertedOptionalChain": "error",
@@ -83,7 +83,8 @@
         "useConst": "error"
       },
       "performance": {
-        "noAccumulatingSpread": "error"
+        "noAccumulatingSpread": "error",
+        "noDynamicNamespaceImportAccess": "off"
       }
     }
   },

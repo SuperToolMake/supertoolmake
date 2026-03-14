@@ -1113,7 +1113,6 @@ describe("REST Integration", () => {
           return new Response(content, {
             status: 200,
             headers: {
-              // eslint-disable-next-line no-useless-escape
               "content-disposition": `attachment; filename="£ and ? rates.pdf"; filename*=UTF-8''%C2%A3%20and%20%E2%82%AC%20rates.pdf`,
               "content-type": "text/plain",
               "content-length": `${content.length}`,

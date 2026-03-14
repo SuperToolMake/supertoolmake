@@ -111,7 +111,7 @@ $: highlightedLogs = expressionLogs.map((l) => ({
               {:else if logLine.type === "warn"}
                 <Icon size="XS" name="warning" color="var(--warning-content)" />
               {/if}
-              <!-- eslint-disable-next-line svelte/no-at-html-tags-->
+              <!-- biome-ignore lint: migrated from eslint svelte/no-at-html-tags-->
               <span>{@html logLine.log}</span>
             </div>
             {#if logLine.line}
@@ -123,7 +123,7 @@ $: highlightedLogs = expressionLogs.map((l) => ({
         {/each}
         <div class="line">
           <div>
-            <!-- eslint-disable-next-line svelte/no-at-html-tags-->
+            <!-- biome-ignore lint: migrated from eslint svelte/no-at-html-tags-->
             {@html highlightedResult}
           </div>
         </div>

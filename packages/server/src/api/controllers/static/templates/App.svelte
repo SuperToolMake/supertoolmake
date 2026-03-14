@@ -106,11 +106,11 @@ export let props
     }
   </style>
 
-  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+  <!-- biome-ignore lint: migrated from eslint svelte/no-at-html-tags -->
   {@html props.headAppScripts || ""}
 </svelte:head>
 
-<!-- eslint-disable-next-line svelte/no-raw-special-elements -->
+<!-- biome-ignore lint: migrated from eslint svelte/no-raw-special-elements -->
 <body id="app">
   {#if props.showSkeletonLoader}
     <ClientAppSkeleton
@@ -171,6 +171,6 @@ export let props
     }
   </script>
 
-  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+  <!-- biome-ignore lint: migrated from eslint svelte/no-at-html-tags -->
   {@html props.bodyAppScripts || ""}
 </body>

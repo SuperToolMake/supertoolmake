@@ -13,7 +13,6 @@ const routing: Readable<Routing> = getContext("routing")
 
 // QueryEditor component interface based on exposed methods
 interface QueryEditor {
-  // eslint-disable-next-line no-unused-vars
   set: (newValue: string, opts?: string) => Promise<void>
   update: (_: string) => void
   resize: () => void

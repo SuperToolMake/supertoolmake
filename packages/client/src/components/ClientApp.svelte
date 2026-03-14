@@ -202,7 +202,7 @@ $: {
                           {#if permissionError}
                             <div class="error">
                               <Layout justifyItems="center" gap="S">
-                                <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                                <!-- biome-ignore lint: migrated from eslint svelte/no-at-html-tags -->
                                 {@html ErrorSVG}
                                 <Heading size="L">
                                   You don't have permission to use this app
@@ -215,7 +215,7 @@ $: {
                           {:else if !$screenStore.activeLayout}
                             <div class="error">
                               <Layout justifyItems="center" gap="S">
-                                <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                                <!-- biome-ignore lint: migrated from eslint svelte/no-at-html-tags -->
                                 {@html ErrorSVG}
                                 <Heading size="L">
                                   Something went wrong rendering your app
@@ -229,7 +229,7 @@ $: {
                           {:else if embedNoScreens}
                             <div class="error">
                               <Layout justifyItems="center" gap="S">
-                                <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                                <!-- biome-ignore lint: migrated from eslint svelte/no-at-html-tags -->
                                 {@html ErrorSVG}
                                 <Heading size="L">
                                   This app is not publicly accessible

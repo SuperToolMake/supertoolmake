@@ -172,7 +172,7 @@ $: onModeChange(mode)
       {/if}
       {#if hoverTarget.code}
         {#if mode === BindingMode.Text || (mode === BindingMode.JavaScript && hoverTarget.type === "binding")}
-          <!-- eslint-disable-next-line svelte/no-at-html-tags-->
+          <!-- biome-ignore lint: migrated from eslint svelte/no-at-html-tags-->
           <pre>{@html hoverTarget.code}</pre>
         {:else}
           <CodeEditor
