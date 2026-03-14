@@ -784,7 +784,6 @@ export class ComponentStore extends BudiStore<ComponentState> {
       throw "A valid screen must be selected"
     }
     const parent = findComponentParent(screen.props, componentId)
-    const index = parent?._children?.findIndex((x: Component) => x._id === componentId)!
 
     // Check for screen and navigation component edge cases
     const screenComponentId = `${screen._id}-screen`
@@ -800,34 +799,37 @@ export class ComponentStore extends BudiStore<ComponentState> {
         componentTreeNodesStore.isNodeExpanded(component._id!))
     ) {
       return component._children[0]._id!
-    } else if (!parent) {
+    } else if (!parent?._children) {
+      return null
+    }
+    const index = parent._children.findIndex((x: Component) => x._id === componentId)
+    if (index === -1) {
       return null
     }
 
     // Otherwise select the next sibling if we have one
-    if (index < parent._children!.length - 1) {
-      const nextSibling = parent._children![index + 1]
+    if (index < parent._children.length - 1) {
+      const nextSibling = parent._children[index + 1]
       return nextSibling._id!
     }
 
     // Last child, select our parents next sibling
     let target = parent
     let targetParent = findComponentParent(screen.props, target._id)
-    let targetIndex = targetParent?._children?.findIndex(
-      (child: Component) => child._id === target._id
-    )!
-    while (targetParent?._children && targetIndex === targetParent._children.length - 1) {
+    while (targetParent?._children) {
+      const targetIndex = targetParent._children.findIndex(
+        (child: Component) => child._id === target._id
+      )
+      if (targetIndex === -1) {
+        return null
+      }
+      if (targetIndex < targetParent._children.length - 1) {
+        return targetParent._children[targetIndex + 1]._id!
+      }
       target = targetParent
       targetParent = findComponentParent(screen.props, target._id)
-      targetIndex = targetParent?._children!.findIndex(
-        (child: Component) => child._id === target._id
-      )!
     }
-    if (targetParent) {
-      return targetParent._children![targetIndex + 1]._id!
-    } else {
-      return null
-    }
+    return null
   }
 
   selectPrevious() {
@@ -856,14 +858,17 @@ export class ComponentStore extends BudiStore<ComponentState> {
       const parent = findComponentParent(screen.props, componentId)
 
       // Check we aren't right at the top of the tree
-      const index = parent?._children?.findIndex((x: Component) => x._id === componentId)!
-      if (!parent || (index === 0 && parent._id === screen.props._id)) {
+      if (!parent?._children) {
+        return
+      }
+      const index = parent._children.findIndex((x: Component) => x._id === componentId)
+      if (index === -1 || (index === 0 && parent._id === screen.props._id)) {
         return
       }
 
       // Copy original component and remove it from the parent
-      const originalComponent = cloneDeep(parent._children![index])
-      parent._children = parent._children!.filter(
+      const originalComponent = cloneDeep(parent._children[index])
+      parent._children = parent._children.filter(
         (component: Component) => component._id !== componentId
       )
 

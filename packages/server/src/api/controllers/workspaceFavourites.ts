@@ -20,7 +20,10 @@ type WorkspaceResourceDoc = Table | WorkspaceApp | Datasource | Query
 export type ResourceGetter = (id: string) => Promise<WorkspaceResourceDoc | undefined>
 
 export async function fetch(ctx: UserCtx<void, WorkspaceFavouriteResponse>) {
-  const createdBy = ctx.user?._id!
+  const createdBy = ctx.user?._id
+  if (!createdBy) {
+    ctx.throw(401, "User is required")
+  }
 
   const favourites = await sdk.workspace.fetch(db.getGlobalIDFromUserMetadataID(createdBy))
   ctx.body = {
@@ -32,7 +35,10 @@ export async function create(
   ctx: UserCtx<AddWorkspaceFavouriteRequest, AddWorkspaceFavouriteResponse>
 ) {
   const { body } = ctx.request
-  const createdBy = ctx.user?._id!
+  const createdBy = ctx.user?._id
+  if (!createdBy) {
+    ctx.throw(401, "User is required")
+  }
   const globalId = db.getGlobalIDFromUserMetadataID(createdBy)
 
   const newFavourite: WithoutDocMetadata<WorkspaceFavourite> = {

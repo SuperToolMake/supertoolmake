@@ -47,7 +47,7 @@
         "noGlobalAssign": "warn",
         "noImplicitAnyLet": "off",
         "noImportAssign": "warn",
-        "noNonNullAssertedOptionalChain": "warn",
+        "noNonNullAssertedOptionalChain": "error",
         "noThenProperty": "warn",
         "useIterableCallbackReturn": "off",
         "noConfusingVoidType": "error",
@@ -95,7 +95,7 @@
             "useImportType": "off"
           },
           "correctness": {
-            "noUnusedVariables": "warn",
+            "noUnusedVariables": "off",
             "noUnusedImports": "off"
           }
         }

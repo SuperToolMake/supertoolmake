@@ -157,7 +157,11 @@ export class DatasourceStore extends DerivedBudiStore<
   }
 
   async updateSchema(datasource: Datasource, tablesFilter: string[]) {
-    const response = await API.buildDatasourceSchema(datasource?._id!, tablesFilter)
+    const datasourceId = datasource._id
+    if (!datasourceId) {
+      throw new Error("Datasource ID is required to update schema")
+    }
+    const response = await API.buildDatasourceSchema(datasourceId, tablesFilter)
     this.updateDatasourceInStore(response)
   }
 

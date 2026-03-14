@@ -43,6 +43,7 @@ import { publishTableToProduction } from "@/utils/publishTableToProduction"
 let generateButton: GridGenerateButton
 let grid: Grid
 let gridContext: GridStore | undefined
+let id: string | undefined
 let lastPublishCount = 0
 let missingProductionDefinition = false
 let previousTableId: string | undefined
@@ -89,7 +90,7 @@ $: duplicates = Object.values(autoColumnStatus).reduce((acc, status) => {
 $: invalidColumnText = duplicates.map((entry: any) => {
   return `${entry.name} (${entry.subtype})`
 })
-$: id = $tables.selected?._id!
+$: id = $tables.selected?._id
 $: isUsersTable = id === TableNames.USERS
 $: isInternal = $tables.selected?.sourceType !== DB_TYPE_EXTERNAL
 $: gridDatasource = {
@@ -220,8 +221,14 @@ const publishProductionTable = async (seedProductionTables: boolean) => {
   const label = seedProductionTables
     ? "Error seeding and publishing table"
     : "Error publishing table"
+  const tableId = id
+  if (!tableId) {
+    tablePublishing = false
+    notifications.error(label)
+    return
+  }
   try {
-    await publishTableToProduction(id, seedProductionTables)
+    await publishTableToProduction(tableId, seedProductionTables)
     if (isProductionMode && gridContext?.rows?.actions?.refreshData) {
       await gridContext.rows.actions.refreshData()
     }
