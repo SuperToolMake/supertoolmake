@@ -33,7 +33,10 @@ let section = "settings"
 const tabs = ["settings", "styles", "conditions"]
 
 $: id = $selectedComponent?._id
-$: id, (section = tabs[0])
+$: {
+  id
+  section = tabs[0]
+}
 $: componentName = getComponentName(componentInstance)
 
 $: highlightedSetting = $builderStore.highlightedSetting

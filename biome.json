@@ -48,7 +48,7 @@
         "noImplicitAnyLet": "off",
         "noImportAssign": "warn",
         "noNonNullAssertedOptionalChain": "error",
-        "noThenProperty": "warn",
+        "noThenProperty": "off",
         "useIterableCallbackReturn": "off",
         "noConfusingVoidType": "error",
         "noGlobalIsNan": "error",
@@ -61,7 +61,8 @@
         "noUnusedVariables": "error",
         "noUnusedFunctionParameters": "error",
         "noUnusedImports": "error",
-        "noUnusedPrivateClassMembers": "error"
+        "noUnusedPrivateClassMembers": "error",
+        "useParseIntRadix": "off"
       },
       "security": {
         "noGlobalEval": "warn"
@@ -69,7 +70,8 @@
       "complexity": {
         "useOptionalChain": "error",
         "noBannedTypes": "off",
-        "noStaticOnlyClass": "off"
+        "noStaticOnlyClass": "off",
+        "noCommaOperator": "error"
       },
       "style": {
         "noNonNullAssertion": "off",

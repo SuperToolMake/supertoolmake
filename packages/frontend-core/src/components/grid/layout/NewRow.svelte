@@ -143,7 +143,10 @@ const handleKeyPress = (e) => {
 
 $: firstColumn = $visibleColumns[0]
 $: width = GutterWidth + ($displayColumn?.width || 0)
-$: $datasource, (visible = false)
+$: {
+  $datasource
+  visible = false
+}
 $: selectedRowCount = Object.values($selectedRows).length
 $: hasNoRows = !$rows.length
 $: renderedRowCount = $renderedRows.length

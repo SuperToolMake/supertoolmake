@@ -50,7 +50,10 @@ $: if (schema) {
   }, {})
 }
 
-$: selectedRows, dispatch("selectionUpdated", selectedRows)
+$: {
+  selectedRows
+  dispatch("selectionUpdated", selectedRows)
+}
 $: isUsersTable = tableId === TableNames.USERS
 $: data && resetSelectedRows()
 $: {

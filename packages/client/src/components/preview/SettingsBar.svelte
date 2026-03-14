@@ -149,7 +149,10 @@ const updatePosition = () => {
 }
 
 $: id = $builderStore.selectedComponentId
-$: id, reset()
+$: {
+  id
+  reset()
+}
 $: component = $componentStore.selectedComponent
 $: definition = $componentStore.selectedComponentDefinition
 $: instance = componentStore.actions.getComponentInstance(id)

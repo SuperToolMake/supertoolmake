@@ -197,7 +197,10 @@ const updatePosition = () => {
   }
 }
 
-$: componentId, reset()
+$: {
+  componentId
+  reset()
+}
 $: visibleIndicators = state.indicators.filter((x) => x.visible)
 $: offset = $builderStore.inBuilder ? 5 : -1
 $: config.set({
@@ -210,7 +213,10 @@ $: config.set({
 
 // Update position when any props change
 const debouncedUpdate = Utils.domDebounce(updatePosition)
-$: $config, debouncedUpdate()
+$: {
+  $config
+  debouncedUpdate()
+}
 
 onMount(() => {
   debouncedUpdate()

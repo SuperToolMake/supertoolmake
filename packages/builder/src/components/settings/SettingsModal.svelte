@@ -114,7 +114,10 @@ $: routesByGroup = routes.reduce((acc: Record<string, Route[]>, entry: Route) =>
 }, {})
 
 // Show/Hide the settings modal as required
-$: modal, toggleSettings(open)
+$: {
+  modal
+  toggleSettings(open)
+}
 
 $: groupEntries = Object.entries(routesByGroup || {})
 
