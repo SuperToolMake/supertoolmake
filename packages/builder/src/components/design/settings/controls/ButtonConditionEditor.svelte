@@ -88,21 +88,6 @@ let dragDisabled = true
 
 let settings: ExtendedComponentSetting[] = []
 
-$: count = value?.length
-$: conditionText = `${count || "No"} condition${count !== 1 ? "s" : ""} set`
-
-$: settings = componentStore.getComponentSettings(componentInstance?._component).concat({
-  label: "Custom CSS",
-  key: "_css",
-  type: "text",
-})
-$: settingOptions = settings
-  .filter((setting) => setting.supportsConditions !== false && setting.key !== "conditions")
-  .map((setting) => ({
-    label: makeLabel(setting),
-    value: setting.key,
-  }))
-
 const makeLabel = (setting: ComponentSetting) => {
   const { section, label } = setting
   if (section) {
@@ -222,10 +207,26 @@ const openDrawer = () => {
   })
   drawer.show()
 }
+
 const save = async () => {
   dispatch("change", conditions)
   drawer.hide()
 }
+
+$: count = value?.length
+$: conditionText = `${count || "No"} condition${count !== 1 ? "s" : ""} set`
+
+$: settings = componentStore.getComponentSettings(componentInstance?._component).concat({
+  label: "Custom CSS",
+  key: "_css",
+  type: "text",
+})
+$: settingOptions = settings
+  .filter((setting) => setting.supportsConditions !== false && setting.key !== "conditions")
+  .map((setting) => ({
+    label: makeLabel(setting),
+    value: setting.key,
+  }))
 </script>
 
 <ActionButton on:click={openDrawer}>{conditionText}</ActionButton>

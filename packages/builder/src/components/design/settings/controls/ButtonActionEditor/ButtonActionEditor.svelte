@@ -28,10 +28,6 @@ const saveEventData = async () => {
   drawer.hide()
 }
 
-$: actionCount = value?.length
-$: actionText = `${actionCount || "No"} action${actionCount !== 1 ? "s" : ""} set`
-$: active = getActive(value)
-
 const getActive = (rules) => {
   if (!rules?.length) {
     return ""
@@ -39,6 +35,10 @@ const getActive = (rules) => {
     return `active`
   }
 }
+
+$: actionCount = value?.length
+$: actionText = `${actionCount || "No"} action${actionCount !== 1 ? "s" : ""} set`
+$: active = getActive(value)
 </script>
 
 <div class="action-editor">

@@ -58,6 +58,26 @@ const fieldInfo = memo<FieldInfo>({
   validation,
   formStep: $formStep || 1,
 })
+const registerField = (info: FieldInfo) => {
+  formField = formApi?.registerField(
+    info.field,
+    info.type,
+    info.defaultValue,
+    info.disabled,
+    info.readonly,
+    info.validation,
+    info.formStep
+  )
+}
+
+const updateLabel = (e: Event) => {
+  if (touched) {
+    const label = e.target as HTMLLabelElement
+    builderStore.actions.updateProp("label", label.textContent)
+  }
+  touched = false
+}
+
 $: fieldInfo.set({
   field: field || $component.name,
   type,
@@ -85,26 +105,6 @@ $: unsubscribe = formField?.subscribe(
 
 // Determine label class from position
 $: labelClass = labelPos === "above" ? "" : `spectrum-FieldLabel--${labelPos}`
-
-const registerField = (info: FieldInfo) => {
-  formField = formApi?.registerField(
-    info.field,
-    info.type,
-    info.defaultValue,
-    info.disabled,
-    info.readonly,
-    info.validation,
-    info.formStep
-  )
-}
-
-const updateLabel = (e: Event) => {
-  if (touched) {
-    const label = e.target as HTMLLabelElement
-    builderStore.actions.updateProp("label", label.textContent)
-  }
-  touched = false
-}
 
 onDestroy(() => {
   fieldApi?.deregister()

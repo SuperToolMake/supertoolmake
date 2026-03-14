@@ -22,10 +22,6 @@ const sizeMap = {
   XXXL: "72px",
 }
 
-$: phosphorIconName = getPhosphorIcon(name)
-$: phosphorClass = `ph ph-${weight} ph-${phosphorIconName}`
-$: style = generateStyle(size, color, hoverColor)
-
 const generateStyle = (
   sizeProp: typeof size,
   colorProp: typeof color,
@@ -40,6 +36,10 @@ const generateStyle = (
   }
   return style
 }
+
+$: phosphorIconName = getPhosphorIcon(name)
+$: phosphorClass = `ph ph-${weight} ph-${phosphorIconName}`
+$: style = generateStyle(size, color, hoverColor)
 </script>
 
 <i

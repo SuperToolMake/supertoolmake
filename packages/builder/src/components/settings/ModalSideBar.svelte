@@ -15,17 +15,6 @@ let timeout: ReturnType<typeof setTimeout> | undefined
 let initialized = false
 let previousCollapsed: boolean | undefined
 
-$: !$pinned && unPin()
-$: collapsed = !(focused || $pinned)
-
-// Only dispatch when collapsed actually changes
-$: {
-  if (initialized && previousCollapsed !== collapsed) {
-    dispatch("toggle", collapsed)
-  }
-  previousCollapsed = collapsed
-}
-
 export const unPin = () => {
   // We need to ignore pointer events for a while since otherwise we would
   // instantly trigger a mouseenter and show it again
@@ -47,6 +36,17 @@ export const keepCollapsed = () => {
   if (!$pinned) {
     unPin()
   }
+}
+
+$: !$pinned && unPin()
+$: collapsed = !(focused || $pinned)
+
+// Only dispatch when collapsed actually changes
+$: {
+  if (initialized && previousCollapsed !== collapsed) {
+    dispatch("toggle", collapsed)
+  }
+  previousCollapsed = collapsed
 }
 
 onMount(() => {

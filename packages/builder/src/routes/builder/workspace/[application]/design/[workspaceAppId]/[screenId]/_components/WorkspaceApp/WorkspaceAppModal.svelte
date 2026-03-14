@@ -17,17 +17,8 @@ export const show = () => modal.show()
 
 let data: WorkspaceApp
 
-$: isNew = !workspaceApp
-
-$: title = isNew ? "Create new app" : "Edit app"
-
 const requiredString = (errorMessage: string) =>
   z.string({ required_error: errorMessage }).trim().min(1, errorMessage)
-
-let validationState: {
-  errors: Partial<Record<keyof WorkspaceApp, string>>
-  touched: Partial<Record<keyof WorkspaceApp, boolean>>
-}
 
 const validateWorkspaceApp = (workspaceApp: Partial<WorkspaceApp>) => {
   const validator = z.object({
@@ -139,6 +130,15 @@ async function onEnterKey() {
   }
 
   modal.hide()
+}
+
+$: isNew = !workspaceApp
+
+$: title = isNew ? "Create new app" : "Edit app"
+
+let validationState: {
+  errors: Partial<Record<keyof WorkspaceApp, string>>
+  touched: Partial<Record<keyof WorkspaceApp, boolean>>
 }
 
 $: {

@@ -18,9 +18,6 @@ export let color = ""
 
 const DefaultColor = "#3aab87"
 
-$: avatarColor = color || getColor(initials)
-$: style = getStyle(size, avatarColor)
-
 const getColor = (initials) => {
   if (!initials?.length) {
     return DefaultColor
@@ -35,6 +32,9 @@ const getStyle = (sizeKey, color) => {
   const fontSize = `calc(${size} / 2)`
   return `width:${size}; height:${size}; font-size:${fontSize}; background:${color};`
 }
+
+$: avatarColor = color || getColor(initials)
+$: style = getStyle(size, avatarColor)
 </script>
 
 {#if url}

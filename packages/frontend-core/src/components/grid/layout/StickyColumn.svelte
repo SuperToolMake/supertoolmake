@@ -29,10 +29,6 @@ const {
   selectedCellCount,
 } = getContext("grid")
 
-$: rowCount = $rows.length
-$: selectedRowCount = Object.values($selectedRows).length
-$: width = GutterWidth + ($displayColumn?.width || 0)
-
 const selectAll = () => {
   const allSelected = selectedRowCount === rowCount
   if (allSelected) {
@@ -45,6 +41,10 @@ const selectAll = () => {
     $selectedRows = allRows
   }
 }
+
+$: rowCount = $rows.length
+$: selectedRowCount = Object.values($selectedRows).length
+$: width = GutterWidth + ($displayColumn?.width || 0)
 </script>
 
 <div

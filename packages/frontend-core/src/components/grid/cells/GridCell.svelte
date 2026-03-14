@@ -13,8 +13,6 @@ export let readonly = false
 export let hidden = false
 export let metadata = null
 
-$: style = getStyle(width, selectedUser, metadata)
-
 const getStyle = (width, selectedUser, metadata) => {
   let style
   if (width === "auto" || width === "100%") {
@@ -33,6 +31,8 @@ const getStyle = (width, selectedUser, metadata) => {
   }
   return style
 }
+
+$: style = getStyle(width, selectedUser, metadata)
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

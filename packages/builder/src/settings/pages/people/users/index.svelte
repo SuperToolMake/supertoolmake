@@ -80,51 +80,6 @@ let workspaceReady = false
 let isWorkspaceQueryReady = false
 let tableLoading = false
 
-$: currentWorkspaceId = $appStore.appId ? sdk.applications.getProdAppID($appStore.appId) : ""
-$: workspaceReady = Boolean(currentWorkspaceId)
-$: isWorkspaceQueryReady =
-  ($fetch.query as { workspaceId?: string })?.workspaceId === currentWorkspaceId
-$: tableLoading = !(workspaceReady && isWorkspaceQueryReady && $fetch.loaded)
-
-$: customRenderers = [
-  { column: "email", component: EmailTableRenderer },
-  { column: "role", component: RoleTableRenderer },
-  { column: "createdAt", component: DateAddedRenderer },
-]
-let userData: UserData = { users: [] }
-
-$: readonly = !sdk.users.isAdmin($auth.user)
-$: debouncedUpdateFetch(searchEmail, currentWorkspaceId)
-$: schema = {
-  email: {
-    displayName: "Email",
-    sortable: false,
-    width: "minmax(200px, max-content)",
-    minWidth: "200px",
-  },
-  role: {
-    displayName: "Access",
-    sortable: false,
-    width: "1fr",
-  },
-  createdAt: {
-    displayName: "Date added",
-    sortable: false,
-    width: "1fr",
-    minWidth: "160px",
-  },
-}
-let inviteUsersResponse: InviteUsersResponse = {
-  successful: [],
-  unsuccessful: [],
-}
-$: enrichedUsers = buildEnrichedUsers($fetch.rows as UserDoc[])
-$: shouldOpenWorkspaceInviteModal =
-  $bb.settings.route?.entry?.path === "/people/workspace" && $bb.settings.route?.hash === "#invite"
-$: if (shouldOpenWorkspaceInviteModal && createUserModal) {
-  createUserModal.show()
-}
-
 const buildEnrichedUsers = (rows: UserDoc[]): EnrichedUser[] => {
   return (
     rows?.map<EnrichedUser>((user) => {
@@ -168,7 +123,6 @@ const updateFetch = (email: string | undefined, workspaceId: string) => {
   }
   fetch.update({ query })
 }
-const debouncedUpdateFetch = Utils.debounce(updateFetch, 250)
 
 const showOnboardingTypeModal = async (addUsersData: UserData, onboardingType?: string) => {
   // no-op if users already exist
@@ -438,6 +392,53 @@ const onRowClick = ({ detail }: { detail: UserDoc }) => {
 
 const onWorkspaceUserSaved = async () => {
   await refreshUserList()
+}
+
+const debouncedUpdateFetch = Utils.debounce(updateFetch, 250)
+
+$: currentWorkspaceId = $appStore.appId ? sdk.applications.getProdAppID($appStore.appId) : ""
+$: workspaceReady = Boolean(currentWorkspaceId)
+$: isWorkspaceQueryReady =
+  ($fetch.query as { workspaceId?: string })?.workspaceId === currentWorkspaceId
+$: tableLoading = !(workspaceReady && isWorkspaceQueryReady && $fetch.loaded)
+
+$: customRenderers = [
+  { column: "email", component: EmailTableRenderer },
+  { column: "role", component: RoleTableRenderer },
+  { column: "createdAt", component: DateAddedRenderer },
+]
+let userData: UserData = { users: [] }
+
+$: readonly = !sdk.users.isAdmin($auth.user)
+$: debouncedUpdateFetch(searchEmail, currentWorkspaceId)
+$: schema = {
+  email: {
+    displayName: "Email",
+    sortable: false,
+    width: "minmax(200px, max-content)",
+    minWidth: "200px",
+  },
+  role: {
+    displayName: "Access",
+    sortable: false,
+    width: "1fr",
+  },
+  createdAt: {
+    displayName: "Date added",
+    sortable: false,
+    width: "1fr",
+    minWidth: "160px",
+  },
+}
+let inviteUsersResponse: InviteUsersResponse = {
+  successful: [],
+  unsuccessful: [],
+}
+$: enrichedUsers = buildEnrichedUsers($fetch.rows as UserDoc[])
+$: shouldOpenWorkspaceInviteModal =
+  $bb.settings.route?.entry?.path === "/people/workspace" && $bb.settings.route?.hash === "#invite"
+$: if (shouldOpenWorkspaceInviteModal && createUserModal) {
+  createUserModal.show()
 }
 </script>
 

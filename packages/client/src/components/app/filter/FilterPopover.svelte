@@ -61,16 +61,6 @@ let timeOnly: boolean
 let ignoreTimezones: boolean
 
 // Change on update
-$: editableFilter = getDefaultFilter(filter, schema, config)
-$: fieldSchema = config ? schema?.[config?.field] : undefined
-$: options = getOptions(fieldSchema)
-
-$: if (fieldSchema?.type === FieldType.DATETIME) {
-  enableTime = !fieldSchema?.dateOnly
-  timeOnly = Boolean(fieldSchema?.timeOnly)
-  ignoreTimezones = Boolean(fieldSchema?.ignoreTimezones)
-}
-
 const parseDateRange = (range: { high: string; low: string } | undefined): string[] | undefined => {
   if (!range) {
     return
@@ -171,6 +161,16 @@ const cacheUserRows = (e: CustomEvent) => {
     ...state,
     ...retrieved,
   }))
+}
+
+$: editableFilter = getDefaultFilter(filter, schema, config)
+$: fieldSchema = config ? schema?.[config?.field] : undefined
+$: options = getOptions(fieldSchema)
+
+$: if (fieldSchema?.type === FieldType.DATETIME) {
+  enableTime = !fieldSchema?.dateOnly
+  timeOnly = Boolean(fieldSchema?.timeOnly)
+  ignoreTimezones = Boolean(fieldSchema?.ignoreTimezones)
 }
 </script>
 

@@ -29,19 +29,6 @@ let componentsUsingState: ComponentUsingState[] = []
 let componentsUpdatingState: ComponentUsingState[] = []
 let editorValue: string = ""
 
-$: selectStateKey($selectedScreen, selectedKey)
-$: keyOptions = getAllStateVariables($selectedScreen)
-$: bindings = getBindableProperties($selectedScreen, $componentStore.selectedComponentId)
-
-// Auto-select first valid state key
-$: {
-  if (keyOptions.length && !keyOptions.includes(selectedKey)) {
-    selectedKey = keyOptions[0]
-  } else if (!keyOptions.length) {
-    selectedKey = undefined
-  }
-}
-
 const selectStateKey = (screen: Screen | undefined, key: string | undefined) => {
   if (screen && key) {
     searchComponents(screen, key)
@@ -226,6 +213,19 @@ const handleStateInspectorChange = (e: CustomEvent) => {
   }
   previewStore.updateState(stateUpdate)
   editorValue = e.detail
+}
+
+$: selectStateKey($selectedScreen, selectedKey)
+$: keyOptions = getAllStateVariables($selectedScreen)
+$: bindings = getBindableProperties($selectedScreen, $componentStore.selectedComponentId)
+
+// Auto-select first valid state key
+$: {
+  if (keyOptions.length && !keyOptions.includes(selectedKey)) {
+    selectedKey = keyOptions[0]
+  } else if (!keyOptions.length) {
+    selectedKey = undefined
+  }
 }
 
 onMount(() => {

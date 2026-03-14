@@ -45,63 +45,10 @@ import SideNavUserSettings from "./SideNavUserSettings.svelte"
 export const show = () => {
   pinned.set(true)
 }
-$: backupErrors = getBackupErrors($enrichedApps || [], appId)
-$: backupErrorCount = Object.keys(backupErrors).length
-
 const getBackupErrors = (apps: EnrichedApp[], appId: string) => {
   const target = apps.find((app) => app.devId === appId)
   return target?.backupErrors || {}
 }
-
-$: goto = $gotoStore
-
-type ResourceLinkFn = (_id: string) => string
-
-interface UIFavouriteResource {
-  name: string
-  icon: string
-  workspaceApp?: UIWorkspaceApp
-}
-interface AllResourceStores {
-  apps: UIWorkspaceApp[]
-  datasources: (Datasource | UIInternalDatasource)[]
-  tables: Table[]
-  queries: Query[]
-}
-
-setContext(Context.PopoverRoot, ".nav .popover-container")
-
-// Default icon mapping
-const ResourceIcons: Record<WorkspaceResource, string> = {
-  [WorkspaceResource.DATASOURCE]: "plugs-connected",
-  [WorkspaceResource.TABLE]: "table",
-  [WorkspaceResource.WORKSPACE_APP]: "browser",
-  [WorkspaceResource.QUERY]: "database", // regular db queries
-}
-
-const datasourceLookup = datasources.lookup
-const favouriteLookup = workspaceFavouriteStore.lookup
-const pinned = createLocalStorageStore("builder-nav-pinned", true)
-const navLogoSize = 24
-
-let ignoreFocus = false
-let focused = false
-let timeout: ReturnType<typeof setTimeout> | undefined
-let resourceLookup: Readable<Record<string, UIFavouriteResource>> | null = null
-let workspaceMenuOpen = false
-
-$: appId = $appStore.appId
-$: !$pinned && unPin()
-
-// keep sidebar expanded when workspace selector is open
-$: collapsed = !(focused || $pinned || workspaceMenuOpen)
-// keep sidebar expanded when selector is open, even if mouse leaves
-$: navFocused = focused || workspaceMenuOpen
-
-// Ignore resources without names
-$: favourites = $workspaceFavouriteStore
-  .filter((f) => $resourceLookup?.[f.resourceId])
-  .sort((a, b) => a.resourceId.localeCompare(b.resourceId))
 
 const initResourceStores = (): Readable<AllResourceStores> =>
   derived(
@@ -113,8 +60,6 @@ const initResourceStores = (): Readable<AllResourceStores> =>
       queries: $queries.list,
     })
   )
-
-type ResourceItem = AllResourceStores[keyof AllResourceStores][number]
 
 const getResourceId = (item: ResourceItem) => {
   if ("_id" in item && typeof item._id === "string") {
@@ -265,6 +210,61 @@ const keepCollapsed = () => {
     unPin()
   }
 }
+
+$: backupErrors = getBackupErrors($enrichedApps || [], appId)
+$: backupErrorCount = Object.keys(backupErrors).length
+
+$: goto = $gotoStore
+
+type ResourceLinkFn = (_id: string) => string
+
+interface UIFavouriteResource {
+  name: string
+  icon: string
+  workspaceApp?: UIWorkspaceApp
+}
+interface AllResourceStores {
+  apps: UIWorkspaceApp[]
+  datasources: (Datasource | UIInternalDatasource)[]
+  tables: Table[]
+  queries: Query[]
+}
+
+setContext(Context.PopoverRoot, ".nav .popover-container")
+
+// Default icon mapping
+const ResourceIcons: Record<WorkspaceResource, string> = {
+  [WorkspaceResource.DATASOURCE]: "plugs-connected",
+  [WorkspaceResource.TABLE]: "table",
+  [WorkspaceResource.WORKSPACE_APP]: "browser",
+  [WorkspaceResource.QUERY]: "database", // regular db queries
+}
+
+const datasourceLookup = datasources.lookup
+const favouriteLookup = workspaceFavouriteStore.lookup
+const pinned = createLocalStorageStore("builder-nav-pinned", true)
+const navLogoSize = 24
+
+let ignoreFocus = false
+let focused = false
+let timeout: ReturnType<typeof setTimeout> | undefined
+let resourceLookup: Readable<Record<string, UIFavouriteResource>> | null = null
+let workspaceMenuOpen = false
+
+$: appId = $appStore.appId
+$: !$pinned && unPin()
+
+// keep sidebar expanded when workspace selector is open
+$: collapsed = !(focused || $pinned || workspaceMenuOpen)
+// keep sidebar expanded when selector is open, even if mouse leaves
+$: navFocused = focused || workspaceMenuOpen
+
+// Ignore resources without names
+$: favourites = $workspaceFavouriteStore
+  .filter((f) => $resourceLookup?.[f.resourceId])
+  .sort((a, b) => a.resourceId.localeCompare(b.resourceId))
+
+type ResourceItem = AllResourceStores[keyof AllResourceStores][number]
 
 onDestroy(() => {
   clearTimeout(timeout)

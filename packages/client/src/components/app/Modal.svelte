@@ -12,6 +12,23 @@ export let size
 let modal
 
 // Open modal automatically in builder
+const handleModalClose = async () => {
+  if (onClose) {
+    await onClose()
+  }
+  modalStore.actions.close()
+}
+
+const handleOpen = (open, modal) => {
+  if (!modal) return
+
+  if (open) {
+    modal.show()
+  } else {
+    modal.hide()
+  }
+}
+
 $: {
   if ($builderStore.inBuilder) {
     if ($component.inSelectedPath && $modalStore.contentId !== $component.id) {
@@ -30,23 +47,6 @@ $: open = $modalStore.contentId === $component.id
 
 $: resolvedHideCloseIcon =
   hideCloseIcon === undefined ? Boolean(ignoreClicksOutside) : hideCloseIcon
-
-const handleModalClose = async () => {
-  if (onClose) {
-    await onClose()
-  }
-  modalStore.actions.close()
-}
-
-const handleOpen = (open, modal) => {
-  if (!modal) return
-
-  if (open) {
-    modal.show()
-  } else {
-    modal.hide()
-  }
-}
 
 $: handleOpen(open, modal)
 </script>

@@ -7,8 +7,6 @@ export let value
 
 const dispatch = createEventDispatcher()
 
-$: displayValue = value?.format("HH:mm")
-
 const handleChange = (e) => {
   if (!e.target.value) {
     dispatch("change", undefined)
@@ -18,6 +16,8 @@ const handleChange = (e) => {
   const [hour, minute] = e.target.value.split(":").map((x) => parseInt(x))
   dispatch("change", (value || dayjs()).hour(hour).minute(minute))
 }
+
+$: displayValue = value?.format("HH:mm")
 </script>
 
 <div class="time-picker">

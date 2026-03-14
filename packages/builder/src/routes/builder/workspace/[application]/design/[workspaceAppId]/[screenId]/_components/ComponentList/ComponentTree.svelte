@@ -18,15 +18,6 @@ import getComponentContextMenuItems from "./getComponentContextMenuItems"
 export let components = []
 export let level = 0
 
-$: openNodes = $componentTreeNodesStore
-
-$: filteredComponents = components?.filter((component) => {
-  return (
-    !$componentStore.componentToPaste?.isCut ||
-    component._id !== $componentStore.componentToPaste?._id
-  )
-})
-
 const dragover = (component, index) => (e) => {
   const mousePosition = e.offsetY / e.currentTarget.offsetHeight
   dndStore.actions.dragover({
@@ -81,8 +72,6 @@ const handleIconClick = (componentId) => {
   componentTreeNodesStore.toggleNode(componentId)
 }
 
-const hover = hoverStore.hover
-
 const openContextMenu = (e, component, opened) => {
   e.preventDefault()
   e.stopPropagation()
@@ -90,6 +79,17 @@ const openContextMenu = (e, component, opened) => {
   const items = getComponentContextMenuItems(component, !opened, componentStore)
   contextMenuStore.open(component._id, items, { x: e.clientX, y: e.clientY })
 }
+
+$: openNodes = $componentTreeNodesStore
+
+$: filteredComponents = components?.filter((component) => {
+  return (
+    !$componentStore.componentToPaste?.isCut ||
+    component._id !== $componentStore.componentToPaste?._id
+  )
+})
+
+const hover = hoverStore.hover
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions-->

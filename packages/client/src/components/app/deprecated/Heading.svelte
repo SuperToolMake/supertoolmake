@@ -16,16 +16,6 @@ export let size
 let node
 let touched = false
 
-$: $component.editing && node?.focus()
-$: placeholder = $builderStore.inBuilder && !text && !$component.editing
-$: componentText = getComponentText(text, $builderStore, $component)
-$: sizeClass = `spectrum-Heading--size${size || "M"}`
-$: alignClass = `align--${align || "left"}`
-
-// Add color styles to main styles object, otherwise the styleable helper
-// overrides the color when it's passed as inline style.
-$: styles = enrichStyles($component.styles, color)
-
 const getComponentText = (text, builderState, componentState) => {
   if (!builderState.inBuilder || componentState.editing) {
     return text || ""
@@ -53,6 +43,16 @@ const updateText = (e) => {
   }
   touched = false
 }
+
+$: $component.editing && node?.focus()
+$: placeholder = $builderStore.inBuilder && !text && !$component.editing
+$: componentText = getComponentText(text, $builderStore, $component)
+$: sizeClass = `spectrum-Heading--size${size || "M"}`
+$: alignClass = `align--${align || "left"}`
+
+// Add color styles to main styles object, otherwise the styleable helper
+// overrides the color when it's passed as inline style.
+$: styles = enrichStyles($component.styles, color)
 </script>
 
 {#key $component.editing}

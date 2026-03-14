@@ -15,14 +15,6 @@ let isFocused = false
 let isHidden = defaultHideConnectionUrl
 let inputValue = ""
 
-$: {
-  if (isHidden && value) {
-    inputValue = "••••••••••••"
-  } else {
-    inputValue = value || ""
-  }
-}
-
 const parseConnectionString = (connStr: string) => {
   try {
     const url = new URL(connStr)
@@ -69,6 +61,14 @@ const toggleVisibility = () => {
     inputValue = value
   } else if (isHidden && value) {
     inputValue = "••••••••••••"
+  }
+}
+
+$: {
+  if (isHidden && value) {
+    inputValue = "••••••••••••"
+  } else {
+    inputValue = value || ""
   }
 }
 </script>

@@ -12,9 +12,6 @@ export let nested
 export let showInstanceName = false
 export let settings
 
-$: componentDef = componentStore.getDefinition(item._component)
-$: displayName = getDisplayName(showInstanceName, item, componentDef)
-
 function getDisplayName(showInstanceName: boolean, item: any, componentDef: any) {
   if (showInstanceName && item._instanceName) {
     return item._instanceName
@@ -38,6 +35,9 @@ const updatedNestedFlags = (originalSettings: ComponentSetting[]) => {
   }))
   return newSettings
 }
+
+$: componentDef = componentStore.getDefinition(item._component)
+$: displayName = getDisplayName(showInstanceName, item, componentDef)
 </script>
 
 <div class="list-item-body">

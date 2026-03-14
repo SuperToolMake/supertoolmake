@@ -17,27 +17,6 @@ let children = writable({})
 let mounted = false
 let styles = memo({})
 
-$: inBuilder = $builderStore.inBuilder
-$: addEmptyRows = $component.isRoot && inBuilder
-$: requiredRows = calculateRequiredRows($children, mobile, addEmptyRows)
-$: requiredHeight = requiredRows * GridRowHeight
-$: availableRows = Math.floor(height / GridRowHeight)
-$: rows = Math.max(requiredRows, availableRows)
-$: mobile = $context.device.mobile
-$: colSize = width / GridColumns
-$: styles.set({
-  ...$component.styles,
-  normal: {
-    ...$component.styles?.normal,
-    "--height": `${requiredHeight}px`,
-    "--min-height": $component.styles?.normal?.height || 0,
-    "--cols": GridColumns,
-    "--rows": rows,
-    "--col-size": colSize,
-    "--row-size": GridRowHeight,
-  },
-})
-
 // Calculates the minimum number of rows required to render all child
 // components, on a certain device type
 const calculateRequiredRows = (children, mobile, addEmptyRows) => {
@@ -91,6 +70,27 @@ const setupResizeObserver = (element) => {
   resizeObserver.observe(element)
   return resizeObserver
 }
+
+$: inBuilder = $builderStore.inBuilder
+$: addEmptyRows = $component.isRoot && inBuilder
+$: requiredRows = calculateRequiredRows($children, mobile, addEmptyRows)
+$: requiredHeight = requiredRows * GridRowHeight
+$: availableRows = Math.floor(height / GridRowHeight)
+$: rows = Math.max(requiredRows, availableRows)
+$: mobile = $context.device.mobile
+$: colSize = width / GridColumns
+$: styles.set({
+  ...$component.styles,
+  normal: {
+    ...$component.styles?.normal,
+    "--height": `${requiredHeight}px`,
+    "--min-height": $component.styles?.normal?.height || 0,
+    "--cols": GridColumns,
+    "--rows": rows,
+    "--col-size": colSize,
+    "--row-size": GridRowHeight,
+  },
+})
 
 onMount(() => {
   let observer

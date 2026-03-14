@@ -20,8 +20,6 @@ import {
 let button: any
 let popover: any
 
-$: hasErrors = Boolean($screenComponentErrorList.length)
-
 function getErrorTitle(error: UIComponentError) {
   const titleParts = [$screenComponentsList.find((c) => c._id === error.componentId)!._instanceName]
   if (error.errorType === "setting" && error.cause === "invalid") {
@@ -36,6 +34,8 @@ async function onErrorClick(error: UIComponentError) {
     builderStore.highlightSetting(error.key, "error")
   }
 }
+
+$: hasErrors = Boolean($screenComponentErrorList.length)
 </script>
 
 <div bind:this={button} class="error-button">

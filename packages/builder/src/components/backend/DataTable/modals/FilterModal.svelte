@@ -64,10 +64,6 @@ const CONJUNCTIONS = [
 
 export let view = {}
 
-$: viewTable = $tables.list.find(({ _id }) => _id === $views.selected?.tableId)
-$: fields = viewTable && Object.keys(viewTable.schema)
-$: schema = viewTable?.schema ? viewTable.schema : {}
-
 function saveView() {
   try {
     views.save(view)
@@ -115,11 +111,16 @@ const fieldChanged = (filter) => (ev) => {
 }
 
 const getOptionLabel = (x) => x.name
+
 const getOptionValue = (x) => x.key
 
 const showValue = (filter) => {
   return !(filter.condition === "EMPTY" || filter.condition === "NOT_EMPTY")
 }
+
+$: viewTable = $tables.list.find(({ _id }) => _id === $views.selected?.tableId)
+$: fields = viewTable && Object.keys(viewTable.schema)
+$: schema = viewTable?.schema ? viewTable.schema : {}
 </script>
 
 <ModalContent title="Filter" confirmText="Save" onConfirm={saveView} size="L">

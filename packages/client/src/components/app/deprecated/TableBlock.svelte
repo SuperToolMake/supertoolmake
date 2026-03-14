@@ -50,49 +50,6 @@ let primaryDisplay
 let enrichedSearchColumns
 let schemaLoaded = false
 
-$: deleteLabel = setDeleteLabel(sidePanelDeleteLabel, sidePanelShowDelete)
-$: id = $component.id
-$: isDSPlus = dataSource?.type === "table" || dataSource?.type === "viewV2"
-$: fetchSchema(dataSource)
-$: enrichSearchColumns(searchColumns, schema).then((val) => (enrichedSearchColumns = val))
-$: enrichedFilter = enrichFilter(filter, enrichedSearchColumns, formId)
-$: editTitle = getEditTitle(detailsFormBlockId, primaryDisplay)
-$: normalFields = getNormalFields(schema)
-$: rowClickActions =
-  clickBehaviour === "actions" || !isDSPlus
-    ? onClick
-    : [
-        {
-          id: 0,
-          "##eventHandlerType": "Update State",
-          parameters: {
-            key: stateKey,
-            type: "set",
-            persist: false,
-            value: `{{ ${safe("eventContext")}.${safe("row")}._id }}`,
-          },
-        },
-        {
-          id: 1,
-          "##eventHandlerType": "Open Side Panel",
-          parameters: {
-            id: detailsSidePanelId,
-          },
-        },
-      ]
-$: buttonClickActions =
-  titleButtonClickBehaviour === "actions" || !isDSPlus
-    ? onClickTitleButton
-    : [
-        {
-          id: 0,
-          "##eventHandlerType": "Open Side Panel",
-          parameters: {
-            id: newRowSidePanelId,
-          },
-        },
-      ]
-
 // Provide additional data context for live binding eval
 export const getAdditionalDataContext = () => {
   const rows = get(context)[dataProviderId]?.rows
@@ -150,6 +107,49 @@ const getEditTitle = (detailsFormBlockId, primaryDisplay) => {
   const binding = `${prefix}.${safe(primaryDisplay)}`
   return `{{#if ${binding}}}{{${binding}}}{{else}}Details{{/if}}`
 }
+
+$: deleteLabel = setDeleteLabel(sidePanelDeleteLabel, sidePanelShowDelete)
+$: id = $component.id
+$: isDSPlus = dataSource?.type === "table" || dataSource?.type === "viewV2"
+$: fetchSchema(dataSource)
+$: enrichSearchColumns(searchColumns, schema).then((val) => (enrichedSearchColumns = val))
+$: enrichedFilter = enrichFilter(filter, enrichedSearchColumns, formId)
+$: editTitle = getEditTitle(detailsFormBlockId, primaryDisplay)
+$: normalFields = getNormalFields(schema)
+$: rowClickActions =
+  clickBehaviour === "actions" || !isDSPlus
+    ? onClick
+    : [
+        {
+          id: 0,
+          "##eventHandlerType": "Update State",
+          parameters: {
+            key: stateKey,
+            type: "set",
+            persist: false,
+            value: `{{ ${safe("eventContext")}.${safe("row")}._id }}`,
+          },
+        },
+        {
+          id: 1,
+          "##eventHandlerType": "Open Side Panel",
+          parameters: {
+            id: detailsSidePanelId,
+          },
+        },
+      ]
+$: buttonClickActions =
+  titleButtonClickBehaviour === "actions" || !isDSPlus
+    ? onClickTitleButton
+    : [
+        {
+          id: 0,
+          "##eventHandlerType": "Open Side Panel",
+          parameters: {
+            id: newRowSidePanelId,
+          },
+        },
+      ]
 </script>
 
 {#if schemaLoaded}

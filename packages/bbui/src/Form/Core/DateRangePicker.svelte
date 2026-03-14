@@ -20,13 +20,6 @@ const valueStore = writable<string[]>()
 let fromDate: Dayjs | null
 let toDate: Dayjs | null
 
-$: valueStore.set(value || [])
-$: parseValue($valueStore)
-$: resolvedStartDayOfWeek = startDayOfWeek ?? browserStartDayOfWeek
-
-$: parsedFrom = fromDate ? parseDate(fromDate, { enableTime }) : undefined
-$: parsedTo = toDate ? parseDate(toDate, { enableTime }) : undefined
-
 const parseValue = (value: string[]) => {
   if (!(Array.isArray(value) && value[0] && value[1])) {
     fromDate = null
@@ -59,6 +52,13 @@ const onChangeTo = (utc: string) => {
   }
   dispatch("change", [fromDate, toDate])
 }
+
+$: valueStore.set(value || [])
+$: parseValue($valueStore)
+$: resolvedStartDayOfWeek = startDayOfWeek ?? browserStartDayOfWeek
+
+$: parsedFrom = fromDate ? parseDate(fromDate, { enableTime }) : undefined
+$: parsedTo = toDate ? parseDate(toDate, { enableTime }) : undefined
 </script>
 
 <div class="date-range">

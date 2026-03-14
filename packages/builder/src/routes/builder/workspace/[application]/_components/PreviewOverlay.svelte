@@ -4,11 +4,11 @@ import { onMount } from "svelte"
 import { fade, fly } from "svelte/transition"
 import { previewStore, selectedAppUrls, themeStore } from "@/stores/builder"
 
-$: src = $selectedAppUrls.previewUrl
-
 const close = () => {
   previewStore.showPreview(false)
 }
+
+$: src = $selectedAppUrls.previewUrl
 
 onMount(() => {
   window.isBuilder = true

@@ -5,13 +5,13 @@ import { appsStore } from "@/stores/portal/apps"
 import type { EnrichedUser, ParsedInvite } from "@/types"
 
 export let row: EnrichedUser | ParsedInvite
-$: priviliged = sdk.users.isAdminOrBuilder(row)
-$: count = getCount(row)
-
 const getCount = (row: EnrichedUser | ParsedInvite) => {
   const appList = priviliged ? $appsStore.apps : row.apps
   return appList?.length || 0
 }
+
+$: priviliged = sdk.users.isAdminOrBuilder(row)
+$: count = getCount(row)
 </script>
 
 <div class="align">

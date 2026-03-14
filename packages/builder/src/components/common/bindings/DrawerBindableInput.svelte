@@ -33,20 +33,12 @@ let bindingDrawer: any
 let currentVal = value
 let scrollable = false
 
-$: readableValue = runtimeToReadableBinding(bindings, value)
-$: tempValue = readableValue
-$: isJS = isJSBinding(value)
-
 const saveBinding = () => {
   onChange(tempValue)
   onBlur()
   builderStore.propertyFocus(null)
   bindingDrawer.hide()
 }
-
-setContext("binding-drawer-actions", {
-  save: saveBinding,
-})
 
 const onChange = (value: any) => {
   currentVal = readableToRuntimeBinding(bindings, value)
@@ -61,6 +53,14 @@ const onDrawerHide = (e: any) => {
   builderStore.propertyFocus(null)
   dispatch("drawerHide", e.detail)
 }
+
+$: readableValue = runtimeToReadableBinding(bindings, value)
+$: tempValue = readableValue
+$: isJS = isJSBinding(value)
+
+setContext("binding-drawer-actions", {
+  save: saveBinding,
+})
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

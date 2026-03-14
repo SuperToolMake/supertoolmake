@@ -8,20 +8,6 @@ import { datasources } from "@/stores/builder"
 $params
 $goto
 
-$: datasource = $datasources.list.find((ds) => ds._id === $params.datasourceId)
-$: {
-  if (!datasource) {
-    $goto("../../../")
-  }
-}
-$: isRestQuery = datasource?.source === IntegrationTypes.REST
-$: query = buildNewQuery(isRestQuery)
-$: {
-  if (isRestQuery) {
-    $goto(`../../../../apis/query/new/${$params.datasourceId}`)
-  }
-}
-
 const buildNewQuery = (isRestQuery) => {
   let query = {
     name: "Untitled query",
@@ -37,6 +23,20 @@ const buildNewQuery = (isRestQuery) => {
     query.fields = { disabledHeaders: {}, headers: {} }
   }
   return query
+}
+
+$: datasource = $datasources.list.find((ds) => ds._id === $params.datasourceId)
+$: {
+  if (!datasource) {
+    $goto("../../../")
+  }
+}
+$: isRestQuery = datasource?.source === IntegrationTypes.REST
+$: query = buildNewQuery(isRestQuery)
+$: {
+  if (isRestQuery) {
+    $goto(`../../../../apis/query/new/${$params.datasourceId}`)
+  }
 }
 </script>
 

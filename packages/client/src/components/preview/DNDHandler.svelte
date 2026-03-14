@@ -23,14 +23,6 @@ const ThrottleRate = 130
 
 // Cache some dnd store state as local variables as it massively helps
 // performance. It lets us avoid calling svelte getters on every DOM action.
-$: source = $dndStore.source
-$: target = $dndStore.target
-$: drop = $dndStore.drop
-$: gridScreen = $isGridScreen
-
-// Local flag for whether we are awaiting an async drop event
-let dropping = false
-
 // Util to get the inner DOM element by a component ID
 const getDOMElement = (id: string): HTMLElement | undefined => {
   const el = document.getElementsByClassName(`${id}-dom`)[0]
@@ -113,6 +105,112 @@ const onDragStart = (e: DragEvent) => {
     })
   }, 0)
 }
+
+const handleEvent = (e: DragEvent) => {
+  e.preventDefault()
+  e.stopPropagation()
+  processEvent(e.clientX, e.clientY)
+}
+
+// Callback when on top of a component
+const onDragOver = (e: DragEvent) => {
+  if (!(source && target) || gridScreen) {
+    return
+  }
+  handleEvent(e)
+}
+
+// Callback when entering a potential drop target
+const onDragEnter = async (e: DragEvent) => {
+  if (!source || gridScreen || !(e.target instanceof HTMLElement)) {
+    return
+  }
+
+  // Find the next valid component to consider dropping over, ignoring nested
+  // block components
+  let comp = e.target.closest?.(`.component:not(.block):not(.${source.id})`)
+  if (!(comp instanceof HTMLElement)) {
+    return
+  }
+  if (comp?.classList.contains("droppable")) {
+    dndStore.actions.updateTarget({
+      id: comp.dataset.id!,
+      parent: comp.dataset.parent!,
+      element: getDOMElement(comp.dataset.id!),
+      empty: comp.classList.contains("empty"),
+      acceptsChildren: comp.classList.contains("parent"),
+    })
+    handleEvent(e)
+  }
+}
+
+// Callback when dropping a drag on top of some component
+const onDrop = async () => {
+  if (!(source && drop?.parent) || drop?.index == null) {
+    return
+  }
+
+  // Check if we're adding a new component rather than moving one
+  if (source.isNew) {
+    dropping = true
+    builderStore.actions.dropNewComponent(
+      source.type,
+      drop.parent,
+      drop.index,
+      $dndStore.meta?.props
+    )
+    dropping = false
+    stopDragging()
+    return
+  }
+
+  // Convert parent + index into target + mode
+  let legacyDropTarget, legacyDropMode: DropPosition
+  const parent: Component | null = findComponentById(
+    get(screenStore).activeScreen?.props,
+    drop.parent
+  )
+  if (!parent) {
+    return
+  }
+
+  // Do nothing if we didn't change the location
+  if (source.parent === drop.parent && source.index === drop.index) {
+    return
+  }
+
+  // Filter out source component and placeholder from consideration
+  const children = parent._children?.filter(
+    (x) => x._id !== DNDPlaceholderID && x._id !== source.id
+  )
+
+  // Use inside if no existing children
+  if (!children?.length) {
+    legacyDropTarget = parent._id
+    legacyDropMode = DropPosition.INSIDE
+  } else if (drop.index === 0) {
+    legacyDropTarget = children[0]?._id
+    legacyDropMode = DropPosition.ABOVE
+  } else {
+    legacyDropTarget = children[drop.index - 1]?._id
+    legacyDropMode = DropPosition.BELOW
+  }
+
+  if (legacyDropTarget && legacyDropMode && source.id) {
+    dropping = true
+    await builderStore.actions.moveComponent(source.id, legacyDropTarget, legacyDropMode)
+    dropping = false
+    stopDragging()
+  }
+}
+
+$: source = $dndStore.source
+$: target = $dndStore.target
+$: drop = $dndStore.drop
+$: gridScreen = $isGridScreen
+
+// Local flag for whether we are awaiting an async drop event
+let dropping = false
 
 // Core logic for handling drop events and determining where to render the
 // drop target placeholder
@@ -222,104 +320,6 @@ const processEvent = Utils.throttle((mouseX: number, mouseY: number) => {
     index: idx,
   })
 }, ThrottleRate)
-
-const handleEvent = (e: DragEvent) => {
-  e.preventDefault()
-  e.stopPropagation()
-  processEvent(e.clientX, e.clientY)
-}
-
-// Callback when on top of a component
-const onDragOver = (e: DragEvent) => {
-  if (!(source && target) || gridScreen) {
-    return
-  }
-  handleEvent(e)
-}
-
-// Callback when entering a potential drop target
-const onDragEnter = async (e: DragEvent) => {
-  if (!source || gridScreen || !(e.target instanceof HTMLElement)) {
-    return
-  }
-
-  // Find the next valid component to consider dropping over, ignoring nested
-  // block components
-  let comp = e.target.closest?.(`.component:not(.block):not(.${source.id})`)
-  if (!(comp instanceof HTMLElement)) {
-    return
-  }
-  if (comp?.classList.contains("droppable")) {
-    dndStore.actions.updateTarget({
-      id: comp.dataset.id!,
-      parent: comp.dataset.parent!,
-      element: getDOMElement(comp.dataset.id!),
-      empty: comp.classList.contains("empty"),
-      acceptsChildren: comp.classList.contains("parent"),
-    })
-    handleEvent(e)
-  }
-}
-
-// Callback when dropping a drag on top of some component
-const onDrop = async () => {
-  if (!(source && drop?.parent) || drop?.index == null) {
-    return
-  }
-
-  // Check if we're adding a new component rather than moving one
-  if (source.isNew) {
-    dropping = true
-    builderStore.actions.dropNewComponent(
-      source.type,
-      drop.parent,
-      drop.index,
-      $dndStore.meta?.props
-    )
-    dropping = false
-    stopDragging()
-    return
-  }
-
-  // Convert parent + index into target + mode
-  let legacyDropTarget, legacyDropMode: DropPosition
-  const parent: Component | null = findComponentById(
-    get(screenStore).activeScreen?.props,
-    drop.parent
-  )
-  if (!parent) {
-    return
-  }
-
-  // Do nothing if we didn't change the location
-  if (source.parent === drop.parent && source.index === drop.index) {
-    return
-  }
-
-  // Filter out source component and placeholder from consideration
-  const children = parent._children?.filter(
-    (x) => x._id !== DNDPlaceholderID && x._id !== source.id
-  )
-
-  // Use inside if no existing children
-  if (!children?.length) {
-    legacyDropTarget = parent._id
-    legacyDropMode = DropPosition.INSIDE
-  } else if (drop.index === 0) {
-    legacyDropTarget = children[0]?._id
-    legacyDropMode = DropPosition.ABOVE
-  } else {
-    legacyDropTarget = children[drop.index - 1]?._id
-    legacyDropMode = DropPosition.BELOW
-  }
-
-  if (legacyDropTarget && legacyDropMode && source.id) {
-    dropping = true
-    await builderStore.actions.moveComponent(source.id, legacyDropTarget, legacyDropMode)
-    dropping = false
-    stopDragging()
-  }
-}
 
 onMount(() => {
   // Events fired on the draggable target

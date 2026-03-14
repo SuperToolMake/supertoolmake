@@ -15,16 +15,6 @@ let touched = false
 let error: string | undefined
 let modal: ModalContent
 
-$: selectedWorkspaceApp = $workspaceAppStore.selectedWorkspaceApp
-
-$: workspacePrefix = selectedWorkspaceApp ? selectedWorkspaceApp.url : ""
-
-$: liveUrl = buildLiveUrl(workspacePrefix, true)
-
-$: hashRoute = !route ? "" : `#${route}`
-
-$: appUrl = `${liveUrl}${hashRoute}`
-
 const routeChanged = (event: { detail: string }) => {
   if (!event.detail.startsWith("/")) {
     route = `/${event.detail}`
@@ -47,7 +37,6 @@ const routeExists = (url: string) => {
       screen.routing.route.toLowerCase() === url.toLowerCase() && screen.routing.roleId === role
   )
 }
-$: disabled = !route || Boolean(error) || !touched
 
 const confirmScreenDetails = async () => {
   if (disabled) {
@@ -58,6 +47,18 @@ const confirmScreenDetails = async () => {
     route,
   })
 }
+
+$: selectedWorkspaceApp = $workspaceAppStore.selectedWorkspaceApp
+
+$: workspacePrefix = selectedWorkspaceApp ? selectedWorkspaceApp.url : ""
+
+$: liveUrl = buildLiveUrl(workspacePrefix, true)
+
+$: hashRoute = !route ? "" : `#${route}`
+
+$: appUrl = `${liveUrl}${hashRoute}`
+
+$: disabled = !route || Boolean(error) || !touched
 </script>
 
 <ModalContent

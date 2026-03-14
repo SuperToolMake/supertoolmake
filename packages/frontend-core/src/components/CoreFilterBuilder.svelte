@@ -26,17 +26,6 @@ export let toReadable
 export let toRuntime
 export let evaluationContext = {}
 
-$: editableFilters = migrateFilters(filters)
-$: {
-  if (
-    tables.find((table) => table._id === datasource?.tableId) &&
-    !schemaFields.some((field) => field.name === "_id")
-  ) {
-    schemaFields = [...schemaFields, { name: "_id", type: "string" }]
-  }
-}
-$: prefix = builderType === "filter" ? "Show data which matches" : "Run branch when matching"
-
 // We still may need to migrate this even though the backend does it automatically now
 // for query definitions. This is because we might be editing saved filter definitions
 // from old screens, which will still be of type LegacyFilter[].
@@ -46,28 +35,6 @@ const migrateFilters = (filters) => {
   }
   return Helpers.cloneDeep(filters)
 }
-
-const filterOperatorOptions = Object.values(FilterOperator).map((entry) => {
-  return { value: entry, label: Helpers.capitalise(entry) }
-})
-
-const onEmptyLabelling = {
-  [OnEmptyFilter.RETURN_ALL]: "All rows",
-  [OnEmptyFilter.RETURN_NONE]: "No rows",
-}
-
-const onEmptyOptions = Object.values(OnEmptyFilter).map((entry) => {
-  return { value: entry, label: onEmptyLabelling[entry] }
-})
-
-const context = getContext("context")
-
-$: fieldOptions = (schemaFields || [])
-  .filter((field) => !field.calculationType)
-  .map((field) => ({
-    label: field.displayName || field.name,
-    value: field.name,
-  }))
 
 const onFieldChange = (filter) => {
   const previousType = filter.type
@@ -245,6 +212,39 @@ const handleFilterChange = (req) => {
 
   dispatch("change", editable)
 }
+
+$: editableFilters = migrateFilters(filters)
+$: {
+  if (
+    tables.find((table) => table._id === datasource?.tableId) &&
+    !schemaFields.some((field) => field.name === "_id")
+  ) {
+    schemaFields = [...schemaFields, { name: "_id", type: "string" }]
+  }
+}
+$: prefix = builderType === "filter" ? "Show data which matches" : "Run branch when matching"
+
+const filterOperatorOptions = Object.values(FilterOperator).map((entry) => {
+  return { value: entry, label: Helpers.capitalise(entry) }
+})
+
+const onEmptyLabelling = {
+  [OnEmptyFilter.RETURN_ALL]: "All rows",
+  [OnEmptyFilter.RETURN_NONE]: "No rows",
+}
+
+const onEmptyOptions = Object.values(OnEmptyFilter).map((entry) => {
+  return { value: entry, label: onEmptyLabelling[entry] }
+})
+
+const context = getContext("context")
+
+$: fieldOptions = (schemaFields || [])
+  .filter((field) => !field.calculationType)
+  .map((field) => ({
+    label: field.displayName || field.name,
+    value: field.name,
+  }))
 </script>
 
 <div class="container" class:mobile={$context?.device?.mobile}>

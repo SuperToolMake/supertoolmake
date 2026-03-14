@@ -20,17 +20,6 @@ let visible = false
 let timeout: ReturnType<typeof setTimeout> | undefined
 let interval: ReturnType<typeof setInterval> | undefined
 
-$: {
-  if (hovered || fixed) {
-    // Debounce showing by 200ms to avoid flashing tooltip
-    timeout = setTimeout(show, 200)
-  } else {
-    hide()
-  }
-}
-$: tooltipStyle = color ? `background:${color};` : null
-$: tipStyle = color ? `border-top-color:${color};` : null
-
 // Computes the position of the tooltip
 const updateTooltipPosition = () => {
   const node = wrapper?.children?.[0]
@@ -72,6 +61,17 @@ const hide = () => {
   clearInterval(interval)
   visible = false
 }
+
+$: {
+  if (hovered || fixed) {
+    // Debounce showing by 200ms to avoid flashing tooltip
+    timeout = setTimeout(show, 200)
+  } else {
+    hide()
+  }
+}
+$: tooltipStyle = color ? `background:${color};` : null
+$: tipStyle = color ? `border-top-color:${color};` : null
 
 // Ensure we clean up interval and timeout
 onDestroy(hide)

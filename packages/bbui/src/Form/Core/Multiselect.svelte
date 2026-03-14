@@ -30,22 +30,6 @@ type Option = any
 
   const dispatch = createEventDispatcher()
 
-  $: arrayValue = Array.isArray(value) ? value : [value].filter(x => !!x)
-  $: selectedLookupMap = getSelectedLookupMap(arrayValue)
-  $: optionLookupMap = getOptionLookupMap(options)
-  $: allSelected =
-    options.length > 0 &&
-    options.every(option => arrayValue.includes(getOptionValue(option)))
-  $: noneSelected =
-    options.length === 0 ||
-    options.every(option => !arrayValue.includes(getOptionValue(option)))
-  $: indeterminate = !allSelected && !noneSelected
-
-  $: fieldText = getFieldText(arrayValue, optionLookupMap, placeholder)
-  $: isOptionSelected = (optionValue: string) =>
-    selectedLookupMap[optionValue] === true
-  $: toggleOption = makeToggleOption(selectedLookupMap, arrayValue)
-
   const getFieldText = (
     value: Primitive[],
     map: Record<string, any> | null,
@@ -67,7 +51,7 @@ type Option = any
     }
   }
 
-  const getSelectedLookupMap = (value: Primitive[]) => {
+const getSelectedLookupMap = (value: Primitive[]) => {
     const map: Record<string, boolean> = {}
     if (Array.isArray(value) && value.length > 0) {
       value.forEach(v => {
@@ -80,7 +64,7 @@ type Option = any
     return map
   }
 
-  const getOptionLookupMap = (options: Option[]) => {
+const getOptionLookupMap = (options: Option[]) => {
     if (!options?.length) {
       return null
     }
@@ -95,7 +79,7 @@ type Option = any
     return map
   }
 
-  const makeToggleOption = (
+const makeToggleOption = (
     map: Record<string, boolean>,
     value: Primitive[]
   ) => {
@@ -112,7 +96,7 @@ type Option = any
     }
   }
 
-  const toggleSelectAll = () => {
+const toggleSelectAll = () => {
     if (allSelected) {
       dispatch("change", [])
     } else {
@@ -120,6 +104,32 @@ type Option = any
       dispatch("change", allValues)
     }
   }
+
+$: arrayValue = Array.isArray(value) ? value : [value].filter(x => !!x)
+  $: selectedLookupMap = getSelectedLookupMap(arrayValue)
+  $: optionLookupMap = getOptionLookupMap(options)
+  $: allSelected =
+    options.length > 0 &&
+    options.every(option => arrayValue.includes(getOptionValue(option)))
+  $: noneSelected =
+    options.length === 0 ||
+    options.every(option => !arrayValue.includes(getOptionValue(option)))
+  $: indeterminate = !allSelected && !noneSelected
+
+  $: fieldText = getFieldText(arrayValue, optionLookupMap, placeholder)
+  $: isOptionSelected = (optionValue: string) =>
+    selectedLookupMap[optionValue] === true
+  $: toggleOption = makeToggleOption(selectedLookupMap, arrayValue)
+
+  
+
+  
+
+  
+
+  
+
+  
 </script>
 
 <Picker

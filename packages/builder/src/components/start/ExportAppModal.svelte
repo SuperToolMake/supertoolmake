@@ -19,6 +19,22 @@ let encrypt = true
 let password: string | null = null
 const validation = createValidationStore()
 validation.addValidatorType("password", "password", true, { minLength: 12 })
+const exportApp = async () => {
+  const id = published ? sdk.applications.getProdAppID(appId) : sdk.applications.getDevAppID(appId)
+  const url = `/api/backups/export?appId=${id}`
+
+  try {
+    const downloaded = await downloadFile(url, {
+      encryptPassword: password,
+    })
+    if (!downloaded) {
+      notifications.error(`Error exporting the workspace.`)
+    }
+  } catch (error: any) {
+    notifications.error(error.message || `Error downloading the exported workspace`)
+  }
+}
+
 $: validation.observe("password", password)
 
 const Step = { CONFIG: "config", SET_PASSWORD: "set_password" }
@@ -51,22 +67,6 @@ $: stepConfig = {
     },
     isValid: $validation.valid,
   },
-}
-
-const exportApp = async () => {
-  const id = published ? sdk.applications.getProdAppID(appId) : sdk.applications.getDevAppID(appId)
-  const url = `/api/backups/export?appId=${id}`
-
-  try {
-    const downloaded = await downloadFile(url, {
-      encryptPassword: password,
-    })
-    if (!downloaded) {
-      notifications.error(`Error exporting the workspace.`)
-    }
-  } catch (error: any) {
-    notifications.error(error.message || `Error downloading the exported workspace`)
-  }
 }
 </script>
 

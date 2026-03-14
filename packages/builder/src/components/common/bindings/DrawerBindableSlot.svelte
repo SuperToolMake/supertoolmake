@@ -26,19 +26,11 @@ const dispatch = createEventDispatcher()
 let bindingDrawer
 let currentVal = value
 
-$: readableValue = runtimeToReadableBinding(bindings, value)
-$: tempValue = readableValue
-$: isJS = isJSBinding(value)
-
 const saveBinding = () => {
   onChange(tempValue)
   onBlur()
   bindingDrawer.hide()
 }
-
-setContext("binding-drawer-actions", {
-  save: saveBinding,
-})
 
 const onChange = (value) => {
   if ((type === "link" || type === "bb_reference") && value && hasValidLinks(value)) {
@@ -88,19 +80,6 @@ const isValidBoolean = (value) => {
   return value === "false" || value === "true" || value == ""
 }
 
-const validationMap = {
-  date: isValidDate,
-  datetime: isValidDate,
-  link: hasValidLinks,
-  bb_reference: hasValidLinks,
-  bb_reference_single: hasValidLinks,
-  array: hasValidOptions,
-  longform: (value) => !isJSBinding(value),
-  json: (value) => !isJSBinding(value),
-  options: (value) => !(isJSBinding(value) || findHBSBlocks(value)?.length),
-  boolean: isValidBoolean,
-}
-
 const isValid = (value) => {
   const validate = validationMap[type]
   return validate ? validate(value) : true
@@ -117,6 +96,27 @@ const getIconClass = (value, type) => {
     return "slot-icon"
   }
   return ""
+}
+
+$: readableValue = runtimeToReadableBinding(bindings, value)
+$: tempValue = readableValue
+$: isJS = isJSBinding(value)
+
+setContext("binding-drawer-actions", {
+  save: saveBinding,
+})
+
+const validationMap = {
+  date: isValidDate,
+  datetime: isValidDate,
+  link: hasValidLinks,
+  bb_reference: hasValidLinks,
+  bb_reference_single: hasValidLinks,
+  array: hasValidOptions,
+  longform: (value) => !isJSBinding(value),
+  json: (value) => !isJSBinding(value),
+  options: (value) => !(isJSBinding(value) || findHBSBlocks(value)?.length),
+  boolean: isValidBoolean,
 }
 </script>
 

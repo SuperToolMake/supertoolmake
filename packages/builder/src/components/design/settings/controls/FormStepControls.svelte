@@ -5,13 +5,13 @@ import { createEventDispatcher, getContext } from "svelte"
 const multiStepStore = getContext("multi-step-form-block")
 const dispatch = createEventDispatcher()
 
-$: ({ stepCount, currentStep } = $multiStepStore)
-
 const stepAction = (action) => {
   dispatch("change", {
     action,
   })
 }
+
+$: ({ stepCount, currentStep } = $multiStepStore)
 </script>
 
 {#if stepCount === 1}

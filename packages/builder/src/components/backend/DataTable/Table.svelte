@@ -29,6 +29,16 @@ let selectedRows = []
 let customRenderers = []
 let parsedSchema = {}
 
+const resetSelectedRows = () => {
+  selectedRows = []
+}
+
+const selectRelationship = ({ tableId, rowId, fieldName }) => {
+  $goto(
+    `/builder/workspace/${$params.application}/data/table/${tableId}/relationship/${rowId}/${fieldName}`
+  )
+}
+
 $: if (schema) {
   parsedSchema = Object.keys(schema).reduce((acc, key) => {
     acc[key] = typeof schema[key] === "string" ? { type: schema[key] } : schema[key]
@@ -72,16 +82,6 @@ $: {
       parsedSchema.status.displayName = "Status"
     }
   }
-}
-
-const resetSelectedRows = () => {
-  selectedRows = []
-}
-
-const selectRelationship = ({ tableId, rowId, fieldName }) => {
-  $goto(
-    `/builder/workspace/${$params.application}/data/table/${tableId}/relationship/${rowId}/${fieldName}`
-  )
 }
 </script>
 

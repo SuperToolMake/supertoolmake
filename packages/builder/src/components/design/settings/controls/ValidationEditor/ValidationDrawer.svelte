@@ -122,12 +122,6 @@ const resolveDatasource = (selectedScreen, componentInstance, parent) => {
   return getDatasourceForProvider(selectedScreen, parent || componentInstance) || {}
 }
 
-$: dataSourceSchema = getDataSourceSchema($selectedScreen, $selectedComponent)
-$: field = fieldName || $selectedComponent?.field
-$: schemaRules = parseRulesFromSchema(field, dataSourceSchema || {})
-$: fieldType = type?.split("/")[1] || "string"
-$: constraintOptions = getConstraintsForType(fieldType)
-
 const getConstraintsForType = (type) => {
   return ConstraintMap[type]
 }
@@ -227,6 +221,12 @@ const duplicateRule = (id) => {
   const newRule = { ...existingRule, id: generate() }
   rules = [...rules, newRule]
 }
+
+$: dataSourceSchema = getDataSourceSchema($selectedScreen, $selectedComponent)
+$: field = fieldName || $selectedComponent?.field
+$: schemaRules = parseRulesFromSchema(field, dataSourceSchema || {})
+$: fieldType = type?.split("/")[1] || "string"
+$: constraintOptions = getConstraintsForType(fieldType)
 </script>
 
 <DrawerContent>

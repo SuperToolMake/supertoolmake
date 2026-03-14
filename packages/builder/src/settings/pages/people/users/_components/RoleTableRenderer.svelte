@@ -21,15 +21,9 @@ const canWorkspaceRoleOverrideGlobalRole = (globalRole) => {
   )
 }
 
-$: globalRoleValue = users.getUserRole(row)
-$: workspaceRoleValue = getRoleFromWorkspaceRole(row?.workspaceRole)
-$: roleValue =
-  canWorkspaceRoleOverrideGlobalRole(globalRoleValue) && workspaceRoleValue
-    ? workspaceRoleValue
-    : globalRoleValue
-$: role = Constants.ExtendedBudibaseRoleOptions.find((x) => x.value === roleValue)
 const isBuiltInEndUserRole = (roleId) =>
   roleId === Constants.Roles.BASIC || roleId === Constants.Roles.ADMIN
+
 const getWorkspaceRoleLabel = (roleId, availableRoles) => {
   if (!roleId || roleId === Constants.Roles.BASIC) {
     return "Basic"
@@ -43,6 +37,15 @@ const getWorkspaceRoleLabel = (roleId, availableRoles) => {
   const customRole = availableRoles.find((x) => x._id === roleId)
   return customRole?.uiMetadata?.displayName || customRole?.name || roleId
 }
+
+$: globalRoleValue = users.getUserRole(row)
+$: workspaceRoleValue = getRoleFromWorkspaceRole(row?.workspaceRole)
+$: roleValue =
+  canWorkspaceRoleOverrideGlobalRole(globalRoleValue) && workspaceRoleValue
+    ? workspaceRoleValue
+    : globalRoleValue
+$: role = Constants.ExtendedBudibaseRoleOptions.find((x) => x.value === roleValue)
+
 $: value =
   role?.value === Constants.BudibaseRoles.AppUser && row?.workspaceRole
     ? isBuiltInEndUserRole(row.workspaceRole)

@@ -37,8 +37,6 @@ export interface ModalAPI {
   let visible: boolean = fixed || inline
   let modal: HTMLElement | undefined
 
-  $: dispatch(visible ? "show" : "hide")
-
   export function show(): void {
     if (visible) {
       return
@@ -46,14 +44,14 @@ export interface ModalAPI {
     visible = true
   }
 
-  export function hide(): void {
+export function hide(): void {
     if (!visible || fixed || inline) {
       return
     }
     visible = false
   }
 
-  export function toggle(): void {
+export function toggle(): void {
     if (visible) {
       hide()
     } else {
@@ -61,7 +59,7 @@ export interface ModalAPI {
     }
   }
 
-  export function cancel(from: ModalCancelFrom): void {
+export function cancel(from: ModalCancelFrom): void {
     if (!visible || disableCancel) {
       return
     }
@@ -69,19 +67,19 @@ export interface ModalAPI {
     hide()
   }
 
-  function handleKey(e: KeyboardEvent): void {
+function handleKey(e: KeyboardEvent): void {
     if (visible && e.key === "Escape") {
       cancel(ModalCancelFrom.ESCAPE_KEY)
     }
   }
 
-  function handleOutsideClick(): void {
+function handleOutsideClick(): void {
     if (closeOnOutsideClick) {
       cancel(ModalCancelFrom.OUTSIDE_CLICK)
     }
   }
 
-  function focusModal(node: HTMLElement): void {
+function focusModal(node: HTMLElement): void {
     if (!autoFocus) return
     tick().then(() => {
       const inputs = node.querySelectorAll("input, textarea")
@@ -95,6 +93,22 @@ export interface ModalAPI {
       }
     })
   }
+
+$: dispatch(visible ? "show" : "hide")
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
 
   setContext(Context.Modal, {
     show,

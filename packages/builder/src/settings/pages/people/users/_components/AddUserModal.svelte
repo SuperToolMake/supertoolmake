@@ -38,85 +38,10 @@ const excludedRoleIds = [
   Constants.Roles.GROUP,
 ]
 let roleColorLookup: Record<string, string | undefined> = {}
-$: roleColorLookup = ($roles || []).reduce(
-  (acc: Record<string, string | undefined>, role) => {
-    acc[role._id] = role.uiMetadata?.color
-    return acc
-  },
-  {} as Record<string, string | undefined>
-)
-$: customEndUserRoleOptions = ($roles || [])
-  .filter((role) => !excludedRoleIds.includes(role._id))
-  .map((role) => ({
-    label: role.uiMetadata?.displayName || role.name || "Custom role",
-    value: role._id,
-    color: role.uiMetadata?.color || "var(--spectrum-global-color-static-magenta-400)",
-  }))
-$: endUserRoleOptions = [
-  {
-    label: "Basic user",
-    value: Constants.Roles.BASIC,
-    color: roleColorLookup[Constants.Roles.BASIC],
-  },
-  {
-    label: "Admin user",
-    value: Constants.Roles.ADMIN,
-    color: roleColorLookup[Constants.Roles.ADMIN],
-  },
-  ...customEndUserRoleOptions,
-]
-let endUserRole = Constants.Roles.BASIC
-let onboardingType: (typeof OnboardingType)[keyof typeof OnboardingType] | null =
-  OnboardingType.EMAIL
-
-type UserData = {
-  email: string
-  role: string
-  password: string
-  forceResetPassword: boolean
-  error: string | null
-}
-
-let userData: UserData[] = [
-  {
-    email: "",
-    role: "appUser",
-    password,
-    forceResetPassword: true,
-    error: null,
-  },
-]
-$: hasError = userData.find((x) => x.error != null)
-$: parsedEmails = useWorkspaceInviteModal ? emailsInput : []
-$: smtpConfigured = $admin.loaded && ($admin.cloud || Boolean($admin.checklist?.smtp?.checked))
-$: emailInviteDisabled = $admin.loaded ? !smtpConfigured : false
-$: passwordInviteDisabled = $organisation.isSSOEnforced
-$: onboardingOptions = [
-  {
-    label: "Send email invites",
-    subtitle: emailInviteDisabled ? "Requires SMTP setup" : undefined,
-    value: OnboardingType.EMAIL,
-    disabled: emailInviteDisabled,
-  },
-  {
-    label: "Generate passwords for each user",
-    value: OnboardingType.PASSWORD,
-    disabled: passwordInviteDisabled,
-  },
-]
-$: if (emailInviteDisabled && passwordInviteDisabled) {
-  onboardingType = null
-} else if (emailInviteDisabled) {
-  onboardingType = OnboardingType.PASSWORD
-} else if (passwordInviteDisabled) {
-  onboardingType = OnboardingType.EMAIL
-} else if (!onboardingType) {
-  onboardingType = OnboardingType.EMAIL
-}
-
 function removeInput(idx: number) {
   userData = userData.filter((_e, i) => i !== idx)
 }
+
 function addNewInput() {
   userData = [
     ...userData,
@@ -224,6 +149,82 @@ const onConfirm = () => {
     users: userData,
     assignToWorkspace,
   })
+}
+
+$: roleColorLookup = ($roles || []).reduce(
+  (acc: Record<string, string | undefined>, role) => {
+    acc[role._id] = role.uiMetadata?.color
+    return acc
+  },
+  {} as Record<string, string | undefined>
+)
+$: customEndUserRoleOptions = ($roles || [])
+  .filter((role) => !excludedRoleIds.includes(role._id))
+  .map((role) => ({
+    label: role.uiMetadata?.displayName || role.name || "Custom role",
+    value: role._id,
+    color: role.uiMetadata?.color || "var(--spectrum-global-color-static-magenta-400)",
+  }))
+$: endUserRoleOptions = [
+  {
+    label: "Basic user",
+    value: Constants.Roles.BASIC,
+    color: roleColorLookup[Constants.Roles.BASIC],
+  },
+  {
+    label: "Admin user",
+    value: Constants.Roles.ADMIN,
+    color: roleColorLookup[Constants.Roles.ADMIN],
+  },
+  ...customEndUserRoleOptions,
+]
+let endUserRole = Constants.Roles.BASIC
+let onboardingType: (typeof OnboardingType)[keyof typeof OnboardingType] | null =
+  OnboardingType.EMAIL
+
+type UserData = {
+  email: string
+  role: string
+  password: string
+  forceResetPassword: boolean
+  error: string | null
+}
+
+let userData: UserData[] = [
+  {
+    email: "",
+    role: "appUser",
+    password,
+    forceResetPassword: true,
+    error: null,
+  },
+]
+$: hasError = userData.find((x) => x.error != null)
+$: parsedEmails = useWorkspaceInviteModal ? emailsInput : []
+$: smtpConfigured = $admin.loaded && ($admin.cloud || Boolean($admin.checklist?.smtp?.checked))
+$: emailInviteDisabled = $admin.loaded ? !smtpConfigured : false
+$: passwordInviteDisabled = $organisation.isSSOEnforced
+$: onboardingOptions = [
+  {
+    label: "Send email invites",
+    subtitle: emailInviteDisabled ? "Requires SMTP setup" : undefined,
+    value: OnboardingType.EMAIL,
+    disabled: emailInviteDisabled,
+  },
+  {
+    label: "Generate passwords for each user",
+    value: OnboardingType.PASSWORD,
+    disabled: passwordInviteDisabled,
+  },
+]
+$: if (emailInviteDisabled && passwordInviteDisabled) {
+  onboardingType = null
+} else if (emailInviteDisabled) {
+  onboardingType = OnboardingType.PASSWORD
+} else if (passwordInviteDisabled) {
+  onboardingType = OnboardingType.EMAIL
+} else if (!onboardingType) {
+  onboardingType = OnboardingType.EMAIL
 }
 </script>
 

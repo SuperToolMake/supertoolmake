@@ -12,14 +12,6 @@ setContext("screenslot", true)
 // Only wrap this as an array to take advantage of svelte keying,
 // to ensure the svelte-spa-router is fully remounted when route config
 // changes
-$: config = {
-  routes: getRouterConfig($routeStore.routes),
-  id: $routeStore.routeSessionId,
-}
-
-// Keep query params up to date
-$: routeStore.actions.setQueryParams(parseQueryString($querystring))
-
 const parseQueryString = (query) => {
   let queryParams = {}
   if (query) {
@@ -46,6 +38,14 @@ const onRouteLoading = ({ detail }) => {
   routeStore.actions.setRouteParams(detail.params || {})
   routeStore.actions.setActiveRoute(detail.route)
 }
+
+$: config = {
+  routes: getRouterConfig($routeStore.routes),
+  id: $routeStore.routeSessionId,
+}
+
+// Keep query params up to date
+$: routeStore.actions.setQueryParams(parseQueryString($querystring))
 
 // Initialise state store from query string on initial load
 onMount(() => {

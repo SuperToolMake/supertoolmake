@@ -29,8 +29,6 @@ let loaded: boolean = false
 let userInfoModal: Modal
 let changePasswordModal: Modal
 
-$: userApps = $clientAppsStore.apps
-
 function getUrl(app: EnrichedApp | PublishedWorkspaceData) {
   if (app.url) {
     return `/app${app.url}`
@@ -46,6 +44,8 @@ const logout = async () => {
     // Swallow error and do nothing
   }
 }
+
+$: userApps = $clientAppsStore.apps
 
 onMount(async () => {
   try {

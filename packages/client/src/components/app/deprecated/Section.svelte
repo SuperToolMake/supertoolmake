@@ -18,8 +18,6 @@ let layoutMap = {
 
 let container
 let containerWidth
-$: columnsDependingOnSize = calculateColumns(containerWidth)
-
 // Instead of svelte bind:clientWidth
 // Svelte injects an iframe causing issues with CSP, this avoids it
 const setupResizeObserver = (element) => {
@@ -43,6 +41,8 @@ function calculateColumns(parentWidth) {
     return numberOfAllowedColumns
   }
 }
+
+$: columnsDependingOnSize = calculateColumns(containerWidth)
 
 onMount(() => {
   let resizeObserver = setupResizeObserver(container)

@@ -16,23 +16,12 @@ let screensContainer: HTMLDivElement
 let scrolling = false
 let newScreenModal: NewScreenModal
 
-$: allScreens = $workspaceAppStore.selectedWorkspaceApp?.screens || []
-$: filteredScreens = getFilteredScreens(allScreens, searchValue)
-
-$: workspaceAppId = $workspaceAppStore.selectedWorkspaceApp?._id || ""
-
 const handleOpenSearch = async () => {
   screensContainer.scroll({ top: 0, behavior: "smooth" })
 }
 
 const isValidScreenRoute = (allScreens: Screen[], id: string) => {
   return allScreens.some((screen) => screen._id === id)
-}
-
-$: {
-  if (searching) {
-    handleOpenSearch()
-  }
 }
 
 const getFilteredScreens = (screens: Screen[], searchValue: string) => {
@@ -43,6 +32,17 @@ const getFilteredScreens = (screens: Screen[], searchValue: string) => {
 
 const handleScroll = (e: any) => {
   scrolling = e.target.scrollTop !== 0
+}
+
+$: allScreens = $workspaceAppStore.selectedWorkspaceApp?.screens || []
+$: filteredScreens = getFilteredScreens(allScreens, searchValue)
+
+$: workspaceAppId = $workspaceAppStore.selectedWorkspaceApp?._id || ""
+
+$: {
+  if (searching) {
+    handleOpenSearch()
+  }
 }
 </script>
 

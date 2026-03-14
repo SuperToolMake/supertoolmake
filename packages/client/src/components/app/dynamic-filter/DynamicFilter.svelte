@@ -18,30 +18,6 @@ let filters
 let schemaLoaded = false,
   schema
 
-$: dataProviderId = dataProvider?.id
-$: datasource = dataProvider?.datasource
-$: isDSPlus = ["table", "link", "viewV2"].includes(datasource?.type)
-
-$: addExtension = getAction(dataProviderId, ActionTypes.AddDataProviderQueryExtension)
-$: removeExtension = getAction(dataProviderId, ActionTypes.RemoveDataProviderQueryExtension)
-$: fetchSchema(datasource)
-$: schemaFields = getSchemaFields(schema, allowedFields)
-
-$: filterCount = filters?.groups?.reduce((acc, group) => {
-  acc += group?.filters?.length || 0
-  return acc
-}, 0)
-
-$: {
-  if (filterCount) {
-    const queryExtension = QueryUtils.buildQuery(filters)
-    delete queryExtension.onEmptyFilter
-    addExtension?.($component.id, queryExtension)
-  } else {
-    removeExtension?.($component.id)
-  }
-}
-
 async function fetchSchema(datasource) {
   if (datasource) {
     schema = await fetchDatasourceSchema(datasource, {
@@ -85,6 +61,30 @@ const openEditor = () => {
 
 const updateQuery = () => {
   filters = Utils.parseFilter(editableFilters)
+}
+
+$: dataProviderId = dataProvider?.id
+$: datasource = dataProvider?.datasource
+$: isDSPlus = ["table", "link", "viewV2"].includes(datasource?.type)
+
+$: addExtension = getAction(dataProviderId, ActionTypes.AddDataProviderQueryExtension)
+$: removeExtension = getAction(dataProviderId, ActionTypes.RemoveDataProviderQueryExtension)
+$: fetchSchema(datasource)
+$: schemaFields = getSchemaFields(schema, allowedFields)
+
+$: filterCount = filters?.groups?.reduce((acc, group) => {
+  acc += group?.filters?.length || 0
+  return acc
+}, 0)
+
+$: {
+  if (filterCount) {
+    const queryExtension = QueryUtils.buildQuery(filters)
+    delete queryExtension.onEmptyFilter
+    addExtension?.($component.id, queryExtension)
+  } else {
+    removeExtension?.($component.id)
+  }
 }
 
 onDestroy(() => {

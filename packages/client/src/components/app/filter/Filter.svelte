@@ -65,51 +65,6 @@ let schema: TableSchema | null
 let dataComponent: Component | null = null
 
 // Update the memo when the filters are updated
-$: memoFilters.set(filters)
-
-// Fully built filter extension
-$: filterExtension = buildExtension($memoFilters)
-
-$: query = filterExtension ? QueryUtils.buildQuery(filterExtension) : null
-
-// Embedded datasources are those inside blocks or other components
-$: filterDatasource = targetComponent?.embeddedData?.dataSource ?? targetComponent?.datasource
-
-// The target component
-$: componentId = targetComponent?.embeddedData?.componentId ?? targetComponent?.id
-
-// Process the target component
-$: target = componentStore.actions.getComponentById(componentId)
-
-// Ensure the target has intialised
-$: loaded = targetComponent?.embeddedData?.loaded ?? targetComponent?.loaded
-
-// Init the target component
-$: loaded && initTarget(target)
-
-// Update schema when the target instance
-$: dataComponent && fetchSchema(filterDatasource)
-
-$: isGridblock = dataComponent?._component === "@budibase/standard-components/gridblock"
-
-// Must be active and part of the current schema
-$: visibleFilters = filterConfig?.filter((filter) => filter.active && schema?.[filter.field])
-
-// Choose the appropriate action based on component type
-$: addAction = isGridblock
-  ? ActionTypes.AddDataProviderFilterExtension
-  : ActionTypes.AddDataProviderQueryExtension
-$: removeAction = isGridblock
-  ? ActionTypes.RemoveDataProviderFilterExtension
-  : ActionTypes.RemoveDataProviderQueryExtension
-
-// Register extension actions
-$: addExtension = componentId && loaded ? getAction(componentId, addAction) : null
-$: removeExtension = componentId && loaded ? getAction(componentId, removeAction) : null
-
-// If the filters are updated, notify the target of the change
-$: hydrated && dataComponent && loaded && fire(filterExtension)
-
 const initTarget = (target: Component | null) => {
   if (!dataComponent && target) {
     dataComponent = target
@@ -317,6 +272,60 @@ const getRelIds = (filters: Record<string, SearchFilter>) => {
   return Array.from(uniqueIds)
 }
 
+const hydrateFilters = () => {
+  // Hydrate with previously set config
+  if (persistFilters) {
+    const filterState = $uiStateStore[$component.id]?.filters
+    filters = Helpers.cloneDeep(filterState || {})
+  }
+  hydrated = true
+}
+
+$: memoFilters.set(filters)
+
+// Fully built filter extension
+$: filterExtension = buildExtension($memoFilters)
+
+$: query = filterExtension ? QueryUtils.buildQuery(filterExtension) : null
+
+// Embedded datasources are those inside blocks or other components
+$: filterDatasource = targetComponent?.embeddedData?.dataSource ?? targetComponent?.datasource
+
+// The target component
+$: componentId = targetComponent?.embeddedData?.componentId ?? targetComponent?.id
+
+// Process the target component
+$: target = componentStore.actions.getComponentById(componentId)
+
+// Ensure the target has intialised
+$: loaded = targetComponent?.embeddedData?.loaded ?? targetComponent?.loaded
+
+// Init the target component
+$: loaded && initTarget(target)
+
+// Update schema when the target instance
+$: dataComponent && fetchSchema(filterDatasource)
+
+$: isGridblock = dataComponent?._component === "@budibase/standard-components/gridblock"
+
+// Must be active and part of the current schema
+$: visibleFilters = filterConfig?.filter((filter) => filter.active && schema?.[filter.field])
+
+// Choose the appropriate action based on component type
+$: addAction = isGridblock
+  ? ActionTypes.AddDataProviderFilterExtension
+  : ActionTypes.AddDataProviderQueryExtension
+$: removeAction = isGridblock
+  ? ActionTypes.RemoveDataProviderFilterExtension
+  : ActionTypes.RemoveDataProviderQueryExtension
+
+// Register extension actions
+$: addExtension = componentId && loaded ? getAction(componentId, addAction) : null
+$: removeExtension = componentId && loaded ? getAction(componentId, removeAction) : null
+
+// If the filters are updated, notify the target of the change
+$: hydrated && dataComponent && loaded && fire(filterExtension)
+
 $: rels = initRelationShips($memoFilters)
 $: relIds = getRelIds(rels)
 
@@ -337,15 +346,6 @@ $: if (fetchedRows.length) {
     ...state,
     ...fetched,
   }))
-}
-
-const hydrateFilters = () => {
-  // Hydrate with previously set config
-  if (persistFilters) {
-    const filterState = $uiStateStore[$component.id]?.filters
-    filters = Helpers.cloneDeep(filterState || {})
-  }
-  hydrated = true
 }
 
 onMount(() => {

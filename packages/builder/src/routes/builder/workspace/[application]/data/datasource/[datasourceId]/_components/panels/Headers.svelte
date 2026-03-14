@@ -12,12 +12,6 @@ let restBindings = getRestBindings()
 let addHeader
 
 // Use parent-provided updatedDatasource when available
-$: localUpdatedDatasource = updatedDatasource ?? cloneDeep(datasource)
-$: parsedHeaders = runtimeToReadableMap(
-  restBindings,
-  localUpdatedDatasource?.config?.defaultHeaders
-)
-
 const onDefaultHeaderUpdate = (headers) => {
   const flatHeaders = cloneDeep(headers).reduce((acc, entry) => {
     const name = (entry?.name ?? "").toString().trim()
@@ -37,6 +31,12 @@ const onDefaultHeaderUpdate = (headers) => {
     markDirty?.()
   }
 }
+
+$: localUpdatedDatasource = updatedDatasource ?? cloneDeep(datasource)
+$: parsedHeaders = runtimeToReadableMap(
+  restBindings,
+  localUpdatedDatasource?.config?.defaultHeaders
+)
 </script>
 
 <Panel>

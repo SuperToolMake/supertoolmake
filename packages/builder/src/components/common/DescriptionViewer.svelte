@@ -98,12 +98,6 @@ onMount(() => {
   }
 })
 
-$: if (resizeObserver && contentEl) {
-  resizeObserver.disconnect()
-  resizeObserver.observe(contentEl)
-  updateCollapsible()
-}
-
 const replaceWithSpan = (anchor: HTMLAnchorElement) => {
   const span = anchor.ownerDocument?.createElement("span")
   if (!span) {
@@ -155,6 +149,12 @@ const enhanceLinks = (node: HTMLElement, params: LinkEnhancerParams = {}) => {
       observer.disconnect()
     },
   }
+}
+
+$: if (resizeObserver && contentEl) {
+  resizeObserver.disconnect()
+  resizeObserver.observe(contentEl)
+  updateCollapsible()
 }
 </script>
 

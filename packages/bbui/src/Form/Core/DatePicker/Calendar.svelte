@@ -38,10 +38,6 @@ const MonthsOfYear = [
 const now = dayjs()
 let calendarDate
 
-$: calendarDate = dayjs(value || dayjs()).startOf("month")
-$: dayHeaders = getDayHeaders(startDayOfWeek)
-$: weekStarts = getWeekStarts(calendarDate, DayIndex[startDayOfWeek])
-
 const getWeekStarts = (monthStart, startDayIndex) => {
   if (!monthStart?.isValid()) {
     return []
@@ -78,6 +74,10 @@ const handleDateChange = (date) => {
 export const setDate = (date) => {
   calendarDate = date
 }
+
+$: calendarDate = dayjs(value || dayjs()).startOf("month")
+$: dayHeaders = getDayHeaders(startDayOfWeek)
+$: weekStarts = getWeekStarts(calendarDate, DayIndex[startDayOfWeek])
 
 const cleanYear = cleanInput({ max: 9999, pad: 0, fallback: now.year() })
 </script>

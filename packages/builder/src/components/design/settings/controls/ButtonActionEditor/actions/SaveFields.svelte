@@ -12,8 +12,6 @@ export let valueLabel = "Value"
 export let bindings = []
 
 let fields = Object.entries(parameterFields || {})
-$: onChange(fields)
-
 const addField = () => {
   fields = [...fields.filter((field) => field[0]), ["", ""]]
 }
@@ -41,6 +39,8 @@ const onChange = (fields) => {
     })
   dispatch("change", newParamFields)
 }
+
+$: onChange(fields)
 </script>
 
 {#if fields}

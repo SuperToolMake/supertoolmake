@@ -17,54 +17,6 @@ export let animate
 export let yAxisUnits
 export let onClick
 
-$: series = getSeries(dataProvider, dateColumn, openColumn, highColumn, lowColumn, closeColumn)
-
-$: options = {
-  series,
-  title: {
-    text: title,
-  },
-  chart: {
-    height: height == null || height === "" ? "auto" : height,
-    width: width == null || width === "" ? "100%" : width,
-    type: "candlestick",
-    animations: {
-      enabled: animate,
-    },
-    toolbar: {
-      show: false,
-    },
-    zoom: {
-      enabled: false,
-    },
-    events: {
-      // Clicking on a Candlestick
-      dataPointSelection: (_event, _chartContext, opts) => {
-        const candlelstickIndex = opts.dataPointIndex
-        const row = dataProvider.rows[candlelstickIndex]
-        handleCandlestickClick(row)
-      },
-    },
-  },
-  xaxis: {
-    tooltip: {
-      formatter: formatters.Datetime,
-    },
-    type: "datetime",
-    title: {
-      text: xAxisLabel,
-    },
-  },
-  yaxis: {
-    labels: {
-      formatter: formatters[yAxisUnits],
-    },
-    title: {
-      text: yAxisLabel,
-    },
-  },
-}
-
 function handleCandlestickClick(candlestick) {
   onClick?.({ candlestick })
 }
@@ -130,6 +82,54 @@ const getSeries = (dataProvider, dateColumn, openColumn, highColumn, lowColumn, 
       }),
     },
   ]
+}
+
+$: series = getSeries(dataProvider, dateColumn, openColumn, highColumn, lowColumn, closeColumn)
+
+$: options = {
+  series,
+  title: {
+    text: title,
+  },
+  chart: {
+    height: height == null || height === "" ? "auto" : height,
+    width: width == null || width === "" ? "100%" : width,
+    type: "candlestick",
+    animations: {
+      enabled: animate,
+    },
+    toolbar: {
+      show: false,
+    },
+    zoom: {
+      enabled: false,
+    },
+    events: {
+      // Clicking on a Candlestick
+      dataPointSelection: (_event, _chartContext, opts) => {
+        const candlelstickIndex = opts.dataPointIndex
+        const row = dataProvider.rows[candlelstickIndex]
+        handleCandlestickClick(row)
+      },
+    },
+  },
+  xaxis: {
+    tooltip: {
+      formatter: formatters.Datetime,
+    },
+    type: "datetime",
+    title: {
+      text: xAxisLabel,
+    },
+  },
+  yaxis: {
+    labels: {
+      formatter: formatters[yAxisUnits],
+    },
+    title: {
+      text: yAxisLabel,
+    },
+  },
 }
 </script>
 

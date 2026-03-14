@@ -39,30 +39,6 @@ let confirmDeleteDialog: ConfirmDialog
 let appChangingStatus: string | undefined
 let versionModal: ShowUI
 
-$: favourites = workspaceFavouriteStore.lookup
-$: updateAvailable =
-  $appStore.upgradableVersion &&
-  $appStore.version &&
-  $appStore.upgradableVersion !== $appStore.version
-
-const filters: {
-  label: string
-  filterValue: PublishResourceState | undefined
-}[] = [
-  {
-    label: "All apps",
-    filterValue: undefined,
-  },
-  {
-    label: "Live",
-    filterValue: PublishResourceState.PUBLISHED,
-  },
-  {
-    label: "Off",
-    filterValue: PublishResourceState.DISABLED,
-  },
-]
-
 const deleteWorkspaceApp = async () => {
   if (!selectedWorkspaceApp) {
     return
@@ -172,6 +148,30 @@ const createApp = () => {
   selectedWorkspaceApp = undefined
   workspaceAppModal.show()
 }
+
+$: favourites = workspaceFavouriteStore.lookup
+$: updateAvailable =
+  $appStore.upgradableVersion &&
+  $appStore.version &&
+  $appStore.upgradableVersion !== $appStore.version
+
+const filters: {
+  label: string
+  filterValue: PublishResourceState | undefined
+}[] = [
+  {
+    label: "All apps",
+    filterValue: undefined,
+  },
+  {
+    label: "Live",
+    filterValue: PublishResourceState.PUBLISHED,
+  },
+  {
+    label: "Off",
+    filterValue: PublishResourceState.DISABLED,
+  },
+]
 
 $: workspaceApps = $workspaceAppStore.workspaceApps
 $: filteredWorkspaceApps = workspaceApps

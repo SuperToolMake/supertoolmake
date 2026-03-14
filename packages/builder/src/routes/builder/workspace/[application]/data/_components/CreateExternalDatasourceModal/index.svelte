@@ -30,8 +30,6 @@ const handleStoreChanges = (store, modal, goto) => {
   }
 }
 
-$: handleStoreChanges($store, modal, $goto)
-
 export function show(integration) {
   if (integration.name === IntegrationTypes.REST) {
     // A REST integration is created immediately, we don't need to display a config modal.
@@ -55,13 +53,6 @@ export function show(integration) {
   }
 }
 
-// Triggers opening the config editor whenever Google OAuth returns the user to the page
-$: $onGoogleAuth((integration, config) => {
-  store.setIntegration(integration)
-  store.setConfig(config)
-  store.editConfigStage()
-})
-
 const createDatasource = async (config) => {
   try {
     const datasource = await datasources.create({
@@ -77,6 +68,15 @@ const createDatasource = async (config) => {
 
   return keepOpen
 }
+
+$: handleStoreChanges($store, modal, $goto)
+
+// Triggers opening the config editor whenever Google OAuth returns the user to the page
+$: $onGoogleAuth((integration, config) => {
+  store.setIntegration(integration)
+  store.setConfig(config)
+  store.editConfigStage()
+})
 </script>
 
 <Modal on:hide={store.cancel} bind:this={modal}>

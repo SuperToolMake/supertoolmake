@@ -25,8 +25,6 @@ const favourites = workspaceFavouriteStore.lookup
 let editModal
 let deleteConfirmationModal
 
-$: favourite = table?._id ? $favourites[table?._id] : undefined
-
 const duplicateTable = async () => {
   try {
     await tablesStore.duplicate(table._id)
@@ -72,6 +70,8 @@ const openContextMenu = (e) => {
   const items = getContextMenuItems()
   contextMenuStore.open(table._id, items, { x: e.clientX, y: e.clientY })
 }
+
+$: favourite = table?._id ? $favourites[table?._id] : undefined
 </script>
 
 <NavItem

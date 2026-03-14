@@ -36,6 +36,19 @@ const colourVariants: Record<ColourVariant, string> = {
   Custom: "var(--primaryColor)",
 }
 
+const handleClick = (value: number): void => {
+  if (enabled) {
+    const changed = fieldApi?.setValue(value)
+    if (onChange && changed) {
+      onChange({ value })
+    }
+  }
+}
+
+const isRated = (value: number | null, index: number): boolean => {
+  return typeof value === "number" && value >= index + 1
+}
+
 $: ratingColour =
   variant === "Custom" && colour ? colour : colourVariants[variant] || "var(--primaryColor)"
 
@@ -49,19 +62,6 @@ const sizeSpacing: Record<Size, number> = {
 
 $: spacing = sizeSpacing[size] || sizeSpacing.M
 $: enabled = !(fieldState?.disabled || fieldState?.readonly)
-
-const handleClick = (value: number): void => {
-  if (enabled) {
-    const changed = fieldApi?.setValue(value)
-    if (onChange && changed) {
-      onChange({ value })
-    }
-  }
-}
-
-const isRated = (value: number | null, index: number): boolean => {
-  return typeof value === "number" && value >= index + 1
-}
 </script>
 
 <Field

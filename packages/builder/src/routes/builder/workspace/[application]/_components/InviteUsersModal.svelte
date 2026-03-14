@@ -36,8 +36,6 @@ let createUsersResponse: BulkUserCreated = {
 let addedToWorkspaceEmails: string[] = []
 let createdUsers: UserData["users"] = []
 
-$: currentWorkspaceId = $appStore.appId ? sdk.applications.getProdAppID($appStore.appId) : ""
-
 const removeDuplicates = (userData: UserData): UserData => {
   return dedupeUsersByEmail(userData)
 }
@@ -156,6 +154,8 @@ const hidePasswordConfirmationModal = () => {
   showingPasswordConfirmation = false
   onHide()
 }
+
+$: currentWorkspaceId = $appStore.appId ? sdk.applications.getProdAppID($appStore.appId) : ""
 
 onMount(() => {
   roles.fetch()

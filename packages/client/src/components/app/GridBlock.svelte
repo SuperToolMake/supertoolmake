@@ -50,52 +50,6 @@ let minHeight = 0
 
 let filterExtensions = {}
 
-$: id = $component.id
-$: currentTheme = $context?.device?.theme
-$: darkMode = !currentTheme?.includes("light")
-$: parsedColumns = getParsedColumns(columns)
-$: enrichedButtons = enrichButtons(buttons)
-$: schemaOverrides = getSchemaOverrides(parsedColumns, $context)
-$: selectedRows = deriveSelectedRows(gridContext)
-$: styles = patchStyles($component.styles, minHeight)
-$: rowMap = gridContext?.rowLookupMap
-
-$: data = {
-  selectedRows: $selectedRows,
-  embeddedData: {
-    dataSource: table,
-    componentId: $component.id,
-    loaded: Boolean($rowMap),
-  },
-}
-
-$: actions = [
-  {
-    type: ActionTypes.RefreshDatasource,
-    callback: () => gridContext?.rows.actions.refreshData(),
-    metadata: { dataSource: table },
-  },
-  {
-    type: ActionTypes.AddDataProviderFilterExtension,
-    callback: addFilterExtension,
-  },
-  {
-    type: ActionTypes.ClearRowSelection,
-    callback: () => gridContext?.selectedRows?.set?.({}),
-  },
-  {
-    type: ActionTypes.RemoveDataProviderFilterExtension,
-    callback: removeFilterExtension,
-  },
-]
-
-$: extendedFilter = extendFilter(initialFilter, filterExtensions)
-$: autoRefreshEnabled = !($builderStore.inBuilder && $builderStore.selectedComponentId)
-$: autoRefreshActions.setUp(
-  autoRefreshEnabled ? autoRefresh : null,
-  gridContext?.rows?.actions?.refreshData
-)
-
 /**
  *
  * @param componentId Originating Component id
@@ -247,6 +201,52 @@ const patchStyles = (styles, minHeight) => {
     },
   }
 }
+
+$: id = $component.id
+$: currentTheme = $context?.device?.theme
+$: darkMode = !currentTheme?.includes("light")
+$: parsedColumns = getParsedColumns(columns)
+$: enrichedButtons = enrichButtons(buttons)
+$: schemaOverrides = getSchemaOverrides(parsedColumns, $context)
+$: selectedRows = deriveSelectedRows(gridContext)
+$: styles = patchStyles($component.styles, minHeight)
+$: rowMap = gridContext?.rowLookupMap
+
+$: data = {
+  selectedRows: $selectedRows,
+  embeddedData: {
+    dataSource: table,
+    componentId: $component.id,
+    loaded: Boolean($rowMap),
+  },
+}
+
+$: actions = [
+  {
+    type: ActionTypes.RefreshDatasource,
+    callback: () => gridContext?.rows.actions.refreshData(),
+    metadata: { dataSource: table },
+  },
+  {
+    type: ActionTypes.AddDataProviderFilterExtension,
+    callback: addFilterExtension,
+  },
+  {
+    type: ActionTypes.ClearRowSelection,
+    callback: () => gridContext?.selectedRows?.set?.({}),
+  },
+  {
+    type: ActionTypes.RemoveDataProviderFilterExtension,
+    callback: removeFilterExtension,
+  },
+]
+
+$: extendedFilter = extendFilter(initialFilter, filterExtensions)
+$: autoRefreshEnabled = !($builderStore.inBuilder && $builderStore.selectedComponentId)
+$: autoRefreshActions.setUp(
+  autoRefreshEnabled ? autoRefresh : null,
+  gridContext?.rows?.actions?.refreshData
+)
 
 onMount(() => {
   gridContext = grid.getContext()

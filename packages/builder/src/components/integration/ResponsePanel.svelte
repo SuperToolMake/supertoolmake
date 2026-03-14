@@ -27,6 +27,27 @@ let addVariableModal: DynamicVariableModal
 let selectedTab: string | undefined
 
 // Build tab options dynamically
+const handleTabChange = (e: CustomEvent<string>) => {
+  selectedTab = e.detail
+}
+
+const compareResponseType = (option: any, value: any) => option.type === value?.type
+
+const handleSchemaChange = (e: CustomEvent<Array<{ name: string; value: any }>>) => {
+  schema = keyValueArrayToRecord(e.detail)
+  dispatch("change", { schema })
+}
+
+const handleDynamicVariableChange = (e: CustomEvent<Record<string, any>>) => {
+  dynamicVariables = e.detail
+  dispatch("change", { dynamicVariables })
+}
+
+const handleDynamicVariablesUpdate = (e: CustomEvent<Array<{ name: string; value: any }>>) => {
+  dynamicVariables = keyValueArrayToRecord(e.detail)
+  dispatch("change", { dynamicVariables })
+}
+
 $: tabOptions = (() => {
   const options = []
   if (response) {
@@ -56,10 +77,6 @@ $: if (response) {
   selectedTab = "JSON"
 }
 
-const handleTabChange = (e: CustomEvent<string>) => {
-  selectedTab = e.detail
-}
-
 const schemaMenuItems = [
   {
     text: "Create dynamic variable",
@@ -79,23 +96,6 @@ const responseHeadersMenuItems = [
     },
   },
 ]
-
-const compareResponseType = (option: any, value: any) => option.type === value?.type
-
-const handleSchemaChange = (e: CustomEvent<Array<{ name: string; value: any }>>) => {
-  schema = keyValueArrayToRecord(e.detail)
-  dispatch("change", { schema })
-}
-
-const handleDynamicVariableChange = (e: CustomEvent<Record<string, any>>) => {
-  dynamicVariables = e.detail
-  dispatch("change", { dynamicVariables })
-}
-
-const handleDynamicVariablesUpdate = (e: CustomEvent<Array<{ name: string; value: any }>>) => {
-  dynamicVariables = keyValueArrayToRecord(e.detail)
-  dispatch("change", { dynamicVariables })
-}
 </script>
 
 <DynamicVariableModal

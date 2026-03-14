@@ -6,17 +6,6 @@ import RestAuthenticationModal from "./RestAuthenticationModal.svelte"
 
 export let authConfigs = []
 
-$: normalizedAuthConfigs = authConfigs ?? []
-
-const dispatch = createEventDispatcher()
-let currentConfig = null
-let modal
-
-const schema = {
-  name: "",
-  type: "",
-}
-
 const openConfigModal = (config) => {
   currentConfig = config
   modal.show()
@@ -47,6 +36,17 @@ const onRemove = () => {
   })
 
   dispatch("change", newAuthConfigs)
+}
+
+$: normalizedAuthConfigs = authConfigs ?? []
+
+const dispatch = createEventDispatcher()
+let currentConfig = null
+let modal
+
+const schema = {
+  name: "",
+  type: "",
 }
 </script>
 

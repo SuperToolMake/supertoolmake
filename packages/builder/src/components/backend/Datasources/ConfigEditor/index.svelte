@@ -20,14 +20,6 @@ export let showNameField: boolean = false
 export let nameFieldValue: string = ""
 export let defaultHideConnectionUrl: boolean | undefined = false
 
-$: configStore = createValidatedConfigStore(integration, config)
-$: nameStore = createValidatedNameStore(nameFieldValue, showNameField)
-
-$: connectionFields = ($configStore.validatedConfig as any[]).filter(
-  (f) => f.type === CONNECTION_TYPE
-)
-$: regularFields = ($configStore.validatedConfig as any[]).filter((f) => f.type !== CONNECTION_TYPE)
-
 const parseConnectionString = (connStr: string) => {
   try {
     const url = new URL(connStr)
@@ -51,8 +43,6 @@ const buildConnectionString = (cfg: Record<string, any>) => {
   const encDb = encodeURIComponent(database || "postgres")
   return `postgresql://${encUser}:${encPass}@${host}:${port || 5432}/${encDb}`
 }
-
-let updatingFromDirectConnection = false
 
 const handleDirectConnectionChange = (value: string) => {
   if (!value) {
@@ -120,6 +110,16 @@ const handleConfirm = async () => {
 
   return keepOpen
 }
+
+$: configStore = createValidatedConfigStore(integration, config)
+$: nameStore = createValidatedNameStore(nameFieldValue, showNameField)
+
+$: connectionFields = ($configStore.validatedConfig as any[]).filter(
+  (f) => f.type === CONNECTION_TYPE
+)
+$: regularFields = ($configStore.validatedConfig as any[]).filter((f) => f.type !== CONNECTION_TYPE)
+
+let updatingFromDirectConnection = false
 </script>
 
 <ModalContent

@@ -9,12 +9,6 @@ const component = getContext("component")
 export let options
 
 // Apex charts directly modifies the options object with default properties and internal variables. These being present could unintentionally cause issues to the provider of this prop as the changes are reflected in that component as well. To prevent any issues we clone options here to provide a buffer.
-$: optionsCopy = cloneDeep(options)
-
-let chartElement
-let chart
-let currentType = null
-
 const updateChart = async (newOptions) => {
   // Line charts have issues transitioning between "datetime" and "category" types, and will ignore the provided formatters
   // in certain scenarios. Rerendering the chart when the user changes label type fixes this, but unfortunately it does
@@ -47,6 +41,12 @@ const renderChart = async (newChartElement) => {
     }
   }
 }
+
+$: optionsCopy = cloneDeep(options)
+
+let chartElement
+let chart
+let currentType = null
 
 $: noData = optionsCopy == null || optionsCopy?.series?.length === 0
 

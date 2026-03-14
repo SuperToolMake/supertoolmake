@@ -35,6 +35,70 @@ const ConfigTypes = {
 
 const HasSpacesRegex = /[\\"\s]/
 
+const onFileSelected = (e) => {
+  let fileName = e.target.files[0].name
+  image = e.target.files[0]
+  providers.oidc.config.configs[0].logo = fileName
+  iconDropdownOptions.unshift({ label: fileName, value: fileName })
+}
+
+async function saveConfig(config) {
+  // Delete unsupported fields
+  delete config.createdAt
+  delete config.updatedAt
+  return API.saveConfig(config)
+}
+
+async function saveOIDCLogo() {
+  if (image) {
+    let data = new FormData()
+    data.append("file", image)
+    await API.uploadOIDCLogo(image.name, data)
+  }
+}
+
+async function saveOIDC() {
+  if (!oidcComplete) {
+    notifications.error(`Please fill in all required ${ConfigTypes.OIDC} fields`)
+    return
+  }
+
+  const oidc = providers.oidc
+
+  // Add a UUID here so each config is distinguishable when it arrives at the login page
+  for (let config of oidc.config.configs) {
+    if (!config.uuid) {
+      config.uuid = Helpers.uuid()
+    }
+    // Callback urls shouldn't be included
+    delete config.callbackURL
+  }
+
+  try {
+    const res = await saveConfig(oidc)
+    providers[res.type]._rev = res._rev
+    providers[res.type]._id = res._id
+    await saveOIDCLogo()
+    notifications.success(`Settings saved`)
+  } catch (e) {
+    notifications.error(e.message)
+    return
+  }
+
+  // Turn the save button grey when clicked
+  oidcSaveButtonDisabled = true
+  originalOidcDoc = cloneDeep(providers.oidc)
+}
+
+const refreshScopes = (idx) => {
+  providers.oidc.config.configs[idx].scopes = providers.oidc.config.configs[idx].scopes
+}
+
+const copyToClipboard = async (value) => {
+  await Helpers.copyToClipboard(value)
+  notifications.success("Copied")
+}
+
 $: OIDCConfigFields = {
   Oidc: [
     { name: "configUrl", label: "Config URL" },
@@ -107,66 +171,7 @@ $: oidcComplete = Boolean(
     providers.oidc?.config?.configs[0].clientSecret
 )
 
-const onFileSelected = (e) => {
-  let fileName = e.target.files[0].name
-  image = e.target.files[0]
-  providers.oidc.config.configs[0].logo = fileName
-  iconDropdownOptions.unshift({ label: fileName, value: fileName })
-}
-
-async function saveConfig(config) {
-  // Delete unsupported fields
-  delete config.createdAt
-  delete config.updatedAt
-  return API.saveConfig(config)
-}
-
-async function saveOIDCLogo() {
-  if (image) {
-    let data = new FormData()
-    data.append("file", image)
-    await API.uploadOIDCLogo(image.name, data)
-  }
-}
-
-async function saveOIDC() {
-  if (!oidcComplete) {
-    notifications.error(`Please fill in all required ${ConfigTypes.OIDC} fields`)
-    return
-  }
-
-  const oidc = providers.oidc
-
-  // Add a UUID here so each config is distinguishable when it arrives at the login page
-  for (let config of oidc.config.configs) {
-    if (!config.uuid) {
-      config.uuid = Helpers.uuid()
-    }
-    // Callback urls shouldn't be included
-    delete config.callbackURL
-  }
-
-  try {
-    const res = await saveConfig(oidc)
-    providers[res.type]._rev = res._rev
-    providers[res.type]._id = res._id
-    await saveOIDCLogo()
-    notifications.success(`Settings saved`)
-  } catch (e) {
-    notifications.error(e.message)
-    return
-  }
-
-  // Turn the save button grey when clicked
-  oidcSaveButtonDisabled = true
-  originalOidcDoc = cloneDeep(providers.oidc)
-}
-
 let defaultScopes = ["profile", "email", "offline_access"]
-
-const refreshScopes = (idx) => {
-  providers.oidc.config.configs[idx].scopes = providers.oidc.config.configs[idx].scopes
-}
 
 let scopesFields = [
   {
@@ -175,11 +180,6 @@ let scopesFields = [
     error: null,
   },
 ]
-
-const copyToClipboard = async (value) => {
-  await Helpers.copyToClipboard(value)
-  notifications.success("Copied")
-}
 
 onMount(async () => {
   try {

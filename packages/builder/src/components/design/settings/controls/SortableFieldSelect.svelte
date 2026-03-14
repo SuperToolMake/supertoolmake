@@ -10,11 +10,6 @@ export let value = ""
 export let placeholder
 
 const dispatch = createEventDispatcher()
-$: datasource = getDatasourceForProvider($selectedScreen, componentInstance)
-$: schema = getSchemaForDatasource($selectedScreen, datasource).schema
-$: options = getSortableFields(schema)
-$: boundValue = getValidValue(value, options)
-
 const getSortableFields = (schema) => {
   return Object.entries(schema || {})
     .filter((entry) => canBeSortColumn(entry[1]))
@@ -39,6 +34,11 @@ const onChange = (value) => {
   boundValue = getValidValue(value.detail, options)
   dispatch("change", boundValue)
 }
+
+$: datasource = getDatasourceForProvider($selectedScreen, componentInstance)
+$: schema = getSchemaForDatasource($selectedScreen, datasource).schema
+$: options = getSortableFields(schema)
+$: boundValue = getValidValue(value, options)
 </script>
 
 <Select {placeholder} value={boundValue} on:change={onChange} {options} />

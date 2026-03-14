@@ -37,11 +37,6 @@ let schema: TableSchema | undefined
 let loaded = false
 let currentStep = getContext("current-step") || writable(getInitialFormStep())
 
-$: fetchSchema(dataSource)
-$: schemaKey = generateSchemaKey(schema)
-$: initialValues = getInitialValues(actionType, dataSource, $component.path, $context)
-$: resetKey = Helpers.hashString(schemaKey + JSON.stringify(initialValues) + disabled + readonly)
-
 // Returns the closes data context which isn't a built in context
 const getInitialValues = (
   type: string,
@@ -95,6 +90,11 @@ const generateSchemaKey = (schema: TableSchema | undefined) => {
   fields.sort()
   return fields.map((field) => `${field}:${schema[field].type}`).join("-")
 }
+
+$: fetchSchema(dataSource)
+$: schemaKey = generateSchemaKey(schema)
+$: initialValues = getInitialValues(actionType, dataSource, $component.path, $context)
+$: resetKey = Helpers.hashString(schemaKey + JSON.stringify(initialValues) + disabled + readonly)
 </script>
 
 {#if loaded}

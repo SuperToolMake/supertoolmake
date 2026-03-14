@@ -75,13 +75,6 @@ const typeOptions = [
   },
 ]
 
-$: {
-  schema = fetchSchema(tableId)
-}
-
-$: table = $tables.list.find((table) => table._id === tableId)
-$: datasource = $datasources.list.find((ds) => ds._id === table?.sourceId)
-
 async function fetchSchema(tableId) {
   try {
     const definition = await API.fetchTableDefinition(tableId)
@@ -128,6 +121,13 @@ async function validate(rows) {
     allValid = response.allValid
   }
 }
+
+$: {
+  schema = fetchSchema(tableId)
+}
+
+$: table = $tables.list.find((table) => table._id === tableId)
+$: datasource = $datasources.list.find((ds) => ds._id === table?.sourceId)
 </script>
 
 <Layout gap="S" noPadding>

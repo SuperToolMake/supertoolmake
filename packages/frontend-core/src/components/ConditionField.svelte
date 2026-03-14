@@ -17,11 +17,6 @@ const dispatch = createEventDispatcher()
 let bindingDrawer
 let fieldValue
 
-$: fieldValue = filter?.field
-$: readableValue = toReadable ? toReadable(bindings, fieldValue) : fieldValue
-$: drawerValue = toDrawerValue(fieldValue)
-$: isJS = isJSBinding(fieldValue)
-
 const drawerOnChange = (e) => {
   drawerValue = e.detail
 }
@@ -47,6 +42,11 @@ const onConfirmBinding = () => {
 const toDrawerValue = (fieldValue) => {
   return Array.isArray(fieldValue) ? fieldValue.join(",") : readableValue
 }
+
+$: fieldValue = filter?.field
+$: readableValue = toReadable ? toReadable(bindings, fieldValue) : fieldValue
+$: drawerValue = toDrawerValue(fieldValue)
+$: isJS = isJSBinding(fieldValue)
 </script>
 
 <div>

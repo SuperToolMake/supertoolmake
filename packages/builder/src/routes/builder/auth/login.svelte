@@ -18,15 +18,6 @@ import GoogleButton from "./_components/GoogleButton.svelte"
 import OIDCButton from "./_components/OIDCButton.svelte"
 import { handleError } from "./_components/utils"
 
-$: goto = $gotoStore
-
-let loaded = false
-let form
-let errors = {}
-let formData = {}
-
-$: company = $organisation.company || "SuperToolMake"
-
 async function login() {
   form.validate()
   if (Object.keys(errors).length > 0) {
@@ -49,6 +40,15 @@ async function login() {
 function handleKeydown(evt) {
   if (evt.key === "Enter") login()
 }
+
+$: goto = $gotoStore
+
+let loaded = false
+let form
+let errors = {}
+let formData = {}
+
+$: company = $organisation.company || "SuperToolMake"
 
 onMount(async () => {
   try {

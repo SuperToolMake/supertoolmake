@@ -26,12 +26,6 @@ export let onSave = null
 let tempValue
 let drawer
 
-$: bindings = getBindableProperties($selectedScreen, $componentStore.selectedComponentId)
-
-$: icon = componentDefinition?.icon
-
-$: highlighted = $builderStore.highlightedSetting?.key === "_styles"
-
 const openDrawer = () => {
   tempValue = runtimeToReadableBinding(bindings, componentInstance?._styles?.custom)
   drawer.show()
@@ -50,6 +44,12 @@ const save = async () => {
   }
   drawer.hide()
 }
+
+$: bindings = getBindableProperties($selectedScreen, $componentStore.selectedComponentId)
+
+$: icon = componentDefinition?.icon
+
+$: highlighted = $builderStore.highlightedSetting?.key === "_styles"
 </script>
 
 <DetailSummary

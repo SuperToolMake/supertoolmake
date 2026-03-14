@@ -70,12 +70,6 @@ const SidePanelIcons: Record<SidePanel, string> = {
   Evaluation: "play",
 }
 
-$: editorModeOptions = getModeOptions(allowHBS, allowJS, allowHTML)
-$: sidePanelOptions = getSidePanelOptions(bindings, context)
-$: enrichedBindings = enrichBindings(bindings, context, snippets)
-$: usingJS = mode === BindingMode.JavaScript
-$: editorMode = getEditorMode(mode, allowHTML)
-
 const getEditorMode = (mode: BindingMode, allowHTML?: boolean) => {
   if (mode === BindingMode.JavaScript) {
     return EditorModes.JS
@@ -84,45 +78,6 @@ const getEditorMode = (mode: BindingMode, allowHTML?: boolean) => {
     return EditorModes.HTML
   }
   return EditorModes.Handlebars
-}
-$: editorValue = (editorMode === EditorModes.JS ? jsValue : hbsValue) as string | null
-$: runtimeExpression = readableToRuntimeBinding(enrichedBindings, value)
-$: requestEval(runtimeExpression, context, snippets)
-$: bindingHelpers = new BindingHelpers(getCaretPosition, insertAtPos)
-
-$: bindingOptions = bindingsToCompletions(enrichedBindings, editorMode)
-$: helperOptions = allowHelpers ? getHelperCompletions(editorMode) : []
-$: snippetsOptions = usingJS && allowSnippets && snippets?.length ? snippets : []
-
-$: completions = !usingJS
-  ? [hbAutocomplete([...bindingOptions, ...helperOptions])]
-  : [
-      jsAutocomplete(bindingOptions),
-      jsHelperAutocomplete(helperOptions),
-      snippetAutoComplete(snippetsOptions),
-    ]
-
-$: validations = {
-  ...bindingOptions.reduce<CodeValidator>((validations, option) => {
-    validations[option.label] = {
-      arguments: [],
-    }
-    return validations
-  }, {}),
-  ...helperOptions.reduce<CodeValidator>((validations, option) => {
-    validations[option.label] = {
-      arguments: option.args,
-      requiresBlock: option.requiresBlock,
-    }
-    return validations
-  }, {}),
-}
-
-$: {
-  // Ensure a valid side panel option is always selected
-  if (sidePanel && !sidePanelOptions.includes(sidePanel)) {
-    sidePanel = sidePanelOptions[0]
-  }
 }
 
 const getModeOptions = (allowHBS = true, allowJS = false, allowHTML = false) => {
@@ -146,31 +101,6 @@ const getSidePanelOptions = (bindings: EnrichedBinding[], context: any) => {
   }
   return options
 }
-
-const debouncedEval = Utils.debounce(
-  (expression: string | null, context: any, snippets: Snippet[] | null) => {
-    try {
-      expressionError = undefined
-      const output = processStringWithLogsSync(
-        expression || "",
-        {
-          ...context,
-          snippets,
-        },
-        {
-          noThrow: false,
-        }
-      )
-      expressionResult = output.result
-      expressionLogs = output.logs
-    } catch (err: any) {
-      expressionResult = undefined
-      expressionError = err
-    }
-    evaluating = false
-  },
-  260
-)
 
 const requestEval = (expression: string | null, context: any, snippets: Snippet[] | null) => {
   evaluating = true
@@ -288,6 +218,77 @@ const onChangeJSValue = (e: { detail: string }) => {
     updateValue(jsValue)
   }
 }
+
+$: editorModeOptions = getModeOptions(allowHBS, allowJS, allowHTML)
+$: sidePanelOptions = getSidePanelOptions(bindings, context)
+$: enrichedBindings = enrichBindings(bindings, context, snippets)
+$: usingJS = mode === BindingMode.JavaScript
+$: editorMode = getEditorMode(mode, allowHTML)
+
+$: editorValue = (editorMode === EditorModes.JS ? jsValue : hbsValue) as string | null
+$: runtimeExpression = readableToRuntimeBinding(enrichedBindings, value)
+$: requestEval(runtimeExpression, context, snippets)
+$: bindingHelpers = new BindingHelpers(getCaretPosition, insertAtPos)
+
+$: bindingOptions = bindingsToCompletions(enrichedBindings, editorMode)
+$: helperOptions = allowHelpers ? getHelperCompletions(editorMode) : []
+$: snippetsOptions = usingJS && allowSnippets && snippets?.length ? snippets : []
+
+$: completions = !usingJS
+  ? [hbAutocomplete([...bindingOptions, ...helperOptions])]
+  : [
+      jsAutocomplete(bindingOptions),
+      jsHelperAutocomplete(helperOptions),
+      snippetAutoComplete(snippetsOptions),
+    ]
+
+$: validations = {
+  ...bindingOptions.reduce<CodeValidator>((validations, option) => {
+    validations[option.label] = {
+      arguments: [],
+    }
+    return validations
+  }, {}),
+  ...helperOptions.reduce<CodeValidator>((validations, option) => {
+    validations[option.label] = {
+      arguments: option.args,
+      requiresBlock: option.requiresBlock,
+    }
+    return validations
+  }, {}),
+}
+
+$: {
+  // Ensure a valid side panel option is always selected
+  if (sidePanel && !sidePanelOptions.includes(sidePanel)) {
+    sidePanel = sidePanelOptions[0]
+  }
+}
+
+const debouncedEval = Utils.debounce(
+  (expression: string | null, context: any, snippets: Snippet[] | null) => {
+    try {
+      expressionError = undefined
+      const output = processStringWithLogsSync(
+        expression || "",
+        {
+          ...context,
+          snippets,
+        },
+        {
+          noThrow: false,
+        }
+      )
+      expressionResult = output.result
+      expressionLogs = output.logs
+    } catch (err: any) {
+      expressionResult = undefined
+      expressionError = err
+    }
+    evaluating = false
+  },
+  260
+)
 
 onMount(() => {
   // Set the initial mode appropriately

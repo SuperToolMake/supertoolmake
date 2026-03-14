@@ -37,18 +37,6 @@ let fieldState: FieldState | undefined
 let fieldApi: FieldApi | undefined
 let fieldSchema: FieldSchema | undefined
 
-$: flatOptions = optionsSource == null || optionsSource === "schema"
-$: expandedDefaultValue = expand(defaultValue)
-$: options = getOptions(
-  optionsSource,
-  fieldSchema,
-  dataProvider,
-  labelColumn,
-  valueColumn,
-  customOptions
-)
-const pickerLabels = loadTranslationsByGroup("picker")
-
 const expand = (values?: string[] | string): string[] => {
   if (!values) {
     return []
@@ -69,6 +57,18 @@ const handleChange = (e: any) => {
     onChange({ value: e.detail })
   }
 }
+
+$: flatOptions = optionsSource == null || optionsSource === "schema"
+$: expandedDefaultValue = expand(defaultValue)
+$: options = getOptions(
+  optionsSource,
+  fieldSchema,
+  dataProvider,
+  labelColumn,
+  valueColumn,
+  customOptions
+)
+const pickerLabels = loadTranslationsByGroup("picker")
 </script>
 
 <Field

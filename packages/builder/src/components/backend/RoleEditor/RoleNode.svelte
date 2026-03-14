@@ -20,10 +20,6 @@ let tempDescription
 let tempColor
 let deleteModal
 
-$: nameError = validateName(tempDisplayName, $roles)
-$: descriptionError = validateDescription(tempDescription)
-$: invalid = nameError || descriptionError
-
 const validateName = (name, roles) => {
   if (!name?.length) {
     return "Please enter a name"
@@ -56,6 +52,10 @@ const saveChanges = () => {
     color: tempColor,
   })
 }
+
+$: nameError = validateName(tempDisplayName, $roles)
+$: descriptionError = validateDescription(tempDescription)
+$: invalid = nameError || descriptionError
 </script>
 
 <div

@@ -27,23 +27,6 @@ let customRenderers = [
   { column: "role", component: RoleTableRenderer },
 ]
 
-$: schema = {
-  email: {
-    sortable: false,
-    width: "1fr",
-    minWidth: "200px",
-  },
-  role: {
-    displayName: "Access",
-    sortable: false,
-    width: "1fr",
-  },
-}
-
-$: pendingSchema = getPendingSchema(schema)
-$: readonly = $auth.user ? !sdk.users.isAdmin($auth.user) : false
-$: parsedInvites = invitesToSchema(pendingInvites)
-
 const invitesToSchema = (invites: InviteWithCode[]): ParsedInvite[] => {
   return invites.map((invite) => {
     const { admin, builder } = invite.info
@@ -83,6 +66,23 @@ const deleteUsers = async () => {
     notifications.error("Error deleting users")
   }
 }
+
+$: schema = {
+  email: {
+    sortable: false,
+    width: "1fr",
+    minWidth: "200px",
+  },
+  role: {
+    displayName: "Access",
+    sortable: false,
+    width: "1fr",
+  },
+}
+
+$: pendingSchema = getPendingSchema(schema)
+$: readonly = $auth.user ? !sdk.users.isAdmin($auth.user) : false
+$: parsedInvites = invitesToSchema(pendingInvites)
 
 onMount(async () => {
   try {

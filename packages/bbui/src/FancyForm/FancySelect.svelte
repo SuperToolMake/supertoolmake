@@ -24,10 +24,6 @@ const dispatch = createEventDispatcher<{ change: string | undefined }>()
 let open = false
 let wrapper: HTMLDivElement
 
-$: placeholder = !value
-$: selectedLabel = getSelectedLabel(value)
-$: fieldColour = getFieldAttribute(getOptionColour, value, options)
-
 const getFieldAttribute = (
   getAttribute: (_option: O, _index?: number) => string | null,
   value: string | undefined,
@@ -40,6 +36,7 @@ const getFieldAttribute = (
   const index = options.findIndex((option, idx) => getOptionValue(option, idx) === value)
   return index !== -1 ? getAttribute(options[index], index) : null
 }
+
 const extractProperty = (value: O, property: string): string => {
   if (value && typeof value === "object") {
     return value[property]
@@ -66,6 +63,10 @@ const getSelectedLabel = (value: string | undefined) => {
   }
   return getOptionLabel(selectedOption)
 }
+
+$: placeholder = !value
+$: selectedLabel = getSelectedLabel(value)
+$: fieldColour = getFieldAttribute(getOptionColour, value, options)
 </script>
 
 <FancyField

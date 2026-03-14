@@ -59,72 +59,6 @@ const dataLayoutContext = getContext("data-layout") as {
 }
 
 // Register grid dispatch with data layout when grid is ready
-$: {
-  if (grid) {
-    gridContext = grid.getContext()
-    if (dataLayoutContext?.registerGridDispatch) {
-      dataLayoutContext.registerGridDispatch(gridContext.dispatch)
-    }
-  }
-}
-
-$: userSchemaOverrides = {
-  firstName: { displayName: "First name", disabled: true },
-  lastName: { displayName: "Last name", disabled: true },
-  email: { displayName: "Email", disabled: true },
-  status: { displayName: "Status", disabled: true },
-  roleId: {
-    displayName: "Role",
-    type: "role",
-    disabled: true,
-    roles: $roles,
-  },
-}
-$: autoColumnStatus = verifyAutocolumns($tables?.selected)
-$: duplicates = Object.values(autoColumnStatus).reduce((acc, status) => {
-  if (status.length > 1) {
-    acc.push(...status)
-  }
-  return acc
-}, [])
-$: invalidColumnText = duplicates.map((entry: any) => {
-  return `${entry.name} (${entry.subtype})`
-})
-$: id = $tables.selected?._id
-$: isUsersTable = id === TableNames.USERS
-$: isInternal = $tables.selected?.sourceType !== DB_TYPE_EXTERNAL
-$: gridDatasource = {
-  type: "table",
-  tableId: id,
-}
-$: tableDatasource = $datasources.list.find((datasource) => {
-  return datasource._id === $tables.selected?.sourceId
-})
-$: relationshipsEnabled = relationshipSupport(tableDatasource)
-$: currentTheme = $themeStore?.theme
-$: darkMode = !currentTheme.includes("light")
-$: isProductionMode = $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION
-$: isDeployed = isInternal && id ? $workspaceDeploymentStore.tables[id]?.published : false
-$: productionUnavailable =
-  isInternal && isProductionMode && (!isDeployed || missingProductionDefinition)
-$: if (!isProductionMode) {
-  missingProductionDefinition = false
-}
-$: if (id !== previousTableId) {
-  missingProductionDefinition = false
-  previousTableId = id
-}
-$: if (!(isUsersTable && $appStore.features.disableUserMetadata)) {
-  highlightUsersAccessButton = false
-}
-$: externalClipboardData = {
-  clipboard: gridClipboard,
-  tableId: id,
-  onCopy: (data: any) => {
-    gridClipboard.copy(data.value, data.multiCellCopy, data.tableId, data.viewId)
-  },
-}
-
 const syncProductionRowSubscription = (shouldSubscribe: boolean, context?: GridStore) => {
   productionRowUnsubscribe?.()
   productionRowUnsubscribe = null
@@ -141,27 +75,6 @@ const syncProductionRowSubscription = (shouldSubscribe: boolean, context?: GridS
     productionRowUnsubscribe = context.rowCount.subscribe(triggerCheck)
   } else {
     checkProductionRowPresence()
-  }
-}
-
-$: syncProductionRowSubscription(
-  isInternal && isProductionMode && isDeployed && !missingProductionDefinition && Boolean(id),
-  gridContext
-)
-
-$: productionEmpty =
-  isInternal && isProductionMode && isDeployed && !productionHasRows && !missingProductionDefinition
-
-$: {
-  const publishCount = $deploymentStore.publishCount
-  if (publishCount > lastPublishCount) {
-    lastPublishCount = publishCount
-    if (
-      $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION &&
-      gridContext?.rows?.actions?.refreshData
-    ) {
-      gridContext.rows.actions.refreshData().catch(() => {})
-    }
   }
 }
 
@@ -258,6 +171,93 @@ const checkProductionRowPresence = async () => {
   } catch {
     if (tableId === id) {
       productionHasRows = true
+    }
+  }
+}
+
+$: {
+  if (grid) {
+    gridContext = grid.getContext()
+    if (dataLayoutContext?.registerGridDispatch) {
+      dataLayoutContext.registerGridDispatch(gridContext.dispatch)
+    }
+  }
+}
+
+$: userSchemaOverrides = {
+  firstName: { displayName: "First name", disabled: true },
+  lastName: { displayName: "Last name", disabled: true },
+  email: { displayName: "Email", disabled: true },
+  status: { displayName: "Status", disabled: true },
+  roleId: {
+    displayName: "Role",
+    type: "role",
+    disabled: true,
+    roles: $roles,
+  },
+}
+$: autoColumnStatus = verifyAutocolumns($tables?.selected)
+$: duplicates = Object.values(autoColumnStatus).reduce((acc, status) => {
+  if (status.length > 1) {
+    acc.push(...status)
+  }
+  return acc
+}, [])
+$: invalidColumnText = duplicates.map((entry: any) => {
+  return `${entry.name} (${entry.subtype})`
+})
+$: id = $tables.selected?._id
+$: isUsersTable = id === TableNames.USERS
+$: isInternal = $tables.selected?.sourceType !== DB_TYPE_EXTERNAL
+$: gridDatasource = {
+  type: "table",
+  tableId: id,
+}
+$: tableDatasource = $datasources.list.find((datasource) => {
+  return datasource._id === $tables.selected?.sourceId
+})
+$: relationshipsEnabled = relationshipSupport(tableDatasource)
+$: currentTheme = $themeStore?.theme
+$: darkMode = !currentTheme.includes("light")
+$: isProductionMode = $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION
+$: isDeployed = isInternal && id ? $workspaceDeploymentStore.tables[id]?.published : false
+$: productionUnavailable =
+  isInternal && isProductionMode && (!isDeployed || missingProductionDefinition)
+$: if (!isProductionMode) {
+  missingProductionDefinition = false
+}
+$: if (id !== previousTableId) {
+  missingProductionDefinition = false
+  previousTableId = id
+}
+$: if (!(isUsersTable && $appStore.features.disableUserMetadata)) {
+  highlightUsersAccessButton = false
+}
+$: externalClipboardData = {
+  clipboard: gridClipboard,
+  tableId: id,
+  onCopy: (data: any) => {
+    gridClipboard.copy(data.value, data.multiCellCopy, data.tableId, data.viewId)
+  },
+}
+
+$: syncProductionRowSubscription(
+  isInternal && isProductionMode && isDeployed && !missingProductionDefinition && Boolean(id),
+  gridContext
+)
+
+$: productionEmpty =
+  isInternal && isProductionMode && isDeployed && !productionHasRows && !missingProductionDefinition
+
+$: {
+  const publishCount = $deploymentStore.publishCount
+  if (publishCount > lastPublishCount) {
+    lastPublishCount = publishCount
+    if (
+      $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION &&
+      gridContext?.rows?.actions?.refreshData
+    ) {
+      gridContext.rows.actions.refreshData().catch(() => {})
     }
   }
 }

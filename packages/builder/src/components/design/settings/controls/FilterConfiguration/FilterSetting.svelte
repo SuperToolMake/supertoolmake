@@ -16,8 +16,6 @@ export let datasource
 
 const dispatch = createEventDispatcher()
 
-$: fieldIconLookupMap = buildFieldIconLookupMap(FIELDS)
-
 const buildFieldIconLookupMap = (fields) => {
   let map = {}
   Object.values(fields).forEach((fieldInfo) => {
@@ -81,6 +79,8 @@ const itemToComponent = (item) => {
     defaultOperator: item.defaultOperator,
   })
 }
+
+$: fieldIconLookupMap = buildFieldIconLookupMap(FIELDS)
 </script>
 
 <div class="list-item-body">

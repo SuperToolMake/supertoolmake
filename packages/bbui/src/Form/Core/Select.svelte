@@ -51,20 +51,13 @@ type V = any
 
   const dispatch = createEventDispatcher()
 
-  $: fieldText = getFieldText(value, options, placeholder)
-  $: fieldSubtitle = showSelectedSubtitle
-    ? getFieldAttribute(getOptionSubtitle, value, options)
-    : null
-  $: fieldIcon = getFieldAttribute(getOptionIcon, value, options)
-  $: fieldColour = getFieldAttribute(getOptionColour, value, options)
-
   function compareOptionAndValue(option: O, value: V) {
     return typeof compare === "function"
       ? compare(option, value)
       : option === value
   }
 
-  const getFieldAttribute = (getAttribute: any, value: V[], options: O[]) => {
+const getFieldAttribute = (getAttribute: any, value: V[], options: O[]) => {
     // Wait for options to load if there is a value but no options
     if (!options?.length) {
       return ""
@@ -75,7 +68,7 @@ type V = any
     return index !== -1 ? getAttribute(options[index], index) : null
   }
 
-  const getFieldText = (
+const getFieldText = (
     value: any,
     options: any,
     placeholder: boolean | string
@@ -94,10 +87,25 @@ type V = any
     )
   }
 
-  const selectOption = (value: V) => {
+const selectOption = (value: V) => {
     dispatch("change", value)
     open = false
   }
+
+$: fieldText = getFieldText(value, options, placeholder)
+  $: fieldSubtitle = showSelectedSubtitle
+    ? getFieldAttribute(getOptionSubtitle, value, options)
+    : null
+  $: fieldIcon = getFieldAttribute(getOptionIcon, value, options)
+  $: fieldColour = getFieldAttribute(getOptionColour, value, options)
+
+  
+
+  
+
+  
+
+  
 </script>
 
 <Picker

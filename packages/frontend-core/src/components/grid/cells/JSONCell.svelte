@@ -5,8 +5,6 @@ export let onChange
 export let value
 export let api
 
-$: stringified = getStringifiedValue(value)
-
 const getStringifiedValue = (value) => {
   if (!value) {
     return value
@@ -31,6 +29,8 @@ const parse = (value) => {
     // Swallow
   }
 }
+
+$: stringified = getStringifiedValue(value)
 </script>
 
 <LongFormCell {...$$props} bind:api value={stringified} onChange={parse} />

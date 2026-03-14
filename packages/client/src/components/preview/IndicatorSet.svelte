@@ -64,20 +64,6 @@ let intersectionObservers: IntersectionObserver[] = []
 let callbackCount = 0
 let nextState: ReturnType<typeof defaultState>
 
-$: componentId, reset()
-$: visibleIndicators = state.indicators.filter((x) => x.visible)
-$: offset = $builderStore.inBuilder ? 5 : -1
-$: config.set({
-  componentId,
-  color,
-  zIndex,
-  prefix,
-  allowResizeAnchors,
-})
-
-// Update position when any props change
-$: $config, debouncedUpdate()
-
 const reset = () => {
   mutationObserver.disconnect()
   observingMutations = false
@@ -210,7 +196,21 @@ const updatePosition = () => {
     updating = false
   }
 }
+
+$: componentId, reset()
+$: visibleIndicators = state.indicators.filter((x) => x.visible)
+$: offset = $builderStore.inBuilder ? 5 : -1
+$: config.set({
+  componentId,
+  color,
+  zIndex,
+  prefix,
+  allowResizeAnchors,
+})
+
+// Update position when any props change
 const debouncedUpdate = Utils.domDebounce(updatePosition)
+$: $config, debouncedUpdate()
 
 onMount(() => {
   debouncedUpdate()

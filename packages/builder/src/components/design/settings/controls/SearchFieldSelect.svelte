@@ -10,11 +10,6 @@ export let value = ""
 export let placeholder
 
 const dispatch = createEventDispatcher()
-$: datasource = getDatasourceForProvider($selectedScreen, componentInstance)
-$: schema = getSchemaForDatasource($selectedScreen, datasource).schema
-$: options = getOptions(datasource, schema || {})
-$: boundValue = getSelectedOption(value, options)
-
 function getOptions(ds, dsSchema) {
   let base = Object.values(dsSchema)
   if (!ds?.tableId) {
@@ -35,6 +30,11 @@ const setValue = (value) => {
   boundValue = getSelectedOption(value.detail, options)
   dispatch("change", boundValue)
 }
+
+$: datasource = getDatasourceForProvider($selectedScreen, componentInstance)
+$: schema = getSchemaForDatasource($selectedScreen, datasource).schema
+$: options = getOptions(datasource, schema || {})
+$: boundValue = getSelectedOption(value, options)
 </script>
 
 <Multiselect {placeholder} value={boundValue} on:change={setValue} {options} />

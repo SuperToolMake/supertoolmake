@@ -41,32 +41,6 @@ let selectedUrl: string | undefined
 let fileInput: HTMLInputElement
 let loading = false
 
-$: selectedImage = value?.[selectedImageIdx] ?? null
-$: fileCount = value?.length ?? 0
-$: isImage =
-  (selectedImage &&
-    "extension" in selectedImage &&
-    imageExtensions.includes(selectedImage?.extension?.toLowerCase())) ||
-  selectedImage?.type?.startsWith("image")
-
-$: {
-  if (selectedImage && "url" in selectedImage && selectedImage?.url) {
-    selectedUrl = selectedImage?.url
-  } else if (selectedImage && isImage) {
-    try {
-      let reader = new FileReader()
-      reader.readAsDataURL(selectedImage as any)
-      reader.onload = (e) => {
-        selectedUrl = e.target?.result as string
-      }
-    } catch {
-      selectedUrl = undefined
-    }
-  }
-}
-
-$: showDropzone = (!maximum || (maximum && (value?.length || 0) < maximum)) && !disabled
-
 async function processFileList(fileList: FileList) {
   if (handleFileTooLarge && Array.from(fileList).some((file) => file.size >= fileSizeLimit)) {
     handleFileTooLarge(fileSizeLimit, value)
@@ -144,6 +118,32 @@ function handleDrop(evt: DragEvent) {
   }
   fileDragged = false
 }
+
+$: selectedImage = value?.[selectedImageIdx] ?? null
+$: fileCount = value?.length ?? 0
+$: isImage =
+  (selectedImage &&
+    "extension" in selectedImage &&
+    imageExtensions.includes(selectedImage?.extension?.toLowerCase())) ||
+  selectedImage?.type?.startsWith("image")
+
+$: {
+  if (selectedImage && "url" in selectedImage && selectedImage?.url) {
+    selectedUrl = selectedImage?.url
+  } else if (selectedImage && isImage) {
+    try {
+      let reader = new FileReader()
+      reader.readAsDataURL(selectedImage as any)
+      reader.onload = (e) => {
+        selectedUrl = e.target?.result as string
+      }
+    } catch {
+      selectedUrl = undefined
+    }
+  }
+}
+
+$: showDropzone = (!maximum || (maximum && (value?.length || 0) < maximum)) && !disabled
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

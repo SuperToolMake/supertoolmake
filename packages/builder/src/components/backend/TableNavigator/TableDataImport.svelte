@@ -100,26 +100,6 @@ let selectedColumnTypes = {}
 
 let rawRows = []
 
-$: displayColumnOptions = Object.keys(schema || {}).filter((column) => {
-  return validation[column] && canBeDisplayColumn(schema[column])
-})
-
-$: if (displayColumn && !canBeDisplayColumn(schema[displayColumn])) {
-  displayColumn = null
-}
-
-$: {
-  rows = rawRows.map((row) => utils.trimOtherProps(row, Object.keys(schema)))
-
-  // binding in consumer is causing double renders here
-  const newValidateHash = JSON.stringify(rows) + JSON.stringify(schema)
-  if (newValidateHash !== validateHash) {
-    validate(rows, schema)
-  }
-  validateHash = newValidateHash
-}
-$: openFileUpload(promptUpload, fileInput)
-
 async function handleFile(e) {
   loading = true
   error = null
@@ -179,6 +159,26 @@ const deleteColumn = (name) => {
   delete schema[name]
   schema = schema
 }
+
+$: displayColumnOptions = Object.keys(schema || {}).filter((column) => {
+  return validation[column] && canBeDisplayColumn(schema[column])
+})
+
+$: if (displayColumn && !canBeDisplayColumn(schema[displayColumn])) {
+  displayColumn = null
+}
+
+$: {
+  rows = rawRows.map((row) => utils.trimOtherProps(row, Object.keys(schema)))
+
+  // binding in consumer is causing double renders here
+  const newValidateHash = JSON.stringify(rows) + JSON.stringify(schema)
+  if (newValidateHash !== validateHash) {
+    validate(rows, schema)
+  }
+  validateHash = newValidateHash
+}
+$: openFileUpload(promptUpload, fileInput)
 </script>
 
 <Layout noPadding gap="S">

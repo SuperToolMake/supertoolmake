@@ -33,9 +33,6 @@ export let labelPrefix: string | null = null
 const dispatch = createEventDispatcher()
 const RemoveID = "remove"
 
-$: enrichLabel = (label: string) => (labelPrefix ? `${labelPrefix} ${label}` : label)
-$: options = getOptions($roles, allowPublic, allowRemove, allowedRoles, allowCreator, enrichLabel)
-
 const getOptions = (
   roles: UIRole[],
   allowPublic: boolean,
@@ -117,6 +114,9 @@ const onChange = (e: CustomEvent) => {
     dispatch("change", e.detail)
   }
 }
+
+$: enrichLabel = (label: string) => (labelPrefix ? `${labelPrefix} ${label}` : label)
+$: options = getOptions($roles, allowPublic, allowRemove, allowedRoles, allowCreator, enrichLabel)
 </script>
 
 {#if fancySelect}

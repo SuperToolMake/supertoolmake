@@ -28,23 +28,6 @@ let isDraggingV = false
 let isDraggingH = false
 
 // Update state to reflect if we are dragging
-$: isDragging.set(isDraggingV || isDraggingH)
-
-// Calculate V scrollbar size and offset
-// Terminology is the same for both axes:
-//   renderX - the space available to render the bar in, edge to edge
-//   availX - the space available to render the bar in, until the edge
-$: renderHeight = $height - 2 * ScrollBarSize
-$: barHeight = Math.max(50, ($height / $contentHeight) * renderHeight)
-$: availHeight = renderHeight - barHeight
-$: barTop = ScrollBarSize + DefaultRowHeight + availHeight * ($scrollTop / $maxScrollTop)
-
-// Calculate H scrollbar size and offset
-$: renderWidth = $screenWidth - 2 * ScrollBarSize
-$: barWidth = Math.max(50, ($screenWidth / $contentWidth) * renderWidth)
-$: availWidth = renderWidth - barWidth
-$: barLeft = ScrollBarSize + availWidth * ($scrollLeft / $maxScrollLeft)
-
 // Helper to close the context menu if it's open
 const closePopovers = () => {
   if ($menu.visible) {
@@ -65,15 +48,7 @@ const startVDragging = (e) => {
   isDraggingV = true
   closePopovers()
 }
-const moveVDragging = domDebounce((e) => {
-  const delta = parseEventLocation(e).y - initialMouse
-  const weight = delta / availHeight
-  const newScrollTop = initialScroll + weight * $maxScrollTop
-  scroll.update((state) => ({
-    ...state,
-    top: Math.max(0, Math.min(newScrollTop, $maxScrollTop)),
-  }))
-})
+
 const stopVDragging = () => {
   document.removeEventListener("mousemove", moveVDragging)
   document.removeEventListener("touchmove", moveVDragging)
@@ -94,6 +69,42 @@ const startHDragging = (e) => {
   isDraggingH = true
   closePopovers()
 }
+
+const stopHDragging = () => {
+  document.removeEventListener("mousemove", moveHDragging)
+  document.removeEventListener("touchmove", moveHDragging)
+  document.removeEventListener("mouseup", stopHDragging)
+  document.removeEventListener("touchend", stopHDragging)
+  isDraggingH = false
+}
+
+$: isDragging.set(isDraggingV || isDraggingH)
+
+// Calculate V scrollbar size and offset
+// Terminology is the same for both axes:
+//   renderX - the space available to render the bar in, edge to edge
+//   availX - the space available to render the bar in, until the edge
+$: renderHeight = $height - 2 * ScrollBarSize
+$: barHeight = Math.max(50, ($height / $contentHeight) * renderHeight)
+$: availHeight = renderHeight - barHeight
+$: barTop = ScrollBarSize + DefaultRowHeight + availHeight * ($scrollTop / $maxScrollTop)
+
+// Calculate H scrollbar size and offset
+$: renderWidth = $screenWidth - 2 * ScrollBarSize
+$: barWidth = Math.max(50, ($screenWidth / $contentWidth) * renderWidth)
+$: availWidth = renderWidth - barWidth
+$: barLeft = ScrollBarSize + availWidth * ($scrollLeft / $maxScrollLeft)
+
+const moveVDragging = domDebounce((e) => {
+  const delta = parseEventLocation(e).y - initialMouse
+  const weight = delta / availHeight
+  const newScrollTop = initialScroll + weight * $maxScrollTop
+  scroll.update((state) => ({
+    ...state,
+    top: Math.max(0, Math.min(newScrollTop, $maxScrollTop)),
+  }))
+})
+
 const moveHDragging = domDebounce((e) => {
   const delta = parseEventLocation(e).x - initialMouse
   const weight = delta / availWidth
@@ -103,13 +114,6 @@ const moveHDragging = domDebounce((e) => {
     left: Math.max(0, Math.min(newScrollLeft, $maxScrollLeft)),
   }))
 })
-const stopHDragging = () => {
-  document.removeEventListener("mousemove", moveHDragging)
-  document.removeEventListener("touchmove", moveHDragging)
-  document.removeEventListener("mouseup", stopHDragging)
-  document.removeEventListener("touchend", stopHDragging)
-  isDraggingH = false
-}
 </script>
 
 {#if $showVScrollbar}

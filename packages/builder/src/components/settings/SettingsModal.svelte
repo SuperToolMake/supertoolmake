@@ -22,42 +22,6 @@ let modalOpen = false
 let settingsSideBarCollapsed = false
 let settingsNav: ModalSideBar
 
-$: ({ route, open } = $bb.settings ?? {})
-$: matchedRoute = route
-
-$beforeUrlChange(() => {
-  bb.hideSettings()
-  return true
-})
-
-// Original structure
-$: routes = $permittedRoutes
-
-// Split by assigned group
-$: routesByGroup = routes.reduce((acc: Record<string, Route[]>, entry: Route) => {
-  const groupName = entry.group || "none"
-  if (!acc[groupName]) {
-    acc[groupName] = []
-  }
-  const group: Route[] = acc[groupName]
-  group.push(entry)
-  return acc
-}, {})
-
-// Show/Hide the settings modal as required
-$: modal, toggleSettings(open)
-
-$: groupEntries = Object.entries(routesByGroup || {})
-
-// Reset scroll when path changes
-$: resetScroll(matchedRoute?.entry?.path)
-
-// Pull out the default route
-$: defaultRoute = $flattenedRoutes.find((r) => r.path === "/general/info")
-
-// Determine the path when opened
-$: handlePath($flattenedRoutes, open, matchedRoute)
-
 const handlePath = (routes: Route[], open: boolean, matchedRoute?: MatchedRoute) => {
   if (routes && open === true) {
     if (!matchedRoute) {
@@ -126,6 +90,42 @@ const navItemClick = (route: Route) => {
   }
   bb.settings(`/${path}`)
 }
+
+$: ({ route, open } = $bb.settings ?? {})
+$: matchedRoute = route
+
+$beforeUrlChange(() => {
+  bb.hideSettings()
+  return true
+})
+
+// Original structure
+$: routes = $permittedRoutes
+
+// Split by assigned group
+$: routesByGroup = routes.reduce((acc: Record<string, Route[]>, entry: Route) => {
+  const groupName = entry.group || "none"
+  if (!acc[groupName]) {
+    acc[groupName] = []
+  }
+  const group: Route[] = acc[groupName]
+  group.push(entry)
+  return acc
+}, {})
+
+// Show/Hide the settings modal as required
+$: modal, toggleSettings(open)
+
+$: groupEntries = Object.entries(routesByGroup || {})
+
+// Reset scroll when path changes
+$: resetScroll(matchedRoute?.entry?.path)
+
+// Pull out the default route
+$: defaultRoute = $flattenedRoutes.find((r) => r.path === "/general/info")
+
+// Determine the path when opened
+$: handlePath($flattenedRoutes, open, matchedRoute)
 </script>
 
 <div class="settings-wrap">

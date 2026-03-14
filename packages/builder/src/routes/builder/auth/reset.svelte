@@ -6,18 +6,7 @@ import Logo from "assets/supertoolmake-emblem.svg"
 import { onMount } from "svelte"
 import { admin, auth, organisation } from "@/stores/portal"
 
-$: goto = $gotoStore
-
 const getQueryParam = (key) => new URLSearchParams(window.location.search).get(key) || undefined
-
-let resetCode = getQueryParam("code")
-let form
-let loaded = false
-let loading = false
-let password
-let passwordError
-
-$: forceResetPassword = $auth?.user?.forceResetPassword
 
 async function reset() {
   if (!form.validate() || passwordError) {
@@ -49,6 +38,23 @@ async function reset() {
   }
 }
 
+const handleKeydown = (evt) => {
+  if (evt.key === "Enter") {
+    reset()
+  }
+}
+
+$: goto = $gotoStore
+
+let resetCode = getQueryParam("code")
+let form
+let loaded = false
+let loading = false
+let password
+let passwordError
+
+$: forceResetPassword = $auth?.user?.forceResetPassword
+
 onMount(async () => {
   try {
     await auth.getSelf()
@@ -58,12 +64,6 @@ onMount(async () => {
   }
   loaded = true
 })
-
-const handleKeydown = (evt) => {
-  if (evt.key === "Enter") {
-    reset()
-  }
-}
 </script>
 
 <svelte:window on:keydown={handleKeydown} />

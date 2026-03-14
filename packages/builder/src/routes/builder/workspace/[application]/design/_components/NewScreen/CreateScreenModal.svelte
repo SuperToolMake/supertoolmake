@@ -44,13 +44,6 @@ let permissions: Record<
 let modals: Modal[] = []
 let stepIndex: number
 
-$: screens = $screenStore.screens
-
-$: {
-  modals.forEach((m) => m.hide())
-  modals[stepIndex]?.show()
-}
-
 export const show = (
   newMode: AutoScreenTypes,
   preselectedWorkspaceAppId: string | undefined,
@@ -256,10 +249,18 @@ const handleTableOrViewToggle = ({ detail: tableOrView }: { detail: SourceOption
     selectedTables = selectedTables.filter((selected) => selected.id !== tableOrView.id)
   }
 }
+
 const onCancel = (e: CustomEvent<ModalCancelFrom>) => {
   if ([ModalCancelFrom.CANCEL_BUTTON, ModalCancelFrom.ESCAPE_KEY].includes(e.detail)) {
     stepIndex--
   }
+}
+
+$: screens = $screenStore.screens
+
+$: {
+  modals.forEach((m) => m.hide())
+  modals[stepIndex]?.show()
 }
 </script>
 

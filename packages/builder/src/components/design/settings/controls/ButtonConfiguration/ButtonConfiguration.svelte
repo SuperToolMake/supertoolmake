@@ -23,24 +23,6 @@ let rowActionTemplates = []
 let anchor
 let popover
 
-$: if (!isEqual(value, cachedValue)) {
-  cachedValue = cloneDeep(value)
-}
-$: buttonList = sanitizeValue(cachedValue) || []
-$: buttonCount = buttonList.length
-$: eventContextBindings = getEventContextBindings({
-  componentInstance,
-  settingKey: key,
-})
-$: allBindings = [...bindings, ...eventContextBindings]
-$: itemProps = {
-  componentBindings: componentBindings || [],
-  bindings: allBindings,
-  removeButton,
-  nested,
-}
-$: canAddButtons = max == null || buttonList.length < max
-
 const sanitizeValue = (val) => {
   if (!Array.isArray(val)) {
     return null
@@ -106,6 +88,24 @@ const removeButton = (id) => {
     buttonList.filter((button) => button._id !== id)
   )
 }
+
+$: if (!isEqual(value, cachedValue)) {
+  cachedValue = cloneDeep(value)
+}
+$: buttonList = sanitizeValue(cachedValue) || []
+$: buttonCount = buttonList.length
+$: eventContextBindings = getEventContextBindings({
+  componentInstance,
+  settingKey: key,
+})
+$: allBindings = [...bindings, ...eventContextBindings]
+$: itemProps = {
+  componentBindings: componentBindings || [],
+  bindings: allBindings,
+  removeButton,
+  nested,
+}
+$: canAddButtons = max == null || buttonList.length < max
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

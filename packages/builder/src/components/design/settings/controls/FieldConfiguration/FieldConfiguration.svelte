@@ -29,24 +29,6 @@ let unconfigured
 
 let selectAll = true
 
-$: resolvedBindings = bindings || getBindableProperties($selectedScreen, componentInstance._id)
-
-$: actionType = componentInstance.actionType
-let componentBindings = []
-
-$: if (actionType) {
-  componentBindings = getComponentBindableProperties($selectedScreen, componentInstance._id)
-}
-
-$: datasource =
-  componentInstance.dataSource || getDatasourceForProvider($selectedScreen, componentInstance)
-
-$: resourceId = datasource?.resourceId || datasource?.tableId
-
-$: if (!isEqual(value, cachedValue)) {
-  cachedValue = cloneDeep(value)
-}
-
 const updateState = (value) => {
   schema = getSchema($selectedScreen, datasource)
   options = Object.keys(schema || {})
@@ -57,8 +39,6 @@ const updateState = (value) => {
     .map(buildPseudoInstance)
     .filter((x) => x != null)
 }
-
-$: updateState(cachedValue, resourceId)
 
 // Builds unused ones only
 const buildUnconfiguredOptions = (schema, selected) => {
@@ -156,6 +136,26 @@ const listUpdated = (columns) => {
   const parsedColumns = getValidColumns(columns, options)
   dispatch("change", parsedColumns)
 }
+
+$: resolvedBindings = bindings || getBindableProperties($selectedScreen, componentInstance._id)
+
+$: actionType = componentInstance.actionType
+let componentBindings = []
+
+$: if (actionType) {
+  componentBindings = getComponentBindableProperties($selectedScreen, componentInstance._id)
+}
+
+$: datasource =
+  componentInstance.dataSource || getDatasourceForProvider($selectedScreen, componentInstance)
+
+$: resourceId = datasource?.resourceId || datasource?.tableId
+
+$: if (!isEqual(value, cachedValue)) {
+  cachedValue = cloneDeep(value)
+}
+
+$: updateState(cachedValue, resourceId)
 </script>
 
 <div class="field-configuration">

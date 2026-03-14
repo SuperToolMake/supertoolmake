@@ -53,8 +53,6 @@ const deleteScreen = async () => {
   }
 }
 
-$: noPaste = !$componentStore.componentToPaste
-
 const pasteComponent = (mode: "inside") => {
   try {
     componentStore.paste(screen.props, mode, screen)
@@ -97,6 +95,8 @@ const openContextMenu = (e: MouseEvent, screen: Screen) => {
 
   contextMenuStore.open(screen._id!, items, { x: e.clientX, y: e.clientY })
 }
+
+$: noPaste = !$componentStore.componentToPaste
 </script>
 
 <NavItem

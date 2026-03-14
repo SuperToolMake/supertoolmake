@@ -46,38 +46,6 @@ let tmpQueryParams
 let tmpCustomData
 let modal
 
-$: text = value?.label ?? "Choose an option"
-$: tables = sortAndFormat.tables($tablesStore.list, $datasources.list)
-$: queries = $queriesStore.list
-  .filter((q) => showAllQueries || q.queryVerb === "read" || q.readable)
-  .map((query) => ({
-    label: query.name,
-    name: query.name,
-    ...query,
-    type: "query",
-  }))
-$: dataProviders = findAllComponents($selectedScreen.props)
-  .filter((component) => {
-    return (
-      component._component?.endsWith("/dataprovider") &&
-      component._id !== $componentStore.selectedComponentId
-    )
-  })
-  .map((provider) => ({
-    label: provider._instanceName,
-    name: provider._instanceName,
-    providerId: provider._id,
-    value: `{{ literal ${safe(provider._id)} }}`,
-    type: "provider",
-  }))
-$: links = extractRelationships(bindings)
-$: fields = extractFields(bindings)
-$: jsonArrays = extractJSONArrayFields(bindings)
-$: custom = {
-  type: "custom",
-  label: "JSON / CSV",
-}
-
 const handleSelected = (selected) => {
   dispatch("change", selected)
   dropdownRight.hide()
@@ -145,6 +113,38 @@ const handleCSV = async (e) => {
     modal.hide()
     drawer.show()
   }
+}
+
+$: text = value?.label ?? "Choose an option"
+$: tables = sortAndFormat.tables($tablesStore.list, $datasources.list)
+$: queries = $queriesStore.list
+  .filter((q) => showAllQueries || q.queryVerb === "read" || q.readable)
+  .map((query) => ({
+    label: query.name,
+    name: query.name,
+    ...query,
+    type: "query",
+  }))
+$: dataProviders = findAllComponents($selectedScreen.props)
+  .filter((component) => {
+    return (
+      component._component?.endsWith("/dataprovider") &&
+      component._id !== $componentStore.selectedComponentId
+    )
+  })
+  .map((provider) => ({
+    label: provider._instanceName,
+    name: provider._instanceName,
+    providerId: provider._id,
+    value: `{{ literal ${safe(provider._id)} }}`,
+    type: "provider",
+  }))
+$: links = extractRelationships(bindings)
+$: fields = extractFields(bindings)
+$: jsonArrays = extractJSONArrayFields(bindings)
+$: custom = {
+  type: "custom",
+  label: "JSON / CSV",
 }
 </script>
 

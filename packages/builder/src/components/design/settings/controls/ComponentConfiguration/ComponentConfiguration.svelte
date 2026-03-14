@@ -22,42 +22,6 @@ const dispatch = createEventDispatcher()
 let cachedValue: Component[]
 let componentDefinition: ComponentDefinition | null
 
-$: if (!isEqual(value, cachedValue)) {
-  cachedValue = cloneDeep(value)
-}
-$: componentList = sanitizeValue(cachedValue) || []
-$: componentCount = componentList.length
-$: eventContextBindings = getEventContextBindings({
-  componentInstance,
-  settingKey: key,
-  componentId: componentInstance._id,
-  componentDefinition: undefined,
-  asset: undefined,
-})
-$: allBindings = [...bindings, ...eventContextBindings]
-$: itemProps = {
-  componentBindings: componentBindings || [],
-  bindings: allBindings,
-  removeComponent,
-  nested,
-  showInstanceName: true,
-}
-$: canAddComponents = max == null || componentList.length < max
-$: resolvedComponentType = resolveComponentType(componentType)
-$: componentDefinition = resolvedComponentType
-  ? componentStore.getDefinition(resolvedComponentType)
-  : null
-$: componentFriendlyName =
-  componentDefinition?.friendlyName || componentDefinition?.name || "component"
-
-// Dispatch sanitized value if it differs from input to ensure proper instances
-$: {
-  const sanitized = sanitizeValue(cachedValue)
-  if (sanitized && cachedValue && !isEqual(sanitized, cachedValue)) {
-    dispatch("change", sanitized)
-  }
-}
-
 const sanitizeValue = (val: Component[]): Component[] | null => {
   if (!Array.isArray(val)) {
     return null
@@ -136,6 +100,42 @@ const removeComponent = (id: string) => {
   const newList = componentList.filter((component) => component._id !== id)
   cachedValue = cloneDeep(newList)
   dispatch("change", newList)
+}
+
+$: if (!isEqual(value, cachedValue)) {
+  cachedValue = cloneDeep(value)
+}
+$: componentList = sanitizeValue(cachedValue) || []
+$: componentCount = componentList.length
+$: eventContextBindings = getEventContextBindings({
+  componentInstance,
+  settingKey: key,
+  componentId: componentInstance._id,
+  componentDefinition: undefined,
+  asset: undefined,
+})
+$: allBindings = [...bindings, ...eventContextBindings]
+$: itemProps = {
+  componentBindings: componentBindings || [],
+  bindings: allBindings,
+  removeComponent,
+  nested,
+  showInstanceName: true,
+}
+$: canAddComponents = max == null || componentList.length < max
+$: resolvedComponentType = resolveComponentType(componentType)
+$: componentDefinition = resolvedComponentType
+  ? componentStore.getDefinition(resolvedComponentType)
+  : null
+$: componentFriendlyName =
+  componentDefinition?.friendlyName || componentDefinition?.name || "component"
+
+// Dispatch sanitized value if it differs from input to ensure proper instances
+$: {
+  const sanitized = sanitizeValue(cachedValue)
+  if (sanitized && cachedValue && !isEqual(sanitized, cachedValue)) {
+    dispatch("change", sanitized)
+  }
 }
 </script>
 

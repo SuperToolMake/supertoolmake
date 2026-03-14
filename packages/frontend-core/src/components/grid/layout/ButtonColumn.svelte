@@ -26,12 +26,6 @@ const {
 
 let container
 
-$: buttons = getButtons($gridProps)
-$: columnsWidth = $scrollableColumns.reduce((total, col) => (total += col.width), 0)
-$: columnEnd = columnsWidth - $scrollLeft - 1
-$: gridEnd = $width - $buttonColumnWidth - 1
-$: left = Math.min(columnEnd, gridEnd)
-
 const getButtons = ({ buttons, buttonsCollapsed }) => {
   let gridButtons = buttons || []
   if (!buttonsCollapsed) {
@@ -74,6 +68,12 @@ const makeCollapsedButtons = (buttons, row) => {
     onClick: () => handleClick(button, row),
   }))
 }
+
+$: buttons = getButtons($gridProps)
+$: columnsWidth = $scrollableColumns.reduce((total, col) => (total += col.width), 0)
+$: columnEnd = columnsWidth - $scrollLeft - 1
+$: gridEnd = $width - $buttonColumnWidth - 1
+$: left = Math.min(columnEnd, gridEnd)
 
 onMount(() => {
   const observer = new ResizeObserver((entries) => {

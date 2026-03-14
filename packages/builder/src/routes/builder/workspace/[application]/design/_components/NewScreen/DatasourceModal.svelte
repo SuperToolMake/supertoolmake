@@ -55,11 +55,11 @@ const getDatasources = (rawDatasources: (Datasource | UIInternalDatasource)[]) =
   return datasources
 }
 
-$: datasources = getDatasources($datasourcesStore.list)
-
 const toggleSelection = (tableOrView: SourceOption) => {
   dispatch("toggle", tableOrView)
 }
+
+$: datasources = getDatasources($datasourcesStore.list)
 
 let dataUrl = ""
 $: dataUrl = $appStore.appId ? `/builder/workspace/${$appStore.appId}/data` : ""

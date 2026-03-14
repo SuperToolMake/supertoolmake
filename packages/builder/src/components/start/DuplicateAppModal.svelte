@@ -23,15 +23,6 @@ const appPrefix = "/app"
 let defaultAppName = `${appName} copy`
 let duplicating = false
 
-$: {
-  const { url } = $values
-
-  validation.check({
-    ...$values,
-    url: url?.[0] === "/" ? url.substring(1, url.length) : url,
-  })
-}
-
 const resolveAppName = (name: string) => {
   return name ? name.trim() : null
 }
@@ -88,6 +79,15 @@ const setupValidation = async () => {
   workspaceValidation.url(validation, { workspaces: applications })
 
   const { url } = $values
+  validation.check({
+    ...$values,
+    url: url?.[0] === "/" ? url.substring(1, url.length) : url,
+  })
+}
+
+$: {
+  const { url } = $values
+
   validation.check({
     ...$values,
     url: url?.[0] === "/" ? url.substring(1, url.length) : url,

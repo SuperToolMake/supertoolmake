@@ -11,11 +11,6 @@ let anchorRight, dropdownRight
 
 const dispatch = createEventDispatcher()
 
-$: tables = sortAndFormat.tables($tableStore.list, $datasourceStore.list)
-$: options = [...(tables || [])]
-
-$: text = value?.label ?? "Choose an option"
-
 const onChange = (e) => {
   dispatch(
     "change",
@@ -23,6 +18,11 @@ const onChange = (e) => {
   )
   dropdownRight.hide()
 }
+
+$: tables = sortAndFormat.tables($tableStore.list, $datasourceStore.list)
+$: options = [...(tables || [])]
+
+$: text = value?.label ?? "Choose an option"
 
 onMount(() => {
   // Migrate old values before "resourceId" existed

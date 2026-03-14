@@ -11,14 +11,6 @@ export let type
 let visible = false
 let timeout
 
-$: {
-  if (condition) {
-    showTooltip()
-  } else {
-    hideTooltip()
-  }
-}
-
 const showTooltip = () => {
   visible = true
   timeout = setTimeout(() => {
@@ -29,6 +21,14 @@ const showTooltip = () => {
 const hideTooltip = () => {
   visible = false
   clearTimeout(timeout)
+}
+
+$: {
+  if (condition) {
+    showTooltip()
+  } else {
+    hideTooltip()
+  }
 }
 
 onDestroy(hideTooltip)

@@ -25,21 +25,6 @@ let popover
 let createModal
 let newName
 
-$: ds = $datasource
-$: tableId = ds?.tableId
-$: viewId = ds?.id
-$: isView = ds?.type === "viewV2"
-$: tableRowActions = $rowActions[tableId] || []
-$: viewRowActions = $rowActions[viewId] || []
-$: actionCount = isView ? viewRowActions.length : tableRowActions.length
-$: newNameInvalid = newName && tableRowActions.some((x) => x.name === newName)
-
-const rowActionUrl = derived([url, appStore], ([$url, $appStore]) => {
-  return ({ automationId }) => {
-    return $url(`/builder/workspace/${$appStore.appId}/automation/${automationId}`)
-  }
-})
-
 const toggleAction = async (action, enabled) => {
   if (enabled) {
     await rowActions.enableView(tableId, action.id, viewId)
@@ -64,6 +49,21 @@ const createRowAction = async () => {
     notifications.error("Error creating row action")
   }
 }
+
+$: ds = $datasource
+$: tableId = ds?.tableId
+$: viewId = ds?.id
+$: isView = ds?.type === "viewV2"
+$: tableRowActions = $rowActions[tableId] || []
+$: viewRowActions = $rowActions[viewId] || []
+$: actionCount = isView ? viewRowActions.length : tableRowActions.length
+$: newNameInvalid = newName && tableRowActions.some((x) => x.name === newName)
+
+const rowActionUrl = derived([url, appStore], ([$url, $appStore]) => {
+  return ({ automationId }) => {
+    return $url(`/builder/workspace/${$appStore.appId}/automation/${automationId}`)
+  }
+})
 </script>
 
 <DetailPopover title="Row actions" bind:this={popover}>

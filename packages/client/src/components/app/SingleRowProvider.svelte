@@ -13,16 +13,6 @@ let row: Row | null | undefined
 let loading = true
 let noRowFound = false
 
-$: datasourceId = datasource.tableId
-$: fetchRow(datasourceId, rowId)
-$: actions = [
-  {
-    type: ActionTypes.RefreshDatasource,
-    callback: () => fetchRow(datasourceId, rowId),
-    metadata: { dataSource: datasource },
-  },
-]
-
 const fetchRow = async (datasourceId: string, rowId: string) => {
   if (!(datasourceId && rowId)) {
     row = undefined
@@ -43,6 +33,16 @@ const fetchRow = async (datasourceId: string, rowId: string) => {
     loading = false
   }
 }
+
+$: datasourceId = datasource.tableId
+$: fetchRow(datasourceId, rowId)
+$: actions = [
+  {
+    type: ActionTypes.RefreshDatasource,
+    callback: () => fetchRow(datasourceId, rowId),
+    metadata: { dataSource: datasource },
+  },
+]
 </script>
 
 {#if !loading}

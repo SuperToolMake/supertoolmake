@@ -23,6 +23,72 @@ export let gradient
 
 export let onClick
 
+function handleLineClick(marker) {
+  onClick?.({ marker })
+}
+
+const getSeries = (dataProvider, valueColumns = []) => {
+  const rows = dataProvider.rows ?? []
+
+  return valueColumns.map((column) => ({
+    name: column,
+    data: rows.map((row) => {
+      const value = row?.[column]
+
+      if (dataProvider?.schema?.[column]?.type === "datetime" && value) {
+        return Date.parse(value)
+      }
+
+      return value
+    }),
+  }))
+}
+
+const getCategories = (dataProvider, labelColumn) => {
+  const rows = dataProvider.rows ?? []
+
+  return rows.map((row) => {
+    const value = row?.[labelColumn]
+
+    // If a nullish or non-scalar type, replace it with an empty string
+    if (!["string", "number", "boolean"].includes(typeof value)) {
+      return ""
+    }
+
+    return value
+  })
+}
+
+const getFormatter = (labelType, yAxisUnits, axis) => {
+  const isLabelAxis = axis === "x"
+
+  if (labelType === "datetime" && isLabelAxis) {
+    return formatters.Datetime
+  }
+
+  if (isLabelAxis) {
+    return formatters.Default
+  }
+
+  return formatters[yAxisUnits]
+}
+
+const getFill = (gradient) => {
+  if (gradient) {
+    return {
+      type: "gradient",
+      gradient: {
+        shadeIntensity: 1,
+        opacityFrom: 0.7,
+        opacityTo: 0.9,
+        stops: [0, 90, 100],
+      },
+    }
+  }
+
+  return { type: "solid" }
+}
+
 $: series = getSeries(dataProvider, valueColumns)
 $: categories = getCategories(dataProvider, labelColumn)
 
@@ -96,72 +162,6 @@ $: options = {
       text: yAxisLabel,
     },
   },
-}
-
-function handleLineClick(marker) {
-  onClick?.({ marker })
-}
-
-const getSeries = (dataProvider, valueColumns = []) => {
-  const rows = dataProvider.rows ?? []
-
-  return valueColumns.map((column) => ({
-    name: column,
-    data: rows.map((row) => {
-      const value = row?.[column]
-
-      if (dataProvider?.schema?.[column]?.type === "datetime" && value) {
-        return Date.parse(value)
-      }
-
-      return value
-    }),
-  }))
-}
-
-const getCategories = (dataProvider, labelColumn) => {
-  const rows = dataProvider.rows ?? []
-
-  return rows.map((row) => {
-    const value = row?.[labelColumn]
-
-    // If a nullish or non-scalar type, replace it with an empty string
-    if (!["string", "number", "boolean"].includes(typeof value)) {
-      return ""
-    }
-
-    return value
-  })
-}
-
-const getFormatter = (labelType, yAxisUnits, axis) => {
-  const isLabelAxis = axis === "x"
-
-  if (labelType === "datetime" && isLabelAxis) {
-    return formatters.Datetime
-  }
-
-  if (isLabelAxis) {
-    return formatters.Default
-  }
-
-  return formatters[yAxisUnits]
-}
-
-const getFill = (gradient) => {
-  if (gradient) {
-    return {
-      type: "gradient",
-      gradient: {
-        shadeIntensity: 1,
-        opacityFrom: 0.7,
-        opacityTo: 0.9,
-        stops: [0, 90, 100],
-      },
-    }
-  }
-
-  return { type: "solid" }
 }
 </script>
 

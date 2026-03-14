@@ -8,13 +8,6 @@ import CreateEditRelationshipModal from "../../Datasources/CreateEditRelationshi
 export let table
 const dispatch = createEventDispatcher()
 
-$: datasource = findDatasource(table?._id)
-$: tables = datasource?.plus
-  ? $tablesStore.list.filter((tbl) => tbl.sourceId === datasource._id)
-  : []
-
-let modal
-
 const findDatasource = (tableId) => {
   return $datasources.list.find((datasource) => {
     return (
@@ -36,6 +29,13 @@ const onError = (err) => {
   }
   notifications.error(`Error saving relationship info: ${err?.message || JSON.stringify(err)}`)
 }
+
+$: datasource = findDatasource(table?._id)
+$: tables = datasource?.plus
+  ? $tablesStore.list.filter((tbl) => tbl.sourceId === datasource._id)
+  : []
+
+let modal
 </script>
 
 {#if datasource}

@@ -25,8 +25,6 @@ const dispatch = createEventDispatcher()
 let open = false
 let focus = false
 
-$: fieldText = getFieldText(dropdownValue, options, placeholder)
-
 const getFieldText = (dropdownValue, options, placeholder) => {
   // Always use placeholder if no value
   if (dropdownValue == null || dropdownValue === "") {
@@ -107,6 +105,8 @@ const handleOutsideClick = (event) => {
     open = false
   }
 }
+
+$: fieldText = getFieldText(dropdownValue, options, placeholder)
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

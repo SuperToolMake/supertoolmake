@@ -11,10 +11,6 @@ export let updatedDatasource
 export let markDirty
 
 // Use parent-provided updatedDatasource when available
-$: localUpdatedDatasource = updatedDatasource ?? cloneDeep(datasource)
-
-$: queriesForDatasource = $queries.list.filter((query) => query.datasourceId === datasource?._id)
-
 const getTemplateStaticVariableKeys = (datasource) => {
   if (!datasource?.restTemplate) {
     return []
@@ -48,6 +44,10 @@ const handleStaticChange = (newUnparsedStaticVariables) => {
     markDirty?.()
   }
 }
+
+$: localUpdatedDatasource = updatedDatasource ?? cloneDeep(datasource)
+
+$: queriesForDatasource = $queries.list.filter((query) => query.datasourceId === datasource?._id)
 
 $: templateStaticVariableKeys = getTemplateStaticVariableKeys(datasource)
 </script>

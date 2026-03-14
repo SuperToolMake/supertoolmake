@@ -20,9 +20,6 @@ let cancelHandler: (_e: CustomEvent<ModalCancelFrom>) => void = () => {}
 let selectedType: AutoScreenTypes | undefined
 let currentStepIndex: number
 
-$: hasScreens = $screenStore.screens?.length
-$: title = hasScreens ? "Create new screen" : "Create your first screen"
-
 export const open = () => {
   currentStepIndex = 0
   selectedType = undefined
@@ -62,6 +59,9 @@ async function onConfirm(type = selectedType) {
     }
   }
 }
+
+$: hasScreens = $screenStore.screens?.length
+$: title = hasScreens ? "Create new screen" : "Create your first screen"
 </script>
 
 <Modal bind:this={rootModal} {inline}>

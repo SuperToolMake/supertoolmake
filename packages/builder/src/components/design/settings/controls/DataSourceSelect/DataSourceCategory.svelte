@@ -12,8 +12,6 @@ export let value
 export let onSelect
 export let identifiers = ["resourceId"]
 
-$: displayDatasourceName = $datasources.list.length > 1
-
 function isSelected(entry) {
   if (!identifiers.length) {
     return false
@@ -43,6 +41,8 @@ const shouldInclude = (entry) => {
   }
   return entry.queryVerb === "create" || entry.queryVerb === "read"
 }
+
+$: displayDatasourceName = $datasources.list.length > 1
 
 $: filteredDataSet = dataSet?.filter(shouldInclude) ?? []
 </script>

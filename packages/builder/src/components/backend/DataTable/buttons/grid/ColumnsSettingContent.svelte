@@ -17,6 +17,61 @@ const { datasource, dispatch } = getContext("grid")
 let relationshipPanelAnchor
 let relationshipFieldName
 
+async function toggleColumn(column, permission) {
+  const visible = permission !== FieldPermissions.HIDDEN
+  const readonly = permission === FieldPermissions.READONLY
+
+  if (!fromRelationshipField) {
+    await datasource.actions.addSchemaMutation(column.name, {
+      visible,
+      readonly,
+    })
+  } else {
+    await datasource.actions.addSubSchemaMutation(column.name, fromRelationshipField.name, {
+      visible,
+      readonly,
+    })
+  }
+  try {
+    await datasource.actions.saveSchemaMutations()
+  } catch (e) {
+    notifications.error(e.message)
+  }
+  dispatch(visible ? "show-column" : "hide-column")
+}
+
+function columnToPermissionOptions(column) {
+  if (column.schema.visible === false) {
+    return FieldPermissions.HIDDEN
+  }
+
+  if (column.schema.readonly) {
+    return FieldPermissions.READONLY
+  }
+
+  return FieldPermissions.WRITABLE
+}
+
+async function updateDisplayName(column, displayName) {
+  // If the display name is the same as the column name, clear it to avoid redundancy
+  const finalDisplayName = displayName === column.name ? undefined : displayName
+
+  if (!fromRelationshipField) {
+    await datasource.actions.addSchemaMutation(column.name, {
+      displayName: finalDisplayName,
+    })
+  } else {
+    await datasource.actions.addSubSchemaMutation(column.name, fromRelationshipField.name, {
+      displayName: finalDisplayName,
+    })
+  }
+  try {
+    await datasource.actions.saveSchemaMutations()
+  } catch (e) {
+    notifications.error(e.message)
+  }
+}
+
 $: relationshipField = columns.find((c) => c.name === relationshipFieldName)?.schema
 $: permissionsObj = permissions.reduce((acc, c) => {
   acc[c] = {
@@ -126,61 +181,6 @@ $: relationshipPanelColumns = Object.entries(relationshipField?.columns || {}).m
 )
 
 $: hasLinkColumns = columns.some((c) => c.schema.type === FieldType.LINK)
-
-async function toggleColumn(column, permission) {
-  const visible = permission !== FieldPermissions.HIDDEN
-  const readonly = permission === FieldPermissions.READONLY
-
-  if (!fromRelationshipField) {
-    await datasource.actions.addSchemaMutation(column.name, {
-      visible,
-      readonly,
-    })
-  } else {
-    await datasource.actions.addSubSchemaMutation(column.name, fromRelationshipField.name, {
-      visible,
-      readonly,
-    })
-  }
-  try {
-    await datasource.actions.saveSchemaMutations()
-  } catch (e) {
-    notifications.error(e.message)
-  }
-  dispatch(visible ? "show-column" : "hide-column")
-}
-
-function columnToPermissionOptions(column) {
-  if (column.schema.visible === false) {
-    return FieldPermissions.HIDDEN
-  }
-
-  if (column.schema.readonly) {
-    return FieldPermissions.READONLY
-  }
-
-  return FieldPermissions.WRITABLE
-}
-
-async function updateDisplayName(column, displayName) {
-  // If the display name is the same as the column name, clear it to avoid redundancy
-  const finalDisplayName = displayName === column.name ? undefined : displayName
-
-  if (!fromRelationshipField) {
-    await datasource.actions.addSchemaMutation(column.name, {
-      displayName: finalDisplayName,
-    })
-  } else {
-    await datasource.actions.addSubSchemaMutation(column.name, fromRelationshipField.name, {
-      displayName: finalDisplayName,
-    })
-  }
-  try {
-    await datasource.actions.saveSchemaMutations()
-  } catch (e) {
-    notifications.error(e.message)
-  }
-}
 </script>
 
 <div class="content">

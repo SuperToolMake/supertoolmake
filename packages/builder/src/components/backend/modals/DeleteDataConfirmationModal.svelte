@@ -10,16 +10,6 @@ import { DB_TYPE_EXTERNAL } from "@/constants/backend"
 import { appStore, datasources, queries, screenStore, tables } from "@/stores/builder"
 import { themeStore } from "@/stores/portal"
 
-$: goto = $gotoStore
-$: params = $paramsStore
-$: isDarkTheme = ![Theme.LIGHTEST, Theme.LIGHT].includes($themeStore.theme)
-
-export let source: Table | Datasource | Query | undefined
-
-let confirmDeleteDialog: any
-let affectedScreens: { text: string; url: string }[] = []
-let sourceType: SourceType | undefined
-
 const getDatasourceQueries = () => {
   if (sourceType !== SourceType.DATASOURCE) {
     return ""
@@ -152,6 +142,16 @@ function buildMessage(sourceType: string) {
   }
   return hasChanged() ? message : ""
 }
+
+$: goto = $gotoStore
+$: params = $paramsStore
+$: isDarkTheme = ![Theme.LIGHTEST, Theme.LIGHT].includes($themeStore.theme)
+
+export let source: Table | Datasource | Query | undefined
+
+let confirmDeleteDialog: any
+let affectedScreens: { text: string; url: string }[] = []
+let sourceType: SourceType | undefined
 </script>
 
 <ConfirmDialog

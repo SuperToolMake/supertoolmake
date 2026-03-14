@@ -11,35 +11,6 @@ export let ignoreClicksOutside
 // For some unknown reason, svelte reactivity breaks if we reference the
 // reactive variable "open" inside the following expression, or if we define
 // "open" above this expression.
-$: {
-  if ($builderStore.inBuilder) {
-    if ($component.inSelectedPath && $sidePanelStore.contentId !== $component.id) {
-      sidePanelStore.actions.open($component.id)
-    } else if (
-      !$component.inSelectedPath &&
-      $sidePanelStore.contentId === $component.id &&
-      !$dndIsDragging
-    ) {
-      sidePanelStore.actions.close()
-    }
-  }
-}
-
-// Derive visibility
-$: open = $sidePanelStore.contentId === $component.id
-
-// Derive a render key which is only changed whenever this panel is made
-// visible after being hidden. We need to key the content to avoid showing
-// stale data when re-revealing a side panel that was closed, but we cannot
-// hide the content altogether when hidden as this breaks ejection.
-let renderKey = null
-$: {
-  if (open) {
-    sidePanelStore.actions.setIgnoreClicksOutside(ignoreClicksOutside)
-    renderKey = Math.random()
-  }
-}
-
 const handleSidePanelClose = async () => {
   if (onClose) {
     await onClose()
@@ -68,6 +39,35 @@ const showInSidePanel = (el, visible) => {
   return {
     update,
     destroy: () => update(false),
+  }
+}
+
+$: {
+  if ($builderStore.inBuilder) {
+    if ($component.inSelectedPath && $sidePanelStore.contentId !== $component.id) {
+      sidePanelStore.actions.open($component.id)
+    } else if (
+      !$component.inSelectedPath &&
+      $sidePanelStore.contentId === $component.id &&
+      !$dndIsDragging
+    ) {
+      sidePanelStore.actions.close()
+    }
+  }
+}
+
+// Derive visibility
+$: open = $sidePanelStore.contentId === $component.id
+
+// Derive a render key which is only changed whenever this panel is made
+// visible after being hidden. We need to key the content to avoid showing
+// stale data when re-revealing a side panel that was closed, but we cannot
+// hide the content altogether when hidden as this breaks ejection.
+let renderKey = null
+$: {
+  if (open) {
+    sidePanelStore.actions.setIgnoreClicksOutside(ignoreClicksOutside)
+    renderKey = Math.random()
   }
 }
 </script>

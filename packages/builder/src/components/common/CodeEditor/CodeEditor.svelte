@@ -107,42 +107,6 @@ export const DropdownPosition = {
   let isDark = !currentTheme.includes("light")
   let themeConfig = new Compartment()
 
-  $: {
-    if (autofocus && isEditorInitialised) {
-      editor.focus()
-    }
-  }
-
-  // Init when all elements are ready
-  $: if (mounted && !isEditorInitialised) {
-    isEditorInitialised = true
-    initEditor()
-  }
-
-  // Theme change
-  $: if (mounted && isEditorInitialised && $themeStore?.theme) {
-    if (currentTheme != $themeStore?.theme) {
-      currentTheme = $themeStore?.theme
-      isDark = !currentTheme.includes("light")
-
-      // Issue theme compartment update
-      editor.dispatch({
-        effects: themeConfig.reconfigure([...(isDark ? [oneDark] : [])]),
-      })
-    }
-  }
-
-  // Wait to try and gracefully replace
-  $: refresh(value, isEditorInitialised, mounted)
-  $: {
-    validBindingSet.clear()
-    for (const binding of bindings || []) {
-      if (binding.readableBinding) {
-        validBindingSet.add(binding.readableBinding)
-      }
-    }
-  }
-
   /**
    * Will refresh the editor contents only after
    * it has been fully initialised
@@ -172,7 +136,7 @@ export const DropdownPosition = {
     }
   }
 
-  const exposeEditorApi = () => {
+const exposeEditorApi = () => {
     getCaretPosition = () => {
       const selection_range = editor.state.selection.ranges[0]
       return {
@@ -199,7 +163,7 @@ export const DropdownPosition = {
     }
   }
 
-  // Match decoration for HBS bindings
+// Match decoration for HBS bindings
   const buildHbsMarkDecorations = (view: EditorView, bindings: Set<string>) => {
     const decos = []
     const regex = new RegExp(FIND_ANY_HBS_REGEX)
@@ -230,67 +194,8 @@ export const DropdownPosition = {
 
     return Decoration.set(decos, true)
   }
-  const hbsMatchDecoPlugin = ViewPlugin.fromClass(
-    class {
-      decorations
-      constructor(view: EditorView) {
-        this.decorations = buildHbsMarkDecorations(view, validBindingSet)
-      }
-      update(update: ViewUpdate) {
-        if (update.docChanged || update.viewportChanged) {
-          this.decorations = buildHbsMarkDecorations(
-            update.view,
-            validBindingSet
-          )
-        }
-      }
-    },
-    {
-      decorations: v => v.decorations,
-    }
-  )
 
-  // Match decoration for snippets
-  const snippetMatchDeco = new MatchDecorator({
-    regexp: /snippets\.[^\s(]+/g,
-    decoration: () => {
-      return Decoration.mark({
-        tag: "span",
-        attributes: {
-          class: "snippet-wrap",
-        },
-      })
-    },
-  })
-  const snippetMatchDecoPlugin = ViewPlugin.define(
-    view => ({
-      decorations: snippetMatchDeco.createDeco(view),
-      update(u) {
-        this.decorations = snippetMatchDeco.updateDeco(u, this.decorations)
-      },
-    }),
-    {
-      decorations: v => v.decorations,
-    }
-  )
-
-  const indentWithTabCustom = {
-    key: "Tab",
-    run: (view: EditorView) => {
-      if (completionStatus(view.state) === "active") {
-        acceptCompletion(view)
-        return true
-      }
-      indentMore(view)
-      return true
-    },
-    shift: (view: EditorView) => {
-      indentLess(view)
-      return true
-    },
-  }
-
-  const buildKeymap = () => {
+const buildKeymap = () => {
     return [
       ...closeBracketsKeymap,
       ...defaultKeymap,
@@ -301,7 +206,7 @@ export const DropdownPosition = {
     ]
   }
 
-  const buildBaseExtensions = () => {
+const buildBaseExtensions = () => {
     return [
       drawSelection(),
       dropCursor(),
@@ -314,7 +219,7 @@ export const DropdownPosition = {
     ]
   }
 
-  const hasStringIcon = (
+const hasStringIcon = (
     completion: Completion
   ): completion is Completion & { icon: string } => {
     if (!("icon" in completion)) {
@@ -323,11 +228,11 @@ export const DropdownPosition = {
     return typeof (completion as { icon?: unknown }).icon === "string"
   }
 
-  const getCompletionIcon = (completion: Completion) => {
+const getCompletionIcon = (completion: Completion) => {
     return hasStringIcon(completion) ? completion.icon : undefined
   }
 
-  // None of this is reactive, but it never has been, so we just assume most
+// None of this is reactive, but it never has been, so we just assume most
   // config flags aren't changed at runtime
   // TODO: work out type for base
   const buildExtensions = (base: Extension[]) => {
@@ -459,7 +364,7 @@ export const DropdownPosition = {
     return complete
   }
 
-  function validate(
+function validate(
     value: string | null,
     editor: EditorView | undefined,
     mode: EditorMode,
@@ -478,9 +383,7 @@ export const DropdownPosition = {
     }
   }
 
-  $: validate(value, editor, mode, validations)
-
-  const initEditor = () => {
+const initEditor = () => {
     const baseExtensions = buildBaseExtensions()
 
     editor = new EditorView({
@@ -497,6 +400,123 @@ export const DropdownPosition = {
     })
     exposeEditorApi()
   }
+
+$: {
+    if (autofocus && isEditorInitialised) {
+      editor.focus()
+    }
+  }
+
+  // Init when all elements are ready
+  $: if (mounted && !isEditorInitialised) {
+    isEditorInitialised = true
+    initEditor()
+  }
+
+  // Theme change
+  $: if (mounted && isEditorInitialised && $themeStore?.theme) {
+    if (currentTheme != $themeStore?.theme) {
+      currentTheme = $themeStore?.theme
+      isDark = !currentTheme.includes("light")
+
+      // Issue theme compartment update
+      editor.dispatch({
+        effects: themeConfig.reconfigure([...(isDark ? [oneDark] : [])]),
+      })
+    }
+  }
+
+  // Wait to try and gracefully replace
+  $: refresh(value, isEditorInitialised, mounted)
+  $: {
+    validBindingSet.clear()
+    for (const binding of bindings || []) {
+      if (binding.readableBinding) {
+        validBindingSet.add(binding.readableBinding)
+      }
+    }
+  }
+
+  
+
+  
+
+  
+  const hbsMatchDecoPlugin = ViewPlugin.fromClass(
+    class {
+      decorations
+      constructor(view: EditorView) {
+        this.decorations = buildHbsMarkDecorations(view, validBindingSet)
+      }
+      update(update: ViewUpdate) {
+        if (update.docChanged || update.viewportChanged) {
+          this.decorations = buildHbsMarkDecorations(
+            update.view,
+            validBindingSet
+          )
+        }
+      }
+    },
+    {
+      decorations: v => v.decorations,
+    }
+  )
+
+  // Match decoration for snippets
+  const snippetMatchDeco = new MatchDecorator({
+    regexp: /snippets\.[^\s(]+/g,
+    decoration: () => {
+      return Decoration.mark({
+        tag: "span",
+        attributes: {
+          class: "snippet-wrap",
+        },
+      })
+    },
+  })
+  const snippetMatchDecoPlugin = ViewPlugin.define(
+    view => ({
+      decorations: snippetMatchDeco.createDeco(view),
+      update(u) {
+        this.decorations = snippetMatchDeco.updateDeco(u, this.decorations)
+      },
+    }),
+    {
+      decorations: v => v.decorations,
+    }
+  )
+
+  const indentWithTabCustom = {
+    key: "Tab",
+    run: (view: EditorView) => {
+      if (completionStatus(view.state) === "active") {
+        acceptCompletion(view)
+        return true
+      }
+      indentMore(view)
+      return true
+    },
+    shift: (view: EditorView) => {
+      indentLess(view)
+      return true
+    },
+  }
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  $: validate(value, editor, mode, validations)
+
+  
 
   onMount(() => {
     mounted = true

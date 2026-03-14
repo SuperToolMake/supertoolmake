@@ -27,10 +27,6 @@ const rootId = getContext("rootId")
 if (!rootId) {
   setContext("rootId", componentInstance._id)
 }
-$: componentInstance._rootId = rootId || componentInstance._id
-
-$: sections = getSections(componentInstance, componentDefinition, isScreen, tag, includeHidden)
-
 const getSections = (instance, definition, isScreen, tag, includeHidden) => {
   const settings = definition?.settings ?? []
   const generalSettings = settings.filter((setting) => !setting.section && setting.tag === tag)
@@ -90,6 +86,10 @@ const canRenderControl = (instance, setting, isScreen, includeHidden) => {
   }
   return shouldDisplaySetting(instance, setting)
 }
+
+$: componentInstance._rootId = rootId || componentInstance._id
+
+$: sections = getSections(componentInstance, componentDefinition, isScreen, tag, includeHidden)
 </script>
 
 {#each sections as section, idx (section.name)}

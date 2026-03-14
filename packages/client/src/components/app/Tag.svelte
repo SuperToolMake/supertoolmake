@@ -15,9 +15,6 @@ const { styleable, builderStore } = getContext("sdk")
 
 // Add color styles to main styles object, otherwise the styleable helper
 // overrides the color when it's passed as inline style.
-$: styles = enrichStyles($component.styles, color, textColor)
-$: componentText = getComponentText(text, $builderStore, $component)
-
 const getComponentText = (text, builderState, componentState) => {
   if (!builderState.inBuilder || componentState.editing) {
     return text || " "
@@ -40,6 +37,9 @@ const enrichStyles = (styles, color, textColor) => {
     },
   }
 }
+
+$: styles = enrichStyles($component.styles, color, textColor)
+$: componentText = getComponentText(text, $builderStore, $component)
 </script>
 
 <div class="spectrum-Tag spectrum-Tag--size{size}" use:styleable={styles}>

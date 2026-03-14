@@ -53,17 +53,6 @@ async function onDropdownShow(): Promise<void> {
 }
 
 // Reactive search - automatically filter icons when searchTerm changes
-$: filteredIcons = searchTerm
-  ? phosphorIcons.filter((icon: string) =>
-      icon.toLowerCase().includes(searchTerm.toLowerCase().trim())
-    )
-  : phosphorIcons
-
-// Reset to first page when search changes
-$: if (searchTerm !== undefined) {
-  currentPage = 1
-}
-
 function pageClick(direction: "next" | "back"): void {
   if (
     (direction === "next" && currentPage >= totalPages) ||
@@ -85,6 +74,17 @@ const select = (icon: string): void => {
   value = icon
   dispatch("change", icon)
   dropdown.hide()
+}
+
+$: filteredIcons = searchTerm
+  ? phosphorIcons.filter((icon: string) =>
+      icon.toLowerCase().includes(searchTerm.toLowerCase().trim())
+    )
+  : phosphorIcons
+
+// Reset to first page when search changes
+$: if (searchTerm !== undefined) {
+  currentPage = 1
 }
 
 $: displayValue = value || "Pick icon"

@@ -37,13 +37,6 @@ let button: HTMLDivElement
 let filterMeta: string | undefined
 let filterTitle: string | undefined
 
-$: iconName = !filter ? "sliders-horizontal" : "x-circle"
-$: fieldSchema = config ? schema?.[config?.field] : undefined
-$: filterOp = filter ? operators?.find((op) => op.value === filter.operator) : undefined
-
-$: truncate = filterOp?.value !== RangeOperator.RANGE
-$: filterDisplay = displayText(filter, fieldSchema)
-
 const parseDateDisplay = (
   filter: SearchFilter | undefined,
   fieldSchema: FieldSchema | undefined
@@ -128,6 +121,13 @@ const displayText = (filter: SearchFilter | undefined, fieldSchema: FieldSchema 
 
   return `${filterOp?.label.toLowerCase()} ${filter.noValue ? "" : display}`
 }
+
+$: iconName = !filter ? "sliders-horizontal" : "x-circle"
+$: fieldSchema = config ? schema?.[config?.field] : undefined
+$: filterOp = filter ? operators?.find((op) => op.value === filter.operator) : undefined
+
+$: truncate = filterOp?.value !== RangeOperator.RANGE
+$: filterDisplay = displayText(filter, fieldSchema)
 </script>
 
 <FilterPopover

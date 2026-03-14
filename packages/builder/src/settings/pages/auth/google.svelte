@@ -26,6 +26,40 @@ const ConfigTypes = {
 
 // Some older google configs contain a manually specified value - retain the functionality to edit the field
 // When there is no value or we are in the cloud - prohibit editing the field, must use platform url to change
+async function saveConfig(config) {
+  // Delete unsupported fields
+  delete config.createdAt
+  delete config.updatedAt
+  return API.saveConfig(config)
+}
+
+async function saveGoogle() {
+  if (!googleComplete) {
+    notifications.error(`Please fill in all required ${ConfigTypes.Google} fields`)
+    return
+  }
+
+  const google = providers.google
+
+  try {
+    const res = await saveConfig(google)
+    providers[res.type]._rev = res._rev
+    providers[res.type]._id = res._id
+    notifications.success(`Settings saved`)
+  } catch (e) {
+    notifications.error(e.message)
+    return
+  }
+
+  googleSaveButtonDisabled = true
+  originalGoogleDoc = cloneDeep(providers.google)
+}
+
+const copyToClipboard = async (value) => {
+  await Helpers.copyToClipboard(value)
+  notifications.success("Copied")
+}
+
 $: googleCallbackUrl = undefined
 $: googleCallbackReadonly = $admin.cloud || !googleCallbackUrl
 
@@ -66,40 +100,6 @@ $: {
 $: googleComplete = Boolean(
   providers.google?.config?.clientID && providers.google?.config?.clientSecret
 )
-
-async function saveConfig(config) {
-  // Delete unsupported fields
-  delete config.createdAt
-  delete config.updatedAt
-  return API.saveConfig(config)
-}
-
-async function saveGoogle() {
-  if (!googleComplete) {
-    notifications.error(`Please fill in all required ${ConfigTypes.Google} fields`)
-    return
-  }
-
-  const google = providers.google
-
-  try {
-    const res = await saveConfig(google)
-    providers[res.type]._rev = res._rev
-    providers[res.type]._id = res._id
-    notifications.success(`Settings saved`)
-  } catch (e) {
-    notifications.error(e.message)
-    return
-  }
-
-  googleSaveButtonDisabled = true
-  originalGoogleDoc = cloneDeep(providers.google)
-}
-
-const copyToClipboard = async (value) => {
-  await Helpers.copyToClipboard(value)
-  notifications.success("Copied")
-}
 
 onMount(async () => {
   try {

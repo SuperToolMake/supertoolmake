@@ -42,22 +42,6 @@ const dispatch = createEventDispatcher()
 let updating = false
 let initialised = false
 
-$: filteredApps = $appsStore.apps.filter((app) => app.devId === $appStore.appId)
-$: app = filteredApps[0]
-$: appDeployed = app?.status === AppStatus.DEPLOYED
-
-$: appName = $appStore.name
-$: appURL = $appStore.url
-$: appIconName = $appStore.icon?.name
-$: appIconColor = $appStore.icon?.color
-
-$: appMeta = {
-  name: appName,
-  url: appURL,
-  iconName: appIconName || "",
-  iconColor: appIconColor || "",
-}
-
 const initForm = (appMeta: FormValues) => {
   values.set({
     ...appMeta,
@@ -76,10 +60,6 @@ const validate = (vals: Record<string, any>) => {
     url: url?.[0] === "/" ? url.substring(1, url.length) : url,
   })
 }
-
-// On workspace/apps update, reset the state.
-$: initForm(appMeta)
-$: validate($values)
 
 const resolveAppUrl = (name: string | undefined) => {
   let parsedName
@@ -148,6 +128,26 @@ const initialiseApp = async () => {
   const applicationPkg = await API.fetchAppPackage($appStore.appId)
   await initialise(applicationPkg)
 }
+
+$: filteredApps = $appsStore.apps.filter((app) => app.devId === $appStore.appId)
+$: app = filteredApps[0]
+$: appDeployed = app?.status === AppStatus.DEPLOYED
+
+$: appName = $appStore.name
+$: appURL = $appStore.url
+$: appIconName = $appStore.icon?.name
+$: appIconColor = $appStore.icon?.color
+
+$: appMeta = {
+  name: appName,
+  url: appURL,
+  iconName: appIconName || "",
+  iconColor: appIconColor || "",
+}
+
+// On workspace/apps update, reset the state.
+$: initForm(appMeta)
+$: validate($values)
 </script>
 
 <div class="form">

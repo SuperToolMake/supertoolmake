@@ -12,10 +12,6 @@ export let cta: boolean = false
 export let link: string = ""
 export let linkText: string = ""
 
-$: icon = selectIcon(type)
-// if newlines used, convert them to different elements
-$: split = message.split("\n")
-
 function selectIcon(alertType: string): string {
   switch (alertType) {
     case "error":
@@ -29,6 +25,10 @@ function selectIcon(alertType: string): string {
       return "info"
   }
 }
+
+$: icon = selectIcon(type)
+// if newlines used, convert them to different elements
+$: split = message.split("\n")
 </script>
 
 <div class="spectrum-InLineAlert spectrum-InLineAlert--{type}">

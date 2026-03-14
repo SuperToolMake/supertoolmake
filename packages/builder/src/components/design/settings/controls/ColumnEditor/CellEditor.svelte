@@ -7,8 +7,6 @@ export let column
 let boundValue
 let drawer
 
-$: updateBoundValue(column)
-
 const updateBoundValue = (value) => {
   boundValue = { ...value }
 }
@@ -22,6 +20,8 @@ const save = () => {
   column = boundValue
   drawer.hide()
 }
+
+$: updateBoundValue(column)
 </script>
 
 <Icon name="gear" hoverable size="S" on:click={open} />

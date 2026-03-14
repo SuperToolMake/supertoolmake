@@ -15,27 +15,6 @@ import DetailPopover from "@/components/common/DetailPopover.svelte"
 import { bb } from "@/stores/bb"
 import { appStore, oauth2 } from "@/stores/builder"
 
-$: goto = $gotoStore
-
-type Config = { label: string; value: string }
-
-export let authConfigId: string | undefined
-export let authConfigType: RestAuthType | undefined
-export let authConfigs: Config[]
-export let datasourceId: string
-
-let popover: DetailPopover
-let allConfigs: Config[]
-
-$: allConfigs = [
-  ...authConfigs,
-  ...$oauth2.configs.map((c) => ({
-    label: c.name,
-    value: c._id,
-  })),
-]
-$: authConfig = allConfigs.find((c) => c.value === authConfigId)
-
 function addBasicConfiguration() {
   goto(`/builder/workspace/[application]/apis/datasource/[datasourceId]`, {
     application: $appStore.appId,
@@ -58,6 +37,27 @@ function selectConfiguration(id: string, type?: RestAuthType) {
   }
   popover.hide()
 }
+
+$: goto = $gotoStore
+
+type Config = { label: string; value: string }
+
+export let authConfigId: string | undefined
+export let authConfigType: RestAuthType | undefined
+export let authConfigs: Config[]
+export let datasourceId: string
+
+let popover: DetailPopover
+let allConfigs: Config[]
+
+$: allConfigs = [
+  ...authConfigs,
+  ...$oauth2.configs.map((c) => ({
+    label: c.name,
+    value: c._id,
+  })),
+]
+$: authConfig = allConfigs.find((c) => c.value === authConfigId)
 
 $: title = !authConfig ? "Authentication" : `Auth: ${authConfig.label}`
 

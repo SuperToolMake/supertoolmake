@@ -39,90 +39,6 @@ import CreateExternalDatasourceModal from "../data/_components/CreateExternalDat
 import DatasourceOption from "../data/_components/DatasourceOption.svelte"
 import RestTemplateOption from "../data/_components/RestTemplateOption.svelte"
 
-$: goto = $gotoStore
-
-let externalDatasourceModal: CreateExternalDatasourceModal
-let externalDatasourceLoading = false
-let templateVersionModal: Modal
-let templateEndpointModal: Modal
-let templateGroupModal: Modal
-let selectedTemplate: RestTemplate | null = null
-let selectedTemplateGroup: RestTemplateGroup<RestTemplateGroupName> | null = null
-let selectedGroupTemplateName: GroupTemplateName | null = null
-let selectedTemplateGroupItem: RestTemplateWithoutIcon<GroupTemplateName> | null = null
-let selectedTemplateGroupItemDescription = ""
-let templateLoading = false
-let templateLoadingPhase: "info" | "import" | null = null
-let pendingTemplate: RestTemplate | null = null
-let pendingSpec: RestTemplate["specs"][number] | null = null
-let templateEndpoints: ImportEndpoint[] = []
-let selectedEndpointId: string | undefined
-let templateDocsBaseUrl: string | undefined
-let templateSearchValue = ""
-$: selectedEndpoint = templateEndpoints.find((endpoint) => endpoint.id === selectedEndpointId)
-
-$: restIntegration = ($integrations || []).find(
-  (integration) => integration.name === IntegrationTypes.REST
-)
-
-$: restDatasources = ($datasources.list || []).filter(
-  (datasource) => datasource.source === IntegrationTypes.REST
-)
-$: hasRestDatasources = restDatasources.length > 0
-$: templateGroupsList = $restTemplates.templateGroups || []
-$: groupedTemplateNames = new Set<RestTemplateName>(
-  templateGroupsList.flatMap((group) => group.templates.map((template) => template.name))
-)
-$: restTemplatesList = ($restTemplates.templates || []).filter(
-  (template) => !groupedTemplateNames.has(template.name)
-)
-$: normalizedTemplateSearch = templateSearchValue.trim().toLowerCase()
-$: filteredTemplateGroups = normalizedTemplateSearch
-  ? templateGroupsList.filter(
-      (group) =>
-        group.name.toLowerCase().includes(normalizedTemplateSearch) ||
-        group.templates.some((template) =>
-          template.name.toLowerCase().includes(normalizedTemplateSearch)
-        )
-    )
-  : templateGroupsList
-$: filteredRestTemplates = normalizedTemplateSearch
-  ? restTemplatesList.filter((template) =>
-      template.name.toLowerCase().includes(normalizedTemplateSearch)
-    )
-  : restTemplatesList
-$: templateOptions = [
-  ...filteredTemplateGroups.map((group) => ({
-    type: "group" as const,
-    name: group.name,
-    group,
-  })),
-  ...filteredRestTemplates.map((template) => ({
-    type: "template" as const,
-    name: template.name,
-    template,
-  })),
-].sort((a, b) => a.name.localeCompare(b.name))
-$: selectedTemplateGroupItem =
-  selectedTemplateGroup && selectedGroupTemplateName
-    ? selectedTemplateGroup.templates.find(
-        (template) => template.name === selectedGroupTemplateName
-      ) || null
-    : null
-$: selectedTemplateGroupItemDescription = selectedTemplateGroupItem?.description || ""
-$: groupTemplateOptions = selectedTemplateGroup
-  ? selectedTemplateGroup.templates.map((template) => ({
-      label: template.name,
-      value: template.name,
-      description: template.description,
-    }))
-  : []
-
-$: disabled = externalDatasourceLoading
-$: templateDisabled = disabled || templateLoading
-
-$: selectedEndpointDescription = selectedEndpoint?.description || ""
-
 const openRestModal = () => {
   if (!restIntegration) {
     return
@@ -194,14 +110,6 @@ const getEndpointIcon = (endpoint: ImportEndpoint) => {
       color,
     },
   }
-}
-
-const verbOrder: Record<string, number> = {
-  GET: 0,
-  POST: 1,
-  PUT: 2,
-  PATCH: 3,
-  DELETE: 4,
 }
 
 const compareEndpointOrder = (a: ImportEndpoint, b: ImportEndpoint) => {
@@ -361,6 +269,98 @@ const close = () => {
   } else {
     goto("../")
   }
+}
+
+$: goto = $gotoStore
+
+let externalDatasourceModal: CreateExternalDatasourceModal
+let externalDatasourceLoading = false
+let templateVersionModal: Modal
+let templateEndpointModal: Modal
+let templateGroupModal: Modal
+let selectedTemplate: RestTemplate | null = null
+let selectedTemplateGroup: RestTemplateGroup<RestTemplateGroupName> | null = null
+let selectedGroupTemplateName: GroupTemplateName | null = null
+let selectedTemplateGroupItem: RestTemplateWithoutIcon<GroupTemplateName> | null = null
+let selectedTemplateGroupItemDescription = ""
+let templateLoading = false
+let templateLoadingPhase: "info" | "import" | null = null
+let pendingTemplate: RestTemplate | null = null
+let pendingSpec: RestTemplate["specs"][number] | null = null
+let templateEndpoints: ImportEndpoint[] = []
+let selectedEndpointId: string | undefined
+let templateDocsBaseUrl: string | undefined
+let templateSearchValue = ""
+$: selectedEndpoint = templateEndpoints.find((endpoint) => endpoint.id === selectedEndpointId)
+
+$: restIntegration = ($integrations || []).find(
+  (integration) => integration.name === IntegrationTypes.REST
+)
+
+$: restDatasources = ($datasources.list || []).filter(
+  (datasource) => datasource.source === IntegrationTypes.REST
+)
+$: hasRestDatasources = restDatasources.length > 0
+$: templateGroupsList = $restTemplates.templateGroups || []
+$: groupedTemplateNames = new Set<RestTemplateName>(
+  templateGroupsList.flatMap((group) => group.templates.map((template) => template.name))
+)
+$: restTemplatesList = ($restTemplates.templates || []).filter(
+  (template) => !groupedTemplateNames.has(template.name)
+)
+$: normalizedTemplateSearch = templateSearchValue.trim().toLowerCase()
+$: filteredTemplateGroups = normalizedTemplateSearch
+  ? templateGroupsList.filter(
+      (group) =>
+        group.name.toLowerCase().includes(normalizedTemplateSearch) ||
+        group.templates.some((template) =>
+          template.name.toLowerCase().includes(normalizedTemplateSearch)
+        )
+    )
+  : templateGroupsList
+$: filteredRestTemplates = normalizedTemplateSearch
+  ? restTemplatesList.filter((template) =>
+      template.name.toLowerCase().includes(normalizedTemplateSearch)
+    )
+  : restTemplatesList
+$: templateOptions = [
+  ...filteredTemplateGroups.map((group) => ({
+    type: "group" as const,
+    name: group.name,
+    group,
+  })),
+  ...filteredRestTemplates.map((template) => ({
+    type: "template" as const,
+    name: template.name,
+    template,
+  })),
+].sort((a, b) => a.name.localeCompare(b.name))
+$: selectedTemplateGroupItem =
+  selectedTemplateGroup && selectedGroupTemplateName
+    ? selectedTemplateGroup.templates.find(
+        (template) => template.name === selectedGroupTemplateName
+      ) || null
+    : null
+$: selectedTemplateGroupItemDescription = selectedTemplateGroupItem?.description || ""
+$: groupTemplateOptions = selectedTemplateGroup
+  ? selectedTemplateGroup.templates.map((template) => ({
+      label: template.name,
+      value: template.name,
+      description: template.description,
+    }))
+  : []
+
+$: disabled = externalDatasourceLoading
+$: templateDisabled = disabled || templateLoading
+
+$: selectedEndpointDescription = selectedEndpoint?.description || ""
+
+const verbOrder: Record<string, number> = {
+  GET: 0,
+  POST: 1,
+  PUT: 2,
+  PATCH: 3,
+  DELETE: 4,
 }
 </script>
 

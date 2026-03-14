@@ -9,8 +9,6 @@ import { admin, auth } from "@/stores/portal"
 $goto
 
 let tenantId = get(auth).tenantSet ? get(auth).tenantId : ""
-$: multiTenancyEnabled = $admin.multiTenancy
-
 async function setOrg() {
   try {
     if (tenantId == null || tenantId === "") {
@@ -28,6 +26,8 @@ async function setOrg() {
 function handleKeydown(evt) {
   if (evt.key === "Enter") setOrg()
 }
+
+$: multiTenancyEnabled = $admin.multiTenancy
 
 onMount(async () => {
   await auth.checkQueryString()

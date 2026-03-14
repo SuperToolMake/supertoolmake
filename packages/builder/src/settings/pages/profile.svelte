@@ -28,19 +28,6 @@ let updating = false
 let apiKey: string | undefined
 let updatePasswordModal: Modal
 
-$: user = $auth.user
-$: first = user?.firstName
-$: last = user?.lastName
-
-$: if (first || last) {
-  values.set({
-    firstName: first,
-    lastName: last,
-  })
-}
-
-$: altered = isAltered($values)
-
 const isAltered = (vals: UpdateSelfRequest) => {
   return vals && (vals.firstName !== first || vals.lastName !== last)
 }
@@ -67,6 +54,19 @@ async function generateAPIKey() {
     notifications.error("Unable to generate new API key")
   }
 }
+
+$: user = $auth.user
+$: first = user?.firstName
+$: last = user?.lastName
+
+$: if (first || last) {
+  values.set({
+    firstName: first,
+    lastName: last,
+  })
+}
+
+$: altered = isAltered($values)
 
 onMount(async () => {
   try {

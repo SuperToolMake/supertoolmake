@@ -24,6 +24,11 @@ export let name
 export let explanation
 export let componentName
 
+const setExplanationSubject = (option) => {
+  detailsModalSubject = option
+  root = root
+}
+
 $: explanationWithPresets = getExplanationWithPresets(explanation, $appStore.typeSupportPresets)
 let support
 let messages = []
@@ -40,11 +45,6 @@ $: {
 let root = null
 
 let detailsModalSubject = subjects.none
-
-const setExplanationSubject = (option) => {
-  detailsModalSubject = option
-  root = root
-}
 </script>
 
 <div bind:this={root} class="tooltipContents">

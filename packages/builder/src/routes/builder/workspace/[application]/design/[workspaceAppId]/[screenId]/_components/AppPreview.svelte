@@ -41,62 +41,6 @@ const MessageTypes = {
 }
 
 // Extract data to pass to the iframe
-$: screen = $selectedScreen
-
-// Determine selected component ID
-$: selectedComponentId = $componentStore.selectedComponentId
-
-$: previewData = {
-  appId: $appStore.appId,
-  layout,
-  screen,
-  selectedComponentId,
-  theme: $appStore.clientFeatures.unifiedThemes
-    ? $themeStore.theme
-    : `${ThemeClassPrefix}${$themeStore.theme}`,
-  customTheme: $themeStore.customTheme,
-  previewDevice: $previewStore.previewDevice,
-  messagePassing: $appStore.clientFeatures.messagePassing,
-  navigation: $navigationStore,
-  hiddenComponentIds:
-    $componentStore.componentToPaste?._id && $componentStore.componentToPaste?.isCut
-      ? [$componentStore.componentToPaste?._id]
-      : [],
-  isBudibaseEvent: true,
-  location: {
-    protocol: window.location.protocol,
-    hostname: window.location.hostname,
-    port: window.location.port,
-  },
-  snippets: $snippets,
-  componentErrors: $screenComponentErrors,
-}
-
-// Refresh the preview when required
-$: json = JSON.stringify(previewData)
-$: refreshContent(json)
-
-// Determine if the add component menu is active
-$: isAddingComponent = $isActive(`./[componentId]`, {
-  componentId: "new",
-})
-
-// Register handler to send custom to the preview
-$: sendPreviewEvent = (name, payload) => {
-  iframe?.contentWindow.postMessage(
-    JSON.stringify({
-      name,
-      payload,
-      isBudibaseEvent: true,
-      runtimeEvent: true,
-    })
-  )
-}
-
-$: previewStore.registerEventHandler((name, payload) => {
-  return sendPreviewEvent(name, payload)
-})
-
 // Update the iframe with the builder info to render the correct preview
 const refreshContent = (message) => {
   iframe?.contentWindow.postMessage(message)
@@ -229,6 +173,62 @@ const toggleAddComponent = () => {
     $goto(`./[componentId]`, { componentId: "new" })
   }
 }
+
+$: screen = $selectedScreen
+
+// Determine selected component ID
+$: selectedComponentId = $componentStore.selectedComponentId
+
+$: previewData = {
+  appId: $appStore.appId,
+  layout,
+  screen,
+  selectedComponentId,
+  theme: $appStore.clientFeatures.unifiedThemes
+    ? $themeStore.theme
+    : `${ThemeClassPrefix}${$themeStore.theme}`,
+  customTheme: $themeStore.customTheme,
+  previewDevice: $previewStore.previewDevice,
+  messagePassing: $appStore.clientFeatures.messagePassing,
+  navigation: $navigationStore,
+  hiddenComponentIds:
+    $componentStore.componentToPaste?._id && $componentStore.componentToPaste?.isCut
+      ? [$componentStore.componentToPaste?._id]
+      : [],
+  isBudibaseEvent: true,
+  location: {
+    protocol: window.location.protocol,
+    hostname: window.location.hostname,
+    port: window.location.port,
+  },
+  snippets: $snippets,
+  componentErrors: $screenComponentErrors,
+}
+
+// Refresh the preview when required
+$: json = JSON.stringify(previewData)
+$: refreshContent(json)
+
+// Determine if the add component menu is active
+$: isAddingComponent = $isActive(`./[componentId]`, {
+  componentId: "new",
+})
+
+// Register handler to send custom to the preview
+$: sendPreviewEvent = (name, payload) => {
+  iframe?.contentWindow.postMessage(
+    JSON.stringify({
+      name,
+      payload,
+      isBudibaseEvent: true,
+      runtimeEvent: true,
+    })
+  )
+}
+
+$: previewStore.registerEventHandler((name, payload) => {
+  return sendPreviewEvent(name, payload)
+})
 
 onMount(() => {
   window.addEventListener("message", receiveMessage)

@@ -31,55 +31,6 @@ import AppRoleTableRenderer from "./_components/AppRoleTableRenderer.svelte"
 import DeleteUserModal from "./_components/DeleteUserModal.svelte"
 import ForceResetPasswordModal from "./_components/ForceResetPasswordModal.svelte"
 
-$: goto = $gotoStore
-
-export let userId
-
-const routing = getContext("routing")
-
-// Override
-$: params = $routing?.params
-$: userId = params.userId
-$: if (params.userId && userId !== params.userId) {
-  userId = params.userId
-}
-const appSchema = {
-  name: {
-    width: "2fr",
-  },
-  role: {
-    width: "1fr",
-    displayName: "Access",
-  },
-}
-const customAppTableRenderers = [
-  {
-    column: "name",
-    component: AppNameTableRenderer,
-  },
-  {
-    column: "role",
-    component: AppRoleTableRenderer,
-  },
-]
-
-let deleteModal
-let resetPasswordModal
-let user
-let loaded = false
-let userFieldsToUpdate = {}
-let roleUpdateTarget
-let saving = false
-
-$: isSSO = Boolean(user?.provider)
-$: isAdmin = sdk.users.isAdmin($auth.user)
-$: isScim = user?.scimInfo?.isSync
-$: readonly = !isAdmin || isScim
-$: privileged = sdk.users.isAdminOrGlobalBuilder(user)
-$: nameLabel = getNameLabel(user)
-$: availableApps = user ? getApps(user, sdk.users.userAppAccessList(user)) : []
-$: globalRole = users.getUserRole(user)
-
 const getApps = (user, appIds) => {
   let availableApps = $appsStore.apps
     .slice()
@@ -195,6 +146,55 @@ async function fetchUser() {
     bb.settings("/people/users")
   }
 }
+
+$: goto = $gotoStore
+
+export let userId
+
+const routing = getContext("routing")
+
+// Override
+$: params = $routing?.params
+$: userId = params.userId
+$: if (params.userId && userId !== params.userId) {
+  userId = params.userId
+}
+const appSchema = {
+  name: {
+    width: "2fr",
+  },
+  role: {
+    width: "1fr",
+    displayName: "Access",
+  },
+}
+const customAppTableRenderers = [
+  {
+    column: "name",
+    component: AppNameTableRenderer,
+  },
+  {
+    column: "role",
+    component: AppRoleTableRenderer,
+  },
+]
+
+let deleteModal
+let resetPasswordModal
+let user
+let loaded = false
+let userFieldsToUpdate = {}
+let roleUpdateTarget
+let saving = false
+
+$: isSSO = Boolean(user?.provider)
+$: isAdmin = sdk.users.isAdmin($auth.user)
+$: isScim = user?.scimInfo?.isSync
+$: readonly = !isAdmin || isScim
+$: privileged = sdk.users.isAdminOrGlobalBuilder(user)
+$: nameLabel = getNameLabel(user)
+$: availableApps = user ? getApps(user, sdk.users.userAppAccessList(user)) : []
+$: globalRole = users.getUserRole(user)
 
 onMount(async () => {
   try {

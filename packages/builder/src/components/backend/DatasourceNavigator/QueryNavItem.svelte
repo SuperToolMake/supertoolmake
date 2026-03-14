@@ -26,14 +26,6 @@ const favourites = workspaceFavouriteStore.lookup
 let confirmDeleteModal
 let editQueryModal
 
-$: favourite = query?._id ? $favourites[query?._id] : undefined
-$: isRestDatasource = datasource?.source === IntegrationTypes.REST
-$: iconVerb = isRestDatasource ? customQueryIconText(query) : ""
-$: iconColor = isRestDatasource ? customQueryIconColor(query) : undefined
-
-// goto won't work in the context menu callback if the store is called directly
-$: goto = $gotoStore
-
 const getContextMenuItems = () => {
   return [
     {
@@ -77,6 +69,14 @@ const openContextMenu = (e) => {
   const items = getContextMenuItems()
   contextMenuStore.open(query._id, items, { x: e.clientX, y: e.clientY })
 }
+
+$: favourite = query?._id ? $favourites[query?._id] : undefined
+$: isRestDatasource = datasource?.source === IntegrationTypes.REST
+$: iconVerb = isRestDatasource ? customQueryIconText(query) : ""
+$: iconColor = isRestDatasource ? customQueryIconColor(query) : undefined
+
+// goto won't work in the context menu callback if the store is called directly
+$: goto = $gotoStore
 </script>
 
 <NavItem

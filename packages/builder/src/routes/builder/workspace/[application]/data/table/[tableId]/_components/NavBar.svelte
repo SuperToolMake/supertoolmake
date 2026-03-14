@@ -25,18 +25,6 @@ $url
 let editTableModal
 let deleteTableModal
 
-$: tableId = $params.tableId
-$: isUsersTable = tableId === TableNames.USERS
-$: table = $tables.list.find((table) => table._id === tableId)
-$: datasource = $datasources.list.find((ds) => ds._id === table?.sourceId)
-$: tableSelectedBy = $userSelectedResourceMap[table?._id]
-$: isDevMode = $dataEnvironmentStore.mode === DataEnvironmentMode.DEVELOPMENT
-$: tableEditable = table?._id !== TableNames.USERS && isDevMode
-$: activeId = decodeURIComponent($params.tableId)
-$: tableName = table?._id === TableNames.USERS ? "App users" : table?.name || ""
-
-const tableUrl = derived(url, ($url) => (tableId) => $url(`../[tableId]`, { tableId }))
-
 const openTableContextMenu = (e) => {
   if (!tableEditable) {
     return
@@ -69,6 +57,18 @@ const openTableContextMenu = (e) => {
     }
   )
 }
+
+$: tableId = $params.tableId
+$: isUsersTable = tableId === TableNames.USERS
+$: table = $tables.list.find((table) => table._id === tableId)
+$: datasource = $datasources.list.find((ds) => ds._id === table?.sourceId)
+$: tableSelectedBy = $userSelectedResourceMap[table?._id]
+$: isDevMode = $dataEnvironmentStore.mode === DataEnvironmentMode.DEVELOPMENT
+$: tableEditable = table?._id !== TableNames.USERS && isDevMode
+$: activeId = decodeURIComponent($params.tableId)
+$: tableName = table?._id === TableNames.USERS ? "App users" : table?.name || ""
+
+const tableUrl = derived(url, ($url) => (tableId) => $url(`../[tableId]`, { tableId }))
 </script>
 
 <div class="nav">

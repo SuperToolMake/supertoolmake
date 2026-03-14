@@ -16,9 +16,6 @@ export let startDayOfWeek = "Monday"
 const dispatch = createEventDispatcher()
 let calendar
 
-$: showCalendar = !timeOnly
-$: showTime = enableTime || timeOnly
-
 const setToNow = () => {
   const now = dayjs()
   calendar?.setDate(now)
@@ -38,6 +35,9 @@ const clearDateOnBackspace = (event) => {
     dispatch("change", null)
   }
 }
+
+$: showCalendar = !timeOnly
+$: showTime = enableTime || timeOnly
 
 onMount(() => {
   if (useKeyboardShortcuts) {

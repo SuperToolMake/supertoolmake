@@ -17,10 +17,6 @@ export let datasource
 let modal
 let relationshipSelectionModal
 
-$: tables = $tablesStore.list.filter((tbl) => tbl.sourceId === datasource._id) || []
-$: relationships = getRelationships(tables)
-$: supportsRelationships = datasource.source === "POSTGRES"
-
 function getRelationships(tables) {
   const relatedColumns = {}
 
@@ -88,6 +84,10 @@ const onError = async ({ action, err }) => {
   }
   notifications.error(`Error ${notificationVerb} datasource: ${err}`)
 }
+
+$: tables = $tablesStore.list.filter((tbl) => tbl.sourceId === datasource._id) || []
+$: relationships = getRelationships(tables)
+$: supportsRelationships = datasource.source === "POSTGRES"
 </script>
 
 <CreateEditRelationshipModal

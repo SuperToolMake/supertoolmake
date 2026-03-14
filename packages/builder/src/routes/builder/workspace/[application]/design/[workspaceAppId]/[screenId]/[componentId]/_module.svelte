@@ -11,18 +11,18 @@ import NewComponentPanel from "./new/_components/NewComponentPanel.svelte"
 $goto
 $params
 
-$: componentId = $componentStore.selectedComponentId
-$: routeComponentId = $params.componentId
-
-$: if (componentId) {
-  builderStore.selectResource(componentId)
-}
-
 const validate = (id: string) => {
   if (id === `${$screenStore.selectedScreenId}-screen`) return true
   if (id === `${$screenStore.selectedScreenId}-navigation`) return true
 
   return Boolean(findComponent($selectedScreen?.props, id))
+}
+
+$: componentId = $componentStore.selectedComponentId
+$: routeComponentId = $params.componentId
+
+$: if (componentId) {
+  builderStore.selectResource(componentId)
 }
 
 onMount(() => {

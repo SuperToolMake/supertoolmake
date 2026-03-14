@@ -17,6 +17,11 @@ const dispatch = createEventDispatcher()
 
 let popover
 
+const openPopover = () => {
+  localFilters = filters
+  popover.show()
+}
+
 $: localFilters = filters
 $: schemaFields = search.getFields($tables.list, Object.values(schema || {}), { allowLinks: true })
 $: filterCount =
@@ -36,11 +41,6 @@ $: bindings = [
   },
   ...getUserBindings(),
 ]
-
-const openPopover = () => {
-  localFilters = filters
-  popover.show()
-}
 </script>
 
 <DetailPopover bind:this={popover} title="Configure filters" width={800}>

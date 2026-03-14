@@ -15,10 +15,6 @@ export let error
 
 const dispatch = createEventDispatcher()
 
-$: readableValue = runtimeToReadableBinding(bindings, value)
-$: isJS = isJSBinding(value)
-$: allOptions = buildOptions(options, bindings, appendBindingsAsOptions)
-
 const onChange = (value, optionPicked) => {
   // Add HBS braces if picking binding
   if (optionPicked && !options?.includes(value)) {
@@ -34,6 +30,10 @@ const buildOptions = (options, bindings, appendBindingsAsOptions) => {
   }
   return [].concat(options || []).concat(bindings?.map((binding) => binding.readableBinding) || [])
 }
+
+$: readableValue = runtimeToReadableBinding(bindings, value)
+$: isJS = isJSBinding(value)
+$: allOptions = buildOptions(options, bindings, appendBindingsAsOptions)
 </script>
 
 <div class="control" class:disabled>

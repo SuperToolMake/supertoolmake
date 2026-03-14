@@ -33,9 +33,6 @@ const scrollApi = getContext("scroll")
 const dispatch = createEventDispatcher()
 
 let contentRef: HTMLDivElement
-$: selected && contentRef && scrollToView()
-$: style = getStyle(indentLevel)
-
 const onClick = () => {
   scrollToView()
   dispatch("click")
@@ -58,6 +55,9 @@ const getStyle = (indentLevel: number) => {
   let style = `padding-left:calc(${indentLevel * 14}px);`
   return style
 }
+
+$: selected && contentRef && scrollToView()
+$: style = getStyle(indentLevel)
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

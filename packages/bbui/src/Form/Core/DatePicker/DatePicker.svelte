@@ -31,12 +31,6 @@ let isOpen = false
 let anchor: HTMLElement
 let popover: Popover
 
-$: resolvedStartDayOfWeek = startDayOfWeek ?? browserStartDayOfWeek
-
-$: parsedValue = parseDate(value as string | dayjs.Dayjs | null, {
-  enableTime,
-})
-
 const onOpen = () => {
   isOpen = true
 }
@@ -44,6 +38,12 @@ const onOpen = () => {
 const onClose = () => {
   isOpen = false
 }
+
+$: resolvedStartDayOfWeek = startDayOfWeek ?? browserStartDayOfWeek
+
+$: parsedValue = parseDate(value as string | dayjs.Dayjs | null, {
+  enableTime,
+})
 
 onMount(() => {
   api = {

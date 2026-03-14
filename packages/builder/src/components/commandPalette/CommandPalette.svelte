@@ -25,70 +25,6 @@ const modalContext = getContext(Context.Modal)
 let search
 let selected = null
 
-$: inApp = $isActive("/builder/workspace/:application")
-$: commands = [
-  {
-    type: "Access",
-    name: "Invite users and manage app access",
-    description: "",
-    icon: "user",
-    action: () => bb.settings("/people/workspace"),
-    requiresApp: true,
-  },
-  ...navigationCommands(),
-  {
-    type: "Publish",
-    name: "App",
-    description: "Deploy your application",
-    icon: "cube",
-    action: deployApp,
-    requiresApp: true,
-  },
-  {
-    type: "Preview",
-    name: "App",
-    description: "",
-    icon: "play",
-    action: () => previewStore.showPreview(true),
-    requiresApp: true,
-  },
-  {
-    type: "Preview",
-    name: "Published App",
-    icon: "play",
-    action: () => window.open(`/app${$appStore.url}`),
-    requiresApp: true,
-  },
-  {
-    type: "Support",
-    name: "Raise Github Discussion",
-    icon: "question",
-    action: () => window.open(`https://github.com/SuperToolMake/supertoolmake/discussions/new`),
-    requiresApp: true,
-  },
-  {
-    type: "Support",
-    name: "Raise A Bug",
-    icon: "bug",
-    action: () =>
-      window.open(
-        `https://github.com/SuperToolMake/supertoolmake/issues/new?assignees=&labels=bug&template=bug_report.md&title=`
-      ),
-    requiresApp: true,
-  },
-  ...datasourceCommands($datasources?.list || []),
-  ...tableCommands($tables?.list || []),
-  ...queryCommands($queries?.list || []),
-  ...screenCommands($sortedScreens),
-  ...themeCommands(),
-]
-$: enrichedCommands = commands.map((cmd) => ({
-  ...cmd,
-  searchValue: `${cmd.type} ${cmd.name} ${cmd.codeName || ""}`.toLowerCase().replace(/_/g, " "),
-}))
-$: results = filterResults(enrichedCommands, search, inApp)
-$: categories = groupResults(results)
-
 const navigationCommands = () => {
   const routes = [
     {
@@ -283,6 +219,70 @@ const runAction = (command) => {
   command.action()
   modalContext.hide()
 }
+
+$: inApp = $isActive("/builder/workspace/:application")
+$: commands = [
+  {
+    type: "Access",
+    name: "Invite users and manage app access",
+    description: "",
+    icon: "user",
+    action: () => bb.settings("/people/workspace"),
+    requiresApp: true,
+  },
+  ...navigationCommands(),
+  {
+    type: "Publish",
+    name: "App",
+    description: "Deploy your application",
+    icon: "cube",
+    action: deployApp,
+    requiresApp: true,
+  },
+  {
+    type: "Preview",
+    name: "App",
+    description: "",
+    icon: "play",
+    action: () => previewStore.showPreview(true),
+    requiresApp: true,
+  },
+  {
+    type: "Preview",
+    name: "Published App",
+    icon: "play",
+    action: () => window.open(`/app${$appStore.url}`),
+    requiresApp: true,
+  },
+  {
+    type: "Support",
+    name: "Raise Github Discussion",
+    icon: "question",
+    action: () => window.open(`https://github.com/SuperToolMake/supertoolmake/discussions/new`),
+    requiresApp: true,
+  },
+  {
+    type: "Support",
+    name: "Raise A Bug",
+    icon: "bug",
+    action: () =>
+      window.open(
+        `https://github.com/SuperToolMake/supertoolmake/issues/new?assignees=&labels=bug&template=bug_report.md&title=`
+      ),
+    requiresApp: true,
+  },
+  ...datasourceCommands($datasources?.list || []),
+  ...tableCommands($tables?.list || []),
+  ...queryCommands($queries?.list || []),
+  ...screenCommands($sortedScreens),
+  ...themeCommands(),
+]
+$: enrichedCommands = commands.map((cmd) => ({
+  ...cmd,
+  searchValue: `${cmd.type} ${cmd.name} ${cmd.codeName || ""}`.toLowerCase().replace(/_/g, " "),
+}))
+$: results = filterResults(enrichedCommands, search, inApp)
+$: categories = groupResults(results)
 </script>
 
 <svelte:window on:keydown={onKeyDown} />

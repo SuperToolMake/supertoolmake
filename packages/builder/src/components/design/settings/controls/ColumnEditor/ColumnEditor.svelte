@@ -26,20 +26,6 @@ const dispatch = createEventDispatcher()
 let drawer
 let boundValue
 
-$: text = getText(value)
-$: datasource = getDatasourceForProvider($selectedScreen, componentInstance)
-$: schema = getSchema($selectedScreen, datasource)
-$: options = allowCellEditing
-  ? Object.keys(schema || {})
-  : enrichedSchemaFields?.map((field) => field.name)
-$: sanitisedValue = getValidColumns(value, options)
-$: updateBoundValue(sanitisedValue)
-$: enrichedSchemaFields = getSchemaFields(schema, $tables.list)
-
-$: {
-  value = (value || []).filter((column) => schema?.[column.name || column] !== undefined)
-}
-
 const getText = (value) => {
   if (!value?.length) {
     return placeholder
@@ -92,6 +78,20 @@ const open = () => {
 const save = () => {
   dispatch("change", getValidColumns(boundValue, options))
   drawer.hide()
+}
+
+$: text = getText(value)
+$: datasource = getDatasourceForProvider($selectedScreen, componentInstance)
+$: schema = getSchema($selectedScreen, datasource)
+$: options = allowCellEditing
+  ? Object.keys(schema || {})
+  : enrichedSchemaFields?.map((field) => field.name)
+$: sanitisedValue = getValidColumns(value, options)
+$: updateBoundValue(sanitisedValue)
+$: enrichedSchemaFields = getSchemaFields(schema, $tables.list)
+
+$: {
+  value = (value || []).filter((column) => schema?.[column.name || column] !== undefined)
 }
 </script>
 

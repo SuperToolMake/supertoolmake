@@ -8,8 +8,6 @@ export let allowJS = false
 export let allowHBS = true
 export let context = null
 
-$: enrichedBindings = enrichBindings(bindings)
-
 // Ensure bindings have the correct properties
 const enrichBindings = (bindings) => {
   return bindings?.map((binding) => ({
@@ -18,6 +16,8 @@ const enrichBindings = (bindings) => {
     runtimeBinding: binding.runtimeBinding || binding.path,
   }))
 }
+
+$: enrichedBindings = enrichBindings(bindings)
 </script>
 
 <BindingPanel

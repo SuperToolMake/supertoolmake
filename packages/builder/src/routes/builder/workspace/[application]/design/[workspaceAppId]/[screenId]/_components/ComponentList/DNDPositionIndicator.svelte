@@ -10,8 +10,6 @@ let y
 let width
 let height
 
-$: calculatePosition(component)
-
 const calculatePosition = (component) => {
   // Get root li element
   const el = document.getElementById(`component-${component?._id}`)
@@ -25,6 +23,8 @@ const calculatePosition = (component) => {
   width = child.clientWidth
   height = child.clientHeight
 }
+
+$: calculatePosition(component)
 </script>
 
 {#if component && position}

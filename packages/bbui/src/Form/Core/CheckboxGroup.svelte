@@ -32,14 +32,6 @@ type V = any
     }
   }
 
-  $: allSelected =
-    options.length > 0 &&
-    options.every(option => value.includes(getOptionValue(option)))
-  $: noneSelected =
-    options.length === 0 ||
-    options.every(option => !value.includes(getOptionValue(option)))
-  $: indeterminate = !allSelected && !noneSelected
-
   const toggleSelectAll = () => {
     if (allSelected) {
       dispatch("change", [])
@@ -48,6 +40,16 @@ type V = any
       dispatch("change", allValues)
     }
   }
+
+$: allSelected =
+    options.length > 0 &&
+    options.every(option => value.includes(getOptionValue(option)))
+  $: noneSelected =
+    options.length === 0 ||
+    options.every(option => !value.includes(getOptionValue(option)))
+  $: indeterminate = !allSelected && !noneSelected
+
+  
 </script>
 
 <div class={`spectrum-FieldGroup spectrum-FieldGroup--${direction}`}>

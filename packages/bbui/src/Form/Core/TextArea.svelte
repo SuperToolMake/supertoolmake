@@ -23,10 +23,6 @@ let isFocused = false
 let textarea: HTMLTextAreaElement
 let scrollable = false
 
-$: heightString = getStyleString("height", height)
-$: minHeightString = getStyleString("min-height", minHeight)
-$: dispatch("scrollable", scrollable)
-
 export function focus() {
   textarea.focus()
 }
@@ -64,6 +60,10 @@ const getStyleString = (attribute: string, value: string | number | undefined) =
   }
   return `${attribute}:${value}px;`
 }
+
+$: heightString = getStyleString("height", height)
+$: minHeightString = getStyleString("min-height", minHeight)
+$: dispatch("scrollable", scrollable)
 </script>
 
 <div

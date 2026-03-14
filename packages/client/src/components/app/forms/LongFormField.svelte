@@ -27,6 +27,13 @@ setContext("component", newContext)
 
 // Determine whether we should use a rich or plain text component.
 // We treat undefined as "auto".
+const handleChange = (e) => {
+  const changed = fieldApi.setValue(e.detail)
+  if (onChange && changed) {
+    onChange({ value: e.detail })
+  }
+}
+
 $: useRichText = format === "rich" || (format !== "plain" && fieldSchema?.useRichText)
 
 // Extract the settings height so we can pass it on to the rich text field.
@@ -45,13 +52,6 @@ $: {
       },
     },
   })
-}
-
-const handleChange = (e) => {
-  const changed = fieldApi.setValue(e.detail)
-  if (onChange && changed) {
-    onChange({ value: e.detail })
-  }
 }
 </script>
 

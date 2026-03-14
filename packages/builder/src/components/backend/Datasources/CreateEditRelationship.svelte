@@ -37,60 +37,6 @@ let relationshipMap = {
     part2: PrettyRelationshipDefinitions.MANY,
   },
 }
-$: relationshipOpts1 =
-  relationshipPart2 === PrettyRelationshipDefinitions.ONE
-    ? [PrettyRelationshipDefinitions.MANY]
-    : Object.values(PrettyRelationshipDefinitions)
-
-$: relationshipOpts2 =
-  relationshipPart1 === PrettyRelationshipDefinitions.ONE
-    ? [PrettyRelationshipDefinitions.MANY]
-    : Object.values(PrettyRelationshipDefinitions)
-
-let relationshipPart1 = PrettyRelationshipDefinitions.ONE
-let relationshipPart2 = PrettyRelationshipDefinitions.MANY
-
-let originalFromColumnName = toRelationship.name,
-  originalToColumnName = fromRelationship.name
-let originalFromTable = plusTables.find((table) => table._id === toRelationship?.tableId)
-let originalToTable = plusTables.find((table) => table._id === fromRelationship?.tableId)
-
-let tableOptions
-let errorChecker = new RelationshipErrorChecker(invalidThroughTable, manyToManyRelationshipExistsFn)
-let errors = {}
-let fromPrimary, fromForeign, fromColumn, toColumn
-
-let throughId, throughToKey, throughFromKey
-let relationshipType
-let hasValidated = false
-
-$: fromId = null
-$: toId = null
-
-$: tableOptions = plusTables.map((table) => ({
-  label: table.name,
-  value: table._id,
-  name: table.name,
-  _id: table._id,
-}))
-
-$: {
-  // Determine the relationship type based on the selected values of both parts
-  relationshipType = Object.entries(relationshipMap).find(
-    ([_, parts]) => parts.part1 === relationshipPart1 && parts.part2 === relationshipPart2
-  )?.[0]
-
-  changed(() => {
-    hasValidated = false
-  })
-}
-
-$: valid =
-  getErrorCount(errors) === 0 && allRequiredAttributesSet(relationshipType) && fromId && toId
-$: isManyToMany = relationshipType === RelationshipType.MANY_TO_MANY
-$: isManyToOne =
-  relationshipType === RelationshipType.MANY_TO_ONE ||
-  relationshipType === RelationshipType.ONE_TO_MANY
 function getTable(id) {
   return plusTables.find((table) => table._id === id)
 }
@@ -111,6 +57,7 @@ function invalidThroughTable() {
   }
   return false
 }
+
 function manyToManyRelationshipExistsFn() {
   if (
     originalFromTable &&
@@ -291,6 +238,7 @@ async function saveRelationship() {
 
   await save({ action: "saved" })
 }
+
 async function deleteRelationship() {
   removeExistingRelationship()
   await save({ action: "deleted" })
@@ -304,6 +252,61 @@ function changed(fn) {
   }
   validate()
 }
+
+let relationshipPart1 = PrettyRelationshipDefinitions.ONE
+let relationshipPart2 = PrettyRelationshipDefinitions.MANY
+
+$: relationshipOpts1 =
+  relationshipPart2 === PrettyRelationshipDefinitions.ONE
+    ? [PrettyRelationshipDefinitions.MANY]
+    : Object.values(PrettyRelationshipDefinitions)
+
+$: relationshipOpts2 =
+  relationshipPart1 === PrettyRelationshipDefinitions.ONE
+    ? [PrettyRelationshipDefinitions.MANY]
+    : Object.values(PrettyRelationshipDefinitions)
+
+let originalFromColumnName = toRelationship.name,
+  originalToColumnName = fromRelationship.name
+let originalFromTable = plusTables.find((table) => table._id === toRelationship?.tableId)
+let originalToTable = plusTables.find((table) => table._id === fromRelationship?.tableId)
+
+let tableOptions
+let errorChecker = new RelationshipErrorChecker(invalidThroughTable, manyToManyRelationshipExistsFn)
+let errors = {}
+let fromPrimary, fromForeign, fromColumn, toColumn
+
+let throughId, throughToKey, throughFromKey
+let relationshipType
+let hasValidated = false
+
+$: fromId = null
+$: toId = null
+
+$: tableOptions = plusTables.map((table) => ({
+  label: table.name,
+  value: table._id,
+  name: table.name,
+  _id: table._id,
+}))
+
+$: {
+  // Determine the relationship type based on the selected values of both parts
+  relationshipType = Object.entries(relationshipMap).find(
+    ([_, parts]) => parts.part1 === relationshipPart1 && parts.part2 === relationshipPart2
+  )?.[0]
+
+  changed(() => {
+    hasValidated = false
+  })
+}
+
+$: valid =
+  getErrorCount(errors) === 0 && allRequiredAttributesSet(relationshipType) && fromId && toId
+$: isManyToMany = relationshipType === RelationshipType.MANY_TO_MANY
+$: isManyToOne =
+  relationshipType === RelationshipType.MANY_TO_ONE ||
+  relationshipType === RelationshipType.ONE_TO_MANY
 
 onMount(() => {
   if (fromRelationship) {

@@ -15,12 +15,6 @@ export let row = {}
 const dispatch = createEventDispatcher()
 let errors = []
 
-$: creating = row?._id == null
-$: table = row.tableId ? $tables.list.find((table) => table._id === row?.tableId) : $tables.selected
-$: tableSchema = getUserSchema(table)
-$: customSchemaKeys = getCustomSchemaKeys(tableSchema)
-$: if (!row.status) row.status = "active"
-
 const getUserSchema = (table) => {
   let schema = table?.schema ?? {}
   if (schema.username) {
@@ -83,6 +77,12 @@ const saveRow = async () => {
     return keepOpen
   }
 }
+
+$: creating = row?._id == null
+$: table = row.tableId ? $tables.list.find((table) => table._id === row?.tableId) : $tables.selected
+$: tableSchema = getUserSchema(table)
+$: customSchemaKeys = getCustomSchemaKeys(tableSchema)
+$: if (!row.status) row.status = "active"
 </script>
 
 <ModalContent

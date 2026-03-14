@@ -16,8 +16,6 @@ let searchValue: string
 let panelWidth = 260
 let apiModal: APIModal
 
-$: goto = $gotoStore
-
 const loadPanelWidth = () => {
   const saved = localStorage.getItem("api-panel-width")
   if (saved) {
@@ -28,14 +26,16 @@ const loadPanelWidth = () => {
   }
 }
 
-type SortableDatasource = Pick<Datasource | UIInternalDatasource, "name">
-
 const sortByDatasourceName = (a: SortableDatasource, b: SortableDatasource) =>
   (a.name || "").localeCompare(b.name || "", undefined, {
     sensitivity: "base",
   })
 
 const datasourceFilter = (datasource: any) => datasource.source === IntegrationTypes.REST
+
+$: goto = $gotoStore
+
+type SortableDatasource = Pick<Datasource | UIInternalDatasource, "name">
 
 const [resizable, resizableHandle] = getHorizontalResizeActions(panelWidth, (width: number) => {
   if (width) {

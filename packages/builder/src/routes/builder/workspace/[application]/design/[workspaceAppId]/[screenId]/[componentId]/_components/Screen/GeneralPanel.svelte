@@ -10,11 +10,6 @@ import { getBindableProperties } from "@/dataBinding"
 import sanitizeUrl from "@/helpers/sanitizeUrl"
 import { appStore, screenStore, selectedScreen } from "@/stores/builder"
 
-$: bindings = getBindableProperties($selectedScreen, null)
-$: screenSettings = getScreenSettings($selectedScreen)
-
-let errors = {}
-
 const getScreenSettings = (screen) => {
   // Determine correct screen settings for the top level component
   let screenComponentSettings = []
@@ -185,6 +180,11 @@ const setScreenSetting = async (setting, value) => {
 const removeCustomLayout = async () => {
   return screenStore.removeCustomLayout(get(selectedScreen))
 }
+
+$: bindings = getBindableProperties($selectedScreen, null)
+$: screenSettings = getScreenSettings($selectedScreen)
+
+let errors = {}
 </script>
 
 {#if $selectedScreen.layoutId}

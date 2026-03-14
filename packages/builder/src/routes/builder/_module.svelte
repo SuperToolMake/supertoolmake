@@ -19,6 +19,57 @@ import { admin, appsStore, auth, enrichedApps, organisation } from "@/stores/por
 import Branding from "./Branding.svelte"
 
 $isActive
+const isOnPreLoginPage = () => {
+  return $isActive("./auth") || $isActive("./invite") || $isActive("./admin")
+}
+
+async function initBuilder() {
+  loaded.set(false)
+  try {
+    await auth.getSelf()
+    await admin.init()
+
+    if ($admin.maintenance.length > 0) {
+      $goto("./maintenance")
+      return
+    }
+    if ($auth.user) {
+      // We need to load apps to know if we need to show onboarding fullscreen
+      await Promise.all([appsStore.load(), organisation.init()])
+
+      await auth.getInitInfo()
+    }
+
+    // Validate tenant if in a multi-tenant env
+    if (multiTenancyEnabled) {
+      await auth.validateTenantId()
+    }
+  } catch (error) {
+    // Don't show a notification here, as we might 403 initially due to not
+    // being logged in. API error handler will clear user if session was destroyed.
+    console.error("Error during builder initialization:", error)
+    // Rethrow to trigger catch block in template
+    throw error
+  }
+
+  loaded.set(true)
+
+  const invalidated = popNumSessionsInvalidated()
+  if (invalidated > 0) {
+    notifications.info(invalidationMessage(invalidated), {
+      duration: 5000,
+    })
+  }
+}
+
+// Event handler for the command palette
+const handleKeyDown = (e) => {
+  if (e.key === "k" && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault()
+    commandPaletteModal.toggle()
+  }
+}
+
 $: goto = $gotoStore
 
 let initPromise
@@ -39,10 +90,6 @@ $: {
     initPromise = initBuilder()
   }
   hasAuthenticated = isAuthenticated
-}
-
-const isOnPreLoginPage = () => {
-  return $isActive("./auth") || $isActive("./invite") || $isActive("./admin")
 }
 
 derivedMemo(
@@ -144,53 +191,6 @@ derivedMemo(
     }
   }
 )
-
-async function initBuilder() {
-  loaded.set(false)
-  try {
-    await auth.getSelf()
-    await admin.init()
-
-    if ($admin.maintenance.length > 0) {
-      $goto("./maintenance")
-      return
-    }
-    if ($auth.user) {
-      // We need to load apps to know if we need to show onboarding fullscreen
-      await Promise.all([appsStore.load(), organisation.init()])
-
-      await auth.getInitInfo()
-    }
-
-    // Validate tenant if in a multi-tenant env
-    if (multiTenancyEnabled) {
-      await auth.validateTenantId()
-    }
-  } catch (error) {
-    // Don't show a notification here, as we might 403 initially due to not
-    // being logged in. API error handler will clear user if session was destroyed.
-    console.error("Error during builder initialization:", error)
-    // Rethrow to trigger catch block in template
-    throw error
-  }
-
-  loaded.set(true)
-
-  const invalidated = popNumSessionsInvalidated()
-  if (invalidated > 0) {
-    notifications.info(invalidationMessage(invalidated), {
-      duration: 5000,
-    })
-  }
-}
-
-// Event handler for the command palette
-const handleKeyDown = (e) => {
-  if (e.key === "k" && (e.ctrlKey || e.metaKey)) {
-    e.preventDefault()
-    commandPaletteModal.toggle()
-  }
-}
 
 onMount(() => {
   initPromise = initBuilder()

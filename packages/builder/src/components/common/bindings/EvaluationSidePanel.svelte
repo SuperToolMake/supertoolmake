@@ -13,16 +13,6 @@ export let expressionLogs: Log[] = []
 export let evaluating = false
 export let expression: string | null = null
 
-$: error = expressionError != null
-$: empty = expression == null || expression?.trim() === ""
-$: success = !(error || empty)
-$: highlightedResult = highlight(expressionResult)
-$: highlightedLogs = expressionLogs.map((l) => ({
-  log: l.log.map((part) => highlight(part)).join(", "),
-  line: l.line,
-  type: l.type,
-}))
-
 const formatError = (err: any) => {
   if (err.code === UserScriptError.code) {
     return err.userScriptError.toString()
@@ -61,6 +51,16 @@ const copy = () => {
   Helpers.copyToClipboard(clipboardVal)
   notifications.success("Value copied to clipboard")
 }
+
+$: error = expressionError != null
+$: empty = expression == null || expression?.trim() === ""
+$: success = !(error || empty)
+$: highlightedResult = highlight(expressionResult)
+$: highlightedLogs = expressionLogs.map((l) => ({
+  log: l.log.map((part) => highlight(part)).join(", "),
+  line: l.line,
+  type: l.type,
+}))
 </script>
 
 <div class="evaluation-side-panel">

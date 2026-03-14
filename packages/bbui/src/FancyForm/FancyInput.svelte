@@ -20,8 +20,6 @@ let ref: HTMLInputElement
 let focused = false
 let autofilled = false
 
-$: placeholder = !(autofilled || focused || value)
-
 const onChange = (e: UIEvent) => {
   const newValue = e.target.value
   dispatch("change", newValue)
@@ -39,6 +37,8 @@ const onBlur = (e: UIEvent) => {
     error = validate(newValue)
   }
 }
+
+$: placeholder = !(autofilled || focused || value)
 
 onMount(() => {
   // Start watching for autofill every 100ms

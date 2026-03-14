@@ -11,11 +11,6 @@ const component = getContext("component")
 const { styleable } = getContext("sdk")
 
 // Add in certain settings to styles
-$: styles = enrichStyles($component.styles, color, align, size)
-
-// Ensure we're always passing in a string value to the markdown editor
-$: safeText = stringify(text)
-
 const enrichStyles = (
   styles: any,
   colorStyle: typeof color,
@@ -51,6 +46,11 @@ const stringify = (text: any): string => {
   }
   return text
 }
+
+$: styles = enrichStyles($component.styles, color, align, size)
+
+// Ensure we're always passing in a string value to the markdown editor
+$: safeText = stringify(text)
 </script>
 
 <div use:styleable={styles}>

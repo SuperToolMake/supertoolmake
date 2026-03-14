@@ -24,8 +24,6 @@ const dispatch = createEventDispatcher()
 
 let fileInput: HTMLInputElement | undefined
 
-$: inputAccept = Array.isArray(extensions) ? extensions.join(",") : "*"
-
 async function processFile(targetFile: File | undefined) {
   if (targetFile) {
     if (handleFileTooLarge && targetFile.size >= fileSizeLimit) {
@@ -44,6 +42,8 @@ function handleFile(evt: Event) {
 function clearFile() {
   if (!disabled) dispatch("change", undefined)
 }
+
+$: inputAccept = Array.isArray(extensions) ? extensions.join(",") : "*"
 </script>
 
 <input

@@ -8,10 +8,6 @@ import { permissions } from "@/stores/builder"
 export let query: Query
 export let label
 
-$: getPermissions(query)
-
-let roleId: string, loaded: boolean, fetched: Query | undefined
-
 async function updateRole(role: string) {
   try {
     roleId = role
@@ -48,6 +44,10 @@ async function getPermissions(queryToFetch: Query) {
   }
   loaded = true
 }
+
+$: getPermissions(query)
+
+let roleId: string, loaded: boolean, fetched: Query | undefined
 </script>
 
 {#if loaded}

@@ -13,13 +13,6 @@ let textarea
 let isOpen = false
 let anchor
 
-$: editable = focused && !readonly
-$: {
-  if (!focused) {
-    isOpen = false
-  }
-}
-
 const handleChange = (e) => {
   onChange(e.target.value)
 }
@@ -40,6 +33,13 @@ const open = async () => {
 const close = () => {
   textarea?.blur()
   isOpen = false
+}
+
+$: editable = focused && !readonly
+$: {
+  if (!focused) {
+    isOpen = false
+  }
 }
 
 onMount(() => {

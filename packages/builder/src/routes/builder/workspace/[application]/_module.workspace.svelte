@@ -20,10 +20,6 @@ export let application
 let sideNav
 let promise = getPackage(application)
 let showInviteUsersModal = false
-$: if ($bb.settings.open && showInviteUsersModal) {
-  showInviteUsersModal = false
-}
-
 async function getPackage(appId) {
   try {
     if ($admin.maintenance.length) {
@@ -46,6 +42,10 @@ async function getPackage(appId) {
 
     throw error
   }
+}
+
+$: if ($bb.settings.open && showInviteUsersModal) {
+  showInviteUsersModal = false
 }
 </script>
 

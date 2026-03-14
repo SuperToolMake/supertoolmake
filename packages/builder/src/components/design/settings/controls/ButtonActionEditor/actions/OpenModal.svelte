@@ -5,8 +5,6 @@ import { selectedScreen } from "@/stores/builder"
 
 export let parameters
 
-$: modalOptions = getModalOptions($selectedScreen)
-
 const getModalOptions = (screen) => {
   const modalComponents = findAllMatchingComponents(screen.props, (component) =>
     component._component.endsWith("/modal")
@@ -16,6 +14,8 @@ const getModalOptions = (screen) => {
     value: modal._id,
   }))
 }
+
+$: modalOptions = getModalOptions($selectedScreen)
 </script>
 
 <div class="root">

@@ -16,13 +16,13 @@ let exportPublishedVersion: boolean = false
 let unpublishModal: ConfirmDialog
 let revertModal: RevertModal
 
-$: updateAvailable = $appStore.upgradableVersion !== $appStore.version
-$: revertAvailable = $appStore.revertableVersion != null
-
 const exportApp = (opts: { published: any }) => {
   exportPublishedVersion = Boolean(opts?.published)
   exportModal.show()
 }
+
+$: updateAvailable = $appStore.upgradableVersion !== $appStore.version
+$: revertAvailable = $appStore.revertableVersion != null
 </script>
 
 <Layout noPadding>

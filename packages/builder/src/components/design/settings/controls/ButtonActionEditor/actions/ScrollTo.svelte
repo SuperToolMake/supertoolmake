@@ -7,16 +7,6 @@ import { componentStore, selectedScreen } from "@/stores/builder"
 export let parameters
 export let nested
 
-$: formComponent = getFormComponent($selectedScreen.props, parameters.componentId)
-$: formSchema = buildFormSchema(formComponent)
-$: fieldOptions = Object.keys(formSchema || {})
-$: actionProviders = getActionProviders(
-  $selectedScreen,
-  $componentStore.selectedComponentId,
-  "ScrollTo",
-  { includeSelf: nested }
-)
-
 const getFormComponent = (asset, id) => {
   let component = findComponent(asset, id)
   if (component) {
@@ -28,6 +18,16 @@ const getFormComponent = (asset, id) => {
   }
   return null
 }
+
+$: formComponent = getFormComponent($selectedScreen.props, parameters.componentId)
+$: formSchema = buildFormSchema(formComponent)
+$: fieldOptions = Object.keys(formSchema || {})
+$: actionProviders = getActionProviders(
+  $selectedScreen,
+  $componentStore.selectedComponentId,
+  "ScrollTo",
+  { includeSelf: nested }
+)
 </script>
 
 <div class="root">

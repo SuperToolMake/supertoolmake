@@ -30,6 +30,67 @@ const component = getContext("component")
 const autoRefreshActions = createAutoRefresh()
 let queryExtensions: Record<string, any> = {}
 
+const createFetch = (datasource: ProviderDatasource) => {
+  return fetchData({
+    API,
+    datasource,
+    options: {
+      query,
+      sortColumn,
+      sortOrder,
+      limit,
+      paginate,
+    },
+  })
+}
+
+const sanitizeSchema = (schema: TableSchema | null) => {
+  if (!schema) {
+    return schema
+  }
+  let cloned = { ...schema }
+  Object.entries(cloned).forEach(([field, fieldSchema]) => {
+    if (fieldSchema.visible === false) {
+      delete cloned[field]
+    }
+  })
+  return cloned
+}
+
+const addQueryExtension = (key: string, extension: any) => {
+  if (!(key && extension)) {
+    return
+  }
+  queryExtensions = { ...queryExtensions, [key]: extension }
+}
+
+const removeQueryExtension = (key: string) => {
+  if (!key) {
+    return
+  }
+  const newQueryExtensions = { ...queryExtensions }
+  delete newQueryExtensions[key]
+  queryExtensions = newQueryExtensions
+}
+
+const extendQuery = (
+  defaultQuery: SearchFilters,
+  extensions: Record<string, any>
+): SearchFilters => {
+  if (!Object.keys(extensions).length) {
+    return defaultQuery
+  }
+  const extended: SearchFilters = {
+    [LogicalOperator.AND]: {
+      conditions: [...(defaultQuery ? [defaultQuery] : []), ...Object.values(extensions || {})],
+    },
+    onEmptyFilter: EmptyFilterOption.RETURN_NONE,
+  }
+
+  // If there are no conditions applied at all, clear the request.
+  return (extended[LogicalOperator.AND]?.conditions?.length ?? 0) > 0 ? extended : {}
+}
+
 $: defaultQuery = QueryUtils.buildQuery(filter)
 
 // We need to manage our lucene query manually as we want to allow components
@@ -93,67 +154,6 @@ $: dataContext = {
   limit,
   primaryDisplay: ($fetch.definition as any)?.primaryDisplay,
   loaded: $fetch.loaded,
-}
-
-const createFetch = (datasource: ProviderDatasource) => {
-  return fetchData({
-    API,
-    datasource,
-    options: {
-      query,
-      sortColumn,
-      sortOrder,
-      limit,
-      paginate,
-    },
-  })
-}
-
-const sanitizeSchema = (schema: TableSchema | null) => {
-  if (!schema) {
-    return schema
-  }
-  let cloned = { ...schema }
-  Object.entries(cloned).forEach(([field, fieldSchema]) => {
-    if (fieldSchema.visible === false) {
-      delete cloned[field]
-    }
-  })
-  return cloned
-}
-
-const addQueryExtension = (key: string, extension: any) => {
-  if (!(key && extension)) {
-    return
-  }
-  queryExtensions = { ...queryExtensions, [key]: extension }
-}
-
-const removeQueryExtension = (key: string) => {
-  if (!key) {
-    return
-  }
-  const newQueryExtensions = { ...queryExtensions }
-  delete newQueryExtensions[key]
-  queryExtensions = newQueryExtensions
-}
-
-const extendQuery = (
-  defaultQuery: SearchFilters,
-  extensions: Record<string, any>
-): SearchFilters => {
-  if (!Object.keys(extensions).length) {
-    return defaultQuery
-  }
-  const extended: SearchFilters = {
-    [LogicalOperator.AND]: {
-      conditions: [...(defaultQuery ? [defaultQuery] : []), ...Object.values(extensions || {})],
-    },
-    onEmptyFilter: EmptyFilterOption.RETURN_NONE,
-  }
-
-  // If there are no conditions applied at all, clear the request.
-  return (extended[LogicalOperator.AND]?.conditions?.length ?? 0) > 0 ? extended : {}
 }
 
 onDestroy(() => {

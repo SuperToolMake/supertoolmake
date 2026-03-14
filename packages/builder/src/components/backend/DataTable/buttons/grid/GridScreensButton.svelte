@@ -11,17 +11,6 @@ const { datasource } = getContext("grid")
 
 let popover: ScreensPopover
 
-$: ds = $datasource
-$: resourceId = ds?.type === "table" ? ds.tableId : ds?.id
-$: connectedScreens = findConnectedScreens($screenStore.screens, resourceId)
-$: screenUsage = connectedScreens.map(
-  (screen: Screen): ScreenUsage => ({
-    url: screen.routing?.route,
-    _id: screen._id!,
-    workspaceAppId: screen.workspaceAppId,
-  })
-)
-
 const findConnectedScreens = (screens: Screen[], resourceId: string): Screen[] => {
   return screens.filter((screen) => {
     return JSON.stringify(screen).includes(`"${resourceId}"`)
@@ -32,6 +21,17 @@ const generateScreen = () => {
   popover?.hide()
   dispatch("generate")
 }
+
+$: ds = $datasource
+$: resourceId = ds?.type === "table" ? ds.tableId : ds?.id
+$: connectedScreens = findConnectedScreens($screenStore.screens, resourceId)
+$: screenUsage = connectedScreens.map(
+  (screen: Screen): ScreenUsage => ({
+    url: screen.routing?.route,
+    _id: screen._id!,
+    workspaceAppId: screen.workspaceAppId,
+  })
+)
 </script>
 
 <ScreensPopover
