@@ -17,6 +17,9 @@ describe("getRoutingInfo", () => {
     defaultWorkspaceApp = (
       await config.api.workspaceApp.fetch()
     ).workspaceApps.find(w => w.isDefault)!
+  })
+
+  it("should have default workspace app", () => {
     expect(defaultWorkspaceApp).toBeDefined()
   })
 

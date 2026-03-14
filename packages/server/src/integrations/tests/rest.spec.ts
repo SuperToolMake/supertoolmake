@@ -25,8 +25,6 @@ import {
   OAuth2GrantType,
   RestAuthType,
 } from "@budibase/types"
-import { createServer } from "http"
-import { AddressInfo } from "net"
 import * as undici from "undici"
 import {
   RequestInit as UndiciRequestInit,
@@ -949,31 +947,6 @@ describe("REST Integration", () => {
   })
 
   describe("Configuration options", () => {
-    // NOTE(samwho): it seems like this code doesn't actually work because it requires
-    // node-fetch >=3, and we're not on that because upgrading to it produces errors to
-    // do with ESM that are above my pay grade.
-    it.skip("doesn't fail when legacyHttpParser is set", async () => {
-      const server = createServer((req, res) => {
-        res.writeHead(200, {
-          "Transfer-Encoding": "chunked",
-          "Content-Length": "10",
-        })
-        res.end(JSON.stringify({ foo: "bar" }))
-      })
-
-      server.listen()
-      await new Promise(resolve => server.once("listening", resolve))
-
-      const address = server.address() as AddressInfo
-
-      const integration = new RestIntegration({
-        url: `http://localhost:${address.port}`,
-        legacyHttpParser: true,
-      })
-      const { data } = await integration.read({})
-      expect(data).toEqual({ foo: "bar" })
-    })
-
     it("doesn't fail when legacyHttpParser is true", async () => {
       queueJsonResponse(
         (url, options) => {

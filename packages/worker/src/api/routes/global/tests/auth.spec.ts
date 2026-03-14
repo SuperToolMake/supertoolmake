@@ -318,54 +318,5 @@ describe("/api/global/auth", () => {
         ).toBe(true)
       })
     })
-
-    describe.skip("GET /api/global/auth/:tenantId/oidc/callback", () => {
-      it("logs in", async () => {
-        const email = `${generator.guid()}@example.com`
-
-        nock("http://someconfigurl").get("/").times(2).reply(200, {
-          issuer: "test",
-          authorization_endpoint: "http://example.com/auth",
-          token_endpoint: "http://example.com/token",
-          userinfo_endpoint: "http://example.com/userinfo",
-        })
-
-        const token = jwt.sign(
-          {
-            iss: "test",
-            sub: "sub",
-            aud: "clientId",
-            exp: Math.floor(Date.now() / 1000) + 60 * 60,
-            email,
-          },
-          "secret"
-        )
-
-        nock("http://example.com").post("/token").reply(200, {
-          access_token: "access",
-          refresh_token: "refresh",
-          id_token: token,
-        })
-
-        nock("http://example.com").get("/userinfo?schema=openid").reply(200, {
-          sub: "sub",
-          email,
-        })
-
-        const configId = await generateOidcConfig()
-        const preAuthRes = await config.api.configs.getOIDCConfig(configId)
-        const res = await config.api.configs.OIDCCallback(configId, preAuthRes)
-        if (res.status > 399) {
-          throw new Error(
-            `OIDC callback failed with status ${res.status}: ${res.text}`
-          )
-        }
-
-        expect(res.status).toBe(302)
-        const location = res.get("location")
-        expect(location).toBe("/")
-        expectSetAuthCookie(res)
-      })
-    })
   })
 })

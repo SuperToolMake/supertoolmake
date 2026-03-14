@@ -11,9 +11,14 @@ describe("workspaceApps utils", () => {
     await config.init()
 
     workspaceApps = (await config.api.workspaceApp.fetch()).workspaceApps
+  })
+
+  it("should have initial workspace app", async () => {
     expect(workspaceApps).toHaveLength(1)
     expect(workspaceApps.find(x => x.url === "/")).toBeDefined()
+  })
 
+  it("should create additional workspace apps", async () => {
     for (const url of ["/app", "/app2"]) {
       workspaceApps.push(
         (

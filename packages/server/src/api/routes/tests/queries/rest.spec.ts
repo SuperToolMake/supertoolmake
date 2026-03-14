@@ -618,24 +618,12 @@ describe("rest", () => {
     })
 
     const user = config.getUserDetails()
+    let capturedBody: any
     mockAgent!
       .get("http://www.example.com")
       .intercept({ path: "/", method: "POST", query: { testParam: "1234" } })
       .reply(({ body }) => {
-        const form = extractFormEntries(body)
-        if (form) {
-          expect(form.email).toEqual(user.email)
-          expect(form.queryCode).toEqual("1234")
-          expect(form.userRef).toEqual(user.firstName)
-        } else {
-          const bodyString = toBodyString(body)
-          expect(bodyString).toContain('name="email"')
-          expect(bodyString).toContain(user.email)
-          expect(bodyString).toContain('name="queryCode"')
-          expect(bodyString).toContain("1234")
-          expect(bodyString).toContain('name="userRef"')
-          expect(bodyString).toContain(user.firstName)
-        }
+        capturedBody = body
         return {
           statusCode: 200,
           data: {},
@@ -662,6 +650,24 @@ describe("rest", () => {
           '{"email":"{{[user].[email]}}","queryCode":{{testParam}},"userRef":"{{userRef}}"}',
       },
     })
+
+    const form = extractFormEntries(capturedBody)
+    const bodyString = toBodyString(capturedBody)
+    const checkFormData = () => {
+      expect(form).toBeDefined()
+      expect(form!.email).toEqual(user.email)
+      expect(form!.queryCode).toEqual("1234")
+      expect(form!.userRef).toEqual(user.firstName)
+    }
+    const checkStringBody = () => {
+      expect(bodyString).toContain('name="email"')
+      expect(bodyString).toContain(user.email)
+      expect(bodyString).toContain('name="queryCode"')
+      expect(bodyString).toContain("1234")
+      expect(bodyString).toContain('name="userRef"')
+      expect(bodyString).toContain(user.firstName)
+    }
+    form ? checkFormData() : checkStringBody()
   })
 
   it("should bind the current user to the request body - encoded", async () => {

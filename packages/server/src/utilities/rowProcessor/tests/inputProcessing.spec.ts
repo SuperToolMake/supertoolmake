@@ -209,18 +209,11 @@ describe("rowProcessor - inputProcessing", () => {
 
       const row = await inputProcessing(userId, table, newRow)
 
-      if (userValue === undefined) {
-        // The 'user' field is omitted
-        expect(row).toEqual({
-          name: "Jack",
-        })
-      } else {
-        // The update is processed if null or "". 'user' is changed to an empty array.
-        expect(row).toEqual({
-          name: "Jack",
-          user: [],
-        })
-      }
+      const expectedUser = userValue === undefined ? undefined : []
+      expect(row).toEqual({
+        name: "Jack",
+        ...(expectedUser !== undefined && { user: expectedUser }),
+      })
 
       expect(
         bbReferenceProcessor.processInputBBReferences

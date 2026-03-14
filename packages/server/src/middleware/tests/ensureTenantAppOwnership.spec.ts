@@ -34,11 +34,13 @@ describe("Ensure Tenant Ownership Middleware", () => {
 
   it("throws when tenant appId does not match tenant ID", async () => {
     let called = false
-    await expect(context.doInTenant("tenant_2", async () => {
+    await expect(
+      context.doInTenant("tenant_2", async () => {
         await ensureTenantAppOwnershipMiddleware(ctx({ appId }), () => {
           called = true
         })
-      })).rejects.toThrow("Unauthorized")
+      })
+    ).rejects.toThrow("Unauthorized")
     expect(called).toBe(false)
   })
 

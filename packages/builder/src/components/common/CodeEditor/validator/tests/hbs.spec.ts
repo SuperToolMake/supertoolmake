@@ -37,37 +37,6 @@ describe("hbs validator", () => {
       expect(result).toHaveLength(0)
     })
 
-    // Waiting for missing fields validation
-    it.skip("throws on untrimmed invalid expressions", () => {
-      const text = "    {{ anotherFieldName }}"
-
-      const result = validateHbsTemplate(text, validators)
-      expect(result).toEqual([
-        {
-          from: 4,
-          message: `"anotherFieldName" handler does not exist.`,
-          severity: "warning",
-          to: 26,
-        },
-      ])
-    })
-
-    // Waiting for missing fields validation
-    it.skip("throws on invalid expressions between valid lines", () => {
-      const text =
-        "literal expression\nthe value is {{ anotherFieldName }}\nanother expression"
-
-      const result = validateHbsTemplate(text, validators)
-      expect(result).toEqual([
-        {
-          from: 32,
-          message: `"anotherFieldName" handler does not exist.`,
-          severity: "warning",
-          to: 54,
-        },
-      ])
-    })
-
     describe("expressions with whitespaces", () => {
       const validators = {
         [`field name`]: {},
@@ -78,21 +47,6 @@ describe("hbs validator", () => {
 
         const result = validateHbsTemplate(text, validators)
         expect(result).toHaveLength(0)
-      })
-
-      // Waiting for missing fields validation
-      it.skip("throws if not wrapped between brackets", () => {
-        const text = `{{ field name }}`
-
-        const result = validateHbsTemplate(text, validators)
-        expect(result).toEqual([
-          {
-            from: 0,
-            message: `"field" handler does not exist.`,
-            severity: "warning",
-            to: 16,
-          },
-        ])
       })
     })
   })

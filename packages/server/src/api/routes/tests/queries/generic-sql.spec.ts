@@ -925,12 +925,11 @@ if (descriptions.length) {
             } catch (err: any) {
               error = err.message
             }
-            if (isMSSQL) {
-              expect(error).toBeUndefined()
-            } else {
-              expect(error).toBeDefined()
-              expect(error).toContain("integer")
-            }
+            expect(error).toSatisfy(
+              isMSSQL
+                ? (e: any) => e === undefined
+                : (e: any) => e !== undefined && e.includes("integer")
+            )
           })
 
           it("should not error for new queries", async () => {

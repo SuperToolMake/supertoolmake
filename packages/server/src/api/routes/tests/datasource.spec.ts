@@ -380,35 +380,35 @@ if (descriptions.length) {
         await config.api.datasource.fetchSchema({ datasourceId })
 
         const updated = await config.api.datasource.get(datasourceId)
+        const buildExpectedTable = (table: Table) => {
+          const expectedSchema: TableSchema = {}
+          for (const [fieldName, field] of Object.entries(table.schema)) {
+            expectedSchema[fieldName] = {
+              ...field,
+              externalType: allowUndefined(expect.any(String)),
+              constraints: allowUndefined(expect.any(Object)),
+              autocolumn: allowUndefined(expect.any(Boolean)),
+            }
+          }
+          return expect.objectContaining({
+            ...table,
+            primaryDisplay: expect.not.stringMatching(
+              new RegExp(`^${table.primaryDisplay || ""}$`)
+            ),
+            schema: expectedSchema,
+          })
+        }
+        const expectedEntities = persisted?.entities
+          ? Object.fromEntries(
+              Object.entries(persisted.entities).map(([tableName, table]) => [
+                tableName,
+                buildExpectedTable(table),
+              ])
+            )
+          : undefined
         const expected: Datasource = {
           ...persisted,
-          entities:
-            persisted?.entities &&
-            Object.entries(persisted.entities).reduce<Record<string, Table>>(
-              (acc, [tableName, table]) => {
-                acc[tableName] = expect.objectContaining({
-                  ...table,
-                  primaryDisplay: expect.not.stringMatching(
-                    new RegExp(`^${table.primaryDisplay || ""}$`)
-                  ),
-                  schema: Object.entries(table.schema).reduce<TableSchema>(
-                    (acc, [fieldName, field]) => {
-                      acc[fieldName] = {
-                        ...field,
-                        externalType: allowUndefined(expect.any(String)),
-                        constraints: allowUndefined(expect.any(Object)),
-                        autocolumn: allowUndefined(expect.any(Boolean)),
-                      }
-                      return acc
-                    },
-                    {}
-                  ),
-                })
-                return acc
-              },
-              {}
-            ),
-
+          entities: expectedEntities,
           _rev: expect.any(String),
           updatedAt: expect.any(String),
         }
