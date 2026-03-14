@@ -370,7 +370,10 @@ const getDynamicVariables = (datasource, queryId, matchFn) => {
     const filtered = queryId
       ? variablesList.filter((variable) => matchFn(variable, queryId))
       : variablesList
-    return filtered.reduce((acc, next) => ({ ...acc, [next.name]: next.value }), {})
+    return filtered.reduce((acc, next) => {
+      acc[next.name] = next.value
+      return acc
+    }, {})
   }
   return {}
 }

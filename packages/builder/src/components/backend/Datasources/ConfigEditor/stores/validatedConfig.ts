@@ -103,13 +103,10 @@ export const createValidatedConfigStore = (
             newStore[field.key] = field.value
           })
         } else {
-          newStore[key] = arrayValue.reduce(
-            (p, field) => ({
-              ...p,
-              [field.key]: field.value,
-            }),
-            {}
-          )
+          newStore[key] = arrayValue.reduce((p, field) => {
+            p[field.key] = field.value
+            return p
+          }, {})
         }
       } else {
         newStore[key] = value

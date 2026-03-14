@@ -45,24 +45,33 @@
         "noDoubleEquals": "off",
         "noExplicitAny": "off",
         "noGlobalAssign": "warn",
-        "noImplicitAnyLet": "warn",
+        "noImplicitAnyLet": "off",
         "noImportAssign": "warn",
         "noNonNullAssertedOptionalChain": "warn",
         "noThenProperty": "warn",
-        "useIterableCallbackReturn": "warn"
+        "useIterableCallbackReturn": "off"
       },
       "correctness": {
         "noConstructorReturn": "warn",
         "noInvalidUseBeforeDeclaration": "warn",
         "noSelfAssign": "warn",
         "noUnusedVariables": "error",
-        "noUnusedFunctionParameters": "error"
+        "noUnusedFunctionParameters": "error",
+        "noUnusedImports": "error"
       },
       "security": {
         "noGlobalEval": "warn"
       },
       "complexity": {
-        "useOptionalChain": "error"
+        "useOptionalChain": "error",
+        "noBannedTypes": "off",
+        "noStaticOnlyClass": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off"
+      },
+      "performance": {
+        "noAccumulatingSpread": "error"
       }
     }
   },
@@ -72,7 +81,8 @@
       "linter": {
         "rules": {
           "correctness": {
-            "noUnusedVariables": "warn"
+            "noUnusedVariables": "warn",
+            "noUnusedImports": "off"
           }
         }
       }

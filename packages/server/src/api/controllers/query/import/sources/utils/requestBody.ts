@@ -119,7 +119,7 @@ const pickSchema = (
         return { ...candidate }
       }
 
-      const next: SchemaObject = { ...accumulator }
+      const next: SchemaObject = accumulator
 
       const mergedProperties = {
         ...getProperties(accumulator),

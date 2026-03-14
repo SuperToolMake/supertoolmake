@@ -130,13 +130,10 @@ async function handleFile(e) {
     rawRows = response.rows
     schema = response.schema
     fileName = response.fileName
-    selectedColumnTypes = Object.entries(response.schema).reduce(
-      (acc, [colName, fieldConfig]) => ({
-        ...acc,
-        [colName]: fieldConfig.type,
-      }),
-      {}
-    )
+    selectedColumnTypes = Object.entries(response.schema).reduce((acc, [colName, fieldConfig]) => {
+      acc[colName] = fieldConfig.type
+      return acc
+    }, {})
   } catch (e) {
     loading = false
     error = e

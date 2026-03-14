@@ -41,10 +41,10 @@ $: valid = $enrichedOptions.every((option) => option.valid)
 
 const updateConstraints = (options) => {
   constraints.inclusion = options.map((option) => option.name)
-  optionColors = options.reduce(
-    (colors, option) => ({ ...colors, [option.name]: option.color }),
-    {}
-  )
+  optionColors = options.reduce((colors, option) => {
+    colors[option.name] = option.color
+    return colors
+  }, {})
 }
 
 const addNewInput = async () => {

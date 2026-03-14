@@ -89,7 +89,12 @@ export function buildUrl(
 }
 
 export const getBindingContext = (objects: Record<any, any>[]): Record<string, any> => {
-  return objects.reduce((acc, current) => ({ ...acc, ...(current || {}) }), {})
+  return objects.reduce((acc, current) => {
+    if (current) {
+      Object.assign(acc, current)
+    }
+    return acc
+  }, {})
 }
 
 export interface DynamicVariablesResult {
@@ -108,13 +113,10 @@ export const getDynamicVariables = (
       queryId && matchFn
         ? variablesList.filter((variable: any) => matchFn(variable, queryId))
         : variablesList
-    return filtered.reduce(
-      (acc: Record<string, any>, next: any) => ({
-        ...acc,
-        [next.name]: next.value,
-      }),
-      {}
-    )
+    return filtered.reduce((acc: Record<string, any>, next: any) => {
+      acc[next.name] = next.value
+      return acc
+    }, {})
   }
   return {}
 }

@@ -309,7 +309,7 @@ const getRelIds = (filters: Record<string, SearchFilter>) => {
       (filter.type === FieldType.BB_REFERENCE_SINGLE || filter.type === FieldType.BB_REFERENCE) &&
       filter.value
     ) {
-      acc = [...acc, ...(Array.isArray(filter.value) ? filter.value : [filter.value])]
+      acc.push(...(Array.isArray(filter.value) ? filter.value : [filter.value]))
     }
     return acc
   }, [])

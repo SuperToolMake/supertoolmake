@@ -18,15 +18,12 @@ let relationshipPanelAnchor
 let relationshipFieldName
 
 $: relationshipField = columns.find((c) => c.name === relationshipFieldName)?.schema
-$: permissionsObj = permissions.reduce(
-  (acc, c) => ({
-    ...acc,
-    [c]: {
-      disabled: disabledPermissions.includes(c),
-    },
-  }),
-  {}
-)
+$: permissionsObj = permissions.reduce((acc, c) => {
+  acc[c] = {
+    disabled: disabledPermissions.includes(c),
+  }
+  return acc
+}, {})
 
 $: displayColumns = columns.map((c) => {
   const isRequired = c.primaryDisplay || helpers.schema.isRequired(c.schema.constraints)

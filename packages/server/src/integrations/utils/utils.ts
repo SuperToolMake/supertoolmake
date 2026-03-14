@@ -361,7 +361,13 @@ export function finaliseExternalTables(
   // sort the tables by name, this is for the UI to display them in alphabetical order
   return Object.entries(finalTables)
     .sort(([a], [b]) => a.localeCompare(b))
-    .reduce((r, [k, v]) => ({ ...r, [k]: v }), {})
+    .reduce(
+      (r, [k, v]) => {
+        r[k] = v
+        return r
+      },
+      {} as Record<string, Table>
+    )
 }
 
 export function checkExternalTables(tables: Record<string, Table>): Record<string, string> {

@@ -450,11 +450,12 @@ class PostgresIntegration extends Sql implements DatasourcePlus {
       // Fetch enum values
       const enumsResponse = await this.client.query(this.ENUM_VALUES())
       // output array, allows for more than 1 single-select to be used at a time
-      const enumValues = enumsResponse.rows?.reduce((acc, row) => {
-        return {
-          ...acc,
-          [row.typname]: [...(acc[row.typname] || []), row.enumlabel],
+      const enumValues = enumsResponse.rows?.reduce<Record<string, string[]>>((acc, row) => {
+        if (!acc[row.typname]) {
+          acc[row.typname] = []
         }
+        acc[row.typname].push(row.enumlabel)
+        return acc
       }, {})
 
       for (const column of columnsResponse.rows) {

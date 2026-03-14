@@ -1,10 +1,10 @@
 <script context="module">
 import iconData from "./icons.js"
 
-const icons = Object.keys(iconData).reduce(
-  (acc, cat) => [...acc, ...Object.keys(iconData[cat])],
-  []
-)
+const icons = Object.keys(iconData).reduce((acc, cat) => {
+  acc.push(...Object.keys(iconData[cat]))
+  return acc
+}, [])
 </script>
 
 <script>

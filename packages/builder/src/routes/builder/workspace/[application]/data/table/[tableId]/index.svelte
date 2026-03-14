@@ -82,7 +82,7 @@ $: userSchemaOverrides = {
 $: autoColumnStatus = verifyAutocolumns($tables?.selected)
 $: duplicates = Object.values(autoColumnStatus).reduce((acc, status) => {
   if (status.length > 1) {
-    acc = [...acc, ...status]
+    acc.push(...status)
   }
   return acc
 }, [])

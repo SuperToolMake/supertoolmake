@@ -111,7 +111,10 @@ function trimFields(rows: Row[], schema: TableSchema) {
   const result = rows.map((row) =>
     Object.keys(row)
       .filter((key) => allowedFields.includes(key))
-      .reduce((acc, key) => ({ ...acc, [key]: row[key] }), {} as Row)
+      .reduce((acc, key) => {
+        acc[key] = row[key]
+        return acc
+      }, {} as Row)
   )
   return result
 }

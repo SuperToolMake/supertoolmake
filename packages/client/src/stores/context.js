@@ -7,7 +7,10 @@ export const createContextStore = (parentContext) => {
   // Derive the total context state at this point in the tree
   const contexts = parentContext ? [parentContext, context] : [context]
   const totalContext = derived(contexts, ($contexts) => {
-    return $contexts.reduce((total, context) => ({ ...total, ...context }), {})
+    return $contexts.reduce((total, context) => {
+      Object.assign(total, context)
+      return total
+    }, {})
   })
 
   // Subscribe to updates in the parent context, so that we can proxy on any

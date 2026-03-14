@@ -248,11 +248,11 @@ const allTableFields = [
 
 const fieldDefinitions: Record<string, UIField> = Object.values(FIELDS).reduce(
   // Storing the fields by complex field id
-  (acc, field) => ({
-    ...acc,
-    [makeFieldId(field.type, field.subtype)]: field,
-  }),
-  {}
+  (acc, field) => {
+    acc[makeFieldId(field.type, field.subtype)] = field
+    return acc
+  },
+  {} as Record<string, UIField>
 )
 
 function makeFieldId(type: string, subtype?: string, autocolumn?: boolean) {

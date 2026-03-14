@@ -96,7 +96,10 @@ export function hasSchema(test: any) {
 export function trimOtherProps(object: any, allowedProps: string[]) {
   const result = Object.keys(object)
     .filter((key) => allowedProps.includes(key))
-    .reduce<Record<string, any>>((acc, key) => ({ ...acc, [key]: object[key] }), {})
+    .reduce<Record<string, any>>((acc, key) => {
+      acc[key] = object[key]
+      return acc
+    }, {})
   return result
 }
 

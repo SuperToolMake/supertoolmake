@@ -7,7 +7,6 @@ import {
   type User,
 } from "@budibase/types"
 import ical from "ical-generator"
-import _ from "lodash"
 import { marked } from "marked"
 import nodemailer from "nodemailer"
 import type SMTPTransport from "nodemailer/lib/smtp-transport"
