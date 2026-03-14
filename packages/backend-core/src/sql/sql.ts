@@ -246,18 +246,6 @@ class InternalBuilder {
     return key.split(".")
   }
 
-  private qualifyIdentifier(key: string): string {
-    const tableName = this.getTableName()
-    const parts = this.splitIdentifier(key)
-    if (parts[0] !== tableName) {
-      parts.unshift(tableName)
-    }
-    if (this.isQuoted(key)) {
-      return this.quotedIdentifier(parts)
-    }
-    return parts.join(".")
-  }
-
   private generateSelectStatement(): (string | Knex.Raw)[] | "*" {
     const { table, resource } = this.query
 

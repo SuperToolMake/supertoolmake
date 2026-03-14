@@ -188,34 +188,6 @@ const SCHEMA: Integration = {
   },
 }
 
-interface MSSQLColumnDefinition {
-  TableName: string
-  ColumnName: string
-  DataType: string
-  MaxLength: number
-  IsNullable: boolean
-  IsIdentity: boolean
-  Precision: number
-  Scale: number
-}
-
-interface ColumnDefinitionMetadata {
-  usesMaxLength?: boolean
-  usesPrecision?: boolean
-}
-
-const COLUMN_DEFINITION_METADATA: Record<string, ColumnDefinitionMetadata> = {
-  DATETIME2: { usesMaxLength: true },
-  TIME: { usesMaxLength: true },
-  DATETIMEOFFSET: { usesMaxLength: true },
-  NCHAR: { usesMaxLength: true },
-  NVARCHAR: { usesMaxLength: true },
-  BINARY: { usesMaxLength: true },
-  VARBINARY: { usesMaxLength: true },
-  DECIMAL: { usesPrecision: true },
-  NUMERIC: { usesPrecision: true },
-}
-
 class SqlServerIntegration extends Sql implements DatasourcePlus {
   private readonly config: MSSQLConfig
   private index = 0
@@ -342,7 +314,7 @@ class SqlServerIntegration extends Sql implements DatasourcePlus {
     }
   }
 
-  async internalQuery(query: SqlQuery, operation: string | undefined) {
+  async internalQuery(query: SqlQuery, operation: string | undefined = undefined) {
     const client = this.client!
     const request = client.request()
     this.index = 0
@@ -524,60 +496,6 @@ class SqlServerIntegration extends Sql implements DatasourcePlus {
       return [{ [operation]: true }]
     }
     return this.queryWithReturning(json, queryFn, processFn)
-  }
-
-  private async getColumnDefinitions(): Promise<MSSQLColumnDefinition[]> {
-    // Query to retrieve table schema
-    const query = `
-  SELECT
-    t.name AS TableName,
-    c.name AS ColumnName,
-    ty.name AS DataType,
-    ty.precision AS Precision,
-    ty.scale AS Scale,
-    c.max_length AS MaxLength,
-    c.is_nullable AS IsNullable,
-    c.is_identity AS IsIdentity
-  FROM
-    sys.tables t
-    INNER JOIN sys.columns c ON t.object_id = c.object_id
-    INNER JOIN sys.types ty 
-      ON c.system_type_id = ty.system_type_id 
-      AND c.user_type_id = ty.user_type_id
-  WHERE
-    t.is_ms_shipped = 0
-  ORDER BY
-    t.name, c.column_id
-`
-
-    await this.connect()
-
-    const result = await this.internalQuery({
-      sql: query,
-    })
-
-    return result.recordset as MSSQLColumnDefinition[]
-  }
-
-  private getDataType(columnDef: MSSQLColumnDefinition): string {
-    const { DataType, MaxLength, Precision, Scale } = columnDef
-    const { usesMaxLength = false, usesPrecision = false } =
-      COLUMN_DEFINITION_METADATA[DataType] || {}
-
-    let dataType = DataType
-
-    if (usesMaxLength) {
-      if (MaxLength === -1) {
-        dataType += `(MAX)`
-      } else {
-        dataType += `(${MaxLength})`
-      }
-    }
-    if (usesPrecision) {
-      dataType += `(${Precision}, ${Scale})`
-    }
-
-    return dataType
   }
 }
 

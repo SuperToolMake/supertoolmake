@@ -59,7 +59,8 @@
         "noSelfAssign": "warn",
         "noUnusedVariables": "error",
         "noUnusedFunctionParameters": "error",
-        "noUnusedImports": "error"
+        "noUnusedImports": "error",
+        "noUnusedPrivateClassMembers": "error"
       },
       "security": {
         "noGlobalEval": "warn"
