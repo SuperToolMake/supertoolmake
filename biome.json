@@ -51,7 +51,8 @@
         "noThenProperty": "warn",
         "useIterableCallbackReturn": "off",
         "noConfusingVoidType": "error",
-        "noGlobalIsNan": "error"
+        "noGlobalIsNan": "error",
+        "useDefaultSwitchClauseLast": "error"
       },
       "correctness": {
         "noConstructorReturn": "warn",

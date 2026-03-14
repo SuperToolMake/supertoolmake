@@ -113,9 +113,6 @@ export default function positionDropdown(element: HTMLElement, opts: Opts) {
       // Applies the X strategy to our styles
       const applyXStrategy = (strategy: Strategy) => {
         switch (strategy) {
-          default:
-            styles.left = anchorBounds.left
-            break
           case "EndToEnd":
             styles.left = anchorBounds.right - elementBounds.width
             break
@@ -131,6 +128,9 @@ export default function positionDropdown(element: HTMLElement, opts: Opts) {
           case "ScreenEdge":
             styles.left = winWidth - elementBounds.width - screenOffset
             break
+          default:
+            styles.left = anchorBounds.left
+            break
         }
       }
 
@@ -145,10 +145,6 @@ export default function positionDropdown(element: HTMLElement, opts: Opts) {
             styles.top = anchorBounds.bottom - elementBounds.height
             applyMaxHeight(anchorBounds.bottom - screenOffset)
             break
-          default:
-            styles.top = anchorBounds.bottom + offset
-            applyMaxHeight(winHeight - anchorBounds.bottom - screenOffset)
-            break
           case "EndToStart":
             styles.top = anchorBounds.top - elementBounds.height - offset
             applyMaxHeight(anchorBounds.top - screenOffset)
@@ -159,6 +155,10 @@ export default function positionDropdown(element: HTMLElement, opts: Opts) {
           case "ScreenEdge":
             styles.top = winHeight - elementBounds.height - screenOffset
             applyMaxHeight(winHeight - 2 * screenOffset)
+            break
+          default:
+            styles.top = anchorBounds.bottom + offset
+            applyMaxHeight(winHeight - anchorBounds.bottom - screenOffset)
             break
         }
       }
