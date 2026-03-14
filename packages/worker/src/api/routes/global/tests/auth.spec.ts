@@ -14,7 +14,6 @@ import { Response } from "superagent"
 
 import * as userSdk from "../../../../sdk/users"
 import nock from "nock"
-import * as jwt from "jsonwebtoken"
 
 function getAuthCookie(response: Response) {
   const cookies = response.headers["set-cookie"]
