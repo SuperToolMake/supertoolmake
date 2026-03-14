@@ -599,14 +599,14 @@ export function runQuery<T extends Record<string, any>>(docs: T[], query: Search
     }
 
     const docNum = Number(docValue)
-    if (!isNaN(docNum)) {
+    if (!Number.isNaN(docNum)) {
       const lowNum = Number(testValue.low)
       const highNum = Number(testValue.high)
-      if (!(isNaN(lowNum) || isNaN(highNum))) {
+      if (!(Number.isNaN(lowNum) || Number.isNaN(highNum))) {
         return docNum >= lowNum && docNum <= highNum
-      } else if (!isNaN(lowNum)) {
+      } else if (!Number.isNaN(lowNum)) {
         return docNum >= lowNum
-      } else if (!isNaN(highNum)) {
+      } else if (!Number.isNaN(highNum)) {
         return docNum <= highNum
       }
     }
@@ -881,7 +881,7 @@ export function sort<T extends Record<string, any>>(
  */
 export function limit<T>(docs: T[], limit: string | number): T[] {
   const numLimit = typeof limit === "number" ? limit : parseFloat(limit)
-  if (isNaN(numLimit)) {
+  if (Number.isNaN(numLimit)) {
     return docs
   }
   return docs.slice(0, numLimit)

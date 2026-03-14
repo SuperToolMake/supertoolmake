@@ -56,7 +56,7 @@ const onBlur = () => {
 }
 
 const isValidDate = (value) => {
-  return !(value && isNaN(new Date(value).valueOf()))
+  return !(value && Number.isNaN(new Date(value).valueOf()))
 }
 
 const hasValidLinks = (value) => {

@@ -101,7 +101,7 @@ const processEvent = Utils.domDebounce((mouseX: number, mouseY: number) => {
   }
   const cols = parseInt(domGrid.dataset.cols || "")
   const colSize = parseInt(domGrid.dataset.colSize || "")
-  if (isNaN(cols) || isNaN(colSize)) {
+  if (Number.isNaN(cols) || Number.isNaN(colSize)) {
     throw "DOM grid missing required dataset attributes"
   }
   const diffX = mouseX - startX

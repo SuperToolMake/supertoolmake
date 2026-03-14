@@ -30,7 +30,7 @@ const resolveTimeStamp = (timestamp) => {
     return null
   }
   let maskedDate = new Date(`0-${timestamp}`)
-  if (maskedDate instanceof Date && !isNaN(maskedDate.getTime())) {
+  if (maskedDate instanceof Date && !Number.isNaN(maskedDate.getTime())) {
     return maskedDate
   } else {
     return null

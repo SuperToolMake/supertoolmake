@@ -137,7 +137,7 @@ export function isValidISODateString(str: string) {
     return false
   }
   const d = new Date(trimmedValue)
-  return !isNaN(d.getTime())
+  return !Number.isNaN(d.getTime())
 }
 
 export function isValidISODateStringWithoutTimezone(str: string) {
@@ -146,7 +146,7 @@ export function isValidISODateStringWithoutTimezone(str: string) {
     return false
   }
   const d = new Date(trimmedValue)
-  return !isNaN(d.getTime())
+  return !Number.isNaN(d.getTime())
 }
 
 export function extractDate(str: string) {

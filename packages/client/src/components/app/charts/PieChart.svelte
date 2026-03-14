@@ -96,7 +96,7 @@ const getSeries = (dataProvider, valueColumn) => {
 
     // This chart doesn't automatically parse strings into numbers
     const numValue = parseFloat(value)
-    if (isNaN(numValue)) {
+    if (Number.isNaN(numValue)) {
       return 0
     }
 

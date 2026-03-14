@@ -59,7 +59,7 @@ const getStyleString = (attribute: string, value: string | number | undefined) =
   if (value == null) {
     return ""
   }
-  if (typeof value !== "number" || isNaN(value)) {
+  if (typeof value !== "number" || Number.isNaN(value)) {
     return `${attribute}:${value};`
   }
   return `${attribute}:${value}px;`

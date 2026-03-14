@@ -96,7 +96,7 @@ export function validate(
         helpers.schema.isRequired(constraints)
       ) {
         results.schemaValidation[columnName] = false
-      } else if (columnType === FieldType.NUMBER && isNaN(Number(columnData))) {
+      } else if (columnType === FieldType.NUMBER && Number.isNaN(Number(columnData))) {
         // If provided must be a valid number
         results.schemaValidation[columnName] = false
       } else if (

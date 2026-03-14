@@ -71,7 +71,7 @@ export class BudibaseQueue<T> {
       queue = new BullQueue(this.jobQueue, queueConfig)
     } else if (
       process.env.BULL_TEST_REDIS_PORT &&
-      !isNaN(Number(process.env.BULL_TEST_REDIS_PORT))
+      !Number.isNaN(Number(process.env.BULL_TEST_REDIS_PORT))
     ) {
       queue = new BullQueue(this.jobQueue, {
         ...queueConfig,

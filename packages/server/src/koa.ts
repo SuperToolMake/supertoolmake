@@ -20,7 +20,7 @@ export default function createKoaApp() {
   ]
 
   let mbNumber = parseInt(env.HTTP_MB_LIMIT || "10")
-  if (!mbNumber || isNaN(mbNumber)) {
+  if (!mbNumber || Number.isNaN(mbNumber)) {
     mbNumber = 10
   }
   const defaultBodyParser = koaBody({

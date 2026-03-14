@@ -327,7 +327,7 @@ export async function coreOutputProcessing(
         if (typeof row[property] === "string") {
           const dateStr = row[property]
           row[property] = new Date(dateStr + "Z")
-          if (isNaN(row[property].getTime())) {
+          if (Number.isNaN(row[property].getTime())) {
             row[property] = new Date(dateStr)
           }
         }
@@ -340,7 +340,7 @@ export async function coreOutputProcessing(
         if (typeof row[property] === "string") {
           const dateStr = row[property]
           row[property] = new Date(dateStr + "Z")
-          if (isNaN(row[property].getTime())) {
+          if (Number.isNaN(row[property].getTime())) {
             row[property] = new Date(dateStr)
           }
         }

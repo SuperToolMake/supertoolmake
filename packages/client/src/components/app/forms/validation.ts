@@ -166,7 +166,7 @@ const parseType = (value: any, type: `${FieldType}`) => {
 
   // Parse as number
   if (type === FieldType.NUMBER) {
-    if (isNaN(value)) {
+    if (Number.isNaN(value)) {
       return null
     }
     return parseFloat(value)
@@ -177,8 +177,8 @@ const parseType = (value: any, type: `${FieldType}`) => {
     if (value instanceof Date) {
       return value.getTime()
     }
-    const time = isNaN(value) ? Date.parse(value) : new Date(value).getTime()
-    return isNaN(time) ? null : time
+    const time = Number.isNaN(value) ? Date.parse(value) : new Date(value).getTime()
+    return Number.isNaN(time) ? null : time
   }
 
   // Parse as boolean

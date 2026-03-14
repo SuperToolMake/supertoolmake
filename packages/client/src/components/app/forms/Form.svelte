@@ -26,7 +26,7 @@ const { fetchDatasourceSchema, fetchDatasourceDefinition } = getContext("sdk")
 
 const getInitialFormStep = () => {
   const parsedFormStep = parseInt(initialFormStep.toString())
-  if (isNaN(parsedFormStep)) {
+  if (Number.isNaN(parsedFormStep)) {
     return 1
   }
   return parsedFormStep

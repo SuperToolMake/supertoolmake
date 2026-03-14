@@ -17,7 +17,7 @@ export default class CustomFetch extends BaseDataFetch<CustomDatasource, CustomD
       }
       // Use JSON for objects to ensure they are stringified
       return "json"
-    } else if (!isNaN(value)) {
+    } else if (!Number.isNaN(value)) {
       return "number"
     } else {
       return "string"

@@ -59,7 +59,7 @@ $: options = {
         const rows = dataProvider.rows || []
         const values = rows
           .map((row, i) => ({ row, value: parseFloat(row[valueColumn]), i }))
-          .filter((obj) => !isNaN(obj.value))
+          .filter((obj) => !Number.isNaN(obj.value))
 
         const [min, max] = getValuesRange(values.map((obj) => obj.value))
         const buckets = getBuckets(min, max, bucketCount)
@@ -105,7 +105,9 @@ function handleBucketClick(rowsInBucket, lowerLimit, upperLimit) {
 const getSeries = (dataProvider, valueColumn, bucketCount) => {
   const rows = dataProvider.rows ?? []
 
-  const values = rows.map((row) => parseFloat(row[valueColumn])).filter((value) => !isNaN(value))
+  const values = rows
+    .map((row) => parseFloat(row[valueColumn]))
+    .filter((value) => !Number.isNaN(value))
   const [min, max] = getValuesRange(values)
   const buckets = getBuckets(min, max, bucketCount)
   const counts = Array(bucketCount).fill(0)

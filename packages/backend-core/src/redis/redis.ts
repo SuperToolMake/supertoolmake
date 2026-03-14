@@ -233,7 +233,7 @@ class RedisWrapper {
 
   async increment(key: string): Promise<number> {
     const result = await this.client.incr(this.prefixed(key))
-    if (isNaN(result)) {
+    if (Number.isNaN(result)) {
       throw new Error(`Redis ${key} does not contain a number`)
     }
     return result

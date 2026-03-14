@@ -297,7 +297,7 @@ const formApi = {
       currentStep.update((step) => Math.max(1, step - 1))
     } else if (type === "first") {
       currentStep.set(1)
-    } else if (type === "specific" && number && !isNaN(number)) {
+    } else if (type === "specific" && number && !Number.isNaN(number)) {
       currentStep.set(parseInt(number))
     }
   },

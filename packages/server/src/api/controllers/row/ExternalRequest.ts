@@ -295,7 +295,7 @@ export class ExternalRequest<T extends Operation> {
         continue
       }
       // parse floats/numbers
-      if (field.type === FieldType.NUMBER && !isNaN(parseFloat(row[key]))) {
+      if (field.type === FieldType.NUMBER && !Number.isNaN(parseFloat(row[key]))) {
         newRow[key] = parseFloat(row[key])
       } else if (field.type === FieldType.LINK) {
         const { tableName: linkTableName } = breakExternalTableId(field.tableId)

@@ -7,7 +7,7 @@ const parseNumber = (val) => {
   if (val == null) {
     return null
   }
-  return isNaN(val) ? null : parseFloat(val)
+  return Number.isNaN(val) ? null : parseFloat(val)
 }
 </script>
 

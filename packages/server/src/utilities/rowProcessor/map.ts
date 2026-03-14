@@ -91,7 +91,7 @@ export const TYPE_TRANSFORM_MAP: Record<
     [undefined]: undefined,
     parse: (n: unknown) => {
       const parsed = parseFloat(n as string)
-      if (isNaN(parsed)) {
+      if (Number.isNaN(parsed)) {
         throw new Error(`Invalid number value "${n}"`)
       }
       return parsed
@@ -120,9 +120,9 @@ export const TYPE_TRANSFORM_MAP: Record<
         // to make sure we're parsing them in as UTC because the rest of the
         // system expects UTC dates.
         let parsed = new Date(`${input}Z`)
-        if (isNaN(parsed.getTime())) {
+        if (Number.isNaN(parsed.getTime())) {
           parsed = new Date(input as string)
-          if (isNaN(parsed.getTime())) {
+          if (Number.isNaN(parsed.getTime())) {
             throw new Error(`Invalid date value: "${input}"`)
           }
         }

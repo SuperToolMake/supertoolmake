@@ -54,10 +54,10 @@ export function processDates<T extends Row | Row[]>(table: Table, inputRows: T):
     for (const col of datesWithTZ) {
       if (row[col] && typeof row[col] === "string" && !row[col].endsWith("Z")) {
         let date = new Date(row[col] + "Z")
-        if (isNaN(date.getTime())) {
+        if (Number.isNaN(date.getTime())) {
           date = new Date(row[col])
         }
-        if (isNaN(date.getTime())) {
+        if (Number.isNaN(date.getTime())) {
           throw new Error(`Invalid date format for column ${col}: ${row[col]}`)
         }
         row[col] = date.toISOString()

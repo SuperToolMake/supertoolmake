@@ -36,7 +36,7 @@ function getVariable(variableName: string) {
     return variableName
   }
   // it is just a number
-  if (!isNaN(parseFloat(variableName))) {
+  if (!Number.isNaN(parseFloat(variableName))) {
     return variableName
   }
   if (variableName.startsWith("'") || variableName.startsWith('"')) {

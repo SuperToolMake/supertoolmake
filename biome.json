@@ -50,7 +50,8 @@
         "noNonNullAssertedOptionalChain": "warn",
         "noThenProperty": "warn",
         "useIterableCallbackReturn": "off",
-        "noConfusingVoidType": "error"
+        "noConfusingVoidType": "error",
+        "noGlobalIsNan": "error"
       },
       "correctness": {
         "noConstructorReturn": "warn",
