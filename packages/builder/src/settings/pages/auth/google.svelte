@@ -60,9 +60,7 @@ const providers = { google }
 let originalGoogleDoc
 let googleSaveButtonDisabled
 $: {
-  isEqual(providers.google?.config, originalGoogleDoc?.config)
-    ? (googleSaveButtonDisabled = true)
-    : (googleSaveButtonDisabled = false)
+  googleSaveButtonDisabled = isEqual(providers.google?.config, originalGoogleDoc?.config)
 }
 
 $: googleComplete = Boolean(

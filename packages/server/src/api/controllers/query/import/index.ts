@@ -132,7 +132,10 @@ export class RestImporter {
     if (!datasource) {
       return
     }
-    const config = datasource.config || (datasource.config = {})
+    if (!datasource.config) {
+      datasource.config = {}
+    }
+    const config = datasource.config
     const defaults = this.getStaticServerVariables()
     const tokens = Object.keys(defaults || {}).filter(Boolean)
     if (tokens.length) {

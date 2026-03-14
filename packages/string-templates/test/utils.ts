@@ -41,8 +41,8 @@ export const getParsedManifest = () => {
 
           // Trim 's
           js = js.replace(/^'|'$/g, "")
-          let parsedExpected: string
-          if ((parsedExpected = tryParseJson(js))) {
+          const parsedExpected = tryParseJson(js)
+          if (parsedExpected) {
             if (Array.isArray(parsedExpected)) {
               if (typeof parsedExpected[0] === "object") {
                 js = JSON.stringify(parsedExpected)

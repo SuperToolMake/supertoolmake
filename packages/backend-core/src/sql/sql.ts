@@ -554,9 +554,10 @@ class InternalBuilder {
         const shouldProcessRelationship = opts?.relationship && isRelationshipField
 
         let castedTypeValue
+        castedTypeValue = structure[key]
         if (
           key === InternalSearchFilterOperator.COMPLEX_ID_OPERATOR &&
-          (castedTypeValue = structure[key]) &&
+          castedTypeValue &&
           complexKeyFn
         ) {
           const alias = getTableAlias(tableName)

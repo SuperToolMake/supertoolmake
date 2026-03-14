@@ -98,9 +98,7 @@ $: {
   // config doc, to ensure an accurate comparison
   delete providers.oidc?.config.configs[0].callbackURL
 
-  isEqual(providers.oidc?.config, originalOidcDoc?.config)
-    ? (oidcSaveButtonDisabled = true)
-    : (oidcSaveButtonDisabled = false)
+  oidcSaveButtonDisabled = isEqual(providers.oidc?.config, originalOidcDoc?.config)
 }
 
 $: oidcComplete = Boolean(

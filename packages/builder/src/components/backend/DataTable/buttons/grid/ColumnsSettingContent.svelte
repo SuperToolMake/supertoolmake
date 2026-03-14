@@ -70,35 +70,37 @@ $: displayColumns = columns.map((c) => {
 
   const options = []
 
-  let permission
-  if ((permission = permissionsObj[FieldPermissions.WRITABLE])) {
+  const writablePermission = permissionsObj[FieldPermissions.WRITABLE]
+  if (writablePermission) {
     const tooltip = requiredTooltips[FieldPermissions.WRITABLE] || "Writable"
     options.push({
       icon: "pencil",
       value: FieldPermissions.WRITABLE,
       tooltip,
-      disabled: isRequired || permission.disabled,
+      disabled: isRequired || writablePermission.disabled,
     })
   }
 
-  if ((permission = permissionsObj[FieldPermissions.READONLY])) {
+  const readonlyPermission = permissionsObj[FieldPermissions.READONLY]
+  if (readonlyPermission) {
     const tooltip =
       (requiredTooltips[FieldPermissions.READONLY] || "Read-only") +
-      (permission.disabled ? " (premium feature)" : "")
+      (readonlyPermission.disabled ? " (premium feature)" : "")
     options.push({
       icon: "eye",
       value: FieldPermissions.READONLY,
       tooltip,
-      disabled: permission.disabled || isRequired,
+      disabled: readonlyPermission.disabled || isRequired,
     })
   }
 
-  if ((permission = permissionsObj[FieldPermissions.HIDDEN])) {
+  const hiddenPermission = permissionsObj[FieldPermissions.HIDDEN]
+  if (hiddenPermission) {
     const tooltip = requiredTooltips[FieldPermissions.HIDDEN] || "Hidden"
     options.push({
       icon: "eye-slash",
       value: FieldPermissions.HIDDEN,
-      disabled: permission.disabled || isRequired,
+      disabled: hiddenPermission.disabled || isRequired,
       tooltip,
     })
   }

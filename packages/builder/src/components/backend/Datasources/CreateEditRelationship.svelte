@@ -212,7 +212,7 @@ function buildRelationships() {
     main: true,
     _id: id,
   }
-  let relateTo = (toRelationship = {
+  let relateTo = {
     ...toRelationship,
     tableId: fromId,
     name: fromColumn,
@@ -220,7 +220,7 @@ function buildRelationships() {
     through: throughId,
     type: "link",
     _id: id,
-  })
+  }
 
   // if any to many only need to check from
   const manyToMany = relateFrom.relationshipType === RelationshipType.MANY_TO_MANY

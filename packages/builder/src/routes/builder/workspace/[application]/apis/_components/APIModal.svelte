@@ -83,7 +83,10 @@ const applySecurityHeaders = (config: Record<string, any>, securityHeaders?: str
   if (!normalizedHeaders.length) {
     return config
   }
-  const headers = (config.defaultHeaders = config.defaultHeaders || {})
+  if (!config.defaultHeaders) {
+    config.defaultHeaders = {}
+  }
+  const headers = config.defaultHeaders
   for (const header of normalizedHeaders) {
     if (!header) {
       continue

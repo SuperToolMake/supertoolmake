@@ -157,11 +157,11 @@ function readBytes(stream: fs.ReadStream, length: number) {
     const data: Buffer[] = []
 
     stream.on("readable", () => {
-      let chunk
-
-      while ((chunk = stream.read(length - bytesRead)) !== null) {
+      let chunk = stream.read(length - bytesRead)
+      while (chunk !== null) {
         data.push(chunk)
         bytesRead += chunk.length
+        chunk = stream.read(length - bytesRead)
       }
 
       resolve(Buffer.concat(data.map((buf) => new Uint8Array(buf))))

@@ -35,7 +35,11 @@ $: routes = $permittedRoutes
 
 // Split by assigned group
 $: routesByGroup = routes.reduce((acc: Record<string, Route[]>, entry: Route) => {
-  const group: Route[] = (acc[entry.group || "none"] ??= [])
+  const groupName = entry.group || "none"
+  if (!acc[groupName]) {
+    acc[groupName] = []
+  }
+  const group: Route[] = acc[groupName]
   group.push(entry)
   return acc
 }, {})

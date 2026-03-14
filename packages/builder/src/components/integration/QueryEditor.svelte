@@ -30,7 +30,8 @@ let height
 // without resetting scroll otherwise
 export async function set(new_value, new_mode) {
   if (new_mode !== mode) {
-    await createEditor((mode = new_mode))
+    mode = new_mode
+    await createEditor(mode)
   }
 
   value = new_value
@@ -44,7 +45,7 @@ export function update(new_value) {
 
   if (editor) {
     const { left, top } = editor.getScrollInfo()
-    editor.setValue((value = new_value))
+    editor.setValue(value)
     editor.scrollTo(left, top)
   }
 }

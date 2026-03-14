@@ -41,7 +41,7 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noAssignInExpressions": "warn",
+        "noAssignInExpressions": "error",
         "noDoubleEquals": "off",
         "noExplicitAny": "off",
         "noGlobalAssign": "warn",

@@ -1398,8 +1398,8 @@ export const updateReferencesInObject = ({ obj, modifiedIndex, action, label, or
     str.replace(`{{ ${label}.${index}.`, `{{ ${label}.${replaceWith}.`)
   for (const key in obj) {
     if (typeof obj[key] === "string") {
-      let matches
-      while ((matches = stepIndexRegex.exec(obj[key])) !== null) {
+      let matches = stepIndexRegex.exec(obj[key])
+      while (matches !== null) {
         const referencedStep = parseInt(matches[1])
         if (action === UpdateReferenceAction.ADD && referencedStep >= modifiedIndex) {
           obj[key] = updateActionStep(obj[key], referencedStep, referencedStep + 1)
@@ -1414,6 +1414,7 @@ export const updateReferencesInObject = ({ obj, modifiedIndex, action, label, or
             obj[key] = updateActionStep(obj[key], referencedStep, referencedStep - 1)
           }
         }
+        matches = stepIndexRegex.exec(obj[key])
       }
     } else if (typeof obj[key] === "object" && obj[key] !== null) {
       updateReferencesInObject({
@@ -1436,11 +1437,12 @@ export const migrateReferencesInObject = ({ obj, label = "steps", steps, origina
 
   for (const key in obj) {
     if (typeof obj[key] === "string") {
-      let matches
-      while ((matches = stepIndexRegex.exec(obj[key])) !== null) {
+      let matches = stepIndexRegex.exec(obj[key])
+      while (matches !== null) {
         const referencedStep = parseInt(matches[1])
 
         obj[key] = updateActionStep(obj[key], referencedStep, steps[referencedStep]?.id)
+        matches = stepIndexRegex.exec(obj[key])
       }
     } else if (typeof obj[key] === "object" && obj[key] !== null) {
       migrateReferencesInObject({

@@ -37,7 +37,7 @@ const getText = (filters) => {
   }
   const groups = filters?.groups || []
   const allFilters = groups.reduce((acc, group) => {
-    return (acc += group.filters.filter((filter) => filter.field).length)
+    return acc + group.filters.filter((filter) => filter.field).length
   }, 0)
   if (allFilters === 0) {
     return "No filters set"
