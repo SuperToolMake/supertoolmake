@@ -139,7 +139,7 @@ export class OpenAPI2 extends OpenAPISource {
       } else {
         return false
       }
-    } catch (err) {
+    } catch (_err) {
       return false
     }
   }

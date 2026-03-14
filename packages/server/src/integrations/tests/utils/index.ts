@@ -78,7 +78,7 @@ async function createDatasources(
   if (rawDatasource) {
     try {
       client = await knexClient(rawDatasource)
-    } catch (e) {
+    } catch (_e) {
       // ignore
     }
   }

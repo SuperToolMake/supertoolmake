@@ -288,7 +288,7 @@ export default class TestConfiguration {
     let existing: Partial<User> = {}
     try {
       existing = await db.get<User>(_id)
-    } catch (err) {
+    } catch (_err) {
       // ignore
     }
     const user: User = {

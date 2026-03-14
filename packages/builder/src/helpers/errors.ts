@@ -44,7 +44,7 @@ export const getErrorMessage = (error: unknown) => {
 
   try {
     return JSON.stringify(error)
-  } catch (stringifyError) {
+  } catch (_stringifyError) {
     return String(error)
   }
 }

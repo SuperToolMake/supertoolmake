@@ -31,7 +31,7 @@ export default class RelationshipFetch extends BaseDataFetch<RelationshipDatasou
         datasource.fieldName
       )
       return { rows: res }
-    } catch (error) {
+    } catch (_error) {
       return { rows: [] }
     }
   }

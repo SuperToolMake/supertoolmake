@@ -34,7 +34,7 @@ async function redirect(ctx: any, method: "GET" | "POST" | "DELETE", path = "glo
   let body
   try {
     body = await response.json()
-  } catch (err) {
+  } catch (_err) {
     // don't worry about errors, likely no JSON
   }
   ctx.status = response.status

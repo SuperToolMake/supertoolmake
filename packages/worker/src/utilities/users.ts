@@ -10,7 +10,7 @@ export async function checkAnyUserExists() {
       })
     )
     return users && users.rows.length >= 1
-  } catch (err) {
+  } catch (_err) {
     throw new Error("Unable to retrieve user list")
   }
 }

@@ -166,7 +166,7 @@ export async function doesTableExist(tableId: string): Promise<boolean> {
   try {
     const table = await getTable(tableId)
     return !!table
-  } catch (err) {
+  } catch (_err) {
     return false
   }
 }

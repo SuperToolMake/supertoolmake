@@ -28,7 +28,7 @@ export default class QueryFetch extends BaseDataFetch<QueryDatasource, Query> {
         definition.fields = datasource.fields
       }
       return definition
-    } catch (error) {
+    } catch (_error) {
       return null
     }
   }
@@ -84,7 +84,7 @@ export default class QueryFetch extends BaseDataFetch<QueryDatasource, Query> {
         cursor: nextCursor,
         hasNextPage,
       }
-    } catch (error) {
+    } catch (_error) {
       return {
         rows: [],
         hasNextPage: false,

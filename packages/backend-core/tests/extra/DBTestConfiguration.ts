@@ -27,7 +27,7 @@ class DBTestConfiguration {
   getTenantId() {
     try {
       return context.getTenantId()
-    } catch (e) {
+    } catch (_e) {
       return this.tenantId!
     }
   }

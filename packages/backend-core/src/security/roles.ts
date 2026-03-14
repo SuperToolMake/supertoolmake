@@ -423,7 +423,7 @@ export async function getAllRoles(appId?: string): Promise<RoleDoc[]> {
     let appDB
     try {
       appDB = getWorkspaceDB()
-    } catch (error) {
+    } catch (_error) {
       // We don't have any apps, so we'll just use the built-in roles
     }
     return internal(appDB)

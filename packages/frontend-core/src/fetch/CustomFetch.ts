@@ -40,7 +40,7 @@ export default class CustomFetch extends BaseDataFetch<CustomDatasource, CustomD
       try {
         const js = JSON.parse(data)
         return Array.isArray(js) ? js : [js]
-      } catch (error) {
+      } catch (_error) {
         // Ignore
       }
 

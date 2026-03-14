@@ -436,7 +436,7 @@ class PostgresIntegration extends Sql implements DatasourcePlus {
           tableKeys[tableName].push(key)
         }
       }
-    } catch (err) {
+    } catch (_err) {
       tableKeys = {}
     }
 

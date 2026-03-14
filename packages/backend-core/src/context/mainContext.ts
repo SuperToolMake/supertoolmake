@@ -89,7 +89,7 @@ function updateContext(updates: ContextMap): ContextMap {
   let context: ContextMap
   try {
     context = Context.get()
-  } catch (err) {
+  } catch (_err) {
     // no context, start empty
     context = {}
   }
@@ -201,7 +201,7 @@ export function getIdentity(): IdentityContext | undefined {
   try {
     const context = Context.get()
     return context?.identity
-  } catch (e) {
+  } catch (_e) {
     // do nothing - identity is not in context
   }
 }
@@ -366,7 +366,7 @@ export function isScim(): boolean {
 export function getCurrentContext(): ContextMap | undefined {
   try {
     return Context.get()
-  } catch (e) {
+  } catch (_e) {
     return undefined
   }
 }

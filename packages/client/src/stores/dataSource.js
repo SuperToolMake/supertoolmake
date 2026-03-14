@@ -85,7 +85,7 @@ export const createDataSourceStore = () => {
       try {
         const definition = await API.fetchTableDefinition(dataSourceId)
         schema = definition?.schema
-      } catch (error) {
+      } catch (_error) {
         schema = null
       }
     }

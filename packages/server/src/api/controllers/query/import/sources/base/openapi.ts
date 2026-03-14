@@ -25,7 +25,7 @@ const prepareDocument = (raw: string): string | OpenAPI.Document => {
     if (isYamlDocument(yamlDocument)) {
       return yamlDocument
     }
-  } catch (err) {
+  } catch (_err) {
     // fall through to allow swagger parser to attempt parsing
   }
 
@@ -45,11 +45,11 @@ export abstract class OpenAPISource extends ImportSource {
 
     try {
       return await SwaggerParser.validate(document)
-    } catch (err) {
+    } catch (_err) {
       console.log(`[OpenAPI Import] Schema validation failed, continuing without validation`)
       try {
         return await SwaggerParser.dereference(document, baseOptions)
-      } catch (dereferenceErr) {
+      } catch (_dereferenceErr) {
         console.log(`[OpenAPI Import] Dereference failed, continuing with parsed document`)
         return document as OpenAPI.Document
       }

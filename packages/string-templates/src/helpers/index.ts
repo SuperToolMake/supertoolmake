@@ -38,7 +38,7 @@ export const HELPERS = [
     try {
       const parsed = JSON.parse(decoded)
       return Array.isArray(parsed) ? parsed : [parsed]
-    } catch (err) {
+    } catch (_err) {
       // wasn't json - likely was handlebars for a many to many
       return [_id]
     }

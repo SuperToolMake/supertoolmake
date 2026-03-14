@@ -67,7 +67,7 @@ function fixJsonTypes(row: Row, table: Table) {
     if (JsonTypes.includes(schema.type) && typeof row[fieldName] === "string") {
       try {
         row[fieldName] = JSON.parse(row[fieldName])
-      } catch (err) {
+      } catch (_err) {
         if (!helpers.schema.isDeprecatedSingleUserColumn(schema)) {
           // couldn't convert back to array, ignore
           delete row[fieldName]

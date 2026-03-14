@@ -66,7 +66,7 @@ export async function getUser({
   if (!tenantId) {
     try {
       tenantId = context.getTenantId()
-    } catch (err) {
+    } catch (_err) {
       tenantId = await platform.users.lookupTenantId(userId)
     }
   }

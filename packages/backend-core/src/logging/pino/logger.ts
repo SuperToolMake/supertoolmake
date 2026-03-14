@@ -191,7 +191,7 @@ if (!env.DISABLE_PINO_LOGGER) {
     let tenantId
     try {
       tenantId = context.getTenantId()
-    } catch (e: any) {
+    } catch (_e: any) {
       // do nothing
     }
     return tenantId
@@ -201,7 +201,7 @@ if (!env.DISABLE_PINO_LOGGER) {
     let appId
     try {
       appId = context.getWorkspaceId()
-    } catch (e) {
+    } catch (_e) {
       // do nothing
     }
     return appId
@@ -211,7 +211,7 @@ if (!env.DISABLE_PINO_LOGGER) {
     let appId
     try {
       appId = context.getAutomationId()
-    } catch (e) {
+    } catch (_e) {
       // do nothing
     }
     return appId
@@ -221,7 +221,7 @@ if (!env.DISABLE_PINO_LOGGER) {
     let identity
     try {
       identity = context.getIdentity()
-    } catch (e) {
+    } catch (_e) {
       // do nothing
     }
     return identity

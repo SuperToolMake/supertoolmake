@@ -115,7 +115,7 @@ export async function enrichContext(
       enrichedQuery.json = JSON.parse(
         enrichedQuery.json || enrichedQuery.customData || enrichedQuery.requestBody
       )
-    } catch (err) {
+    } catch (_err) {
       // no json found, ignore
     }
     delete enrichedQuery.customData

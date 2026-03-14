@@ -53,7 +53,7 @@ export async function generateAPIKey(ctx: UserCtx<GenerateAPIKeyRequest, Generat
   let devInfo: DevInfo
   try {
     devInfo = await db.get<DevInfo>(id)
-  } catch (err) {
+  } catch (_err) {
     devInfo = { _id: id, userId }
   }
   devInfo.apiKey = apiKey
@@ -67,7 +67,7 @@ export async function fetchAPIKey(ctx: UserCtx<void, FetchAPIKeyResponse>) {
   let devInfo
   try {
     devInfo = await db.get(id)
-  } catch (err) {
+  } catch (_err) {
     devInfo = {
       _id: id,
       userId: ctx.user._id,

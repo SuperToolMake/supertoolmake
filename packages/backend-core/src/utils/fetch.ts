@@ -23,7 +23,7 @@ function createProxyDispatcher(options?: { rejectUnauthorized?: boolean }): Prox
   // Validate URL format
   try {
     new URL(trimmedProxyUrl)
-  } catch (error) {
+  } catch (_error) {
     console.log("[fetch] Invalid proxy URL format:", proxyUrl)
     return false
   }

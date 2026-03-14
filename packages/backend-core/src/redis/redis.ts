@@ -7,7 +7,7 @@ if (env.MOCK_REDIS) {
   try {
     // ioredis mock is all in memory
     MockRedis = require("ioredis-mock")
-  } catch (err) {
+  } catch (_err) {
     console.log("Mock redis unavailable")
   }
 }
@@ -147,7 +147,7 @@ class RedisWrapper {
     // if its not an object just return the response
     try {
       return JSON.parse(response!)
-    } catch (err) {
+    } catch (_err) {
       return response
     }
   }
@@ -167,7 +167,7 @@ class RedisWrapper {
 
         try {
           acc[key] = result ? (JSON.parse(result) as T) : null
-        } catch (err) {
+        } catch (_err) {
           // TODO: this is a filthy lie but downstream code expects this, I have
           // no idea how it actually works if if this branch is ever hit in
           // practice.

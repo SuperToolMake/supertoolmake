@@ -41,13 +41,39 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noExplicitAny": "off"
+        "noAssignInExpressions": "warn",
+        "noDoubleEquals": "off",
+        "noExplicitAny": "off",
+        "noGlobalAssign": "warn",
+        "noImplicitAnyLet": "warn",
+        "noImportAssign": "warn",
+        "noNonNullAssertedOptionalChain": "warn",
+        "noThenProperty": "warn",
+        "useIterableCallbackReturn": "warn"
       },
       "correctness": {
+        "noConstructorReturn": "warn",
+        "noInvalidUseBeforeDeclaration": "warn",
+        "noSelfAssign": "warn",
         "noUnusedVariables": "error"
+      },
+      "security": {
+        "noGlobalEval": "warn"
       }
     }
   },
+  "overrides": [
+    {
+      "includes": ["packages/**/*.svelte"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedVariables": "warn"
+          }
+        }
+      }
+    }
+  ],
   "assist": {
     "enabled": true,
     "actions": {

@@ -125,7 +125,7 @@ export function breakRowIdField(_id: string | { _id: string }): any[] {
   try {
     const parsed = JSON.parse(decoded)
     return Array.isArray(parsed) ? parsed : [parsed]
-  } catch (err) {
+  } catch (_err) {
     // wasn't json - likely was handlebars for a many to many
     return [_id]
   }

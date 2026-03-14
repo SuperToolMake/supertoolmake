@@ -121,7 +121,7 @@ export async function doesUserExist(email: string) {
     if (Array.isArray(user) || user != null) {
       return true
     }
-  } catch (err) {
+  } catch (_err) {
     return false
   }
   return false

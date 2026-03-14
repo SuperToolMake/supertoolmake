@@ -147,7 +147,7 @@ export async function processPWAZip(ctx: UserCtx) {
     try {
       const iconsContent = await fsp.readFile(iconsJsonPath, "utf-8")
       iconsData = JSON.parse(iconsContent)
-    } catch (error) {
+    } catch (_error) {
       ctx.throw(400, "Invalid icons.json file - could not parse JSON")
     }
 
@@ -377,7 +377,7 @@ export const getSignedUploadURL = async (
     if (!datasource) {
       ctx.throw(400, "The specified datasource could not be found")
     }
-  } catch (error) {
+  } catch (_error) {
     ctx.throw(400, "The specified datasource could not be found")
   }
 
@@ -480,7 +480,7 @@ export async function servePwaManifest(ctx: UserCtx<void, any>) {
 
     ctx.set("Content-Type", "application/json")
     ctx.body = manifest
-  } catch (error) {
+  } catch (_error) {
     ctx.status = 500
     ctx.body = { message: "Error generating manifest" }
   }

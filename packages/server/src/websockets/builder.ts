@@ -81,7 +81,7 @@ export default class BuilderSocket extends BaseSocket {
           })
         }
       }
-    } catch (e) {
+    } catch (_e) {
       // This is fine, just means this user didn't hold the lock
     }
   }

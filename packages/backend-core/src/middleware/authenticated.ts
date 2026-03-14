@@ -66,7 +66,7 @@ async function checkApiKey(
         },
         db
       )) as string
-    } catch (err) {
+    } catch (_err) {
       userId = undefined
     }
     if (userId) {

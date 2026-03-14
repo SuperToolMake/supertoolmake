@@ -14,7 +14,7 @@ export default class JSONArrayFetch extends FieldFetch<JSONArrayFieldDatasource>
       const schema =
         table.schema[fieldName].schema ?? getJSONArrayDatasourceSchema(table.schema, datasource)
       return { schema }
-    } catch (error) {
+    } catch (_error) {
       return null
     }
   }

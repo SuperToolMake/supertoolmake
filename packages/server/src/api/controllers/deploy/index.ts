@@ -48,7 +48,7 @@ async function storeDeploymentHistory(deployment: Deployment) {
   try {
     // theres only one deployment doc per app database
     deploymentDoc = await db.get<any>(DocumentType.DEPLOYMENTS)
-  } catch (err) {
+  } catch (_err) {
     deploymentDoc = { _id: DocumentType.DEPLOYMENTS, history: {} }
   }
 
@@ -148,7 +148,7 @@ export async function fetchDeployments(ctx: UserCtx<void, FetchDeploymentRespons
       await db.put(deployments)
     }
     ctx.body = deployments.history ? Object.values(deployments.history).reverse() : []
-  } catch (err) {
+  } catch (_err) {
     ctx.body = []
   }
 }
@@ -161,7 +161,7 @@ export async function deploymentProgress(ctx: UserCtx<void, DeploymentProgressRe
       ctx.throw(404, "No deployment found")
     }
     ctx.body = deploymentDoc.history?.[ctx.params.deploymentId]
-  } catch (err) {
+  } catch (_err) {
     ctx.throw(500, `Error fetching data for deployment ${ctx.params.deploymentId}`)
   }
 }

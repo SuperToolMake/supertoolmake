@@ -633,7 +633,7 @@ export async function getObjectMetadata(
 
   try {
     return await client.headObject(params)
-  } catch (err: any) {
+  } catch (_err: any) {
     throw new Error("Unable to retrieve metadata from object")
   }
 }

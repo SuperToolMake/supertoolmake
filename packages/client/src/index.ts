@@ -181,7 +181,7 @@ const loadBudibase = async () => {
       let stringifiedContext = null
       try {
         stringifiedContext = JSON.stringify(context)
-      } catch (error) {
+      } catch (_error) {
         // Ignore - invalid context
       }
       eventStore.actions.dispatchEvent("provide-context", {

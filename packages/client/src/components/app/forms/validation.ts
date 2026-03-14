@@ -319,7 +319,7 @@ const jsonHandler = (value: any) => {
   try {
     JSON.parse(JSON.stringify(value))
     return true
-  } catch (error) {
+  } catch (_error) {
     return false
   }
 }

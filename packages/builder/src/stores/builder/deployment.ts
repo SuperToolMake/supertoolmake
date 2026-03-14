@@ -71,7 +71,7 @@ class DeploymentStore extends DerivedBudiStore<DeploymentState, DerivedDeploymen
         ...state,
         deployments,
       }))
-    } catch (err) {
+    } catch (_err) {
       notifications.error("Error fetching deployments")
     }
   }
@@ -102,7 +102,7 @@ class DeploymentStore extends DerivedBudiStore<DeploymentState, DerivedDeploymen
         appsStore.load(),
       ])
       await this.load()
-    } catch (err) {
+    } catch (_err) {
       notifications.error("Error refreshing app")
     }
   }
@@ -122,7 +122,7 @@ class DeploymentStore extends DerivedBudiStore<DeploymentState, DerivedDeploymen
         type: "success",
         icon: "globe",
       })
-    } catch (err) {
+    } catch (_err) {
       notifications.error("Error unpublishing app")
     }
   }

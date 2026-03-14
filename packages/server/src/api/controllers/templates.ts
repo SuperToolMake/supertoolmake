@@ -19,7 +19,7 @@ export async function fetch(ctx: UserCtx<void, FetchGlobalTemplateResponse>) {
     if (response.status !== 200) {
       error = true
     }
-  } catch (err) {
+  } catch (_err) {
     error = true
   }
   // if there is an error, simply return no templates

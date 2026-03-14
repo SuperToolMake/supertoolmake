@@ -64,7 +64,7 @@ export default class GridSocket extends BaseSocket {
           const sessions = await this.getRoomSessions(room)
           callback({ users: sessions })
         })
-      } catch (error) {
+      } catch (_error) {
         socket.disconnect(true)
       }
     })

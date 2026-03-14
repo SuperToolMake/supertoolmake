@@ -191,7 +191,7 @@ async function addCreatorToUsersTable(ctx: UserCtx) {
   let creator
   try {
     creator = await getGlobalUser(metadataId)
-  } catch (err) {
+  } catch (_err) {
     return
   }
 
@@ -484,7 +484,7 @@ async function performWorkspaceCreate(
 
         // Fetch the latest version of the workspace after these changes
         newWorkspace = await sdk.workspaces.metadata.get()
-      } catch (err) {
+      } catch (_err) {
         ctx.throw(400, "App created, but failed to add onboarding screens")
       }
     }

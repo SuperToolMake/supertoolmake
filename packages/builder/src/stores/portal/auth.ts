@@ -106,7 +106,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
     try {
       const user = await API.fetchBuilderSelf()
       this.setUser(user)
-    } catch (error) {
+    } catch (_error) {
       this.setUser()
     }
   }
@@ -139,7 +139,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
     this.setUser()
     try {
       await this.setInitInfo({})
-    } catch (error) {
+    } catch (_error) {
       // Ignore errors clearing init info after logout
       // User is already logged out, this is just cleanup
     }
@@ -154,7 +154,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
     try {
       const user = await API.fetchBuilderSelf()
       this.setUser(user)
-    } catch (error) {
+    } catch (_error) {
       this.setUser()
     }
   }
@@ -216,7 +216,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
         try {
           await this.logout()
           await this.setOrganisation()
-        } catch (error) {
+        } catch (_error) {
           console.error(`Tenant mis-match - "${urlTenantId}" and "${store.user.tenantId}" - logout`)
         }
       }

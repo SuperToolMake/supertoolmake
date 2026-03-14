@@ -385,7 +385,7 @@ export class CouchDatabase implements Database {
           let json
           try {
             json = JSON.parse(text)
-          } catch (err) {
+          } catch (_err) {
             console.error(`error: ${text}`)
             throw new CouchDBError("error while running query, please try again later", {
               name: "error",

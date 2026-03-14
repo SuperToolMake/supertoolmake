@@ -551,7 +551,7 @@ export const getUserInvites = async (ctx: UserCtx<void, GetUserInvitesResponse>)
   try {
     // Restricted to the currently authenticated tenant
     ctx.body = await cache.invite.getInviteCodes()
-  } catch (e) {
+  } catch (_e) {
     ctx.throw(400, "There was a problem fetching invites")
   }
 }
@@ -575,7 +575,7 @@ export const addWorkspaceIdToInvite = async (
 
     await cache.invite.updateCode(code, invite)
     ctx.body = { ...invite }
-  } catch (e) {
+  } catch (_e) {
     ctx.throw(400, "Invitation is not valid or has expired.")
   }
 }
@@ -599,7 +599,7 @@ export const removeWorkspaceIdFromInvite = async (
 
     await cache.invite.updateCode(code, invite)
     ctx.body = { ...invite }
-  } catch (e) {
+  } catch (_e) {
     ctx.throw(400, "Invitation is not valid or has expired.")
   }
 }

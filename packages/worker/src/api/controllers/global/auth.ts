@@ -152,7 +152,7 @@ export const setInitInfo = (ctx: UserCtx<SetInitInfoRequest, SetInitInfoResponse
 export const getInitInfo = (ctx: UserCtx<void, GetInitInfoResponse>) => {
   try {
     ctx.body = getCookie(ctx, Cookie.Init) || {}
-  } catch (err) {
+  } catch (_err) {
     clearCookie(ctx, Cookie.Init)
     ctx.body = {}
   }

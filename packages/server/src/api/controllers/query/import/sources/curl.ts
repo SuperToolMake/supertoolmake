@@ -25,7 +25,7 @@ const parseBody = (curl: any) => {
           key = key.substring(1)
         }
         return JSON.parse(key)
-      } catch (e) {
+      } catch (_e) {
         // do nothing
       }
     }
@@ -54,7 +54,7 @@ export class Curl extends ImportSource {
   isSupported = async (data: string): Promise<boolean> => {
     try {
       this.curl = parseCurl(data)
-    } catch (err) {
+    } catch (_err) {
       return false
     }
     return true

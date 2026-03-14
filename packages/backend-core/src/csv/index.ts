@@ -63,7 +63,7 @@ export async function jsonFromCsvString(csvString: string, options?: CsvToJsonOp
       }
 
       return result
-    } catch (err) {}
+    } catch (_err) {}
   }
 
   throw new Error("Unable to determine delimiter")

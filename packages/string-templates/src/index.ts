@@ -47,7 +47,7 @@ function testObject(object: any) {
   // JSON stringify will fail if there are any cycles, stops infinite recursion
   try {
     JSON.stringify(object)
-  } catch (err) {
+  } catch (_err) {
     throw "Unable to process inputs to JSON, cannot recurse"
   }
 }

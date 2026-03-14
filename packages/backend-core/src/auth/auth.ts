@@ -55,7 +55,7 @@ async function refreshOIDCAccessToken(
       throw new Error("OIDC Config contents invalid")
     }
     strategy = await oidc.strategyFactory(enrichedConfig, ssoSaveUserNoOp)
-  } catch (err) {
+  } catch (_err) {
     throw new Error("Could not refresh OAuth Token")
   }
 

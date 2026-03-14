@@ -157,7 +157,7 @@ class TestConfiguration {
   getTenantId() {
     try {
       return context.getTenantId()
-    } catch (e) {
+    } catch (_e) {
       return this.tenantId!
     }
   }
@@ -336,7 +336,7 @@ class TestConfiguration {
           controllers.config.destroy
         )
       }
-    } catch (err) {
+    } catch (_err) {
       // don't need to handle error
     }
   }
