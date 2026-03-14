@@ -179,9 +179,8 @@ const resolveWorkspaceName = (name: string) => {
 }
 
 const resolveWorkspaceUrl = (name: string) => {
-  let parsedName
   const resolvedName = resolveWorkspaceName(name)
-  parsedName = resolvedName ? resolvedName.toLowerCase() : ""
+  const parsedName = resolvedName ? resolvedName.toLowerCase() : ""
   const parsedUrl = parsedName ? parsedName.replace(/\s+/g, "-") : ""
   return encodeURI(parsedUrl)
 }

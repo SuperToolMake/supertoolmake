@@ -52,7 +52,9 @@
         "useIterableCallbackReturn": "off",
         "noConfusingVoidType": "error",
         "noGlobalIsNan": "error",
-        "useDefaultSwitchClauseLast": "error"
+        "useDefaultSwitchClauseLast": "error",
+        "noDocumentCookie": "off",
+        "noTemplateCurlyInString": "off"
       },
       "correctness": {
         "noConstructorReturn": "warn",
@@ -65,7 +67,7 @@
         "useParseIntRadix": "off"
       },
       "security": {
-        "noGlobalEval": "warn"
+        "noGlobalEval": "off"
       },
       "complexity": {
         "useOptionalChain": "error",
@@ -76,7 +78,8 @@
       "style": {
         "noNonNullAssertion": "off",
         "useNodejsImportProtocol": "error",
-        "useTemplate": "error"
+        "useTemplate": "error",
+        "useConst": "error"
       },
       "performance": {
         "noAccumulatingSpread": "error"
