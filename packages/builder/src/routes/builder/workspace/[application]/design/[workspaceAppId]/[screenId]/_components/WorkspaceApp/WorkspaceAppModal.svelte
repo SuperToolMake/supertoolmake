@@ -1,13 +1,5 @@
 <script lang="ts">
-import {
-  Body,
-  Icon,
-  Input,
-  keepOpen,
-  Modal,
-  ModalContent,
-  notifications,
-} from "@budibase/bbui"
+import { Body, Icon, Input, keepOpen, Modal, ModalContent, notifications } from "@budibase/bbui"
 import { PublishResourceState, type UIWorkspaceApp, type WorkspaceApp } from "@budibase/types"
 import { goto } from "@roxi/routify"
 import type { ZodType } from "zod"
