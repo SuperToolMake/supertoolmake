@@ -305,7 +305,7 @@ export class DatasourceStore extends DerivedBudiStore<
 
   async createViewQuery(datasource: Datasource, viewName: string) {
     try {
-      const sql = "SELECT * FROM " + viewName + " \nLIMIT {{ limit }} \nOFFSET {{ offset }}"
+      const sql = `SELECT * FROM ${viewName} \nLIMIT {{ limit }} \nOFFSET {{ offset }}`
 
       const query = {
         datasourceId: datasource._id!,

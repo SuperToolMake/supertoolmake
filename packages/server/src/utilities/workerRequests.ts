@@ -119,7 +119,7 @@ export async function sendSmtpEmail({
     attachments,
   }
   const response = await fetch(
-    checkSlashesInUrl(env.WORKER_URL + `/api/global/email/send`),
+    checkSlashesInUrl(`${env.WORKER_URL}/api/global/email/send`),
     createRequest<SendEmailRequest>({ method: "POST", body: request })
   )
   return (await checkResponse(response, "send email")) as SendEmailResponse
@@ -127,7 +127,7 @@ export async function sendSmtpEmail({
 
 export async function allGlobalUsers(ctx: Ctx) {
   const response = await fetch(
-    checkSlashesInUrl(env.WORKER_URL + "/api/global/users"),
+    checkSlashesInUrl(`${env.WORKER_URL}/api/global/users`),
     // we don't want to use API key when getting self
     createRequest({ ctx, method: "GET" })
   )
@@ -136,7 +136,7 @@ export async function allGlobalUsers(ctx: Ctx) {
 
 export async function saveGlobalUser(ctx: Ctx) {
   const response = await fetch(
-    checkSlashesInUrl(env.WORKER_URL + "/api/global/users"),
+    checkSlashesInUrl(`${env.WORKER_URL}/api/global/users`),
     // we don't want to use API key when getting self
     createRequest({ ctx, method: "POST", body: ctx.request.body })
   )
@@ -145,7 +145,7 @@ export async function saveGlobalUser(ctx: Ctx) {
 
 export async function deleteGlobalUser(ctx: Ctx) {
   const response = await fetch(
-    checkSlashesInUrl(env.WORKER_URL + `/api/global/users/${ctx.params.userId}`),
+    checkSlashesInUrl(`${env.WORKER_URL}/api/global/users/${ctx.params.userId}`),
     // we don't want to use API key when getting self
     createRequest({ ctx, method: "DELETE" })
   )
@@ -154,7 +154,7 @@ export async function deleteGlobalUser(ctx: Ctx) {
 
 export async function readGlobalUser(ctx: Ctx): Promise<User> {
   const response = await fetch(
-    checkSlashesInUrl(env.WORKER_URL + `/api/global/users/${ctx.params.userId}`),
+    checkSlashesInUrl(`${env.WORKER_URL}/api/global/users/${ctx.params.userId}`),
     // we don't want to use API key when getting self
     createRequest({ ctx, method: "GET" })
   )
@@ -165,7 +165,7 @@ export async function getChecklist(): Promise<{
   adminUser: { checked: boolean }
 }> {
   const response = await fetch(
-    checkSlashesInUrl(env.WORKER_URL + "/api/global/configs/checklist"),
+    checkSlashesInUrl(`${env.WORKER_URL}/api/global/configs/checklist`),
     createRequest({ method: "GET" })
   )
   return checkResponse(response, "get checklist")
@@ -173,7 +173,7 @@ export async function getChecklist(): Promise<{
 
 export async function generateApiKey(userId: string) {
   const response = await fetch(
-    checkSlashesInUrl(env.WORKER_URL + "/api/global/self/api_key"),
+    checkSlashesInUrl(`${env.WORKER_URL}/api/global/self/api_key`),
     createRequest({ method: "POST", body: { userId } })
   )
   return checkResponse(response, "generate API key")

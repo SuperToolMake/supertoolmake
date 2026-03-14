@@ -16,7 +16,7 @@ export const buildMatcherRegex = (patterns: EndpointMatcher[]): RegexMatcher[] =
     if (matches) {
       for (const match of matches) {
         const suffix = match.endsWith("/") ? "/" : ""
-        const pattern = "/.*" + suffix
+        const pattern = `/.*${suffix}`
         route = route.replace(match, pattern)
       }
     }

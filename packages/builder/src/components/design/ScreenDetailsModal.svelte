@@ -27,7 +27,7 @@ $: appUrl = `${liveUrl}${hashRoute}`
 
 const routeChanged = (event: { detail: string }) => {
   if (!event.detail.startsWith("/")) {
-    route = "/" + event.detail
+    route = `/${event.detail}`
   }
   touched = true
   route = sanitizeUrl(route)

@@ -176,7 +176,7 @@ export function parse(rows: Rows, table: Table): Rows {
                 400
               )
             }
-            parsedRow[columnName] = new Date(columnData.trim() + "Z")
+            parsedRow[columnName] = new Date(`${columnData.trim()}Z`)
           } else {
             if (!sql.utils.isValidISODateString(columnData)) {
               let message = `Invalid format for field "${columnName}": "${columnData}".`

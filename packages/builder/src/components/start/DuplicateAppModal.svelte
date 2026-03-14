@@ -15,12 +15,12 @@ export let onDuplicateSuccess = () => {}
 
 const validation = createValidationStore()
 const values = writable<{ name: string; url: string | null }>({
-  name: appName + " copy",
+  name: `${appName} copy`,
   url: null,
 })
 const appPrefix = "/app"
 
-let defaultAppName = appName + " copy"
+let defaultAppName = `${appName} copy`
 let duplicating = false
 
 $: {

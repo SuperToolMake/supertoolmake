@@ -47,7 +47,7 @@ export function format(json: JSONValue, colorOptions: ColorsOptions = {}) {
           color = colors.keyColor
         } else {
           color = colors.stringColor
-          match = '"' + escapeHtml(match.substr(1, match.length - 2)) + '"'
+          match = `"${escapeHtml(match.substr(1, match.length - 2))}"`
           style = "word-wrap:break-word;white-space:pre-wrap;"
         }
       } else {

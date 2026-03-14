@@ -333,7 +333,7 @@ class InternalBuilder {
         if (isValidISODateString(input)) {
           return new Date(input)
         } else if (isValidISODateStringWithoutTimezone(input)) {
-          return new Date(input + "Z")
+          return new Date(`${input}Z`)
         } else {
           return null
         }

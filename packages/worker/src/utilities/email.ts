@@ -192,7 +192,7 @@ export async function sendEmail(email: string, purpose: EmailTemplatePurpose, op
 
   const response = await transport.sendMail(message)
   if (TEST_MODE) {
-    console.log("Test email URL: " + nodemailer.getTestMessageUrl(response))
+    console.log(`Test email URL: ${nodemailer.getTestMessageUrl(response)}`)
   }
   return response
 }

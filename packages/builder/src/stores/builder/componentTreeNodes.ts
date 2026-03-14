@@ -47,7 +47,7 @@ export class ComponentTreeNodesStore extends BudiStore<OpenNodesState> {
     const selectedScreen: Screen | undefined = get(selectedScreenStore)
 
     if (!selectedScreen) {
-      console.error("Invalid node " + componentId)
+      console.error(`Invalid node ${componentId}`)
       return {}
     }
 

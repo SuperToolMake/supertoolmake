@@ -84,7 +84,7 @@ const getScreenSettings = (screen) => {
       control: Input,
       parser: (val) => {
         if (!val.startsWith("/")) {
-          val = "/" + val
+          val = `/${val}`
         }
         return sanitizeUrl(val)
       },

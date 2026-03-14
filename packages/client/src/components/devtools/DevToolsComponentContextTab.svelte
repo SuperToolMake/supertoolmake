@@ -80,7 +80,7 @@ const getContextProviders = (context) => {
 
           // Otherwise we don't know
           categories.push({
-            label: "Unknown - " + category,
+            label: `Unknown - ${category}`,
             value: category,
           })
         }

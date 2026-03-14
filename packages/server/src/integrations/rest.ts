@@ -365,7 +365,7 @@ export class RestIntegration implements IntegrationBase {
 
       // only add query string if there are remaining parameters
       if (Object.keys(filtered).length > 0) {
-        queryString = "?" + qs.encode(filtered)
+        queryString = `?${qs.encode(filtered)}`
       } else {
         queryString = ""
       }

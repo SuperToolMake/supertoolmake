@@ -305,7 +305,7 @@ export async function fetchAppPackage(ctx: UserCtx<void, FetchAppPackageResponse
     // disabled workspace apps should appear to not exist
     // if the dev workspace is being served, allow the request regardless
     if (!matchedWorkspaceApp || (matchedWorkspaceApp.disabled && !isDev)) {
-      ctx.throw(404, "No matching workspace app found for URL path: " + urlPath)
+      ctx.throw(404, `No matching workspace app found for URL path: ${urlPath}`)
     }
     screens = screens.filter((s) => s.workspaceAppId === matchedWorkspaceApp._id)
 

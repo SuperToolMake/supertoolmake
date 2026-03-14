@@ -661,7 +661,7 @@ const getSelectedRowsBindings = (asset) => {
       tableBlocks.map((block) => ({
         type: "context",
         runtimeBinding: `${safeState}.${makePropSafe(
-          block._id + "-table"
+          `${block._id}-table`
         )}.${makePropSafe("selectedRows")}`,
         readableBinding: `${block._instanceName}.Selected Row IDs (deprecated)`,
         category: "Selected Row IDs (deprecated)",

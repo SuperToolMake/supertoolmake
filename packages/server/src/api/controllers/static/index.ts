@@ -474,7 +474,7 @@ export async function servePwaManifest(ctx: UserCtx<void, any>) {
           })
         }
       } catch (error) {
-        throw new Error("Error processing manifest icons: " + error)
+        throw new Error(`Error processing manifest icons: ${error}`)
       }
     }
 

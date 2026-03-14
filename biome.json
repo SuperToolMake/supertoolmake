@@ -72,7 +72,8 @@
       },
       "style": {
         "noNonNullAssertion": "off",
-        "useNodejsImportProtocol": "error"
+        "useNodejsImportProtocol": "error",
+        "useTemplate": "error"
       },
       "performance": {
         "noAccumulatingSpread": "error"

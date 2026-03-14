@@ -90,7 +90,7 @@ function getLockName(opts: LockOptions) {
   let name = `lock:${prefix}_${opts.name}`
   // add additional unique name if required
   if (opts.resource) {
-    name = name + `_${opts.resource}`
+    name = `${name}_${opts.resource}`
   }
   return name
 }

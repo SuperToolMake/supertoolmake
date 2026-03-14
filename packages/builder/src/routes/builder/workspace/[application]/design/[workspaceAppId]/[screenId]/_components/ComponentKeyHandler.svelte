@@ -104,10 +104,10 @@ const handleKeyAction = async ({ event, component, key, ctrlKey = false, shiftKe
     }
     // Prefix keys for modifiers
     if (shiftKey) {
-      key = "Shift+" + key
+      key = `Shift+${key}`
     }
     if (ctrlKey) {
-      key = "Ctrl+" + key
+      key = `Ctrl+${key}`
     }
     const handler = keyHandlers[key]
     if (!handler) {

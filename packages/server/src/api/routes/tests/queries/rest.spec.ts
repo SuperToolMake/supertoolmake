@@ -456,8 +456,7 @@ describe("rest", () => {
     })
 
     const user = config.getUserDetails()
-    const expectedBody =
-      "This is plain text and this is my email: " + user.email + ". This is a test param: 1234"
+    const expectedBody = `This is plain text and this is my email: ${user.email}. This is a test param: 1234`
     mockAgent!
       .get("http://www.example.com")
       .intercept({ path: "/", method: "POST", query: { testParam: "1234" } })

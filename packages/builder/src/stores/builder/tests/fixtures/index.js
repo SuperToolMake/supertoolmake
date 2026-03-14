@@ -66,7 +66,7 @@ export const generateFakeRoutes = (screens) => {
   return {
     routes: screens.reduce((acc, screen, idx) => {
       const routing = screen.routing
-      const route = routing.route || "/screen_" + idx
+      const route = routing.route || `/screen_${idx}`
       acc[route] = {
         subpaths: {
           [route]: {
@@ -90,7 +90,7 @@ export const generateAppPackage = ({
   name = "Test app",
   url = "/test-app",
 }) => {
-  const appId = "app_dev_" + getDocId()
+  const appId = `app_dev_${getDocId()}`
 
   const features = {}
   features.componentValidation = appValidation

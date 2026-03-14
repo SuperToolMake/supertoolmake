@@ -138,7 +138,7 @@ const buildEnrichedUsers = (rows: UserDoc[]): EnrichedUser[] => {
       const isWorkspaceTenantAdmin = role.value === Constants.BudibaseRoles.Admin
       return {
         ...user,
-        name: user.firstName ? user.firstName + " " + user.lastName : "",
+        name: user.firstName ? `${user.firstName} ${user.lastName}` : "",
         workspaceRole,
         __selectable: !(
           role.value === Constants.BudibaseRoles.Owner ||

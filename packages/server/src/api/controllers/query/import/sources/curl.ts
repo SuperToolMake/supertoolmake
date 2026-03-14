@@ -37,7 +37,7 @@ const parseCookie = (curl: any) => {
   if (curl.cookies) {
     return Object.entries(curl.cookies).reduce((acc, entry) => {
       const [key, value] = entry
-      return acc + `${key}=${value}; `
+      return `${acc}${key}=${value}; `
     }, "")
   }
 
