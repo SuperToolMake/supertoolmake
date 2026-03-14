@@ -54,7 +54,8 @@
         "noGlobalIsNan": "error",
         "useDefaultSwitchClauseLast": "error",
         "noDocumentCookie": "off",
-        "noTemplateCurlyInString": "off"
+        "noTemplateCurlyInString": "off",
+        "useIsArray": "error"
       },
       "correctness": {
         "noConstructorReturn": "warn",
