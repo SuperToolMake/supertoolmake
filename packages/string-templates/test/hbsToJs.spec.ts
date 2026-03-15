@@ -43,18 +43,12 @@ describe("Test that the string processing works correctly", () => {
 
   it("should handle one of the examples (after)", () => {
     const response = convertToJS("{{ after [1, 2, 3] 1}}")
-    checkLines(response, [
-      "const var1 = helpers.after([1, 2, 3], 1);",
-      "return `${var1}`;",
-    ])
+    checkLines(response, ["const var1 = helpers.after([1, 2, 3], 1);", "return `${var1}`;"])
   })
 
   it("should handle one of the examples (equalsLength)", () => {
     const response = convertToJS("{{equalsLength '[1,2,3]' 3}}")
-    checkLines(response, [
-      "const var1 = helpers.equalsLength('[1,2,3]', 3);",
-      "return `${var1}`;",
-    ])
+    checkLines(response, ["const var1 = helpers.equalsLength('[1,2,3]', 3);", "return `${var1}`;"])
   })
 
   it("should handle one of the examples (pluck)", () => {
@@ -67,10 +61,7 @@ describe("Test that the string processing works correctly", () => {
 
   it("should handle sorting an array", () => {
     const response = convertToJS("{{ sort ['b', 'a', 'c'] }}")
-    checkLines(response, [
-      "const var1 = helpers.sort(['b', 'a', 'c']);",
-      "return `${var1}`;",
-    ])
+    checkLines(response, ["const var1 = helpers.sort(['b', 'a', 'c']);", "return `${var1}`;"])
   })
 
   it("should handle a helper block", () => {
@@ -82,9 +73,7 @@ describe("Test that the string processing works correctly", () => {
   })
 
   it("should handle multi-variable helper", () => {
-    const response = convertToJS(
-      "This is the average: {{ join ( avg val1 val2 val3 ) }}"
-    )
+    const response = convertToJS("This is the average: {{ join ( avg val1 val2 val3 ) }}")
     checkLines(response, [
       'const var1 = helpers.join(helpers.avg($("val1"), $("val2"), $("val3")));',
       "return `This is the average: ${var1}`;",
@@ -92,9 +81,7 @@ describe("Test that the string processing works correctly", () => {
   })
 
   it("should handle a complex statement", () => {
-    const response = convertToJS(
-      "This is the average: {{ join val1 ( avg val2 val3 val4 ) }}"
-    )
+    const response = convertToJS("This is the average: {{ join val1 ( avg val2 val3 val4 ) }}")
     checkLines(response, [
       'const var1 = helpers.join($("val1"), helpers.avg($("val2"), $("val3"), $("val4")));',
       "return `This is the average: ${var1}`;",
@@ -103,24 +90,16 @@ describe("Test that the string processing works correctly", () => {
 
   it("should handle square brackets", () => {
     const response = convertToJS("This is: {{ [val thing] }}")
-    checkLines(response, [
-      'const var1 = $("[val thing]");',
-      "return `This is: ${var1}`;",
-    ])
+    checkLines(response, ['const var1 = $("[val thing]");', "return `This is: ${var1}`;"])
   })
 
   it("should handle square brackets with properties", () => {
     const response = convertToJS("{{ [user].[_id] }}")
-    checkLines(response, [
-      'const var1 = $("[user].[_id]");',
-      "return `${var1}`;",
-    ])
+    checkLines(response, ['const var1 = $("[user].[_id]");', "return `${var1}`;"])
   })
 
   it("should handle multiple complex statements", () => {
-    const response = convertToJS(
-      "average: {{ avg val1 ( abs val2 ) }} add: {{ add 1 2 }}"
-    )
+    const response = convertToJS("average: {{ avg val1 ( abs val2 ) }} add: {{ add 1 2 }}")
     checkLines(response, [
       'const var1 = helpers.avg($("val1"), helpers.abs($("val2")));',
       "const var2 = helpers.add(1, 2);",
@@ -130,9 +109,6 @@ describe("Test that the string processing works correctly", () => {
 
   it("should handle uuids", () => {
     const response = convertToJS("This is: {{ uuid }}")
-    checkLines(response, [
-      "const var1 = helpers.uuid();",
-      "return `This is: ${var1}`;",
-    ])
+    checkLines(response, ["const var1 = helpers.uuid();", "return `This is: ${var1}`;"])
   })
 })

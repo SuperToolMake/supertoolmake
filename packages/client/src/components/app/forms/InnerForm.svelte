@@ -72,10 +72,13 @@ const deriveFieldProperty = <T>(
   getProp: (_field: FieldInfo) => T
 ) => {
   return derived(fieldStores, (fieldValues) => {
-    return fieldValues.reduce<Record<string, T>>((map, field) => {
-      map[field.name] = getProp(field)
-      return map
-    }, {} as Record<string, T>)
+    return fieldValues.reduce<Record<string, T>>(
+      (map, field) => {
+        map[field.name] = getProp(field)
+        return map
+      },
+      {} as Record<string, T>
+    )
   })
 }
 

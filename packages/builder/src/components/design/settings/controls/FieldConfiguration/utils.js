@@ -1,10 +1,10 @@
 import { FieldType } from "@budibase/types"
 
-export const convertOldFieldFormat = fields => {
+export const convertOldFieldFormat = (fields) => {
   if (!fields) {
     return []
   }
-  const converted = fields.map(field => {
+  const converted = fields.map((field) => {
     if (typeof field === "string") {
       // existed but was a string
       return {

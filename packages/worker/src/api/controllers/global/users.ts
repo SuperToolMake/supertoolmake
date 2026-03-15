@@ -265,7 +265,7 @@ export const search = async (ctx: UserCtx<SearchUsersRequest, SearchUsersRespons
     }
   }
 
-  const hasWorkspaceId = Boolean(body) && Object.prototype.hasOwnProperty.call(body, "workspaceId")
+  const hasWorkspaceId = Boolean(body) && Object.hasOwn(body, "workspaceId")
 
   if (hasWorkspaceId) {
     const response = await searchWorkspaceUsers(body)

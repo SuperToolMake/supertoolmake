@@ -20,19 +20,14 @@ describe("/applications/:appId/import", () => {
     const appId = config.getDevWorkspaceId()
     await request
       .post(`/api/applications/${appId}/import`)
-      .attach(
-        "appExport",
-        path.join(__dirname, "data", "export-change-request.tar.gz")
-      )
+      .attach("appExport", path.join(__dirname, "data", "export-change-request.tar.gz"))
       .set(config.defaultHeaders())
       .expect("Content-Type", /json/)
       .expect(200)
     const appPackage = await config.api.workspace.get(appId!)
     expect(appPackage.navigation?.links?.length).toBe(3)
     expect(appPackage.navigation?.links?.[0].url).toBe("/my-change-requests")
-    expect(appPackage.navigation?.links?.[1].url).toBe(
-      "/review-change-requests"
-    )
+    expect(appPackage.navigation?.links?.[1].url).toBe("/review-change-requests")
     expect(appPackage.navigation?.links?.[2].url).toBe("/administration")
 
     const screens = await config.api.screen.list()
@@ -55,11 +50,9 @@ describe("/applications/:appId/import", () => {
       "chunks/ApexChart-39eab0fb.js": "6c3a81927d09960cd43928a7bcf47494",
       "chunks/AreaChart-a379ae5f.js": "a3d0bf7077ab88f212f27f70319d7970",
       "chunks/AttachmentField-e5117cd3.js": "28d5375a8aadcd4a0e2bfaddec5bd101",
-      "chunks/AttachmentSingleField-1572398b.js":
-        "09f744333db6e9089d5d6b4bea88682f",
+      "chunks/AttachmentSingleField-1572398b.js": "09f744333db6e9089d5d6b4bea88682f",
       "chunks/BBReferenceField-e3676b66.js": "f7246829444474fddf1b8e9ed3652e02",
-      "chunks/BBReferenceSingleField-fc28c308.js":
-        "8cc1698452229d6963b636d59a3b90f2",
+      "chunks/BBReferenceSingleField-fc28c308.js": "8cc1698452229d6963b636d59a3b90f2",
       "chunks/BackgroundImage-3795f230.js": "b613be4eec5d861ae39a18e81e1948d8",
       "chunks/BarChart-162a85a3.js": "e447d8bb5974487e6da1c468e17f314f",
       "chunks/BigIntField-1178528a.js": "095b3580d930300f1b481bc3f91fc0d2",
@@ -75,8 +68,7 @@ describe("/applications/:appId/import", () => {
       "chunks/CheckboxGroup-995bb449.js": "d234f50e0ef9fcbeb212a82cdf1b8222",
       "chunks/CodeGenerator-491374a6.js": "5ab08a313fd009d5c3ccfae4294a01d2",
       "chunks/CodeScannerField-878f0124.js": "880ab344a303f85d245d0188936cbaa8",
-      "chunks/CollapsedButtonGroup-2dfcf354.js":
-        "8a8ab48ee3e3cb65c7ada31d7f6fe2b5",
+      "chunks/CollapsedButtonGroup-2dfcf354.js": "8a8ab48ee3e3cb65c7ada31d7f6fe2b5",
       "chunks/Container-7ddcd183.js": "d1983447bf76acd38d89fa131ae77b11",
       "chunks/DataProvider-2dab392d.js": "94ea5723bd485131e8aec71991311252",
       "chunks/DatePicker-1e1fb6b9.js": "2710176a8f77f123bc5e2a24d9d579b8",
@@ -93,8 +85,7 @@ describe("/applications/:appId/import", () => {
       "chunks/Filter-3a9aa189.js": "7276af9ac5a0bbdeeafef42ce14fda5e",
       "chunks/Form-56b35759.js": "9e2e769ace0f80bb439dd301ff863d73",
       "chunks/FormBlock-3cd3ad17.js": "1e19c090b5823dd18c1be05dc6ab4f81",
-      "chunks/FormBlockComponent-2878d220.js":
-        "1a07a0d8ae66a2105aff65b32f8a530e",
+      "chunks/FormBlockComponent-2878d220.js": "1a07a0d8ae66a2105aff65b32f8a530e",
       "chunks/FormStep-df7eab03.js": "a768c847b0deabaa1d77f7067bef8a03",
       "chunks/GridBlock-491c18a4.js": "90f1ef4741f7376faed56a409961cfac",
       "chunks/Heading-4b1671cd.js": "ac4638c1ae5f62309116512a8e0eab51",
@@ -113,8 +104,7 @@ describe("/applications/:appId/import", () => {
       "chunks/MarkdownViewer-dd1a3360.js": "ee22472560b67ae10f0f30c4ab32dddc",
       "chunks/Modal-008cf67c.js": "b29d0060369155dcd334d1b68cbba03e",
       "chunks/MultiFieldSelect-23df1bf3.js": "276080e77efbc46058b53339da0641fd",
-      "chunks/MultiStepFormblock-01bfdb43.js":
-        "431f0cfdccddb7319d5906a776d4ec6d",
+      "chunks/MultiStepFormblock-01bfdb43.js": "431f0cfdccddb7319d5906a776d4ec6d",
       "chunks/Multiselect-7c6c2576.js": "ea398ee03e5c7a1007f1276423ff5daa",
       "chunks/Navigation-87988fa7.js": "b5c4a52e7abed3e0efcc82fc5c3aa2c3",
       "chunks/NumberField-466f5c60.js": "f5e6ff725f6eb731756f9f8db70a10ad",
@@ -126,8 +116,7 @@ describe("/applications/:appId/import", () => {
       "chunks/Placeholder-31706623.js": "60d9ea517a314f0236b2ad695f3a7bbc",
       "chunks/RadioGroup-00f609dd.js": "23279784bec23c9ce9fcea24399647ff",
       "chunks/RatingField-ffd5a256.js": "7a4451771f5d215384b1f48feb535872",
-      "chunks/RelationshipField-1b2fe5d7.js":
-        "188c395de77004c4f5fb92f96b4b12a6",
+      "chunks/RelationshipField-1b2fe5d7.js": "188c395de77004c4f5fb92f96b4b12a6",
       "chunks/Repeater-81cb2810.js": "954d0a4355b87ca3cb3c4f7cba42cd93",
       "chunks/RepeaterBlock-fb4c50d5.js": "41ab68b67e9ba2ab941dd38b6b2f94c7",
       "chunks/RowExplorer-33d5e611.js": "df6b48cd8f3f7788952da92e3708e0dc",
@@ -135,8 +124,7 @@ describe("/applications/:appId/import", () => {
       "chunks/ScreenSlot-68962710.js": "6decb6e4e44a2a49bde5cd5f27155236",
       "chunks/Section-9872aa71.js": "f3670bfbc30ee6077e2171d52fd608d9",
       "chunks/SidePanel-cd5a291c.js": "92c3b80b1c39b46d3318ca7456a18eec",
-      "chunks/SingleRowProvider-63b76c66.js":
-        "9032c0b573ff818cea22d24689f08f32",
+      "chunks/SingleRowProvider-63b76c66.js": "9032c0b573ff818cea22d24689f08f32",
       "chunks/SpectrumCard-a5a528eb.js": "31a0c889a4106db57c2817a86c8acfa4",
       "chunks/StackedList-4cc5f377.js": "a71b5816fd410a805a77a19cf42ea6ca",
       "chunks/StringField-126698b8.js": "7eb28a84da15ebffbc86b7d3a63b7f53",
@@ -149,17 +137,14 @@ describe("/applications/:appId/import", () => {
       "chunks/UserAvatar-be3a991a.js": "9531b40b5486a62146b4a40bad3a03a9",
       "chunks/___vite-browser-external_commonjs-proxy-7d128c64.js":
         "0f39b111899f167f217ce463140097d4",
-      "chunks/_commonjs-dynamic-modules-58f2b0ec.js":
-        "f4894f5027d4507efa95bac3f0835734",
-      "chunks/apexcharts.common-4a420431.js":
-        "7725a9d63f9bde736d08c554fc3138b9",
+      "chunks/_commonjs-dynamic-modules-58f2b0ec.js": "f4894f5027d4507efa95bac3f0835734",
+      "chunks/apexcharts.common-4a420431.js": "7725a9d63f9bde736d08c554fc3138b9",
       "chunks/blocks-37916d2a.js": "d885dee62719debeca88185734e803e3",
       "chunks/easymde-4c022f51.js": "bbf6dc7af9d62fdad24ddfb56685dd0d",
       "chunks/index-445f15a6.js": "9e163d2006e7c7f9245dc849d3ac82a5",
       "chunks/index-a0738cd3.js": "b9b4e1ccd9dd74a91b632bfae8dff028",
       "chunks/optionsParser-a13cad91.js": "6dc97a247da4216a7706cfa641a8c94f",
-      "chunks/phosphorIconLoader-f5abc73c.js":
-        "b2ab8b782be3a65902f50a4f5bcb079b",
+      "chunks/phosphorIconLoader-f5abc73c.js": "b2ab8b782be3a65902f50a4f5bcb079b",
       "chunks/table-a8827bda.js": "83edddafbee024f0efa03eb3097931e4",
       "chunks/users-c42bb877.js": "76b0eaaf02626699bb7140acfc5cf688",
       "chunks/utc-ac6b2ab4.js": "d8ad2d7735b971be7749d7f62e81629c",

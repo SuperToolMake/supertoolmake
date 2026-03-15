@@ -1,22 +1,22 @@
 <script lang="ts">
-  import { Button, Icon, Layout } from "@budibase/bbui"
+import { Button, Icon, Layout } from "@budibase/bbui"
 
-  enum ResourceType {
-    App = "app",
-    Automation = "automation",
-    Agent = "agent",
-  }
+enum ResourceType {
+  App = "app",
+  Automation = "automation",
+  Agent = "agent",
+}
 
-  export let onCtaClick: () => void
-  export let ctaText: string
-  export let resourceType: `${ResourceType}`
-  export let hideCta: boolean = false
+export let onCtaClick: () => void
+export let ctaText: string
+export let resourceType: `${ResourceType}`
+export let hideCta: boolean = false
 
-  const iconByType = {
-    [ResourceType.App]: "browser",
-    [ResourceType.Automation]: "path",
-    [ResourceType.Agent]: "cpu",
-  }
+const iconByType = {
+  [ResourceType.App]: "browser",
+  [ResourceType.Automation]: "path",
+  [ResourceType.Agent]: "cpu",
+}
 </script>
 
 <Layout alignContent="center" justifyItems="center">

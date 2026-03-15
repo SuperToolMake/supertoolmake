@@ -1,43 +1,42 @@
 <script>
-  import {
-    DatePicker,
-    Input,
-    Label,
-    Multiselect,
-    RichTextField,
-    Select,
-    TextArea,
-    Toggle,
-  } from "@budibase/bbui"
-  import Dropzone from "@/components/common/Dropzone.svelte"
-  import LinkedRowSelector from "@/components/common/LinkedRowSelector.svelte"
-  import { capitalise } from "@/helpers"
-  import Editor from "../../integration/QueryEditor.svelte"
+import {
+  DatePicker,
+  Input,
+  Label,
+  Multiselect,
+  RichTextField,
+  Select,
+  TextArea,
+  Toggle,
+} from "@budibase/bbui"
+import Dropzone from "@/components/common/Dropzone.svelte"
+import LinkedRowSelector from "@/components/common/LinkedRowSelector.svelte"
+import { capitalise } from "@/helpers"
+import Editor from "../../integration/QueryEditor.svelte"
 
-  export let meta
-  export let value
-  export let readonly
-  export let error
+export let meta
+export let value
+export let readonly
+export let error
 
-  const resolveTimeStamp = timestamp => {
-    if (!timestamp) {
-      return null
-    }
-    let maskedDate = new Date(`0-${timestamp}`)
-    if (maskedDate instanceof Date && !Number.isNaN(maskedDate.getTime())) {
-      return maskedDate
-    } else {
-      return null
-    }
+const resolveTimeStamp = (timestamp) => {
+  if (!timestamp) {
+    return null
   }
+  let maskedDate = new Date(`0-${timestamp}`)
+  if (maskedDate instanceof Date && !Number.isNaN(maskedDate.getTime())) {
+    return maskedDate
+  } else {
+    return null
+  }
+}
 
-  $: stringVal =
-    typeof value === "object" ? JSON.stringify(value, null, 2) : value
-  $: type = meta?.type
-  $: label = meta.name ? capitalise(meta.name) : ""
+$: stringVal = typeof value === "object" ? JSON.stringify(value, null, 2) : value
+$: type = meta?.type
+$: label = meta.name ? capitalise(meta.name) : ""
 
-  const timeStamp = resolveTimeStamp(value)
-  const isTimeStamp = Boolean(timeStamp) || meta?.timeOnly
+const timeStamp = resolveTimeStamp(value)
+const isTimeStamp = Boolean(timeStamp) || meta?.timeOnly
 </script>
 
 {#if type === "options" && meta.constraints.inclusion.length !== 0}

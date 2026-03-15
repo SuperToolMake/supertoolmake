@@ -106,7 +106,7 @@ const componentMap = {
   "validation/bb_reference": ValidationEditor,
 }
 
-export const getComponentForSetting = setting => {
+export const getComponentForSetting = (setting) => {
   const { type, showInBar, barStyle } = setting || {}
   if (!type) {
     return null

@@ -13,16 +13,9 @@ import tk from "timekeeper"
 import { USERS_TABLE_SCHEMA } from "../../../constants"
 import { WorkspaceStatus } from "../../../db/utils"
 import env from "../../../environment"
-import {
-  type DatabaseName,
-  getDatasource,
-} from "../../../integrations/tests/utils"
+import { type DatabaseName, getDatasource } from "../../../integrations/tests/utils"
 import { getAppObjectStorageEtags } from "../../../tests/utilities/objectStore"
-import {
-  basicScreen,
-  basicTable,
-  customScreen,
-} from "../../../tests/utilities/structures"
+import { basicScreen, basicTable, customScreen } from "../../../tests/utilities/structures"
 import * as setup from "./utilities"
 import { checkBuilderEndpoint } from "./utilities/TestFunctions"
 
@@ -113,9 +106,7 @@ describe("/applications", () => {
 
   describe("create", () => {
     const checkScreenCount = async (expectedCount: number) => {
-      const res = await config.api.workspace.getDefinition(
-        config.getDevWorkspaceId()
-      )
+      const res = await config.api.workspace.getDefinition(config.getDevWorkspaceId())
       expect(res.screens.length).toEqual(expectedCount)
     }
 
@@ -145,7 +136,7 @@ describe("/applications", () => {
 
       await config.withApp(newWorkspace, async () => {
         const rows = await config.api.row.fetch(USERS_TABLE_SCHEMA._id!)
-        const userRow = rows.find(row => row.email === creator.email)
+        const userRow = rows.find((row) => row.email === creator.email)
         expect(userRow).toBeDefined()
         expect(userRow?.roleId).toEqual(roles.BUILTIN_ROLE_IDS.ADMIN)
       })
@@ -190,10 +181,7 @@ describe("/applications", () => {
     it("creates app from template", async () => {
       nock("https://prod-budi-templates.s3-eu-west-1.amazonaws.com")
         .get(`/templates/app/expense-approval.tar.gz`)
-        .replyWithFile(
-          200,
-          path.resolve(__dirname, "data", "expense-approval.tar.gz")
-        )
+        .replyWithFile(200, path.resolve(__dirname, "data", "expense-approval.tar.gz"))
 
       const newApp = await config.api.workspace.create({
         name: generateAppName(),
@@ -213,11 +201,7 @@ describe("/applications", () => {
     })
 
     it("creates app from file", async () => {
-      const fileToImport = path.join(
-        __dirname,
-        "data",
-        "export-change-request.tar.gz"
-      )
+      const fileToImport = path.join(__dirname, "data", "export-change-request.tar.gz")
       const newApp = await config.api.workspace.create({
         name: generateAppName(),
         useTemplate: "true",
@@ -259,11 +243,7 @@ describe("/applications", () => {
     })
 
     it("creates app from a new import", async () => {
-      const filePath = path.join(
-        __dirname,
-        "data",
-        "export-change-request.tar.gz"
-      )
+      const filePath = path.join(__dirname, "data", "export-change-request.tar.gz")
       const newApp = await config.api.workspace.create({
         name: generateAppName(),
       })
@@ -292,23 +272,17 @@ describe("/applications", () => {
         "chunks/Accordion-2cb8cb47.js": "6c31abff08901e08cbccddb166c45595",
         "chunks/ApexChart-39eab0fb.js": "6c3a81927d09960cd43928a7bcf47494",
         "chunks/AreaChart-a379ae5f.js": "a3d0bf7077ab88f212f27f70319d7970",
-        "chunks/AttachmentField-e5117cd3.js":
-          "28d5375a8aadcd4a0e2bfaddec5bd101",
-        "chunks/AttachmentSingleField-1572398b.js":
-          "09f744333db6e9089d5d6b4bea88682f",
-        "chunks/BBReferenceField-e3676b66.js":
-          "f7246829444474fddf1b8e9ed3652e02",
-        "chunks/BBReferenceSingleField-fc28c308.js":
-          "8cc1698452229d6963b636d59a3b90f2",
-        "chunks/BackgroundImage-3795f230.js":
-          "b613be4eec5d861ae39a18e81e1948d8",
+        "chunks/AttachmentField-e5117cd3.js": "28d5375a8aadcd4a0e2bfaddec5bd101",
+        "chunks/AttachmentSingleField-1572398b.js": "09f744333db6e9089d5d6b4bea88682f",
+        "chunks/BBReferenceField-e3676b66.js": "f7246829444474fddf1b8e9ed3652e02",
+        "chunks/BBReferenceSingleField-fc28c308.js": "8cc1698452229d6963b636d59a3b90f2",
+        "chunks/BackgroundImage-3795f230.js": "b613be4eec5d861ae39a18e81e1948d8",
         "chunks/BarChart-162a85a3.js": "e447d8bb5974487e6da1c468e17f314f",
         "chunks/BigIntField-1178528a.js": "095b3580d930300f1b481bc3f91fc0d2",
         "chunks/BooleanField-a73bf955.js": "91cf7ace226a5370744de046cc6358da",
         "chunks/Button-55cd96fd.js": "c2ac4b3fdb85e768eab38763023ea5a7",
         "chunks/ButtonGroup-dd32cbc5.js": "70f98d27c6e4a3d81c799781db11fb1b",
-        "chunks/CandleStickChart-c8debfdc.js":
-          "70adf3c3955f6a2a08d2f347d6a801c4",
+        "chunks/CandleStickChart-c8debfdc.js": "70adf3c3955f6a2a08d2f347d6a801c4",
         "chunks/Card-0f6d1d51.js": "0bf5032569513ca6d2a6cd81cda6ef27",
         "chunks/CardHorizontal-e6ec1d90.js": "0ec2cb7147611937b00985ae75d1f12d",
         "chunks/CardStat-10bc4b91.js": "289581a2f425e4bf6cf2118e51bbefa2",
@@ -316,16 +290,13 @@ describe("/applications", () => {
         "chunks/ChartBlock-9712464a.js": "e42adb87fc2d53b4c88f3831e32d437b",
         "chunks/CheckboxGroup-995bb449.js": "d234f50e0ef9fcbeb212a82cdf1b8222",
         "chunks/CodeGenerator-491374a6.js": "5ab08a313fd009d5c3ccfae4294a01d2",
-        "chunks/CodeScannerField-878f0124.js":
-          "880ab344a303f85d245d0188936cbaa8",
-        "chunks/CollapsedButtonGroup-2dfcf354.js":
-          "8a8ab48ee3e3cb65c7ada31d7f6fe2b5",
+        "chunks/CodeScannerField-878f0124.js": "880ab344a303f85d245d0188936cbaa8",
+        "chunks/CollapsedButtonGroup-2dfcf354.js": "8a8ab48ee3e3cb65c7ada31d7f6fe2b5",
         "chunks/Container-7ddcd183.js": "d1983447bf76acd38d89fa131ae77b11",
         "chunks/DataProvider-2dab392d.js": "94ea5723bd485131e8aec71991311252",
         "chunks/DatePicker-1e1fb6b9.js": "2710176a8f77f123bc5e2a24d9d579b8",
         "chunks/DatePicker-7555af0b.js": "cfe62110215bc4e76805939032b7f0e2",
-        "chunks/DateRangePicker-a1795a88.js":
-          "85ef887f3f29e68f888ecc7d2b9cba48",
+        "chunks/DateRangePicker-a1795a88.js": "85ef887f3f29e68f888ecc7d2b9cba48",
         "chunks/DateTimeField-f5d99d23.js": "b6489bc9d0e90f56314fcf27a4754464",
         "chunks/Divider-68332217.js": "611627e6f84349e36ecefbb108455348",
         "chunks/DonutChart-28fb127b.js": "be3e0af33c16f5c3d581af02478b7e33",
@@ -337,8 +308,7 @@ describe("/applications", () => {
         "chunks/Filter-3a9aa189.js": "7276af9ac5a0bbdeeafef42ce14fda5e",
         "chunks/Form-56b35759.js": "9e2e769ace0f80bb439dd301ff863d73",
         "chunks/FormBlock-3cd3ad17.js": "1e19c090b5823dd18c1be05dc6ab4f81",
-        "chunks/FormBlockComponent-2878d220.js":
-          "1a07a0d8ae66a2105aff65b32f8a530e",
+        "chunks/FormBlockComponent-2878d220.js": "1a07a0d8ae66a2105aff65b32f8a530e",
         "chunks/FormStep-df7eab03.js": "a768c847b0deabaa1d77f7067bef8a03",
         "chunks/GridBlock-491c18a4.js": "90f1ef4741f7376faed56a409961cfac",
         "chunks/Heading-4b1671cd.js": "ac4638c1ae5f62309116512a8e0eab51",
@@ -356,10 +326,8 @@ describe("/applications", () => {
         "chunks/MarkdownViewer-7a4fbc38.js": "63317b70e8e7da3842ddd0f07ab234f4",
         "chunks/MarkdownViewer-dd1a3360.js": "ee22472560b67ae10f0f30c4ab32dddc",
         "chunks/Modal-008cf67c.js": "b29d0060369155dcd334d1b68cbba03e",
-        "chunks/MultiFieldSelect-23df1bf3.js":
-          "276080e77efbc46058b53339da0641fd",
-        "chunks/MultiStepFormblock-01bfdb43.js":
-          "431f0cfdccddb7319d5906a776d4ec6d",
+        "chunks/MultiFieldSelect-23df1bf3.js": "276080e77efbc46058b53339da0641fd",
+        "chunks/MultiStepFormblock-01bfdb43.js": "431f0cfdccddb7319d5906a776d4ec6d",
         "chunks/Multiselect-7c6c2576.js": "ea398ee03e5c7a1007f1276423ff5daa",
         "chunks/Navigation-87988fa7.js": "b5c4a52e7abed3e0efcc82fc5c3aa2c3",
         "chunks/NumberField-466f5c60.js": "f5e6ff725f6eb731756f9f8db70a10ad",
@@ -371,8 +339,7 @@ describe("/applications", () => {
         "chunks/Placeholder-31706623.js": "60d9ea517a314f0236b2ad695f3a7bbc",
         "chunks/RadioGroup-00f609dd.js": "23279784bec23c9ce9fcea24399647ff",
         "chunks/RatingField-ffd5a256.js": "7a4451771f5d215384b1f48feb535872",
-        "chunks/RelationshipField-1b2fe5d7.js":
-          "188c395de77004c4f5fb92f96b4b12a6",
+        "chunks/RelationshipField-1b2fe5d7.js": "188c395de77004c4f5fb92f96b4b12a6",
         "chunks/Repeater-81cb2810.js": "954d0a4355b87ca3cb3c4f7cba42cd93",
         "chunks/RepeaterBlock-fb4c50d5.js": "41ab68b67e9ba2ab941dd38b6b2f94c7",
         "chunks/RowExplorer-33d5e611.js": "df6b48cd8f3f7788952da92e3708e0dc",
@@ -380,8 +347,7 @@ describe("/applications", () => {
         "chunks/ScreenSlot-68962710.js": "6decb6e4e44a2a49bde5cd5f27155236",
         "chunks/Section-9872aa71.js": "f3670bfbc30ee6077e2171d52fd608d9",
         "chunks/SidePanel-cd5a291c.js": "92c3b80b1c39b46d3318ca7456a18eec",
-        "chunks/SingleRowProvider-63b76c66.js":
-          "9032c0b573ff818cea22d24689f08f32",
+        "chunks/SingleRowProvider-63b76c66.js": "9032c0b573ff818cea22d24689f08f32",
         "chunks/SpectrumCard-a5a528eb.js": "31a0c889a4106db57c2817a86c8acfa4",
         "chunks/StackedList-4cc5f377.js": "a71b5816fd410a805a77a19cf42ea6ca",
         "chunks/StringField-126698b8.js": "7eb28a84da15ebffbc86b7d3a63b7f53",
@@ -394,17 +360,14 @@ describe("/applications", () => {
         "chunks/UserAvatar-be3a991a.js": "9531b40b5486a62146b4a40bad3a03a9",
         "chunks/___vite-browser-external_commonjs-proxy-7d128c64.js":
           "0f39b111899f167f217ce463140097d4",
-        "chunks/_commonjs-dynamic-modules-58f2b0ec.js":
-          "f4894f5027d4507efa95bac3f0835734",
-        "chunks/apexcharts.common-4a420431.js":
-          "7725a9d63f9bde736d08c554fc3138b9",
+        "chunks/_commonjs-dynamic-modules-58f2b0ec.js": "f4894f5027d4507efa95bac3f0835734",
+        "chunks/apexcharts.common-4a420431.js": "7725a9d63f9bde736d08c554fc3138b9",
         "chunks/blocks-37916d2a.js": "d885dee62719debeca88185734e803e3",
         "chunks/easymde-4c022f51.js": "bbf6dc7af9d62fdad24ddfb56685dd0d",
         "chunks/index-445f15a6.js": "9e163d2006e7c7f9245dc849d3ac82a5",
         "chunks/index-a0738cd3.js": "b9b4e1ccd9dd74a91b632bfae8dff028",
         "chunks/optionsParser-a13cad91.js": "6dc97a247da4216a7706cfa641a8c94f",
-        "chunks/phosphorIconLoader-f5abc73c.js":
-          "b2ab8b782be3a65902f50a4f5bcb079b",
+        "chunks/phosphorIconLoader-f5abc73c.js": "b2ab8b782be3a65902f50a4f5bcb079b",
         "chunks/table-a8827bda.js": "83edddafbee024f0efa03eb3097931e4",
         "chunks/users-c42bb877.js": "76b0eaaf02626699bb7140acfc5cf688",
         "chunks/utc-ac6b2ab4.js": "d8ad2d7735b971be7749d7f62e81629c",
@@ -446,7 +409,7 @@ describe("/applications", () => {
 
       expect(response.apps.length).toBe(2)
 
-      const testApp = response.apps.find(a => a.name === "Test Workspace App")
+      const testApp = response.apps.find((a) => a.name === "Test Workspace App")
       expect(testApp).toEqual(
         expect.objectContaining({
           prodId: config.getProdWorkspaceId(),
@@ -457,21 +420,19 @@ describe("/applications", () => {
     })
 
     it("should handle creating multiple workspace apps", async () => {
-      const { workspaceApp: workspaceApp1 } =
-        await config.api.workspaceApp.create(
-          structures.workspaceApps.createRequest({
-            name: "App One",
-            url: "/appone",
-          })
-        )
+      const { workspaceApp: workspaceApp1 } = await config.api.workspaceApp.create(
+        structures.workspaceApps.createRequest({
+          name: "App One",
+          url: "/appone",
+        })
+      )
 
-      const { workspaceApp: workspaceApp2 } =
-        await config.api.workspaceApp.create(
-          structures.workspaceApps.createRequest({
-            name: "App Two",
-            url: "/apptwo",
-          })
-        )
+      const { workspaceApp: workspaceApp2 } = await config.api.workspaceApp.create(
+        structures.workspaceApps.createRequest({
+          name: "App Two",
+          url: "/apptwo",
+        })
+      )
       const app = await config.publish()
 
       const response = await config.api.workspace.fetchClientApps()
@@ -480,9 +441,7 @@ describe("/applications", () => {
       expect(response.apps).toEqual(
         expect.arrayContaining([
           {
-            appId: expect.stringMatching(
-              new RegExp(`^${app.appId}_workspace_app_.+`)
-            ),
+            appId: expect.stringMatching(new RegExp(`^${app.appId}_workspace_app_.+`)),
             name: app.name,
             prodId: app.appId,
             updatedAt: app.updatedAt,
@@ -507,13 +466,12 @@ describe("/applications", () => {
     })
 
     it("should return apps from multiple published workspaces", async () => {
-      const { workspaceApp: app1Workspace1 } =
-        await config.api.workspaceApp.create(
-          structures.workspaceApps.createRequest({
-            name: "App One",
-            url: "/appone",
-          })
-        )
+      const { workspaceApp: app1Workspace1 } = await config.api.workspaceApp.create(
+        structures.workspaceApps.createRequest({
+          name: "App One",
+          url: "/appone",
+        })
+      )
       workspace = await config.publish()
 
       const secondWorkspace = await tk.withFreeze(new Date(), async () => {
@@ -543,9 +501,7 @@ describe("/applications", () => {
       expect(response.apps).toEqual(
         expect.arrayContaining([
           {
-            appId: expect.stringMatching(
-              new RegExp(`^${workspace.appId}_workspace_app_.+`)
-            ),
+            appId: expect.stringMatching(new RegExp(`^${workspace.appId}_workspace_app_.+`)),
             name: workspace.name,
             prodId: workspace.appId,
             updatedAt: workspace.updatedAt,
@@ -560,9 +516,7 @@ describe("/applications", () => {
           },
           {
             appId: expect.stringMatching(
-              new RegExp(
-                `^${db.getProdWorkspaceID(secondWorkspace.appId)}_workspace_app_.+`
-              )
+              new RegExp(`^${db.getProdWorkspaceID(secondWorkspace.appId)}_workspace_app_.+`)
             ),
             name: "App Two",
             prodId: db.getProdWorkspaceID(secondWorkspace.appId),
@@ -574,14 +528,13 @@ describe("/applications", () => {
     })
 
     it("should not return unpublished workspaces", async () => {
-      const { workspaceApp: app1Workspace1 } =
-        await config.api.workspaceApp.create(
-          structures.workspaceApps.createRequest({
-            name: "App One",
-            url: "/appone",
-            disabled: false,
-          })
-        )
+      const { workspaceApp: app1Workspace1 } = await config.api.workspaceApp.create(
+        structures.workspaceApps.createRequest({
+          name: "App One",
+          url: "/appone",
+          disabled: false,
+        })
+      )
       workspace = await config.publish()
 
       // Non published workspace
@@ -626,9 +579,7 @@ describe("/applications", () => {
       expect(response.apps).toEqual(
         expect.arrayContaining([
           {
-            appId: expect.stringMatching(
-              new RegExp(`^${workspace.appId}_workspace_app_.+`)
-            ),
+            appId: expect.stringMatching(new RegExp(`^${workspace.appId}_workspace_app_.+`)),
             name: workspace.name,
             prodId: workspace.appId,
             updatedAt: workspace.updatedAt,
@@ -643,9 +594,7 @@ describe("/applications", () => {
           },
           {
             appId: expect.stringMatching(
-              new RegExp(
-                `^${db.getProdWorkspaceID(secondWorkspace.appId)}_workspace_app_.+`
-              )
+              new RegExp(`^${db.getProdWorkspaceID(secondWorkspace.appId)}_workspace_app_.+`)
             ),
             name: "Default",
             prodId: db.getProdWorkspaceID(secondWorkspace.appId),
@@ -657,14 +606,13 @@ describe("/applications", () => {
     })
 
     it("should not return disabled apps", async () => {
-      const { workspaceApp: app1Workspace1 } =
-        await config.api.workspaceApp.create(
-          structures.workspaceApps.createRequest({
-            name: "App One",
-            url: "/appone",
-            disabled: false,
-          })
-        )
+      const { workspaceApp: app1Workspace1 } = await config.api.workspaceApp.create(
+        structures.workspaceApps.createRequest({
+          name: "App One",
+          url: "/appone",
+          disabled: false,
+        })
+      )
 
       await config.api.workspaceApp.create(
         structures.workspaceApps.createRequest({
@@ -682,9 +630,7 @@ describe("/applications", () => {
       expect(response.apps).toEqual(
         expect.arrayContaining([
           {
-            appId: expect.stringMatching(
-              new RegExp(`^${workspace.appId}_workspace_app_.+`)
-            ),
+            appId: expect.stringMatching(new RegExp(`^${workspace.appId}_workspace_app_.+`)),
             name: workspace.name,
             prodId: workspace.appId,
             updatedAt: workspace.updatedAt,
@@ -739,25 +685,19 @@ describe("/applications", () => {
       ])
 
       await config.publish()
-      const res = await config.withHeaders(
-        { referer: `http://localhost:10000/app` },
-        () =>
-          config.api.workspace.getAppPackage(config.getProdWorkspaceId(), {
-            publicUser: true,
-          })
+      const res = await config.withHeaders({ referer: `http://localhost:10000/app` }, () =>
+        config.api.workspace.getAppPackage(config.getProdWorkspaceId(), {
+          publicUser: true,
+        })
       )
 
       expect(res.screens).toHaveLength(1)
-      expect(res.screens).toContainEqual(
-        expect.objectContaining({ _id: screen2._id })
-      )
+      expect(res.screens).toContainEqual(expect.objectContaining({ _id: screen2._id }))
     })
 
     describe("workspace apps", () => {
       it("should retrieve all the screens for builder calls", async () => {
-        await config.api.workspaceApp.create(
-          structures.workspaceApps.createRequest()
-        )
+        await config.api.workspaceApp.create(structures.workspaceApps.createRequest())
 
         const res = await config.api.workspace.getAppPackage(workspace.appId)
 
@@ -771,14 +711,11 @@ describe("/applications", () => {
         }[]
 
         beforeEach(async () => {
-          const appPackage = await config.api.workspace.getAppPackage(
-            workspace.appId
-          )
+          const appPackage = await config.api.workspace.getAppPackage(workspace.appId)
 
           let defaultWorkspaceApp: WorkspaceApp | undefined
 
-          const { workspaceApps: allWorkspaceApps } =
-            await config.api.workspaceApp.fetch()
+          const { workspaceApps: allWorkspaceApps } = await config.api.workspaceApp.fetch()
           defaultWorkspaceApp = allWorkspaceApps[0]
           if (!defaultWorkspaceApp) {
             defaultWorkspaceApp = (
@@ -791,25 +728,20 @@ describe("/applications", () => {
             ).workspaceApp
           }
 
-          const { workspaceApp: workspaceApp1 } =
-            await config.api.workspaceApp.create(
-              structures.workspaceApps.createRequest({
-                url: "/app1",
-              })
-            )
-          const { workspaceApp: workspaceApp2 } =
-            await config.api.workspaceApp.create(
-              structures.workspaceApps.createRequest({
-                url: "/app2",
-              })
-            )
+          const { workspaceApp: workspaceApp1 } = await config.api.workspaceApp.create(
+            structures.workspaceApps.createRequest({
+              url: "/app1",
+            })
+          )
+          const { workspaceApp: workspaceApp2 } = await config.api.workspaceApp.create(
+            structures.workspaceApps.createRequest({
+              url: "/app2",
+            })
+          )
 
           workspaceAppInfo = []
 
-          async function createScreens(
-            workspaceApp: WorkspaceApp,
-            routes: string[]
-          ) {
+          async function createScreens(workspaceApp: WorkspaceApp, routes: string[]) {
             const screens = []
 
             for (const route of routes) {
@@ -833,66 +765,56 @@ describe("/applications", () => {
           workspaceAppInfo[0].screens.unshift(...appPackage.screens)
         })
 
-        it.each(["", "/"])(
-          "should retrieve only the screens for a the workspace all with empty prefix",
-          async closingChar => {
-            await config.withHeaders(
-              {
-                referer: `http://localhost:10000/${config.devWorkspaceId}${closingChar}`,
-              },
-              async () => {
-                const res = await config.api.workspace.getAppPackage(
-                  workspace.appId,
-                  {
-                    headers: {
-                      [Header.TYPE]: "client",
-                    },
-                  }
-                )
+        it.each([
+          "",
+          "/",
+        ])("should retrieve only the screens for a the workspace all with empty prefix", async (closingChar) => {
+          await config.withHeaders(
+            {
+              referer: `http://localhost:10000/${config.devWorkspaceId}${closingChar}`,
+            },
+            async () => {
+              const res = await config.api.workspace.getAppPackage(workspace.appId, {
+                headers: {
+                  [Header.TYPE]: "client",
+                },
+              })
 
-                expect(res.screens).toHaveLength(1)
-                expect(res.screens).toEqual(
-                  expect.arrayContaining(
-                    workspaceAppInfo[0].screens.map(s =>
-                      expect.objectContaining({ _id: s._id })
-                    )
-                  )
+              expect(res.screens).toHaveLength(1)
+              expect(res.screens).toEqual(
+                expect.arrayContaining(
+                  workspaceAppInfo[0].screens.map((s) => expect.objectContaining({ _id: s._id }))
                 )
-              }
-            )
-          }
-        )
+              )
+            }
+          )
+        })
 
-        it.each(["", "/"])(
-          "should retrieve only the screens for a the workspace from the base url of it",
-          async closingChar => {
-            const { url } = workspaceAppInfo[1].workspaceApp
-            await config.withHeaders(
-              {
-                referer: `http://localhost:10000/${config.devWorkspaceId}${url}${closingChar}`,
-              },
-              async () => {
-                const res = await config.api.workspace.getAppPackage(
-                  workspace.appId,
-                  {
-                    headers: {
-                      [Header.TYPE]: "client",
-                    },
-                  }
-                )
+        it.each([
+          "",
+          "/",
+        ])("should retrieve only the screens for a the workspace from the base url of it", async (closingChar) => {
+          const { url } = workspaceAppInfo[1].workspaceApp
+          await config.withHeaders(
+            {
+              referer: `http://localhost:10000/${config.devWorkspaceId}${url}${closingChar}`,
+            },
+            async () => {
+              const res = await config.api.workspace.getAppPackage(workspace.appId, {
+                headers: {
+                  [Header.TYPE]: "client",
+                },
+              })
 
-                expect(res.screens).toHaveLength(3)
-                expect(res.screens).toEqual(
-                  expect.arrayContaining(
-                    workspaceAppInfo[1].screens.map(s =>
-                      expect.objectContaining({ _id: s._id })
-                    )
-                  )
+              expect(res.screens).toHaveLength(3)
+              expect(res.screens).toEqual(
+                expect.arrayContaining(
+                  workspaceAppInfo[1].screens.map((s) => expect.objectContaining({ _id: s._id }))
                 )
-              }
-            )
-          }
-        )
+              )
+            }
+          )
+        })
 
         it("should retrieve only the screens for a the workspace for prod app", async () => {
           await config.publish()
@@ -902,21 +824,16 @@ describe("/applications", () => {
                 referer: `http://localhost:10000/app`,
               },
               async () => {
-                const res = await config.api.workspace.getAppPackage(
-                  config.getDevWorkspaceId(),
-                  {
-                    headers: {
-                      [Header.TYPE]: "client",
-                    },
-                  }
-                )
+                const res = await config.api.workspace.getAppPackage(config.getDevWorkspaceId(), {
+                  headers: {
+                    [Header.TYPE]: "client",
+                  },
+                })
 
                 expect(res.screens).toHaveLength(1)
                 expect(res.screens).toEqual(
                   expect.arrayContaining(
-                    workspaceAppInfo[0].screens.map(s =>
-                      expect.objectContaining({ _id: s._id })
-                    )
+                    workspaceAppInfo[0].screens.map((s) => expect.objectContaining({ _id: s._id }))
                   )
                 )
               }
@@ -946,11 +863,8 @@ describe("/applications", () => {
     })
 
     it("should publish table permissions for custom roles correctly", async () => {
-      const ds =
-        process.env.DATASOURCE === "none" ? "postgres" : process.env.DATASOURCE
-      const rawDatasource = await getDatasource(
-        (ds as DatabaseName) || "postgres"
-      )
+      const ds = process.env.DATASOURCE === "none" ? "postgres" : process.env.DATASOURCE
+      const rawDatasource = await getDatasource((ds as DatabaseName) || "postgres")
       const datasource = await config.api.datasource.create(rawDatasource!)
       const table = await config.api.table.save(basicTable(datasource))
       expect(table._id).toBeDefined()
@@ -985,7 +899,7 @@ describe("/applications", () => {
 
         // Also verify the role itself exists in production
         const roles = await config.api.roles.fetch()
-        const prodRole = roles.find(r => r.name === customRole.name)
+        const prodRole = roles.find((r) => r.name === customRole.name)
         expect(prodRole).toBeDefined()
         expect(prodRole!.name).toBe("TestRole")
       })
@@ -1007,8 +921,7 @@ describe("/applications", () => {
     it("middleware should set updatedAt", async () => {
       const app = await tk.withFreeze(
         "2021-01-01",
-        async () =>
-          await config.api.workspace.create({ name: generateAppName() })
+        async () => await config.api.workspace.create({ name: generateAppName() })
       )
       expect(app.updatedAt).toEqual("2021-01-01T00:00:00.000Z")
 
@@ -1042,9 +955,7 @@ describe("/applications", () => {
         })
       )
 
-      expect(message).toEqual(
-        "This action cannot be performed for production apps"
-      )
+      expect(message).toEqual("This action cannot be performed for production apps")
     })
 
     it("app should not sync if sync is disabled", async () => {
