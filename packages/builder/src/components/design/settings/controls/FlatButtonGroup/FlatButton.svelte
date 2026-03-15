@@ -15,7 +15,7 @@ $: useIcon = Boolean(icon)
     <i class={icon}></i>
   {:else}
     <span>
-      <!-- biome-ignore lint: migrated from eslint svelte/no-at-html-tags -->
+      <!-- biome-ignore lint: svelte/no-at-html-tags -->
       {@html text}
     </span>
   {/if}

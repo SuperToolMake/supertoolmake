@@ -1,591 +1,667 @@
 <script lang="ts">
-import {
-  AbsTooltip,
-  Button,
-  DatePicker,
-  Icon,
-  Input,
-  Label,
-  Layout,
-  Modal,
-  Multiselect,
-  notifications,
-  ProgressCircle,
-  Select,
-  Toggle,
-  TooltipPosition,
-  TooltipType,
-} from "@budibase/bbui"
-import { canBeDisplayColumn } from "@budibase/frontend-core"
-import {
-  canHaveDefaultColumn,
-  helpers,
-  isAllowedDisplayField,
-  PROTECTED_EXTERNAL_COLUMNS,
-  PROTECTED_INTERNAL_COLUMNS,
-  SWITCHABLE_TYPES,
-  ValidColumnNameRegex,
-} from "@budibase/shared-core"
-import { makePropSafe } from "@budibase/string-templates"
-import type {
-  AutoFieldSubType,
-  Datasource,
-  FieldSchema,
-  FieldSchemaConfig,
-  Table,
-  UIField,
-  UIFieldSchema,
-} from "@budibase/types"
-import { BBReferenceFieldSubType, FieldType, SourceName } from "@budibase/types"
-import { cloneDeep } from "lodash/fp"
-import { createEventDispatcher, getContext, onMount } from "svelte"
-import ModalBindableInput from "@/components/common/bindings/ModalBindableInput.svelte"
-import ServerBindingPanel from "@/components/common/bindings/ServerBindingPanel.svelte"
-import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
-import RelationshipSelector from "@/components/common/RelationshipSelector.svelte"
-import { TableNames, UNEDITABLE_USER_FIELDS } from "@/constants"
-import {
-  DB_TYPE_EXTERNAL,
-  FIELDS,
-  PrettyRelationshipDefinitions,
-  RelationshipType,
-} from "@/constants/backend"
-import { getUserBindings } from "@/dataBinding"
-import { buildAutoColumn, getAutoColumnInformation } from "@/helpers/utils"
-import { datasources, tables } from "@/stores/builder"
-import JSONSchemaModal from "./JSONSchemaModal.svelte"
-import OptionsEditor from "./OptionsEditor.svelte"
+  import {
+    AbsTooltip,
+    Button,
+    DatePicker,
+    Icon,
+    Input,
+    Label,
+    Layout,
+    Modal,
+    Multiselect,
+    notifications,
+    ProgressCircle,
+    Select,
+    Toggle,
+    TooltipPosition,
+    TooltipType,
+  } from "@budibase/bbui"
+  import { canBeDisplayColumn } from "@budibase/frontend-core"
+  import {
+    canHaveDefaultColumn,
+    helpers,
+    isAllowedDisplayField,
+    PROTECTED_EXTERNAL_COLUMNS,
+    PROTECTED_INTERNAL_COLUMNS,
+    SWITCHABLE_TYPES,
+    ValidColumnNameRegex,
+  } from "@budibase/shared-core"
+  import { makePropSafe } from "@budibase/string-templates"
+  import type {
+    AutoFieldSubType,
+    Datasource,
+    FieldSchema,
+    FieldSchemaConfig,
+    Table,
+    UIField,
+    UIFieldSchema,
+  } from "@budibase/types"
+  import {
+    BBReferenceFieldSubType,
+    FieldType,
+    SourceName,
+  } from "@budibase/types"
+  import { cloneDeep } from "lodash/fp"
+  import { createEventDispatcher, getContext, onMount } from "svelte"
+  import ModalBindableInput from "@/components/common/bindings/ModalBindableInput.svelte"
+  import ServerBindingPanel from "@/components/common/bindings/ServerBindingPanel.svelte"
+  import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
+  import RelationshipSelector from "@/components/common/RelationshipSelector.svelte"
+  import { TableNames, UNEDITABLE_USER_FIELDS } from "@/constants"
+  import {
+    DB_TYPE_EXTERNAL,
+    FIELDS,
+    PrettyRelationshipDefinitions,
+    RelationshipType,
+  } from "@/constants/backend"
+  import { getUserBindings } from "@/dataBinding"
+  import { buildAutoColumn, getAutoColumnInformation } from "@/helpers/utils"
+  import { datasources, tables } from "@/stores/builder"
+  import JSONSchemaModal from "./JSONSchemaModal.svelte"
+  import OptionsEditor from "./OptionsEditor.svelte"
 
-export let field: FieldSchema
+  export let field: FieldSchema
 
-const dispatch = createEventDispatcher()
-const { dispatch: gridDispatch } = getContext("grid") as any
-const SafeID = `${makePropSafe("user")}.${makePropSafe("_id")}`
-const SingleUserDefault = `{{ ${SafeID} }}`
-const MultiUserDefault = `{{ js "${btoa(`return [$("${SafeID}")]`)}" }}`
+  const dispatch = createEventDispatcher()
+  const { dispatch: gridDispatch } = getContext("grid") as any
+  const SafeID = `${makePropSafe("user")}.${makePropSafe("_id")}`
+  const SingleUserDefault = `{{ ${SafeID} }}`
+  const MultiUserDefault = `{{ js "${btoa(`return [$("${SafeID}")]`)}" }}`
 
-let mounted = false
-let originalName: string | undefined
-let linkEditDisabled: boolean = false
-let hasPrimaryDisplay: boolean
-let isCreating: boolean | undefined
-let relationshipPart1 = PrettyRelationshipDefinitions.MANY
-let relationshipPart2 = PrettyRelationshipDefinitions.ONE
-let relationshipTableIdPrimary: string | undefined
-let relationshipTableIdSecondary: string | undefined
-let table: Table | undefined = $tables.selected
-let confirmDeleteDialog: any
-let savingColumn: boolean
-let deleteColName: string | undefined
-let jsonSchemaModal: any
-let editableColumn: FieldSchemaConfig = {
-  type: FieldType.STRING,
-  constraints: FIELDS.STRING.constraints as any,
-  name: "",
-  // Initial value for column name in other table for linked records
-  fieldName: $tables.selected?.name || "",
-}
-let relationshipOpts1 = Object.values(PrettyRelationshipDefinitions)
-let relationshipOpts2 = Object.values(PrettyRelationshipDefinitions)
-const relationshipMap = {
-  [RelationshipType.ONE_TO_MANY]: {
-    part1: PrettyRelationshipDefinitions.MANY,
-    part2: PrettyRelationshipDefinitions.ONE,
-  },
-  [RelationshipType.MANY_TO_MANY]: {
-    part1: PrettyRelationshipDefinitions.MANY,
-    part2: PrettyRelationshipDefinitions.MANY,
-  },
-  [RelationshipType.MANY_TO_ONE]: {
-    part1: PrettyRelationshipDefinitions.ONE,
-    part2: PrettyRelationshipDefinitions.MANY,
-  },
-}
-const autoColumnInfo = getAutoColumnInformation()
-let optionsValid = true
-
-// a fixed order for the types to stop them moving around
-// we've never really guaranteed an order to these, which means that
-// they can move around very easily
-const fixedTypeOrder = [
-  FIELDS.STRING,
-  FIELDS.NUMBER,
-  FIELDS.OPTIONS,
-  FIELDS.ARRAY,
-  FIELDS.BOOLEAN,
-  FIELDS.DATETIME,
-  FIELDS.LINK,
-  FIELDS.LONGFORM,
-  FIELDS.USER,
-  FIELDS.USERS,
-  FIELDS.JSON,
-  FIELDS.BARCODEQR,
-  FIELDS.SIGNATURE_SINGLE,
-  FIELDS.BIGINT,
-  FIELDS.AUTO,
-]
-
-function makeFieldId(type: string, subtype?: string, autocolumn?: boolean) {
-  // don't make field IDs for auto types
-  if (type === FieldType.AUTO || autocolumn) {
-    return type.toUpperCase()
-  } else if (type === FieldType.BB_REFERENCE || type === FieldType.BB_REFERENCE_SINGLE) {
-    return `${type}${subtype || ""}`.toUpperCase()
-  } else {
-    return type.toUpperCase()
+  let mounted = false
+  let originalName: string | undefined
+  let linkEditDisabled: boolean = false
+  let hasPrimaryDisplay: boolean
+  let isCreating: boolean | undefined
+  let relationshipPart1 = PrettyRelationshipDefinitions.MANY
+  let relationshipPart2 = PrettyRelationshipDefinitions.ONE
+  let relationshipTableIdPrimary: string | undefined
+  let relationshipTableIdSecondary: string | undefined
+  let table: Table | undefined = $tables.selected
+  let confirmDeleteDialog: any
+  let savingColumn: boolean
+  let deleteColName: string | undefined
+  let jsonSchemaModal: any
+  let editableColumn: FieldSchemaConfig = {
+    type: FieldType.STRING,
+    constraints: FIELDS.STRING.constraints as any,
+    name: "",
+    // Initial value for column name in other table for linked records
+    fieldName: $tables.selected?.name || "",
   }
-}
+  let relationshipOpts1 = Object.values(PrettyRelationshipDefinitions)
+  let relationshipOpts2 = Object.values(PrettyRelationshipDefinitions)
+  const relationshipMap = {
+    [RelationshipType.ONE_TO_MANY]: {
+      part1: PrettyRelationshipDefinitions.MANY,
+      part2: PrettyRelationshipDefinitions.ONE,
+    },
+    [RelationshipType.MANY_TO_MANY]: {
+      part1: PrettyRelationshipDefinitions.MANY,
+      part2: PrettyRelationshipDefinitions.MANY,
+    },
+    [RelationshipType.MANY_TO_ONE]: {
+      part1: PrettyRelationshipDefinitions.ONE,
+      part2: PrettyRelationshipDefinitions.MANY,
+    },
+  }
+  const autoColumnInfo = getAutoColumnInformation()
+  let optionsValid = true
 
-const initialiseField = (field: FieldSchema | undefined, savingColumn: boolean) => {
-  isCreating = !field
-  if (field && !savingColumn) {
-    editableColumn = cloneDeep(field) as FieldSchemaConfig
-    originalName = editableColumn.name ? String(editableColumn.name) : undefined
-    linkEditDisabled = originalName != null
-    hasPrimaryDisplay =
-      $tables.selected?.primaryDisplay == null ||
-      $tables.selected?.primaryDisplay === editableColumn.name
+  // a fixed order for the types to stop them moving around
+  // we've never really guaranteed an order to these, which means that
+  // they can move around very easily
+  const fixedTypeOrder = [
+    FIELDS.STRING,
+    FIELDS.NUMBER,
+    FIELDS.OPTIONS,
+    FIELDS.ARRAY,
+    FIELDS.BOOLEAN,
+    FIELDS.DATETIME,
+    FIELDS.LINK,
+    FIELDS.LONGFORM,
+    FIELDS.USER,
+    FIELDS.USERS,
+    FIELDS.JSON,
+    FIELDS.BARCODEQR,
+    FIELDS.BIGINT,
+    FIELDS.AUTO,
+  ]
 
-    // Here we are setting the relationship values based on the editableColumn
-    // This part of the code is used when viewing an existing field hence the check
-    // for the tableId
-    if (editableColumn.type === FieldType.LINK && editableColumn.tableId) {
-      relationshipTableIdPrimary = table?._id
-      relationshipTableIdSecondary = editableColumn.tableId
-      if (editableColumn.relationshipType && editableColumn.relationshipType in relationshipMap) {
-        const { part1, part2 } = relationshipMap[editableColumn.relationshipType]
-        relationshipPart1 = part1
-        relationshipPart2 = part2
-      }
+  function makeFieldId(type: string, subtype?: string, autocolumn?: boolean) {
+    // don't make field IDs for auto types
+    if (type === FieldType.AUTO || autocolumn) {
+      return type.toUpperCase()
+    } else if (
+      type === FieldType.BB_REFERENCE ||
+      type === FieldType.BB_REFERENCE_SINGLE
+    ) {
+      return `${type}${subtype || ""}`.toUpperCase()
+    } else {
+      return type.toUpperCase()
     }
   }
 
-  if (!savingColumn) {
-    editableColumn.fieldId = makeFieldId(
-      editableColumn.type,
-      editableColumn.subtype,
-      editableColumn.autocolumn
+  const initialiseField = (
+    field: FieldSchema | undefined,
+    savingColumn: boolean
+  ) => {
+    isCreating = !field
+    if (field && !savingColumn) {
+      editableColumn = cloneDeep(field) as FieldSchemaConfig
+      originalName = editableColumn.name
+        ? String(editableColumn.name)
+        : undefined
+      linkEditDisabled = originalName != null
+      hasPrimaryDisplay =
+        $tables.selected?.primaryDisplay == null ||
+        $tables.selected?.primaryDisplay === editableColumn.name
+
+      // Here we are setting the relationship values based on the editableColumn
+      // This part of the code is used when viewing an existing field hence the check
+      // for the tableId
+      if (editableColumn.type === FieldType.LINK && editableColumn.tableId) {
+        relationshipTableIdPrimary = table?._id
+        relationshipTableIdSecondary = editableColumn.tableId
+        if (
+          editableColumn.relationshipType &&
+          editableColumn.relationshipType in relationshipMap
+        ) {
+          const { part1, part2 } =
+            relationshipMap[editableColumn.relationshipType]
+          relationshipPart1 = part1
+          relationshipPart2 = part2
+        }
+      }
+    }
+
+    if (!savingColumn) {
+      editableColumn.fieldId = makeFieldId(
+        editableColumn.type,
+        editableColumn.subtype,
+        editableColumn.autocolumn
+      )
+    }
+  }
+
+  const getTableAutoColumnTypes = (table: Table | undefined) => {
+    return Object.keys(table?.schema || {}).reduce(
+      (acc: string[], key: string) => {
+        let fieldSchema = table?.schema[key]
+        if (fieldSchema?.autocolumn && fieldSchema?.subtype) {
+          acc.push(fieldSchema.subtype)
+        }
+        return acc
+      },
+      []
     )
   }
-}
 
-const getTableAutoColumnTypes = (table: Table | undefined) => {
-  return Object.keys(table?.schema || {}).reduce((acc: string[], key: string) => {
-    let fieldSchema = table?.schema[key]
-    if (fieldSchema?.autocolumn && fieldSchema?.subtype) {
-      acc.push(fieldSchema.subtype)
+  async function saveColumn() {
+    if (Object.keys(errors || {}).length) {
+      return
     }
-    return acc
-  }, [])
-}
 
-async function saveColumn() {
-  if (Object.keys(errors || {}).length) {
-    return
-  }
+    savingColumn = true
+    let saveColumn = cloneDeep(editableColumn)
 
-  savingColumn = true
-  let saveColumn = cloneDeep(editableColumn)
+    delete saveColumn.fieldId
 
-  delete saveColumn.fieldId
-
-  if ($tables.selected && saveColumn.name && saveColumn.type === FieldType.AUTO) {
-    saveColumn = buildAutoColumn(
-      $tables.selected.name,
-      saveColumn.name,
-      saveColumn.subtype as AutoFieldSubType
-    ) as FieldSchemaConfig
-  }
-  if ("fieldName" in saveColumn && saveColumn.type !== FieldType.LINK) {
-    delete saveColumn.fieldName
-  }
-
-  // Ensure we don't have a default value if we can't have one
-  if (!canHaveDefault) {
-    delete saveColumn.default
-  }
-
-  // Ensure primary display columns are always required and don't have default values
-  if (hasPrimaryDisplay) {
-    saveColumn.constraints!.presence = { allowEmpty: false }
-    delete saveColumn.default
-  }
-
-  // Ensure the field is not required if we have a default value
-  if (saveColumn.default) {
-    saveColumn.constraints!.presence = false
-  }
-
-  try {
-    await tables.saveField({
-      originalName,
-      field: saveColumn as FieldSchema,
-      hasPrimaryDisplay,
-    })
-    dispatch("updatecolumns")
-    gridDispatch("close-edit-column")
-
-    if (originalName) {
-      notifications.success("Column updated successfully")
-    } else {
-      notifications.success("Column created successfully")
+    if (
+      $tables.selected &&
+      saveColumn.name &&
+      saveColumn.type === FieldType.AUTO
+    ) {
+      saveColumn = buildAutoColumn(
+        $tables.selected.name,
+        saveColumn.name,
+        saveColumn.subtype as AutoFieldSubType
+      ) as FieldSchemaConfig
     }
-  } catch (err: any) {
-    notifications.error(`Error saving column: ${err.message}`)
-  } finally {
-    savingColumn = false
-  }
-}
-
-function cancelEdit() {
-  if (originalName) {
-    editableColumn.name = originalName
-  }
-  gridDispatch("close-edit-column")
-}
-
-async function deleteColumn() {
-  try {
-    if (deleteColName) {
-      editableColumn.name = deleteColName
+    if ("fieldName" in saveColumn && saveColumn.type !== FieldType.LINK) {
+      delete saveColumn.fieldName
     }
-    if (editableColumn.name === $tables.selected?.primaryDisplay) {
-      notifications.error("You cannot delete the display column")
-    } else {
-      await tables.deleteField({ name: editableColumn.name! })
-      notifications.success(`Column ${editableColumn.name} deleted`)
-      confirmDeleteDialog.hide()
+
+    // Ensure we don't have a default value if we can't have one
+    if (!canHaveDefault) {
+      delete saveColumn.default
+    }
+
+    // Ensure primary display columns are always required and don't have default values
+    if (hasPrimaryDisplay) {
+      saveColumn.constraints!.presence = { allowEmpty: false }
+      delete saveColumn.default
+    }
+
+    // Ensure the field is not required if we have a default value
+    if (saveColumn.default) {
+      saveColumn.constraints!.presence = false
+    }
+
+    try {
+      await tables.saveField({
+        originalName,
+        field: saveColumn as FieldSchema,
+        hasPrimaryDisplay,
+      })
       dispatch("updatecolumns")
       gridDispatch("close-edit-column")
-    }
-  } catch (error: any) {
-    notifications.error(`Error deleting column: ${error.message}`)
-  }
-}
 
-function onHandleTypeChange(event: any) {
-  handleTypeChange(event.detail)
-}
-
-function handleTypeChange(type?: string) {
-  // remove any extra fields that may not be related to this type
-  const columnsToClear = ["autocolumn", "subtype", "tableId", "relationshipType"]
-  for (let column of columnsToClear) {
-    if (column in editableColumn) {
-      delete editableColumn[column as keyof FieldSchema]
+      if (originalName) {
+        notifications.success("Column updated successfully")
+      } else {
+        notifications.success("Column created successfully")
+      }
+    } catch (err: any) {
+      notifications.error(`Error saving column: ${err.message}`)
+    } finally {
+      savingColumn = false
     }
   }
-  editableColumn.constraints = {}
 
-  // Add in defaults and initial definition
-  const definition = fieldDefinitions[type?.toUpperCase() || ""]
-  if (definition?.constraints) {
-    editableColumn.constraints = cloneDeep(definition.constraints)
-  }
-
-  editableColumn.type = definition.type
-  if (definition.subtype) {
-    // @ts-expect-error the setting of sub-type here doesn't fit our definition with
-    // FieldSchema, there is no type checking, it simply sets it if it is provided
-    editableColumn.subtype = definition.subtype
-  }
-
-  // Default relationships many to many
-  if (editableColumn.type === FieldType.LINK) {
-    editableColumn.relationshipType = RelationshipType.MANY_TO_MANY
-  }
-}
-
-function setRequired(req: boolean) {
-  editableColumn.constraints!.presence = req ? { allowEmpty: false } : false
-  required = req
-}
-
-function onChangeRequired(e: any) {
-  setRequired(e.detail)
-}
-
-function openJsonSchemaEditor() {
-  jsonSchemaModal.show()
-}
-
-function confirmDelete() {
-  confirmDeleteDialog.show()
-}
-
-function hideDeleteDialog() {
-  deleteColName = ""
-}
-
-function getAllowedTypes(table: Table | undefined): UIField[] {
-  const isSqlTable = table?.sql
-  if (originalName) {
-    let possibleTypes = SWITCHABLE_TYPES[field.type] || [editableColumn.type]
-    if (helpers.schema.isDeprecatedSingleUserColumn(editableColumn as FieldSchema)) {
-      // This will handle old single users columns
-      return [
-        {
-          ...FIELDS.USER,
-          type: FieldType.BB_REFERENCE,
-          subtype: BBReferenceFieldSubType.USER,
-        },
-      ]
-    } else if (
-      editableColumn.type === FieldType.BB_REFERENCE &&
-      editableColumn.subtype === BBReferenceFieldSubType.USERS
-    ) {
-      // This will handle old multi users columns
-      return [
-        {
-          ...FIELDS.USERS,
-          subtype: BBReferenceFieldSubType.USERS,
-        },
-      ]
+  function cancelEdit() {
+    if (originalName) {
+      editableColumn.name = originalName
     }
-
-    return Object.entries(FIELDS)
-      .filter(([_, field]) => possibleTypes.includes(field.type))
-      .map(([_, fieldDefinition]) => fieldDefinition)
+    gridDispatch("close-edit-column")
   }
 
-  if (!isExternalTable) {
-    const fields = [...allTableFields, FIELDS.USER, FIELDS.USERS, FIELDS.JSON, FIELDS.AUTO]
-    return fields
-  }
-  if (isExternalTable && isSqlTable) {
-    return [...allTableFields, FIELDS.USER, FIELDS.USERS]
-  }
-  if (isExternalTable && !isSqlTable) {
-    // filter out SQL-specific types for non-SQL datasources
-    return allTableFields.filter((x) => x !== FIELDS.LINK && x !== FIELDS.ARRAY)
-  }
-
-  throw new Error("No valid allowed types found")
-}
-
-function checkConstraints(fieldToCheck: FieldSchema) {
-  if (!fieldToCheck) {
-    return
-  }
-
-  // most types need this, just make sure its always present
-  if (!fieldToCheck.constraints) {
-    fieldToCheck.constraints = {}
-  }
-  // some string types may have been built by server, may not always have constraints
-  if (fieldToCheck.type === FieldType.STRING && !fieldToCheck.constraints.length) {
-    fieldToCheck.constraints.length = {}
-  }
-  // some number types made server-side will be missing constraints
-  if (fieldToCheck.type === FieldType.NUMBER && !fieldToCheck.constraints.numericality) {
-    fieldToCheck.constraints.numericality = {}
-  }
-  if (fieldToCheck.type === FieldType.DATETIME && !fieldToCheck.constraints.datetime) {
-    fieldToCheck.constraints.datetime = {}
-  }
-}
-
-function checkErrors(fieldInfo: FieldSchema) {
-  if (!editableColumn) {
-    return
-  }
-  function inUse(tbl?: Table, column?: string, ogName?: string) {
-    const parsedColumn = column ? column.toLowerCase().trim() : column
-
-    return Object.keys(tbl?.schema || {}).some((key) => {
-      let lowerKey = key.toLowerCase()
-      return lowerKey !== ogName?.toLowerCase() && lowerKey === parsedColumn
-    })
-  }
-  const newError: { name?: string; subtype?: string; relatedName?: string } = {}
-  const prohibited = isExternalTable ? PROTECTED_EXTERNAL_COLUMNS : PROTECTED_INTERNAL_COLUMNS
-  if (!isExternalTable && fieldInfo.name?.startsWith("_")) {
-    newError.name = `Column name cannot start with an underscore.`
-  } else if (fieldInfo.name && !fieldInfo.name.match(ValidColumnNameRegex)) {
-    newError.name = `Illegal character; must be alpha-numeric.`
-  } else if (prohibited.some((name) => fieldInfo?.name === name)) {
-    newError.name = `${prohibited.join(", ")} are not allowed as column names - case insensitive.`
-  } else if (inUse($tables.selected, fieldInfo.name, originalName)) {
-    newError.name = `Column name already in use.`
-  }
-
-  if (fieldInfo.type === FieldType.AUTO && !fieldInfo.subtype) {
-    newError.subtype = `Auto Column requires a type.`
-  }
-
-  if (fieldInfo.type === FieldType.LINK && fieldInfo.fieldName && fieldInfo.tableId) {
-    const relatedTable = $tables.list.find((tbl) => tbl._id === fieldInfo.tableId)
-    if (inUse(relatedTable, fieldInfo.fieldName) && !originalName) {
-      newError.relatedName = `Column name already in use in table ${relatedTable?.name}`
+  async function deleteColumn() {
+    try {
+      if (deleteColName) {
+        editableColumn.name = deleteColName
+      }
+      if (editableColumn.name === $tables.selected?.primaryDisplay) {
+        notifications.error("You cannot delete the display column")
+      } else {
+        await tables.deleteField({ name: editableColumn.name! })
+        notifications.success(`Column ${editableColumn.name} deleted`)
+        confirmDeleteDialog.hide()
+        dispatch("updatecolumns")
+        gridDispatch("close-edit-column")
+      }
+    } catch (error: any) {
+      notifications.error(`Error deleting column: ${error.message}`)
     }
   }
-  return newError
-}
 
-const sanitiseDefaultValue = (
-  type: FieldType,
-  options: string[],
-  defaultValue?: string[] | string
-) => {
-  if (!defaultValue?.length) {
-    return
+  function onHandleTypeChange(event: any) {
+    handleTypeChange(event.detail)
   }
-  // Delete default value for options fields if the option is no longer available
-  if (
-    type === FieldType.OPTIONS &&
-    typeof defaultValue === "string" &&
-    !options.includes(defaultValue)
-  ) {
-    delete editableColumn.default
-  }
-  // Filter array default values to only valid options
-  if (type === FieldType.ARRAY && Array.isArray(defaultValue)) {
-    editableColumn.default = defaultValue.filter((x) => options.includes(x))
-  }
-}
 
-function handleNameInput(evt: any) {
-  if (!(uneditable || (linkEditDisabled && editableColumn.type === FieldType.LINK))) {
-    editableColumn.name = evt.target.value
-  }
-}
-
-$: if (hasPrimaryDisplay && editableColumn.constraints) {
-  editableColumn.constraints.presence = { allowEmpty: false }
-}
-$: {
-  // this parses any changes the user has made when creating a new internal relationship
-  // into what we expect the schema to look like
-  if (editableColumn.type === FieldType.LINK) {
-    relationshipTableIdPrimary = table?._id
-    if (relationshipPart1 === PrettyRelationshipDefinitions.ONE) {
-      relationshipOpts2 = relationshipOpts2.filter(
-        (opt) => opt !== PrettyRelationshipDefinitions.ONE
-      )
-    } else {
-      relationshipOpts2 = Object.values(PrettyRelationshipDefinitions)
-    }
-
-    if (relationshipPart2 === PrettyRelationshipDefinitions.ONE) {
-      relationshipOpts1 = relationshipOpts1.filter(
-        (opt) => opt !== PrettyRelationshipDefinitions.ONE
-      )
-    } else {
-      relationshipOpts1 = Object.values(PrettyRelationshipDefinitions)
-    }
-    // Determine the relationship type based on the selected values of both parts
-    editableColumn.relationshipType = Object.entries(relationshipMap).find(
-      ([_, parts]) => parts.part1 === relationshipPart1 && parts.part2 === relationshipPart2
-    )?.[0] as RelationshipType
-    if (relationshipTableIdSecondary) {
-      // Set the tableId based on the selected table
-      editableColumn.tableId = relationshipTableIdSecondary
-    }
-  }
-}
-$: initialiseField(field, savingColumn)
-$: checkConstraints(editableColumn)
-$: required =
-  hasPrimaryDisplay ||
-  editableColumn?.constraints?.presence === true ||
-  (editableColumn?.constraints?.presence as any)?.allowEmpty === false
-$: uneditable =
-  $tables.selected?._id === TableNames.USERS &&
-  UNEDITABLE_USER_FIELDS.includes(editableColumn.name || "")
-$: invalid =
-  !editableColumn?.name ||
-  (editableColumn?.type === FieldType.LINK && !editableColumn?.tableId) ||
-  Object.keys(errors || {}).length !== 0 ||
-  !optionsValid
-$: errors = checkErrors(editableColumn)
-$: datasource = $datasources.list.find((source) => source._id === table?.sourceId) as
-  | Datasource
-  | undefined
-$: tableAutoColumnsTypes = getTableAutoColumnTypes($tables?.selected)
-$: availableAutoColumns = Object.keys(autoColumnInfo).reduce(
-  (acc: Record<string, { enabled: boolean; name: string }>, key: string) => {
-    if (!tableAutoColumnsTypes.includes(key)) {
-      const subtypeKey = key as AutoFieldSubType
-      if (autoColumnInfo[subtypeKey]) {
-        acc[key] = autoColumnInfo[subtypeKey]
+  function handleTypeChange(type?: string) {
+    // remove any extra fields that may not be related to this type
+    const columnsToClear = [
+      "autocolumn",
+      "subtype",
+      "tableId",
+      "relationshipType",
+    ]
+    for (let column of columnsToClear) {
+      if (column in editableColumn) {
+        delete editableColumn[column as keyof FieldSchema]
       }
     }
-    return acc
-  },
-  {}
-)
-$: availableAutoColumnKeys = availableAutoColumns ? Object.keys(availableAutoColumns) : []
-$: autoColumnOptions = editableColumn.autocolumn ? autoColumnInfo : availableAutoColumns
-// used to select what different options can be displayed for column type
-$: canBeDisplay = canBeDisplayColumn(editableColumn as UIFieldSchema) && !editableColumn.autocolumn
-$: canHaveDefault = !required && canHaveDefaultColumn(editableColumn.type)
-$: canBeRequired =
-  editableColumn?.type !== FieldType.LINK &&
-  !uneditable &&
-  editableColumn?.type !== FieldType.AUTO &&
-  !editableColumn.autocolumn
-$: hasDefault = editableColumn?.default != null && editableColumn?.default !== ""
-$: isExternalTable = table?.sourceType === DB_TYPE_EXTERNAL
-// in the case of internal tables the sourceId will just be undefined
-$: tableOptions = $tables.list.filter(
-  (opt) => opt.sourceType === table?.sourceType && table.sourceId === opt.sourceId
-)
-$: typeEnabled =
-  !originalName || (originalName && SWITCHABLE_TYPES[field.type] && !editableColumn?.autocolumn)
-$: allowedTypes = getAllowedTypes(table)
-$: orderedAllowedTypes = fixedTypeOrder
-  .filter((ordered) => allowedTypes.find((allowed) => allowed.type === ordered.type))
-  .map((t) => ({
-    fieldId: makeFieldId(t.type, t.subtype),
-    ...t,
-  }))
-$: defaultValueBindings = [
-  {
-    type: "context",
-    runtimeBinding: `${makePropSafe("now")}`,
-    readableBinding: `Date`,
-    category: "Date",
-    icon: "calendar",
-    display: {
-      name: "Server date",
+    editableColumn.constraints = {}
+
+    // Add in defaults and initial definition
+    const definition = fieldDefinitions[type?.toUpperCase() || ""]
+    if (definition?.constraints) {
+      editableColumn.constraints = cloneDeep(definition.constraints)
+    }
+
+    editableColumn.type = definition.type
+    if (definition.subtype) {
+      // @ts-expect-error the setting of sub-type here doesn't fit our definition with
+      // FieldSchema, there is no type checking, it simply sets it if it is provided
+      editableColumn.subtype = definition.subtype
+    }
+
+    // Default relationships many to many
+    if (editableColumn.type === FieldType.LINK) {
+      editableColumn.relationshipType = RelationshipType.MANY_TO_MANY
+    }
+  }
+
+  function setRequired(req: boolean) {
+    editableColumn.constraints!.presence = req ? { allowEmpty: false } : false
+    required = req
+  }
+
+  function onChangeRequired(e: any) {
+    setRequired(e.detail)
+  }
+
+  function openJsonSchemaEditor() {
+    jsonSchemaModal.show()
+  }
+
+  function confirmDelete() {
+    confirmDeleteDialog.show()
+  }
+
+  function hideDeleteDialog() {
+    deleteColName = ""
+  }
+
+  function getAllowedTypes(table: Table | undefined): UIField[] {
+    const isSqlTable = table?.sql
+    if (originalName) {
+      let possibleTypes = SWITCHABLE_TYPES[field.type] || [editableColumn.type]
+      if (
+        helpers.schema.isDeprecatedSingleUserColumn(
+          editableColumn as FieldSchema
+        )
+      ) {
+        // This will handle old single users columns
+        return [
+          {
+            ...FIELDS.USER,
+            type: FieldType.BB_REFERENCE,
+            subtype: BBReferenceFieldSubType.USER,
+          },
+        ]
+      } else if (
+        editableColumn.type === FieldType.BB_REFERENCE &&
+        editableColumn.subtype === BBReferenceFieldSubType.USERS
+      ) {
+        // This will handle old multi users columns
+        return [
+          {
+            ...FIELDS.USERS,
+            subtype: BBReferenceFieldSubType.USERS,
+          },
+        ]
+      }
+
+      return Object.entries(FIELDS)
+        .filter(([_, field]) => possibleTypes.includes(field.type))
+        .map(([_, fieldDefinition]) => fieldDefinition)
+    }
+
+    if (!isExternalTable) {
+      const fields = [
+        ...allTableFields,
+        FIELDS.USER,
+        FIELDS.USERS,
+        FIELDS.JSON,
+        FIELDS.AUTO,
+      ]
+      return fields
+    }
+    if (isExternalTable && isSqlTable) {
+      return [...allTableFields, FIELDS.USER, FIELDS.USERS]
+    }
+    if (isExternalTable && !isSqlTable) {
+      // filter out SQL-specific types for non-SQL datasources
+      return allTableFields.filter(x => x !== FIELDS.LINK && x !== FIELDS.ARRAY)
+    }
+
+    throw new Error("No valid allowed types found")
+  }
+
+  function checkConstraints(fieldToCheck: FieldSchema) {
+    if (!fieldToCheck) {
+      return
+    }
+
+    // most types need this, just make sure its always present
+    if (!fieldToCheck.constraints) {
+      fieldToCheck.constraints = {}
+    }
+    // some string types may have been built by server, may not always have constraints
+    if (
+      fieldToCheck.type === FieldType.STRING &&
+      !fieldToCheck.constraints.length
+    ) {
+      fieldToCheck.constraints.length = {}
+    }
+    // some number types made server-side will be missing constraints
+    if (
+      fieldToCheck.type === FieldType.NUMBER &&
+      !fieldToCheck.constraints.numericality
+    ) {
+      fieldToCheck.constraints.numericality = {}
+    }
+    if (
+      fieldToCheck.type === FieldType.DATETIME &&
+      !fieldToCheck.constraints.datetime
+    ) {
+      fieldToCheck.constraints.datetime = {}
+    }
+  }
+
+  function checkErrors(fieldInfo: FieldSchema) {
+    if (!editableColumn) {
+      return
+    }
+    function inUse(tbl?: Table, column?: string, ogName?: string) {
+      const parsedColumn = column ? column.toLowerCase().trim() : column
+
+      return Object.keys(tbl?.schema || {}).some(key => {
+        let lowerKey = key.toLowerCase()
+        return lowerKey !== ogName?.toLowerCase() && lowerKey === parsedColumn
+      })
+    }
+    const newError: { name?: string; subtype?: string; relatedName?: string } =
+      {}
+    const prohibited = isExternalTable
+      ? PROTECTED_EXTERNAL_COLUMNS
+      : PROTECTED_INTERNAL_COLUMNS
+    if (!isExternalTable && fieldInfo.name?.startsWith("_")) {
+      newError.name = `Column name cannot start with an underscore.`
+    } else if (fieldInfo.name && !fieldInfo.name.match(ValidColumnNameRegex)) {
+      newError.name = `Illegal character; must be alpha-numeric.`
+    } else if (prohibited.some(name => fieldInfo?.name === name)) {
+      newError.name = `${prohibited.join(", ")} are not allowed as column names - case insensitive.`
+    } else if (inUse($tables.selected, fieldInfo.name, originalName)) {
+      newError.name = `Column name already in use.`
+    }
+
+    if (fieldInfo.type === FieldType.AUTO && !fieldInfo.subtype) {
+      newError.subtype = `Auto Column requires a type.`
+    }
+
+    if (
+      fieldInfo.type === FieldType.LINK &&
+      fieldInfo.fieldName &&
+      fieldInfo.tableId
+    ) {
+      const relatedTable = $tables.list.find(
+        tbl => tbl._id === fieldInfo.tableId
+      )
+      if (inUse(relatedTable, fieldInfo.fieldName) && !originalName) {
+        newError.relatedName = `Column name already in use in table ${relatedTable?.name}`
+      }
+    }
+    return newError
+  }
+
+  const sanitiseDefaultValue = (
+    type: FieldType,
+    options: string[],
+    defaultValue?: string[] | string
+  ) => {
+    if (!defaultValue?.length) {
+      return
+    }
+    // Delete default value for options fields if the option is no longer available
+    if (
+      type === FieldType.OPTIONS &&
+      typeof defaultValue === "string" &&
+      !options.includes(defaultValue)
+    ) {
+      delete editableColumn.default
+    }
+    // Filter array default values to only valid options
+    if (type === FieldType.ARRAY && Array.isArray(defaultValue)) {
+      editableColumn.default = defaultValue.filter(x => options.includes(x))
+    }
+  }
+
+  function handleNameInput(evt: any) {
+    if (
+      !(
+        uneditable ||
+        (linkEditDisabled && editableColumn.type === FieldType.LINK)
+      )
+    ) {
+      editableColumn.name = evt.target.value
+    }
+  }
+
+  $: if (hasPrimaryDisplay && editableColumn.constraints) {
+    editableColumn.constraints.presence = { allowEmpty: false }
+  }
+  $: {
+    // this parses any changes the user has made when creating a new internal relationship
+    // into what we expect the schema to look like
+    if (editableColumn.type === FieldType.LINK) {
+      relationshipTableIdPrimary = table?._id
+      if (relationshipPart1 === PrettyRelationshipDefinitions.ONE) {
+        relationshipOpts2 = relationshipOpts2.filter(
+          opt => opt !== PrettyRelationshipDefinitions.ONE
+        )
+      } else {
+        relationshipOpts2 = Object.values(PrettyRelationshipDefinitions)
+      }
+
+      if (relationshipPart2 === PrettyRelationshipDefinitions.ONE) {
+        relationshipOpts1 = relationshipOpts1.filter(
+          opt => opt !== PrettyRelationshipDefinitions.ONE
+        )
+      } else {
+        relationshipOpts1 = Object.values(PrettyRelationshipDefinitions)
+      }
+      // Determine the relationship type based on the selected values of both parts
+      editableColumn.relationshipType = Object.entries(relationshipMap).find(
+        ([_, parts]) =>
+          parts.part1 === relationshipPart1 && parts.part2 === relationshipPart2
+      )?.[0] as RelationshipType
+      if (relationshipTableIdSecondary) {
+        // Set the tableId based on the selected table
+        editableColumn.tableId = relationshipTableIdSecondary
+      }
+    }
+  }
+  $: initialiseField(field, savingColumn)
+  $: checkConstraints(editableColumn)
+  $: required =
+    hasPrimaryDisplay ||
+    editableColumn?.constraints?.presence === true ||
+    (editableColumn?.constraints?.presence as any)?.allowEmpty === false
+  $: uneditable =
+    $tables.selected?._id === TableNames.USERS &&
+    UNEDITABLE_USER_FIELDS.includes(editableColumn.name || "")
+  $: invalid =
+    !editableColumn?.name ||
+    (editableColumn?.type === FieldType.LINK && !editableColumn?.tableId) ||
+    Object.keys(errors || {}).length !== 0 ||
+    !optionsValid
+  $: errors = checkErrors(editableColumn)
+  $: datasource = $datasources.list.find(
+    source => source._id === table?.sourceId
+  ) as Datasource | undefined
+  $: tableAutoColumnsTypes = getTableAutoColumnTypes($tables?.selected)
+  $: availableAutoColumns = Object.keys(autoColumnInfo).reduce(
+    (acc: Record<string, { enabled: boolean; name: string }>, key: string) => {
+      if (!tableAutoColumnsTypes.includes(key)) {
+        const subtypeKey = key as AutoFieldSubType
+        if (autoColumnInfo[subtypeKey]) {
+          acc[key] = autoColumnInfo[subtypeKey]
+        }
+      }
+      return acc
     },
-  },
-  ...getUserBindings(),
-]
-$: sanitiseDefaultValue(
-  editableColumn.type,
-  editableColumn.constraints?.inclusion || [],
-  editableColumn.default
-)
+    {}
+  )
+  $: availableAutoColumnKeys = availableAutoColumns
+    ? Object.keys(availableAutoColumns)
+    : []
+  $: autoColumnOptions = editableColumn.autocolumn
+    ? autoColumnInfo
+    : availableAutoColumns
+  // used to select what different options can be displayed for column type
+  $: canBeDisplay =
+    canBeDisplayColumn(editableColumn as UIFieldSchema) &&
+    !editableColumn.autocolumn
+  $: canHaveDefault = !required && canHaveDefaultColumn(editableColumn.type)
+  $: canBeRequired =
+    editableColumn?.type !== FieldType.LINK &&
+    !uneditable &&
+    editableColumn?.type !== FieldType.AUTO &&
+    !editableColumn.autocolumn
+  $: hasDefault =
+    editableColumn?.default != null && editableColumn?.default !== ""
+  $: isExternalTable = table?.sourceType === DB_TYPE_EXTERNAL
+  // in the case of internal tables the sourceId will just be undefined
+  $: tableOptions = $tables.list.filter(
+    opt =>
+      opt.sourceType === table?.sourceType && table.sourceId === opt.sourceId
+  )
+  $: typeEnabled =
+    !originalName ||
+    (originalName &&
+      SWITCHABLE_TYPES[field.type] &&
+      !editableColumn?.autocolumn)
+  $: allowedTypes = getAllowedTypes(table)
+  $: orderedAllowedTypes = fixedTypeOrder
+    .filter(ordered =>
+      allowedTypes.find(allowed => allowed.type === ordered.type)
+    )
+    .map(t => ({
+      fieldId: makeFieldId(t.type, t.subtype),
+      ...t,
+    }))
+  $: defaultValueBindings = [
+    {
+      type: "context",
+      runtimeBinding: `${makePropSafe("now")}`,
+      readableBinding: `Date`,
+      category: "Date",
+      icon: "calendar",
+      display: {
+        name: "Server date",
+      },
+    },
+    ...getUserBindings(),
+  ]
+  $: sanitiseDefaultValue(
+    editableColumn.type,
+    editableColumn.constraints?.inclusion || [],
+    editableColumn.default
+  )
 
-const allTableFields = [
-  FIELDS.STRING,
-  FIELDS.NUMBER,
-  FIELDS.OPTIONS,
-  FIELDS.ARRAY,
-  FIELDS.BOOLEAN,
-  FIELDS.DATETIME,
-  FIELDS.LINK,
-  FIELDS.LONGFORM,
-  FIELDS.BARCODEQR,
-  FIELDS.BIGINT,
-]
+  const allTableFields = [
+    FIELDS.STRING,
+    FIELDS.NUMBER,
+    FIELDS.OPTIONS,
+    FIELDS.ARRAY,
+    FIELDS.BOOLEAN,
+    FIELDS.DATETIME,
+    FIELDS.LINK,
+    FIELDS.LONGFORM,
+    FIELDS.BARCODEQR,
+    FIELDS.BIGINT,
+  ]
 
-const fieldDefinitions: Record<string, UIField> = Object.values(FIELDS).reduce(
-  // Storing the fields by complex field id
-  (acc, field) => {
-    acc[makeFieldId(field.type, field.subtype)] = field
-    return acc
-  },
-  {} as Record<string, UIField>
-)
+  const fieldDefinitions: Record<string, UIField> = Object.values(
+    FIELDS
+  ).reduce(
+    // Storing the fields by complex field id
+    (acc, field) => {
+      acc[makeFieldId(field.type, field.subtype)] = field
+      return acc
+    },
+    {} as Record<string, UIField>
+  )
 
-onMount(() => {
-  mounted = true
-})
+  onMount(() => {
+    mounted = true
+  })
 
-// Helper: checks if it's the first column being added
-$: isFirstColumn = Object.keys(table?.schema || {}).length === 0
+  // Helper: checks if it's the first column being added
+  $: isFirstColumn = Object.keys(table?.schema || {}).length === 0
 </script>
 
 <Layout noPadding gap="S">

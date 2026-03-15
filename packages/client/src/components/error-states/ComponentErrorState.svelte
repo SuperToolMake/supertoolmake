@@ -21,7 +21,7 @@ $: errorMessage = componentErrors?.[0]
         color="var(--spectrum-global-color-static-red-600)"
       />
       {#if errorMessage}
-        <!-- biome-ignore lint: migrated from eslint svelte/no-at-html-tags-->
+        <!-- biome-ignore lint: svelte/no-at-html-tags-->
         {@html errorMessage.message}
         <ComponentErrorStateCta error={errorMessage} />
       {/if}

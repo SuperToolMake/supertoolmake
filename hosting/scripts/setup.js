@@ -20,7 +20,7 @@ async function commandExistsUnix(command) {
 }
 
 async function commandExistsWindows(command) {
-  // biome-ignore lint: migrated from eslint no-control-regex
+  // biome-ignore lint: no-control-regex
   if (/[\x00-\x1f<>:"|?*]/.test(command)) {
     return false
   }

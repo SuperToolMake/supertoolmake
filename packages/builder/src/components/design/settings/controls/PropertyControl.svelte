@@ -139,7 +139,7 @@ $: highlightedProp && isHighlighted && scrollToElement(domElement)
     />
   </div>
   {#if info}
-    <!-- biome-ignore lint: migrated from eslint svelte/no-at-html-tags -->
+    <!-- biome-ignore lint: svelte/no-at-html-tags -->
     <div class="text">{@html info}</div>
   {/if}
 </div>

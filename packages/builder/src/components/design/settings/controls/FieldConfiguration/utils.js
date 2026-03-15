@@ -1,10 +1,10 @@
 import { FieldType } from "@budibase/types"
 
-export const convertOldFieldFormat = (fields) => {
+export const convertOldFieldFormat = fields => {
   if (!fields) {
     return []
   }
-  const converted = fields.map((field) => {
+  const converted = fields.map(field => {
     if (typeof field === "string") {
       // existed but was a string
       return {
@@ -41,7 +41,6 @@ export const FieldTypeToComponentMap = {
   [FieldType.BOOLEAN]: "booleanfield",
   [FieldType.LONGFORM]: "longformfield",
   [FieldType.DATETIME]: "datetimefield",
-  [FieldType.SIGNATURE_SINGLE]: "signaturesinglefield",
   [FieldType.ATTACHMENTS]: "attachmentfield",
   [FieldType.ATTACHMENT_SINGLE]: "attachmentsinglefield",
   [FieldType.LINK]: "relationshipfield",

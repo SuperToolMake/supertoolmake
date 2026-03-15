@@ -19,7 +19,7 @@ vi.stubGlobal("window", { location: { pathname: "/current-path" } })
 describe("google auth store", () => {
   beforeEach((ctx) => {
     vi.clearAllMocks()
-    // biome-ignore lint: migrated from eslint no-import-assign
+    // biome-ignore lint: no-import-assign
     integrations = writable({
       [IntegrationTypes.GOOGLE_SHEETS]: { data: "integration" },
     })
@@ -28,7 +28,7 @@ describe("google auth store", () => {
 
   describe("with id present", () => {
     beforeEach((ctx) => {
-      // biome-ignore lint: migrated from eslint no-import-assign
+      // biome-ignore lint: no-import-assign
       params = writable({ "?continue_google_setup": "googleId" })
       get(createOnGoogleAuthStore())(ctx.callback)
     })
@@ -52,7 +52,7 @@ describe("google auth store", () => {
 
   describe("without id present", () => {
     beforeEach((ctx) => {
-      // biome-ignore lint: migrated from eslint no-import-assign
+      // biome-ignore lint: no-import-assign
       params = writable({})
       get(createOnGoogleAuthStore())(ctx.callback)
     })

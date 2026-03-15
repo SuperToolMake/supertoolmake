@@ -79,7 +79,7 @@ $: hasErrors = Boolean($screenComponentErrorList.length)
           <Link overBackground on:click={() => onErrorClick(error)}>
             {getErrorTitle(error)}
           </Link>:
-          <!-- biome-ignore lint: migrated from eslint svelte/no-at-html-tags-->
+          <!-- biome-ignore lint: svelte/no-at-html-tags-->
           {@html error.message}
         </div>
       </div>

@@ -91,7 +91,6 @@ const componentMap = {
   "field/array": FormFieldSelect,
   "field/json": FormFieldSelect,
   "field/barcodeqr": FormFieldSelect,
-  "field/signature_single": FormFieldSelect,
   "field/bb_reference": FormFieldSelect,
   "field/bb_reference_single": FormFieldSelect,
   // Some validation types are the same as others, so not all types are
@@ -103,12 +102,11 @@ const componentMap = {
   "validation/datetime": ValidationEditor,
   "validation/attachment": ValidationEditor,
   "validation/attachment_single": ValidationEditor,
-  "validation/signature_single": ValidationEditor,
   "validation/link": ValidationEditor,
   "validation/bb_reference": ValidationEditor,
 }
 
-export const getComponentForSetting = (setting) => {
+export const getComponentForSetting = setting => {
   const { type, showInBar, barStyle } = setting || {}
   if (!type) {
     return null
