@@ -1,27 +1,19 @@
 import fs from "node:fs"
-import fsp from "node:fs/promises"
-import { tmpdir } from "node:os"
 import path from "node:path"
-import { PutObjectCommand, S3 } from "@aws-sdk/client-s3"
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-import { BadRequestError, configs, context, objectStore, utils } from "@budibase/backend-core"
+import { BadRequestError, configs, context, objectStore } from "@budibase/backend-core"
 import { InvalidFileExtensions } from "@budibase/shared-core"
 import { processString } from "@budibase/string-templates"
 import {
   type AppProps,
   type Ctx,
   DocumentType,
-  type GetSignedUploadUrlRequest,
-  type GetSignedUploadUrlResponse,
   type ProcessAttachmentResponse,
-  type PWAManifest,
   type ServeAppResponse,
   type ServeBuilderPreviewResponse,
   type ServeClientLibraryResponse,
   type UserCtx,
   type Workspace,
 } from "@budibase/types"
-import extract from "extract-zip"
 import send from "koa-send"
 import { render } from "svelte/server"
 import * as uuid from "uuid"
@@ -117,85 +109,6 @@ export const uploadFile = async (ctx: Ctx<void, ProcessAttachmentResponse>) => {
       }
     })
   )
-}
-
-export async function processPWAZip(ctx: UserCtx) {
-  const file = ctx.request.files?.file
-  if (!file || Array.isArray(file)) {
-    ctx.throw(400, "No file or multiple files provided")
-  }
-
-  const filePath = getUploadPath(file)
-  const fileName = getUploadFilename(file)
-
-  if (!(filePath && fileName?.toLowerCase().endsWith(".zip"))) {
-    ctx.throw(400, "Invalid file - must be a zip file")
-  }
-
-  const tempDir = join(tmpdir(), `pwa-${Date.now()}`)
-  try {
-    await fsp.mkdir(tempDir, { recursive: true })
-
-    await extract(filePath, { dir: tempDir })
-    const iconsJsonPath = join(tempDir, "icons.json")
-
-    if (!fs.existsSync(iconsJsonPath)) {
-      ctx.throw(400, "Invalid zip structure - missing icons.json")
-    }
-
-    let iconsData
-    try {
-      const iconsContent = await fsp.readFile(iconsJsonPath, "utf-8")
-      iconsData = JSON.parse(iconsContent)
-    } catch {
-      ctx.throw(400, "Invalid icons.json file - could not parse JSON")
-    }
-
-    if (!(iconsData.icons && Array.isArray(iconsData.icons))) {
-      ctx.throw(400, "Invalid icons.json file - missing icons array")
-    }
-
-    const icons = []
-    const baseDir = path.dirname(iconsJsonPath)
-    const appId = context.getProdWorkspaceId()
-
-    for (const icon of iconsData.icons) {
-      if (!(icon.src && icon.sizes && fs.existsSync(join(baseDir, icon.src)))) {
-        continue
-      }
-
-      const extension = path.extname(icon.src) || ".png"
-      const key = `${appId}/pwa/${uuid.v4()}${extension}`
-      const mimeType = icon.type || (extension === ".png" ? "image/png" : "image/jpeg")
-
-      try {
-        const result = await objectStore.upload({
-          bucket: ObjectStoreBuckets.APPS,
-          filename: key,
-          path: join(baseDir, icon.src),
-          type: mimeType,
-        })
-
-        if (result.Key) {
-          icons.push({
-            src: result.Key,
-            sizes: icon.sizes,
-            type: mimeType,
-          })
-        }
-      } catch (uploadError) {
-        throw new Error(`Failed to upload icon ${icon.src}: ${uploadError}`)
-      }
-    }
-
-    if (icons.length === 0) {
-      ctx.throw(400, "No valid icons found in the zip file")
-    }
-
-    ctx.body = { icons }
-  } catch (error: any) {
-    ctx.throw(500, `Error processing zip: ${error.message}`)
-  }
 }
 
 export const serveApp = async (ctx: UserCtx<void, ServeAppResponse>) => {
@@ -364,124 +277,4 @@ export const serveServiceWorker = async (ctx: Ctx) => {
 
   ctx.set("Content-Type", "application/javascript")
   ctx.body = serviceWorkerContent
-}
-
-export const getSignedUploadURL = async (
-  ctx: Ctx<GetSignedUploadUrlRequest, GetSignedUploadUrlResponse>
-) => {
-  // Ensure datasource is valid
-  let datasource
-  try {
-    const { datasourceId } = ctx.params
-    datasource = await sdk.datasources.get(datasourceId, { enriched: true })
-    if (!datasource) {
-      ctx.throw(400, "The specified datasource could not be found")
-    }
-  } catch {
-    ctx.throw(400, "The specified datasource could not be found")
-  }
-
-  // Determine type of datasource and generate signed URL
-  let signedUrl
-  let publicUrl
-  const awsRegion = (datasource?.config?.region || "eu-west-1") as string
-  if (datasource?.source === "S3") {
-    const { bucket, key } = ctx.request.body || {}
-    if (!(bucket && key)) {
-      ctx.throw(400, "bucket and key values are required")
-    }
-    try {
-      let endpoint = datasource?.config?.endpoint
-      if (endpoint && !utils.urlHasProtocol(endpoint)) {
-        endpoint = `https://${endpoint}`
-      }
-      const s3 = new S3({
-        region: awsRegion,
-        endpoint: endpoint,
-        credentials: {
-          accessKeyId: datasource?.config?.accessKeyId as string,
-          secretAccessKey: datasource?.config?.secretAccessKey as string,
-        },
-      })
-      const params = { Bucket: bucket, Key: key }
-      signedUrl = await getSignedUrl(s3, new PutObjectCommand(params))
-      if (endpoint) {
-        publicUrl = `${endpoint}/${bucket}/${key}`
-      } else {
-        publicUrl = `https://${bucket}.s3.${awsRegion}.amazonaws.com/${key}`
-      }
-    } catch (error: any) {
-      ctx.throw(400, error)
-    }
-  }
-
-  ctx.body = { signedUrl, publicUrl }
-}
-
-export async function servePwaManifest(ctx: UserCtx<void, any>) {
-  const appId = context.getWorkspaceId()
-  if (!appId) {
-    ctx.throw(404)
-  }
-
-  try {
-    const db = context.getWorkspaceDB({ skip_setup: true })
-    const appInfo = await db.get<Workspace>(DocumentType.WORKSPACE_METADATA)
-
-    if (!appInfo.pwa) {
-      ctx.throw(404)
-    }
-
-    const manifest: PWAManifest = {
-      name: appInfo.pwa.name || appInfo.name,
-      scope: `/app${appInfo.url}`,
-      short_name: appInfo.pwa.short_name || appInfo.name,
-      description: appInfo.pwa.description || "",
-      start_url: `/app${appInfo.url}`,
-      display: appInfo.pwa.display || "standalone",
-      background_color: appInfo.pwa.background_color || "#FFFFFF",
-      theme_color: appInfo.pwa.theme_color || "#FFFFFF",
-      icons: [],
-      screenshots: [],
-    }
-
-    if (appInfo.pwa.icons && appInfo.pwa.icons.length > 0) {
-      try {
-        manifest.icons = await objectStore.enrichPWAImages(appInfo.pwa.icons)
-
-        const desktopScreenshot = manifest.icons.find(
-          (icon) => icon.sizes === "1240x600" || icon.sizes === "2480x1200"
-        )
-        if (desktopScreenshot) {
-          manifest.screenshots.push({
-            src: desktopScreenshot.src,
-            sizes: desktopScreenshot.sizes,
-            type: "image/png",
-            form_factor: "wide",
-            label: "Desktop view",
-          })
-        }
-
-        const mobileScreenshot = manifest.icons.find(
-          (icon) => icon.sizes === "620x620" || icon.sizes === "1024x1024"
-        )
-        if (mobileScreenshot) {
-          manifest.screenshots.push({
-            src: mobileScreenshot.src,
-            sizes: mobileScreenshot.sizes,
-            type: "image/png",
-            label: "Mobile view",
-          })
-        }
-      } catch (error) {
-        throw new Error(`Error processing manifest icons: ${error}`)
-      }
-    }
-
-    ctx.set("Content-Type", "application/json")
-    ctx.body = manifest
-  } catch {
-    ctx.status = 500
-    ctx.body = { message: "Error generating manifest" }
-  }
 }

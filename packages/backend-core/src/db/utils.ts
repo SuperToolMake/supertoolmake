@@ -79,7 +79,7 @@ export async function getAllWorkspaces({
   if (!(env.MULTI_TENANCY || tenantId)) {
     tenantId = DEFAULT_TENANT_ID
   }
-  const dbs = await getAllDbs({ efficient: efficient })
+  const dbs = await getAllDbs({ efficient: efficient ?? false })
   const workspaceDbNames = dbs.filter((dbName: any) => {
     if (env.isTest() && !dbName) {
       return false

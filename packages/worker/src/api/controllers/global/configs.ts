@@ -300,7 +300,7 @@ export async function publicSettings(ctx: Ctx<void, GetPublicSettingsResponse>) 
         getLogoUrl(),
       ])
 
-    const oidc = oidcConfig?.activated
+    const oidc = Boolean(oidcConfig?.activated)
     const googleDatasourceConfigured = Boolean(googleDatasource)
     if (logoUrl) {
       config.logoUrl = logoUrl

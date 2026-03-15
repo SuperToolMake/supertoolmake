@@ -100,7 +100,7 @@ export async function getUsers(
   const usersFromCache = await client.bulkGet<User>(userIds)
   const missingUsersFromCache = userIds.filter((uid) => !usersFromCache[uid])
 
-  const users = Object.values(usersFromCache).filter((user) => Boolean(user))
+  const users = Object.values(usersFromCache).filter((user): user is User => user != null)
   let notFoundIds
   if (missingUsersFromCache.length) {
     const usersFromDb = await populateUsersFromDB(missingUsersFromCache)

@@ -198,7 +198,6 @@ export class BaseSocket {
     }
 
     // Store in redis
-    // @ts-expect-error
     const user: SocketSession = socket.data
     const { sessionId } = user
     const key = this.getSessionKey(sessionId)
@@ -216,7 +215,6 @@ export class BaseSocket {
 
   // Disconnects a socket from its current room
   async leaveRoom(socket: Socket) {
-    // @ts-expect-error
     const user: SocketSession = socket.data
     const { room, sessionId } = user
     if (!room) {

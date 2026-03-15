@@ -213,7 +213,7 @@ export class UserDB {
 
     const addUsers = async () => {
       const isNewUser = !dbUser
-      const isEmailChanging = Boolean(dbUser) && Boolean(email) && dbUser.email !== email
+      const isEmailChanging = Boolean(email) && dbUser?.email != null && dbUser.email !== email
       const shouldValidateUniqueUser =
         !opts.isAccountHolder && Boolean(email) && (isNewUser || isEmailChanging)
 

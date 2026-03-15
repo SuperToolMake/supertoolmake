@@ -146,7 +146,7 @@ $: {
 
 // filename should be separated to avoid updates everytime any other form element changes
 $: filename = $values.file?.name
-$: encryptedFile = Boolean(filename) && isEncryptedRegex.test(filename)
+$: encryptedFile = Boolean(filename) && isEncryptedRegex.test(filename ?? "")
 
 onMount(async () => {
   if ($auth.user?.firstName) {

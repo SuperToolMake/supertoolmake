@@ -10,7 +10,7 @@ function generateTenantKey(key: string) {
 export default class BaseCache {
   client: Client | undefined
 
-  constructor(client: Client | undefined) {
+  constructor(client?: Client) {
     this.client = client
   }
 

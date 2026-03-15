@@ -14,7 +14,7 @@ export const deepGet = (obj: Record<string, any> | undefined, key: string) => {
   if (!(obj && key)) {
     return null
   }
-  if (Object.hasOwn(obj, key)) {
+  if (Object.prototype.hasOwnProperty.call(obj, key)) {
     return obj[key]
   }
   const split = key.split(".")

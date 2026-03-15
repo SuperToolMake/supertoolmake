@@ -70,7 +70,6 @@ export async function fetchByType(ctx: UserCtx<void, FetchGlobalTemplateByTypeRe
 }
 
 export async function fetchByOwner(ctx: UserCtx<void, FetchGlobalTemplateByOwnerIDResponse>) {
-  // @ts-expect-error
   ctx.body = await getTemplates({
     ownerId: ctx.params.ownerId,
   })

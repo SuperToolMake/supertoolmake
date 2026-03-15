@@ -79,15 +79,27 @@ const endUserRoleOptions = $derived([
 const roleOptions = $derived(Constants.BudibaseRoleOptions)
 const disableFields = $derived(readonly || Boolean(user?.scimInfo?.isSync))
 const hasChanges = $derived(
-  Boolean(initialDraft) &&
-    (draft.firstName !== initialDraft.firstName ||
-      draft.lastName !== initialDraft.lastName ||
-      draft.role !== initialDraft.role ||
-      draft.appRole !== initialDraft.appRole)
+  (() => {
+    const initial = initialDraft
+    if (!initial) {
+      return false
+    }
+    return (
+      draft.firstName !== initial.firstName ||
+      draft.lastName !== initial.lastName ||
+      draft.role !== initial.role ||
+      draft.appRole !== initial.appRole
+    )
+  })()
 )
 const hasRoleChanges = $derived(
-  Boolean(initialDraft) &&
-    (draft.role !== initialDraft.role || draft.appRole !== initialDraft.appRole)
+  (() => {
+    const initial = initialDraft
+    if (!initial) {
+      return false
+    }
+    return draft.role !== initial.role || draft.appRole !== initial.appRole
+  })()
 )
 
 $effect(() => {

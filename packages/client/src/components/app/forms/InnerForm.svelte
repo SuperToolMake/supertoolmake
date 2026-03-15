@@ -67,15 +67,15 @@ const formState = writable({
 // Reactive derived stores to derive form state from field array
 // Generates a derived store from an array of fields, comprised of a map of
 // extracted values from the field array
-const deriveFieldProperty = (
+const deriveFieldProperty = <T>(
   fieldStores: Readable<FieldInfo>[],
-  getProp: (_field: FieldInfo) => any
+  getProp: (_field: FieldInfo) => T
 ) => {
   return derived(fieldStores, (fieldValues) => {
-    return fieldValues.reduce((map, field) => {
+    return fieldValues.reduce<Record<string, T>>((map, field) => {
       map[field.name] = getProp(field)
       return map
-    }, {})
+    }, {} as Record<string, T>)
   })
 }
 

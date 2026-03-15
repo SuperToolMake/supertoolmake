@@ -9,6 +9,8 @@ import { BUDIBASE_INTERNAL_DB_ID } from "@/constants/backend"
 import { contextMenuStore, userSelectedResourceMap } from "@/stores/builder"
 import { restTemplates } from "@/stores/builder/restTemplates"
 
+export let datasource
+
 const getContextMenuItems = () => {
   return [
     ...(datasource._id !== BUDIBASE_INTERNAL_DB_ID ? [addQueryItem] : []),
@@ -45,8 +47,6 @@ const openContextMenu = (e) => {
 
 $: goto = $gotoStore
 $params
-
-export let datasource
 
 $: templateIcon =
   datasource?.restTemplate && $restTemplates

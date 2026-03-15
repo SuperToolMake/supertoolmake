@@ -265,7 +265,7 @@ export const search = async (ctx: UserCtx<SearchUsersRequest, SearchUsersRespons
     }
   }
 
-  const hasWorkspaceId = body && Object.hasOwn(body, "workspaceId")
+  const hasWorkspaceId = Boolean(body) && Object.prototype.hasOwnProperty.call(body, "workspaceId")
 
   if (hasWorkspaceId) {
     const response = await searchWorkspaceUsers(body)
@@ -644,7 +644,7 @@ export const inviteAccept = async (ctx: Ctx<AcceptUserInviteRequest, AcceptUserI
             creator?: boolean
             apps?: string[]
           } = {
-            global: info?.builder?.global,
+            global: Boolean(info?.builder?.global),
           }
 
           if (hasCreatorPerms) {

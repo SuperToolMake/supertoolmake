@@ -115,7 +115,6 @@ function generateSchema(
             throw new Error("Invalid relationship schema")
           }
           const { tableName } = breakExternalTableId(column.tableId)
-          // @ts-expect-error
           const relatedTable = tables[tableName]
           if (!relatedTable?.primary) {
             throw new Error("Referenced table doesn't exist or has no primary keys")

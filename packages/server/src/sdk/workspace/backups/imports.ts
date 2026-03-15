@@ -154,7 +154,6 @@ export async function importApp(appId: string, db: Database, template: TemplateT
   } else {
     dbStream = await getTemplateStream(template)
   }
-  // @ts-expect-error
   const { ok } = await db.load(dbStream)
   if (!ok) {
     throw "Error loading database dump from template."

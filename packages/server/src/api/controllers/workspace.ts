@@ -815,17 +815,6 @@ export async function updateWorkspacePackage(
       newWorkspacePackage._rev = application._rev
     }
 
-    // Make sure that when saving down pwa settings, we don't override the keys with the enriched url
-    if (workspacePackage.pwa && application.pwa) {
-      if (workspacePackage.pwa.icons) {
-        workspacePackage.pwa.icons = workspacePackage.pwa.icons.map((icon, i) =>
-          icon.src.startsWith(objectStore.SIGNED_FILE_PREFIX) && application?.pwa?.icons?.[i]
-            ? { ...icon, src: application?.pwa?.icons?.[i].src }
-            : icon
-        )
-      }
-    }
-
     // the locked by property is attached by server but generated from
     // Redis, shouldn't ever store it
     delete newWorkspacePackage.lockedBy

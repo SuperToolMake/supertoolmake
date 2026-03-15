@@ -95,8 +95,9 @@ const authorized =
       const { resourceId, subResourceId } = ctx
 
       const permissions = await sdk.permissions.getResourcePerms(resourceId)
-      const subPermissions =
-        Boolean(subResourceId) && (await sdk.permissions.getResourcePerms(subResourceId))
+      const subPermissions = subResourceId
+        ? await sdk.permissions.getResourcePerms(subResourceId)
+        : undefined
 
       const getPermLevel = (permLevel: string) => {
         const result: string[] = []

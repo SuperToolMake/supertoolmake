@@ -64,7 +64,8 @@ $: tabOptions = (() => {
 })()
 
 // RESPONSE
-$: responseSuccess = Boolean(response) && response.info.code >= 200 && response.info.code < 400
+$: responseSuccess =
+  response != null && response.info.code >= 200 && response.info.code < 400
 $: showVariables = shouldShowVariables(dynamicVariables, responseSuccess)
 
 // Set default selected tab

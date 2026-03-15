@@ -1,4 +1,3 @@
-// @ts-expect-error
 import { iifeWrapper } from "@budibase/string-templates"
 
 export default new Proxy(

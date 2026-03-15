@@ -16,7 +16,7 @@ type FunctionNodeType = (typeof FUNCTION_NODE_TYPES)[number]
 type FunctionLikeNode = Extract<acorn.AnyNode, { type: FunctionNodeType }>
 
 const isFunctionNode = (node?: acorn.Node | null): node is FunctionLikeNode =>
-  Boolean(node) && FUNCTION_NODE_TYPES.includes(node.type as FunctionNodeType)
+  node != null && FUNCTION_NODE_TYPES.includes(node.type as FunctionNodeType)
 
 const isProgramNode = (node?: acorn.Node | null): node is acorn.Program => node?.type === "Program"
 

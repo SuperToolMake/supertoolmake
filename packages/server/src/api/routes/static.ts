@@ -18,9 +18,7 @@ router
   })
   .get("/api/assets/:appId/client", controller.serveClientLibrary)
   .get("/api/assets/:appId/:file(.*)", controller.serve3rdPartyFile)
-  .get("/api/apps/:appId/manifest.json", controller.servePwaManifest)
   .post("/api/attachments/process", authorized(BUILDER), controller.uploadFile)
-  .post("/api/pwa/process-zip", authorized(BUILDER), controller.processPWAZip)
   .post(
     "/api/attachments/:tableId/upload",
     paramResource("tableId"),
@@ -31,6 +29,5 @@ router
   .get("/app/service-worker.js", controller.serveServiceWorker)
   .get("/app/:appUrl/:path*", controller.serveApp)
   .get(`/${devAppIdPath}/:path*`, controller.serveApp)
-  .post("/api/attachments/:datasourceId/url", controller.getSignedUploadURL)
 
 export default router

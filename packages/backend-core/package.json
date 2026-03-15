@@ -32,7 +32,6 @@
   "dependencies": {
     "@aws-sdk/client-s3": "3.709.0",
     "@aws-sdk/lib-storage": "3.709.0",
-    "@aws-sdk/s3-request-presigner": "3.709.0",
     "@smithy/node-http-handler": "^4.1.1",
     "nano": "11.0.3",
     "@budibase/pouchdb-replication-stream": "1.2.11",

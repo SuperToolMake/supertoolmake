@@ -58,9 +58,7 @@ window.svelteLegacyInternal = svelteLegacyInternal
 window.svelte_internal = svelteLegacyInternal
 // @ts-expect-error - augmenting the window at runtime
 window.svelte_store = svelteLegacyStore
-// @ts-expect-error - augmenting the window at runtime
 window.svelteStore = svelteStore
-// @ts-expect-error - augmenting the window at runtime
 window.svelteInternal = svelteInternal
 
 // Extend global window scope

@@ -65,6 +65,9 @@ import ResponsePanel from "./ResponsePanel.svelte"
 import RestBodyInput from "./RestBodyInput.svelte"
 import AuthPicker from "./rest/AuthPicker.svelte"
 
+export let queryId: string | undefined
+export let datasourceId: string
+
 const ensureQueryDefaults = (target: Query) => {
   if (!target.fields?.disabledHeaders) {
     target.fields.disabledHeaders = {}
@@ -488,9 +491,6 @@ const sidebarTransition = (_node: HTMLElement, params: { direction: "in" | "out"
 
 $: goto = $gotoStore
 $params
-
-export let queryId
-export let datasourceId
 
 type EndpointWithIcon = ImportEndpoint & {
   icon?: {
