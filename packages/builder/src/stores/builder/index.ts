@@ -1,4 +1,4 @@
-// biome-ignore-all lint: The order of imports matters for derived stores
+// biome-ignore-all format: The order of imports matters for derived stores
 import { layoutStore } from "./layouts"
 import { workspaceAppStore } from "./workspaceApps"
 import { workspaceFavouriteStore } from "./workspaceFavourites"
@@ -34,7 +34,7 @@ import componentTreeNodesStore from "./componentTreeNodes"
 import { oauth2 } from "./oauth2"
 import { dataEnvironmentStore, dataAPI } from "./dataEnvironment"
 
-import { FetchAppPackageResponse } from "@budibase/types"
+import type { FetchAppPackageResponse } from "@budibase/types"
 import { selectedAppUrls } from "./appUrls"
 import { restTemplates } from "./restTemplates"
 

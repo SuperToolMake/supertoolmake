@@ -109,6 +109,16 @@
           }
         }
       }
+    },
+    {
+      "includes": ["packages/builder/src/stores/builder/index.ts"],
+      "assist": {
+        "actions": {
+          "source": {
+            "organizeImports": "off"
+          }
+        }
+      }
     }
   ],
   "assist": {
