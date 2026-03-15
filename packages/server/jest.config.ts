@@ -1,4 +1,5 @@
-import { join } from "node:path"
+import { dirname, join } from "node:path"
+import { fileURLToPath } from "node:url"
 import type { Config } from "jest"
 
 const baseConfig: Config = {
@@ -39,6 +40,7 @@ const config: Config = {
   coverageReporters: ["lcov", "json", "clover"],
 }
 
-process.env.TOP_LEVEL_PATH = join(__dirname, "..", "..")
+const configDir = dirname(fileURLToPath(import.meta.url))
+process.env.TOP_LEVEL_PATH = join(configDir, "..", "..")
 
 export default config
