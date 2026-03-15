@@ -4,8 +4,6 @@ import UserAvatar from "../../UserAvatar.svelte"
 
 const { users } = getContext("grid")
 
-$: uniqueUsers = unique($users)
-
 const unique = (users) => {
   let uniqueUsers = {}
   users?.forEach((user) => {
@@ -13,6 +11,8 @@ const unique = (users) => {
   })
   return Object.values(uniqueUsers)
 }
+
+$: uniqueUsers = unique($users)
 </script>
 
 <div class="users">

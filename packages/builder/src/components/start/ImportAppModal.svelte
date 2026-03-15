@@ -13,8 +13,6 @@ export let app: {
 let encrypted: boolean = false
 let password: string
 let file: File
-$: disabled = (encrypted && !password) || !file
-
 async function updateApp() {
   try {
     const body: ImportToUpdateWorkspaceRequest = {}
@@ -36,6 +34,8 @@ async function onFileChange(e: CustomEvent) {
   file = e.detail?.[0]
   encrypted = file?.name?.endsWith(".enc.tar.gz")
 }
+
+$: disabled = (encrypted && !password) || !file
 </script>
 
 <ModalContent

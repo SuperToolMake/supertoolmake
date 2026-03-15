@@ -122,7 +122,7 @@ export function bindingTypeCoerce(bindings: SqlQueryBinding) {
     }
     const matches = binding.match(NUMBER_REGEX)
     // check if number first
-    if (matches && matches[0] !== "" && !isNaN(Number(matches[0]))) {
+    if (matches && matches[0] !== "" && !Number.isNaN(Number(matches[0]))) {
       bindings[i] = parseFloat(binding)
     }
     // if not a number, see if it is a date - important to do in this order as any
@@ -130,7 +130,7 @@ export function bindingTypeCoerce(bindings: SqlQueryBinding) {
     else if (isDate(binding)) {
       let value: any
       value = new Date(binding)
-      if (isNaN(value)) {
+      if (Number.isNaN(value)) {
         value = binding
       }
       bindings[i] = value

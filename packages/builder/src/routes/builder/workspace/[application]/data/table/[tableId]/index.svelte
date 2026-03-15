@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Banner, Button, notifications } from "@budibase/bbui"
-import { type Grid, gridClipboard } from "@budibase/frontend-core"
+import { Grid, gridClipboard } from "@budibase/frontend-core"
 import type { Store as GridStore } from "@budibase/frontend-core/src/components/grid/stores"
 import {
   DataEnvironmentMode,
@@ -13,7 +13,7 @@ import { getContext, onDestroy } from "svelte"
 import { productionAPI } from "@/api"
 import ProductionBlankState from "@/components/backend/DataTable/blankstates/ProductionBlankState.svelte"
 import GridExportButton from "@/components/backend/DataTable/buttons/grid/GridExportButton.svelte"
-import type GridGenerateButton from "@/components/backend/DataTable/buttons/grid/GridGenerateButton.svelte"
+import GridGenerateButton from "@/components/backend/DataTable/buttons/grid/GridGenerateButton.svelte"
 import GridImportButton from "@/components/backend/DataTable/buttons/grid/GridImportButton.svelte"
 import GridManageAccessButton from "@/components/backend/DataTable/buttons/grid/GridManageAccessButton.svelte"
 import GridRelationshipButton from "@/components/backend/DataTable/buttons/grid/GridRelationshipButton.svelte"
@@ -43,6 +43,7 @@ import { publishTableToProduction } from "@/utils/publishTableToProduction"
 let generateButton: GridGenerateButton
 let grid: Grid
 let gridContext: GridStore | undefined
+let id: string | undefined
 let lastPublishCount = 0
 let missingProductionDefinition = false
 let previousTableId: string | undefined
@@ -58,72 +59,6 @@ const dataLayoutContext = getContext("data-layout") as {
 }
 
 // Register grid dispatch with data layout when grid is ready
-$: {
-  if (grid) {
-    gridContext = grid.getContext()
-    if (dataLayoutContext?.registerGridDispatch) {
-      dataLayoutContext.registerGridDispatch(gridContext.dispatch)
-    }
-  }
-}
-
-$: userSchemaOverrides = {
-  firstName: { displayName: "First name", disabled: true },
-  lastName: { displayName: "Last name", disabled: true },
-  email: { displayName: "Email", disabled: true },
-  status: { displayName: "Status", disabled: true },
-  roleId: {
-    displayName: "Role",
-    type: "role",
-    disabled: true,
-    roles: $roles,
-  },
-}
-$: autoColumnStatus = verifyAutocolumns($tables?.selected)
-$: duplicates = Object.values(autoColumnStatus).reduce((acc, status) => {
-  if (status.length > 1) {
-    acc = [...acc, ...status]
-  }
-  return acc
-}, [])
-$: invalidColumnText = duplicates.map((entry: any) => {
-  return `${entry.name} (${entry.subtype})`
-})
-$: id = $tables.selected?._id!
-$: isUsersTable = id === TableNames.USERS
-$: isInternal = $tables.selected?.sourceType !== DB_TYPE_EXTERNAL
-$: gridDatasource = {
-  type: "table",
-  tableId: id,
-}
-$: tableDatasource = $datasources.list.find((datasource) => {
-  return datasource._id === $tables.selected?.sourceId
-})
-$: relationshipsEnabled = relationshipSupport(tableDatasource)
-$: currentTheme = $themeStore?.theme
-$: darkMode = !currentTheme.includes("light")
-$: isProductionMode = $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION
-$: isDeployed = isInternal && id ? $workspaceDeploymentStore.tables[id]?.published : false
-$: productionUnavailable =
-  isInternal && isProductionMode && (!isDeployed || missingProductionDefinition)
-$: if (!isProductionMode) {
-  missingProductionDefinition = false
-}
-$: if (id !== previousTableId) {
-  missingProductionDefinition = false
-  previousTableId = id
-}
-$: if (!isUsersTable || !$appStore.features.disableUserMetadata) {
-  highlightUsersAccessButton = false
-}
-$: externalClipboardData = {
-  clipboard: gridClipboard,
-  tableId: id,
-  onCopy: (data: any) => {
-    gridClipboard.copy(data.value, data.multiCellCopy, data.tableId, data.viewId)
-  },
-}
-
 const syncProductionRowSubscription = (shouldSubscribe: boolean, context?: GridStore) => {
   productionRowUnsubscribe?.()
   productionRowUnsubscribe = null
@@ -143,29 +78,8 @@ const syncProductionRowSubscription = (shouldSubscribe: boolean, context?: GridS
   }
 }
 
-$: syncProductionRowSubscription(
-  isInternal && isProductionMode && isDeployed && !missingProductionDefinition && Boolean(id),
-  gridContext
-)
-
-$: productionEmpty =
-  isInternal && isProductionMode && isDeployed && !productionHasRows && !missingProductionDefinition
-
-$: {
-  const publishCount = $deploymentStore.publishCount
-  if (publishCount > lastPublishCount) {
-    lastPublishCount = publishCount
-    if (
-      $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION &&
-      gridContext?.rows?.actions?.refreshData
-    ) {
-      gridContext.rows.actions.refreshData().catch(() => {})
-    }
-  }
-}
-
 const relationshipSupport = (datasource?: Datasource | UIDatasource | UIInternalDatasource) => {
-  if (!datasource || !("source" in datasource)) {
+  if (!(datasource && "source" in datasource)) {
     return false
   }
   const integration = $integrations[datasource?.source]
@@ -185,7 +99,7 @@ const verifyAutocolumns = (table?: Table) => {
   // Check for duplicates
   return Object.values(table?.schema || {}).reduce(
     (acc, fieldSchema) => {
-      if (!fieldSchema.autocolumn || !fieldSchema.subtype) {
+      if (!(fieldSchema.autocolumn && fieldSchema.subtype)) {
         return acc
       }
       let fieldKey: string =
@@ -220,8 +134,14 @@ const publishProductionTable = async (seedProductionTables: boolean) => {
   const label = seedProductionTables
     ? "Error seeding and publishing table"
     : "Error publishing table"
+  const tableId = id
+  if (!tableId) {
+    tablePublishing = false
+    notifications.error(label)
+    return
+  }
   try {
-    await publishTableToProduction(id, seedProductionTables)
+    await publishTableToProduction(tableId, seedProductionTables)
     if (isProductionMode && gridContext?.rows?.actions?.refreshData) {
       await gridContext.rows.actions.refreshData()
     }
@@ -248,9 +168,96 @@ const checkProductionRowPresence = async () => {
     if (tableId === id) {
       productionHasRows = Boolean(res?.rows?.length)
     }
-  } catch (error) {
+  } catch {
     if (tableId === id) {
       productionHasRows = true
+    }
+  }
+}
+
+$: {
+  if (grid) {
+    gridContext = grid.getContext()
+    if (dataLayoutContext?.registerGridDispatch) {
+      dataLayoutContext.registerGridDispatch(gridContext.dispatch)
+    }
+  }
+}
+
+$: userSchemaOverrides = {
+  firstName: { displayName: "First name", disabled: true },
+  lastName: { displayName: "Last name", disabled: true },
+  email: { displayName: "Email", disabled: true },
+  status: { displayName: "Status", disabled: true },
+  roleId: {
+    displayName: "Role",
+    type: "role",
+    disabled: true,
+    roles: $roles,
+  },
+}
+$: autoColumnStatus = verifyAutocolumns($tables?.selected)
+$: duplicates = Object.values(autoColumnStatus).reduce((acc, status) => {
+  if (status.length > 1) {
+    acc.push(...status)
+  }
+  return acc
+}, [])
+$: invalidColumnText = duplicates.map((entry: any) => {
+  return `${entry.name} (${entry.subtype})`
+})
+$: id = $tables.selected?._id
+$: isUsersTable = id === TableNames.USERS
+$: isInternal = $tables.selected?.sourceType !== DB_TYPE_EXTERNAL
+$: gridDatasource = {
+  type: "table",
+  tableId: id,
+}
+$: tableDatasource = $datasources.list.find((datasource) => {
+  return datasource._id === $tables.selected?.sourceId
+})
+$: relationshipsEnabled = relationshipSupport(tableDatasource)
+$: currentTheme = $themeStore?.theme
+$: darkMode = !currentTheme.includes("light")
+$: isProductionMode = $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION
+$: isDeployed = isInternal && id ? $workspaceDeploymentStore.tables[id]?.published : false
+$: productionUnavailable =
+  isInternal && isProductionMode && (!isDeployed || missingProductionDefinition)
+$: if (!isProductionMode) {
+  missingProductionDefinition = false
+}
+$: if (id !== previousTableId) {
+  missingProductionDefinition = false
+  previousTableId = id
+}
+$: if (!(isUsersTable && $appStore.features.disableUserMetadata)) {
+  highlightUsersAccessButton = false
+}
+$: externalClipboardData = {
+  clipboard: gridClipboard,
+  tableId: id,
+  onCopy: (data: any) => {
+    gridClipboard.copy(data.value, data.multiCellCopy, data.tableId, data.viewId)
+  },
+}
+
+$: syncProductionRowSubscription(
+  isInternal && isProductionMode && isDeployed && !missingProductionDefinition && Boolean(id),
+  gridContext
+)
+
+$: productionEmpty =
+  isInternal && isProductionMode && isDeployed && !productionHasRows && !missingProductionDefinition
+
+$: {
+  const publishCount = $deploymentStore.publishCount
+  if (publishCount > lastPublishCount) {
+    lastPublishCount = publishCount
+    if (
+      $dataEnvironmentStore.mode === DataEnvironmentMode.PRODUCTION &&
+      gridContext?.rows?.actions?.refreshData
+    ) {
+      gridContext.rows.actions.refreshData().catch(() => {})
     }
   }
 }

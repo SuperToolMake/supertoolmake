@@ -1,4 +1,4 @@
-import path from "path"
+import path from "node:path"
 
 // this simply runs all of our path join and resolve functions through
 // a central location incase we need to add some protection to file paths

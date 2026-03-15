@@ -16,7 +16,7 @@ $: {
   for (let i = 0; i < rowsToDisplay.length; i++) {
     let row = rowsToDisplay[i]
     for (let fieldName of Object.keys(schema)) {
-      if (schema[fieldName] === "number" && !isNaN(Number(row[fieldName]))) {
+      if (schema[fieldName] === "number" && !Number.isNaN(Number(row[fieldName]))) {
         row[fieldName] = Number(row[fieldName])
       } else {
         row[fieldName] = row[fieldName]?.toString()

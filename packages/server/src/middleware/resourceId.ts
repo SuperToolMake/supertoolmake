@@ -1,4 +1,5 @@
 import type { Ctx } from "@budibase/types"
+import type { Next } from "koa"
 
 export class ResourceIdGetter {
   parameter: string
@@ -9,7 +10,6 @@ export class ResourceIdGetter {
     this.parameter = ctxProperty
     this.main = null
     this.sub = null
-    return this
   }
 
   mainResource(field: string) {
@@ -26,7 +26,7 @@ export class ResourceIdGetter {
     const parameter = this.parameter,
       main = this.main,
       sub = this.sub
-    return (ctx: Ctx, next: () => void) => {
+    return (ctx: Ctx, next: Next) => {
       // @ts-expect-error
       const request = ctx.request[parameter] || ctx[parameter]
       if (request == null) {

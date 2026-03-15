@@ -39,7 +39,7 @@ export async function checkForColumnUpdates(
   const db = context.getWorkspaceDB()
   let updatedRows = []
   let deletedColumns: any = []
-  if (oldTable && oldTable.schema && updatedTable.schema) {
+  if (oldTable?.schema && updatedTable.schema) {
     deletedColumns = Object.keys(oldTable.schema).filter(
       (colName) => updatedTable.schema[colName] == null
     )
@@ -104,7 +104,7 @@ export async function importToRows(
 ) {
   const originalTable = table
   const finalData: Row[] = []
-  const keepCouchId = !!opts?.keepCouchId
+  const keepCouchId = Boolean(opts?.keepCouchId)
   for (let i = 0; i < data.length; i++) {
     let row = data[i]
     row._id = (keepCouchId && row._id) || generateRowID(table._id!)
@@ -161,7 +161,7 @@ export async function handleDataImport(
   const identifierFields = opts?.identifierFields || []
   const importRows = opts?.importRows
 
-  if (!importRows || !isRows(importRows) || !isSchema(schema)) {
+  if (!(importRows && isRows(importRows) && isSchema(schema))) {
     return table
   }
 

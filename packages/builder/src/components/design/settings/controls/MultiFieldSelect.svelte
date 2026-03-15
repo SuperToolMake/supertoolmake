@@ -19,11 +19,6 @@ let currentOption = null
 let contextTooltipVisible = false
 
 const dispatch = createEventDispatcher()
-$: datasource = getDatasourceForProvider($selectedScreen, componentInstance)
-$: schema = getSchemaForDatasource($selectedScreen, datasource).schema
-$: options = Object.keys(schema || {})
-$: boundValue = getValidOptions(value, options)
-
 const getValidOptions = (selectedOptions, allOptions) => {
   // Fix the hardcoded default string value
   if (!Array.isArray(selectedOptions)) {
@@ -37,6 +32,19 @@ const setValue = (value) => {
   dispatch("change", boundValue)
 }
 
+const onOptionMouseenter = (e, option) => {
+  updateTooltip(e, option)
+}
+
+const onOptionMouseleave = (e) => {
+  updateTooltip(e, null)
+}
+
+$: datasource = getDatasourceForProvider($selectedScreen, componentInstance)
+$: schema = getSchemaForDatasource($selectedScreen, datasource).schema
+$: options = Object.keys(schema || {})
+$: boundValue = getValidOptions(value, options)
+
 const updateTooltip = debounce((e, option) => {
   if (option == null) {
     contextTooltipVisible = false
@@ -46,14 +54,6 @@ const updateTooltip = debounce((e, option) => {
     contextTooltipVisible = true
   }
 }, 200)
-
-const onOptionMouseenter = (e, option) => {
-  updateTooltip(e, option)
-}
-
-const onOptionMouseleave = (e) => {
-  updateTooltip(e, null)
-}
 </script>
 
 <Multiselect

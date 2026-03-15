@@ -2,10 +2,6 @@
 import { params } from "@roxi/routify"
 import { builderStore, datasources } from "@/stores/builder"
 
-$: setId($params.datasourceId)
-$: datasourceId = $datasources.selectedDatasourceId
-$: builderStore.selectResource(datasourceId!)
-
 const validate = (id: string) => $datasources.list?.some((ds) => ds._id === id)
 
 const setId = (id: string) => {
@@ -13,6 +9,10 @@ const setId = (id: string) => {
     datasources.select(id)
   }
 }
+
+$: setId($params.datasourceId)
+$: datasourceId = $datasources.selectedDatasourceId
+$: builderStore.selectResource(datasourceId!)
 </script>
 
 {#key $datasources.selected}

@@ -15,22 +15,13 @@ export let onDuplicateSuccess = () => {}
 
 const validation = createValidationStore()
 const values = writable<{ name: string; url: string | null }>({
-  name: appName + " copy",
+  name: `${appName} copy`,
   url: null,
 })
 const appPrefix = "/app"
 
-let defaultAppName = appName + " copy"
+let defaultAppName = `${appName} copy`
 let duplicating = false
-
-$: {
-  const { url } = $values
-
-  validation.check({
-    ...$values,
-    url: url?.[0] === "/" ? url.substring(1, url.length) : url,
-  })
-}
 
 const resolveAppName = (name: string) => {
   return name ? name.trim() : null
@@ -76,7 +67,7 @@ const duplicateApp = async () => {
     }
     onDuplicateSuccess()
     notifications.success("App duplicated successfully")
-  } catch (err) {
+  } catch {
     notifications.error("Error duplicating app")
     duplicating = false
   }
@@ -88,6 +79,15 @@ const setupValidation = async () => {
   workspaceValidation.url(validation, { workspaces: applications })
 
   const { url } = $values
+  validation.check({
+    ...$values,
+    url: url?.[0] === "/" ? url.substring(1, url.length) : url,
+  })
+}
+
+$: {
+  const { url } = $values
+
   validation.check({
     ...$values,
     url: url?.[0] === "/" ? url.substring(1, url.length) : url,

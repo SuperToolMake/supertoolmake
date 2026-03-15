@@ -34,7 +34,7 @@ function userColumnMapping(column: string, filters: SearchFilters) {
   findColumnInQueries(column, filters, (filterValue: any): any => {
     const isArray = Array.isArray(filterValue),
       isString = typeof filterValue === "string"
-    if (!isString && !isArray) {
+    if (!(isString || isArray)) {
       return filterValue
     }
 

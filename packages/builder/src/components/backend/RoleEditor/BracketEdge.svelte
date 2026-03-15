@@ -8,15 +8,6 @@ export let sourceY
 
 const { bounds } = getContext("flow")
 
-$: bracketWidth = GridResolution * 3
-$: bracketHeight = $bounds.height / 2 + GridResolution * 2
-$: path = getCurlyBracePath(
-  sourceX + bracketWidth,
-  sourceY - bracketHeight,
-  sourceX + bracketWidth,
-  sourceY + bracketHeight
-)
-
 const getCurlyBracePath = (x1, y1, x2, y2) => {
   const w = 2 // Thickness
   const q = 1 // Intensity
@@ -44,6 +35,15 @@ const getCurlyBracePath = (x1, y1, x2, y2) => {
 
   return `M ${x1} ${y1} Q ${qx1} ${qy1} ${qx2} ${qy2} T ${tx1} ${ty1} M ${x2} ${y2} Q ${qx3} ${qy3} ${qx4} ${qy4} T ${tx1} ${ty1}`
 }
+
+$: bracketWidth = GridResolution * 3
+$: bracketHeight = $bounds.height / 2 + GridResolution * 2
+$: path = getCurlyBracePath(
+  sourceX + bracketWidth,
+  sourceY - bracketHeight,
+  sourceX + bracketWidth,
+  sourceY + bracketHeight
+)
 </script>
 
 <BaseEdge

@@ -41,7 +41,7 @@ export const createActions = (context: StoreContext): TableActions => {
   }
 
   const isDatasourceValid = (datasource: UIDatasource) => {
-    return datasource?.type === "table" && !!datasource?.tableId
+    return datasource?.type === "table" && Boolean(datasource?.tableId)
   }
 
   const getRow = async (id: any) => {

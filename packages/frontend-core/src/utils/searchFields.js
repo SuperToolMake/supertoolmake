@@ -2,7 +2,7 @@ import { BannedSearchTypes } from "../constants"
 
 export function getTableFields(tables, linkField) {
   const table = tables.find((table) => table._id === linkField.tableId)
-  if (!table || !table.sql) {
+  if (!table?.sql) {
     return []
   }
   const linkFields = getFields(tables, Object.values(table.schema), {

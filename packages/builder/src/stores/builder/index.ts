@@ -1,39 +1,42 @@
-import type { FetchAppPackageResponse } from "@budibase/types"
-import { appStore } from "./app"
-import { selectedAppUrls } from "./appUrls"
-import { builderStore } from "./builder"
-import { componentStore, selectedComponent } from "./components"
-import componentTreeNodesStore from "./componentTreeNodes"
-import { contextMenuStore } from "./contextMenu"
-import { dataAPI, dataEnvironmentStore } from "./dataEnvironment"
-import { datasources } from "./datasources"
-import { deploymentStore } from "./deployment"
-import { hoverStore } from "./hover"
-import { integrations } from "./integrations"
+// biome-ignore-all format: The order of imports matters for derived stores
 import { layoutStore } from "./layouts"
+import { workspaceAppStore } from "./workspaceApps"
+import { workspaceFavouriteStore } from "./workspaceFavourites"
+import { appStore } from "./app"
+import { componentStore, selectedComponent } from "./components"
 import { navigationStore } from "./navigation"
-import { oauth2 } from "./oauth2"
-import { permissions } from "./permissions"
-import { previewStore } from "./preview"
-import { queries } from "./queries"
-import { restTemplates } from "./restTemplates"
-import { roles } from "./roles"
-import { rowActions } from "./rowActions"
-import {
-  screenComponentErrorList,
-  screenComponentErrors,
-  screenComponentsList,
-} from "./screenComponent"
+import { themeStore } from "./theme"
 import { screenStore, selectedScreen, sortedScreens } from "./screens"
+import { builderStore } from "./builder"
+import { hoverStore } from "./hover"
+import { previewStore } from "./preview"
+import { workspaceDeploymentStore } from "./workspaceDeployment"
+import { userStore, userSelectedResourceMap, isOnlyUser } from "./users"
+import { deploymentStore } from "./deployment"
+import { contextMenuStore } from "./contextMenu"
 import { snippets } from "./snippets"
-import { sortedIntegrations } from "./sortedIntegrations"
+import {
+  screenComponentsList,
+  screenComponentErrors,
+  screenComponentErrorList,
+} from "./screenComponent"
+
 // Backend
 import { tables } from "./tables"
-import { themeStore } from "./theme"
-import { isOnlyUser, userSelectedResourceMap, userStore } from "./users"
-import { workspaceAppStore } from "./workspaceApps"
-import { workspaceDeploymentStore } from "./workspaceDeployment"
-import { workspaceFavouriteStore } from "./workspaceFavourites"
+import { permissions } from "./permissions"
+import { roles } from "./roles"
+import { datasources } from "./datasources"
+import { integrations } from "./integrations"
+import { sortedIntegrations } from "./sortedIntegrations"
+import { queries } from "./queries"
+import { rowActions } from "./rowActions"
+import componentTreeNodesStore from "./componentTreeNodes"
+import { oauth2 } from "./oauth2"
+import { dataEnvironmentStore, dataAPI } from "./dataEnvironment"
+
+import type { FetchAppPackageResponse } from "@budibase/types"
+import { selectedAppUrls } from "./appUrls"
+import { restTemplates } from "./restTemplates"
 
 export {
   appStore,

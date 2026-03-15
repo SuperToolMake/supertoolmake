@@ -280,7 +280,7 @@ export class ScreenStore extends BudiStore<ScreenState> {
    * supports deeply mutating the current doc rather than just appending data.
    */
   sequentialScreenPatch = Utils.sequential(
-    async (patchFn: (screen: Screen) => boolean, screenId: string): Promise<Screen | void> => {
+    async (patchFn: (screen: Screen) => boolean, screenId: string): Promise<Screen | undefined> => {
       const state = get(this.store)
       const screen = state.screens.find((screen) => screen._id === screenId)
       if (!screen) {
@@ -307,13 +307,13 @@ export class ScreenStore extends BudiStore<ScreenState> {
   async patch(
     patchFn: (screen: Screen) => any,
     screenId?: string | null
-  ): Promise<SaveScreenResponse | void> {
+  ): Promise<SaveScreenResponse | undefined> {
     // Default to the currently selected screen
     if (!screenId) {
       const state = get(this.store)
       screenId = state.selectedScreenId
     }
-    if (!screenId || !patchFn) {
+    if (!(screenId && patchFn)) {
       return
     }
     return await this.sequentialScreenPatch(patchFn, screenId)
@@ -376,7 +376,8 @@ export class ScreenStore extends BudiStore<ScreenState> {
     // Underline the expectation that _id and _rev will be set after filtering
     screensToDelete
       .filter(
-        (screen): screen is Screen & { _id: string; _rev: string } => !!screen._id || !!screen._rev
+        (screen): screen is Screen & { _id: string; _rev: string } =>
+          Boolean(screen._id) || Boolean(screen._rev)
       )
       .forEach((screen) => {
         // Delete the screen
@@ -426,7 +427,7 @@ export class ScreenStore extends BudiStore<ScreenState> {
    * @param {any} value
    */
   async updateSetting(screen: Screen, name: string, value: any) {
-    if (!screen || !name) {
+    if (!(screen && name)) {
       return
     }
 
@@ -482,7 +483,7 @@ export class ScreenStore extends BudiStore<ScreenState> {
    */
   async enrichEmptySettings(screen: Screen) {
     // Flatten the recursive component tree
-    const components = findAllMatchingComponents(screen.props, (x: Component) => !!x)
+    const components = findAllMatchingComponents(screen.props, (x: Component) => Boolean(x))
 
     // Iterate over all components and run checks
     components.forEach((component) => {
@@ -515,8 +516,8 @@ export const sortedScreens = derived(screenStore, ($screenStore) => {
       return roleA > roleB ? -1 : 1
     }
     // Then put home screens first
-    const homeA = !!a.routing.homeScreen
-    const homeB = !!b.routing.homeScreen
+    const homeA = Boolean(a.routing.homeScreen)
+    const homeB = Boolean(b.routing.homeScreen)
     if (homeA !== homeB) {
       return homeA ? -1 : 1
     }

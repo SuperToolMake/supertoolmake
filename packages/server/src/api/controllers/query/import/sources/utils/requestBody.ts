@@ -58,7 +58,7 @@ const toSchemaObject = (
   value: SchemaObject | ReferenceObject | undefined
 ): SchemaObject | undefined => {
   if (!value || isReferenceObject(value)) {
-    return undefined
+    return
   }
   return value
 }
@@ -106,7 +106,7 @@ const pickSchema = (
 ): SchemaObject | undefined => {
   const resolvedSchema = toSchemaObject(schema)
   if (!resolvedSchema) {
-    return undefined
+    return
   }
 
   if (Array.isArray(resolvedSchema.allOf) && resolvedSchema.allOf.length > 0) {
@@ -119,7 +119,7 @@ const pickSchema = (
         return { ...candidate }
       }
 
-      const next: SchemaObject = { ...accumulator }
+      const next: SchemaObject = accumulator
 
       const mergedProperties = {
         ...getProperties(accumulator),
@@ -168,7 +168,7 @@ const pickSchema = (
 
 const getSchemaType = (schema: SchemaObject | undefined): string | undefined => {
   if (!schema) {
-    return undefined
+    return
   }
   const { type } = schema
   if (Array.isArray(type)) {
@@ -209,11 +209,11 @@ const getProperties = (schema: SchemaObject | undefined): Record<string, SchemaO
 
 const getItemsSchema = (schema: SchemaObject | undefined): SchemaObject | undefined => {
   if (!schema) {
-    return undefined
+    return
   }
   const items = schema.items
   if (!items) {
-    return undefined
+    return
   }
   if (Array.isArray(items)) {
     const candidates = items as Array<SchemaObject | ReferenceObject>
@@ -223,7 +223,7 @@ const getItemsSchema = (schema: SchemaObject | undefined): SchemaObject | undefi
         return schemaItem
       }
     }
-    return undefined
+    return
   }
   return pickSchema(items as SchemaObject | ReferenceObject)
 }
@@ -470,7 +470,7 @@ export const generateRequestBodyFromSchema = (
 ): GeneratedRequestBody | undefined => {
   const resolvedSchema = pickSchema(schema as SchemaObject | ReferenceObject | undefined)
   if (!resolvedSchema) {
-    return undefined
+    return
   }
   const seen = new Set<SchemaObject>()
   const buildOptions: BuildOptions = {
@@ -478,7 +478,7 @@ export const generateRequestBodyFromSchema = (
   }
   const result = buildFromSchema(resolvedSchema, [rootName], 0, seen, buildOptions)
   if (result.value === undefined) {
-    return undefined
+    return
   }
   return { body: result.value, bindings: result.bindings }
 }
@@ -488,26 +488,26 @@ export const generateRequestBodyFromExample = (
   rootName = "body"
 ): GeneratedRequestBody | undefined => {
   if (example === undefined) {
-    return undefined
+    return
   }
   const seen = new WeakSet<object>()
   const result = buildFromExample(example, [rootName], 0, seen)
   if (result.value === undefined) {
-    return undefined
+    return
   }
   return { body: result.value, bindings: result.bindings }
 }
 
 export const serialiseRequestBody = (body: unknown): string | undefined => {
   if (body === undefined) {
-    return undefined
+    return
   }
   if (typeof body === "string") {
     return body
   }
   const json = JSON.stringify(body, null, 2)
   if (typeof json !== "string") {
-    return undefined
+    return
   }
   return json.replace(BINDING_TOKEN_REGEX, (_match, type, key) => {
     const binding = `{{ ${key} }}`
@@ -546,26 +546,26 @@ const cloneSerializableRequestBody = (value: unknown): unknown => {
 
 export const buildSerializableRequestBody = (body: unknown): unknown => {
   if (body === undefined) {
-    return undefined
+    return
   }
   return cloneSerializableRequestBody(body)
 }
 
 const extractBindingFromPlaceholder = (value: unknown): string | undefined => {
   if (!value || typeof value !== "object") {
-    return undefined
+    return
   }
   const candidate = value as { toJSON?: () => unknown }
   if (typeof candidate.toJSON !== "function") {
-    return undefined
+    return
   }
   const token = candidate.toJSON()
   if (typeof token !== "string") {
-    return undefined
+    return
   }
   const match = token.match(BINDING_VALUE_REGEX)
   if (!match) {
-    return undefined
+    return
   }
   return match[2]
 }
@@ -624,7 +624,7 @@ const collectKeyValuePairs = (
 
 export const buildKeyValueRequestBody = (body: unknown): Record<string, string> | undefined => {
   if (!body || typeof body !== "object") {
-    return undefined
+    return
   }
 
   const accumulator: Record<string, string> = {}
@@ -633,7 +633,7 @@ export const buildKeyValueRequestBody = (body: unknown): Record<string, string> 
   }
 
   if (Object.keys(accumulator).length === 0) {
-    return undefined
+    return
   }
 
   return accumulator
@@ -653,7 +653,7 @@ export const buildRequestBodyFromFormDataParameters = (
   params: FormDataParameter[]
 ): GeneratedRequestBody | undefined => {
   if (!Array.isArray(params) || params.length === 0) {
-    return undefined
+    return
   }
 
   const body: Record<string, unknown> = {}
@@ -676,7 +676,7 @@ export const buildRequestBodyFromFormDataParameters = (
   }
 
   if (Object.keys(body).length === 0) {
-    return undefined
+    return
   }
 
   return { body, bindings }

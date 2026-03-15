@@ -16,7 +16,7 @@ type FunctionNodeType = (typeof FUNCTION_NODE_TYPES)[number]
 type FunctionLikeNode = Extract<acorn.AnyNode, { type: FunctionNodeType }>
 
 const isFunctionNode = (node?: acorn.Node | null): node is FunctionLikeNode =>
-  !!node && FUNCTION_NODE_TYPES.includes(node.type as FunctionNodeType)
+  node != null && FUNCTION_NODE_TYPES.includes(node.type as FunctionNodeType)
 
 const isProgramNode = (node?: acorn.Node | null): node is acorn.Program => node?.type === "Program"
 
@@ -32,7 +32,7 @@ const getHelperFunctionName = (callee: acorn.Expression | acorn.Super) => {
     callee.object.type !== "Identifier" ||
     callee.object.name !== "helpers"
   ) {
-    return undefined
+    return
   }
 
   if (callee.property.type === "Identifier") {
@@ -43,7 +43,7 @@ const getHelperFunctionName = (callee: acorn.Expression | acorn.Super) => {
     return callee.property.value
   }
 
-  return undefined
+  return
 }
 
 export function validateJsTemplate(code: string, validations: CodeValidator): Diagnostic[] {

@@ -35,7 +35,7 @@ export function validateHbsTemplate(text: string, validations: CodeValidator): D
         ignoreMissing?: boolean
       }
     ) {
-      const ignoreMissing = options?.ignoreMissing || false
+      const ignoreMissing = options?.ignoreMissing
       nodes.forEach((node) => {
         if ((isMustacheStatement(node) || isBlockStatement(node)) && isPathExpression(node.path)) {
           const helperName = node.path.original

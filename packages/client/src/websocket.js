@@ -9,7 +9,7 @@ export const initWebsocket = () => {
   const { cloud } = get(environmentStore)
 
   // Only connect when we're inside the builder preview, for now
-  if (!inBuilder || !location || cloud || socket) {
+  if (!(inBuilder && location) || cloud || socket) {
     return
   }
 

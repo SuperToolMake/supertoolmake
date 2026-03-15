@@ -26,12 +26,6 @@ const {
 
 let container
 
-$: buttons = getButtons($gridProps)
-$: columnsWidth = $scrollableColumns.reduce((total, col) => (total += col.width), 0)
-$: columnEnd = columnsWidth - $scrollLeft - 1
-$: gridEnd = $width - $buttonColumnWidth - 1
-$: left = Math.min(columnEnd, gridEnd)
-
 const getButtons = ({ buttons, buttonsCollapsed }) => {
   let gridButtons = buttons || []
   if (!buttonsCollapsed) {
@@ -42,7 +36,7 @@ const getButtons = ({ buttons, buttonsCollapsed }) => {
 
 // Apply button conditions and return filtered/modified buttons for a specific row
 const getButtonsForRow = (buttons, row) => {
-  if (!buttons || !row) return buttons
+  if (!(buttons && row)) return buttons
 
   const rowMetadata = $metadata?.[row._id]?.button || {}
 
@@ -74,6 +68,12 @@ const makeCollapsedButtons = (buttons, row) => {
     onClick: () => handleClick(button, row),
   }))
 }
+
+$: buttons = getButtons($gridProps)
+$: columnsWidth = $scrollableColumns.reduce((total, col) => (total += col.width), 0)
+$: columnEnd = columnsWidth - $scrollLeft - 1
+$: gridEnd = $width - $buttonColumnWidth - 1
+$: left = Math.min(columnEnd, gridEnd)
 
 onMount(() => {
   const observer = new ResizeObserver((entries) => {

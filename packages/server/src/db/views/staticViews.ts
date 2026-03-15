@@ -31,7 +31,6 @@ export async function createLinkView() {
         const doc1 = doc.doc1
         const doc2 = doc.doc2
         // @ts-expect-error emit is available in a CouchDB map function
-        // eslint-disable-next-line no-undef
         emit([doc1.tableId, doc1.rowId], {
           id: doc2.rowId,
           thisId: doc1.rowId,
@@ -40,7 +39,6 @@ export async function createLinkView() {
         // if linking to same table can't emit twice
         if (doc1.tableId !== doc2.tableId) {
           // @ts-expect-error emit is available in a CouchDB map function
-          // eslint-disable-next-line no-undef
           emit([doc2.tableId, doc2.rowId], {
             id: doc1.rowId,
             thisId: doc2.rowId,

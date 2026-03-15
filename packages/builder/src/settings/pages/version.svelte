@@ -12,7 +12,7 @@ let githubPublishedTime
 async function getVersion() {
   try {
     version = await API.getInstallVersion()
-  } catch (error) {
+  } catch {
     notifications.error("Error getting version")
     version = null
   }
@@ -32,7 +32,7 @@ async function getLatestVersion() {
     githubPublishedDate = new Date(githubResponse.published_at)
     githubPublishedTime = githubPublishedDate.toLocaleTimeString()
     githubPublishedDate = githubPublishedDate.toLocaleDateString()
-  } catch (error) {
+  } catch {
     notifications.error("Error getting the latest version")
     githubVersion = null
   }

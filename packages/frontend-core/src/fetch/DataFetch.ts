@@ -207,9 +207,9 @@ export default abstract class BaseDataFetch<
     // Determine feature flags
     const features = await this.determineFeatureFlags()
     this.features = {
-      supportsSearch: !!features?.supportsSearch,
-      supportsSort: !!features?.supportsSort,
-      supportsPagination: paginate && !!features?.supportsPagination,
+      supportsSearch: Boolean(features?.supportsSearch),
+      supportsSort: Boolean(features?.supportsSort),
+      supportsPagination: paginate && Boolean(features?.supportsPagination),
     }
 
     // Fetch and enrich schema

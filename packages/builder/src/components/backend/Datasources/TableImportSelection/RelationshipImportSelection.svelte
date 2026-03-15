@@ -15,7 +15,7 @@ function convertLabelsToRelationships(selectedLabels: string[]): DatasourceRelat
       const option = $store.relationshipOptions.find((opt) => opt.label === label)
       return option ? option.id : null
     })
-    .filter((id): id is string => !!id)
+    .filter((id): id is string => Boolean(id))
   return $store.relationships.filter((rel) => selectedIds.includes(rel._id))
 }
 

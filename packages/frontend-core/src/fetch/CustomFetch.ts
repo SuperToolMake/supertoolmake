@@ -17,7 +17,7 @@ export default class CustomFetch extends BaseDataFetch<CustomDatasource, CustomD
       }
       // Use JSON for objects to ensure they are stringified
       return "json"
-    } else if (!isNaN(value)) {
+    } else if (!Number.isNaN(value)) {
       return "number"
     } else {
       return "string"
@@ -40,7 +40,7 @@ export default class CustomFetch extends BaseDataFetch<CustomDatasource, CustomD
       try {
         const js = JSON.parse(data)
         return Array.isArray(js) ? js : [js]
-      } catch (error) {
+      } catch {
         // Ignore
       }
 

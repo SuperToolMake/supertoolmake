@@ -1,7 +1,7 @@
+import os from "node:os"
+import process from "node:process"
 import { env } from "@budibase/backend-core"
 import type { GetDiagnosticsResponse, UserCtx } from "@budibase/types"
-import os from "os"
-import process from "process"
 
 export async function systemDebugInfo(ctx: UserCtx<void, GetDiagnosticsResponse>) {
   const { days, hours, minutes } = secondsToHMS(os.uptime())

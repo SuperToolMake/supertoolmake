@@ -26,7 +26,7 @@ async function resetPassword() {
     })
     notifications.success("Password reset successfully")
     dispatch("update")
-  } catch (error) {
+  } catch {
     notifications.error("Error resetting password")
   }
 }

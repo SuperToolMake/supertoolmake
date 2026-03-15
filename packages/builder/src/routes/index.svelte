@@ -9,7 +9,7 @@ $: goto = $gotoStore
 onMount(async () => {
   try {
     await auth.checkQueryString()
-  } catch (error) {
+  } catch {
     notifications.error("Error setting org")
   }
   goto(`./builder`)

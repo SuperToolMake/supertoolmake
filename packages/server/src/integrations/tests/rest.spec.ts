@@ -46,7 +46,7 @@ const fetchMock = undici.fetch as jest.MockedFunction<typeof realFetch>
 
 const getFormDataBuffer = (body: any): string | undefined => {
   if (!body) {
-    return undefined
+    return
   }
 
   const candidate = body.getBuffer
@@ -62,17 +62,17 @@ const getFormDataBuffer = (body: any): string | undefined => {
       if (ArrayBuffer.isView(result)) {
         return Buffer.from(result.buffer, result.byteOffset, result.byteLength).toString("utf8")
       }
-    } catch (_err) {
+    } catch {
       // fall through to other strategies
     }
   }
 
-  return undefined
+  return
 }
 
 const extractFormEntries = (body: any): Record<string, string> | undefined => {
   if (!body) {
-    return undefined
+    return
   }
 
   if (typeof body.entries === "function") {
@@ -91,7 +91,7 @@ const extractFormEntries = (body: any): Record<string, string> | undefined => {
     return result
   }
 
-  return undefined
+  return
 }
 
 const expectFormDataToMatch = (body: unknown, expected: Record<string, string>) => {
@@ -327,7 +327,7 @@ describe("REST Integration", () => {
     })
 
     it("should allow encoded form data", () => {
-      const { URLSearchParams } = require("url")
+      const { URLSearchParams } = require("node:url")
       const output = integration.addBody("encoded", input, {})
       expect(output.body instanceof URLSearchParams).toEqual(true)
       expect(output.body!.toString()).toEqual("a=1&b=2")
@@ -1113,7 +1113,6 @@ describe("REST Integration", () => {
           return new Response(content, {
             status: 200,
             headers: {
-              // eslint-disable-next-line no-useless-escape
               "content-disposition": `attachment; filename="£ and ? rates.pdf"; filename*=UTF-8''%C2%A3%20and%20%E2%82%AC%20rates.pdf`,
               "content-type": "text/plain",
               "content-length": `${content.length}`,

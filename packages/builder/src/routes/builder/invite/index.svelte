@@ -8,22 +8,9 @@ import { admin, auth, organisation, users } from "@/stores/portal"
 import { handleError, passwordsMatch } from "../auth/_components/utils"
 
 $params
-$: goto = $gotoStore
-
-let inviteTenantId
 const getQueryParam = (key) => {
   return new URLSearchParams(window.location.search).get(key) || undefined
 }
-$: inviteCode = $params["?code"] || getQueryParam("code")
-$: inviteTenantId = $params["?tenantId"] || getQueryParam("tenantId")
-let form
-let formData = {}
-let onboarding = false
-let errors = {}
-let loaded = false
-
-$: company = $organisation.company || "SuperToolMake"
-$: passwordMinLength = $admin.passwordMinLength ?? 12
 
 async function acceptInvite() {
   form.validate()
@@ -78,22 +65,37 @@ async function login() {
   }
 }
 
+const handleKeydown = (evt) => {
+  if (evt.key === "Enter") {
+    acceptInvite()
+  }
+}
+
+$: goto = $gotoStore
+
+let inviteTenantId
+
+$: inviteCode = $params["?code"] || getQueryParam("code")
+$: inviteTenantId = $params["?tenantId"] || getQueryParam("tenantId")
+let form
+let formData = {}
+let onboarding = false
+let errors = {}
+let loaded = false
+
+$: company = $organisation.company || "SuperToolMake"
+$: passwordMinLength = $admin.passwordMinLength ?? 12
+
 onMount(async () => {
   try {
     await auth.checkQueryString()
     await organisation.init()
     await getInvite()
     loaded = true
-  } catch (error) {
+  } catch {
     notifications.error("Error getting invite config")
   }
 })
-
-const handleKeydown = (evt) => {
-  if (evt.key === "Enter") {
-    acceptInvite()
-  }
-}
 </script>
 
 <svelte:window on:keydown={handleKeydown} />

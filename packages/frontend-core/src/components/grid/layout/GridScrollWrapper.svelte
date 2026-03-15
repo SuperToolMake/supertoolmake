@@ -26,8 +26,6 @@ export let ref
 let initialTouchX
 let initialTouchY
 
-$: style = generateStyle($scrollLeft, $scrollTop, $rowHeight)
-
 const generateStyle = (scrollLeft, scrollTop, rowHeight) => {
   const offsetX = scrollHorizontally ? -1 * scrollLeft : 0
   const offsetY = scrollVertically ? -1 * (scrollTop % rowHeight) : 0
@@ -74,6 +72,8 @@ const handleTouchMove = (e) => {
     menu.actions.close()
   }
 }
+
+$: style = generateStyle($scrollLeft, $scrollTop, $rowHeight)
 
 // Updates the scroll offset by a certain delta, and ensure scrolling
 // stays within sensible bounds. Debounced for performance.

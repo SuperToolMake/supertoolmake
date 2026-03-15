@@ -20,8 +20,6 @@ import {
 let button: any
 let popover: any
 
-$: hasErrors = !!$screenComponentErrorList.length
-
 function getErrorTitle(error: UIComponentError) {
   const titleParts = [$screenComponentsList.find((c) => c._id === error.componentId)!._instanceName]
   if (error.errorType === "setting" && error.cause === "invalid") {
@@ -36,6 +34,8 @@ async function onErrorClick(error: UIComponentError) {
     builderStore.highlightSetting(error.key, "error")
   }
 }
+
+$: hasErrors = Boolean($screenComponentErrorList.length)
 </script>
 
 <div bind:this={button} class="error-button">
@@ -79,7 +79,7 @@ async function onErrorClick(error: UIComponentError) {
           <Link overBackground on:click={() => onErrorClick(error)}>
             {getErrorTitle(error)}
           </Link>:
-          <!-- eslint-disable-next-line svelte/no-at-html-tags-->
+          <!-- biome-ignore lint: svelte/no-at-html-tags-->
           {@html error.message}
         </div>
       </div>

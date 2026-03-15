@@ -1,5 +1,5 @@
-import fs from "fs"
-import { join } from "path"
+import fs from "node:fs"
+import { join } from "node:path"
 import { DEV_ASSET_PATH } from "../../../utilities/fileSystem"
 import * as setup from "./utilities"
 

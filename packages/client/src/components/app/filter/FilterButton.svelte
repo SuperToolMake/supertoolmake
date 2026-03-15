@@ -37,18 +37,11 @@ let button: HTMLDivElement
 let filterMeta: string | undefined
 let filterTitle: string | undefined
 
-$: iconName = !filter ? "sliders-horizontal" : "x-circle"
-$: fieldSchema = config ? schema?.[config?.field] : undefined
-$: filterOp = filter ? operators?.find((op) => op.value === filter.operator) : undefined
-
-$: truncate = filterOp?.value !== RangeOperator.RANGE
-$: filterDisplay = displayText(filter, fieldSchema)
-
 const parseDateDisplay = (
   filter: SearchFilter | undefined,
   fieldSchema: FieldSchema | undefined
 ) => {
-  if (!filter || !fieldSchema || fieldSchema.type !== FieldType.DATETIME) return ""
+  if (!(filter && fieldSchema) || fieldSchema.type !== FieldType.DATETIME) return ""
 
   if (filter.operator === RangeOperator.RANGE) {
     const enableTime = !fieldSchema.dateOnly
@@ -85,7 +78,7 @@ const parseMultiDisplay = (value: string[] | undefined) => {
 const displayText = (filter: SearchFilter | undefined, fieldSchema: FieldSchema | undefined) => {
   filterMeta = undefined
   filterTitle = undefined
-  if (!filter || !fieldSchema) return
+  if (!(filter && fieldSchema)) return
 
   // Default to the base value. This could be a string or an array
   // Some of the values could be refs for users.
@@ -128,6 +121,13 @@ const displayText = (filter: SearchFilter | undefined, fieldSchema: FieldSchema 
 
   return `${filterOp?.label.toLowerCase()} ${filter.noValue ? "" : display}`
 }
+
+$: iconName = !filter ? "sliders-horizontal" : "x-circle"
+$: fieldSchema = config ? schema?.[config?.field] : undefined
+$: filterOp = filter ? operators?.find((op) => op.value === filter.operator) : undefined
+
+$: truncate = filterOp?.value !== RangeOperator.RANGE
+$: filterDisplay = displayText(filter, fieldSchema)
 </script>
 
 <FilterPopover

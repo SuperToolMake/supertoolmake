@@ -10,33 +10,33 @@ let contentEl: HTMLDivElement | null = null
 const resolveBaseUrl = (value: string | undefined) => {
   const url = (value || "").trim()
   if (!url) {
-    return undefined
+    return
   }
   try {
     return new URL(url).toString()
-  } catch (_error) {
-    return undefined
+  } catch {
+    return
   }
 }
 
 const toAbsoluteUrl = (href: string | null | undefined, resolvedBase?: string) => {
   if (!href) {
-    return undefined
+    return
   }
   try {
     if (resolvedBase) {
       return new URL(href, resolvedBase).toString()
     }
     return new URL(href).toString()
-  } catch (_error) {
+  } catch {
     if (resolvedBase) {
       try {
         return new URL(href, resolvedBase).toString()
-      } catch (_err) {
-        return undefined
+      } catch {
+        return
       }
     }
-    return undefined
+    return
   }
 }
 

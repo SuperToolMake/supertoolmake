@@ -23,8 +23,6 @@ const validation = [
 let fieldState
 let fieldApi
 
-$: height = $component.styles?.normal?.height || "124px"
-
 const serialiseValue = (value) => {
   return JSON.stringify(value || undefined, null, 4) || ""
 }
@@ -32,7 +30,7 @@ const serialiseValue = (value) => {
 const parseValue = (value) => {
   try {
     return JSON.parse(value)
-  } catch (error) {
+  } catch {
     return value
   }
 }
@@ -44,6 +42,8 @@ const handleChange = (e) => {
     onChange({ value })
   }
 }
+
+$: height = $component.styles?.normal?.height || "124px"
 </script>
 
 <Field

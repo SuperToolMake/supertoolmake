@@ -95,7 +95,7 @@ describe("sso", () => {
           ssoUser.roles = {}
 
           // modified external id to match user format
-          ssoUser._id = "us_" + details.userId
+          ssoUser._id = `us_${details.userId}`
           delete ssoUser.userId
 
           // new sso user won't have a password

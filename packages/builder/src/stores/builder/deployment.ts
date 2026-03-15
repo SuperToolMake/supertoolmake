@@ -31,7 +31,7 @@ class DeploymentStore extends DerivedBudiStore<DeploymentState, DerivedDeploymen
         // Determine whether the app is published
         const app = $appsStore.apps.find((app) => app.devId === $appStore.appId)
         const deployments = $store.deployments.filter((x) => x.status === DeploymentStatus.SUCCESS)
-        const isPublished = app?.status === "published" && !!deployments.length
+        const isPublished = app?.status === "published" && Boolean(deployments.length)
 
         // Generate last published string
         let lastPublished
@@ -39,7 +39,7 @@ class DeploymentStore extends DerivedBudiStore<DeploymentState, DerivedDeploymen
           lastPublished = processStringSync(
             `Your apps and automations were last published {{ duration time 'millisecond' }} ago`,
             {
-              time: new Date().getTime() - new Date(deployments[0].updatedAt).getTime(),
+              time: Date.now() - new Date(deployments[0].updatedAt).getTime(),
             }
           )
         }
@@ -71,7 +71,7 @@ class DeploymentStore extends DerivedBudiStore<DeploymentState, DerivedDeploymen
         ...state,
         deployments,
       }))
-    } catch (err) {
+    } catch {
       notifications.error("Error fetching deployments")
     }
   }
@@ -102,7 +102,7 @@ class DeploymentStore extends DerivedBudiStore<DeploymentState, DerivedDeploymen
         appsStore.load(),
       ])
       await this.load()
-    } catch (err) {
+    } catch {
       notifications.error("Error refreshing app")
     }
   }
@@ -122,7 +122,7 @@ class DeploymentStore extends DerivedBudiStore<DeploymentState, DerivedDeploymen
         type: "success",
         icon: "globe",
       })
-    } catch (err) {
+    } catch {
       notifications.error("Error unpublishing app")
     }
   }

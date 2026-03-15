@@ -98,7 +98,7 @@ export class DatasourceAPI extends TestAPI {
     const datasource = await this.get(oneTableInfo.datasourceId)
     const oneTable = datasource.entities?.[oneTableInfo.tableName],
       manyTable = datasource.entities?.[manyTableInfo.tableName]
-    if (!oneTable || !manyTable) {
+    if (!(oneTable && manyTable)) {
       throw new Error("Both tables not found in datasource, cannot create relationship.")
     }
 

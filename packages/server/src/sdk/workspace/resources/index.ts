@@ -192,7 +192,7 @@ async function fetchTableRowsPage(
   }
   const response = await sourceDb.allDocs<Row>(getRowParams(tableId, null, params))
 
-  const docs = response.rows.map((row) => row.doc).filter((doc): doc is Row => !!doc)
+  const docs = response.rows.map((row) => row.doc).filter((doc): doc is Row => Boolean(doc))
   const rows = docs.length > ROW_PAGE_SIZE ? docs.slice(0, ROW_PAGE_SIZE) : docs
   const nextStartAfter = rows.length === ROW_PAGE_SIZE ? rows[rows.length - 1]._id : undefined
   return { rows, nextStartAfter }
@@ -245,14 +245,16 @@ async function duplicateInternalTableRows(
       continue
     }
 
-    const destinationHasRows = !!(
-      await destinationDb.allDocs(
-        getRowParams(table._id!, null, {
-          include_docs: false,
-          limit: 1,
-        })
-      )
-    ).rows.length
+    const destinationHasRows = Boolean(
+      (
+        await destinationDb.allDocs(
+          getRowParams(table._id!, null, {
+            include_docs: false,
+            limit: 1,
+          })
+        )
+      ).rows.length
+    )
     if (destinationHasRows) {
       logging.logWarn(
         "Resource duplication: destination table already contains rows, skipping copy",

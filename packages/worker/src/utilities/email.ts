@@ -7,7 +7,6 @@ import {
   type User,
 } from "@budibase/types"
 import ical from "ical-generator"
-import _ from "lodash"
 import { marked } from "marked"
 import nodemailer from "nodemailer"
 import type SMTPTransport from "nodemailer/lib/smtp-transport"
@@ -87,12 +86,12 @@ async function buildEmail(
   // Change from branding to core
   const core = EmailTemplates[EmailTemplatePurpose.CORE]
 
-  if (!base || !body || !core) {
+  if (!(base && body && core)) {
     throw "Unable to build email, missing base components"
   }
 
   let name: string | undefined
-  if (user && user.firstName) {
+  if (user?.firstName) {
     name = user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName
   }
   context = {
@@ -134,7 +133,7 @@ export async function isEmailConfigured() {
  */
 export async function sendEmail(email: string, purpose: EmailTemplatePurpose, opts: SendEmailOpts) {
   const config = await configs.getSMTPConfig()
-  if (!config && !TEST_MODE) {
+  if (!(config || TEST_MODE)) {
     throw "Unable to find SMTP configuration."
   }
   const transport = createSMTPTransport(config)
@@ -142,7 +141,7 @@ export async function sendEmail(email: string, purpose: EmailTemplatePurpose, op
   let code: string | null = null
   switch (purpose) {
     case EmailTemplatePurpose.PASSWORD_RECOVERY:
-      if (!opts.user || !opts.user._id) {
+      if (!opts.user?._id) {
         throw new HTTPError("User must be provided for password recovery.", 400)
       }
       code = await cache.passwordReset.createCode(opts.user._id, opts.info)
@@ -193,7 +192,7 @@ export async function sendEmail(email: string, purpose: EmailTemplatePurpose, op
 
   const response = await transport.sendMail(message)
   if (TEST_MODE) {
-    console.log("Test email URL: " + nodemailer.getTestMessageUrl(response))
+    console.log(`Test email URL: ${nodemailer.getTestMessageUrl(response)}`)
   }
   return response
 }

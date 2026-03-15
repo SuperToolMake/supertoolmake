@@ -13,7 +13,7 @@ import DesignSection from "./DesignSection.svelte"
 const onUpdateName = async (value) => {
   try {
     await componentStore.updateSetting("_instanceName", value)
-  } catch (error) {
+  } catch {
     notifications.error("Error updating component name")
   }
 }
@@ -33,7 +33,10 @@ let section = "settings"
 const tabs = ["settings", "styles", "conditions"]
 
 $: id = $selectedComponent?._id
-$: id, (section = tabs[0])
+$: {
+  id
+  section = tabs[0]
+}
 $: componentName = getComponentName(componentInstance)
 
 $: highlightedSetting = $builderStore.highlightedSetting

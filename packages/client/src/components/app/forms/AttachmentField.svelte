@@ -53,7 +53,7 @@ const processFiles = async (fileList) => {
       sourceId = formContext.dataSource.id
     }
     return await API.uploadAttachment(sourceId, data)
-  } catch (error) {
+  } catch {
     return []
   }
 }

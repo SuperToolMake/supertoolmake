@@ -14,13 +14,6 @@ export let allowReorder = true
 const flipDurationMs = 150
 let dragDisabled = true
 
-$: unselectedColumns = getUnselectedColumns(options, columns)
-$: columns.forEach((column) => {
-  if (!column.id) {
-    column.id = generate()
-  }
-})
-
 const getUnselectedColumns = (allColumns, selectedColumns) => {
   let optionsObj = {}
   allColumns.forEach((option) => {
@@ -61,7 +54,7 @@ const addAllColumns = () => {
   options.forEach((field) => {
     const fieldSchema = schema[field]
     const hasCol = columns && columns.findIndex((x) => x.name === field) !== -1
-    if (!fieldSchema?.autocolumn && !hasCol) {
+    if (!(fieldSchema?.autocolumn || hasCol)) {
       newColumns.push({
         name: field,
         displayName: field,
@@ -74,6 +67,13 @@ const addAllColumns = () => {
 const reset = () => {
   columns = []
 }
+
+$: unselectedColumns = getUnselectedColumns(options, columns)
+$: columns.forEach((column) => {
+  if (!column.id) {
+    column.id = generate()
+  }
+})
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

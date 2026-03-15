@@ -16,7 +16,6 @@ let container: HTMLElement
 let instance: any
 
 let _scope: any
-// eslint-disable-next-line no-undef
 $: _scope = (globalThis as any).$$scope
 
 let _slots: any

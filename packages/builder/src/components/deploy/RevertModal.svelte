@@ -8,8 +8,6 @@ export let onComplete = () => {}
 let revertModal
 let appName
 
-$: appId = $appStore.appId
-
 const revert = async () => {
   try {
     await API.revertAppChanges(appId)
@@ -31,6 +29,8 @@ export const hide = () => {
 export const show = () => {
   revertModal.show()
 }
+
+$: appId = $appStore.appId
 </script>
 
 <Modal bind:this={revertModal}>

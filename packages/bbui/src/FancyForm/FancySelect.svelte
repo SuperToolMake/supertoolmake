@@ -1,5 +1,4 @@
-<script lang="ts" generics="O extends Record<string, any>| string">
-
+<script lang="ts" generics="O extends string | { [key: string]: any }">
 import { createEventDispatcher } from "svelte"
 import Picker from "../Form/Core/Picker.svelte"
 import Icon from "../Icon/Icon.svelte"
@@ -17,21 +16,13 @@ export let footer: string | undefined = undefined
 export let isOptionEnabled = (_option: O) => true
 export let getOptionLabel = (option: O, _index?: number) => extractProperty(option, "label")
 export let getOptionValue = (option: O, _index?: number) => extractProperty(option, "value")
-export let getOptionSubtitle = (option: O) =>
-    extractProperty(option, "subtitle")
-export let getOptionColour: (
-    _option: O,
-    _index?: number
-  ) => string | null = () => null
+export let getOptionSubtitle = (option: O) => extractProperty(option, "subtitle")
+export let getOptionColour: (_option: O, _index?: number) => string | null = () => null
 
 const dispatch = createEventDispatcher<{ change: string | undefined }>()
 
 let open = false
 let wrapper: HTMLDivElement
-
-$: placeholder = !value
-$: selectedLabel = getSelectedLabel(value)
-$: fieldColour = getFieldAttribute(getOptionColour, value, options)
 
 const getFieldAttribute = (
   getAttribute: (_option: O, _index?: number) => string | null,
@@ -45,32 +36,37 @@ const getFieldAttribute = (
   const index = options.findIndex((option, idx) => getOptionValue(option, idx) === value)
   return index !== -1 ? getAttribute(options[index], index) : null
 }
+
 const extractProperty = (value: O, property: string): string => {
-    if (value && typeof value === "object") {
-      return value[property]
-    }
-    return value
+  if (value && typeof value === "object") {
+    return value[property]
   }
+  return value
+}
 
 const onChange = (newValue: string | undefined) => {
-    dispatch("change", newValue)
-    value = newValue
-    if (validate) {
-      error = validate(newValue)
-    }
-    open = false
+  dispatch("change", newValue)
+  value = newValue
+  if (validate) {
+    error = validate(newValue)
   }
+  open = false
+}
 
 const getSelectedLabel = (value: string | undefined) => {
-    if (!value || !options?.length) {
-      return ""
-    }
-    const selectedOption = options.find(x => getOptionValue(x) === value)
-    if (!selectedOption) {
-      return value
-    }
-    return getOptionLabel(selectedOption)
+  if (!(value && options?.length)) {
+    return ""
   }
+  const selectedOption = options.find((x) => getOptionValue(x) === value)
+  if (!selectedOption) {
+    return value
+  }
+  return getOptionLabel(selectedOption)
+}
+
+$: placeholder = !value
+$: selectedLabel = getSelectedLabel(value)
+$: fieldColour = getFieldAttribute(getOptionColour, value, options)
 </script>
 
 <FancyField

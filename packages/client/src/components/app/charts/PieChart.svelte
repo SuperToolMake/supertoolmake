@@ -15,6 +15,47 @@ export let palette
 export let c1, c2, c3, c4, c5
 export let onClick
 
+function handleSegmentClick(segment, index, percentage) {
+  onClick?.({ segment, index, percentage })
+}
+
+const getSeries = (dataProvider, valueColumn) => {
+  const rows = dataProvider.rows ?? []
+
+  return rows.map((row) => {
+    const value = row?.[valueColumn]
+
+    if (dataProvider?.schema?.[valueColumn]?.type === "datetime" && value) {
+      return Date.parse(value)
+    }
+
+    // This chart doesn't automatically parse strings into numbers
+    const numValue = parseFloat(value)
+    if (Number.isNaN(numValue)) {
+      return 0
+    }
+
+    return numValue
+  })
+}
+
+const getLabels = (dataProvider, labelColumn, labelType) => {
+  const rows = dataProvider.rows ?? []
+
+  return rows.map((row) => {
+    const value = row?.[labelColumn]
+
+    // If a nullish or non-scalar type, replace it with an empty string
+    if (!["string", "number", "boolean"].includes(typeof value)) {
+      return ""
+    } else if (labelType === "datetime") {
+      return formatters.Datetime(value)
+    }
+
+    return value
+  })
+}
+
 $: labelType = dataProvider?.schema?.[labelColumn]?.type === "datetime" ? "datetime" : "category"
 $: series = getSeries(dataProvider, valueColumn)
 $: labels = getLabels(dataProvider, labelColumn, labelType)
@@ -55,7 +96,7 @@ $: options = {
     },
     events: {
       // Clicking on a slice of the pie
-      dataPointSelection: (event, chartContext, opts) => {
+      dataPointSelection: (_event, _chartContext, opts) => {
         const segmentIndex = opts.dataPointIndex
         const row = dataProvider.rows[segmentIndex]
 
@@ -78,47 +119,6 @@ $: options = {
       },
     },
   },
-}
-
-function handleSegmentClick(segment, index, percentage) {
-  onClick?.({ segment, index, percentage })
-}
-
-const getSeries = (dataProvider, valueColumn) => {
-  const rows = dataProvider.rows ?? []
-
-  return rows.map((row) => {
-    const value = row?.[valueColumn]
-
-    if (dataProvider?.schema?.[valueColumn]?.type === "datetime" && value) {
-      return Date.parse(value)
-    }
-
-    // This chart doesn't automatically parse strings into numbers
-    const numValue = parseFloat(value)
-    if (isNaN(numValue)) {
-      return 0
-    }
-
-    return numValue
-  })
-}
-
-const getLabels = (dataProvider, labelColumn, labelType) => {
-  const rows = dataProvider.rows ?? []
-
-  return rows.map((row) => {
-    const value = row?.[labelColumn]
-
-    // If a nullish or non-scalar type, replace it with an empty string
-    if (!["string", "number", "boolean"].includes(typeof value)) {
-      return ""
-    } else if (labelType === "datetime") {
-      return formatters["Datetime"](value)
-    }
-
-    return value
-  })
 }
 </script>
 

@@ -61,10 +61,10 @@ export class ConfigAPI extends TestAPI {
     return resp.body as SaveConfigResponse
   }
 
-  OIDCCallback = (configId: string, preAuthRes: any) => {
+  OIDCCallback = (_configId: string, preAuthRes: any) => {
     const cookie = this.config.cookieHeader(preAuthRes.get("set-cookie"))
     const setKoaSession = cookie.Cookie.find((c: string) => c.includes("koa:sess"))
-    const koaSession = setKoaSession.split("=")[1] + "=="
+    const koaSession = `${setKoaSession.split("=")[1]}==`
     const sessionContent = JSON.parse(Buffer.from(koaSession, "base64").toString("utf-8"))
     const handle = sessionContent["openidconnect:example.com"].state.handle
     return this.request

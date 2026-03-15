@@ -8,36 +8,6 @@ import { findComponentPath } from "@/helpers/components"
 import { componentStore, previewStore, selectedComponent, selectedScreen } from "@/stores/builder"
 import { getComponentStructure } from "./componentStructure"
 
-$: goto = $gotoStore
-
-// Smallest possible 1x1 transparent GIF
-const ghost = new Image(1, 1)
-ghost.src = "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
-
-// Aliases for other strings to match to when searching
-const aliases = {
-  text: ["headline", "heading", "title", "paragraph", "markdown"],
-}
-
-let searchString
-let searchRef
-let selectedIndex
-let componentList = []
-
-$: allowedComponents = getAllowedComponents(
-  $componentStore.components,
-  $selectedScreen,
-  $selectedComponent
-)
-$: structure = getComponentStructure()
-$: enrichedStructure = enrichStructure(
-  structure,
-  $componentStore.components,
-  $componentStore.customComponents
-)
-$: filteredStructure = filterStructure(enrichedStructure, allowedComponents, searchString)
-$: orderMap = createComponentOrderMap(componentList)
-
 const getAllowedComponents = (allComponents, screen, component) => {
   // Default to using the root screen container if no component specified
   if (!component) {
@@ -141,7 +111,7 @@ const filterStructure = (structure, allowedComponents, search) => {
       if (search) {
         const nameMatch = name.includes(search)
         const aliasMatch = (aliases[name] || []).some((x) => x.includes(search))
-        if (!nameMatch && !aliasMatch) {
+        if (!(nameMatch || aliasMatch)) {
           return false
         }
       }
@@ -192,15 +162,6 @@ const handleKeyDown = (e) => {
   }
 }
 
-onMount(() => {
-  searchRef.focus()
-  window.addEventListener("keydown", handleKeyDown)
-
-  return () => {
-    window.removeEventListener("keydown", handleKeyDown)
-  }
-})
-
 const onDragStart = (e, component) => {
   e.dataTransfer.setDragImage(ghost, 0, 0)
   previewStore.startDrag(component)
@@ -209,6 +170,45 @@ const onDragStart = (e, component) => {
 const onDragEnd = () => {
   previewStore.stopDrag()
 }
+
+$: goto = $gotoStore
+
+// Smallest possible 1x1 transparent GIF
+const ghost = new Image(1, 1)
+ghost.src = "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
+
+// Aliases for other strings to match to when searching
+const aliases = {
+  text: ["headline", "heading", "title", "paragraph", "markdown"],
+}
+
+let searchString
+let searchRef
+let selectedIndex
+let componentList = []
+
+$: allowedComponents = getAllowedComponents(
+  $componentStore.components,
+  $selectedScreen,
+  $selectedComponent
+)
+$: structure = getComponentStructure()
+$: enrichedStructure = enrichStructure(
+  structure,
+  $componentStore.components,
+  $componentStore.customComponents
+)
+$: filteredStructure = filterStructure(enrichedStructure, allowedComponents, searchString)
+$: orderMap = createComponentOrderMap(componentList)
+
+onMount(() => {
+  searchRef.focus()
+  window.addEventListener("keydown", handleKeyDown)
+
+  return () => {
+    window.removeEventListener("keydown", handleKeyDown)
+  }
+})
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

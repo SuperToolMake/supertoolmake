@@ -82,7 +82,7 @@ async function getLayouts() {
 }
 
 function getUserRoleId(ctx: UserCtx) {
-  return !ctx.user?.role || !ctx.user.role._id ? roles.BUILTIN_ROLE_IDS.PUBLIC : ctx.user.role._id
+  return !ctx.user?.role?._id ? roles.BUILTIN_ROLE_IDS.PUBLIC : ctx.user.role._id
 }
 
 function checkWorkspaceUrl(ctx: UserCtx, apps: Workspace[], url: string, currentAppId?: string) {
@@ -191,7 +191,7 @@ async function addCreatorToUsersTable(ctx: UserCtx) {
   let creator
   try {
     creator = await getGlobalUser(metadataId)
-  } catch (err) {
+  } catch {
     return
   }
 
@@ -305,7 +305,7 @@ export async function fetchAppPackage(ctx: UserCtx<void, FetchAppPackageResponse
     // disabled workspace apps should appear to not exist
     // if the dev workspace is being served, allow the request regardless
     if (!matchedWorkspaceApp || (matchedWorkspaceApp.disabled && !isDev)) {
-      ctx.throw(404, "No matching workspace app found for URL path: " + urlPath)
+      ctx.throw(404, `No matching workspace app found for URL path: ${urlPath}`)
     }
     screens = screens.filter((s) => s.workspaceAppId === matchedWorkspaceApp._id)
 
@@ -348,7 +348,7 @@ async function performWorkspaceCreate(
     useTemplate,
     key: templateKey,
   }
-  if (ctx.request.files && ctx.request.files.fileToImport) {
+  if (ctx.request.files?.fileToImport) {
     const importFile = ctx.request.files.fileToImport
     const fileToImport = Array.isArray(importFile) ? importFile[0] : importFile
     const legacyPath = isLegacyUploadedFile(fileToImport) ? fileToImport.path : undefined
@@ -379,8 +379,9 @@ async function performWorkspaceCreate(
     const instance = await createInstance(workspaceId)
     const db = context.getWorkspaceDB()
     const shouldImportTemplate =
-      !!instanceConfig.file || (!!instanceConfig.useTemplate && !!instanceConfig.key)
-    const isImport = !!instanceConfig.file
+      Boolean(instanceConfig.file) ||
+      (Boolean(instanceConfig.useTemplate) && Boolean(instanceConfig.key))
+    const isImport = Boolean(instanceConfig.file)
 
     if (shouldImportTemplate) {
       try {
@@ -484,7 +485,7 @@ async function performWorkspaceCreate(
 
         // Fetch the latest version of the workspace after these changes
         newWorkspace = await sdk.workspaces.metadata.get()
-      } catch (err) {
+      } catch {
         ctx.throw(400, "App created, but failed to add onboarding screens")
       }
     }
@@ -812,17 +813,6 @@ export async function updateWorkspacePackage(
     }
     if (workspacePackage._rev !== application._rev) {
       newWorkspacePackage._rev = application._rev
-    }
-
-    // Make sure that when saving down pwa settings, we don't override the keys with the enriched url
-    if (workspacePackage.pwa && application.pwa) {
-      if (workspacePackage.pwa.icons) {
-        workspacePackage.pwa.icons = workspacePackage.pwa.icons.map((icon, i) =>
-          icon.src.startsWith(objectStore.SIGNED_FILE_PREFIX) && application?.pwa?.icons?.[i]
-            ? { ...icon, src: application?.pwa?.icons?.[i].src }
-            : icon
-        )
-      }
     }
 
     // the locked by property is attached by server but generated from

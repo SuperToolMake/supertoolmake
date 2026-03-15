@@ -10,13 +10,11 @@ import TopBar from "@/components/common/TopBar.svelte"
 import Panel from "@/components/design/Panel.svelte"
 import { IntegrationTypes } from "@/constants/backend"
 import { builderStore, datasources } from "@/stores/builder"
-import type APIModal from "./_components/APIModal.svelte"
+import APIModal from "./_components/APIModal.svelte"
 
 let searchValue: string
 let panelWidth = 260
 let apiModal: APIModal
-
-$: goto = $gotoStore
 
 const loadPanelWidth = () => {
   const saved = localStorage.getItem("api-panel-width")
@@ -28,14 +26,16 @@ const loadPanelWidth = () => {
   }
 }
 
-type SortableDatasource = Pick<Datasource | UIInternalDatasource, "name">
-
 const sortByDatasourceName = (a: SortableDatasource, b: SortableDatasource) =>
   (a.name || "").localeCompare(b.name || "", undefined, {
     sensitivity: "base",
   })
 
 const datasourceFilter = (datasource: any) => datasource.source === IntegrationTypes.REST
+
+$: goto = $gotoStore
+
+type SortableDatasource = Pick<Datasource | UIInternalDatasource, "name">
 
 const [resizable, resizableHandle] = getHorizontalResizeActions(panelWidth, (width: number) => {
   if (width) {
@@ -55,7 +55,7 @@ $: hasRestDatasources = restDatasources.length > 0
 
 const APIS_BASE_ROUTE = "/builder/workspace/[application]/apis"
 
-$: shouldRedirectToNew = !hasRestDatasources && !$isActive("./new") && $isActive(APIS_BASE_ROUTE)
+$: shouldRedirectToNew = !(hasRestDatasources || $isActive("./new")) && $isActive(APIS_BASE_ROUTE)
 
 $: if (shouldRedirectToNew) {
   goto("./new")

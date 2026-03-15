@@ -24,10 +24,6 @@ let processing = false
 let progressPercentage = 0
 let promptQuantity = 0
 
-$: rowsToDelete = Object.keys($selectedRows)
-  .map((rowId) => $rowLookupMap[rowId])
-  .filter((x) => x != null)
-
 const handleBulkDeleteRequest = () => {
   progressPercentage = 0
   menu.actions.close()
@@ -75,6 +71,10 @@ const bulkDeleteCells = async () => {
   await sleep(duration)
   processing = false
 }
+
+$: rowsToDelete = Object.keys($selectedRows)
+  .map((rowId) => $rowLookupMap[rowId])
+  .filter((x) => x != null)
 
 onMount(() => subscribe("request-bulk-delete", handleBulkDeleteRequest))
 </script>

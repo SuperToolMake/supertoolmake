@@ -1,5 +1,5 @@
-import fs, { type PathLike } from "fs"
-import { join } from "path"
+import fs, { type PathLike } from "node:fs"
+import { join } from "node:path"
 import * as tar from "tar"
 import { v4 as uuid } from "uuid"
 import env from "../../environment"

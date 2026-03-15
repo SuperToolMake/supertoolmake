@@ -1,5 +1,6 @@
+import { dirname, join } from "node:path"
+import { fileURLToPath } from "node:url"
 import type { Config } from "jest"
-import { join } from "path"
 
 const baseConfig: Config = {
   setupFiles: ["./src/tests/jestEnv.ts"],
@@ -11,7 +12,7 @@ const baseConfig: Config = {
     "^.+\\.js?$": "@swc/jest",
     "^.+\\.svelte?$": "<rootDir>/scripts/svelteTransformer.js",
   },
-  transformIgnorePatterns: ["/node_modules/(?!svelte/|esm-env/).*"],
+  transformIgnorePatterns: ["/node_modules/(?!svelte/|esm-env/|devalue/).*"],
   moduleNameMapper: {
     "@budibase/backend-core/(.*)": "<rootDir>/../backend-core/$1",
     "@budibase/shared-core/(.*)": "<rootDir>/../shared-core/$1",
@@ -39,6 +40,7 @@ const config: Config = {
   coverageReporters: ["lcov", "json", "clover"],
 }
 
-process.env.TOP_LEVEL_PATH = join(__dirname, "..", "..")
+const configDir = dirname(fileURLToPath(import.meta.url))
+process.env.TOP_LEVEL_PATH = join(configDir, "..", "..")
 
 export default config

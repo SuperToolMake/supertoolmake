@@ -6,7 +6,7 @@ import CreationPage from "@/components/common/CreationPage.svelte"
 import { IntegrationTypes } from "@/constants/backend"
 import { datasources, sortedIntegrations as integrations, tables } from "@/stores/builder"
 import { hasData } from "@/stores/selectors"
-import type CreateExternalDatasourceModal from "./_components/CreateExternalDatasourceModal/index.svelte"
+import CreateExternalDatasourceModal from "./_components/CreateExternalDatasourceModal/index.svelte"
 import DatasourceOption from "./_components/DatasourceOption.svelte"
 
 $: goto = $gotoStore

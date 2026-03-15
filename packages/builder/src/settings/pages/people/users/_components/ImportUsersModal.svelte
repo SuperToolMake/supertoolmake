@@ -16,8 +16,6 @@ let userEmails: string[] = []
 let usersRole: string = Constants.BudibaseRoles.AppUser
 let invalidEmails: string[] = []
 
-$: importDisabled = !userEmails.length || !validEmails(userEmails) || !usersRole
-
 const validEmails = (userEmails: string[]): boolean => {
   invalidEmails = [] // Reset invalid emails
   if ($admin.cloud && userEmails.length > MAX_USERS_UPLOAD_LIMIT) {
@@ -65,6 +63,8 @@ async function handleFile(evt: Event): Promise<void> {
   })
   reader.readAsText(fileArray[0])
 }
+
+$: importDisabled = !(userEmails.length && validEmails(userEmails) && usersRole)
 </script>
 
 <ModalContent

@@ -52,15 +52,15 @@ const allowDefaultColumnByType: Record<FieldType, boolean> = {
 }
 
 export function canBeDisplayColumn(type: FieldType): boolean {
-  return !!allowDisplayColumnByType[type]
+  return Boolean(allowDisplayColumnByType[type])
 }
 
 export function canBeSortColumn(type: FieldType): boolean {
-  return !!allowSortColumnByType[type]
+  return Boolean(allowSortColumnByType[type])
 }
 
 export function canHaveDefaultColumn(type: FieldType): boolean {
-  return !!allowDefaultColumnByType[type]
+  return Boolean(allowDefaultColumnByType[type])
 }
 
 export function isAllowedDisplayField(name: string, type: FieldType) {

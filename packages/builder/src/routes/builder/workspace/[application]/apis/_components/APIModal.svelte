@@ -1,5 +1,5 @@
 <script lang="ts">
-import { type Modal, notifications } from "@budibase/bbui"
+import { Modal, notifications } from "@budibase/bbui"
 import type {
   RestTemplate,
   RestTemplateGroup,
@@ -19,28 +19,9 @@ import { sortedIntegrations as integrations } from "@/stores/builder/sortedInteg
 import { configFromIntegration } from "@/stores/selectors"
 import SelectCategoryAPIModal from "./SelectCategoryAPIModal.svelte"
 
-$: goto = $gotoStore
-
 export const show = () => modal.show()
+
 export const hide = () => modal.hide()
-
-let modal: Modal
-let loading = false
-
-let selectedTemplate: TemplateSelectionContext | null = null
-let targetSpec: RestTemplateSpec | null = null
-let templatesValue: RestTemplate[] = []
-let templateGroupsValue: RestTemplateGroup<RestTemplateGroupName>[] = []
-
-$beforeUrlChange(() => {
-  return true
-})
-
-$: templatesValue = $restTemplates?.templates || []
-$: templateGroupsValue = $restTemplates?.templateGroups || []
-$: restIntegration = ($integrations || []).find(
-  (integration) => integration.name === IntegrationTypes.REST
-)
 
 // CUSTOM REST
 const handleCustom = async (integration?: UIIntegration) => {
@@ -71,7 +52,7 @@ const handleCustom = async (integration?: UIIntegration) => {
 const loadTemplateInfo = async (spec?: RestTemplateSpec | null) => {
   const request = getRestTemplateImportInfoRequest(spec)
   if (!request) {
-    return undefined
+    return
   }
   return await queries.fetchImportInfo(request)
 }
@@ -83,7 +64,10 @@ const applySecurityHeaders = (config: Record<string, any>, securityHeaders?: str
   if (!normalizedHeaders.length) {
     return config
   }
-  const headers = (config.defaultHeaders = config.defaultHeaders || {})
+  if (!config.defaultHeaders) {
+    config.defaultHeaders = {}
+  }
+  const headers = config.defaultHeaders
   for (const header of normalizedHeaders) {
     if (!header) {
       continue
@@ -218,6 +202,26 @@ const onSelectTemplate = (event: CustomEvent<TemplateSelectionEventDetail>) => {
     restTemplateName: selectedTemplate.name,
   })
 }
+
+$: goto = $gotoStore
+
+let modal: Modal
+let loading = false
+
+let selectedTemplate: TemplateSelectionContext | null = null
+let targetSpec: RestTemplateSpec | null = null
+let templatesValue: RestTemplate[] = []
+let templateGroupsValue: RestTemplateGroup<RestTemplateGroupName>[] = []
+
+$beforeUrlChange(() => {
+  return true
+})
+
+$: templatesValue = $restTemplates?.templates || []
+$: templateGroupsValue = $restTemplates?.templateGroups || []
+$: restIntegration = ($integrations || []).find(
+  (integration) => integration.name === IntegrationTypes.REST
+)
 </script>
 
 <div class="settings-wrap">

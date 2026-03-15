@@ -29,7 +29,7 @@ export async function processRelationshipFields(
 ): Promise<Row> {
   for (const relationship of relationships) {
     const linkedTable = tables[relationship.tableName]
-    if (!linkedTable || !row[relationship.column]) {
+    if (!(linkedTable && row[relationship.column])) {
       continue
     }
     for (const key of Object.keys(row[relationship.column])) {
@@ -153,7 +153,7 @@ export async function enrichSearchContext(
   helpers = true
 ): Promise<Record<string, any>> {
   const enrichedQuery: Record<string, unknown> = {}
-  if (!fields || !inputs) {
+  if (!(fields && inputs)) {
     return enrichedQuery
   }
   const parameters = { ...inputs }

@@ -1,8 +1,8 @@
+import { createSecretKey } from "node:crypto"
+import { existsSync, readFileSync } from "node:fs"
+import { join, resolve } from "node:path"
 import { ServiceType } from "@budibase/types"
-import { createSecretKey } from "crypto"
-import { existsSync, readFileSync } from "fs"
 import { cloneDeep } from "lodash"
-import { join, resolve } from "path"
 
 const TOP_LEVEL_PATH =
   process.env.TOP_LEVEL_PATH ||
@@ -45,7 +45,7 @@ const DefaultBucketName = {
   TEMP: "tmp-file-attachments",
 }
 
-const selfHosted = !!parseInt(process.env.SELF_HOSTED || "")
+const selfHosted = Boolean(parseInt(process.env.SELF_HOSTED || ""))
 
 function getAPIEncryptionKey() {
   return process.env.API_ENCRYPTION_KEY ? process.env.API_ENCRYPTION_KEY : process.env.JWT_SECRET // fallback to the JWT_SECRET used historically
@@ -185,7 +185,7 @@ const environment = {
   TEMPLATES_BUCKET_NAME: process.env.TEMPLATES_BUCKET_NAME || DefaultBucketName.TEMPLATES,
   GLOBAL_BUCKET_NAME: process.env.GLOBAL_BUCKET_NAME || DefaultBucketName.GLOBAL,
   TEMP_BUCKET_NAME: process.env.TEMP_BUCKET_NAME || DefaultBucketName.TEMP,
-  USE_COUCH: process.env.USE_COUCH || true,
+  USE_COUCH: true,
   MOCK_REDIS: process.env.MOCK_REDIS,
   DEFAULT_LICENSE: process.env.DEFAULT_LICENSE,
   SERVICE: getServiceName(),

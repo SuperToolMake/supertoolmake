@@ -27,7 +27,7 @@ const createEnvironmentStore = () => {
           ...environment,
           loaded: true,
         })
-      } catch (error) {
+      } catch {
         store.set(initialState)
       }
     },

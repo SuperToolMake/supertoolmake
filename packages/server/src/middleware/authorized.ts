@@ -88,29 +88,30 @@ const authorized =
 
     if (resourcePath) {
       // Reusing the existing middleware to extract the value
-      paramResource(resourcePath)(ctx, () => {})
+      await paramResource(resourcePath)(ctx, async () => {})
     }
 
     if (hasResource(ctx)) {
       const { resourceId, subResourceId } = ctx
 
       const permissions = await sdk.permissions.getResourcePerms(resourceId)
-      const subPermissions =
-        !!subResourceId && (await sdk.permissions.getResourcePerms(subResourceId))
+      const subPermissions = subResourceId
+        ? await sdk.permissions.getResourcePerms(subResourceId)
+        : undefined
 
       const getPermLevel = (permLevel: string) => {
         const result: string[] = []
         if (permissions[permLevel]) {
           result.push(permissions[permLevel].role)
         }
-        if (subPermissions && subPermissions[permLevel]) {
+        if (subPermissions?.[permLevel]) {
           result.push(subPermissions[permLevel].role)
         }
         return result
       }
 
       resourceRoles = getPermLevel(permLevel!)
-      if (opts && opts.schema) {
+      if (opts?.schema) {
         otherLevelRoles = getPermLevel(otherLevel!)
       }
     }
@@ -118,7 +119,7 @@ const authorized =
     // if the resource is public, proceed
     if (
       resourceRoles.includes(roles.BUILTIN_ROLE_IDS.PUBLIC) ||
-      (otherLevelRoles && otherLevelRoles.includes(roles.BUILTIN_ROLE_IDS.PUBLIC))
+      otherLevelRoles?.includes(roles.BUILTIN_ROLE_IDS.PUBLIC)
     ) {
       return next()
     }
@@ -143,7 +144,7 @@ const authorized =
       await checkAuthorized(ctx, resourceRoles, permType, permLevel!)
     } catch (err) {
       // this is a schema, check if
-      if (opts && opts.schema && permLevel) {
+      if (opts?.schema && permLevel) {
         await checkAuthorized(ctx, otherLevelRoles, permType, otherLevel)
       } else {
         throw err

@@ -31,32 +31,6 @@ const dispatch = createEventDispatcher()
 let selectedAll = false
 
 // Load the component for processing
-$: targetId = extractLiteralHandlebarsID(componentInstance.targetComponent)
-$: targetComponent =
-  $selectedScreen && targetId ? findComponent($selectedScreen?.props, targetId) : null
-
-$: contextDS = getDatasourceForProvider($selectedScreen, targetComponent)
-
-$: schema = $selectedScreen ? getSchema($selectedScreen, contextDS) : undefined
-
-$: searchable = getSearchableFields(schema, $tables.list)
-
-$: defaultValues = searchable
-  .filter((column: UIFieldSchema) => !column.nestedJSON)
-  .map(
-    (column: UIFieldSchema): FilterConfig => ({
-      field: column.name,
-      active: !!value == false ? false : !!column.visible,
-      columnType: column.type,
-    })
-  )
-
-$: parsedColumns = schema
-  ? removeInvalidAddMissing(value || [], [...defaultValues]).map((column) => ({
-      ...column,
-    }))
-  : []
-
 const itemUpdate = (e: CustomEvent) => {
   // The item is a component instance. '_instanceName' === 'field'
   const item: Component = e.detail
@@ -100,6 +74,32 @@ const getSchema = (screen: Screen, datasource: any) => {
 
   return Object.fromEntries(filteredSchema)
 }
+
+$: targetId = extractLiteralHandlebarsID(componentInstance.targetComponent)
+$: targetComponent =
+  $selectedScreen && targetId ? findComponent($selectedScreen?.props, targetId) : null
+
+$: contextDS = getDatasourceForProvider($selectedScreen, targetComponent)
+
+$: schema = $selectedScreen ? getSchema($selectedScreen, contextDS) : undefined
+
+$: searchable = getSearchableFields(schema, $tables.list)
+
+$: defaultValues = searchable
+  .filter((column: UIFieldSchema) => !column.nestedJSON)
+  .map(
+    (column: UIFieldSchema): FilterConfig => ({
+      field: column.name,
+      active: Boolean(value) == false ? false : Boolean(column.visible),
+      columnType: column.type,
+    })
+  )
+
+$: parsedColumns = schema
+  ? removeInvalidAddMissing(value || [], [...defaultValues]).map((column) => ({
+      ...column,
+    }))
+  : []
 </script>
 
 <div class="filter-configuration">

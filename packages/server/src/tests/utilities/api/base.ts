@@ -1,4 +1,4 @@
-import type { ReadStream } from "fs"
+import type { ReadStream } from "node:fs"
 import request, { type Response, type SuperTest, type Test } from "supertest"
 import { getServer } from "../../../app"
 import type TestConfiguration from "../TestConfiguration"
@@ -227,7 +227,7 @@ export abstract class PublicAPI extends TestAPI {
   prefix = "/api/public/v1"
 
   async getHeaders(
-    opts?: RequestOpts,
+    _opts?: RequestOpts,
     extras?: Record<string, string | string[]>
   ): Promise<Record<string, string | string[]>> {
     const apiKey = await this.config.generateApiKey()

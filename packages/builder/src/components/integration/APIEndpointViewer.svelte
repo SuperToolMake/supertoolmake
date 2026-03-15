@@ -65,48 +65,8 @@ import ResponsePanel from "./ResponsePanel.svelte"
 import RestBodyInput from "./RestBodyInput.svelte"
 import AuthPicker from "./rest/AuthPicker.svelte"
 
-$: goto = $gotoStore
-$params
-
-export let queryId
-export let datasourceId
-
-type EndpointWithIcon = ImportEndpoint & {
-  icon?: {
-    component: typeof APIEndpointVerbBadge
-    props: { verb?: string; color?: string }
-  }
-}
-type AuthConfigOption = {
-  label: string
-  value: string
-}
-
-const sidebarExpanded = writable(false)
-let sidebarElement: HTMLDivElement
-let isTransitioning = false
-
-// Expanded sidebar dimensions
-const EXPANDED_MARGIN = 0.15 // 15vh/15vw margins
-const EXPANDED_SIZE = 0.7 // 70vh/70vw size
-
-let selectedEndpointOption: EndpointWithIcon | undefined
-let endpoints: ImportEndpoint[] | undefined
-let endpointsLoading = false
-let endpointLoadError: string | undefined
-let queryParams: Record<string, string> | undefined
-let localDynamicVariables: Record<string, string> | undefined
-let savingQuery = false,
-  runningQuery = false
-let originalBuiltQuery: Query | undefined
-let baseUrl: string | undefined
-let response: PreviewQueryResponse
-let query: Query | undefined
-let template: RestTemplate | undefined
-let datasource: Datasource | UIInternalDatasource | undefined
-let authConfigs: AuthConfigOption[] = []
-let defaultAuthApplied = false
-let defaultAuthKey: string | undefined
+export let queryId: string | undefined
+export let datasourceId: string
 
 const ensureQueryDefaults = (target: Query) => {
   if (!target.fields?.disabledHeaders) {
@@ -124,6 +84,7 @@ const ensureQueryDefaults = (target: Query) => {
     target.fields.bodyType = target.fields.requestBody ? BodyType.JSON : BodyType.NONE
   }
 }
+
 const applyEndpointDefaults = (
   sourceQuery: Query,
   endpoint: EndpointWithIcon,
@@ -190,27 +151,6 @@ const applyEndpointDefaults = (
   return updated
 }
 
-// Reset state when datasourceId changes
-$: if (datasourceId) {
-  selectedEndpointOption = undefined
-  endpoints = undefined
-  endpointLoadError = undefined
-  queryParams = undefined
-  originalBuiltQuery = undefined
-}
-
-// Build selectedEndpointOption from query metadata or fetch endpoints if needed
-$: if (query) {
-  ensureQueryDefaults(query)
-  syncEndpointFromQuery(query, endpoints)
-}
-
-let queryKey: string | undefined
-let appliedEndpointKey: string | undefined
-let lastSyncedQueryId: string | undefined
-let lastSyncedQueryName: string | undefined
-let isNewQuery = false
-
 const syncQueryFromStore = (localQuery: Query, storeQuery: Query) => {
   let updatedQuery = localQuery
 
@@ -227,176 +167,6 @@ const syncQueryFromStore = (localQuery: Query, storeQuery: Query) => {
   }
 
   lastSyncedQueryName = storeQuery.name
-}
-$: storeQuery = getSelectedQuery(queryId, datasourceId)
-$: isNewQuery = !storeQuery?._id
-$: {
-  const key = storeQuery?._id || `new::${datasourceId || ""}`
-  if (!query || key !== queryKey) {
-    query = structuredClone(storeQuery)
-    queryKey = key
-    queryParams = undefined
-    originalBuiltQuery = undefined
-    if (query?._id) {
-      appliedEndpointKey = undefined
-    }
-  }
-}
-$: if (query && query._id && query._id !== lastSyncedQueryId) {
-  lastSyncedQueryId = query._id
-  lastSyncedQueryName = query.name
-}
-$: if (query && storeQuery && query._id && query._id === storeQuery._id) {
-  syncQueryFromStore(query, storeQuery)
-}
-$: datasourceLookupId = datasourceId || storeQuery?.datasourceId
-$: datasource = structuredClone($datasources.list.find((d) => d._id === datasourceLookupId))
-$: authConfigs = buildAuthConfigs(datasource)
-$: {
-  const key = query?._id || `new::${datasourceId || ""}`
-  if (key !== defaultAuthKey) {
-    defaultAuthKey = key
-    defaultAuthApplied = false
-  }
-}
-$: if (!defaultAuthApplied && query && datasource && isNewQuery) {
-  const defaultAuth = getDefaultRestAuthConfig(datasource)
-  if (defaultAuth && !query.fields?.authConfigId && !query.fields?.authConfigType) {
-    query = {
-      ...query,
-      fields: {
-        ...query.fields,
-        authConfigId: defaultAuth.authConfigId,
-        authConfigType: defaultAuth.authConfigType,
-      },
-    }
-    defaultAuthApplied = true
-  } else if (defaultAuth && (query.fields?.authConfigId || query.fields?.authConfigType)) {
-    defaultAuthApplied = true
-  }
-}
-
-// QUERY DATA
-$: queryString = query?.fields.queryString
-$: runtimeUrlQueries = readableToRuntimeMap(mergedBindings, queryParams)
-$: isGet = query?.queryVerb === "read"
-$: schema = query?.schema
-$: nestedSchemaFields = query?.nestedSchemaFields
-$: requestBindings = query ? restUtils.queryParametersToKeyValue(query.parameters) : {}
-$: enabledHeaders = query ? restUtils.flipHeaderState(query.fields.disabledHeaders || {}) : {}
-
-// Init and build full API path if the query is new
-$: if (selectedEndpointOption && baseUrl && query && !query._id) {
-  query = {
-    ...query,
-    fields: {
-      ...query.fields,
-      path: constructFullPath(baseUrl, selectedEndpointOption.path || ""),
-    },
-  }
-}
-
-// Build dynamic variables from the datasource and query
-$: ({ dynamicVariables: computedDynamicVariables, globalDynamicBindings } =
-  datasource && query
-    ? buildDynamicVariables(datasource, query._id)
-    : { dynamicVariables: {}, globalDynamicBindings: {} })
-
-// Use local override if available, otherwise use computed variables
-$: dynamicVariables = localDynamicVariables ?? computedDynamicVariables
-
-// Generate all query bindings.
-$: ({
-  globalDynamicRequestBindings,
-  dataSourceStaticBindings,
-  restBindings,
-  mergedBindings,
-  bindingPreviewContext,
-} = buildQueryBindings(datasource, requestBindings, globalDynamicBindings, dynamicVariables))
-
-// Lazily initialize queryParams from query string once dependencies are ready
-$: if (!queryParams && queryString && mergedBindings) {
-  queryParams = runtimeToReadableMap(
-    mergedBindings,
-    restUtils.breakQueryString(encodeURI(queryString))
-  )
-}
-
-// Fully qualified display url
-$: requestURL = buildUrl(query?.fields?.path, queryParams, mergedBindings)
-
-// Generates a complete runtime-ready version of the query used to monitor the
-// current edit state.
-$: builtQuery =
-  query &&
-  schema &&
-  buildQuery(
-    query,
-    runtimeUrlQueries,
-    requestBindings,
-    mergedBindings,
-    enabledHeaders || {},
-    schema,
-    nestedSchemaFields
-  )
-
-// Track dirty state by comparing runtime-ready queries
-$: if (builtQuery && !originalBuiltQuery) {
-  originalBuiltQuery = structuredClone(builtQuery)
-}
-
-$: queryDirty =
-  (!!originalBuiltQuery && !isEqual(builtQuery, originalBuiltQuery)) || !!localDynamicVariables
-
-$: prettyBody = query?.fields?.requestBody
-  ? prettifyQueryRequestBody(query, mergedBindings)
-  : undefined
-
-// BB Rest template specs
-$: template =
-  datasource?.restTemplate && $restTemplates
-    ? restTemplates.getByName(datasource.restTemplate)
-    : undefined
-$: spec = template?.specs?.[0]
-
-// ENDPOINTS - only skip loading if we have both query Id AND metadata
-// Load endpoints for new queries OR existing queries without metadata
-$: if (
-  spec &&
-  !endpoints &&
-  !endpointsLoading &&
-  !endpointLoadError &&
-  !(query?._id && query?.restTemplateMetadata)
-) {
-  loadEndpoints(spec)
-}
-
-// Build endpoint options from either endpoints list or selected endpoint from metadata
-$: endpointOptions = (() => {
-  const options = getEndpointOptions(endpoints || [])
-
-  // If we have a selected endpoint from metadata that's not in the options, add it
-  if (selectedEndpointOption && !options.find((o) => o.id === selectedEndpointOption?.id)) {
-    return [selectedEndpointOption, ...options]
-  }
-
-  return options
-})()
-$: endpointVerbColor = selectedEndpointOption?.icon?.props?.color
-$: endpointDocs = selectedEndpointOption?.docsUrl
-$: endpointTemplateKey =
-  isNewQuery && selectedEndpointOption
-    ? `${selectedEndpointOption.id || selectedEndpointOption.path || ""}::${baseUrl || ""}`
-    : undefined
-$: if (
-  query &&
-  isNewQuery &&
-  selectedEndpointOption &&
-  endpointTemplateKey &&
-  endpointTemplateKey !== appliedEndpointKey
-) {
-  query = applyEndpointDefaults(query, selectedEndpointOption, baseUrl)
-  appliedEndpointKey = endpointTemplateKey
 }
 
 const loadEndpoints = async (spec?: RestTemplateSpec) => {
@@ -521,7 +291,7 @@ function parseLegacyQuery(query: Query, endpoints: ImportEndpoint[] | undefined)
 
 // SAVE/PREVIEW
 async function saveQuery(redirectIfNew = true) {
-  if (!builtQuery || !datasource) {
+  if (!(builtQuery && datasource)) {
     return
   }
   savingQuery = true
@@ -570,7 +340,7 @@ async function saveQuery(redirectIfNew = true) {
     localDynamicVariables = undefined
 
     return { ok: true }
-  } catch (err) {
+  } catch {
     notifications.error(`Error saving query`)
   } finally {
     savingQuery = false
@@ -580,7 +350,7 @@ async function saveQuery(redirectIfNew = true) {
 }
 
 async function previewQuery() {
-  if (!selectedEndpointOption || !query || !builtQuery) return
+  if (!(selectedEndpointOption && query && builtQuery)) return
   try {
     validateQuery(
       requestURL,
@@ -717,6 +487,239 @@ const sidebarTransition = (_node: HTMLElement, params: { direction: "in" | "out"
         `
     },
   }
+}
+
+$: goto = $gotoStore
+$params
+
+type EndpointWithIcon = ImportEndpoint & {
+  icon?: {
+    component: typeof APIEndpointVerbBadge
+    props: { verb?: string; color?: string }
+  }
+}
+type AuthConfigOption = {
+  label: string
+  value: string
+}
+
+const sidebarExpanded = writable(false)
+let sidebarElement: HTMLDivElement
+let isTransitioning = false
+
+// Expanded sidebar dimensions
+const EXPANDED_MARGIN = 0.15 // 15vh/15vw margins
+const EXPANDED_SIZE = 0.7 // 70vh/70vw size
+
+let selectedEndpointOption: EndpointWithIcon | undefined
+let endpoints: ImportEndpoint[] | undefined
+let endpointsLoading = false
+let endpointLoadError: string | undefined
+let queryParams: Record<string, string> | undefined
+let localDynamicVariables: Record<string, string> | undefined
+let savingQuery = false,
+  runningQuery = false
+let originalBuiltQuery: Query | undefined
+let baseUrl: string | undefined
+let response: PreviewQueryResponse
+let query: Query | undefined
+let template: RestTemplate | undefined
+let datasource: Datasource | UIInternalDatasource | undefined
+let authConfigs: AuthConfigOption[] = []
+let defaultAuthApplied = false
+let defaultAuthKey: string | undefined
+
+// Reset state when datasourceId changes
+$: if (datasourceId) {
+  selectedEndpointOption = undefined
+  endpoints = undefined
+  endpointLoadError = undefined
+  queryParams = undefined
+  originalBuiltQuery = undefined
+}
+
+// Build selectedEndpointOption from query metadata or fetch endpoints if needed
+$: if (query) {
+  ensureQueryDefaults(query)
+  syncEndpointFromQuery(query, endpoints)
+}
+
+let queryKey: string | undefined
+let appliedEndpointKey: string | undefined
+let lastSyncedQueryId: string | undefined
+let lastSyncedQueryName: string | undefined
+let isNewQuery = false
+
+$: storeQuery = getSelectedQuery(queryId, datasourceId)
+$: isNewQuery = !storeQuery?._id
+$: {
+  const key = storeQuery?._id || `new::${datasourceId || ""}`
+  if (!query || key !== queryKey) {
+    query = structuredClone(storeQuery)
+    queryKey = key
+    queryParams = undefined
+    originalBuiltQuery = undefined
+    if (query?._id) {
+      appliedEndpointKey = undefined
+    }
+  }
+}
+$: if (query?._id && query._id !== lastSyncedQueryId) {
+  lastSyncedQueryId = query._id
+  lastSyncedQueryName = query.name
+}
+$: if (query && storeQuery && query._id && query._id === storeQuery._id) {
+  syncQueryFromStore(query, storeQuery)
+}
+$: datasourceLookupId = datasourceId || storeQuery?.datasourceId
+$: datasource = structuredClone($datasources.list.find((d) => d._id === datasourceLookupId))
+$: authConfigs = buildAuthConfigs(datasource)
+$: {
+  const key = query?._id || `new::${datasourceId || ""}`
+  if (key !== defaultAuthKey) {
+    defaultAuthKey = key
+    defaultAuthApplied = false
+  }
+}
+$: if (!defaultAuthApplied && query && datasource && isNewQuery) {
+  const defaultAuth = getDefaultRestAuthConfig(datasource)
+  if (defaultAuth && !query.fields?.authConfigId && !query.fields?.authConfigType) {
+    query = {
+      ...query,
+      fields: {
+        ...query.fields,
+        authConfigId: defaultAuth.authConfigId,
+        authConfigType: defaultAuth.authConfigType,
+      },
+    }
+    defaultAuthApplied = true
+  } else if (defaultAuth && (query.fields?.authConfigId || query.fields?.authConfigType)) {
+    defaultAuthApplied = true
+  }
+}
+
+// QUERY DATA
+$: queryString = query?.fields.queryString
+$: runtimeUrlQueries = readableToRuntimeMap(mergedBindings, queryParams)
+$: isGet = query?.queryVerb === "read"
+$: schema = query?.schema
+$: nestedSchemaFields = query?.nestedSchemaFields
+$: requestBindings = query ? restUtils.queryParametersToKeyValue(query.parameters) : {}
+$: enabledHeaders = query ? restUtils.flipHeaderState(query.fields.disabledHeaders || {}) : {}
+
+// Init and build full API path if the query is new
+$: if (selectedEndpointOption && baseUrl && query && !query._id) {
+  query = {
+    ...query,
+    fields: {
+      ...query.fields,
+      path: constructFullPath(baseUrl, selectedEndpointOption.path || ""),
+    },
+  }
+}
+
+// Build dynamic variables from the datasource and query
+$: ({ dynamicVariables: computedDynamicVariables, globalDynamicBindings } =
+  datasource && query
+    ? buildDynamicVariables(datasource, query._id)
+    : { dynamicVariables: {}, globalDynamicBindings: {} })
+
+// Use local override if available, otherwise use computed variables
+$: dynamicVariables = localDynamicVariables ?? computedDynamicVariables
+
+// Generate all query bindings.
+$: ({
+  globalDynamicRequestBindings,
+  dataSourceStaticBindings,
+  restBindings,
+  mergedBindings,
+  bindingPreviewContext,
+} = buildQueryBindings(datasource, requestBindings, globalDynamicBindings, dynamicVariables))
+
+// Lazily initialize queryParams from query string once dependencies are ready
+$: if (!queryParams && queryString && mergedBindings) {
+  queryParams = runtimeToReadableMap(
+    mergedBindings,
+    restUtils.breakQueryString(encodeURI(queryString))
+  )
+}
+
+// Fully qualified display url
+$: requestURL = buildUrl(query?.fields?.path, queryParams, mergedBindings)
+
+// Generates a complete runtime-ready version of the query used to monitor the
+// current edit state.
+$: builtQuery =
+  query &&
+  schema &&
+  buildQuery(
+    query,
+    runtimeUrlQueries,
+    requestBindings,
+    mergedBindings,
+    enabledHeaders || {},
+    schema,
+    nestedSchemaFields
+  )
+
+// Track dirty state by comparing runtime-ready queries
+$: if (builtQuery && !originalBuiltQuery) {
+  originalBuiltQuery = structuredClone(builtQuery)
+}
+
+$: queryDirty =
+  (Boolean(originalBuiltQuery) && !isEqual(builtQuery, originalBuiltQuery)) ||
+  Boolean(localDynamicVariables)
+
+$: prettyBody = query?.fields?.requestBody
+  ? prettifyQueryRequestBody(query, mergedBindings)
+  : undefined
+
+// BB Rest template specs
+$: template =
+  datasource?.restTemplate && $restTemplates
+    ? restTemplates.getByName(datasource.restTemplate)
+    : undefined
+$: spec = template?.specs?.[0]
+
+// ENDPOINTS - only skip loading if we have both query Id AND metadata
+// Load endpoints for new queries OR existing queries without metadata
+$: if (
+  spec &&
+  !endpoints &&
+  !endpointsLoading &&
+  !endpointLoadError &&
+  !(query?._id && query?.restTemplateMetadata)
+) {
+  loadEndpoints(spec)
+}
+
+// Build endpoint options from either endpoints list or selected endpoint from metadata
+$: endpointOptions = (() => {
+  const options = getEndpointOptions(endpoints || [])
+
+  // If we have a selected endpoint from metadata that's not in the options, add it
+  if (selectedEndpointOption && !options.find((o) => o.id === selectedEndpointOption?.id)) {
+    return [selectedEndpointOption, ...options]
+  }
+
+  return options
+})()
+$: endpointVerbColor = selectedEndpointOption?.icon?.props?.color
+$: endpointDocs = selectedEndpointOption?.docsUrl
+$: endpointTemplateKey =
+  isNewQuery && selectedEndpointOption
+    ? `${selectedEndpointOption.id || selectedEndpointOption.path || ""}::${baseUrl || ""}`
+    : undefined
+$: if (
+  query &&
+  isNewQuery &&
+  selectedEndpointOption &&
+  endpointTemplateKey &&
+  endpointTemplateKey !== appliedEndpointKey
+) {
+  query = applyEndpointDefaults(query, selectedEndpointOption, baseUrl)
+  appliedEndpointKey = endpointTemplateKey
 }
 </script>
 

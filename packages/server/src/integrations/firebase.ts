@@ -100,11 +100,9 @@ const SCHEMA: Integration = {
 }
 
 class FirebaseIntegration implements IntegrationBase {
-  private config: FirebaseConfig
   private client: Firestore
 
   constructor(config: FirebaseConfig) {
-    this.config = config
     this.client = new Firestore({
       projectId: config.projectId,
       databaseId: config.databaseId || "(default)",

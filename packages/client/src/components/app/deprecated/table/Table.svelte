@@ -30,37 +30,6 @@ const customRenderers = [
 
 let selectedRows = []
 
-$: snippets = $context.snippets
-$: hasChildren = $component.children
-$: loading = dataProvider?.loading ?? false
-$: data = dataProvider?.rows || []
-$: fullSchema = dataProvider?.schema ?? {}
-$: primaryDisplay = dataProvider?.primaryDisplay
-$: fields = getFields(fullSchema, columns, false, primaryDisplay)
-$: schema = getFilteredSchema(fullSchema, fields, hasChildren)
-$: setSorting = getAction(dataProvider?.id, ActionTypes.SetDataProviderSorting)
-$: table = dataProvider?.datasource?.type === "table"
-$: {
-  rowSelectionStore.actions.updateSelection(
-    $component.id,
-    selectedRows.length ? selectedRows[0].tableId : "",
-    selectedRows.map((row) => row._id)
-  )
-}
-
-// If the data changes, double check that the selected elements are still present.
-$: if (data) {
-  let rowIds = data.map((row) => row._id)
-  if (rowIds.length) {
-    selectedRows = selectedRows.filter((row) => rowIds.includes(row._id))
-  }
-}
-
-// Build our data context
-$: dataContext = {
-  selectedRows,
-}
-
 // Provide additional data context for live binding eval
 export const getAdditionalDataContext = () => {
   const goldenRow = generateGoldenSample(data)
@@ -159,6 +128,37 @@ const handleClick = (e) => {
   if (onClick) {
     onClick({ row: e.detail })
   }
+}
+
+$: snippets = $context.snippets
+$: hasChildren = $component.children
+$: loading = dataProvider?.loading ?? false
+$: data = dataProvider?.rows || []
+$: fullSchema = dataProvider?.schema ?? {}
+$: primaryDisplay = dataProvider?.primaryDisplay
+$: fields = getFields(fullSchema, columns, false, primaryDisplay)
+$: schema = getFilteredSchema(fullSchema, fields, hasChildren)
+$: setSorting = getAction(dataProvider?.id, ActionTypes.SetDataProviderSorting)
+$: table = dataProvider?.datasource?.type === "table"
+$: {
+  rowSelectionStore.actions.updateSelection(
+    $component.id,
+    selectedRows.length ? selectedRows[0].tableId : "",
+    selectedRows.map((row) => row._id)
+  )
+}
+
+// If the data changes, double check that the selected elements are still present.
+$: if (data) {
+  let rowIds = data.map((row) => row._id)
+  if (rowIds.length) {
+    selectedRows = selectedRows.filter((row) => rowIds.includes(row._id))
+  }
+}
+
+// Build our data context
+$: dataContext = {
+  selectedRows,
 }
 
 const actions = [

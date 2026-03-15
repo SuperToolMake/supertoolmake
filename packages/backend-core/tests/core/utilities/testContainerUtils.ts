@@ -1,4 +1,4 @@
-import { execSync } from "child_process"
+import { execSync } from "node:child_process"
 import { cloneDeep } from "lodash"
 import type { GenericContainer, StartedTestContainer } from "testcontainers"
 
@@ -129,7 +129,7 @@ export function setupEnv(...envs: any[]) {
     { key: "MINIO_URL", value: `http://127.0.0.1:${minioPort}` },
   ]
 
-  for (const config of configs.filter((x) => !!x.value)) {
+  for (const config of configs.filter((x) => Boolean(x.value))) {
     for (const env of envs) {
       env._set(config.key, config.value)
     }

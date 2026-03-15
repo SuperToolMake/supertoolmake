@@ -17,17 +17,6 @@ export let size
 let node
 let touched = false
 
-$: $component.editing && node?.focus()
-$: externalLink = url && typeof url === "string" && !url.startsWith("/")
-$: target = openInNewTab ? "_blank" : "_self"
-$: placeholder = $builderStore.inBuilder && !text
-$: componentText = getComponentText(text, $builderStore, $component)
-$: sanitizedUrl = getSanitizedUrl(url, externalLink, openInNewTab)
-
-// Add color styles to main styles object, otherwise the styleable helper
-// overrides the color when it's passed as inline style.
-$: styles = enrichStyles($component.styles, color)
-
 const handleUrlChange = () => {
   sidePanelStore.actions.close()
   modalStore.actions.close()
@@ -72,6 +61,17 @@ const updateText = (e) => {
   }
   touched = false
 }
+
+$: $component.editing && node?.focus()
+$: externalLink = url && typeof url === "string" && !url.startsWith("/")
+$: target = openInNewTab ? "_blank" : "_self"
+$: placeholder = $builderStore.inBuilder && !text
+$: componentText = getComponentText(text, $builderStore, $component)
+$: sanitizedUrl = getSanitizedUrl(url, externalLink, openInNewTab)
+
+// Add color styles to main styles object, otherwise the styleable helper
+// overrides the color when it's passed as inline style.
+$: styles = enrichStyles($component.styles, color)
 </script>
 
 {#if $component.editing}

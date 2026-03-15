@@ -6,12 +6,12 @@ const { hide } = getContext(Context.Modal)
 
 let count: number = 0
 const clicks: number = 5
-$: if (count === clicks) hide()
-$: remaining = clicks - count
-
 function increment() {
   count++
 }
+
+$: if (count === clicks) hide()
+$: remaining = clicks - count
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

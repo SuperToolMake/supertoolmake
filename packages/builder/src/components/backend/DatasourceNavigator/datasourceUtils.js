@@ -112,7 +112,7 @@ export const enrichDatasources = (
         (table) => !searchTerm || table.name?.toLowerCase()?.indexOf(searchTerm.toLowerCase()) > -1
       )
 
-    const show = !!(!searchTerm || visibleDsQueries.length || visibleDsTables.length)
+    const show = Boolean(!searchTerm || visibleDsQueries.length || visibleDsTables.length)
     return {
       ...datasource,
       selected,

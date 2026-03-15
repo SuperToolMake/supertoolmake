@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto"
+import { randomUUID } from "node:crypto"
 import { GenericContainer, type StartedTestContainer } from "testcontainers"
 import { generator, structures } from "../../../tests"
 import env from "../../environment"

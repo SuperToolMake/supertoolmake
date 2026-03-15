@@ -7,7 +7,7 @@ import {
   Icon,
   Layout,
   MenuItem,
-  type Modal,
+  Modal,
   notifications,
   Page,
 } from "@budibase/bbui"
@@ -29,8 +29,6 @@ let loaded: boolean = false
 let userInfoModal: Modal
 let changePasswordModal: Modal
 
-$: userApps = $clientAppsStore.apps
-
 function getUrl(app: EnrichedApp | PublishedWorkspaceData) {
   if (app.url) {
     return `/app${app.url}`
@@ -42,15 +40,17 @@ function getUrl(app: EnrichedApp | PublishedWorkspaceData) {
 const logout = async () => {
   try {
     await auth.logout()
-  } catch (error) {
+  } catch {
     // Swallow error and do nothing
   }
 }
 
+$: userApps = $clientAppsStore.apps
+
 onMount(async () => {
   try {
     await clientAppsStore.load()
-  } catch (error) {
+  } catch {
     notifications.error("Error loading apps")
   }
   loaded = true

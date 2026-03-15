@@ -30,7 +30,7 @@ export const findComponentParent = (
   id: string | undefined,
   parentComponent: Component | null = null
 ): Component | null => {
-  if (!rootComponent || !id) {
+  if (!(rootComponent && id)) {
     return null
   }
   if (rootComponent._id === id) {
@@ -57,7 +57,7 @@ export const findComponentPath = (
   id: string | undefined,
   path: Component[] = []
 ): Component[] => {
-  if (!rootComponent || !id) {
+  if (!(rootComponent && id)) {
     return []
   }
   if (rootComponent._id === id) {
@@ -84,7 +84,7 @@ export const findAllMatchingComponents = (
   rootComponent: Component | null,
   selector: (component: Component) => boolean
 ) => {
-  if (!rootComponent || !selector) {
+  if (!(rootComponent && selector)) {
     return []
   }
   let components: Component[] = []
@@ -134,7 +134,7 @@ const searchComponentTree = (
   rootComponent: Component | undefined,
   matchComponent: (component: Component) => boolean
 ): Component | null => {
-  if (!rootComponent || !matchComponent) {
+  if (!(rootComponent && matchComponent)) {
     return null
   }
   if (matchComponent(rootComponent)) {

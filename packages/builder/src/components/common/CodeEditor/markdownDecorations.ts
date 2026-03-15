@@ -34,18 +34,18 @@ const processRegexMatches = (
 ) => {
   const decorations = []
   regex.lastIndex = 0
-  let match: RegExpExecArray | null
-
-  while ((match = regex.exec(text))) {
+  let match = regex.exec(text)
+  while (match !== null) {
     const baseStart = from + match.index
     const baseEnd = baseStart + match[0].length
     const { start, end } = adjustRange
       ? adjustRange(match, baseStart, baseEnd)
       : { start: baseStart, end: baseEnd }
 
-    if (overlapsHbs(start, end)) continue
-
-    decorations.push(Decoration.mark({ class: getClassName(match) }).range(start, end))
+    if (!overlapsHbs(start, end)) {
+      decorations.push(Decoration.mark({ class: getClassName(match) }).range(start, end))
+    }
+    match = regex.exec(text)
   }
 
   return decorations
@@ -60,13 +60,14 @@ const buildMarkdownDecorations = (view: EditorView): DecorationSet => {
 
   for (const { from, to } of view.visibleRanges) {
     const text = view.state.doc.sliceString(from, to)
-    let hbsMatch: RegExpExecArray | null
     hbsRegex.lastIndex = 0
-    while ((hbsMatch = hbsRegex.exec(text))) {
+    let hbsMatch = hbsRegex.exec(text)
+    while (hbsMatch !== null) {
       hbsRanges.push({
         from: from + hbsMatch.index,
         to: from + hbsMatch.index + hbsMatch[0].length,
       })
+      hbsMatch = hbsRegex.exec(text)
     }
   }
 

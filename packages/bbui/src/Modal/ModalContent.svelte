@@ -37,8 +37,6 @@ export const keepOpen = Symbol("keepOpen")
   let loading: boolean = false
 
   let confirmDisabled: boolean
-  $: confirmDisabled = disabled || loading
-
   async function secondary(e: Event): Promise<void> {
     loading = true
     if (!secondaryAction || (await secondaryAction(e)) !== keepOpen) {
@@ -47,7 +45,7 @@ export const keepOpen = Symbol("keepOpen")
     loading = false
   }
 
-  export async function confirm(): Promise<void> {
+export async function confirm(): Promise<void> {
     loading = true
     if (!onConfirm || (await onConfirm()) !== keepOpen) {
       hide()
@@ -55,13 +53,21 @@ export const keepOpen = Symbol("keepOpen")
     loading = false
   }
 
-  async function close(): Promise<void> {
+async function close(): Promise<void> {
     loading = true
     if (!onCancel || (await onCancel()) !== keepOpen) {
       cancel(ModalCancelFrom.CANCEL_BUTTON)
     }
     loading = false
   }
+
+$: confirmDisabled = disabled || loading
+
+  
+
+  
+
+  
 </script>
 
 <div

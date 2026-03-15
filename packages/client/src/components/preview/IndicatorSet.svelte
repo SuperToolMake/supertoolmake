@@ -64,20 +64,6 @@ let intersectionObservers: IntersectionObserver[] = []
 let callbackCount = 0
 let nextState: ReturnType<typeof defaultState>
 
-$: componentId, reset()
-$: visibleIndicators = state.indicators.filter((x) => x.visible)
-$: offset = $builderStore.inBuilder ? 5 : -1
-$: config.set({
-  componentId,
-  color,
-  zIndex,
-  prefix,
-  allowResizeAnchors,
-})
-
-// Update position when any props change
-$: $config, debouncedUpdate()
-
 const reset = () => {
   mutationObserver.disconnect()
   observingMutations = false
@@ -197,8 +183,8 @@ const updatePosition = () => {
       intersectionObserver.observe(element)
       intersectionObservers.push(intersectionObserver)
       indicator.visible = false
-      indicator.insideSidePanel = !!element.closest(".side-panel")
-      indicator.insideModal = !!element.closest(".modal-content")
+      indicator.insideSidePanel = Boolean(element.closest(".side-panel"))
+      indicator.insideModal = Boolean(element.closest(".modal-content"))
     }
 
     return indicator
@@ -210,7 +196,27 @@ const updatePosition = () => {
     updating = false
   }
 }
+
+$: {
+  componentId
+  reset()
+}
+$: visibleIndicators = state.indicators.filter((x) => x.visible)
+$: offset = $builderStore.inBuilder ? 5 : -1
+$: config.set({
+  componentId,
+  color,
+  zIndex,
+  prefix,
+  allowResizeAnchors,
+})
+
+// Update position when any props change
 const debouncedUpdate = Utils.domDebounce(updatePosition)
+$: {
+  $config
+  debouncedUpdate()
+}
 
 onMount(() => {
   debouncedUpdate()

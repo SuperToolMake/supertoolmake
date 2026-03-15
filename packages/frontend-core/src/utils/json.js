@@ -82,7 +82,7 @@ export const convertJSONSchemaToTableSchema = (jsonSchema, options) => {
  * @param squashObjects whether to recurse into objects or not
  */
 const extractJSONSchemaKeys = (jsonSchema, squashObjects = false) => {
-  if (!jsonSchema || !Object.keys(jsonSchema).length) {
+  if (!(jsonSchema && Object.keys(jsonSchema).length)) {
     return []
   }
 

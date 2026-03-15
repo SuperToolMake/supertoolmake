@@ -51,25 +51,6 @@ const valueTypeOptions = [
 
 let dragDisabled = true
 
-$: finalActionOptions = actionOptions ?? defaultActionOptions
-
-$: settings = componentStore.getComponentSettings($selectedComponent?._component)?.concat({
-  label: "Custom CSS",
-  key: "_css",
-  type: "text",
-})
-$: settingOptions = settings
-  .filter((setting) => setting.supportsConditions !== false)
-  .map((setting) => ({
-    label: makeLabel(setting),
-    value: setting.key,
-  }))
-$: conditions.forEach((link) => {
-  if (!link.id) {
-    link.id = generate()
-  }
-})
-
 const makeLabel = (setting) => {
   const { section, label } = setting
   if (section) {
@@ -151,6 +132,25 @@ const onSettingChange = (e, condition) => {
     delete condition.settingValue
   }
 }
+
+$: finalActionOptions = actionOptions ?? defaultActionOptions
+
+$: settings = componentStore.getComponentSettings($selectedComponent?._component)?.concat({
+  label: "Custom CSS",
+  key: "_css",
+  type: "text",
+})
+$: settingOptions = settings
+  .filter((setting) => setting.supportsConditions !== false)
+  .map((setting) => ({
+    label: makeLabel(setting),
+    value: setting.key,
+  }))
+$: conditions.forEach((link) => {
+  if (!link.id) {
+    link.id = generate()
+  }
+})
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

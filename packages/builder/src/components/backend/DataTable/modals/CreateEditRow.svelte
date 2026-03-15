@@ -9,10 +9,6 @@ export let row = {}
 let errors = []
 const dispatch = createEventDispatcher()
 
-$: creating = row?._id == null
-$: table = row.tableId ? $tables.list.find((table) => table._id === row?.tableId) : $tables.selected
-$: tableSchema = Object.entries(table?.schema ?? {})
-
 async function saveRow() {
   errors = []
   try {
@@ -36,6 +32,10 @@ async function saveRow() {
     return keepOpen
   }
 }
+
+$: creating = row?._id == null
+$: table = row.tableId ? $tables.list.find((table) => table._id === row?.tableId) : $tables.selected
+$: tableSchema = Object.entries(table?.schema ?? {})
 </script>
 
 <span class="modal-wrap">

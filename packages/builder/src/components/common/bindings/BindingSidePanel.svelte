@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Icon, Input, Layout, type Popover } from "@budibase/bbui"
+import { Icon, Input, Layout, Popover } from "@budibase/bbui"
 import { convertToJS } from "@budibase/string-templates"
 import type { EnrichedBinding, Helper } from "@budibase/types"
 import { BindingMode } from "@budibase/types"
@@ -29,45 +29,9 @@ let helpers = handlebarsCompletions()
 let selectedCategory: string | null
 let hideTimeout: ReturnType<typeof setTimeout> | null
 
-$: bindingIcons = bindings?.reduce<Record<string, string>>((acc, ele) => {
-  if (ele.icon) {
-    acc[ele.category] = acc[ele.category] || ele.icon
-  }
-  return acc
-}, {})
-$: categoryIcons = {
-  ...bindingIcons,
-  Helpers: "MagicWand",
-  Snippets: "Code",
-} as Record<string, string>
-$: categories = Object.entries(groupBy("category", bindings))
-
-$: categoryNames = getCategoryNames(categories, allowSnippets && mode === BindingMode.JavaScript)
-$: searchRgx = new RegExp(search, "ig")
-$: filteredCategories = categories
-  .map(([name, categoryBindings]) => ({
-    name,
-    bindings: categoryBindings?.filter((binding) => {
-      return !search || binding.readableBinding.match(searchRgx)
-    }),
-  }))
-  .filter((category) => {
-    return (
-      category.bindings?.length > 0 &&
-      (!selectedCategory ? true : selectedCategory === category.name)
-    )
-  })
-$: filteredHelpers = helpers?.filter((helper) => {
-  return (
-    (!search || helper.label.match(searchRgx) || helper.description.match(searchRgx)) &&
-    (mode !== BindingMode.JavaScript || helper.allowsJs)
-  )
-})
-
 function onModeChange(_mode: BindingMode | undefined) {
   selectedCategory = null
 }
-$: onModeChange(mode)
 
 const getHelperExample = (helper: Helper, js: boolean) => {
   let example = helper.example || ""
@@ -92,7 +56,7 @@ const getCategoryNames = (categories: [string, EnrichedBinding[]][], showSnippet
 }
 
 const showBindingPopover = (binding: EnrichedBinding, target: HTMLElement) => {
-  if (!context || !binding.value || binding.value === "") {
+  if (!(context && binding.value) || binding.value === "") {
     return
   }
   stopHidingPopover()
@@ -146,6 +110,43 @@ const stopSearching = (e: Event) => {
   searching = false
   search = ""
 }
+
+$: bindingIcons = bindings?.reduce<Record<string, string>>((acc, ele) => {
+  if (ele.icon) {
+    acc[ele.category] = acc[ele.category] || ele.icon
+  }
+  return acc
+}, {})
+$: categoryIcons = {
+  ...bindingIcons,
+  Helpers: "MagicWand",
+  Snippets: "Code",
+} as Record<string, string>
+$: categories = Object.entries(groupBy("category", bindings))
+
+$: categoryNames = getCategoryNames(categories, allowSnippets && mode === BindingMode.JavaScript)
+$: searchRgx = new RegExp(search, "ig")
+$: filteredCategories = categories
+  .map(([name, categoryBindings]) => ({
+    name,
+    bindings: categoryBindings?.filter((binding) => {
+      return !search || binding.readableBinding.match(searchRgx)
+    }),
+  }))
+  .filter((category) => {
+    return (
+      category.bindings?.length > 0 &&
+      (!selectedCategory ? true : selectedCategory === category.name)
+    )
+  })
+$: filteredHelpers = helpers?.filter((helper) => {
+  return (
+    (!search || helper.label.match(searchRgx) || helper.description.match(searchRgx)) &&
+    (mode !== BindingMode.JavaScript || helper.allowsJs)
+  )
+})
+
+$: onModeChange(mode)
 </script>
 
 <Popover
@@ -171,7 +172,7 @@ const stopSearching = (e: Event) => {
       {/if}
       {#if hoverTarget.code}
         {#if mode === BindingMode.Text || (mode === BindingMode.JavaScript && hoverTarget.type === "binding")}
-          <!-- eslint-disable-next-line svelte/no-at-html-tags-->
+          <!-- biome-ignore lint: svelte/no-at-html-tags-->
           <pre>{@html hoverTarget.code}</pre>
         {:else}
           <CodeEditor

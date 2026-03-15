@@ -6,13 +6,6 @@ import { DefaultRowHeight } from "../lib/constants"
 const { isReordering, reorder, columnLookupMap, rowHeight, renderedRows, scrollLeft, stickyWidth } =
   getContext("grid")
 
-$: targetColumn = $columnLookupMap[$reorder.targetColumn]
-$: insertAfter = $reorder.insertAfter
-$: left = getLeft(targetColumn, insertAfter, $scrollLeft)
-$: height = $rowHeight * $renderedRows.length + DefaultRowHeight
-$: style = `left:${left}px; height:${height}px;`
-$: visible = $isReordering && left >= $stickyWidth
-
 const getLeft = (targetColumn, insertAfter, scrollLeft) => {
   if (!targetColumn) {
     return 0
@@ -23,6 +16,13 @@ const getLeft = (targetColumn, insertAfter, scrollLeft) => {
   }
   return left
 }
+
+$: targetColumn = $columnLookupMap[$reorder.targetColumn]
+$: insertAfter = $reorder.insertAfter
+$: left = getLeft(targetColumn, insertAfter, $scrollLeft)
+$: height = $rowHeight * $renderedRows.length + DefaultRowHeight
+$: style = `left:${left}px; height:${height}px;`
+$: visible = $isReordering && left >= $stickyWidth
 </script>
 
 {#if visible}

@@ -114,7 +114,7 @@ export async function bulkDestroy(ctx: UserCtx) {
     )
   }
   const responses = await Promise.all(promises)
-  const finalRows = responses.map((resp) => resp.row).filter((row) => row && row._id)
+  const finalRows = responses.map((resp) => resp.row).filter((row) => row?._id)
   return { response: { ok: true }, rows: finalRows }
 }
 
@@ -124,7 +124,7 @@ export async function fetchEnrichedRow(ctx: UserCtx) {
   const { tableId } = utils.getSourceId(ctx)
   const { datasourceId, tableName } = breakExternalTableId(tableId)
   const datasource: Datasource = await sdk.datasources.get(datasourceId)
-  if (!datasource || !datasource.entities) {
+  if (!datasource?.entities) {
     ctx.throw(400, "Datasource has not been configured for plus API.")
   }
   const tables = datasource.entities

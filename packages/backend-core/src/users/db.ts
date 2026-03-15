@@ -178,7 +178,7 @@ export class UserDB {
 
     const { email, _id, roles } = user
 
-    if (!email && !_id) {
+    if (!(email || _id)) {
       throw new Error("_id or email is required")
     }
 
@@ -213,9 +213,9 @@ export class UserDB {
 
     const addUsers = async () => {
       const isNewUser = !dbUser
-      const isEmailChanging = !!dbUser && !!email && dbUser.email !== email
+      const isEmailChanging = Boolean(email) && dbUser?.email != null && dbUser.email !== email
       const shouldValidateUniqueUser =
-        !opts.isAccountHolder && !!email && (isNewUser || isEmailChanging)
+        !opts.isAccountHolder && Boolean(email) && (isNewUser || isEmailChanging)
 
       if (shouldValidateUniqueUser) {
         await validateUniqueUser(email, tenantId)

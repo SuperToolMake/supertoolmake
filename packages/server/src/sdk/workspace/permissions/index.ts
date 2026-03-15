@@ -64,7 +64,7 @@ export async function updatePermissionOnRole(
       ? role.permissions
       : {}
     // make sure its an array, also handle migrating
-    if (!rolePermissions[resourceId] || !Array.isArray(rolePermissions[resourceId])) {
+    if (!(rolePermissions[resourceId] && Array.isArray(rolePermissions[resourceId]))) {
       rolePermissions[resourceId] =
         typeof rolePermissions[resourceId] === "string"
           ? [rolePermissions[resourceId] as unknown as PermissionLevel]

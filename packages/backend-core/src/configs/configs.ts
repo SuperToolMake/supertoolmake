@@ -119,7 +119,7 @@ export async function getGoogleDatasourceConfig(): Promise<GoogleInnerConfig | u
   let config = await getGoogleConfig()
 
   // fallback to env vars
-  if (!config || !config.activated) {
+  if (!config?.activated) {
     config = getDefaultGoogleConfig()
   }
 
@@ -149,7 +149,7 @@ async function getOIDCConfigDoc(): Promise<OIDCConfig | undefined> {
 export async function getOIDCConfig(): Promise<OIDCInnerConfig | undefined> {
   const config = (await getOIDCConfigDoc())?.config
   // default to the 0th config
-  return config?.configs && config.configs[0]
+  return config?.configs?.[0]
 }
 
 /**
@@ -157,7 +157,7 @@ export async function getOIDCConfig(): Promise<OIDCInnerConfig | undefined> {
  */
 export async function getOIDCConfigById(configId: string): Promise<OIDCInnerConfig | undefined> {
   const config = (await getConfig<OIDCConfig>(ConfigType.OIDC))?.config
-  return config && config.configs.filter((c: any) => c.uuid === configId)[0]
+  return config?.configs.filter((c: any) => c.uuid === configId)[0]
 }
 
 // SMTP

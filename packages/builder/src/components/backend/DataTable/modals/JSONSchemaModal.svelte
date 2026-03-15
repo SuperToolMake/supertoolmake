@@ -150,7 +150,7 @@ async function onJsonUpdate({ detail }) {
     let inputJson = JSON.parse(input)
     deriveSchemaFromJson(inputJson)
     invalid = false
-  } catch (err) {
+  } catch {
     // json not currently valid
     invalid = true
   }
@@ -199,7 +199,7 @@ function removeKey(index) {
         delete parsed[keyToRemove]
         json = JSON.stringify(parsed, null, 2)
       }
-    } catch (err) {
+    } catch {
       // json not valid, ignore
     }
   }
@@ -218,7 +218,7 @@ onMount(() => {
       deriveSchemaFromJson(JSON.parse(json))
       invalid = false
       return
-    } catch (err) {
+    } catch {
       invalid = true
     }
   }

@@ -14,11 +14,11 @@ export function getAttachmentHeaders(
   if (contentDisposition) {
     const tokenRegex = /"(?:[^"\\]|\\.)*"|[;=]/g
     // Example match: parses "filename=\"report.pdf\"; size=123" into the quoted filename token and the ; or = separators
-    let match: RegExpMatchArray | null = null
     let hasSeparator = false
     let hasParameters = false
 
-    while ((match = tokenRegex.exec(contentDisposition)) !== null) {
+    let match = tokenRegex.exec(contentDisposition)
+    while (match !== null) {
       if (match[0] === ";") {
         hasSeparator = true
         break
@@ -26,6 +26,7 @@ export function getAttachmentHeaders(
       if (match[0] === "=") {
         hasParameters = true
       }
+      match = tokenRegex.exec(contentDisposition)
     }
 
     if (!hasSeparator && hasParameters) {

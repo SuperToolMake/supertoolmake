@@ -12,7 +12,7 @@ async function deleteUser() {
     await users.delete(user._id)
     notifications.success(`User ${user?.email} deleted.`)
     $goto("./")
-  } catch (error) {
+  } catch {
     notifications.error("Error deleting user")
   }
 }

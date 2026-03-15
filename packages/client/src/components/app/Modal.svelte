@@ -12,24 +12,6 @@ export let size
 let modal
 
 // Open modal automatically in builder
-$: {
-  if ($builderStore.inBuilder) {
-    if ($component.inSelectedPath && $modalStore.contentId !== $component.id) {
-      modalStore.actions.open($component.id)
-    } else if (
-      !$component.inSelectedPath &&
-      $modalStore.contentId === $component.id &&
-      !$dndIsDragging
-    ) {
-      modalStore.actions.close()
-    }
-  }
-}
-
-$: open = $modalStore.contentId === $component.id
-
-$: resolvedHideCloseIcon = hideCloseIcon === undefined ? !!ignoreClicksOutside : hideCloseIcon
-
 const handleModalClose = async () => {
   if (onClose) {
     await onClose()
@@ -46,6 +28,25 @@ const handleOpen = (open, modal) => {
     modal.hide()
   }
 }
+
+$: {
+  if ($builderStore.inBuilder) {
+    if ($component.inSelectedPath && $modalStore.contentId !== $component.id) {
+      modalStore.actions.open($component.id)
+    } else if (
+      !$component.inSelectedPath &&
+      $modalStore.contentId === $component.id &&
+      !$dndIsDragging
+    ) {
+      modalStore.actions.close()
+    }
+  }
+}
+
+$: open = $modalStore.contentId === $component.id
+
+$: resolvedHideCloseIcon =
+  hideCloseIcon === undefined ? Boolean(ignoreClicksOutside) : hideCloseIcon
 
 $: handleOpen(open, modal)
 </script>

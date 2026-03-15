@@ -26,7 +26,7 @@ const { fetchDatasourceSchema, fetchDatasourceDefinition } = getContext("sdk")
 
 const getInitialFormStep = () => {
   const parsedFormStep = parseInt(initialFormStep.toString())
-  if (isNaN(parsedFormStep)) {
+  if (Number.isNaN(parsedFormStep)) {
     return 1
   }
   return parsedFormStep
@@ -36,11 +36,6 @@ let definition: Table | undefined
 let schema: TableSchema | undefined
 let loaded = false
 let currentStep = getContext("current-step") || writable(getInitialFormStep())
-
-$: fetchSchema(dataSource)
-$: schemaKey = generateSchemaKey(schema)
-$: initialValues = getInitialValues(actionType, dataSource, $component.path, $context)
-$: resetKey = Helpers.hashString(schemaKey + JSON.stringify(initialValues) + disabled + readonly)
 
 // Returns the closes data context which isn't a built in context
 const getInitialValues = (
@@ -74,7 +69,7 @@ const getInitialValues = (
 const fetchSchema = async (dataSource: DataFetchDatasource) => {
   try {
     definition = await fetchDatasourceDefinition(dataSource)
-  } catch (error) {
+  } catch {
     definition = undefined
   }
   const res = await fetchDatasourceSchema(dataSource)
@@ -95,6 +90,11 @@ const generateSchemaKey = (schema: TableSchema | undefined) => {
   fields.sort()
   return fields.map((field) => `${field}:${schema[field].type}`).join("-")
 }
+
+$: fetchSchema(dataSource)
+$: schemaKey = generateSchemaKey(schema)
+$: initialValues = getInitialValues(actionType, dataSource, $component.path, $context)
+$: resetKey = Helpers.hashString(schemaKey + JSON.stringify(initialValues) + disabled + readonly)
 </script>
 
 {#if loaded}

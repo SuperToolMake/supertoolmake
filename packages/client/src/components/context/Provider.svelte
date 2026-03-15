@@ -29,9 +29,6 @@ const instanceId = generate()
 let lastDataKey
 let lastActionsKey
 
-$: provideData(data)
-$: provideActions(actions, instanceId)
-
 const provideData = (newData) => {
   const dataKey = JSON.stringify(newData)
   if (dataKey !== lastDataKey) {
@@ -57,6 +54,9 @@ const provideActions = (newActions) => {
     })
   }
 }
+
+$: provideData(data)
+$: provideActions(actions, instanceId)
 
 onDestroy(() => {
   // Unregister all datasource instances when unmounting this provider

@@ -24,7 +24,7 @@ async function saveConfig() {
 
     // Update settings
     await organisation.save(config)
-  } catch (error) {
+  } catch {
     notifications.error("Error saving org config")
   }
   loading = false

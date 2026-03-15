@@ -76,7 +76,7 @@ const Constraints = {
   },
 }
 const ConstraintMap = {
-  ["string"]: [
+  string: [
     Constraints.Required,
     Constraints.MaxLength,
     Constraints.Equal,
@@ -84,32 +84,31 @@ const ConstraintMap = {
     Constraints.Regex,
     Constraints.NotRegex,
   ],
-  ["number"]: [
+  number: [
     Constraints.Required,
     Constraints.MaxValue,
     Constraints.MinValue,
     Constraints.Equal,
     Constraints.NotEqual,
   ],
-  ["boolean"]: [Constraints.Required, Constraints.Equal, Constraints.NotEqual],
-  ["datetime"]: [
+  boolean: [Constraints.Required, Constraints.Equal, Constraints.NotEqual],
+  datetime: [
     Constraints.Required,
     Constraints.MaxValue,
     Constraints.MinValue,
     Constraints.Equal,
     Constraints.NotEqual,
   ],
-  ["attachment"]: [Constraints.Required, Constraints.MaxFileSize, Constraints.MaxUploadSize],
-  ["attachment_single"]: [Constraints.Required, Constraints.MaxUploadSize],
-  ["signature_single"]: [Constraints.Required],
-  ["link"]: [
+  attachment: [Constraints.Required, Constraints.MaxFileSize, Constraints.MaxUploadSize],
+  attachment_single: [Constraints.Required, Constraints.MaxUploadSize],
+  link: [
     Constraints.Required,
     Constraints.Contains,
     Constraints.NotContains,
     Constraints.MinLength,
     Constraints.MaxLength,
   ],
-  ["array"]: [
+  array: [
     Constraints.Required,
     Constraints.MinLength,
     Constraints.MaxLength,
@@ -122,18 +121,12 @@ const resolveDatasource = (selectedScreen, componentInstance, parent) => {
   return getDatasourceForProvider(selectedScreen, parent || componentInstance) || {}
 }
 
-$: dataSourceSchema = getDataSourceSchema($selectedScreen, $selectedComponent)
-$: field = fieldName || $selectedComponent?.field
-$: schemaRules = parseRulesFromSchema(field, dataSourceSchema || {})
-$: fieldType = type?.split("/")[1] || "string"
-$: constraintOptions = getConstraintsForType(fieldType)
-
 const getConstraintsForType = (type) => {
   return ConstraintMap[type]
 }
 
 const getDataSourceSchema = (asset, component) => {
-  if (!asset || !component) {
+  if (!(asset && component)) {
     return null
   }
   const formParent = findClosestMatchingComponent(
@@ -149,7 +142,7 @@ const getDataSourceSchema = (asset, component) => {
 }
 
 const parseRulesFromSchema = (field, dataSourceSchema) => {
-  if (!field || !dataSourceSchema) {
+  if (!(field && dataSourceSchema)) {
     return []
   }
   const fieldSchema = dataSourceSchema.schema?.[field]
@@ -227,6 +220,12 @@ const duplicateRule = (id) => {
   const newRule = { ...existingRule, id: generate() }
   rules = [...rules, newRule]
 }
+
+$: dataSourceSchema = getDataSourceSchema($selectedScreen, $selectedComponent)
+$: field = fieldName || $selectedComponent?.field
+$: schemaRules = parseRulesFromSchema(field, dataSourceSchema || {})
+$: fieldType = type?.split("/")[1] || "string"
+$: constraintOptions = getConstraintsForType(fieldType)
 </script>
 
 <DrawerContent>

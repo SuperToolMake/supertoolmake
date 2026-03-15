@@ -9,8 +9,6 @@ import LeftPanel from "./_components/LeftPanel.svelte"
 $goto
 $params
 
-$: navigateToComponent($componentStore.selectedComponentId)
-
 const navigateToComponent = (componentId: string | undefined) => {
   if (!componentId) {
     return
@@ -19,6 +17,8 @@ const navigateToComponent = (componentId: string | undefined) => {
 }
 
 const validate = (id: string) => $screenStore.screens.some((screen) => screen._id === id)
+
+$: navigateToComponent($componentStore.selectedComponentId)
 
 onMount(() => {
   const screenId = $params.screenId

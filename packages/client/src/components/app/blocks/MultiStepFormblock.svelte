@@ -26,13 +26,6 @@ setContext("current-step", currentStep)
 
 let schema
 
-$: id = $component.id
-$: selected = $component.selected
-$: builderStep = $builderStore.metadata?.step
-$: fetchSchema(dataSource)
-$: enrichedSteps = enrichSteps(steps, schema, id)
-$: updateCurrentStep(enrichedSteps, selected, builderStep)
-
 // Provide additional data context for live binding eval
 export const getAdditionalDataContext = () => {
   const id = get(component).id
@@ -94,6 +87,13 @@ const enrichSteps = (steps, schema, id) => {
     }
   })
 }
+
+$: id = $component.id
+$: selected = $component.selected
+$: builderStep = $builderStore.metadata?.step
+$: fetchSchema(dataSource)
+$: enrichedSteps = enrichSteps(steps, schema, id)
+$: updateCurrentStep(enrichedSteps, selected, builderStep)
 </script>
 
 <FormBlockWrapper {actionType} {dataSource} {rowId} {noRowsMessage}>

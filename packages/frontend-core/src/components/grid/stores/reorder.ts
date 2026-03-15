@@ -37,7 +37,7 @@ export type Store = ReorderInitialStore
 
 export const createStores = (): ReorderInitialStore => {
   const reorder = writable(reorderInitialState)
-  const isReordering = derived(reorder, ($reorder) => !!$reorder.sourceColumn, false)
+  const isReordering = derived(reorder, ($reorder) => Boolean($reorder.sourceColumn), false)
   return {
     reorder,
     isReordering,

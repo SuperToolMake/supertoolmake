@@ -23,7 +23,7 @@ $: cardStyles = {
   },
 }
 
-$: showImage = !!imageUrl
+$: showImage = Boolean(imageUrl)
 </script>
 
 <div class="container" use:styleable={cardStyles}>

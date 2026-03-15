@@ -100,7 +100,7 @@ const downloadCsvFile = () => {
 
 const download = (filename: string, text: string) => {
   const element = document.createElement("a")
-  element.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURIComponent(text))
+  element.setAttribute("href", `data:text/csv;charset=utf-8,${encodeURIComponent(text)}`)
   element.setAttribute("download", filename)
 
   element.style.display = "none"

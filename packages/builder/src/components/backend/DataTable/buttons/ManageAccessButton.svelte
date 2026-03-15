@@ -16,30 +16,6 @@ let permissions
 let showPopover = true
 let dependantsInfoMessage
 
-$: fetchPermissions(resourceId)
-$: roleMismatch = checkRoleMismatch(permissions)
-$: selectedRoleID = roleMismatch ? null : permissions?.[0]?.value
-$: selectedRole = $roles.find((x) => x._id === selectedRoleID)
-$: selectedRoleColor = selectedRole?.uiMetadata?.color
-$: selectedRoleHighlight = selectedRoleColor
-  ? window
-      .getComputedStyle(document.body)
-      .getPropertyValue(selectedRoleColor.substring(4, selectedRoleColor.length - 1))
-  : "#ff0000"
-
-$: readableRole = selectedRoleID ? selectedRole?.uiMetadata.displayName : null
-$: buttonLabel = readableRole ? `Access: ${readableRole}` : "Access"
-
-$: builtInRoles = builtins.map((roleId) => $roles.find((x) => x._id === roleId)).filter((r) => !!r)
-$: customRoles = $roles
-  .filter((x) => !builtins.includes(x._id))
-  .slice()
-  .toSorted((a, b) => {
-    const aName = a.uiMetadata.displayName || a.name
-    const bName = b.uiMetadata.displayName || b.name
-    return aName < bName ? -1 : 1
-  })
-
 const fetchPermissions = async (id) => {
   const res = await permissionsStore.forResourceDetailed(id)
   permissions = Object.entries(res?.permissions || {}).map(([perm, info]) => {
@@ -87,6 +63,32 @@ const changePermission = async (role) => {
     notifications.error("Error updating permissions")
   }
 }
+
+$: fetchPermissions(resourceId)
+$: roleMismatch = checkRoleMismatch(permissions)
+$: selectedRoleID = roleMismatch ? null : permissions?.[0]?.value
+$: selectedRole = $roles.find((x) => x._id === selectedRoleID)
+$: selectedRoleColor = selectedRole?.uiMetadata?.color
+$: selectedRoleHighlight = selectedRoleColor
+  ? window
+      .getComputedStyle(document.body)
+      .getPropertyValue(selectedRoleColor.substring(4, selectedRoleColor.length - 1))
+  : "#ff0000"
+
+$: readableRole = selectedRoleID ? selectedRole?.uiMetadata.displayName : null
+$: buttonLabel = readableRole ? `Access: ${readableRole}` : "Access"
+
+$: builtInRoles = builtins
+  .map((roleId) => $roles.find((x) => x._id === roleId))
+  .filter((r) => Boolean(r))
+$: customRoles = $roles
+  .filter((x) => !builtins.includes(x._id))
+  .slice()
+  .toSorted((a, b) => {
+    const aName = a.uiMetadata.displayName || a.name
+    const bName = b.uiMetadata.displayName || b.name
+    return aName < bName ? -1 : 1
+  })
 </script>
 
 <DetailPopover title="Select access role" {showPopover}>

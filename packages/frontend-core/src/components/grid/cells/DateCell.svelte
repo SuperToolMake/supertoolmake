@@ -15,23 +15,6 @@ export let startDayOfWeek = "Monday"
 let isOpen
 let anchor
 
-$: timeOnly = schema?.timeOnly
-$: enableTime = !schema?.dateOnly
-$: ignoreTimezones = schema?.ignoreTimezones
-$: editable = focused && !readonly
-$: parsedValue = Helpers.parseDate(value, {
-  timeOnly,
-  enableTime,
-  ignoreTimezones,
-})
-$: displayValue = getDisplayValue(parsedValue, timeOnly, enableTime)
-// Ensure open state matches desired state
-$: {
-  if (!focused && isOpen) {
-    close()
-  }
-}
-
 const getDisplayValue = (value, timeOnly, enableTime) => {
   return Helpers.getDateDisplayValue(value, {
     enableTime,
@@ -82,6 +65,23 @@ const changeDate = (quantity, unit) => {
     timeOnly,
     ignoreTimezones,
   })
+}
+
+$: timeOnly = schema?.timeOnly
+$: enableTime = !schema?.dateOnly
+$: ignoreTimezones = schema?.ignoreTimezones
+$: editable = focused && !readonly
+$: parsedValue = Helpers.parseDate(value, {
+  timeOnly,
+  enableTime,
+  ignoreTimezones,
+})
+$: displayValue = getDisplayValue(parsedValue, timeOnly, enableTime)
+// Ensure open state matches desired state
+$: {
+  if (!focused && isOpen) {
+    close()
+  }
 }
 
 onMount(() => {

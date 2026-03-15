@@ -51,7 +51,7 @@ export class RoleStore extends DerivedBudiStore<Role[], UIRole[]> {
   }
 
   delete = async (role: Role) => {
-    if (!role._id || !role._rev) {
+    if (!(role._id && role._rev)) {
       return
     }
     await API.deleteRole(role._id, role._rev)

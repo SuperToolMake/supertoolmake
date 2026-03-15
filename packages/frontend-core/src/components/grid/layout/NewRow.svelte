@@ -41,16 +41,6 @@ let isAdding = false
 let newRow
 let offset = 0
 
-$: firstColumn = $visibleColumns[0]
-$: width = GutterWidth + ($displayColumn?.width || 0)
-$: $datasource, (visible = false)
-$: selectedRowCount = Object.values($selectedRows).length
-$: hasNoRows = !$rows.length
-$: renderedRowCount = $renderedRows.length
-$: offset = getOffset($hasNextPage, renderedRowCount, $rowHeight, $scrollTop)
-$: spaceBelow = $height - offset - $rowHeight
-$: flipButtons = spaceBelow < 36 + DefaultRowHeight
-
 const getOffset = (hasNextPage, rowCount, rowHeight, scrollTop) => {
   // If we have a next page of data then we aren't truly at the bottom, so we
   // render the add row component at the top
@@ -150,6 +140,19 @@ const handleKeyPress = (e) => {
     }
   }
 }
+
+$: firstColumn = $visibleColumns[0]
+$: width = GutterWidth + ($displayColumn?.width || 0)
+$: {
+  $datasource
+  visible = false
+}
+$: selectedRowCount = Object.values($selectedRows).length
+$: hasNoRows = !$rows.length
+$: renderedRowCount = $renderedRows.length
+$: offset = getOffset($hasNextPage, renderedRowCount, $rowHeight, $scrollTop)
+$: spaceBelow = $height - offset - $rowHeight
+$: flipButtons = spaceBelow < 36 + DefaultRowHeight
 
 onMount(() => subscribe("add-row-inline", startAdding))
 onDestroy(() => {

@@ -1,7 +1,7 @@
-import crypto from "crypto"
-import fs from "fs"
-import { join } from "path"
-import zlib from "zlib"
+import crypto from "node:crypto"
+import fs from "node:fs"
+import { join } from "node:path"
+import zlib from "node:zlib"
 import env from "../environment"
 
 const ALGO = "aes-256-ctr"
@@ -24,7 +24,6 @@ export function getSecret(secretOption: SecretOption): string {
       secret = env.ENCRYPTION_KEY
       secretName = "ENCRYPTION_KEY"
       break
-    case SecretOption.API:
     default:
       secret = env.API_ENCRYPTION_KEY
       secretName = "API_ENCRYPTION_KEY"
@@ -158,11 +157,11 @@ function readBytes(stream: fs.ReadStream, length: number) {
     const data: Buffer[] = []
 
     stream.on("readable", () => {
-      let chunk
-
-      while ((chunk = stream.read(length - bytesRead)) !== null) {
+      let chunk = stream.read(length - bytesRead)
+      while (chunk !== null) {
         data.push(chunk)
         bytesRead += chunk.length
+        chunk = stream.read(length - bytesRead)
       }
 
       resolve(Buffer.concat(data.map((buf) => new Uint8Array(buf))))

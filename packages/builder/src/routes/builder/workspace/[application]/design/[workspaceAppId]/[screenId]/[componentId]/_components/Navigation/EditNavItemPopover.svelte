@@ -36,6 +36,13 @@ let popover
 let open = false
 let drawerCount = 0
 
+const update = (setting) => async (value) => {
+  dispatch("change", {
+    ...navItem,
+    [setting]: value,
+  })
+}
+
 $: urlOptions = screenStore.routes
 
 // Auto hide the component when another item is selected
@@ -47,13 +54,6 @@ $: if (open && $draggable.selected !== navItem.id) {
 $: if (!open && $draggable.selected === navItem.id && popover) {
   popover.show()
   open = true
-}
-
-const update = (setting) => async (value) => {
-  dispatch("change", {
-    ...navItem,
-    [setting]: value,
-  })
 }
 </script>
 

@@ -1,7 +1,7 @@
+import type http from "node:http"
 import { auth, permissions } from "@budibase/backend-core"
 import { GridSocketEvent } from "@budibase/shared-core"
 import type { Ctx, Row, Table, WorkspaceApp } from "@budibase/types"
-import type http from "http"
 import type Koa from "koa"
 import { userAgent } from "koa-useragent"
 import type { Socket } from "socket.io"
@@ -27,7 +27,7 @@ export default class GridSocket extends BaseSocket {
       let valid = true
 
       // Validate datasource
-      if (!resourceId || !appId) {
+      if (!(resourceId && appId)) {
         // Ignore if no table or app specified
         valid = false
       }
@@ -64,7 +64,7 @@ export default class GridSocket extends BaseSocket {
           const sessions = await this.getRoomSessions(room)
           callback({ users: sessions })
         })
-      } catch (error) {
+      } catch {
         socket.disconnect(true)
       }
     })

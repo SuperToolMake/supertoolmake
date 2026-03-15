@@ -20,14 +20,13 @@ export function isDeprecatedSingleUserColumn(
 
 export function isRequired(constraints: FieldConstraints | undefined) {
   const isRequired =
-    !!constraints &&
-    ((typeof constraints.presence !== "boolean" && constraints.presence?.allowEmpty === false) ||
-      constraints.presence === true)
+    (typeof constraints?.presence !== "boolean" && constraints?.presence?.allowEmpty === false) ||
+    constraints?.presence === true
   return isRequired
 }
 
 export function decodeNonAscii(str: string): string {
-  return str.replace(/\\u([0-9a-fA-F]{4})/g, (match, p1) => String.fromCharCode(parseInt(p1, 16)))
+  return str.replace(/\\u([0-9a-fA-F]{4})/g, (_match, p1) => String.fromCharCode(parseInt(p1, 16)))
 }
 
 export function isNumeric(field: FieldSchema) {

@@ -62,7 +62,7 @@ export async function updateLock(devAppId: string, user: ContextUser) {
     ...user,
     userId: globalId,
     _id: globalId,
-    lockedAt: new Date().getTime(),
+    lockedAt: Date.now(),
   }
 
   await devAppClient.store(devAppId, inputUser, APP_DEV_LOCK_SECONDS)
@@ -90,7 +90,7 @@ export async function setDebounce(id: string, seconds: number) {
 
 export async function checkTestFlag(id: string) {
   const flag = await flagClient?.get(id)
-  return !!(flag && flag.testing)
+  return Boolean(flag?.testing)
 }
 
 export async function withTestFlag<R>(id: string, fn: () => Promise<R>) {

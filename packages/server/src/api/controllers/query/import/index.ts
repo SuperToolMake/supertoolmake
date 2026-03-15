@@ -132,7 +132,10 @@ export class RestImporter {
     if (!datasource) {
       return
     }
-    const config = datasource.config || (datasource.config = {})
+    if (!datasource.config) {
+      datasource.config = {}
+    }
+    const config = datasource.config
     const defaults = this.getStaticServerVariables()
     const tokens = Object.keys(defaults || {}).filter(Boolean)
     if (tokens.length) {
@@ -174,7 +177,7 @@ export class RestImporter {
     let datasource: Datasource | undefined
     try {
       datasource = await db.get<Datasource>(datasourceId)
-    } catch (_err) {
+    } catch {
       return {}
     }
     const staticVariables = datasource?.config?.staticVariables

@@ -8,10 +8,6 @@ import { permissions } from "@/stores/builder"
 export let query: Query
 export let label
 
-$: getPermissions(query)
-
-let roleId: string, loaded: boolean, fetched: Query | undefined
-
 async function updateRole(role: string) {
   try {
     roleId = role
@@ -25,7 +21,7 @@ async function updateRole(role: string) {
         })
       }
     }
-  } catch (error) {
+  } catch {
     notifications.error("Error updating role")
   }
 }
@@ -36,18 +32,22 @@ async function getPermissions(queryToFetch: Query) {
     return
   }
   fetched = queryToFetch
-  if (!queryToFetch || !queryToFetch._id) {
+  if (!queryToFetch?._id) {
     roleId = Constants.Roles.BASIC
     loaded = true
     return
   }
   try {
-    roleId = (await permissions.forResource(queryToFetch._id))["read"].role
-  } catch (err) {
+    roleId = (await permissions.forResource(queryToFetch._id)).read.role
+  } catch {
     roleId = Constants.Roles.BASIC
   }
   loaded = true
 }
+
+$: getPermissions(query)
+
+let roleId: string, loaded: boolean, fetched: Query | undefined
 </script>
 
 {#if loaded}

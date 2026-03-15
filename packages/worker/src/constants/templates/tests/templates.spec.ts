@@ -1,5 +1,5 @@
+import { join } from "node:path"
 import { EmailTemplatePurpose, type Template } from "@budibase/types"
-import { join } from "path"
 import { TestConfiguration } from "../../../tests"
 import { addBaseTemplates, loadTemplateConfig } from ".."
 

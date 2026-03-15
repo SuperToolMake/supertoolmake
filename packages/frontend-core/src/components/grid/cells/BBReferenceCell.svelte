@@ -11,16 +11,6 @@ export let schema
 const { API } = getContext("grid")
 const { type, subtype } = schema
 
-$: schema = {
-  ...$$props.schema,
-  // This is not really used, just adding some content to be able to render the relationship cell
-  tableId: "external",
-  relationshipType:
-    type === FieldType.BB_REFERENCE_SINGLE || helpers.schema.isDeprecatedSingleUserColumn(schema)
-      ? RelationshipType.ONE_TO_MANY
-      : RelationshipType.MANY_TO_MANY,
-}
-
 async function searchFunction(_tableId, searchParams) {
   if (subtype !== BBReferenceFieldSubType.USER && subtype !== BBReferenceFieldSubType.USERS) {
     throw `Search for '${subtype}' not implemented`
@@ -39,6 +29,16 @@ async function searchFunction(_tableId, searchParams) {
     data: undefined,
     rows: results.data,
   }
+}
+
+$: schema = {
+  ...$$props.schema,
+  // This is not really used, just adding some content to be able to render the relationship cell
+  tableId: "external",
+  relationshipType:
+    type === FieldType.BB_REFERENCE_SINGLE || helpers.schema.isDeprecatedSingleUserColumn(schema)
+      ? RelationshipType.ONE_TO_MANY
+      : RelationshipType.MANY_TO_MANY,
 }
 </script>
 

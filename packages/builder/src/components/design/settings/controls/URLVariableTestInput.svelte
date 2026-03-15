@@ -8,15 +8,6 @@ export let baseRoute = ""
 
 let testValue: string | undefined
 
-$: routeParams = baseRoute.match(/:[a-zA-Z]+/g) || []
-$: hasUrlParams = routeParams.length > 0
-$: placeholder = getPlaceholder(baseRoute)
-$: baseInput = createBaseInput(baseRoute)
-$: updateTestValueFromContext($previewStore.selectedComponentContext)
-$: if ($selectedScreen) {
-  testValue = ""
-}
-
 const getPlaceholder = (route: string) => {
   const trimmed = route.replace(/\/$/, "")
   if (trimmed.startsWith("/:")) {
@@ -56,6 +47,15 @@ const createBaseInput = (baseRoute: string) => {
 
 const onVariableChange = (e: CustomEvent) => {
   previewStore.setUrlTestData({ route: baseRoute, testValue: e.detail })
+}
+
+$: routeParams = baseRoute.match(/:[a-zA-Z]+/g) || []
+$: hasUrlParams = routeParams.length > 0
+$: placeholder = getPlaceholder(baseRoute)
+$: baseInput = createBaseInput(baseRoute)
+$: updateTestValueFromContext($previewStore.selectedComponentContext)
+$: if ($selectedScreen) {
+  testValue = ""
 }
 
 onMount(() => {

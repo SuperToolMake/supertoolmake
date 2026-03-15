@@ -13,11 +13,6 @@ type DataBinding = {
   readableBinding: string
 }
 
-$: previewContext = $previewStore.selectedComponentContext || {}
-$: selectedComponentId = $componentStore.selectedComponentId
-$: context = makeContext(previewContext, bindings)
-$: bindings = getBindableProperties($selectedScreen, selectedComponentId)
-
 const makeContext = (previewContext: Record<string, any>, bindings: DataBinding[]) => {
   // Create a single big array to enrich in one go
   const bindingStrings = bindings.map((binding) => {
@@ -53,6 +48,11 @@ const copyBinding = (e: JSONViewerClickEvent) => {
   Helpers.copyToClipboard(readableBinding)
   notifications.success("Binding copied to clipboard")
 }
+
+$: previewContext = $previewStore.selectedComponentContext || {}
+$: selectedComponentId = $componentStore.selectedComponentId
+$: context = makeContext(previewContext, bindings)
+$: bindings = getBindableProperties($selectedScreen, selectedComponentId)
 
 onMount(previewStore.requestComponentContext)
 </script>

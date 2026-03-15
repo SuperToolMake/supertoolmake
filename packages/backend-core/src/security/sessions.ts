@@ -123,7 +123,7 @@ export async function endSession(userId: string, sessionId: string) {
 }
 
 export async function getSession(userId: string, sessionId: string): Promise<Session> {
-  if (!userId || !sessionId) {
+  if (!(userId && sessionId)) {
     throw new Error(`Invalid session details - ${userId} - ${sessionId}`)
   }
   const client = await redis.getSessionClient()

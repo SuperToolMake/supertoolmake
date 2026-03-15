@@ -58,8 +58,12 @@ export async function processAutoColumn(
   // if a row doesn't have a revision then it doesn't exist yet
   const creating = !row._rev
   // check its not user table, or whether any of the processing options have been disabled
-  const shouldUpdateUserFields =
-    !isUserTable && !opts?.reprocessing && !opts?.noAutoRelationships && !noUser
+  const shouldUpdateUserFields = !(
+    isUserTable ||
+    opts?.reprocessing ||
+    opts?.noAutoRelationships ||
+    noUser
+  )
 
   let autoIdAllocations: Record<string, number> = {}
   if (creating) {
@@ -123,7 +127,7 @@ export async function processAutoColumn(
 }
 
 async function processDefaultValues(table: Table, row: Row) {
-  const ctx: { ["Current User"]?: User; user?: User } = {}
+  const ctx: { "Current User"?: User; user?: User } = {}
 
   const identity = context.getIdentity()
   if (identity?._id && identity.type === IdentityType.USER) {
@@ -162,7 +166,7 @@ async function processDefaultValues(table: Table, row: Row) {
 /**
  * This will coerce a value to the correct types based on the type transform map
  * @param value The value to coerce
- * @param type The type fo coerce to
+ *e
  * @returns The coerced value
  */
 export function coerce(value: string | Date | string[], type: FieldType) {
@@ -170,7 +174,6 @@ export function coerce(value: string | Date | string[], type: FieldType) {
   if (!TYPE_TRANSFORM_MAP[type]) {
     return value
   }
-  // eslint-disable-next-line no-prototype-builtins
   if (Object.hasOwn(TYPE_TRANSFORM_MAP[type], value as PropertyKey)) {
     // @ts-expect-error
     return TYPE_TRANSFORM_MAP[type][value]
@@ -205,7 +208,7 @@ export async function inputProcessing(
       ? isExternalColumnName(key)
       : isInternalColumnName(key)
     // cleanse fields that aren't in the schema
-    if (!field && !isBuiltinColumn) {
+    if (!(field || isBuiltinColumn)) {
       delete clonedRow[key]
     }
     // field isn't found - might be a built-in column, skip over it
@@ -225,7 +228,7 @@ export async function inputProcessing(
     }
   }
 
-  if (!clonedRow._id || !clonedRow._rev) {
+  if (!(clonedRow._id && clonedRow._rev)) {
     clonedRow._id = row._id
     clonedRow._rev = row._rev
   }
@@ -260,7 +263,7 @@ export async function outputProcessing<T extends Row[] | Row>(
 ): Promise<T> {
   let safeRows: Row[]
   let wasArray = true
-  if (!(rows instanceof Array)) {
+  if (!Array.isArray(rows)) {
     safeRows = [rows]
     wasArray = false
   } else {
@@ -322,8 +325,8 @@ export async function coreOutputProcessing(
       for (const row of rows) {
         if (typeof row[property] === "string") {
           const dateStr = row[property]
-          row[property] = new Date(dateStr + "Z")
-          if (isNaN(row[property].getTime())) {
+          row[property] = new Date(`${dateStr}Z`)
+          if (Number.isNaN(row[property].getTime())) {
             row[property] = new Date(dateStr)
           }
         }
@@ -335,8 +338,8 @@ export async function coreOutputProcessing(
       for (const row of rows) {
         if (typeof row[property] === "string") {
           const dateStr = row[property]
-          row[property] = new Date(dateStr + "Z")
-          if (isNaN(row[property].getTime())) {
+          row[property] = new Date(`${dateStr}Z`)
+          if (Number.isNaN(row[property].getTime())) {
             row[property] = new Date(dateStr)
           }
         }

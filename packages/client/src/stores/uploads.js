@@ -5,7 +5,7 @@ export const createUploadStore = () => {
 
   // Registers a new file upload component
   const registerFileUpload = (componentId, callback) => {
-    if (!componentId || !callback) {
+    if (!(componentId && callback)) {
       return
     }
 

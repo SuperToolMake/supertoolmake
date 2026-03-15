@@ -34,46 +34,6 @@ let creating = false
 let defaultAppName: string
 let template: AppTemplate | null = null
 
-$: {
-  const { url } = $values
-
-  validation.check({
-    ...$values,
-    url: url?.[0] === "/" ? url.substring(1, url.length) : url,
-  })
-  encryptionValidation.check({ ...$values })
-}
-
-// filename should be separated to avoid updates everytime any other form element changes
-$: filename = $values.file?.name
-$: encryptedFile = !!filename && isEncryptedRegex.test(filename)
-
-onMount(async () => {
-  if ($auth.user?.firstName) {
-    const lastChar = $auth.user?.firstName
-      ? $auth.user?.firstName[$auth.user?.firstName.length - 1]
-      : null
-    defaultAppName =
-      lastChar && lastChar.toLowerCase() == "s"
-        ? `${$auth.user.firstName} workspace`
-        : `${$auth.user.firstName}s workspace`
-  } else {
-    defaultAppName = `My workspace`
-  }
-
-  $values.name = resolveAppName(template, defaultAppName)
-  nameToUrl($values.name)
-  await setupValidation()
-})
-
-$: workspacePrefix = `/workspace`
-
-$: appUrl = `${window.location.origin}${
-  $values.url
-    ? `${workspacePrefix}${$values.url}`
-    : `${workspacePrefix}${resolveAppUrl(template, $values.name)}`
-}`
-
 const resolveAppUrl = (template: AppTemplate | null, name: string) => {
   let parsedName
   const resolvedName = resolveAppName(template, name)
@@ -116,6 +76,7 @@ const setupValidation = async () => {
     url: url?.[0] === "/" ? url.substring(1, url.length) : url,
   })
 }
+
 async function createNewApp() {
   creating = true
 
@@ -168,11 +129,58 @@ async function createNewApp() {
   }
 }
 
+function onDropFile(e: CustomEvent<any[]>) {
+  $values.file = e.detail?.[0]
+  $validation.touched.file = true
+}
+
+$: {
+  const { url } = $values
+
+  validation.check({
+    ...$values,
+    url: url?.[0] === "/" ? url.substring(1, url.length) : url,
+  })
+  encryptionValidation.check({ ...$values })
+}
+
+// filename should be separated to avoid updates everytime any other form element changes
+$: filename = $values.file?.name
+$: encryptedFile = Boolean(filename) && isEncryptedRegex.test(filename ?? "")
+
+onMount(async () => {
+  if ($auth.user?.firstName) {
+    const lastChar = $auth.user?.firstName
+      ? $auth.user?.firstName[$auth.user?.firstName.length - 1]
+      : null
+    defaultAppName =
+      lastChar && lastChar.toLowerCase() == "s"
+        ? `${$auth.user.firstName} workspace`
+        : `${$auth.user.firstName}s workspace`
+  } else {
+    defaultAppName = `My workspace`
+  }
+
+  $values.name = resolveAppName(template, defaultAppName)
+  nameToUrl($values.name)
+  await setupValidation()
+})
+
+$: workspacePrefix = `/workspace`
+
+$: appUrl = `${window.location.origin}${
+  $values.url
+    ? `${workspacePrefix}${$values.url}`
+    : `${workspacePrefix}${resolveAppUrl(template, $values.name)}`
+}`
+
 const Step = { CONFIG: "config", SET_PASSWORD: "set_password" }
 let currentStep = Step.CONFIG
 
 // Check if create button should be enabled
-$: isCreateValid = template?.fromFile ? $validation.valid && !!$values.file : $validation.valid
+$: isCreateValid = template?.fromFile
+  ? $validation.valid && Boolean($values.file)
+  : $validation.valid
 
 $: stepConfig = {
   [Step.CONFIG]: {
@@ -209,11 +217,6 @@ $: stepConfig = {
     },
     isValid: $encryptionValidation.valid,
   },
-}
-
-function onDropFile(e: CustomEvent<any[]>) {
-  $values.file = e.detail?.[0]
-  $validation.touched.file = true
 }
 </script>
 

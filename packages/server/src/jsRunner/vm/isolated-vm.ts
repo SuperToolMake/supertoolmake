@@ -1,10 +1,10 @@
+import crypto from "node:crypto"
+import querystring from "node:querystring"
+import url from "node:url"
 import { iifeWrapper, UserScriptError } from "@budibase/string-templates"
 import type { Snippet, VM } from "@budibase/types"
 import bson from "bson"
-import crypto from "crypto"
 import ivm from "isolated-vm"
-import querystring from "querystring"
-import url from "url"
 import environment from "../../environment"
 import { BundleType, loadBundle } from "../bundles"
 

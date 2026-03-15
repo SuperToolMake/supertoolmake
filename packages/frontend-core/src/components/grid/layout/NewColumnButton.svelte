@@ -8,11 +8,6 @@ const { scrollableColumns, scrollLeft, width, subscribe, ui, keyboardBlocked } =
 let anchor
 let isOpen = false
 
-$: columnsWidth = $scrollableColumns.reduce((total, col) => (total += col.width), 0)
-$: end = columnsWidth - 1 - $scrollLeft
-$: left = Math.min($width - 40, end)
-$: keyboardBlocked.set(isOpen)
-
 const open = () => {
   ui.actions.blur()
   isOpen = true
@@ -21,6 +16,11 @@ const open = () => {
 const close = () => {
   isOpen = false
 }
+
+$: columnsWidth = $scrollableColumns.reduce((total, col) => (total += col.width), 0)
+$: end = columnsWidth - 1 - $scrollLeft
+$: left = Math.min($width - 40, end)
+$: keyboardBlocked.set(isOpen)
 
 onMount(() => subscribe("close-edit-column", close))
 </script>

@@ -11,7 +11,7 @@ import type { User } from "@budibase/types"
  * @return the value or null if a value was not found for this key
  */
 export const deepGet = (obj: Record<string, any> | undefined, key: string) => {
-  if (!obj || !key) {
+  if (!(obj && key)) {
     return null
   }
   if (Object.hasOwn(obj, key)) {

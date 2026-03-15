@@ -36,15 +36,12 @@ const enrichedOptions = derived(options, ($options) => {
 let openOption = null
 let anchor = null
 
-$: options.subscribe(updateConstraints)
-$: valid = $enrichedOptions.every((option) => option.valid)
-
 const updateConstraints = (options) => {
   constraints.inclusion = options.map((option) => option.name)
-  optionColors = options.reduce(
-    (colors, option) => ({ ...colors, [option.name]: option.color }),
-    {}
-  )
+  optionColors = options.reduce((colors, option) => {
+    colors[option.name] = option.color
+    return colors
+  }, {})
 }
 
 const addNewInput = async () => {
@@ -92,6 +89,9 @@ const handleNameChange = (id, name) => {
     return state.slice()
   })
 }
+
+$: options.subscribe(updateConstraints)
+$: valid = $enrichedOptions.every((option) => option.valid)
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

@@ -18,7 +18,7 @@ export async function triggerAutomation(
     headers: {
       [constants.Header.APP_ID]: appId,
       [constants.Header.API_KEY]: env.INTERNAL_API_KEY,
-      ["Content-Type"]: "application/json",
+      "Content-Type": "application/json",
     },
   })
   if (res.status >= 300) {

@@ -6,7 +6,7 @@ import { appStore, themeStore } from "@/stores/builder"
 const onChangeTheme = async (theme) => {
   try {
     await themeStore.save(theme, $appStore.appId)
-  } catch (error) {
+  } catch {
     notifications.error("Error updating theme")
   }
 }

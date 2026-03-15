@@ -4,6 +4,7 @@ import * as controllers from "./controllers"
 
 dbConfig.init()
 
+import type http from "node:http"
 import {
   constants,
   context,
@@ -23,7 +24,6 @@ import {
   type SMTPInnerConfig,
   type User,
 } from "@budibase/types"
-import type http from "http"
 import jwt, { type Secret } from "jsonwebtoken"
 import supertest from "supertest"
 import { Config } from "../constants"
@@ -157,7 +157,7 @@ class TestConfiguration {
   getTenantId() {
     try {
       return context.getTenantId()
-    } catch (e) {
+    } catch {
       return this.tenantId!
     }
   }
@@ -336,7 +336,7 @@ class TestConfiguration {
           controllers.config.destroy
         )
       }
-    } catch (err) {
+    } catch {
       // don't need to handle error
     }
   }

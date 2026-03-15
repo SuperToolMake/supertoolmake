@@ -3,7 +3,7 @@ import { params } from "@roxi/routify"
 import { onMount } from "svelte"
 import TopBar from "@/components/common/TopBar.svelte"
 import { workspaceAppStore } from "@/stores/builder"
-import type NewScreen from "../../_components/NewScreen/index.svelte"
+import NewScreen from "../../_components/NewScreen/index.svelte"
 
 $params
 

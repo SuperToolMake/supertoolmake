@@ -1,5 +1,5 @@
+import { EventEmitter } from "node:events"
 import type { ContextEmitter, EventType, Row, Table, UserBindings } from "@budibase/types"
-import { EventEmitter } from "events"
 import { rowEmission, tableEmission } from "./utils"
 
 /**

@@ -32,34 +32,6 @@ let lastSearchId
 let searching = false
 let anchor
 
-$: fieldValue = parseValue(value)
-$: oneRowOnly = schema?.relationshipType === "one-to-many"
-$: editable = focused && !readonly
-$: lookupMap = buildLookupMap(fieldValue, isOpen)
-$: debouncedSearch(searchString)
-$: {
-  if (!focused && isOpen) {
-    close()
-  }
-}
-
-$: relationshipSearchPlaceholder = primaryDisplay
-  ? pickerLabels.searchByFieldPlaceholder.replace("{field}", primaryDisplay)
-  : pickerLabels.searchPlaceholder
-
-$: relationFields = fieldValue?.reduce((acc, f) => {
-  const fields = {}
-  for (const [column] of Object.entries(schema?.columns || {}).filter(
-    ([key, column]) => column.visible !== false && f[key] !== null && f[key] !== undefined
-  )) {
-    fields[column] = f[column]
-  }
-  if (Object.keys(fields).length) {
-    acc[f._id] = fields
-  }
-  return acc
-}, {})
-
 const parseValue = (value) => {
   if (Array.isArray(value) && value.every((x) => x?._id)) {
     return value
@@ -70,7 +42,7 @@ const parseValue = (value) => {
 // Builds a lookup map to quickly check which rows are selected
 const buildLookupMap = (value, isOpen) => {
   let map = {}
-  if (!isOpen || !value?.length) {
+  if (!(isOpen && value?.length)) {
     return map
   }
   for (let i = 0; i < value.length; i++) {
@@ -91,12 +63,12 @@ const isRowSelected = (row) => {
 const search = async (searchString, force = false) => {
   // Avoid update state at all if we've already handled the update and this is
   // a wasted search due to svelte reactivity
-  if (!force && !searchString && !lastSearchString) {
+  if (!(force || searchString || lastSearchString)) {
     return
   }
 
   // Reset state if this search is invalid
-  if (!schema?.tableId || !isOpen) {
+  if (!(schema?.tableId && isOpen)) {
     lastSearchString = null
     candidateIndex = null
     searchResults = []
@@ -135,9 +107,6 @@ const search = async (searchString, force = false) => {
   candidateIndex = searchResults?.length ? 0 : null
   lastSearchString = searchString
 }
-
-// Debounced version of searching
-const debouncedSearch = debounce(search, 250)
 
 // Alphabetically sorts rows by their primary display column
 const sortRows = (rows) => {
@@ -236,6 +205,37 @@ const readable = (value) => {
   }
   return value
 }
+
+// Debounced version of searching
+const debouncedSearch = debounce(search, 250)
+
+$: fieldValue = parseValue(value)
+$: oneRowOnly = schema?.relationshipType === "one-to-many"
+$: editable = focused && !readonly
+$: lookupMap = buildLookupMap(fieldValue, isOpen)
+$: debouncedSearch(searchString)
+$: {
+  if (!focused && isOpen) {
+    close()
+  }
+}
+
+$: relationshipSearchPlaceholder = primaryDisplay
+  ? pickerLabels.searchByFieldPlaceholder.replace("{field}", primaryDisplay)
+  : pickerLabels.searchPlaceholder
+
+$: relationFields = fieldValue?.reduce((acc, f) => {
+  const fields = {}
+  for (const [column] of Object.entries(schema?.columns || {}).filter(
+    ([key, column]) => column.visible !== false && f[key] !== null && f[key] !== undefined
+  )) {
+    fields[column] = f[column]
+  }
+  if (Object.keys(fields).length) {
+    acc[f._id] = fields
+  }
+  return acc
+}, {})
 
 onMount(() => {
   api = {

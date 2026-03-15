@@ -19,7 +19,7 @@ export let customDisabled = false
 
 const dispatch = createEventDispatcher<{
   selectTemplate: TemplateSelection
-  custom: void
+  custom: undefined
 }>()
 
 let scrolling = false
@@ -34,6 +34,73 @@ let lastConnectorCount = 0
 let searchValue = ""
 let lastSearchValue = ""
 const itemsPerPage = 24
+
+const handleScroll = (event: Event) => {
+  const target = event.target as HTMLDivElement
+  scrolling = target?.scrollTop !== 0
+}
+
+const openTemplateGroup = (group: RestTemplateGroup<RestTemplateGroupName>) => {
+  if (loading) {
+    return
+  }
+  activeGroup = group
+  activeGroupTemplateName = group.templates[0]?.name || null
+}
+
+const resetGroupSelection = () => {
+  activeGroup = null
+  activeGroupTemplateName = null
+  searchValue = ""
+}
+
+const confirmGroupTemplateSelection = () => {
+  if (!(activeGroup && selectedGroupTemplate)) {
+    return
+  }
+  dispatch("selectTemplate", {
+    kind: "group",
+    groupName: activeGroup.name,
+    template: selectedGroupTemplate,
+  })
+}
+
+const handleTemplateSelection = (template: RestTemplate) => {
+  dispatch("selectTemplate", { kind: "template", template })
+}
+
+const handleCustomClick = () => {
+  dispatch("custom")
+}
+
+const handleIntersect = async (entries: IntersectionObserverEntry[]) => {
+  if (loadingMore || !hasNextPage) {
+    return
+  }
+  const isVisible = entries.some((entry) => entry.isIntersecting)
+  if (!isVisible) {
+    return
+  }
+  loadingMore = true
+  currentPage += 1
+  await tick()
+  loadingMore = false
+}
+
+const ensureObserver = () => {
+  if (!(scrollContainer && loadTrigger)) {
+    return
+  }
+  observer?.disconnect()
+  if (!observer) {
+    observer = new IntersectionObserver(handleIntersect, {
+      root: scrollContainer,
+      rootMargin: "80px",
+      threshold: 0.1,
+    })
+  }
+  observer.observe(loadTrigger)
+}
 
 $: normalizedSearchValue = searchValue.trim().toLowerCase()
 $: if (normalizedSearchValue !== lastSearchValue) {
@@ -111,73 +178,6 @@ $: selectedGroupTemplate =
 $: selectedGroupTemplateDescription = activeGroupOptions.find(
   (option) => option.value === activeGroupTemplateName
 )?.description
-
-const handleScroll = (event: Event) => {
-  const target = event.target as HTMLDivElement
-  scrolling = target?.scrollTop !== 0
-}
-
-const openTemplateGroup = (group: RestTemplateGroup<RestTemplateGroupName>) => {
-  if (loading) {
-    return
-  }
-  activeGroup = group
-  activeGroupTemplateName = group.templates[0]?.name || null
-}
-
-const resetGroupSelection = () => {
-  activeGroup = null
-  activeGroupTemplateName = null
-  searchValue = ""
-}
-
-const confirmGroupTemplateSelection = () => {
-  if (!activeGroup || !selectedGroupTemplate) {
-    return
-  }
-  dispatch("selectTemplate", {
-    kind: "group",
-    groupName: activeGroup.name,
-    template: selectedGroupTemplate,
-  })
-}
-
-const handleTemplateSelection = (template: RestTemplate) => {
-  dispatch("selectTemplate", { kind: "template", template })
-}
-
-const handleCustomClick = () => {
-  dispatch("custom")
-}
-
-const handleIntersect = async (entries: IntersectionObserverEntry[]) => {
-  if (loadingMore || !hasNextPage) {
-    return
-  }
-  const isVisible = entries.some((entry) => entry.isIntersecting)
-  if (!isVisible) {
-    return
-  }
-  loadingMore = true
-  currentPage += 1
-  await tick()
-  loadingMore = false
-}
-
-const ensureObserver = () => {
-  if (!scrollContainer || !loadTrigger) {
-    return
-  }
-  observer?.disconnect()
-  if (!observer) {
-    observer = new IntersectionObserver(handleIntersect, {
-      root: scrollContainer,
-      rootMargin: "80px",
-      threshold: 0.1,
-    })
-  }
-  observer.observe(loadTrigger)
-}
 
 onMount(() => {
   ensureObserver()

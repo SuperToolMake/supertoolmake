@@ -40,7 +40,7 @@ export const Pages = {
     const component = componentMap[key]
     if (!component) {
       console.error(`Component not found for key: ${key}`)
-      return undefined
+      return
     }
 
     return component

@@ -48,7 +48,7 @@ export const styleable = (node, styles = {}) => {
     }
 
     // Allow dragging if required
-    node.setAttribute("draggable", !!newStyles.draggable)
+    node.setAttribute("draggable", Boolean(newStyles.draggable))
 
     // Applies a style string to a DOM node
     const applyStyles = (styleString) => {

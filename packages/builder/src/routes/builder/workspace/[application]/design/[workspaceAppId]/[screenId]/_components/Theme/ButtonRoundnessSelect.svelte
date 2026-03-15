@@ -7,11 +7,11 @@ export let customTheme
 const dispatch = createEventDispatcher()
 const options = ["0", "4px", "8px", "16px"]
 
-$: index = options.indexOf(customTheme.buttonBorderRadius) ?? 2
-
 const onChange = async (e) => {
   dispatch("change", options[e.detail])
 }
+
+$: index = options.indexOf(customTheme.buttonBorderRadius) ?? 2
 </script>
 
 <div class="container">

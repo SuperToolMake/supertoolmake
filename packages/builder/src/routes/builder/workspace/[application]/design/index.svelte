@@ -12,14 +12,14 @@ import {
 } from "@budibase/bbui"
 import { PublishResourceState, type UIWorkspaceApp, WorkspaceResource } from "@budibase/types"
 import { url } from "@roxi/routify"
-import type ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
+import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
 import PublishStatusBadge from "@/components/common/PublishStatusBadge.svelte"
 import TopBar from "@/components/common/TopBar.svelte"
 import VersionModal from "@/components/deploy/VersionModal.svelte"
 import { capitalise, durationFromNow } from "@/helpers"
 import { buildLiveUrl } from "@/helpers/urls"
 import FavouriteResourceButton from "@/routes/builder/_components/FavouriteResourceButton.svelte"
-import type WorkspaceAppModal from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/_components/WorkspaceApp/WorkspaceAppModal.svelte"
+import WorkspaceAppModal from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/_components/WorkspaceApp/WorkspaceAppModal.svelte"
 import {
   appStore,
   contextMenuStore,
@@ -38,30 +38,6 @@ let workspaceAppModal: WorkspaceAppModal
 let confirmDeleteDialog: ConfirmDialog
 let appChangingStatus: string | undefined
 let versionModal: ShowUI
-
-$: favourites = workspaceFavouriteStore.lookup
-$: updateAvailable =
-  $appStore.upgradableVersion &&
-  $appStore.version &&
-  $appStore.upgradableVersion !== $appStore.version
-
-const filters: {
-  label: string
-  filterValue: PublishResourceState | undefined
-}[] = [
-  {
-    label: "All apps",
-    filterValue: undefined,
-  },
-  {
-    label: "Live",
-    filterValue: PublishResourceState.PUBLISHED,
-  },
-  {
-    label: "Off",
-    filterValue: PublishResourceState.DISABLED,
-  },
-]
 
 const deleteWorkspaceApp = async () => {
   if (!selectedWorkspaceApp) {
@@ -134,7 +110,7 @@ const getContextMenuOptions = (workspaceApp: UIWorkspaceApp) => {
     {
       icon: "globe-simple",
       name: "View live app",
-      visible: !!liveUrl,
+      visible: Boolean(liveUrl),
       callback: () => openLiveWorkspaceApp(liveUrl),
     },
 
@@ -173,6 +149,30 @@ const createApp = () => {
   workspaceAppModal.show()
 }
 
+$: favourites = workspaceFavouriteStore.lookup
+$: updateAvailable =
+  $appStore.upgradableVersion &&
+  $appStore.version &&
+  $appStore.upgradableVersion !== $appStore.version
+
+const filters: {
+  label: string
+  filterValue: PublishResourceState | undefined
+}[] = [
+  {
+    label: "All apps",
+    filterValue: undefined,
+  },
+  {
+    label: "Live",
+    filterValue: PublishResourceState.PUBLISHED,
+  },
+  {
+    label: "Off",
+    filterValue: PublishResourceState.DISABLED,
+  },
+]
+
 $: workspaceApps = $workspaceAppStore.workspaceApps
 $: filteredWorkspaceApps = workspaceApps
   .filter((a) => {
@@ -192,8 +192,8 @@ $: filteredWorkspaceApps = workspaceApps
     }
   })
   .sort((a, b) => {
-    const aIsFav = !!a.favourite._id
-    const bIsFav = !!b.favourite._id
+    const aIsFav = Boolean(a.favourite._id)
+    const bIsFav = Boolean(b.favourite._id)
 
     // Group by favourite status
     if (aIsFav !== bIsFav) {

@@ -24,13 +24,14 @@ export let onOptionMouseenter = () => {}
 export let onOptionMouseleave = () => {}
 export let searchPlaceholder: string | undefined = undefined
 
-$: arrayValue = value && !Array.isArray(value) ? [value] : (value as string[])
-
-const dispatch = createEventDispatcher()
 const onChange = (e: any) => {
   value = e.detail
   dispatch("change", e.detail)
 }
+
+$: arrayValue = value && !Array.isArray(value) ? [value] : (value as string[])
+
+const dispatch = createEventDispatcher()
 </script>
 
 <Field {helpText} {label} {labelPosition} {error}>

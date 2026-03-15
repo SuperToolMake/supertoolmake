@@ -387,7 +387,7 @@ class PostgresIntegration extends Sql implements DatasourcePlus {
     this.index = 1
     // need to handle a specific issue with json data types in postgres,
     // new lines inside the JSON data will break it
-    if (query && query.sql) {
+    if (query?.sql) {
       const matches = query.sql.match(JSON_REGEX)
       if (matches && matches.length > 0) {
         for (const match of matches) {
@@ -436,7 +436,7 @@ class PostgresIntegration extends Sql implements DatasourcePlus {
           tableKeys[tableName].push(key)
         }
       }
-    } catch (err) {
+    } catch {
       tableKeys = {}
     }
 
@@ -450,11 +450,12 @@ class PostgresIntegration extends Sql implements DatasourcePlus {
       // Fetch enum values
       const enumsResponse = await this.client.query(this.ENUM_VALUES())
       // output array, allows for more than 1 single-select to be used at a time
-      const enumValues = enumsResponse.rows?.reduce((acc, row) => {
-        return {
-          ...acc,
-          [row.typname]: [...(acc[row.typname] || []), row.enumlabel],
+      const enumValues = enumsResponse.rows?.reduce<Record<string, string[]>>((acc, row) => {
+        if (!acc[row.typname]) {
+          acc[row.typname] = []
         }
+        acc[row.typname].push(row.enumlabel)
+        return acc
       }, {})
 
       for (const column of columnsResponse.rows) {
@@ -462,7 +463,7 @@ class PostgresIntegration extends Sql implements DatasourcePlus {
         const columnName: string = column.column_name
 
         // table key doesn't exist yet
-        if (!tables[tableName] || !tables[tableName].schema) {
+        if (!tables[tableName]?.schema) {
           tables[tableName] = {
             type: "table",
             _id: buildExternalTableId(datasourceId, tableName),
@@ -474,10 +475,8 @@ class PostgresIntegration extends Sql implements DatasourcePlus {
           }
         }
 
-        const identity = !!(
-          column.identity_generation ||
-          column.identity_start ||
-          column.identity_increment
+        const identity = Boolean(
+          column.identity_generation || column.identity_start || column.identity_increment
         )
         const hasDefault = column.column_default != null
         const hasNextVal =

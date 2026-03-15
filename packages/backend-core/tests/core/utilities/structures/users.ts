@@ -72,16 +72,13 @@ export const appBuilderUser = (appId: string, userProps?: any): BuilderUser => {
 export function ssoUser(opts: { user?: any; details?: SSOAuthDetails } = {}): SSOUser {
   const base = user(opts.user)
   delete base.password
-
-  if (!opts.details) {
-    opts.details = authDetails(base)
-  }
+  const details = opts.details ?? authDetails(base)
 
   return {
     ...base,
     forceResetPassword: false,
-    oauth2: opts.details?.oauth2,
-    provider: opts.details?.provider!,
-    providerType: opts.details?.providerType!,
+    oauth2: details.oauth2,
+    provider: details.provider,
+    providerType: details.providerType,
   }
 }

@@ -5,7 +5,7 @@ export let icon = ""
 export let onClick = () => {}
 export let selected = false
 
-$: useIcon = !!icon
+$: useIcon = Boolean(icon)
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -15,7 +15,7 @@ $: useIcon = !!icon
     <i class={icon}></i>
   {:else}
     <span>
-      <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+      <!-- biome-ignore lint: svelte/no-at-html-tags -->
       {@html text}
     </span>
   {/if}

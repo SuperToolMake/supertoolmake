@@ -8,7 +8,7 @@ export const createValidatedNameStore = (name: string, isVisible: boolean) => {
   const errorStore = writable<string | null>(null)
 
   const validate = async () => {
-    if (!isVisible || !get(isActiveStore)) {
+    if (!(isVisible && get(isActiveStore))) {
       return true
     }
 

@@ -22,8 +22,10 @@ export const validateFilters = (filters: SearchFilters, validFields: string[]) =
 
       for (const key of Object.keys(filter)) {
         if (
-          !validFields.includes(key.toLowerCase()) &&
-          !validFields.includes(db.removeKeyNumbering(key).toLowerCase())
+          !(
+            validFields.includes(key.toLowerCase()) ||
+            validFields.includes(db.removeKeyNumbering(key).toLowerCase())
+          )
         ) {
           throw new HTTPError(`Invalid filter field: ${key}`, 400)
         }

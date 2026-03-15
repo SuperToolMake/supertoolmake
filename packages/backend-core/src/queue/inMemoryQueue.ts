@@ -1,6 +1,6 @@
+import events from "node:events"
 import { helpers } from "@budibase/shared-core"
 import type { DoneCallback, Job, JobId, JobInformation } from "bull"
-import events from "events"
 import { newid, timeout } from "../utils"
 import type { JobOptions, Queue, QueueOptions } from "./queue"
 

@@ -21,16 +21,18 @@ interface Breadcrumb {
   let publishPopoverAnchor: HTMLElement | undefined
   let publishSuccessPopover: PopoverAPI | undefined
 
-  $: hasBeenPublished($deploymentStore.publishCount)
-
-  let publishCount = 0
-
   const hasBeenPublished = (count: number) => {
     if (publishCount < count) {
       publishCount = count
       publishSuccessPopover?.show()
     }
   }
+
+$: hasBeenPublished($deploymentStore.publishCount)
+
+  let publishCount = 0
+
+  
 </script>
 
 <div class="top-bar">

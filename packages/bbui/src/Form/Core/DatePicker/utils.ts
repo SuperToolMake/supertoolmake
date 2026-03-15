@@ -113,7 +113,7 @@ export const cleanInput = ({ max, pad, fallback }: Input) => {
     const target = e.target as HTMLInputElement
     if (target.value) {
       const value = parseInt(target.value)
-      if (isNaN(value)) {
+      if (Number.isNaN(value)) {
         target.value = fallback
       } else {
         target.value = Math.min(max, value).toString().padStart(pad, "0")

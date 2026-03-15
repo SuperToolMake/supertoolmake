@@ -27,14 +27,6 @@ const dispatch = createEventDispatcher()
 let highlightType
 let domElement
 
-$: highlightedProp = $builderStore.highlightedSetting
-$: allBindings = getAllBindings(bindings, componentBindings, nested, contextAccess)
-$: safeValue = getSafeValue(value, defaultValue, allBindings)
-$: replaceBindings = (val) => readableToRuntimeBinding(allBindings, val)
-$: isHighlighted = highlightedProp?.key === key
-$: highlightType = isHighlighted ? `highlighted-${highlightedProp?.type}` : ""
-$: highlightedProp && isHighlighted && scrollToElement(domElement)
-
 const getAllBindings = (bindings, componentBindings, nested, contextAccess) => {
   // contextAccess is a bit of an escape hatch to get around how we render
   // certain settings types by using a pseudo component definition, leading
@@ -102,6 +94,14 @@ function scrollToElement(element) {
     block: "center",
   })
 }
+
+$: highlightedProp = $builderStore.highlightedSetting
+$: allBindings = getAllBindings(bindings, componentBindings, nested, contextAccess)
+$: safeValue = getSafeValue(value, defaultValue, allBindings)
+$: replaceBindings = (val) => readableToRuntimeBinding(allBindings, val)
+$: isHighlighted = highlightedProp?.key === key
+$: highlightType = isHighlighted ? `highlighted-${highlightedProp?.type}` : ""
+$: highlightedProp && isHighlighted && scrollToElement(domElement)
 </script>
 
 <div
@@ -139,7 +139,7 @@ function scrollToElement(element) {
     />
   </div>
   {#if info}
-    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+    <!-- biome-ignore lint: svelte/no-at-html-tags -->
     <div class="text">{@html info}</div>
   {/if}
 </div>

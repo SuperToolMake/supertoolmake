@@ -11,6 +11,15 @@ export let parameters
 export let bindings: EnrichedBinding[] = []
 export let nested
 
+const getSchemaFields = (resourceId: string) => {
+  const { schema } = getSchemaForDatasourcePlus(resourceId, {})
+  return Object.values(schema || {})
+}
+
+const onFieldsChanged = (e: CustomEvent) => {
+  parameters.fields = e.detail
+}
+
 $: providerOptions = getDatasourceLikeProviders({
   asset: $selectedScreen,
   componentId: $componentStore.selectedComponentId,
@@ -26,15 +35,6 @@ $: tableOptions = $tables.list.map((table) => {
   }
 })
 $: options = [...(tableOptions || [])]
-
-const getSchemaFields = (resourceId: string) => {
-  const { schema } = getSchemaForDatasourcePlus(resourceId, {})
-  return Object.values(schema || {})
-}
-
-const onFieldsChanged = (e: CustomEvent) => {
-  parameters.fields = e.detail
-}
 </script>
 
 <div class="root">

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { type Modal, ModalCancelFrom, notifications } from "@budibase/bbui"
+import { Modal, ModalCancelFrom, notifications } from "@budibase/bbui"
 import type { SaveScreenRequest, Screen, Table } from "@budibase/types"
 import { goto } from "@roxi/routify"
 import ScreenDetailsModal from "@/components/design/ScreenDetailsModal.svelte"
@@ -43,13 +43,6 @@ let permissions: Record<
 
 let modals: Modal[] = []
 let stepIndex: number
-
-$: screens = $screenStore.screens
-
-$: {
-  modals.forEach((m) => m.hide())
-  modals[stepIndex]?.show()
-}
 
 export const show = (
   newMode: AutoScreenTypes,
@@ -242,7 +235,7 @@ const fetchPermission = (resourceId: string) => {
 
 const deletePermission = (resourceId: string) => {
   delete permissions[resourceId]
-  permissions = permissions
+  permissions = { ...permissions }
 }
 
 const handleTableOrViewToggle = ({ detail: tableOrView }: { detail: SourceOption }) => {
@@ -256,10 +249,18 @@ const handleTableOrViewToggle = ({ detail: tableOrView }: { detail: SourceOption
     selectedTables = selectedTables.filter((selected) => selected.id !== tableOrView.id)
   }
 }
+
 const onCancel = (e: CustomEvent<ModalCancelFrom>) => {
   if ([ModalCancelFrom.CANCEL_BUTTON, ModalCancelFrom.ESCAPE_KEY].includes(e.detail)) {
     stepIndex--
   }
+}
+
+$: screens = $screenStore.screens
+
+$: {
+  modals.forEach((m) => m.hide())
+  modals[stepIndex]?.show()
 }
 </script>
 

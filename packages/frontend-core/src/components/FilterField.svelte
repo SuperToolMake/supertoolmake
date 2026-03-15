@@ -22,12 +22,6 @@ const { OperatorOptions, FilterValueType } = Constants
 
 let bindingDrawer
 
-$: fieldValue = filter?.value
-$: readableValue = toReadable ? toReadable(bindings, fieldValue) : fieldValue
-$: drawerValue = toDrawerValue(fieldValue)
-$: isJS = isJSBinding(fieldValue)
-$: fieldIsValid = isValid(fieldValue)
-
 const getFieldOptions = (field) => {
   const schema = schemaFields.find((x) => x.name === field)
   return schema?.constraints?.inclusion || []
@@ -56,7 +50,7 @@ const onConfirmBinding = () => {
 }
 
 const isValidDate = (value) => {
-  return !value || !isNaN(new Date(value).valueOf())
+  return !(value && Number.isNaN(new Date(value).valueOf()))
 }
 
 const hasValidOptions = (value) => {
@@ -88,17 +82,6 @@ const hasValidLinks = (value) => {
   return links.every((link) => link.startsWith("ro_"))
 }
 
-const validationMap = {
-  date: isValidDate,
-  datetime: isValidDate,
-  bb_reference: hasValidLinks,
-  bb_reference_single: hasValidLinks,
-  array: hasValidOptions,
-  longform: (value) => !isJSBinding(value),
-  options: (value) => !isJSBinding(value) && !findHBSBlocks(value)?.length,
-  boolean: isValidBoolean,
-}
-
 const isValid = (value) => {
   const validate = validationMap[filter.type]
   return validate ? validate(value) : true
@@ -114,6 +97,23 @@ const isValid = (value) => {
 const toDrawerValue = (fieldValue) => {
   const normalised = Array.isArray(fieldValue) ? fieldValue.join(",") : readableValue
   return normalised ?? ""
+}
+
+$: fieldValue = filter?.value
+$: readableValue = toReadable ? toReadable(bindings, fieldValue) : fieldValue
+$: drawerValue = toDrawerValue(fieldValue)
+$: isJS = isJSBinding(fieldValue)
+$: fieldIsValid = isValid(fieldValue)
+
+const validationMap = {
+  date: isValidDate,
+  datetime: isValidDate,
+  bb_reference: hasValidLinks,
+  bb_reference_single: hasValidLinks,
+  array: hasValidOptions,
+  longform: (value) => !isJSBinding(value),
+  options: (value) => !(isJSBinding(value) || findHBSBlocks(value)?.length),
+  boolean: isValidBoolean,
 }
 </script>
 

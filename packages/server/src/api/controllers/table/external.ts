@@ -95,7 +95,7 @@ export async function bulkImport(ctx: UserCtx<BulkImportRequest, BulkImportRespo
     )
   }
 
-  if (!rows || !isRows(rows) || !isSchema(schema)) {
+  if (!(rows && isRows(rows) && isSchema(schema))) {
     ctx.throw(400, "Provided data import information is invalid.")
   }
 

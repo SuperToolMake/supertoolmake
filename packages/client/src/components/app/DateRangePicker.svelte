@@ -22,14 +22,8 @@ const options = [
 ]
 let value = options.includes(defaultValue) ? defaultValue : "Last 30 days"
 
-$: dataProviderId = dataProvider?.id
-$: addExtension = getAction(dataProviderId, ActionTypes.AddDataProviderQueryExtension)
-$: removeExtension = getAction(dataProviderId, ActionTypes.RemoveDataProviderQueryExtension)
-$: queryExtension = getQueryExtension(field, value)
-$: addExtension?.($component.id, queryExtension)
-
 const getQueryExtension = (field, value) => {
-  if (!field || !value) {
+  if (!(field && value)) {
     return null
   }
   let low = dayjs.utc().subtract(1, "year")
@@ -54,6 +48,12 @@ const getQueryExtension = (field, value) => {
     },
   }
 }
+
+$: dataProviderId = dataProvider?.id
+$: addExtension = getAction(dataProviderId, ActionTypes.AddDataProviderQueryExtension)
+$: removeExtension = getAction(dataProviderId, ActionTypes.RemoveDataProviderQueryExtension)
+$: queryExtension = getQueryExtension(field, value)
+$: addExtension?.($component.id, queryExtension)
 
 onDestroy(() => {
   removeExtension?.($component.id)

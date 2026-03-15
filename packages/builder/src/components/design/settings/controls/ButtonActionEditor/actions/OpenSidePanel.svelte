@@ -5,8 +5,6 @@ import { selectedScreen } from "@/stores/builder"
 
 export let parameters
 
-$: sidePanelOptions = getSidePanelOptions($selectedScreen)
-
 const getSidePanelOptions = (screen) => {
   const sidePanelComponents = findAllMatchingComponents(screen.props, (component) =>
     component._component.endsWith("/sidepanel")
@@ -16,6 +14,8 @@ const getSidePanelOptions = (screen) => {
     value: sidePanel._id,
   }))
 }
+
+$: sidePanelOptions = getSidePanelOptions($selectedScreen)
 </script>
 
 <div class="root">

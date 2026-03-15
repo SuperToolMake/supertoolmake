@@ -58,9 +58,7 @@ window.svelteLegacyInternal = svelteLegacyInternal
 window.svelte_internal = svelteLegacyInternal
 // @ts-expect-error - augmenting the window at runtime
 window.svelte_store = svelteLegacyStore
-// @ts-expect-error - augmenting the window at runtime
 window.svelteStore = svelteStore
-// @ts-expect-error - augmenting the window at runtime
 window.svelteInternal = svelteInternal
 
 // Extend global window scope
@@ -123,7 +121,7 @@ const loadBudibase = async () => {
   // Update builder store with any builder flags
   builderStore.set({
     ...get(builderStore),
-    inBuilder: !!window["##BUDIBASE_IN_BUILDER##"],
+    inBuilder: Boolean(window["##BUDIBASE_IN_BUILDER##"]),
     screen: window["##BUDIBASE_PREVIEW_SCREEN##"],
     selectedComponentId: window["##BUDIBASE_SELECTED_COMPONENT_ID##"],
     previewId: window["##BUDIBASE_PREVIEW_ID##"],
@@ -181,7 +179,7 @@ const loadBudibase = async () => {
       let stringifiedContext = null
       try {
         stringifiedContext = JSON.stringify(context)
-      } catch (error) {
+      } catch {
         // Ignore - invalid context
       }
       eventStore.actions.dispatchEvent("provide-context", {

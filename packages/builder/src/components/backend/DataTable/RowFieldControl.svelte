@@ -1,23 +1,17 @@
 <script>
 import {
-  ActionButton,
-  CoreSignature,
   DatePicker,
   Input,
   Label,
   Multiselect,
-  notifications,
   RichTextField,
   Select,
   TextArea,
   Toggle,
 } from "@budibase/bbui"
-import { SignatureModal } from "@budibase/frontend-core/src/components"
-import { API } from "@/api"
 import Dropzone from "@/components/common/Dropzone.svelte"
 import LinkedRowSelector from "@/components/common/LinkedRowSelector.svelte"
 import { capitalise } from "@/helpers"
-import { themeStore } from "@/stores/portal"
 import Editor from "../../integration/QueryEditor.svelte"
 
 export let meta
@@ -30,7 +24,7 @@ const resolveTimeStamp = (timestamp) => {
     return null
   }
   let maskedDate = new Date(`0-${timestamp}`)
-  if (maskedDate instanceof Date && !isNaN(maskedDate.getTime())) {
+  if (maskedDate instanceof Date && !Number.isNaN(maskedDate.getTime())) {
     return maskedDate
   } else {
     return null
@@ -42,35 +36,8 @@ $: type = meta?.type
 $: label = meta.name ? capitalise(meta.name) : ""
 
 const timeStamp = resolveTimeStamp(value)
-const isTimeStamp = !!timeStamp || meta?.timeOnly
-
-$: currentTheme = $themeStore?.theme
-$: darkMode = !currentTheme.includes("light")
-
-let signatureModal
+const isTimeStamp = Boolean(timeStamp) || meta?.timeOnly
 </script>
-
-<SignatureModal
-  {darkMode}
-  onConfirm={async sigCanvas => {
-    const signatureFile = sigCanvas.toFile()
-
-    let attachRequest = new FormData()
-    attachRequest.append("file", signatureFile)
-
-    try {
-      const uploadReq = await API.uploadBuilderAttachment(attachRequest)
-      const [signatureAttachment] = uploadReq
-      value = signatureAttachment
-    } catch (error) {
-      $notifications.error(error.message || "Failed to save signature")
-      value = []
-    }
-  }}
-  title={meta.name}
-  {value}
-  bind:this={signatureModal}
-/>
 
 {#if type === "options" && meta.constraints.inclusion.length !== 0}
   <Select
@@ -108,31 +75,6 @@ let signatureModal
     }}
     maximum={1}
   />
-{:else if type === "signature_single"}
-  <div class="signature">
-    <Label>{label}</Label>
-    <div class="sig-wrap" class:display={value}>
-      {#if value}
-        <CoreSignature
-          {darkMode}
-          {value}
-          editable={false}
-          on:clear={() => {
-            value = null
-          }}
-        />
-      {:else}
-        <ActionButton
-          fullWidth
-          on:click={() => {
-            signatureModal.show()
-          }}
-        >
-          Add signature
-        </ActionButton>
-      {/if}
-    </div>
-  </div>
 {:else if type === "boolean"}
   <Toggle text={label} {error} bind:value />
 {:else if type === "array" && meta.constraints.inclusion.length !== 0}
@@ -168,22 +110,3 @@ let signatureModal
 {:else}
   <Input {label} {type} {error} bind:value disabled={readonly} />
 {/if}
-
-<style>
-  .signature :global(label.spectrum-FieldLabel) {
-    padding-top: var(--spectrum-fieldlabel-padding-top);
-    padding-bottom: var(--spectrum-fieldlabel-padding-bottom);
-  }
-  .sig-wrap.display {
-    min-height: 50px;
-    justify-content: center;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    background-color: var(--spectrum-global-color-gray-50);
-    box-sizing: border-box;
-    border: var(--spectrum-alias-border-size-thin)
-      var(--spectrum-alias-border-color) solid;
-    border-radius: var(--spectrum-alias-border-radius-regular);
-  }
-</style>

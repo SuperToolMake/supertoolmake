@@ -25,7 +25,7 @@ $: customHeaderContent = $$slots["panel-header-content"]
 $: customTitleContent = $$slots["panel-title-content"]
 
 $: panelStyle =
-  customWidth && !isNaN(customWidth)
+  customWidth && !Number.isNaN(customWidth)
     ? `min-width: ${customWidth}px; width: ${customWidth}px; flex: 0 0 ${customWidth}px;`
     : resizable
       ? `flex: 1 1 auto; min-width: 260px;`

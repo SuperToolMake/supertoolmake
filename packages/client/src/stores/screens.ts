@@ -141,7 +141,7 @@ const createScreenStore = () => {
           }
 
           // Default title to app name
-          if (!layoutSettings.title && !layoutSettings.hideTitle) {
+          if (!(layoutSettings.title || layoutSettings.hideTitle)) {
             layoutSettings.title = $appStore.application?.name
           }
 

@@ -7,7 +7,7 @@ import GoogleButton from "./GoogleButton.svelte"
 
 const dispatch = createEventDispatcher()
 
-$: isGoogleConfigured = !!$organisation.googleDatasourceConfigured
+$: isGoogleConfigured = Boolean($organisation.googleDatasourceConfigured)
 </script>
 
 <ModalContent

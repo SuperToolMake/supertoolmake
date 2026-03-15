@@ -39,24 +39,6 @@ const context = getContext("context")
 
 let schema: TableSchema
 
-$: fetchSchema(dataSource)
-$: id = $component.id
-$: formattedFields = convertOldFieldFormat(fields)
-$: fieldsOrDefault = getDefaultFields(formattedFields, schema)
-$: buttonsOrDefault =
-  buttons ||
-  Utils.buildFormBlockButtonConfig({
-    _id: id,
-    showDeleteButton,
-    showSaveButton,
-    saveButtonLabel,
-    deleteButtonLabel,
-    notificationOverride,
-    actionType,
-    actionUrl,
-    dataSource,
-  })
-
 // Provide additional data context for live binding eval
 export const getAdditionalDataContext = () => {
   const id = get(component).id
@@ -110,6 +92,24 @@ const getDefaultFields = (fields: Field[], schema: TableSchema) => {
 const fetchSchema = async (datasource: { resourceId: string }) => {
   schema = (await fetchDatasourceSchema(datasource)) || {}
 }
+
+$: fetchSchema(dataSource)
+$: id = $component.id
+$: formattedFields = convertOldFieldFormat(fields)
+$: fieldsOrDefault = getDefaultFields(formattedFields, schema)
+$: buttonsOrDefault =
+  buttons ||
+  Utils.buildFormBlockButtonConfig({
+    _id: id,
+    showDeleteButton,
+    showSaveButton,
+    saveButtonLabel,
+    deleteButtonLabel,
+    notificationOverride,
+    actionType,
+    actionUrl,
+    dataSource,
+  })
 </script>
 
 <FormBlockWrapper {actionType} {dataSource} {rowId} {noRowsMessage}>

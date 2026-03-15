@@ -4643,63 +4643,6 @@
       ]
     }
   },
-  "signaturesinglefield": {
-    "name": "Signature",
-    "icon": "signature",
-    "styles": ["size"],
-    "size": {
-      "width": 400,
-      "height": 60
-    },
-    "requiredAncestors": ["form"],
-    "settings": [
-      {
-        "type": "field/signature_single",
-        "label": "Field",
-        "key": "field",
-        "required": true
-      },
-      {
-        "type": "text",
-        "label": "Label",
-        "key": "label"
-      },
-      {
-        "type": "text",
-        "label": "Help text",
-        "key": "helpText"
-      },
-      {
-        "type": "text",
-        "label": "Button text",
-        "key": "buttonText",
-        "defaultValue": "Add signature",
-        "placeholder": "Add signature"
-      },
-      {
-        "type": "boolean",
-        "label": "Disabled",
-        "key": "disabled",
-        "defaultValue": false
-      },
-      {
-        "type": "event",
-        "label": "On change",
-        "key": "onChange",
-        "context": [
-          {
-            "label": "Field Value",
-            "key": "value"
-          }
-        ]
-      },
-      {
-        "type": "validation/signature_single",
-        "label": "Validation",
-        "key": "validation"
-      }
-    ]
-  },
   "attachmentfield": {
     "name": "Attachment List",
     "icon": "files",

@@ -19,12 +19,12 @@ export function tenancy(
   const noTenancyOptions = buildMatcherRegex(noTenancyPatterns)
 
   return (async (ctx: Ctx, next: Next) => {
-    const allowNoTenant = opts.noTenancyRequired || !!matches(ctx, noTenancyOptions)
+    const allowNoTenant = opts.noTenancyRequired || Boolean(matches(ctx, noTenancyOptions))
     const tenantOpts: GetTenantIdOptions = {
       allowNoTenant,
     }
 
-    const allowQs = !!matches(ctx, allowQsOptions)
+    const allowQs = Boolean(matches(ctx, allowQsOptions))
     if (!allowQs) {
       tenantOpts.excludeStrategies = [TenantResolutionStrategy.QUERY]
     }

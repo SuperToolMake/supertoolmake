@@ -21,6 +21,55 @@ export let c1, c2, c3, c4, c5
 export let horizontal
 export let onClick
 
+function handleBarClick(bar) {
+  onClick?.({ bar })
+}
+
+const getSeries = (dataProvider, valueColumns = []) => {
+  const rows = dataProvider.rows ?? []
+
+  return valueColumns.map((column) => ({
+    name: column,
+    data: rows.map((row) => {
+      const value = row?.[column]
+
+      if (dataProvider?.schema?.[column]?.type === "datetime" && value) {
+        return Date.parse(value)
+      }
+
+      return value
+    }),
+  }))
+}
+
+const getCategories = (dataProvider, labelColumn) => {
+  const rows = dataProvider.rows ?? []
+
+  return rows.map((row) => {
+    const value = row?.[labelColumn]
+
+    // If a nullish or non-scalar type, replace it with an empty string
+    if (!["string", "number", "boolean"].includes(typeof value)) {
+      return ""
+    }
+
+    return value
+  })
+}
+
+const getFormatter = (labelType, yAxisUnits, horizontal, axis) => {
+  const isLabelAxis = (axis === "y" && horizontal) || (axis === "x" && !horizontal)
+  if (labelType === "datetime" && isLabelAxis) {
+    return formatters.Datetime
+  }
+
+  if (isLabelAxis) {
+    return formatters.Default
+  }
+
+  return formatters[yAxisUnits]
+}
+
 $: series = getSeries(dataProvider, valueColumns)
 $: categories = getCategories(dataProvider, labelColumn)
 
@@ -67,7 +116,7 @@ $: options = {
     },
     events: {
       // Clicking on a bar or group of bars
-      dataPointSelection: (event, chartContext, opts) => {
+      dataPointSelection: (_event, _chartContext, opts) => {
         const barsIndex = opts.dataPointIndex
         const row = dataProvider.rows[barsIndex]
 
@@ -99,55 +148,6 @@ $: options = {
       text: yAxisLabel,
     },
   },
-}
-
-function handleBarClick(bar) {
-  onClick?.({ bar })
-}
-
-const getSeries = (dataProvider, valueColumns = []) => {
-  const rows = dataProvider.rows ?? []
-
-  return valueColumns.map((column) => ({
-    name: column,
-    data: rows.map((row) => {
-      const value = row?.[column]
-
-      if (dataProvider?.schema?.[column]?.type === "datetime" && value) {
-        return Date.parse(value)
-      }
-
-      return value
-    }),
-  }))
-}
-
-const getCategories = (dataProvider, labelColumn) => {
-  const rows = dataProvider.rows ?? []
-
-  return rows.map((row) => {
-    const value = row?.[labelColumn]
-
-    // If a nullish or non-scalar type, replace it with an empty string
-    if (!["string", "number", "boolean"].includes(typeof value)) {
-      return ""
-    }
-
-    return value
-  })
-}
-
-const getFormatter = (labelType, yAxisUnits, horizontal, axis) => {
-  const isLabelAxis = (axis === "y" && horizontal) || (axis === "x" && !horizontal)
-  if (labelType === "datetime" && isLabelAxis) {
-    return formatters["Datetime"]
-  }
-
-  if (isLabelAxis) {
-    return formatters["Default"]
-  }
-
-  return formatters[yAxisUnits]
 }
 </script>
 

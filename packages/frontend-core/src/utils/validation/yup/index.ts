@@ -27,7 +27,7 @@ export const createValidationStore = () => {
   const validation: Writable<ValidationState> = writable(DEFAULT)
 
   const addValidator = (propertyName: string, propertyValidator: AnySchema | null) => {
-    if (!propertyValidator || !propertyName) return
+    if (!(propertyValidator && propertyName)) return
     validator[propertyName] = propertyValidator
   }
 
@@ -37,7 +37,7 @@ export const createValidationStore = () => {
     required?: boolean,
     options?: AddValidatorTypeOptions
   ) => {
-    if (!type || !propertyName) return
+    if (!(type && propertyName)) return
 
     let propertyValidator: AnySchema
 

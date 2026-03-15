@@ -10,9 +10,6 @@ export let order: OrderType = "ltr"
 export let size: "XS" | "S" = "S"
 export let tooltipPosition: TooltipPosition = TooltipPosition.Top
 
-$: uniqueUsers = unique(users)
-$: avatars = getAvatars(uniqueUsers, order)
-
 const unique = (users: UIUser[]) => {
   const uniqueUsers: Record<string, UIUser> = {}
   users.forEach((user) => {
@@ -21,7 +18,6 @@ const unique = (users: UIUser[]) => {
   return Object.values(uniqueUsers)
 }
 
-type Overflow = { _id: "overflow"; label: string }
 const getAvatars = (users: UIUser[], order: OrderType) => {
   const avatars: (Overflow | UIUser)[] = users.slice(0, 3)
   if (users.length > 3) {
@@ -45,6 +41,11 @@ const getAvatars = (users: UIUser[], order: OrderType) => {
 function isUser(value: Overflow | UIUser): value is UIUser {
   return value._id !== "overflow"
 }
+
+$: uniqueUsers = unique(users)
+$: avatars = getAvatars(uniqueUsers, order)
+
+type Overflow = { _id: "overflow"; label: string }
 </script>
 
 <div class="avatars">

@@ -23,26 +23,6 @@ let insideGrid = false
 let gridHAlign
 let gridVAlign
 
-$: id = $builderStore.selectedComponentId
-$: id, reset()
-$: component = $componentStore.selectedComponent
-$: definition = $componentStore.selectedComponentDefinition
-$: instance = componentStore.actions.getComponentInstance(id)
-$: instanceSate = $instance?.state
-$: showBar =
-  definition?.showSettingsBar !== false &&
-  !$dndIsDragging &&
-  definition &&
-  !$instanceSate?.errorState
-$: settings = getBarSettings(component, definition)
-$: isRoot = id === $builderStore.screen?.props?._id
-$: showGridStyles =
-  insideGrid && (definition?.grid?.hAlign !== "stretch" || definition?.grid?.vAlign !== "stretch")
-$: mobile = $context.device.mobile
-$: device = mobile ? Devices.Mobile : Devices.Desktop
-$: gridHAlignVar = getGridVar(device, GridParams.HAlign)
-$: gridVAlignVar = getGridVar(device, GridParams.VAlign)
-
 const reset = () => {
   observer.disconnect()
   measured = false
@@ -96,7 +76,7 @@ const updatePosition = () => {
   if (!insideGrid) {
     domBoundary = domBoundary.getElementsByClassName(`${id}-dom`)[0] || domBoundary.children?.[0]
   }
-  if (!domBoundary || !self) {
+  if (!(domBoundary && self)) {
     return reset()
   }
 
@@ -167,6 +147,30 @@ const updatePosition = () => {
   }
   measured = true
 }
+
+$: id = $builderStore.selectedComponentId
+$: {
+  id
+  reset()
+}
+$: component = $componentStore.selectedComponent
+$: definition = $componentStore.selectedComponentDefinition
+$: instance = componentStore.actions.getComponentInstance(id)
+$: instanceSate = $instance?.state
+$: showBar =
+  definition?.showSettingsBar !== false &&
+  !$dndIsDragging &&
+  definition &&
+  !$instanceSate?.errorState
+$: settings = getBarSettings(component, definition)
+$: isRoot = id === $builderStore.screen?.props?._id
+$: showGridStyles =
+  insideGrid && (definition?.grid?.hAlign !== "stretch" || definition?.grid?.vAlign !== "stretch")
+$: mobile = $context.device.mobile
+$: device = mobile ? Devices.Mobile : Devices.Desktop
+$: gridHAlignVar = getGridVar(device, GridParams.HAlign)
+$: gridVAlignVar = getGridVar(device, GridParams.VAlign)
+
 const debouncedUpdate = Utils.domDebounce(updatePosition)
 
 onMount(() => {

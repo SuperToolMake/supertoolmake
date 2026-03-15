@@ -19,21 +19,6 @@ let drawers = []
 let isOpen = false
 
 // Auto hide the component when another item is selected
-$: if (open && $draggable.selected && $draggable.selected !== componentInstance._instanceName) {
-  close()
-}
-// Open automatically if the component is marked as selected
-$: if (!open && $draggable.selected === componentInstance._id && popover) {
-  open()
-}
-
-$: componentDef = componentStore.getDefinition(componentInstance._component)
-$: parsedComponentDef = processComponentDefinitionSettings(componentDef)
-$: componentBindings = getComponentBindableProperties(
-  $selectedScreen,
-  $componentStore.selectedComponentId
-)
-
 const open = () => {
   isOpen = true
   drawers = []
@@ -76,6 +61,21 @@ const updateSetting = async (setting, value) => {
   patchFn(nestedComponentInstance)
   dispatch("change", nestedComponentInstance)
 }
+
+$: if (open && $draggable.selected && $draggable.selected !== componentInstance._instanceName) {
+  close()
+}
+// Open automatically if the component is marked as selected
+$: if (!open && $draggable.selected === componentInstance._id && popover) {
+  open()
+}
+
+$: componentDef = componentStore.getDefinition(componentInstance._component)
+$: parsedComponentDef = processComponentDefinitionSettings(componentDef)
+$: componentBindings = getComponentBindableProperties(
+  $selectedScreen,
+  $componentStore.selectedComponentId
+)
 </script>
 
 <Icon name="gear" hoverable size="S" on:click={toggleOpen} />

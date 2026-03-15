@@ -66,18 +66,12 @@ const parseQuery = (query) => {
   queryHash = JSON.stringify(newQuery)
 }
 
-$: parseQuery(query)
-
 const checkIsModified = (newQuery) => {
   const newQueryHash = JSON.stringify(newQuery)
   modified = newQueryHash !== queryHash
 
   return modified
 }
-
-const debouncedCheckIsModified = Utils.debounce(checkIsModified, 1000)
-
-$: debouncedCheckIsModified(newQuery)
 
 async function runQuery({ suppressErrors = true }) {
   try {
@@ -143,7 +137,7 @@ const handleScroll = (e) => {
 
 async function handleKeyDown(evt) {
   keys[evt.key] = true
-  if ((keys["Meta"] || keys["Control"]) && keys["Enter"]) {
+  if ((keys.Meta || keys.Control) && keys.Enter) {
     await runQuery({ suppressErrors: false })
   }
 }
@@ -151,6 +145,12 @@ async function handleKeyDown(evt) {
 function handleKeyUp(evt) {
   delete keys[evt.key]
 }
+
+$: parseQuery(query)
+
+const debouncedCheckIsModified = Utils.debounce(checkIsModified, 1000)
+
+$: debouncedCheckIsModified(newQuery)
 </script>
 
 <svelte:window on:keydown={handleKeyDown} on:keyup={handleKeyUp} />

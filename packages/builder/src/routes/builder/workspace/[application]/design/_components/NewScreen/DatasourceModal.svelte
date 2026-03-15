@@ -39,7 +39,7 @@ const getDatasources = (rawDatasources: (Datasource | UIInternalDatasource)[]) =
   const datasources = []
 
   for (const rawDatasource of rawDatasources) {
-    if (rawDatasource.source === IntegrationNames.REST || !rawDatasource["entities"]) {
+    if (rawDatasource.source === IntegrationNames.REST || !rawDatasource.entities) {
       continue
     }
 
@@ -55,11 +55,11 @@ const getDatasources = (rawDatasources: (Datasource | UIInternalDatasource)[]) =
   return datasources
 }
 
-$: datasources = getDatasources($datasourcesStore.list)
-
 const toggleSelection = (tableOrView: SourceOption) => {
   dispatch("toggle", tableOrView)
 }
+
+$: datasources = getDatasources($datasourcesStore.list)
 
 let dataUrl = ""
 $: dataUrl = $appStore.appId ? `/builder/workspace/${$appStore.appId}/data` : ""

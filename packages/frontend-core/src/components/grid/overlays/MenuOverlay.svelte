@@ -24,9 +24,6 @@ const {
 
 let anchor
 
-$: style = makeStyle($menu)
-$: isNewRow = $focusedRowId === NewRowID
-
 const makeStyle = (menu) => {
   return `left:${menu.left}px; top:${menu.top}px;`
 }
@@ -53,6 +50,9 @@ const copyToClipboard = async (value) => {
   await Helpers.copyToClipboard(value)
   $notifications.success("Copied to clipboard")
 }
+
+$: style = makeStyle($menu)
+$: isNewRow = $focusedRowId === NewRowID
 </script>
 
 <div bind:this={anchor} {style} class="menu-anchor"></div>

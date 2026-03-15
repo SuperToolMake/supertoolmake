@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Helpers, Icon, type Modal, notifications } from "@budibase/bbui"
+import { Helpers, Icon, Modal, notifications } from "@budibase/bbui"
 import type { Screen } from "@budibase/types"
-import type ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
+import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
 import NavItem from "@/components/common/NavItem.svelte"
 import ScreenDetailsModal from "@/components/design/ScreenDetailsModal.svelte"
 import { capitalise } from "@/helpers"
@@ -39,7 +39,7 @@ const createDuplicateScreen = async ({ route }: { route: string }) => {
       ...duplicateScreen,
       navigationLinkLabel: linkLabel,
     })
-  } catch (error) {
+  } catch {
     notifications.error("Error duplicating screen")
   }
 }
@@ -48,17 +48,15 @@ const deleteScreen = async () => {
   try {
     await screenStore.delete(screen)
     notifications.success("Deleted screen successfully")
-  } catch (err) {
+  } catch {
     notifications.error("Error deleting screen")
   }
 }
 
-$: noPaste = !$componentStore.componentToPaste
-
 const pasteComponent = (mode: "inside") => {
   try {
     componentStore.paste(screen.props, mode, screen)
-  } catch (error) {
+  } catch {
     notifications.error("Error saving component")
   }
 }
@@ -97,6 +95,8 @@ const openContextMenu = (e: MouseEvent, screen: Screen) => {
 
   contextMenuStore.open(screen._id!, items, { x: e.clientX, y: e.clientY })
 }
+
+$: noPaste = !$componentStore.componentToPaste
 </script>
 
 <NavItem

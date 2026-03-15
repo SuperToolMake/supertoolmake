@@ -13,18 +13,8 @@ let row: Row | null | undefined
 let loading = true
 let noRowFound = false
 
-$: datasourceId = datasource.tableId
-$: fetchRow(datasourceId, rowId)
-$: actions = [
-  {
-    type: ActionTypes.RefreshDatasource,
-    callback: () => fetchRow(datasourceId, rowId),
-    metadata: { dataSource: datasource },
-  },
-]
-
 const fetchRow = async (datasourceId: string, rowId: string) => {
-  if (!datasourceId || !rowId) {
+  if (!(datasourceId && rowId)) {
     row = undefined
     noRowFound = true
     loading = false
@@ -36,13 +26,23 @@ const fetchRow = async (datasourceId: string, rowId: string) => {
   try {
     row = await API.fetchRow(datasourceId, rowId, true)
     noRowFound = row == null
-  } catch (e) {
+  } catch {
     row = undefined
     noRowFound = true
   } finally {
     loading = false
   }
 }
+
+$: datasourceId = datasource.tableId
+$: fetchRow(datasourceId, rowId)
+$: actions = [
+  {
+    type: ActionTypes.RefreshDatasource,
+    callback: () => fetchRow(datasourceId, rowId),
+    metadata: { dataSource: datasource },
+  },
+]
 </script>
 
 {#if !loading}

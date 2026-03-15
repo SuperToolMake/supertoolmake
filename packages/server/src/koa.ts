@@ -1,5 +1,5 @@
+import http from "node:http"
 import { logging, middleware, timers } from "@budibase/backend-core"
-import http from "http"
 import gracefulShutdown from "http-graceful-shutdown"
 import Koa from "koa"
 import koaBody, { HttpMethodEnum } from "koa-body"
@@ -20,7 +20,7 @@ export default function createKoaApp() {
   ]
 
   let mbNumber = parseInt(env.HTTP_MB_LIMIT || "10")
-  if (!mbNumber || isNaN(mbNumber)) {
+  if (!mbNumber || Number.isNaN(mbNumber)) {
     mbNumber = 10
   }
   const defaultBodyParser = koaBody({
@@ -78,7 +78,7 @@ export default function createKoaApp() {
   process.on("uncaughtException", async (err) => {
     // @ts-expect-error
     // don't worry about this error, comes from zlib isn't important
-    if (err?.["code"] === "ERR_INVALID_CHAR") {
+    if (err?.code === "ERR_INVALID_CHAR") {
       logging.logAlert("Uncaught exception.", err)
       return
     }

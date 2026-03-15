@@ -1,3 +1,4 @@
+import path from "node:path"
 import { db, Header, roles } from "@budibase/backend-core"
 import { structures } from "@budibase/backend-core/tests"
 import {
@@ -8,7 +9,6 @@ import {
   type WorkspaceApp,
 } from "@budibase/types"
 import nock from "nock"
-import path from "path"
 import tk from "timekeeper"
 import { USERS_TABLE_SCHEMA } from "../../../constants"
 import { WorkspaceStatus } from "../../../db/utils"

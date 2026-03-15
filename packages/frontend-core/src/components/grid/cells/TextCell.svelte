@@ -12,9 +12,6 @@ export let format = null
 let input
 let active = false
 
-$: editable = focused && !readonly
-$: displayValue = format?.(value) ?? value ?? ""
-
 const handleChange = (e) => {
   onChange(e.target.value)
 }
@@ -30,6 +27,9 @@ const onKeyDown = (e) => {
   }
   return true
 }
+
+$: editable = focused && !readonly
+$: displayValue = format?.(value) ?? value ?? ""
 
 onMount(() => {
   api = {

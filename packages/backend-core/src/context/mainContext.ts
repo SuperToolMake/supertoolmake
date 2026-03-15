@@ -50,12 +50,12 @@ export function getPlatformURL() {
 }
 
 export function isMultiTenant() {
-  return !!env.MULTI_TENANCY
+  return Boolean(env.MULTI_TENANCY)
 }
 
 export function isTenantIdSet() {
   const context = Context.get()
-  return !!context?.tenantId
+  return Boolean(context?.tenantId)
 }
 
 export function isTenancyEnabled() {
@@ -68,7 +68,7 @@ export function isTenancyEnabled() {
  */
 export function getTenantIDFromWorkspaceID(workspaceId: string) {
   if (!workspaceId) {
-    return undefined
+    return
   }
   if (!isMultiTenant()) {
     return DEFAULT_TENANT_ID
@@ -76,7 +76,7 @@ export function getTenantIDFromWorkspaceID(workspaceId: string) {
   const split = workspaceId.split(SEPARATOR)
   const hasDev = split[1] === DocumentType.DEV
   if ((hasDev && split.length === 3) || (!hasDev && split.length === 2)) {
-    return undefined
+    return
   }
   if (hasDev) {
     return split[2]
@@ -89,7 +89,7 @@ function updateContext(updates: ContextMap): ContextMap {
   let context: ContextMap
   try {
     context = Context.get()
-  } catch (err) {
+  } catch {
     // no context, start empty
     context = {}
   }
@@ -142,7 +142,7 @@ export async function doInSelfHostTenantUsingCloud<T>(tenantId: string, task: ()
 
 export function isSelfHostUsingCloud() {
   const context = Context.get()
-  return !!context?.isSelfHostUsingCloud
+  return Boolean(context?.isSelfHostUsingCloud)
 }
 
 export async function doInWorkspaceContext<T>(workspaceId: string, task: () => T): Promise<T> {
@@ -201,7 +201,7 @@ export function getIdentity(): IdentityContext | undefined {
   try {
     const context = Context.get()
     return context?.identity
-  } catch (e) {
+  } catch {
     // do nothing - identity is not in context
   }
 }
@@ -360,14 +360,14 @@ export function getDevWorkspaceDB(opts?: any): Database {
 export function isScim(): boolean {
   const context = Context.get()
   const scimCall = context?.isScim
-  return !!scimCall
+  return Boolean(scimCall)
 }
 
 export function getCurrentContext(): ContextMap | undefined {
   try {
     return Context.get()
-  } catch (e) {
-    return undefined
+  } catch {
+    return
   }
 }
 

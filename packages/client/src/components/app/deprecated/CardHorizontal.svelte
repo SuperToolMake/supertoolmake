@@ -17,7 +17,7 @@ export let cardWidth
 export let imageWidth
 export let imageHeight
 
-$: showImage = !!imageUrl
+$: showImage = Boolean(imageUrl)
 </script>
 
 <div

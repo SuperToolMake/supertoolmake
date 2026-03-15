@@ -910,9 +910,7 @@ if (descriptions.length) {
             error = err.message
           }
           expect(error).toSatisfy(
-            isMSSQL
-              ? (e: any) => e === undefined
-              : (e: any) => e !== undefined && e.includes("integer")
+            isMSSQL ? (e: any) => e === undefined : (e: any) => e?.includes("integer")
           )
         })
 

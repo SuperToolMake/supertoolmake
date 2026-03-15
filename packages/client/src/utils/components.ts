@@ -7,7 +7,7 @@ export const findComponentById = (
   component: Component | undefined,
   componentId: string | undefined
 ): Component | null => {
-  if (!component || !componentId) {
+  if (!(component && componentId)) {
     return null
   }
   if (component._id === componentId) {
@@ -33,7 +33,7 @@ export const findComponentPathById = (
   componentId: string | undefined,
   path: Component[] = []
 ): Component[] | null => {
-  if (!component || !componentId) {
+  if (!(component && componentId)) {
     return null
   }
   path = [...path, component]
@@ -82,7 +82,7 @@ export const findComponentParent = (
   id: string | undefined,
   parentComponent?: Component
 ): Component | null => {
-  if (!rootComponent || !id) {
+  if (!(rootComponent && id)) {
     return null
   }
   if (rootComponent._id === id) {

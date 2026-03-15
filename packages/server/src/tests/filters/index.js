@@ -1,4 +1,4 @@
-const fs = require("fs")
+const fs = require("node:fs")
 
 function isDatasourceTest(path) {
   const content = fs.readFileSync(path, "utf8")

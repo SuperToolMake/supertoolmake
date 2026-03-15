@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const compose = require("docker-compose")
-const path = require("path")
+const path = require("node:path")
 
 // This script wraps docker-compose allowing you to manage your dev infrastructure with simple commands.
 const CONFIG = {
@@ -42,8 +42,7 @@ async function nuke() {
 const managementCommand = process.argv.slice(2)[0]
 
 if (
-  !managementCommand ||
-  !Object.values(Commands).some((command) => managementCommand === command)
+  !(managementCommand && Object.values(Commands).some((command) => managementCommand === command))
 ) {
   throw new Error(
     "You must supply either an 'up', 'down' or 'nuke' commmand to manage the budibase development environment."

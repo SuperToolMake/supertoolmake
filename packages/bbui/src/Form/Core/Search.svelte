@@ -13,7 +13,7 @@ export let inputRef: HTMLElement | undefined = undefined
 
 interface SearchEvents {
   change: any
-  clear: void
+  clear: undefined
 }
 
 const dispatch = createEventDispatcher<SearchEvents>()

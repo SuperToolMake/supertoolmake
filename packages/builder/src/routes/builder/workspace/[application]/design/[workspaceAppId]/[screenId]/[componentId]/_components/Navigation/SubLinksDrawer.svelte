@@ -16,16 +16,6 @@ const flipDurationMs = 150
 let drawer
 let subLinks = value?.slice() || []
 
-$: count = value?.length ?? 0
-$: buttonText = `${count || "No"} sub link${count === 1 ? "" : "s"}`
-$: drawerTitle = navItem.text ? `${navItem.text} sub links` : "Sub links"
-$: subLinks.forEach((subLink) => {
-  if (!subLink.id) {
-    subLink.id = generate()
-  }
-})
-$: urlOptions = screenStore.routes
-
 const addSubLink = () => {
   subLinks = [...subLinks, {}]
 }
@@ -42,6 +32,16 @@ const saveSubLinks = () => {
 const updateSubLinks = (e) => {
   subLinks = e.detail.items
 }
+
+$: count = value?.length ?? 0
+$: buttonText = `${count || "No"} sub link${count === 1 ? "" : "s"}`
+$: drawerTitle = navItem.text ? `${navItem.text} sub links` : "Sub links"
+$: subLinks.forEach((subLink) => {
+  if (!subLink.id) {
+    subLink.id = generate()
+  }
+})
+$: urlOptions = screenStore.routes
 </script>
 
 <Drawer bind:this={drawer} title={drawerTitle} on:drawerShow on:drawerHide>

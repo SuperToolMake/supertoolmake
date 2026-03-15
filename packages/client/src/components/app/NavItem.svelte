@@ -21,16 +21,6 @@ const dispatch = createEventDispatcher()
 
 let renderKey
 
-$: isBuilderActive = (testUrl) => {
-  return $builderStore.inBuilder && testUrl && testUrl === $screenStore.activeScreen?.routing?.route
-}
-$: builderActive = isBuilderActive(url)
-$: containsActiveLink = (subLinks || []).some((x) => isBuilderActive(x.url))
-$: expanded = !!$navStateStore[text] || containsActiveLink
-$: renderLeftNav = leftNav || mobile
-$: caret = !renderLeftNav || expanded ? "caret-down" : "caret-right"
-$: collapsedText = getShortText(text)
-
 const getShortText = (text) => {
   if (!text) {
     return ""
@@ -61,6 +51,16 @@ const onClickDropdown = () => {
     [text]: !state[text],
   }))
 }
+
+$: isBuilderActive = (testUrl) => {
+  return $builderStore.inBuilder && testUrl && testUrl === $screenStore.activeScreen?.routing?.route
+}
+$: builderActive = isBuilderActive(url)
+$: containsActiveLink = (subLinks || []).some((x) => isBuilderActive(x.url))
+$: expanded = Boolean($navStateStore[text]) || containsActiveLink
+$: renderLeftNav = leftNav || mobile
+$: caret = !renderLeftNav || expanded ? "caret-down" : "caret-right"
+$: collapsedText = getShortText(text)
 </script>
 
 {#if !type || type === "link"}

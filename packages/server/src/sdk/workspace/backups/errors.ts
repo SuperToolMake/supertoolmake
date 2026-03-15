@@ -6,7 +6,7 @@ export async function clearErrors(backupId?: string) {
   const metadata = await database.get<Workspace>(DocumentType.WORKSPACE_METADATA)
   if (!backupId) {
     delete metadata.backupErrors
-  } else if (metadata.backupErrors && metadata.backupErrors[backupId]) {
+  } else if (metadata.backupErrors?.[backupId]) {
     delete metadata.backupErrors[backupId]
   }
   await database.put(metadata)

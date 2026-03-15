@@ -1,9 +1,9 @@
 <script lang="ts">
-import { Body, Button, Divider, Heading, Icon, Layout, type Modal } from "@budibase/bbui"
-import type ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
+import { Body, Button, Divider, Heading, Icon, Layout, Modal } from "@budibase/bbui"
+import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
 import UpdateAppForm from "@/components/common/UpdateAppForm.svelte"
-import type RevertModal from "@/components/deploy/RevertModal.svelte"
-import type VersionModal from "@/components/deploy/VersionModal.svelte"
+import RevertModal from "@/components/deploy/RevertModal.svelte"
+import VersionModal from "@/components/deploy/VersionModal.svelte"
 import ExportAppModal from "@/components/start/ExportAppModal.svelte"
 import ImportAppModal from "@/components/start/ImportAppModal.svelte"
 import { appStore, deploymentStore, isOnlyUser } from "@/stores/builder"
@@ -16,13 +16,13 @@ let exportPublishedVersion: boolean = false
 let unpublishModal: ConfirmDialog
 let revertModal: RevertModal
 
-$: updateAvailable = $appStore.upgradableVersion !== $appStore.version
-$: revertAvailable = $appStore.revertableVersion != null
-
 const exportApp = (opts: { published: any }) => {
-  exportPublishedVersion = !!opts?.published
+  exportPublishedVersion = Boolean(opts?.published)
   exportModal.show()
 }
+
+$: updateAvailable = $appStore.upgradableVersion !== $appStore.version
+$: revertAvailable = $appStore.revertableVersion != null
 </script>
 
 <Layout noPadding>

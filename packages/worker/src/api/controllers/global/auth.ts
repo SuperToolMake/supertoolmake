@@ -40,7 +40,7 @@ const normalizeEmail = (e: string) => (e || "").toLowerCase()
 const failKey = (email: string) => `auth:login:fail:${normalizeEmail(email)}`
 const lockKey = (email: string) => `auth:login:lock:${normalizeEmail(email)}`
 const isLocked = async (email: string) => {
-  return !!(await cache.get(lockKey(email)))
+  return Boolean(await cache.get(lockKey(email)))
 }
 
 const handleLockoutResponse = (ctx: Ctx, email: string) => {
@@ -116,7 +116,7 @@ export const login = async (ctx: Ctx<LoginRequest, LoginResponse>, next: Next) =
       if (await isLocked(email)) {
         return handleLockoutResponse(ctx, email)
       }
-      const reason = (info && info.message) || (err && err.message) || "unknown"
+      const reason = info?.message || err?.message || "unknown"
       console.log(`[auth] password auth failed email=${normalizeEmail(email)} reason=${reason}`)
       // delegate to shared passport failure handling to preserve specific messages (e.g. expired)
       return passportCallback(ctx, user as any, err, info)
@@ -133,7 +133,7 @@ export const login = async (ctx: Ctx<LoginRequest, LoginResponse>, next: Next) =
 }
 
 export const logout = async (ctx: UserCtx<void, LogoutResponse>) => {
-  if (ctx.user && ctx.user._id) {
+  if (ctx.user?._id) {
     await authSdk.logout({ ctx, userId: ctx.user._id })
   }
   ctx.body = { message: "User logged out." }
@@ -141,7 +141,7 @@ export const logout = async (ctx: UserCtx<void, LogoutResponse>) => {
 
 // INIT
 
-export const setInitInfo = (ctx: UserCtx<SetInitInfoRequest, SetInitInfoResponse>) => {
+export const setInitInfo = async (ctx: UserCtx<SetInitInfoRequest, SetInitInfoResponse>) => {
   const initInfo = ctx.request.body
   setCookie(ctx, initInfo, Cookie.Init)
   ctx.body = {
@@ -149,10 +149,10 @@ export const setInitInfo = (ctx: UserCtx<SetInitInfoRequest, SetInitInfoResponse
   }
 }
 
-export const getInitInfo = (ctx: UserCtx<void, GetInitInfoResponse>) => {
+export const getInitInfo = async (ctx: UserCtx<void, GetInitInfoResponse>) => {
   try {
     ctx.body = getCookie(ctx, Cookie.Init) || {}
-  } catch (err) {
+  } catch {
     clearCookie(ctx, Cookie.Init)
     ctx.body = {}
   }

@@ -26,47 +26,6 @@ const ConfigTypes = {
 
 // Some older google configs contain a manually specified value - retain the functionality to edit the field
 // When there is no value or we are in the cloud - prohibit editing the field, must use platform url to change
-$: googleCallbackUrl = undefined
-$: googleCallbackReadonly = $admin.cloud || !googleCallbackUrl
-
-// Indicate to user that callback is based on platform url
-// If there is an existing value, indicate that it may be removed to return to default behaviour
-$: googleCallbackTooltip = $admin.cloud
-  ? null
-  : googleCallbackReadonly
-    ? "Visit the organisation page to update the platform URL"
-    : "Leave blank to use the default callback URL"
-
-$: GoogleConfigFields = {
-  Google: [
-    { name: "clientID", label: "Client ID" },
-    { name: "clientSecret", label: "Client secret" },
-    {
-      name: "callbackURL",
-      label: "Callback URL",
-      readonly: googleCallbackReadonly,
-      tooltip: googleCallbackTooltip,
-      placeholder: $organisation.googleCallbackUrl,
-      copyButton: true,
-    },
-  ],
-}
-
-let google
-
-const providers = { google }
-
-// control the state of the save button depending on whether form has changed
-let originalGoogleDoc
-let googleSaveButtonDisabled
-$: {
-  isEqual(providers.google?.config, originalGoogleDoc?.config)
-    ? (googleSaveButtonDisabled = true)
-    : (googleSaveButtonDisabled = false)
-}
-
-$: googleComplete = !!(providers.google?.config?.clientID && providers.google?.config?.clientSecret)
-
 async function saveConfig(config) {
   // Delete unsupported fields
   delete config.createdAt
@@ -101,10 +60,51 @@ const copyToClipboard = async (value) => {
   notifications.success("Copied")
 }
 
+$: googleCallbackUrl = undefined
+$: googleCallbackReadonly = $admin.cloud || !googleCallbackUrl
+
+// Indicate to user that callback is based on platform url
+// If there is an existing value, indicate that it may be removed to return to default behaviour
+$: googleCallbackTooltip = $admin.cloud
+  ? null
+  : googleCallbackReadonly
+    ? "Visit the organisation page to update the platform URL"
+    : "Leave blank to use the default callback URL"
+
+$: GoogleConfigFields = {
+  Google: [
+    { name: "clientID", label: "Client ID" },
+    { name: "clientSecret", label: "Client secret" },
+    {
+      name: "callbackURL",
+      label: "Callback URL",
+      readonly: googleCallbackReadonly,
+      tooltip: googleCallbackTooltip,
+      placeholder: $organisation.googleCallbackUrl,
+      copyButton: true,
+    },
+  ],
+}
+
+let google
+
+const providers = { google }
+
+// control the state of the save button depending on whether form has changed
+let originalGoogleDoc
+let googleSaveButtonDisabled
+$: {
+  googleSaveButtonDisabled = isEqual(providers.google?.config, originalGoogleDoc?.config)
+}
+
+$: googleComplete = Boolean(
+  providers.google?.config?.clientID && providers.google?.config?.clientSecret
+)
+
 onMount(async () => {
   try {
     await organisation.init()
-  } catch (error) {
+  } catch {
     notifications.error("Error getting org config")
   }
 
@@ -112,7 +112,7 @@ onMount(async () => {
   let googleDoc
   try {
     googleDoc = await API.getConfig(ConfigTypes.Google)
-  } catch (error) {
+  } catch {
     notifications.error("Error fetching Google OAuth config")
   }
   if (!googleDoc?._id) {

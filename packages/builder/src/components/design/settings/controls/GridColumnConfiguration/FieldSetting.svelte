@@ -13,8 +13,6 @@ export let bindings
 
 const dispatch = createEventDispatcher()
 
-$: fieldIconLookupMap = buildFieldIconLookupMap(FIELDS)
-
 const buildFieldIconLookupMap = (fields) => {
   let map = {}
   Object.values(fields).forEach((fieldInfo) => {
@@ -47,6 +45,8 @@ const parseSettings = (settings) => {
   }
   return columnSettings
 }
+
+$: fieldIconLookupMap = buildFieldIconLookupMap(FIELDS)
 </script>
 
 <div class="list-item-body">

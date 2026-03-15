@@ -26,7 +26,7 @@ const removeSquareBrackets = (value: string) => {
   }
   const regex = /\[+(.+)]+/
   const matches = value.match(regex)
-  if (matches && matches[1]) {
+  if (matches?.[1]) {
     return matches[1]
   }
   return value
@@ -43,7 +43,7 @@ const isReservedKey = (key: string) =>
 const getContextValue = (path: string, context: any) => {
   // We populate `snippets` ourselves, don't allow access to it.
   if (isReservedKey(path)) {
-    return undefined
+    return
   }
   const literalStringRegex = /^(["'`]).*\1$/
   let data = context
@@ -63,7 +63,7 @@ const getContextValue = (path: string, context: any) => {
 
 // Evaluates JS code against a certain context
 export function processJS(handlebars: string, context: any) {
-  if (!isJSAllowed() || !runJS) {
+  if (!(isJSAllowed() && runJS)) {
     throw new Error("JS disabled in environment.")
   }
   try {
@@ -156,7 +156,7 @@ export function processJS(handlebars: string, context: any) {
     const res = { data: runJS(js, sandboxContext), logs }
     return `{{${LITERAL_MARKER} js_result-${JSON.stringify(res)}}}`
   } catch (error: any) {
-    onErrorLog && onErrorLog(error)
+    onErrorLog?.(error)
 
     const { noThrow = true } = context.__opts || {}
 

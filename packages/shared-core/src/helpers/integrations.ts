@@ -1,7 +1,7 @@
 import { type Datasource, SourceName } from "@budibase/types"
 
 export function isSQL(datasource: Datasource): boolean {
-  if (!datasource || !datasource.source) {
+  if (!datasource?.source) {
     return false
   }
   const SQL = [SourceName.POSTGRES, SourceName.SQL_SERVER, SourceName.MYSQL]

@@ -12,20 +12,6 @@ let loading = false
 let publishLoading = false
 let seedLoading = false
 
-$: loading = publishing || loadingAction !== null
-$: publishLoading = loading && (loadingAction === null || loadingAction === "publish")
-$: seedLoading = loading && (loadingAction === null || loadingAction === "seed")
-$: {
-  if (publishing) {
-    publishCycleStarted = true
-  } else if (publishCycleStarted && loadingAction) {
-    loadingAction = null
-    publishCycleStarted = false
-  }
-}
-
-const dispatch = createEventDispatcher()
-
 const publishEmpty = () => {
   if (loading) {
     return
@@ -41,6 +27,20 @@ const seedAndPublish = () => {
   loadingAction = "seed"
   dispatch("seedPublish")
 }
+
+$: loading = publishing || loadingAction !== null
+$: publishLoading = loading && (loadingAction === null || loadingAction === "publish")
+$: seedLoading = loading && (loadingAction === null || loadingAction === "seed")
+$: {
+  if (publishing) {
+    publishCycleStarted = true
+  } else if (publishCycleStarted && loadingAction) {
+    loadingAction = null
+    publishCycleStarted = false
+  }
+}
+
+const dispatch = createEventDispatcher()
 </script>
 
 <div class="production-blank">

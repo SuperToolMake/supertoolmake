@@ -1,3 +1,4 @@
+import type { ReadStream, WriteStream } from "node:fs"
 import {
   type AllDocsResponse,
   type AnyDocument,
@@ -13,7 +14,6 @@ import {
   type RowResponse,
   type RowValue,
 } from "@budibase/types"
-import type { ReadStream, WriteStream } from "fs"
 import Nano, { type DocumentListParams } from "nano"
 import { newid } from "../../docIds/newid"
 import { checkSlashesInUrl } from "../../helpers"
@@ -70,7 +70,7 @@ class CouchDBError extends Error implements DBError {
 }
 
 export function DatabaseWithConnection(dbName: string, connection: string, opts?: DatabaseOpts) {
-  if (!dbName || !connection) {
+  if (!(dbName && connection)) {
     throw new Error("Unable to create database without database name or connection")
   }
   const db = new CouchDatabase(dbName, opts, connection)
@@ -140,7 +140,7 @@ export class CouchDatabase implements Database {
     const shouldCreate = !this.pouchOpts?.skip_setup
     // check exists in a lightweight fashion
     const exists = await this.exists()
-    if (!shouldCreate && !exists) {
+    if (!(shouldCreate || exists)) {
       throw new Error("DB does not exist")
     }
     if (!exists) {
@@ -197,7 +197,7 @@ export class CouchDatabase implements Database {
       return await this.get<T>(id)
     } catch (err: any) {
       if (err.statusCode === 404) {
-        return undefined
+        return
       }
       throw err
     }
@@ -253,7 +253,7 @@ export class CouchDatabase implements Database {
         _rev = rev!
       }
 
-      if (!_id || !_rev) {
+      if (!(_id && _rev)) {
         throw new Error("Unable to remove doc without a valid _id and _rev.")
       }
       return () => db.destroy(_id, _rev)
@@ -385,7 +385,7 @@ export class CouchDatabase implements Database {
           let json
           try {
             json = JSON.parse(text)
-          } catch (err) {
+          } catch {
             console.error(`error: ${text}`)
             throw new CouchDBError("error while running query, please try again later", {
               name: "error",

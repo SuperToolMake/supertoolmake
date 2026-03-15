@@ -1,7 +1,7 @@
+import { join, resolve } from "node:path"
 import { env as coreEnv } from "@budibase/backend-core"
 import { ServiceType } from "@budibase/types"
 import cloneDeep from "lodash/cloneDeep"
-import { join, resolve } from "path"
 
 coreEnv._set("SERVICE_TYPE", ServiceType.APPS)
 
@@ -111,7 +111,7 @@ const environment = {
   DISABLE_THREADING: process.env.DISABLE_THREADING,
   DISABLE_AUTOMATION_LOGS: process.env.DISABLE_AUTOMATION_LOGS,
   DISABLE_RATE_LIMITING: process.env.DISABLE_RATE_LIMITING,
-  DISABLE_WORKSPACE_MIGRATIONS: process.env.SKIP_WORKSPACE_MIGRATIONS || false,
+  DISABLE_WORKSPACE_MIGRATIONS: process.env.SKIP_WORKSPACE_MIGRATIONS,
   MULTI_TENANCY: process.env.MULTI_TENANCY,
   ENABLE_ANALYTICS: process.env.ENABLE_ANALYTICS,
   SELF_HOSTED: process.env.SELF_HOSTED,

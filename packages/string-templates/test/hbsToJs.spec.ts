@@ -1,4 +1,3 @@
-/* eslint-disable no-template-curly-in-string */
 import { convertToJS } from "../src/index"
 
 function checkLines(response: string, lines: string[]) {

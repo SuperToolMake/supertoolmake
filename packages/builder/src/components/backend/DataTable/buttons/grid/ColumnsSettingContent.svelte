@@ -17,117 +17,6 @@ const { datasource, dispatch } = getContext("grid")
 let relationshipPanelAnchor
 let relationshipFieldName
 
-$: relationshipField = columns.find((c) => c.name === relationshipFieldName)?.schema
-$: permissionsObj = permissions.reduce(
-  (acc, c) => ({
-    ...acc,
-    [c]: {
-      disabled: disabledPermissions.includes(c),
-    },
-  }),
-  {}
-)
-
-$: displayColumns = columns.map((c) => {
-  const isRequired = c.primaryDisplay || helpers.schema.isRequired(c.schema.constraints)
-
-  const defaultPermission = permissions[0]
-  const requiredTooltips = {
-    [FieldPermissions.WRITABLE]: (() => {
-      if (defaultPermission === FieldPermissions.WRITABLE) {
-        if (c.primaryDisplay) {
-          return "Display column must be writable"
-        }
-        if (isRequired) {
-          return "Required columns must be writable"
-        }
-      }
-    })(),
-    [FieldPermissions.READONLY]: (() => {
-      if (defaultPermission === FieldPermissions.WRITABLE) {
-        if (c.primaryDisplay) {
-          return "Display column cannot be read-only"
-        }
-        if (isRequired) {
-          return "Required columns cannot be read-only"
-        }
-      }
-      if (defaultPermission === FieldPermissions.READONLY) {
-        if (c.primaryDisplay) {
-          return "Display column must be read-only"
-        }
-        if (isRequired) {
-          return "Required columns must be read-only"
-        }
-      }
-    })(),
-    [FieldPermissions.HIDDEN]: (() => {
-      if (c.primaryDisplay) {
-        return "Display column cannot be hidden"
-      }
-      if (isRequired) {
-        return "Required columns cannot be hidden"
-      }
-    })(),
-  }
-
-  const options = []
-
-  let permission
-  if ((permission = permissionsObj[FieldPermissions.WRITABLE])) {
-    const tooltip = requiredTooltips[FieldPermissions.WRITABLE] || "Writable"
-    options.push({
-      icon: "pencil",
-      value: FieldPermissions.WRITABLE,
-      tooltip,
-      disabled: isRequired || permission.disabled,
-    })
-  }
-
-  if ((permission = permissionsObj[FieldPermissions.READONLY])) {
-    const tooltip =
-      (requiredTooltips[FieldPermissions.READONLY] || "Read-only") +
-      (permission.disabled ? " (premium feature)" : "")
-    options.push({
-      icon: "eye",
-      value: FieldPermissions.READONLY,
-      tooltip,
-      disabled: permission.disabled || isRequired,
-    })
-  }
-
-  if ((permission = permissionsObj[FieldPermissions.HIDDEN])) {
-    const tooltip = requiredTooltips[FieldPermissions.HIDDEN] || "Hidden"
-    options.push({
-      icon: "eye-slash",
-      value: FieldPermissions.HIDDEN,
-      disabled: permission.disabled || isRequired,
-      tooltip,
-    })
-  }
-
-  return { ...c, options }
-})
-
-$: relationshipPanelColumns = Object.entries(relationshipField?.columns || {}).map(
-  ([name, column]) => {
-    return {
-      name: name,
-      label: name,
-      schema: {
-        type: column.type,
-        subtype: column.subtype,
-        visible: column.visible,
-        readonly: column.readonly,
-        icon: column.icon,
-        displayName: column.displayName,
-      },
-    }
-  }
-)
-
-$: hasLinkColumns = columns.some((c) => c.schema.type === FieldType.LINK)
-
 async function toggleColumn(column, permission) {
   const visible = permission !== FieldPermissions.HIDDEN
   const readonly = permission === FieldPermissions.READONLY
@@ -182,6 +71,116 @@ async function updateDisplayName(column, displayName) {
     notifications.error(e.message)
   }
 }
+
+$: relationshipField = columns.find((c) => c.name === relationshipFieldName)?.schema
+$: permissionsObj = permissions.reduce((acc, c) => {
+  acc[c] = {
+    disabled: disabledPermissions.includes(c),
+  }
+  return acc
+}, {})
+
+$: displayColumns = columns.map((c) => {
+  const isRequired = c.primaryDisplay || helpers.schema.isRequired(c.schema.constraints)
+
+  const defaultPermission = permissions[0]
+  const requiredTooltips = {
+    [FieldPermissions.WRITABLE]: (() => {
+      if (defaultPermission === FieldPermissions.WRITABLE) {
+        if (c.primaryDisplay) {
+          return "Display column must be writable"
+        }
+        if (isRequired) {
+          return "Required columns must be writable"
+        }
+      }
+    })(),
+    [FieldPermissions.READONLY]: (() => {
+      if (defaultPermission === FieldPermissions.WRITABLE) {
+        if (c.primaryDisplay) {
+          return "Display column cannot be read-only"
+        }
+        if (isRequired) {
+          return "Required columns cannot be read-only"
+        }
+      }
+      if (defaultPermission === FieldPermissions.READONLY) {
+        if (c.primaryDisplay) {
+          return "Display column must be read-only"
+        }
+        if (isRequired) {
+          return "Required columns must be read-only"
+        }
+      }
+    })(),
+    [FieldPermissions.HIDDEN]: (() => {
+      if (c.primaryDisplay) {
+        return "Display column cannot be hidden"
+      }
+      if (isRequired) {
+        return "Required columns cannot be hidden"
+      }
+    })(),
+  }
+
+  const options = []
+
+  const writablePermission = permissionsObj[FieldPermissions.WRITABLE]
+  if (writablePermission) {
+    const tooltip = requiredTooltips[FieldPermissions.WRITABLE] || "Writable"
+    options.push({
+      icon: "pencil",
+      value: FieldPermissions.WRITABLE,
+      tooltip,
+      disabled: isRequired || writablePermission.disabled,
+    })
+  }
+
+  const readonlyPermission = permissionsObj[FieldPermissions.READONLY]
+  if (readonlyPermission) {
+    const tooltip =
+      (requiredTooltips[FieldPermissions.READONLY] || "Read-only") +
+      (readonlyPermission.disabled ? " (premium feature)" : "")
+    options.push({
+      icon: "eye",
+      value: FieldPermissions.READONLY,
+      tooltip,
+      disabled: readonlyPermission.disabled || isRequired,
+    })
+  }
+
+  const hiddenPermission = permissionsObj[FieldPermissions.HIDDEN]
+  if (hiddenPermission) {
+    const tooltip = requiredTooltips[FieldPermissions.HIDDEN] || "Hidden"
+    options.push({
+      icon: "eye-slash",
+      value: FieldPermissions.HIDDEN,
+      disabled: hiddenPermission.disabled || isRequired,
+      tooltip,
+    })
+  }
+
+  return { ...c, options }
+})
+
+$: relationshipPanelColumns = Object.entries(relationshipField?.columns || {}).map(
+  ([name, column]) => {
+    return {
+      name: name,
+      label: name,
+      schema: {
+        type: column.type,
+        subtype: column.subtype,
+        visible: column.visible,
+        readonly: column.readonly,
+        icon: column.icon,
+        displayName: column.displayName,
+      },
+    }
+  }
+)
+
+$: hasLinkColumns = columns.some((c) => c.schema.type === FieldType.LINK)
 </script>
 
 <div class="content">

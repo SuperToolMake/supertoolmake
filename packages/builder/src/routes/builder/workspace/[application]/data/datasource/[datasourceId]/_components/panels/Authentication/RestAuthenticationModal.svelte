@@ -129,13 +129,13 @@ const checkErrors = () => {
     else {
       errors.name = "Name is required"
     }
-    return !!errors.name
+    return Boolean(errors.name)
   }
 
   // TYPE
   const typeError = () => {
     errors.type = form.type ? undefined : "Type is required"
-    return !!errors.type
+    return Boolean(errors.type)
   }
 
   // BASIC AUTH
@@ -143,13 +143,13 @@ const checkErrors = () => {
     errors.basic.username = form.basic.username ? undefined : "Username is required"
     errors.basic.password = form.basic.password ? undefined : "Password is required"
 
-    return !!(errors.basic.username || errors.basic.password || commonError)
+    return Boolean(errors.basic.username || errors.basic.password || commonError)
   }
 
   // BEARER TOKEN
   const bearerTokenErrors = () => {
     errors.bearer.token = form.bearer.token ? undefined : "Token is required"
-    return !!(errors.bearer.token || commonError)
+    return Boolean(errors.bearer.token || commonError)
   }
 
   const commonError = nameError() || typeError()
@@ -158,7 +158,7 @@ const checkErrors = () => {
   } else if (form.type === AUTH_TYPES.BEARER) {
     hasErrors = bearerTokenErrors() || commonError
   } else {
-    hasErrors = !!commonError
+    hasErrors = Boolean(commonError)
   }
 }
 

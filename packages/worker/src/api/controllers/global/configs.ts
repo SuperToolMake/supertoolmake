@@ -52,14 +52,14 @@ async function hasActivatedConfig(ssoConfigs?: SSOConfigs) {
   if (!ssoConfigs) {
     ssoConfigs = await getSSOConfigs()
   }
-  return !!Object.values(ssoConfigs).find((c) => c?.activated)
+  return Boolean(Object.values(ssoConfigs).find((c) => c?.activated))
 }
 
 async function processSMTPConfig(config: SMTPInnerConfig, existingConfig?: SMTPInnerConfig) {
   await email.verifyConfig(config)
   if (config.auth?.pass === PASSWORD_REPLACEMENT) {
     // if the password is being replaced, use the existing password
-    if (existingConfig && existingConfig.auth?.pass) {
+    if (existingConfig?.auth?.pass) {
       config.auth.pass = existingConfig.auth.pass
     } else {
       // otherwise, throw an error
@@ -282,7 +282,7 @@ export async function publicSettings(ctx: Ctx<void, GetPublicSettingsResponse>) 
     // google
     const googleDatasourcePromise = configs.getGoogleDatasourceConfig()
     const preActivated = googleConfig && googleConfig.activated == null
-    const google = preActivated || !!googleConfig?.activated
+    const google = preActivated || Boolean(googleConfig?.activated)
     const googleCallbackUrlPromise = auth.googleCallbackUrl(googleConfig)
 
     // oidc
@@ -300,8 +300,8 @@ export async function publicSettings(ctx: Ctx<void, GetPublicSettingsResponse>) 
         getLogoUrl(),
       ])
 
-    const oidc = oidcConfig?.activated || false
-    const googleDatasourceConfigured = !!googleDatasource
+    const oidc = Boolean(oidcConfig?.activated)
+    const googleDatasourceConfigured = Boolean(googleDatasource)
     if (logoUrl) {
       config.logoUrl = logoUrl
     }
@@ -417,10 +417,10 @@ export async function configChecklist(ctx: Ctx<void, ConfigChecklistResponse>) {
             link: BUILDER_URLS.WORKSPACES,
           },
           smtp: {
-            checked: !!smtpConfig,
+            checked: Boolean(smtpConfig),
             label: "Set up email",
             link: BUILDER_URLS.SETTINGS_EMAIL,
-            fallback: smtpConfig?.fallback || false,
+            fallback: smtpConfig?.fallback,
           },
           adminUser: {
             checked: userExists,
@@ -428,7 +428,7 @@ export async function configChecklist(ctx: Ctx<void, ConfigChecklistResponse>) {
             link: BUILDER_URLS.SETTINGS_PEOPLE_USERS,
           },
           sso: {
-            checked: !!googleConfig || !!oidcConfig,
+            checked: Boolean(googleConfig) || Boolean(oidcConfig),
             label: "Set up single sign-on",
             link: BUILDER_URLS.SETTINGS_AUTH,
           },

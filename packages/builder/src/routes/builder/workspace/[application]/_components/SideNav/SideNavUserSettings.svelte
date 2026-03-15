@@ -8,9 +8,6 @@ import SideNavLink from "./SideNavLink.svelte"
 
 export let collapsed = false
 
-$: user = $auth.user
-$: name = getName(user)
-
 const getName = (user?: User) => {
   if (!user) {
     return ""
@@ -25,6 +22,9 @@ const getName = (user?: User) => {
     return user.email
   }
 }
+
+$: user = $auth.user
+$: name = getName(user)
 </script>
 
 {#if user}

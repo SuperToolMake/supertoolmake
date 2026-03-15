@@ -10,7 +10,7 @@ import { createEventDispatcher } from "svelte"
 import { SchemaTypeOptionsExpanded } from "@/constants/backend"
 import { EditorModes } from "../common/CodeEditor"
 import CodeEditor from "../common/CodeEditor/CodeEditor.svelte"
-import type DynamicVariableModal from "./DynamicVariableModal.svelte"
+import DynamicVariableModal from "./DynamicVariableModal.svelte"
 import KeyValueBuilder from "./KeyValueBuilder.svelte"
 import { keyValueArrayToRecord, shouldShowVariables } from "./query"
 
@@ -27,6 +27,27 @@ let addVariableModal: DynamicVariableModal
 let selectedTab: string | undefined
 
 // Build tab options dynamically
+const handleTabChange = (e: CustomEvent<string>) => {
+  selectedTab = e.detail
+}
+
+const compareResponseType = (option: any, value: any) => option.type === value?.type
+
+const handleSchemaChange = (e: CustomEvent<Array<{ name: string; value: any }>>) => {
+  schema = keyValueArrayToRecord(e.detail)
+  dispatch("change", { schema })
+}
+
+const handleDynamicVariableChange = (e: CustomEvent<Record<string, any>>) => {
+  dynamicVariables = e.detail
+  dispatch("change", { dynamicVariables })
+}
+
+const handleDynamicVariablesUpdate = (e: CustomEvent<Array<{ name: string; value: any }>>) => {
+  dynamicVariables = keyValueArrayToRecord(e.detail)
+  dispatch("change", { dynamicVariables })
+}
+
 $: tabOptions = (() => {
   const options = []
   if (response) {
@@ -43,7 +64,7 @@ $: tabOptions = (() => {
 })()
 
 // RESPONSE
-$: responseSuccess = !!response && response.info.code >= 200 && response.info.code < 400
+$: responseSuccess = response != null && response.info.code >= 200 && response.info.code < 400
 $: showVariables = shouldShowVariables(dynamicVariables, responseSuccess)
 
 // Set default selected tab
@@ -54,10 +75,6 @@ $: if (selectedTab === undefined && tabOptions.length > 0) {
 // Switch to JSON tab whenever response changes
 $: if (response) {
   selectedTab = "JSON"
-}
-
-const handleTabChange = (e: CustomEvent<string>) => {
-  selectedTab = e.detail
 }
 
 const schemaMenuItems = [
@@ -79,23 +96,6 @@ const responseHeadersMenuItems = [
     },
   },
 ]
-
-const compareResponseType = (option: any, value: any) => option.type === value?.type
-
-const handleSchemaChange = (e: CustomEvent<Array<{ name: string; value: any }>>) => {
-  schema = keyValueArrayToRecord(e.detail)
-  dispatch("change", { schema })
-}
-
-const handleDynamicVariableChange = (e: CustomEvent<Record<string, any>>) => {
-  dynamicVariables = e.detail
-  dispatch("change", { dynamicVariables })
-}
-
-const handleDynamicVariablesUpdate = (e: CustomEvent<Array<{ name: string; value: any }>>) => {
-  dynamicVariables = keyValueArrayToRecord(e.detail)
-  dispatch("change", { dynamicVariables })
-}
 </script>
 
 <DynamicVariableModal

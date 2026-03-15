@@ -65,50 +65,20 @@ const formState = writable({
 })
 
 // Reactive derived stores to derive form state from field array
-$: values = deriveFieldProperty(fields, (f) => f.fieldState.value)
-$: errors = deriveFieldProperty(fields, (f) => f.fieldState.error)
-$: enrichments = deriveBindingEnrichments(fields)
-$: valid = !Object.values($errors).some((error) => error != null)
-
-// Derive whether the current form step is valid
-$: currentStepValid = derived([currentStep, ...fields], ([currentStepValue, ...fieldsValue]) => {
-  return !fieldsValue
-    .filter((f) => f.step === currentStepValue)
-    .some((f) => f.fieldState.error != null)
-})
-
-// Update form state store from derived stores
-$: {
-  formState.set({
-    values: $values,
-    errors: $errors,
-    valid,
-    currentStep: $currentStep,
-  })
-}
-
-// Derive value of whole form
-$: formValue = deriveFormValue(initialValues, $values, $enrichments)
-
-// Create data context to provide
-$: dataContext = {
-  ...formValue,
-
-  // These static values are prefixed to avoid clashes with actual columns
-  __value: formValue,
-  __valid: valid,
-  __currentStep: $currentStep,
-  __currentStepValid: $currentStepValid,
-}
-
 // Generates a derived store from an array of fields, comprised of a map of
 // extracted values from the field array
-const deriveFieldProperty = (
+const deriveFieldProperty = <T>(
   fieldStores: Readable<FieldInfo>[],
-  getProp: (_field: FieldInfo) => any
+  getProp: (_field: FieldInfo) => T
 ) => {
   return derived(fieldStores, (fieldValues) => {
-    return fieldValues.reduce((map, field) => ({ ...map, [field.name]: getProp(field) }), {})
+    return fieldValues.reduce<Record<string, T>>(
+      (map, field) => {
+        map[field.name] = getProp(field)
+        return map
+      },
+      {} as Record<string, T>
+    )
   })
 }
 
@@ -172,6 +142,156 @@ const sanitiseValue = (value: any, schema: FieldSchema | undefined, type: FieldT
   return value
 }
 
+// Creates an API for a specific field
+const makeFieldApi = (field: string) => {
+  // Sets the value for a certain field and invokes validation
+  const setValue = (value: any, skipCheck = false) => {
+    const fieldInfo = getField(field)
+    const { fieldState } = get(fieldInfo)
+    const { validator } = fieldState
+
+    // Skip if the value is the same
+    if (!skipCheck && fieldState.value === value) {
+      return false
+    }
+
+    // Update field state
+    const error = validator?.(value)
+    fieldInfo.update((state) => {
+      state.fieldState.value = value
+      state.fieldState.error = error
+      state.fieldState.lastUpdate = Date.now()
+      return state
+    })
+
+    return true
+  }
+
+  // Clears the value of a certain field back to the default value
+  const reset = () => {
+    const fieldInfo = getField(field)
+    const { fieldState } = get(fieldInfo)
+    const newValue = fieldState.defaultValue
+
+    // Update field state
+    fieldInfo.update((state) => {
+      state.fieldState.value = newValue
+      state.fieldState.error = null
+      state.fieldState.lastUpdate = Date.now()
+      return state
+    })
+  }
+
+  // We don't want to actually remove the field state when deregistering, just
+  // remove any errors and validation
+  const deregister = () => {
+    const fieldInfo = getField(field)
+    fieldInfo.update((state) => {
+      state.fieldState.validator = null
+      state.fieldState.error = null
+      return state
+    })
+  }
+
+  // Updates the disabled state of a certain field
+  const setDisabled = (fieldDisabled: boolean) => {
+    const fieldInfo = getField(field)
+
+    // Auto columns are always disabled
+    const isAutoColumn = Boolean(schema?.[field]?.autocolumn)
+
+    // Update disabled state
+    fieldInfo.update((state) => {
+      state.fieldState.disabled = disabled || fieldDisabled || isAutoColumn
+      return state
+    })
+  }
+
+  return {
+    setValue,
+    reset,
+    setDisabled,
+    deregister,
+    validate: () => {
+      // Validate the field by force setting the same value again
+      const fieldInfo = getField(field)
+      setValue(get(fieldInfo).fieldState.value, true)
+      return !get(fieldInfo).fieldState.error
+    },
+  }
+}
+
+const handleUpdateFieldValue = ({
+  type,
+  field,
+  value,
+}: {
+  type: "set" | "reset"
+  field: string
+  value: any
+}) => {
+  if (type === "set") {
+    formApi.setFieldValue(field, value)
+  } else {
+    formApi.resetField(field)
+  }
+}
+
+const handleScrollToField = (props: { field: FieldInfo | string }) => {
+  let field
+  if (typeof props.field === "string") {
+    field = get(getField(props.field))
+  } else {
+    field = props.field
+  }
+  const fieldId = field.fieldState.fieldId
+  const fieldElement = document.getElementById(fieldId)
+  if (fieldElement) {
+    fieldElement.focus({ preventScroll: true })
+  }
+  const label = document.querySelector<HTMLElement>(`label[for="${fieldId}"]`)
+  if (label) {
+    label.style.scrollMargin = "100px"
+    label.scrollIntoView({ behavior: "smooth", block: "nearest" })
+  }
+}
+
+$: values = deriveFieldProperty(fields, (f) => f.fieldState.value)
+$: errors = deriveFieldProperty(fields, (f) => f.fieldState.error)
+$: enrichments = deriveBindingEnrichments(fields)
+$: valid = !Object.values($errors).some((error) => error != null)
+
+// Derive whether the current form step is valid
+$: currentStepValid = derived([currentStep, ...fields], ([currentStepValue, ...fieldsValue]) => {
+  return !fieldsValue
+    .filter((f) => f.step === currentStepValue)
+    .some((f) => f.fieldState.error != null)
+})
+
+// Update form state store from derived stores
+$: {
+  formState.set({
+    values: $values,
+    errors: $errors,
+    valid,
+    currentStep: $currentStep,
+  })
+}
+
+// Derive value of whole form
+$: formValue = deriveFormValue(initialValues, $values, $enrichments)
+
+// Create data context to provide
+$: dataContext = {
+  ...formValue,
+
+  // These static values are prefixed to avoid clashes with actual columns
+  __value: formValue,
+  __valid: valid,
+  __currentStep: $currentStep,
+  __currentStepValid: $currentStepValid,
+}
+
 const formApi = {
   registerField: (
     field: string,
@@ -233,7 +353,7 @@ const formApi = {
     }
 
     // Auto columns are always disabled
-    const isAutoColumn = !!schema?.[field]?.autocolumn
+    const isAutoColumn = Boolean(schema?.[field]?.autocolumn)
 
     // Construct field info
     const fieldInfo = writable<FieldInfo>({
@@ -273,7 +393,7 @@ const formApi = {
     stepFields.forEach((field) => {
       const fieldValid = get(field).fieldApi.validate()
       valid = valid && fieldValid
-      if (!valid && !hasScrolled) {
+      if (!(valid || hasScrolled)) {
         handleScrollToField({ field: get(field) })
         hasScrolled = true
       }
@@ -294,7 +414,7 @@ const formApi = {
       currentStep.update((step) => Math.max(1, step - 1))
     } else if (type === "first") {
       currentStep.set(1)
-    } else if (type === "specific" && number && !isNaN(number)) {
+    } else if (type === "specific" && number && !Number.isNaN(number)) {
       currentStep.set(parseInt(number))
     }
   },
@@ -321,85 +441,6 @@ const formApi = {
   },
 }
 
-// Creates an API for a specific field
-const makeFieldApi = (field: string) => {
-  // Sets the value for a certain field and invokes validation
-  const setValue = (value: any, skipCheck = false) => {
-    const fieldInfo = getField(field)
-    const { fieldState } = get(fieldInfo)
-    const { validator } = fieldState
-
-    // Skip if the value is the same
-    if (!skipCheck && fieldState.value === value) {
-      return false
-    }
-
-    // Update field state
-    const error = validator?.(value)
-    fieldInfo.update((state) => {
-      state.fieldState.value = value
-      state.fieldState.error = error
-      state.fieldState.lastUpdate = Date.now()
-      return state
-    })
-
-    return true
-  }
-
-  // Clears the value of a certain field back to the default value
-  const reset = () => {
-    const fieldInfo = getField(field)
-    const { fieldState } = get(fieldInfo)
-    const newValue = fieldState.defaultValue
-
-    // Update field state
-    fieldInfo.update((state) => {
-      state.fieldState.value = newValue
-      state.fieldState.error = null
-      state.fieldState.lastUpdate = Date.now()
-      return state
-    })
-  }
-
-  // We don't want to actually remove the field state when deregistering, just
-  // remove any errors and validation
-  const deregister = () => {
-    const fieldInfo = getField(field)
-    fieldInfo.update((state) => {
-      state.fieldState.validator = null
-      state.fieldState.error = null
-      return state
-    })
-  }
-
-  // Updates the disabled state of a certain field
-  const setDisabled = (fieldDisabled: boolean) => {
-    const fieldInfo = getField(field)
-
-    // Auto columns are always disabled
-    const isAutoColumn = !!schema?.[field]?.autocolumn
-
-    // Update disabled state
-    fieldInfo.update((state) => {
-      state.fieldState.disabled = disabled || fieldDisabled || isAutoColumn
-      return state
-    })
-  }
-
-  return {
-    setValue,
-    reset,
-    setDisabled,
-    deregister,
-    validate: () => {
-      // Validate the field by force setting the same value again
-      const fieldInfo = getField(field)
-      setValue(get(fieldInfo).fieldState.value, true)
-      return !get(fieldInfo).fieldState.error
-    },
-  }
-}
-
 // Provide form state and api for full control by children
 setContext("form", {
   formState,
@@ -413,41 +454,6 @@ setContext("form", {
 // Provide form step context so that forms without any step components
 // register their fields to step 1
 setContext("form-step", writable(1))
-
-const handleUpdateFieldValue = ({
-  type,
-  field,
-  value,
-}: {
-  type: "set" | "reset"
-  field: string
-  value: any
-}) => {
-  if (type === "set") {
-    formApi.setFieldValue(field, value)
-  } else {
-    formApi.resetField(field)
-  }
-}
-
-const handleScrollToField = (props: { field: FieldInfo | string }) => {
-  let field
-  if (typeof props.field === "string") {
-    field = get(getField(props.field))
-  } else {
-    field = props.field
-  }
-  const fieldId = field.fieldState.fieldId
-  const fieldElement = document.getElementById(fieldId)
-  if (fieldElement) {
-    fieldElement.focus({ preventScroll: true })
-  }
-  const label = document.querySelector<HTMLElement>(`label[for="${fieldId}"]`)
-  if (label) {
-    label.style.scrollMargin = "100px"
-    label.scrollIntoView({ behavior: "smooth", block: "nearest" })
-  }
-}
 
 // Action context to pass to children
 const actions = [

@@ -37,7 +37,7 @@ const handleChange = (e) => {
   }
 }
 
-const isValidDate = (value) => !isNaN(new Date(value))
+const isValidDate = (value) => !Number.isNaN(new Date(value))
 
 const timeToDateISOString = (value) => {
   let [hours, minutes] = value.split(":").map(Number)

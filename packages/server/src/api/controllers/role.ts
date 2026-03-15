@@ -84,7 +84,7 @@ export async function save(ctx: UserCtx<SaveRoleRequest, SaveRoleResponse>) {
   const db = context.getWorkspaceDB()
   let { _id, _rev, name, inherits, permissionId, version, uiMetadata } = ctx.request.body
   let isCreate = false
-  if (!_rev && !version) {
+  if (!(_rev || version)) {
     version = roles.RoleIDVersion.NAME
   }
   const isNewVersion = version === roles.RoleIDVersion.NAME
@@ -171,7 +171,7 @@ export async function save(ctx: UserCtx<SaveRoleRequest, SaveRoleResponse>) {
     })
     await replication.replicate({
       filter: (doc) => {
-        return doc._id && doc._id.startsWith("role_")
+        return doc._id?.startsWith("role_")
       },
     })
   }

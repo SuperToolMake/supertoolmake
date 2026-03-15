@@ -7,7 +7,7 @@ export let onChange
 
 const numberOnChange = (value) => {
   const float = parseFloat(value)
-  const newValue = isNaN(float) ? null : float
+  const newValue = Number.isNaN(float) ? null : float
   onChange(newValue)
 }
 </script>

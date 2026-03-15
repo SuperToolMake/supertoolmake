@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Body, Divider, Icon, type Modal, StatusLight } from "@budibase/bbui"
+import { Body, Divider, Icon, Modal, StatusLight } from "@budibase/bbui"
 import { beforeUrlChange, goto } from "@roxi/routify"
 import { tick } from "svelte"
 import NewPill from "@/components/common/NewPill.svelte"
@@ -9,7 +9,7 @@ import Router from "@/settings/Router.svelte"
 import { bb } from "@/stores/bb"
 import { flattenedRoutes, permittedRoutes } from "@/stores/routing"
 import { isRouteHREF, isSettingIcon, type MatchedRoute, type Route } from "@/types/routing"
-import type ModalSideBar from "./ModalSideBar.svelte"
+import ModalSideBar from "./ModalSideBar.svelte"
 
 export const show = () => modal.show()
 
@@ -21,38 +21,6 @@ let page: HTMLDivElement
 let modalOpen = false
 let settingsSideBarCollapsed = false
 let settingsNav: ModalSideBar
-
-$: ({ route, open } = $bb.settings ?? {})
-$: matchedRoute = route
-
-$beforeUrlChange(() => {
-  bb.hideSettings()
-  return true
-})
-
-// Original structure
-$: routes = $permittedRoutes
-
-// Split by assigned group
-$: routesByGroup = routes.reduce((acc: Record<string, Route[]>, entry: Route) => {
-  const group: Route[] = (acc[entry.group || "none"] ??= [])
-  group.push(entry)
-  return acc
-}, {})
-
-// Show/Hide the settings modal as required
-$: modal, toggleSettings(open)
-
-$: groupEntries = Object.entries(routesByGroup || {})
-
-// Reset scroll when path changes
-$: resetScroll(matchedRoute?.entry?.path)
-
-// Pull out the default route
-$: defaultRoute = $flattenedRoutes.find((r) => r.path === "/general/info")
-
-// Determine the path when opened
-$: handlePath($flattenedRoutes, open, matchedRoute)
 
 const handlePath = (routes: Route[], open: boolean, matchedRoute?: MatchedRoute) => {
   if (routes && open === true) {
@@ -122,6 +90,45 @@ const navItemClick = (route: Route) => {
   }
   bb.settings(`/${path}`)
 }
+
+$: ({ route, open } = $bb.settings ?? {})
+$: matchedRoute = route
+
+$beforeUrlChange(() => {
+  bb.hideSettings()
+  return true
+})
+
+// Original structure
+$: routes = $permittedRoutes
+
+// Split by assigned group
+$: routesByGroup = routes.reduce((acc: Record<string, Route[]>, entry: Route) => {
+  const groupName = entry.group || "none"
+  if (!acc[groupName]) {
+    acc[groupName] = []
+  }
+  const group: Route[] = acc[groupName]
+  group.push(entry)
+  return acc
+}, {})
+
+// Show/Hide the settings modal as required
+$: {
+  modal
+  toggleSettings(open)
+}
+
+$: groupEntries = Object.entries(routesByGroup || {})
+
+// Reset scroll when path changes
+$: resetScroll(matchedRoute?.entry?.path)
+
+// Pull out the default route
+$: defaultRoute = $flattenedRoutes.find((r) => r.path === "/general/info")
+
+// Determine the path when opened
+$: handlePath($flattenedRoutes, open, matchedRoute)
 </script>
 
 <div class="settings-wrap">

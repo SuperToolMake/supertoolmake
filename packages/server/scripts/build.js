@@ -1,6 +1,6 @@
 #!/usr/bin/node
-const { join } = require("path")
-const fs = require("fs")
+const { join } = require("node:path")
+const fs = require("node:fs")
 const coreBuild = require("../../../scripts/build")
 
 const dir = join(__dirname, "..")

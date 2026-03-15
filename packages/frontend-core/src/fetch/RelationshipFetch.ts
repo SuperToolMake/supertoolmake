@@ -21,7 +21,7 @@ export default class RelationshipFetch extends BaseDataFetch<RelationshipDatasou
 
   async getData() {
     const { datasource } = this.options
-    if (!datasource?.rowId || !datasource?.rowTableId) {
+    if (!(datasource?.rowId && datasource?.rowTableId)) {
       return { rows: [] }
     }
     try {
@@ -31,7 +31,7 @@ export default class RelationshipFetch extends BaseDataFetch<RelationshipDatasou
         datasource.fieldName
       )
       return { rows: res }
-    } catch (error) {
+    } catch {
       return { rows: [] }
     }
   }

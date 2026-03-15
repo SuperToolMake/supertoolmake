@@ -30,7 +30,8 @@ let height
 // without resetting scroll otherwise
 export async function set(new_value, new_mode) {
   if (new_mode !== mode) {
-    await createEditor((mode = new_mode))
+    mode = new_mode
+    await createEditor(mode)
   }
 
   value = new_value
@@ -44,7 +45,7 @@ export function update(new_value) {
 
   if (editor) {
     const { left, top } = editor.getScrollInfo()
-    editor.setValue((value = new_value))
+    editor.setValue(value)
     editor.scrollTo(left, top)
   }
 }
@@ -86,23 +87,6 @@ const refs = {}
 let editor
 let updating_externally = false
 let destroyed = false
-
-$: if (editor && width && height) {
-  editor.refresh()
-}
-
-onMount(() => {
-  createEditor(mode).then(() => {
-    if (editor) editor.setValue(value || "")
-  })
-
-  return () => {
-    destroyed = true
-    if (editor) editor.toTextArea()
-  }
-})
-
-let first = true
 
 async function createEditor(mode) {
   if (destroyed || !CodeMirror) return
@@ -172,6 +156,23 @@ async function createEditor(mode) {
 function sleep(ms) {
   return new Promise((fulfil) => setTimeout(fulfil, ms))
 }
+
+$: if (editor && width && height) {
+  editor.refresh()
+}
+
+onMount(() => {
+  createEditor(mode).then(() => {
+    if (editor) editor.setValue(value || "")
+  })
+
+  return () => {
+    destroyed = true
+    if (editor) editor.toTextArea()
+  }
+})
+
+let first = true
 </script>
 
 {#if label}

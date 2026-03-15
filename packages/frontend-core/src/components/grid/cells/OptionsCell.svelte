@@ -19,17 +19,6 @@ let isOpen = false
 let focusedOptionIdx = null
 let anchor
 
-$: options = schema?.constraints?.inclusion || []
-$: optionColors = schema?.optionColors || {}
-$: editable = focused && !readonly
-$: values = Array.isArray(value) ? value : [value].filter((x) => x != null)
-$: {
-  // Close when deselected
-  if (!focused && isOpen) {
-    close()
-  }
-}
-
 const open = () => {
   isOpen = true
   focusedOptionIdx = 0
@@ -74,6 +63,17 @@ const onKeyDown = (e) => {
     toggleOption(options[focusedOptionIdx])
   }
   return true
+}
+
+$: options = schema?.constraints?.inclusion || []
+$: optionColors = schema?.optionColors || {}
+$: editable = focused && !readonly
+$: values = Array.isArray(value) ? value : [value].filter((x) => x != null)
+$: {
+  // Close when deselected
+  if (!focused && isOpen) {
+    close()
+  }
 }
 
 onMount(() => {

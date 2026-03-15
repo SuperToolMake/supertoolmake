@@ -1,4 +1,4 @@
-import https from "https"
+import https from "node:https"
 
 // Capture S3 constructor calls
 let s3ConstructorCalls: any[] = []

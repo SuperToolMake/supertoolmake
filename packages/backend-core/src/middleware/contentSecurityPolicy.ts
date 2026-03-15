@@ -1,5 +1,5 @@
+import crypto from "node:crypto"
 import type { Ctx } from "@budibase/types"
-import crypto from "crypto"
 import type { Middleware, Next } from "koa"
 
 const CSP_DIRECTIVES = {
