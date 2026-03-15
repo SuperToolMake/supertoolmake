@@ -88,7 +88,7 @@ const authorized =
 
     if (resourcePath) {
       // Reusing the existing middleware to extract the value
-      paramResource(resourcePath)(ctx, () => {})
+      await paramResource(resourcePath)(ctx, async () => {})
     }
 
     if (hasResource(ctx)) {
