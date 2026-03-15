@@ -244,7 +244,7 @@ export default class TestConfiguration {
 
   // UTILS
 
-  _req<Req extends Record<string, any> | undefined, Res>(
+  _req<Req, Res>(
     handler: (ctx: UserCtx<Req, Res>) => Promise<void>,
     body?: Req,
     params?: Record<string, string | undefined>

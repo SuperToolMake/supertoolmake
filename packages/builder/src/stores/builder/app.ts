@@ -2,7 +2,6 @@ import { resolveWorkspaceTranslations } from "@budibase/shared-core"
 import type {
   AppScript,
   AutomationSettings,
-  PWAManifest,
   TranslationOverrides,
   UpdateWorkspaceRequest,
   Workspace,
@@ -51,7 +50,6 @@ export interface AppMetaState {
   revertableVersion?: string
   upgradableVersion?: string
   icon?: WorkspaceIcon
-  pwa?: PWAManifest
   scripts: AppScript[]
   translationOverrides: TranslationOverrides
 }
@@ -86,17 +84,6 @@ export const INITIAL_APP_META_STATE: AppMetaState = {
   hasAppPackage: false,
   automations: {},
   routes: {},
-  pwa: {
-    name: "",
-    short_name: "",
-    description: "",
-    icons: [],
-    background_color: "",
-    theme_color: "",
-    start_url: "",
-    scope: "",
-    screenshots: [],
-  },
   scripts: [],
   translationOverrides: {},
 }
@@ -131,7 +118,6 @@ export class AppMetaStore extends BudiStore<AppMetaState> {
       initialised: true,
       automations: workspace.automations || {},
       hasAppPackage: true,
-      pwa: workspace.pwa,
       scripts: workspace.scripts || [],
       translationOverrides,
     }))
@@ -185,18 +171,6 @@ export class AppMetaStore extends BudiStore<AppMetaState> {
       name,
       url,
       icon,
-      pwa: {
-        ...state.pwa,
-        name: state.pwa?.name || "",
-        short_name: state.pwa?.short_name || "",
-        description: state.pwa?.description || "",
-        icons: state.pwa?.icons || [],
-        background_color: state.pwa?.background_color || "",
-        theme_color: state.pwa?.theme_color || "",
-        start_url: state.pwa?.start_url || "",
-        scope: state.pwa?.scope || "",
-        screenshots: state.pwa?.screenshots || [],
-      },
     }))
   }
 
