@@ -141,7 +141,7 @@ export const logout = async (ctx: UserCtx<void, LogoutResponse>) => {
 
 // INIT
 
-export const setInitInfo = (ctx: UserCtx<SetInitInfoRequest, SetInitInfoResponse>) => {
+export const setInitInfo = async (ctx: UserCtx<SetInitInfoRequest, SetInitInfoResponse>) => {
   const initInfo = ctx.request.body
   setCookie(ctx, initInfo, Cookie.Init)
   ctx.body = {
@@ -149,7 +149,7 @@ export const setInitInfo = (ctx: UserCtx<SetInitInfoRequest, SetInitInfoResponse
   }
 }
 
-export const getInitInfo = (ctx: UserCtx<void, GetInitInfoResponse>) => {
+export const getInitInfo = async (ctx: UserCtx<void, GetInitInfoResponse>) => {
   try {
     ctx.body = getCookie(ctx, Cookie.Init) || {}
   } catch {

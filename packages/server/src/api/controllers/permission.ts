@@ -17,11 +17,11 @@ import { CURRENTLY_SUPPORTED_LEVELS, getBasePermissions } from "../../utilities/
 
 const SUPPORTED_LEVELS = CURRENTLY_SUPPORTED_LEVELS
 
-export function fetchBuiltin(ctx: UserCtx<void, FetchBuiltinPermissionsResponse>) {
+export async function fetchBuiltin(ctx: UserCtx<void, FetchBuiltinPermissionsResponse>) {
   ctx.body = Object.values(permissions.getBuiltinPermissions())
 }
 
-export function fetchLevels(ctx: UserCtx<void, FetchPermissionLevelsRequest>) {
+export async function fetchLevels(ctx: UserCtx<void, FetchPermissionLevelsRequest>) {
   // for now only provide the read/write perms externally
   ctx.body = SUPPORTED_LEVELS
 }
