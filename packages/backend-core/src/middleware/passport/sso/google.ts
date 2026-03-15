@@ -47,7 +47,7 @@ export async function strategyFactory(
   try {
     const { clientID, clientSecret } = config
 
-    if (!clientID || !clientSecret) {
+    if (!(clientID && clientSecret)) {
       throw new Error("Configuration invalid. Must contain google clientID and clientSecret")
     }
 

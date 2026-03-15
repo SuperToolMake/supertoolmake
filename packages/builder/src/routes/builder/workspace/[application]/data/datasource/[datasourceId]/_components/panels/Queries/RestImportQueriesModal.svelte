@@ -37,9 +37,6 @@ const data = writable<ImportFormData>({
 let lastTouched: "url" | "file" | "raw" = "url"
 
 let datasource: Datasource
-$: datasource = $datasources.selected as Datasource
-let dataStringCache: string | undefined
-
 const resetCache = () => {
   dataStringCache = undefined
 }
@@ -96,7 +93,7 @@ async function importQueries() {
       return keepOpen
     }
 
-    if (!datasourceId && !createDatasource) {
+    if (!(datasourceId || createDatasource)) {
       throw new Error("No datasource id")
     }
 
@@ -124,6 +121,9 @@ async function importQueries() {
     return keepOpen
   }
 }
+
+$: datasource = $datasources.selected as Datasource
+let dataStringCache: string | undefined
 </script>
 
 <ModalContent

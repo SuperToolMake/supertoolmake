@@ -19,6 +19,21 @@ const { deleteEdge, selectedNodes } = getContext("flow")
 let iconHovered = false
 let edgeHovered = false
 
+const getEdgeClasses = (active, iconHovered) => {
+  let classes = ""
+  if (active) classes += `active `
+  if (iconHovered) classes += `delete `
+  return classes
+}
+
+const onEdgeMouseOver = () => {
+  edgeHovered = true
+}
+
+const onEdgeMouseOut = () => {
+  edgeHovered = false
+}
+
 $: hovered = iconHovered || edgeHovered
 $: active = hovered || $selectedNodes.includes(source) || $selectedNodes.includes(target)
 $: edgeClasses = getEdgeClasses(active, iconHovered)
@@ -36,21 +51,6 @@ $: tooltip =
   sourceRole && targetRole
     ? `Stop ${targetRole.uiMetadata.displayName} from inheriting ${sourceRole.uiMetadata.displayName}`
     : null
-
-const getEdgeClasses = (active, iconHovered) => {
-  let classes = ""
-  if (active) classes += `active `
-  if (iconHovered) classes += `delete `
-  return classes
-}
-
-const onEdgeMouseOver = () => {
-  edgeHovered = true
-}
-
-const onEdgeMouseOut = () => {
-  edgeHovered = false
-}
 
 onMount(() => {
   const edge = document.querySelector(`.svelte-flow__edge[data-id="${id}"]`)

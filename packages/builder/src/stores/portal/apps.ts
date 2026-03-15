@@ -170,7 +170,7 @@ export const enrichedApps = derived([appsStore, auth, sortBy], ([$store, $auth, 
       deployed: app.status === AppStatus.DEPLOYED,
       lockedYou: app.lockedBy != null && app.lockedBy.email === user?.email,
       lockedOther: app.lockedBy != null && app.lockedBy.email !== user?.email,
-      favourite: !!user?.appFavourites?.includes(app.appId),
+      favourite: Boolean(user?.appFavourites?.includes(app.appId)),
       editable: sdk.users.isBuilder(user, app?.devId),
     }
   })

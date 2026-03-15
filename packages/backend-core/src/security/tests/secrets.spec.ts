@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto"
+import { randomUUID } from "node:crypto"
 import environment, { SECRETS } from "../../environment"
 import { stringContainsSecret } from "../secrets"
 

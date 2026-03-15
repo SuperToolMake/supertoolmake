@@ -1,3 +1,7 @@
+import path from "node:path"
+import { performance } from "node:perf_hooks"
+import qs from "node:querystring"
+import { URLSearchParams } from "node:url"
 import { blacklist } from "@budibase/backend-core"
 import { utils } from "@budibase/shared-core"
 import {
@@ -16,9 +20,6 @@ import {
 } from "@budibase/types"
 import { parse } from "content-disposition"
 import get from "lodash/get"
-import path from "path"
-import { performance } from "perf_hooks"
-import qs from "querystring"
 import {
   Agent,
   FormData,
@@ -29,7 +30,6 @@ import {
   type RequestInit,
   type Response,
 } from "undici"
-import { URLSearchParams } from "url"
 import { Builder as XmlBuilder } from "xml2js"
 import environment from "../environment"
 import sdk from "../sdk"
@@ -365,7 +365,7 @@ export class RestIntegration implements IntegrationBase {
 
       // only add query string if there are remaining parameters
       if (Object.keys(filtered).length > 0) {
-        queryString = "?" + qs.encode(filtered)
+        queryString = `?${qs.encode(filtered)}`
       } else {
         queryString = ""
       }
@@ -531,7 +531,7 @@ export class RestIntegration implements IntegrationBase {
         } else if (string) {
           try {
             payload = JSON.parse(string) as JSONValue
-          } catch (_err) {
+          } catch {
             payload = object as JSONValue
           }
         } else {
@@ -716,7 +716,7 @@ export class RestIntegration implements IntegrationBase {
         error: error.message,
         cause: error.cause?.message,
         code: error.cause?.code,
-        hasDispatcher: !!input.dispatcher,
+        hasDispatcher: Boolean(input.dispatcher),
         isHttpsUrl: url.startsWith("https://"),
         rejectUnauthorized,
       })

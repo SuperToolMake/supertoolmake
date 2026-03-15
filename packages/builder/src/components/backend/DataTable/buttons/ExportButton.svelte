@@ -30,16 +30,6 @@ let popover
 let exportFormat
 let loading = false
 
-$: options = FORMATS.filter((format) => {
-  if (formats && !formats.includes(format.key)) {
-    return false
-  }
-  return true
-})
-$: if (options && !exportFormat) {
-  exportFormat = Array.isArray(options) ? options[0]?.key : []
-}
-
 const openPopover = () => {
   loading = false
   popover.show()
@@ -83,6 +73,16 @@ const exportData = async () => {
   } finally {
     loading = false
   }
+}
+
+$: options = FORMATS.filter((format) => {
+  if (formats && !formats.includes(format.key)) {
+    return false
+  }
+  return true
+})
+$: if (options && !exportFormat) {
+  exportFormat = Array.isArray(options) ? options[0]?.key : []
 }
 </script>
 

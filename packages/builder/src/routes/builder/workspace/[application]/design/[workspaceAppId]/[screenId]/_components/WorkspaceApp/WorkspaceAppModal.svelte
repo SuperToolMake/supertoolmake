@@ -1,13 +1,5 @@
 <script lang="ts">
-import {
-  Body,
-  Icon,
-  Input,
-  keepOpen,
-  type Modal,
-  ModalContent,
-  notifications,
-} from "@budibase/bbui"
+import { Body, Icon, Input, keepOpen, Modal, ModalContent, notifications } from "@budibase/bbui"
 import { PublishResourceState, type UIWorkspaceApp, type WorkspaceApp } from "@budibase/types"
 import { goto } from "@roxi/routify"
 import type { ZodType } from "zod"
@@ -25,17 +17,8 @@ export const show = () => modal.show()
 
 let data: WorkspaceApp
 
-$: isNew = !workspaceApp
-
-$: title = isNew ? "Create new app" : "Edit app"
-
 const requiredString = (errorMessage: string) =>
   z.string({ required_error: errorMessage }).trim().min(1, errorMessage)
-
-let validationState: {
-  errors: Partial<Record<keyof WorkspaceApp, string>>
-  touched: Partial<Record<keyof WorkspaceApp, boolean>>
-}
 
 const validateWorkspaceApp = (workspaceApp: Partial<WorkspaceApp>) => {
   const validator = z.object({
@@ -147,6 +130,15 @@ async function onEnterKey() {
   }
 
   modal.hide()
+}
+
+$: isNew = !workspaceApp
+
+$: title = isNew ? "Create new app" : "Edit app"
+
+let validationState: {
+  errors: Partial<Record<keyof WorkspaceApp, string>>
+  touched: Partial<Record<keyof WorkspaceApp, boolean>>
 }
 
 $: {

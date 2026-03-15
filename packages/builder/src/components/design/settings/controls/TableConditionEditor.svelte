@@ -52,15 +52,6 @@ let tempValue = []
 let drawer
 let dragDisabled = true
 
-$: count = value?.length
-$: conditionText = `${count || "No"} condition${count !== 1 ? "s" : ""} set`
-$: type = componentInstance.columnType
-$: valueTypeOptions = getValueTypeOptions(type)
-$: hasValueOption = type !== FieldType.STRING
-$: operatorOptions = QueryUtils.getValidOperatorsForType({
-  type,
-})
-
 const getValueTypeOptions = (type) => {
   let options = [
     {
@@ -131,6 +122,15 @@ const handleFinalize = (e) => {
   updateConditions(e)
   dragDisabled = true
 }
+
+$: count = value?.length
+$: conditionText = `${count || "No"} condition${count !== 1 ? "s" : ""} set`
+$: type = componentInstance.columnType
+$: valueTypeOptions = getValueTypeOptions(type)
+$: hasValueOption = type !== FieldType.STRING
+$: operatorOptions = QueryUtils.getValidOperatorsForType({
+  type,
+})
 </script>
 
 <ActionButton on:click={openDrawer}>{conditionText}</ActionButton>

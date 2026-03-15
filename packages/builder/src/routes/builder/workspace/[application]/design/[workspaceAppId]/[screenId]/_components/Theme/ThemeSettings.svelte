@@ -18,8 +18,6 @@ import ButtonRoundnessSelect from "./ButtonRoundnessSelect.svelte"
 
 let popover: any
 
-$: customTheme = $themeStore.customTheme || {}
-
 export function show() {
   popover?.show()
 }
@@ -31,10 +29,12 @@ export function hide() {
 const update = async (property: string, value: any) => {
   try {
     await themeStore.saveCustom({ [property]: value }, $appStore.appId)
-  } catch (error) {
+  } catch {
     notifications.error("Error updating custom theme")
   }
 }
+
+$: customTheme = $themeStore.customTheme || {}
 </script>
 
 <DetailPopover

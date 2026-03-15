@@ -20,7 +20,7 @@ async function createDefaultApp() {
   await onConfirm(workspaceApp._id)
 }
 
-$: hasApps = !!$workspaceAppStore.workspaceApps.length
+$: hasApps = Boolean($workspaceAppStore.workspaceApps.length)
 </script>
 
 {#if hasApps}

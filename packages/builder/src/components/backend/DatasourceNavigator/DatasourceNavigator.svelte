@@ -24,21 +24,6 @@ export let datasourceFilter = (_) => true
 export let datasourceSort
 let toggledDatasources = {}
 
-$: enrichedDataSources = enrichDatasources(
-  $datasources,
-  $params,
-  $isActive,
-  $tables,
-  $queries,
-  toggledDatasources,
-  searchTerm,
-  datasourceFilter
-)
-
-$: displayedDatasources = datasourceSort
-  ? enrichedDataSources.slice().sort(datasourceSort)
-  : enrichedDataSources
-
 function selectDatasource(datasource) {
   openNode(datasource)
   $goto("./datasource/[datasourceId]", { datasourceId: datasource._id })
@@ -60,6 +45,21 @@ function openNode(datasource) {
 function toggleNode(datasource) {
   toggledDatasources[datasource._id] = !datasource.open
 }
+
+$: enrichedDataSources = enrichDatasources(
+  $datasources,
+  $params,
+  $isActive,
+  $tables,
+  $queries,
+  toggledDatasources,
+  searchTerm,
+  datasourceFilter
+)
+
+$: displayedDatasources = datasourceSort
+  ? enrichedDataSources.slice().sort(datasourceSort)
+  : enrichedDataSources
 
 onMount(() => {
   if ($tables.selected) {

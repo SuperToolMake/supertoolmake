@@ -1,6 +1,6 @@
-import dns from "dns"
-import net from "net"
-import { promisify } from "util"
+import dns from "node:dns"
+import net from "node:net"
+import { promisify } from "node:util"
 import env from "../environment"
 
 const DEFAULT_BLACKLIST = [

@@ -31,35 +31,6 @@ export let datasourceId: string | undefined = undefined
 export let createDatasource = false
 export let onCancel: (() => void) | undefined = undefined
 
-$: datasource = $datasources.selected as Datasource
-let selectedEndpoint: ImportEndpoint | undefined
-let template: RestTemplate | undefined
-$: restIntegration = ($integrations || []).find(
-  (integration) => integration.name === datasource?.source
-)
-$: template =
-  datasource?.restTemplate && $restTemplates
-    ? restTemplates.getByName(datasource.restTemplate)
-    : undefined
-$: selectedTemplateSpec = template
-  ? template.specs?.find((spec) => spec.version === datasource?.restTemplateVersion) ||
-    template.specs?.[0]
-  : undefined
-$: resolvedTemplateSpecUrl = selectedTemplateSpec?.url
-$: templateName = template?.name
-$: templateIcon = template?.icon
-$: isTemplateDatasource = Boolean(datasource?.restTemplate && template)
-$: templateEndpointDescription = selectedEndpoint?.description || ""
-let endpointOptions: ImportEndpoint[] = []
-let selectedEndpointId: string | undefined
-let endpointsLoading = false
-let endpointsError: string | null = null
-let endpointsSourceUrl: string | undefined
-let loadRequestId = 0
-$: confirmDisabled = !selectedEndpointId || endpointsLoading
-let currentTemplateUrl: string | undefined
-let templateDocsBaseUrl: string | undefined
-
 const resetEndpoints = () => {
   loadRequestId += 1
   endpointOptions = []
@@ -100,22 +71,12 @@ const loadTemplateEndpoints = async (specUrl: string) => {
   }
 }
 
-$: if (isTemplateDatasource) {
-  const specUrl = resolvedTemplateSpecUrl
-  if (specUrl && specUrl !== currentTemplateUrl) {
-    currentTemplateUrl = specUrl
-    loadTemplateEndpoints(specUrl)
-  }
-} else if (currentTemplateUrl) {
-  currentTemplateUrl = undefined
-}
-
 const getEndpointId = (endpoint: ImportEndpoint) => endpoint.id
 
 const getEndpointIcon = (endpoint: ImportEndpoint) => {
   const method = (endpoint.method || "").toUpperCase()
   if (!method) {
-    return undefined
+    return
   }
   const verbKey = endpoint.queryVerb || method.toLowerCase()
   return {
@@ -125,14 +86,6 @@ const getEndpointIcon = (endpoint: ImportEndpoint) => {
       color: customQueryIconColor(verbKey),
     },
   }
-}
-
-const verbOrder: Record<string, number> = {
-  GET: 0,
-  POST: 1,
-  PUT: 2,
-  PATCH: 3,
-  DELETE: 4,
 }
 
 const compareEndpointOrder = (a: ImportEndpoint, b: ImportEndpoint) => {
@@ -152,8 +105,6 @@ const onSelectEndpoint = (event: CustomEvent<string | undefined>) => {
   selectedEndpointId = event.detail
 }
 
-$: selectedEndpoint = endpointOptions.find((endpoint) => endpoint.id === selectedEndpointId)
-
 async function importQueries() {
   try {
     if (!selectedEndpointId) {
@@ -166,7 +117,7 @@ async function importQueries() {
       return keepOpen
     }
 
-    if (!datasourceId && !createDatasource) {
+    if (!(datasourceId || createDatasource)) {
       throw new Error("No datasource id")
     }
 
@@ -196,6 +147,55 @@ async function importQueries() {
     return keepOpen
   }
 }
+
+$: datasource = $datasources.selected as Datasource
+let selectedEndpoint: ImportEndpoint | undefined
+let template: RestTemplate | undefined
+$: restIntegration = ($integrations || []).find(
+  (integration) => integration.name === datasource?.source
+)
+$: template =
+  datasource?.restTemplate && $restTemplates
+    ? restTemplates.getByName(datasource.restTemplate)
+    : undefined
+$: selectedTemplateSpec = template
+  ? template.specs?.find((spec) => spec.version === datasource?.restTemplateVersion) ||
+    template.specs?.[0]
+  : undefined
+$: resolvedTemplateSpecUrl = selectedTemplateSpec?.url
+$: templateName = template?.name
+$: templateIcon = template?.icon
+$: isTemplateDatasource = Boolean(datasource?.restTemplate && template)
+$: templateEndpointDescription = selectedEndpoint?.description || ""
+let endpointOptions: ImportEndpoint[] = []
+let selectedEndpointId: string | undefined
+let endpointsLoading = false
+let endpointsError: string | null = null
+let endpointsSourceUrl: string | undefined
+let loadRequestId = 0
+$: confirmDisabled = !selectedEndpointId || endpointsLoading
+let currentTemplateUrl: string | undefined
+let templateDocsBaseUrl: string | undefined
+
+$: if (isTemplateDatasource) {
+  const specUrl = resolvedTemplateSpecUrl
+  if (specUrl && specUrl !== currentTemplateUrl) {
+    currentTemplateUrl = specUrl
+    loadTemplateEndpoints(specUrl)
+  }
+} else if (currentTemplateUrl) {
+  currentTemplateUrl = undefined
+}
+
+const verbOrder: Record<string, number> = {
+  GET: 0,
+  POST: 1,
+  PUT: 2,
+  PATCH: 3,
+  DELETE: 4,
+}
+
+$: selectedEndpoint = endpointOptions.find((endpoint) => endpoint.id === selectedEndpointId)
 </script>
 
 <ModalContent

@@ -69,10 +69,13 @@ export class BudibaseQueue<T> {
     let queue: Queue<T>
     if (!env.isTest()) {
       queue = new BullQueue(this.jobQueue, queueConfig)
-    } else if (process.env.BULL_TEST_REDIS_PORT && !isNaN(+process.env.BULL_TEST_REDIS_PORT)) {
+    } else if (
+      process.env.BULL_TEST_REDIS_PORT &&
+      !Number.isNaN(Number(process.env.BULL_TEST_REDIS_PORT))
+    ) {
       queue = new BullQueue(this.jobQueue, {
         ...queueConfig,
-        redis: { host: "localhost", port: +process.env.BULL_TEST_REDIS_PORT },
+        redis: { host: "localhost", port: Number(process.env.BULL_TEST_REDIS_PORT) },
       })
     } else {
       queue = new InMemoryQueue(this.jobQueue, queueConfig) as any
@@ -80,7 +83,7 @@ export class BudibaseQueue<T> {
 
     addListeners(queue, this.jobQueue, this.opts.removeStalledCb)
     QUEUES.push(queue)
-    if (!cleanupInterval && !env.isTest()) {
+    if (!(cleanupInterval || env.isTest())) {
       cleanupInterval = timers.set(cleanup, CLEANUP_PERIOD_MS)
       // fire off an initial cleanup
       cleanup().catch((err) => {

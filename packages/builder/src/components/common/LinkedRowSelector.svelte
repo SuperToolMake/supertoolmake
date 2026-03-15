@@ -15,12 +15,6 @@ const dispatch = createEventDispatcher()
 let rows = []
 let linkedIds = []
 
-$: fieldValue = getFieldValue(linkedData, schema)
-$: label = label || capitalise(schema.name)
-$: linkedTableId = linkedTableId || schema.tableId
-$: linkedTable = $tables.list.find((table) => table._id === linkedTableId)
-$: fetchRows(linkedTableId)
-
 const getFieldValue = (val) => {
   const linkedIds = (Array.isArray(val) ? val : [])?.map((row) => row?._id || row)
   if (schema.relationshipType === "one-to-many" || schema.type === "bb_reference_single") {
@@ -33,7 +27,7 @@ const getFieldValue = (val) => {
 async function fetchRows(linkedTableId) {
   try {
     rows = await API.fetchTableData(linkedTableId)
-  } catch (error) {
+  } catch {
     rows = []
   }
 }
@@ -41,6 +35,12 @@ async function fetchRows(linkedTableId) {
 function getPrettyName(row) {
   return row[linkedTable.primaryDisplay || "_id"]
 }
+
+$: fieldValue = getFieldValue(linkedData, schema)
+$: label = label || capitalise(schema.name)
+$: linkedTableId = linkedTableId || schema.tableId
+$: linkedTable = $tables.list.find((table) => table._id === linkedTableId)
+$: fetchRows(linkedTableId)
 </script>
 
 {#if linkedTable.primaryDisplay == null}

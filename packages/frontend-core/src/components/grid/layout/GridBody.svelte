@@ -19,11 +19,11 @@ const {
 
 let body
 
-$: columnsWidth = $scrollableColumns.reduce((total, col) => (total += col.width), 0)
-
 const updateBounds = () => {
   bounds.set(body.getBoundingClientRect())
 }
+
+$: columnsWidth = $scrollableColumns.reduce((total, col) => (total += col.width), 0)
 
 onMount(() => {
   // Observe and record the height of the body

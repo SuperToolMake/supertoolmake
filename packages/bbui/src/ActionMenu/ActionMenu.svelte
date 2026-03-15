@@ -2,7 +2,7 @@
 import { getContext, setContext } from "svelte"
 import type { PopoverAlignment } from "../constants"
 import Menu from "../Menu/Menu.svelte"
-import type Popover from "../Popover/Popover.svelte"
+import Popover from "../Popover/Popover.svelte"
 
 export let disabled: boolean = false
 export let align: `${PopoverAlignment}` = "left"

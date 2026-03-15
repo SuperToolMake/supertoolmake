@@ -10,11 +10,6 @@ let newTemplates: TemplateMetadata[] = []
 let isLoading = false
 let selectedTemplateId: string | null = null
 
-$: {
-  const templateList = $templates as TemplateMetadata[]
-  newTemplates = templateList?.filter((template) => template.new) || []
-}
-
 const handleSelectTemplate = async (template: TemplateMetadata) => {
   if (isLoading) return
 
@@ -28,6 +23,11 @@ const handleSelectTemplate = async (template: TemplateMetadata) => {
     selectedTemplateId = null
     throw error
   }
+}
+
+$: {
+  const templateList = $templates as TemplateMetadata[]
+  newTemplates = templateList?.filter((template) => template.new) || []
 }
 </script>
 

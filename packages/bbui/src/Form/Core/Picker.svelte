@@ -108,31 +108,6 @@ type V = any
     return null
   }
 
-  $: resolvedFieldIcon = resolveIcon(fieldIcon)
-
-  $: sortedOptions = getSortedOptions(options, getOptionLabel, sort)
-  $: filteredOptions = getFilteredOptions(
-    sortedOptions,
-    searchTerm,
-    getOptionLabel
-  )
-  $: virtualizationEnabled = filteredOptions.length > VIRTUALIZATION_THRESHOLD
-  $: {
-    if (!virtualizationEnabled) {
-      virtualizedOptions = filteredOptions.map((option, idx) => ({
-        option,
-        idx,
-      }))
-      virtualPaddingTop = 0
-      virtualPaddingBottom = 0
-    } else {
-      tick().then(updateVirtualSlice)
-    }
-  }
-  $: if (virtualizationEnabled && component) {
-    tick().then(updateVirtualSlice)
-  }
-
   const onClick = (e: MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -144,7 +119,7 @@ type V = any
     open = !open
   }
 
-  const getSortedOptions = (
+const getSortedOptions = (
     options: any[],
     getLabel: (_option: any) => string,
     sort: boolean
@@ -162,7 +137,7 @@ type V = any
     })
   }
 
-  const getFilteredOptions = (
+const getFilteredOptions = (
     options: any[],
     term: string | null,
     getLabel: (_option: any) => string
@@ -176,7 +151,7 @@ type V = any
     return options
   }
 
-  const onScroll = (e: any) => {
+const onScroll = (e: any) => {
     const scrollPxThreshold = 100
     const scrollPositionFromBottom =
       e.target.scrollHeight - e.target.clientHeight - e.target.scrollTop
@@ -185,7 +160,7 @@ type V = any
     }
   }
 
-  const updateVirtualSlice = () => {
+const updateVirtualSlice = () => {
     if (!virtualizationEnabled || !component) {
       return
     }
@@ -212,13 +187,50 @@ type V = any
       }))
   }
 
-  const handleScroll = (event: Event) => {
+const handleScroll = (event: Event) => {
     const target = event.currentTarget as HTMLElement
     onScroll(event)
     if (virtualizationEnabled && target === component) {
       updateVirtualSlice()
     }
   }
+
+$: resolvedFieldIcon = resolveIcon(fieldIcon)
+
+  $: sortedOptions = getSortedOptions(options, getOptionLabel, sort)
+  $: filteredOptions = getFilteredOptions(
+    sortedOptions,
+    searchTerm,
+    getOptionLabel
+  )
+  $: virtualizationEnabled = filteredOptions.length > VIRTUALIZATION_THRESHOLD
+  $: {
+    if (!virtualizationEnabled) {
+      virtualizedOptions = filteredOptions.map((option, idx) => ({
+        option,
+        idx,
+      }))
+      virtualPaddingTop = 0
+      virtualPaddingBottom = 0
+    } else {
+      tick().then(updateVirtualSlice)
+    }
+  }
+  $: if (virtualizationEnabled && component) {
+    tick().then(updateVirtualSlice)
+  }
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
 
   onDestroy(() => {
     component = null

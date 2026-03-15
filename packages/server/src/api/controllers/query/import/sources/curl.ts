@@ -1,4 +1,4 @@
-import { URL } from "url"
+import { URL } from "node:url"
 import type { Query } from "../../../../../definitions/common"
 import { type GetQueriesOptions, type ImportInfo, ImportSource } from "./base"
 
@@ -25,19 +25,19 @@ const parseBody = (curl: any) => {
           key = key.substring(1)
         }
         return JSON.parse(key)
-      } catch (e) {
+      } catch {
         // do nothing
       }
     }
   }
-  return undefined
+  return
 }
 
 const parseCookie = (curl: any) => {
   if (curl.cookies) {
     return Object.entries(curl.cookies).reduce((acc, entry) => {
       const [key, value] = entry
-      return acc + `${key}=${value}; `
+      return `${acc}${key}=${value}; `
     }, "")
   }
 
@@ -54,7 +54,7 @@ export class Curl extends ImportSource {
   isSupported = async (data: string): Promise<boolean> => {
     try {
       this.curl = parseCurl(data)
-    } catch (err) {
+    } catch {
       return false
     }
     return true
@@ -106,7 +106,7 @@ export class Curl extends ImportSource {
 
     const cookieHeader = parseCookie(this.curl)
     if (cookieHeader) {
-      headers["Cookie"] = cookieHeader
+      headers.Cookie = cookieHeader
     }
 
     const query = this.constructQuery(

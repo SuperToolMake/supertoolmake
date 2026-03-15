@@ -7,7 +7,7 @@ import { ServiceType } from "@budibase/types"
 
 coreEnv._set("SERVICE_TYPE", ServiceType.APPS)
 
-import type { Server } from "http"
+import type { Server } from "node:http"
 import type Koa from "koa"
 import createKoaApp from "./koa"
 import { startup } from "./startup"

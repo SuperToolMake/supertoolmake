@@ -29,13 +29,13 @@ export function buildVerifyFn(saveUserFn: SaveSSOUserFunction) {
    */
   return async (
     issuer: string,
-    sub: string,
+    _sub: string,
     profile: SSOProfile,
     jwtClaims: JwtClaims,
     accessToken: string,
     refreshToken: string,
-    idToken: string,
-    params: any,
+    _idToken: string,
+    _params: any,
     done: Function
   ) => {
     const details: SSOAuthDetails = {
@@ -114,7 +114,7 @@ export async function fetchStrategyConfig(
   try {
     const { clientID, clientSecret, configUrl } = oidcConfig
 
-    if (!clientID || !clientSecret || !callbackUrl || !configUrl) {
+    if (!(clientID && clientSecret && callbackUrl && configUrl)) {
       // check for remote config and all required elements
       throw new Error(
         "Configuration invalid. Must contain clientID, clientSecret, callbackUrl and configUrl"

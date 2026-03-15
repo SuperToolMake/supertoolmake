@@ -7,7 +7,7 @@ export const formatEndpointLabel = (endpoint: ImportEndpoint) => {
   const path = endpoint.path || ""
   const name = endpoint.name || ""
 
-  if (!path && !name) {
+  if (!(path || name)) {
     return ""
   }
   if (!path) {
@@ -29,14 +29,14 @@ export const getRestTemplateImportInfoRequest = (
   spec?: RestTemplateSpec | null
 ): ImportRestQueryInfoRequest | undefined => {
   if (!spec) {
-    return undefined
+    return
   }
   const payload: ImportRestQueryInfoRequest = {}
   if (spec.url) {
     payload.url = spec.url
   }
   if (!payload.url) {
-    return undefined
+    return
   }
   return payload
 }

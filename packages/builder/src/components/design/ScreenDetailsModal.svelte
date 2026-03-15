@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Input, keepOpen, type ModalContent } from "@budibase/bbui"
+import { Input, keepOpen, ModalContent } from "@budibase/bbui"
 import { get } from "svelte/store"
 import sanitizeUrl from "@/helpers/sanitizeUrl"
 import { buildLiveUrl } from "@/helpers/urls"
@@ -15,19 +15,9 @@ let touched = false
 let error: string | undefined
 let modal: ModalContent
 
-$: selectedWorkspaceApp = $workspaceAppStore.selectedWorkspaceApp
-
-$: workspacePrefix = selectedWorkspaceApp ? selectedWorkspaceApp.url : ""
-
-$: liveUrl = buildLiveUrl(workspacePrefix, true)
-
-$: hashRoute = !route ? "" : `#${route}`
-
-$: appUrl = `${liveUrl}${hashRoute}`
-
 const routeChanged = (event: { detail: string }) => {
   if (!event.detail.startsWith("/")) {
-    route = "/" + event.detail
+    route = `/${event.detail}`
   }
   touched = true
   route = sanitizeUrl(route)
@@ -47,7 +37,6 @@ const routeExists = (url: string) => {
       screen.routing.route.toLowerCase() === url.toLowerCase() && screen.routing.roleId === role
   )
 }
-$: disabled = !route || !!error || !touched
 
 const confirmScreenDetails = async () => {
   if (disabled) {
@@ -58,6 +47,18 @@ const confirmScreenDetails = async () => {
     route,
   })
 }
+
+$: selectedWorkspaceApp = $workspaceAppStore.selectedWorkspaceApp
+
+$: workspacePrefix = selectedWorkspaceApp ? selectedWorkspaceApp.url : ""
+
+$: liveUrl = buildLiveUrl(workspacePrefix, true)
+
+$: hashRoute = !route ? "" : `#${route}`
+
+$: appUrl = `${liveUrl}${hashRoute}`
+
+$: disabled = !route || Boolean(error) || !touched
 </script>
 
 <ModalContent

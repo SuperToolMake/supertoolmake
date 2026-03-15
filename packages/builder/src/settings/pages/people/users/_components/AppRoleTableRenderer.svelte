@@ -6,13 +6,13 @@ import { roles } from "@/stores/builder"
 
 export let value
 
-$: role = $roles.find((x) => x._id === value)
-
 const getRoleLabel = (roleId) => {
   return roleId === Constants.Roles.CREATOR
     ? capitalise(Constants.Roles.CREATOR.toLowerCase())
     : role?.uiMetadata.displayName || role?.name || "Custom role"
 }
+
+$: role = $roles.find((x) => x._id === value)
 </script>
 
 {#if value === Constants.Roles.GROUP}

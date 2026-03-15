@@ -13,7 +13,6 @@ const routing: Readable<Routing> = getContext("routing")
 
 // QueryEditor component interface based on exposed methods
 interface QueryEditor {
-  // eslint-disable-next-line no-unused-vars
   set: (newValue: string, opts?: string) => Promise<void>
   update: (_: string) => void
   resize: () => void
@@ -43,22 +42,6 @@ let mounted: boolean = false
 let selectedBindingTab: string = ""
 
 // this is the email purpose
-$: params = $routing?.params
-$: template = params?.templateId
-
-$: selectedTemplate = $email.templates?.find(({ purpose }: Template) => purpose === template) as
-  | Template
-  | undefined
-$: name = $email.definitions?.info[template]?.name as string | undefined
-$: description = $email.definitions?.info[template]?.description as string | undefined
-$: baseTemplate = $email.templates?.find(({ purpose }: Template) => purpose === "base") as
-  | Template
-  | undefined
-$: templateBindings = selectedTemplate?.purpose
-  ? (($email.definitions?.bindings?.[selectedTemplate.purpose] || []) as GlobalTemplateBinding[])
-  : []
-$: previewContent = makePreviewContent(baseTemplate, selectedTemplate)
-
 async function saveTemplate(): Promise<void> {
   try {
     if (!selectedTemplate) {
@@ -68,7 +51,7 @@ async function saveTemplate(): Promise<void> {
     // Save your template config
     await email.saveTemplate(selectedTemplate)
     notifications.success("Template saved")
-  } catch (error) {
+  } catch {
     notifications.error("Failed to update template settings")
   }
 }
@@ -102,17 +85,6 @@ function makePreviewContent(
   return base.replace("{{ body }}", selectedTemplate?.contents ?? "")
 }
 
-// Set initial binding tab based on available bindings, only if not already set
-$: {
-  if (!selectedBindingTab && templateBindings) {
-    selectedBindingTab = templateBindings.length ? "Template" : "Common"
-  }
-}
-
-onMount(() => {
-  mounted = true
-})
-
 async function fixMountBug(event: TabSelectEvent): Promise<void> {
   const { detail } = event
   if (detail === "Edit") {
@@ -128,6 +100,33 @@ function handleEditorChange(event: EditorChangeEvent): void {
     selectedTemplate.contents = event.detail.value
   }
 }
+
+$: params = $routing?.params
+$: template = params?.templateId
+
+$: selectedTemplate = $email.templates?.find(({ purpose }: Template) => purpose === template) as
+  | Template
+  | undefined
+$: name = $email.definitions?.info[template]?.name as string | undefined
+$: description = $email.definitions?.info[template]?.description as string | undefined
+$: baseTemplate = $email.templates?.find(({ purpose }: Template) => purpose === "base") as
+  | Template
+  | undefined
+$: templateBindings = selectedTemplate?.purpose
+  ? (($email.definitions?.bindings?.[selectedTemplate.purpose] || []) as GlobalTemplateBinding[])
+  : []
+$: previewContent = makePreviewContent(baseTemplate, selectedTemplate)
+
+// Set initial binding tab based on available bindings, only if not already set
+$: {
+  if (!selectedBindingTab && templateBindings) {
+    selectedBindingTab = templateBindings.length ? "Template" : "Common"
+  }
+}
+
+onMount(() => {
+  mounted = true
+})
 </script>
 
 <Layout gap="S" noPadding>

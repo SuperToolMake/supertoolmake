@@ -12,11 +12,8 @@ const valueStore = memo(value)
 let date1
 let date2
 
-$: valueStore.set(value)
-$: parseValue($valueStore)
-
 const parseValue = (value) => {
-  if (!Array.isArray(value) || !value[0] || !value[1]) {
+  if (!(Array.isArray(value) && value[0] && value[1])) {
     date1 = null
     date2 = null
   } else {
@@ -48,6 +45,9 @@ const onChangeDate2 = (e) => {
 const broadcastChange = () => {
   dispatch("change", [date1, date2])
 }
+
+$: valueStore.set(value)
+$: parseValue($valueStore)
 </script>
 
 <div class="date-range-picker">

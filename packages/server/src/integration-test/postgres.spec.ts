@@ -84,7 +84,7 @@ if (mainDescriptions.length) {
         const table = response.datasource.entities?.[tableName]
 
         expect(table).toBeDefined()
-        expect(table?.schema["status"].type).toEqual(FieldType.OPTIONS)
+        expect(table?.schema.status.type).toEqual(FieldType.OPTIONS)
       })
 
       it("should be able to filter enum columns using string filter", async () => {
@@ -143,7 +143,7 @@ if (mainDescriptions.length) {
           datasourceId: datasource._id!,
         })
         expect(response.datasource.entities).toBeDefined()
-        const table = response.datasource.entities?.["binaryTable"]
+        const table = response.datasource.entities?.binaryTable
         expect(table).toBeDefined()
         expect(table?.schema.id.externalType).toBe("bytea")
         const row = await config.api.row.save(table!._id!, {
@@ -171,9 +171,9 @@ if (mainDescriptions.length) {
         })
         const entities = response.datasource.entities
         expect(entities).toBeDefined()
-        const nullableTable = entities?.["nullableTable"]
+        const nullableTable = entities?.nullableTable
         expect(nullableTable).toBeDefined()
-        expect(nullableTable?.schema["order_number"].constraints?.presence).toEqual(true)
+        expect(nullableTable?.schema.order_number.constraints?.presence).toEqual(true)
 
         await client.schema.alterTable("nullableTable", (table) => {
           table.setNullable("order_number")
@@ -184,9 +184,9 @@ if (mainDescriptions.length) {
         })
         const entitiesAfter = responseAfter.datasource.entities
         expect(entitiesAfter).toBeDefined()
-        const nullableTableAfter = entitiesAfter?.["nullableTable"]
+        const nullableTableAfter = entitiesAfter?.nullableTable
         expect(nullableTableAfter).toBeDefined()
-        expect(nullableTableAfter?.schema["order_number"].constraints?.presence).toBeUndefined()
+        expect(nullableTableAfter?.schema.order_number.constraints?.presence).toBeUndefined()
       })
     })
 

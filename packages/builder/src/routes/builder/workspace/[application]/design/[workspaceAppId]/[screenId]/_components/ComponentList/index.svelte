@@ -15,9 +15,6 @@ import DNDPositionIndicator from "./DNDPositionIndicator.svelte"
 import { DropPosition, dndStore } from "./dndStore.js"
 import getScreenContextMenuItems from "./getScreenContextMenuItems"
 
-$: screenComponentId = `${$screenStore.selectedScreenId}-screen`
-$: navComponentId = `${$screenStore.selectedScreenId}-navigation`
-
 const onDrop = async () => {
   try {
     await dndStore.actions.drop()
@@ -26,8 +23,6 @@ const onDrop = async () => {
     notifications.error("Error saving component")
   }
 }
-
-const hover = hoverStore.hover
 
 // showCopy is used to hide the copy button when the user right-clicks the empty
 // background of their component tree. Pasting in the empty space makes sense,
@@ -50,6 +45,11 @@ const openScreenContextMenu = (e, showCopy) => {
     })
   }
 }
+
+$: screenComponentId = `${$screenStore.selectedScreenId}-screen`
+$: navComponentId = `${$screenStore.selectedScreenId}-navigation`
+
+const hover = hoverStore.hover
 </script>
 
 <div class="components">

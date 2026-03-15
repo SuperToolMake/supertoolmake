@@ -39,9 +39,6 @@ const titleSizeOptions = [
   { value: "L", label: "L" },
 ]
 
-$: bindings = getBindableProperties($selectedScreen, $componentStore.selectedComponentId)
-$: screenRouteOptions = screenStore.routes
-
 const updateShowNavigation = async (show) => {
   await screenStore.updateSetting(get(selectedScreen), "showNavigation", show)
 }
@@ -51,10 +48,13 @@ const update = async (key, value) => {
     let navigation = $nav
     navigation[key] = value
     await nav.save(navigation)
-  } catch (error) {
+  } catch {
     notifications.error("Error updating navigation settings")
   }
 }
+
+$: bindings = getBindableProperties($selectedScreen, $componentStore.selectedComponentId)
+$: screenRouteOptions = screenStore.routes
 </script>
 
 <Panel

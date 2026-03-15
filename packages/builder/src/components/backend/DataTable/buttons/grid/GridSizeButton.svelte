@@ -29,10 +29,17 @@ const rowSizeOptions = [
 let popover
 
 // Column width sizes
+const changeRowHeight = (height) => {
+  datasource.actions.saveDefinition({
+    ...$definition,
+    rowHeight: height,
+  })
+}
+
 $: allSmall = $columns.every((col) => col.width === smallColSize)
 $: allMedium = $columns.every((col) => col.width === mediumColSize)
 $: allLarge = $columns.every((col) => col.width === largeColSize)
-$: custom = !allSmall && !allMedium && !allLarge
+$: custom = !(allSmall || allMedium || allLarge)
 $: columnSizeOptions = [
   {
     label: "Small",
@@ -50,13 +57,6 @@ $: columnSizeOptions = [
     selected: allLarge,
   },
 ]
-
-const changeRowHeight = (height) => {
-  datasource.actions.saveDefinition({
-    ...$definition,
-    rowHeight: height,
-  })
-}
 </script>
 
 <DetailPopover bind:this={popover} title="Column and row size" width={300}>

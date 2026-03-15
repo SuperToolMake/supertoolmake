@@ -1,3 +1,4 @@
+import type { URL } from "node:url"
 import { ValidQueryNameRegex } from "@budibase/shared-core"
 import {
   BodyType,
@@ -7,7 +8,6 @@ import {
   type QueryVerb,
   type RestTemplateQueryMetadata,
 } from "@budibase/types"
-import type { URL } from "url"
 import { buildKeyValueRequestBody, serialiseRequestBody } from "../utils/requestBody"
 
 export interface ImportInfo {
@@ -71,7 +71,7 @@ export abstract class ImportSource {
 
   protected normalizeMethod = (method?: string): string | undefined => {
     if (!method) {
-      return undefined
+      return
     }
     return method.toLowerCase()
   }
@@ -135,7 +135,7 @@ export abstract class ImportSource {
     queryString: string,
     headers: object = {},
     parameters: QueryParameter[] = [],
-    body: unknown = undefined,
+    body: unknown,
     bodyBindings: Record<string, string> = {},
     explicitBodyType?: BodyType,
     restTemplateMetadata?: RestTemplateQueryMetadata

@@ -9,14 +9,6 @@ export let datasource
 
 let dynamicVariables = []
 
-$: enrichDynamicVariables(datasource, $queries.list)
-
-const dynamicVariableSchema = {
-  name: "",
-  query: "",
-  value: "",
-}
-
 const onClick = (dynamicVariable) => {
   const queryId = dynamicVariable.queryId
   queries.select({ _id: queryId })
@@ -34,6 +26,14 @@ function enrichDynamicVariables(ds, possibleQueries) {
       dynamicVariables.push({ ...dv, query: query.name })
     }
   })
+}
+
+$: enrichDynamicVariables(datasource, $queries.list)
+
+const dynamicVariableSchema = {
+  name: "",
+  query: "",
+  value: "",
 }
 </script>
 

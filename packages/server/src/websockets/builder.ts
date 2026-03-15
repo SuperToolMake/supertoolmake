@@ -1,3 +1,4 @@
+import type http from "node:http"
 import { permissions } from "@budibase/backend-core"
 import { BuilderSocketEvent } from "@budibase/shared-core"
 import type {
@@ -11,7 +12,6 @@ import type {
   Workspace,
   WorkspaceApp,
 } from "@budibase/types"
-import type http from "http"
 import type Koa from "koa"
 import type { Socket } from "socket.io"
 import { authorizedMiddleware as authorized } from "../middleware/authorized"
@@ -52,7 +52,6 @@ export default class BuilderSocket extends BaseSocket {
     // Remove app lock from this user if they have no other connections,
     // and transfer it to someone else if possible
     try {
-      // @ts-expect-error
       const session: SocketSession = socket.data
       const { _id, sessionId, room } = session
       const sessions = await this.getRoomSessions(room)
@@ -61,8 +60,7 @@ export default class BuilderSocket extends BaseSocket {
       })
       if (!hasOtherSession && room) {
         // Clear the lock from this user since they had no other sessions
-        // @ts-expect-error
-        const user: ContextUser = { _id: socket.data._id }
+        const user = { _id: socket.data._id } as ContextUser
         await clearLock(room, user)
 
         // Transfer lock ownership to the next oldest user
@@ -73,15 +71,14 @@ export default class BuilderSocket extends BaseSocket {
         const nextSession = otherSessions[0]
         if (nextSession) {
           const { _id, email, firstName, lastName } = nextSession
-          // @ts-expect-error
-          const nextUser: ContextUser = { _id, email, firstName, lastName }
+          const nextUser = { _id, email, firstName, lastName } as ContextUser
           await updateLock(room, nextUser)
           this.io.to(room).emit(BuilderSocketEvent.LockTransfer, {
             userId: _id,
           })
         }
       }
-    } catch (e) {
+    } catch {
       // This is fine, just means this user didn't hold the lock
     }
   }

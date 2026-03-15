@@ -73,9 +73,6 @@ const unobserve = () => {
   let visible = false
   let drawerId = generate()
 
-  $: depth = $openDrawers.length - $openDrawers.indexOf(drawerId) - 1
-  $: style = getStyle(depth, $drawerLeft, $drawerWidth, $modal)
-
   const getStyle = (depth, left, width, modal) => {
     let style = `
       --scale-factor: ${getScaleFactor(depth)};
@@ -94,7 +91,7 @@ const unobserve = () => {
     `
   }
 
-  export function show() {
+export function show() {
     if (visible) {
       return
     }
@@ -108,7 +105,7 @@ const unobserve = () => {
     openDrawers.update(state => [...state, drawerId])
   }
 
-  export function hide() {
+export function hide() {
     if (!visible) {
       return
     }
@@ -118,18 +115,11 @@ const unobserve = () => {
     unobserve()
   }
 
-  setContext("drawer", {
-    hide,
-    show,
-    modal,
-    resizable,
-  })
-
-  const easeInOutQuad = x => {
+const easeInOutQuad = x => {
     return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2
   }
 
-  // Use a custom svelte transition here because the built-in slide
+// Use a custom svelte transition here because the built-in slide
   // transition has a horrible overshoot
   const drawerSlide = () => {
     return {
@@ -145,7 +135,7 @@ const unobserve = () => {
     }
   }
 
-  // Custom fade transition because the default svelte one doesn't work any more
+// Custom fade transition because the default svelte one doesn't work any more
   // with svelte 4
   const drawerFade = () => {
     return {
@@ -156,12 +146,36 @@ const unobserve = () => {
     }
   }
 
-  const getScaleFactor = depth => {
+const getScaleFactor = depth => {
     // Quadratic function approaching a limit of 1 as depth tends to infinity
     const lim = 1 - 1 / (depth * depth + 1)
     // Scale drawers between 1 and 0.9 as depth approaches infinity
     return 1 - lim * 0.1
   }
+
+$: depth = $openDrawers.length - $openDrawers.indexOf(drawerId) - 1
+  $: style = getStyle(depth, $drawerLeft, $drawerWidth, $modal)
+
+  
+
+  
+
+  
+
+  setContext("drawer", {
+    hide,
+    show,
+    modal,
+    resizable,
+  })
+
+  
+
+  
+
+  
+
+  
 
   onDestroy(() => {
     if (visible) {

@@ -58,45 +58,6 @@ let ref: HTMLDivElement
 
 // Config
 const headerHeight: number = 36
-$: rowHeight = compact ? 46 : 55
-
-// Sorting state
-let sortColumn: string | undefined
-let sortOrder: "Ascending" | "Descending" | undefined
-
-// Table state
-let height: number = 0
-let loaded: boolean = false
-let checkboxStatus: boolean = false
-
-$: schema = fixSchema(schema)
-$: if (!loading) loaded = true
-$: fields = getFields(schema, showAutoColumns, autoSortColumns)
-$: rows = fields?.length ? data || [] : []
-$: totalRowCount = rows?.length || 0
-$: visibleRowCount = getVisibleRowCount(loaded, height, rows.length, rowCount, rowHeight)
-$: effectiveHeaderHeight = hideHeader ? 0 : headerHeight
-$: heightStyle = getHeightStyle(
-  visibleRowCount,
-  rowCount,
-  totalRowCount,
-  rowHeight,
-  loading,
-  effectiveHeaderHeight
-)
-$: sortedRows = sortRows(rows, sortColumn, sortOrder)
-$: gridStyle = getGridStyle(fields, schema, showEditColumn)
-$: showEditColumn = allowEditRows || allowSelectRows
-$: cellStyles = computeCellStyles(schema)
-
-// Deselect the "select all" checkbox when the user navigates to a new page
-$: {
-  let checkRowCount = rows.filter((o1) => selectedRows.some((o2) => o1._id === o2._id))
-  if (checkRowCount.length === 0) {
-    checkboxStatus = false
-  }
-}
-
 const fixSchema = (schema: Record<string, any>): Record<string, any> => {
   let fixedSchema: Record<string, any> = {}
   Object.entries(schema || {}).forEach(([fieldName, fieldSchema]) => {
@@ -149,7 +110,7 @@ const getHeightStyle = (
   if (loading) {
     return `height: ${effectiveHeaderHeight + visibleRowCount * rowHeight}px;`
   }
-  if (!rowCount || !visibleRowCount || totalRowCount <= rowCount) {
+  if (!(rowCount && visibleRowCount) || totalRowCount <= rowCount) {
     return ""
   }
   return `height: ${effectiveHeaderHeight + visibleRowCount * rowHeight}px;`
@@ -183,7 +144,7 @@ const sortRows = (
 ): any[] => {
   sortColumn = sortColumn ?? defaultSortColumn
   sortOrder = sortOrder ?? defaultSortOrder
-  if (!sortColumn || !sortOrder || disableSorting) {
+  if (!(sortColumn && sortOrder) || disableSorting) {
     return rows
   }
   return rows.slice().sort((a, b) => {
@@ -229,10 +190,10 @@ const getFields = (
   let columns: any[] = []
   let autoColumns: any[] = []
   Object.entries(schema || {}).forEach(([field, fieldSchema]) => {
-    if (!field || !fieldSchema) {
+    if (!(field && fieldSchema)) {
       return
     }
-    if (!autoSortColumns || !fieldSchema?.autocolumn) {
+    if (!(autoSortColumns && fieldSchema?.autocolumn)) {
       columns.push(fieldSchema)
     } else if (showAutoColumns) {
       autoColumns.push(fieldSchema)
@@ -281,7 +242,7 @@ const toggleSelectRow = (row: any): void => {
 }
 
 const toggleSelectAll = (e: CustomEvent): void => {
-  const select = !!e.detail
+  const select = Boolean(e.detail)
   if (select) {
     const next = [...selectedRows]
     // Add any rows which are not already in selected rows
@@ -338,6 +299,45 @@ const setupResizeObserver = (element: HTMLElement) => {
   })
   resizeObserver.observe(element)
   return resizeObserver
+}
+
+$: rowHeight = compact ? 46 : 55
+
+// Sorting state
+let sortColumn: string | undefined
+let sortOrder: "Ascending" | "Descending" | undefined
+
+// Table state
+let height: number = 0
+let loaded: boolean = false
+let checkboxStatus: boolean = false
+
+$: schema = fixSchema(schema)
+$: if (!loading) loaded = true
+$: fields = getFields(schema, showAutoColumns, autoSortColumns)
+$: rows = fields?.length ? data || [] : []
+$: totalRowCount = rows?.length || 0
+$: visibleRowCount = getVisibleRowCount(loaded, height, rows.length, rowCount, rowHeight)
+$: effectiveHeaderHeight = hideHeader ? 0 : headerHeight
+$: heightStyle = getHeightStyle(
+  visibleRowCount,
+  rowCount,
+  totalRowCount,
+  rowHeight,
+  loading,
+  effectiveHeaderHeight
+)
+$: sortedRows = sortRows(rows, sortColumn, sortOrder)
+$: gridStyle = getGridStyle(fields, schema, showEditColumn)
+$: showEditColumn = allowEditRows || allowSelectRows
+$: cellStyles = computeCellStyles(schema)
+
+// Deselect the "select all" checkbox when the user navigates to a new page
+$: {
+  let checkRowCount = rows.filter((o1) => selectedRows.some((o2) => o1._id === o2._id))
+  if (checkRowCount.length === 0) {
+    checkboxStatus = false
+  }
 }
 
 onMount(() => {

@@ -6,22 +6,22 @@ export let label
 export let value
 export let copyable = false
 
-$: prettyLabel = label == null ? "-" : label
-$: prettyValue = value == null ? "-" : value
-$: empty = value == null
-$: canCopy = copyable && !empty
-
 const copyValue = async () => {
   try {
     await Helpers.copyToClipboard(value)
     notificationStore.actions.success("Copied to clipboard")
-  } catch (error) {
+  } catch {
     notificationStore.actions.error(
       "Failed to copy to clipboard. Check the dev console for the value."
     )
     console.warn("Failed to copy the value", value)
   }
 }
+
+$: prettyLabel = label == null ? "-" : label
+$: prettyValue = value == null ? "-" : value
+$: empty = value == null
+$: canCopy = copyable && !empty
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

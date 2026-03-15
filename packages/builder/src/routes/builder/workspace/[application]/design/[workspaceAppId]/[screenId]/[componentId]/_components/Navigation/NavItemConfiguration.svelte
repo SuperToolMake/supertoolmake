@@ -8,12 +8,6 @@ import NavItem from "./NavItem.svelte"
 
 export let bindings
 
-$: navItems = enrichNavItems($navigationStore.links)
-$: navItemProps = {
-  removeNavItem,
-  bindings,
-}
-
 const enrichNavItems = (links) => {
   return (links || []).map((link) => ({
     ...link,
@@ -60,6 +54,12 @@ const addNavItem = async () => {
 
 const removeNavItem = async (id) => {
   await save(navItems.filter((navItem) => navItem.id !== id))
+}
+
+$: navItems = enrichNavItems($navigationStore.links)
+$: navItemProps = {
+  removeNavItem,
+  bindings,
 }
 </script>
 

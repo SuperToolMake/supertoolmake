@@ -122,7 +122,7 @@ export class QueryStore extends DerivedBudiStore<BuilderQueryStore, DerivedQuery
   }
 
   async delete(query: Query) {
-    if (!query._id || !query._rev) {
+    if (!(query._id && query._rev)) {
       throw new Error("Query ID or Revision is missing")
     }
     await API.deleteQuery(query._id, query._rev)

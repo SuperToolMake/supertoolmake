@@ -1,9 +1,9 @@
+import fs from "node:fs"
+import fsp from "node:fs/promises"
+import { join } from "node:path"
 import { db as dbCore, encryption, objectStore } from "@budibase/backend-core"
 import { utils } from "@budibase/shared-core"
 import type { Database } from "@budibase/types"
-import fs from "fs"
-import fsp from "fs/promises"
-import { join } from "path"
 import * as tar from "tar"
 import { v4 as uuid } from "uuid"
 import { ObjectStoreBuckets } from "../../../constants"
@@ -89,7 +89,7 @@ export function getListOfAppsInMulti(tmpPath: string) {
 export async function importApp(appId: string, db: Database, template: TemplateType) {
   const prodAppId = dbCore.getProdWorkspaceID(appId)
   let dbStream: fs.ReadStream
-  const isTar = template.file && template?.file?.type?.endsWith("gzip")
+  const isTar = template?.file?.type?.endsWith("gzip")
   const isDirectory = template.file && (await fsp.lstat(template.file.path)).isDirectory()
   let tmpPath: string | undefined
   if (template.file && (isTar || isDirectory)) {
@@ -98,7 +98,7 @@ export async function importApp(appId: string, db: Database, template: TemplateT
       await decryptFiles(tmpPath, template.file.password)
     }
     const contents = await fsp.readdir(tmpPath)
-    const stillEncrypted = !!contents.find((name) => name.endsWith(".enc"))
+    const stillEncrypted = Boolean(contents.find((name) => name.endsWith(".enc")))
     if (stillEncrypted) {
       throw new Error("Files are encrypted but no password has been supplied.")
     }
@@ -154,7 +154,6 @@ export async function importApp(appId: string, db: Database, template: TemplateT
   } else {
     dbStream = await getTemplateStream(template)
   }
-  // @ts-expect-error
   const { ok } = await db.load(dbStream)
   if (!ok) {
     throw "Error loading database dump from template."

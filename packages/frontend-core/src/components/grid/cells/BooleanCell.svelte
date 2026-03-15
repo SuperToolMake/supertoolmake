@@ -8,8 +8,6 @@ export let onChange
 export let readonly = false
 export let api
 
-$: editable = focused && !readonly
-
 const handleChange = (e) => {
   onChange(e.detail)
 }
@@ -21,6 +19,8 @@ const onKeyDown = (e) => {
   }
   return false
 }
+
+$: editable = focused && !readonly
 
 onMount(() => {
   api = {

@@ -82,10 +82,6 @@ const getDocLink = (columnType) => {
   if (columnType === FieldType.BOOLEAN) {
     return "https://docs.budibase.com/docs/boolean-truefalse"
   }
-  if (columnType === FieldType.SIGNATURE_SINGLE) {
-    // No Signature docs
-    return null
-  }
   if (columnType === FieldType.BIGINT) {
     // No BigInt docs
     return null

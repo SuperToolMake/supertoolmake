@@ -23,7 +23,7 @@ async function populateUsersFromDB(
   const getUsersResponse = await UserDB.bulkGet(userIds)
 
   // Handle missed user ids
-  const notFoundIds = userIds.filter((uid, i) => !getUsersResponse[i])
+  const notFoundIds = userIds.filter((_uid, i) => !getUsersResponse[i])
 
   const users = getUsersResponse.filter((x) => x)
 
@@ -66,7 +66,7 @@ export async function getUser({
   if (!tenantId) {
     try {
       tenantId = context.getTenantId()
-    } catch (err) {
+    } catch {
       tenantId = await platform.users.lookupTenantId(userId)
     }
   }
@@ -100,7 +100,7 @@ export async function getUsers(
   const usersFromCache = await client.bulkGet<User>(userIds)
   const missingUsersFromCache = userIds.filter((uid) => !usersFromCache[uid])
 
-  const users = Object.values(usersFromCache).filter((user) => !!user)
+  const users = Object.values(usersFromCache).filter((user): user is User => user != null)
   let notFoundIds
   if (missingUsersFromCache.length) {
     const usersFromDb = await populateUsersFromDB(missingUsersFromCache)

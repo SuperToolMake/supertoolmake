@@ -59,7 +59,7 @@ export class HTTPError extends BudibaseError {
       message = error.message
       httpStatus = error.status
       code = error.error?.code
-    } catch (e) {
+    } catch {
       // ignore
     }
     return new HTTPError(message, httpStatus, code)

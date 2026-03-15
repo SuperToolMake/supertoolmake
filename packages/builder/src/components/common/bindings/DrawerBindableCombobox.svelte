@@ -20,19 +20,10 @@ export let error
 const dispatch = createEventDispatcher()
 let bindingDrawer
 
-$: readableValue = runtimeToReadableBinding(bindings, value)
-$: tempValue = readableValue
-$: isJS = isJSBinding(value)
-$: allOptions = buildOptions(options, bindings, appendBindingsAsOptions)
-
 const handleClose = () => {
   onChange(tempValue)
   bindingDrawer.hide()
 }
-
-setContext("binding-drawer-actions", {
-  save: handleClose,
-})
 
 const onChange = (value, optionPicked) => {
   // Add HBS braces if picking binding
@@ -49,6 +40,15 @@ const buildOptions = (options, bindings, appendBindingsAsOptions) => {
   }
   return [].concat(options || []).concat(bindings?.map((binding) => binding.readableBinding) || [])
 }
+
+$: readableValue = runtimeToReadableBinding(bindings, value)
+$: tempValue = readableValue
+$: isJS = isJSBinding(value)
+$: allOptions = buildOptions(options, bindings, appendBindingsAsOptions)
+
+setContext("binding-drawer-actions", {
+  save: handleClose,
+})
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

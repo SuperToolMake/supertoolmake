@@ -51,9 +51,9 @@ const buildHbsTagDecorations = (
 
   for (const { from, to } of view.visibleRanges) {
     const text = view.state.doc.sliceString(from, to)
-    let match: RegExpExecArray | null
     regex.lastIndex = 0
-    while ((match = regex.exec(text))) {
+    let match = regex.exec(text)
+    while (match !== null) {
       const start = from + match.index
       const end = start + match[0].length
 
@@ -61,17 +61,15 @@ const buildHbsTagDecorations = (
       const cursorInside = cursorPositions.some(
         (cursor) => cursor.from > start && cursor.from < end
       )
-      if (cursorInside) {
-        continue
+      if (!cursorInside) {
+        const clean = stripHbsDelimiters(match[0])
+        if (isValidBinding(clean)) {
+          const icon = bindingIcons?.[clean]
+          const widget = new HbsTagWidget(clean, icon)
+          decos.push(Decoration.replace({ widget, inclusive: true }).range(start, end))
+        }
       }
-
-      const clean = stripHbsDelimiters(match[0])
-      if (!isValidBinding(clean)) {
-        continue
-      }
-      const icon = bindingIcons?.[clean]
-      const widget = new HbsTagWidget(clean, icon)
-      decos.push(Decoration.replace({ widget, inclusive: true }).range(start, end))
+      match = regex.exec(text)
     }
   }
   return Decoration.set(decos, true)

@@ -36,18 +36,6 @@ export let dropdown = DropdownPosition.Absolute
 let getCaretPosition: CaretPositionFn | undefined
 let insertAtPos: InsertAtPositionFn | undefined
 
-$: readable = runtimeToReadableBinding(bindings, value || "")
-$: jsValue = decodeJSBinding(readable)
-
-$: useSnippets = allowSnippets
-$: enrichedBindings = enrichBindings(bindings, context, $snippets)
-$: editorMode = EditorModes.JS
-$: bindingCompletions = bindingsToCompletions(enrichedBindings, editorMode)
-$: jsCompletions = getJSCompletions(bindingCompletions, $snippets, {
-  useHelpers: allowHelpers,
-  useSnippets,
-})
-
 const getJSCompletions = (
   bindingCompletions: BindingCompletionOption[],
   snippets: Snippet[] | null,
@@ -123,6 +111,18 @@ const onBlurJSValue = (e: { detail: string }) => {
   // Don't bother saving empty values as JS
   updateValue(e.detail?.trim())
 }
+
+$: readable = runtimeToReadableBinding(bindings, value || "")
+$: jsValue = decodeJSBinding(readable)
+
+$: useSnippets = allowSnippets
+$: enrichedBindings = enrichBindings(bindings, context, $snippets)
+$: editorMode = EditorModes.JS
+$: bindingCompletions = bindingsToCompletions(enrichedBindings, editorMode)
+$: jsCompletions = getJSCompletions(bindingCompletions, $snippets, {
+  useHelpers: allowHelpers,
+  useSnippets,
+})
 </script>
 
 <div class="code-panel">

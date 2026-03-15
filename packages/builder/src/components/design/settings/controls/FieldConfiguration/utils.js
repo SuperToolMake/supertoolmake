@@ -25,7 +25,7 @@ export const convertOldFieldFormat = (fields) => {
 }
 
 export const getComponentForField = (field, schema) => {
-  if (!field || !schema?.[field]) {
+  if (!(field && schema?.[field])) {
     return null
   }
   const type = schema[field].type
@@ -41,7 +41,6 @@ export const FieldTypeToComponentMap = {
   [FieldType.BOOLEAN]: "booleanfield",
   [FieldType.LONGFORM]: "longformfield",
   [FieldType.DATETIME]: "datetimefield",
-  [FieldType.SIGNATURE_SINGLE]: "signaturesinglefield",
   [FieldType.ATTACHMENTS]: "attachmentfield",
   [FieldType.ATTACHMENT_SINGLE]: "attachmentsinglefield",
   [FieldType.LINK]: "relationshipfield",

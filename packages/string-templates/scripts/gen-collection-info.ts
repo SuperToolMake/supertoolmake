@@ -1,6 +1,6 @@
-import { readFileSync, writeFileSync } from "fs"
+import { readFileSync, writeFileSync } from "node:fs"
+import { dirname, join } from "node:path"
 import { marked } from "marked"
-import { dirname, join } from "path"
 import { EXTERNAL_FUNCTION_COLLECTIONS, HelperFunctionBuiltin } from "../src/helpers/constants"
 
 const helpers = require("@budibase/handlebars-helpers")
@@ -121,7 +121,7 @@ function getCommentInfo(file: string, func: string): BudibaseAnnotation {
     docs.example = examples.join(" ")
   }
   // hacky example fix
-  if (docs.example && docs.example.includes("product")) {
+  if (docs.example?.includes("product")) {
     docs.example = docs.example.replace("product", "multiply")
   }
   docs.description = blocks[0].trim()

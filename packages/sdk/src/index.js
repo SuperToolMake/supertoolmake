@@ -12,7 +12,7 @@ export default class SDK {
 
     // Default to current host
     ApiClient.basePath = `${host || ""}/api/public/v1`
-    ApiClient.authentications["ApiKeyAuth"].apiKey = apiKey
+    ApiClient.authentications.ApiKeyAuth.apiKey = apiKey
 
     this.applications = new BudibaseApi.ApplicationsApi(ApiClient)
     this.queries = new BudibaseApi.QueriesApi(ApiClient)

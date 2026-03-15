@@ -100,7 +100,7 @@ const saveRowHandler = async (action, context) => {
       invalidateRelationships: true,
     })
     return { row }
-  } catch (error) {
+  } catch {
     // Abort next actions
     return false
   }
@@ -134,7 +134,7 @@ const duplicateRowHandler = async (action, context) => {
         invalidateRelationships: true,
       })
       return { row }
-    } catch (error) {
+    } catch {
       // Abort next actions
       return false
     }
@@ -149,7 +149,7 @@ const fetchRowHandler = async (action) => {
       const row = await API.fetchRow(tableId, rowId)
 
       return { row }
-    } catch (error) {
+    } catch {
       return false
     }
   }
@@ -165,7 +165,7 @@ const deleteRowHandler = async (action) => {
       if (typeof rowConfig === "string") {
         try {
           parsedRowConfig = JSON.parse(rowConfig)
-        } catch (e) {
+        } catch {
           parsedRowConfig = rowConfig
             .split(",")
             .map((id) => id.trim())
@@ -183,7 +183,7 @@ const deleteRowHandler = async (action) => {
         requestConfig = [String(parsedRowConfig)]
       }
 
-      if (!requestConfig && !parsedRowConfig) {
+      if (!(requestConfig || parsedRowConfig)) {
         notificationStore.actions.warning("No valid rows were supplied")
         return false
       }
@@ -223,7 +223,7 @@ const triggerAutomationHandler = async (action) => {
     if (!notificationOverride) {
       notificationStore.actions.success("Automation triggered")
     }
-  } catch (error) {
+  } catch {
     // Abort next actions
     return false
   }
@@ -262,7 +262,7 @@ const queryExecutionHandler = async (action) => {
     }
 
     return { result }
-  } catch (error) {
+  } catch {
     notificationStore.actions.error("An error occurred while executing the query")
 
     // Abort next actions
@@ -373,14 +373,14 @@ const exportDataHandler = async (action) => {
       customHeaders,
     })
     download(new Blob([data], { type: "text/plain" }), `${tableId}.${type}`)
-  } catch (error) {
+  } catch {
     notificationStore.actions.error("There was an error exporting the data")
   }
 }
 
 const continueIfHandler = (action) => {
   const { type, value, operator, referenceValue } = action.parameters
-  if (!type || !operator) {
+  if (!(type && operator)) {
     return
   }
   let match = false
@@ -400,7 +400,7 @@ const continueIfHandler = (action) => {
 
 const showNotificationHandler = (action) => {
   const { message, type, autoDismiss, duration } = action.parameters
-  if (!message || !type) {
+  if (!(message && type)) {
     return
   }
   notificationStore.actions[type]?.(message, autoDismiss, duration)
@@ -501,37 +501,37 @@ const rowActionHandler = async (action) => {
 }
 
 const handlerMap = {
-  ["Fetch Row"]: fetchRowHandler,
-  ["Save Row"]: saveRowHandler,
-  ["Duplicate Row"]: duplicateRowHandler,
-  ["Delete Row"]: deleteRowHandler,
-  ["Navigate To"]: navigationHandler,
-  ["Execute Query"]: queryExecutionHandler,
-  ["Trigger Automation"]: triggerAutomationHandler,
-  ["Log Out"]: logoutHandler,
-  ["Close Screen Modal"]: closeScreenModalHandler,
-  ["Update State"]: updateStateHandler,
-  ["Upload File to S3"]: s3UploadHandler,
-  ["Export Data"]: exportDataHandler,
-  ["Continue if / Stop if"]: continueIfHandler,
-  ["Show Notification"]: showNotificationHandler,
-  ["Prompt User"]: promptUserHandler,
-  ["Open Side Panel"]: openSidePanelHandler,
-  ["Close Side Panel"]: closeSidePanelHandler,
-  ["Open Modal"]: openModalHandler,
-  ["Close Modal"]: closeModalHandler,
-  ["Download File"]: downloadFileHandler,
-  ["Row Action"]: rowActionHandler,
-  ["Copy To Clipboard"]: copyToClipboardHandler,
+  "Fetch Row": fetchRowHandler,
+  "Save Row": saveRowHandler,
+  "Duplicate Row": duplicateRowHandler,
+  "Delete Row": deleteRowHandler,
+  "Navigate To": navigationHandler,
+  "Execute Query": queryExecutionHandler,
+  "Trigger Automation": triggerAutomationHandler,
+  "Log Out": logoutHandler,
+  "Close Screen Modal": closeScreenModalHandler,
+  "Update State": updateStateHandler,
+  "Upload File to S3": s3UploadHandler,
+  "Export Data": exportDataHandler,
+  "Continue if / Stop if": continueIfHandler,
+  "Show Notification": showNotificationHandler,
+  "Prompt User": promptUserHandler,
+  "Open Side Panel": openSidePanelHandler,
+  "Close Side Panel": closeSidePanelHandler,
+  "Open Modal": openModalHandler,
+  "Close Modal": closeModalHandler,
+  "Download File": downloadFileHandler,
+  "Row Action": rowActionHandler,
+  "Copy To Clipboard": copyToClipboardHandler,
 }
 
 const confirmTextMap = {
-  ["Delete Row"]: "Are you sure you want to delete this row?",
-  ["Save Row"]: "Are you sure you want to save this row?",
-  ["Execute Query"]: "Are you sure you want to execute this query?",
-  ["Trigger Automation"]: "Are you sure you want to trigger this automation?",
-  ["Prompt User"]: "Are you sure you want to continue?",
-  ["Duplicate Row"]: "Are you sure you want to duplicate this row?",
+  "Delete Row": "Are you sure you want to delete this row?",
+  "Save Row": "Are you sure you want to save this row?",
+  "Execute Query": "Are you sure you want to execute this query?",
+  "Trigger Automation": "Are you sure you want to trigger this automation?",
+  "Prompt User": "Are you sure you want to continue?",
+  "Duplicate Row": "Are you sure you want to duplicate this row?",
 }
 
 /**

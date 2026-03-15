@@ -7,8 +7,6 @@ import RestAuthenticationBuilder from "./RestAuthenticationBuilder.svelte"
 
 export let datasource
 export let updatedDatasource
-$: localUpdatedDatasource = cloneDeep(datasource ?? updatedDatasource)
-
 const updateAuthConfigs = async (newAuthConfigs) => {
   localUpdatedDatasource.config.authConfigs = newAuthConfigs
 
@@ -20,6 +18,8 @@ const updateAuthConfigs = async (newAuthConfigs) => {
     notifications.error(`Error saving datasource: ${error.message}`)
   }
 }
+
+$: localUpdatedDatasource = cloneDeep(datasource ?? updatedDatasource)
 </script>
 
 <Panel>

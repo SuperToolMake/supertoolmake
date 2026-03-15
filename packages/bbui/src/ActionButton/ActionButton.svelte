@@ -18,8 +18,6 @@ export let accentColor: string | null = null
 
 let showTooltip = false
 
-$: accentStyle = getAccentStyle(accentColor)
-
 const getAccentStyle = (color: string | null) => {
   if (!color) {
     return ""
@@ -34,6 +32,8 @@ const getAccentStyle = (color: string | null) => {
   style += `--accent-border-color:${color};`
   return style
 }
+
+$: accentStyle = getAccentStyle(accentColor)
 </script>
 
 <button

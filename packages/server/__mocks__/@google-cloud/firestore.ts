@@ -1,5 +1,5 @@
 // @ts-nocheck
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// biome-ignore lint/correctness/noUnusedVariables: namespace scope is intentional for this Jest CJS mock.
 namespace FirebaseMock {
   const firebase = {}
 

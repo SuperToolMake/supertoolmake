@@ -9,8 +9,6 @@ const SELF_ROLE = "self"
 
 let roles
 
-$: previewOptions = buildRoleList(roles)
-
 function buildRoleList(roles) {
   const list = []
   list.push({
@@ -28,6 +26,8 @@ function buildRoleList(roles) {
   }
   return list
 }
+
+$: previewOptions = buildRoleList(roles)
 
 onMount(async () => {
   // make sure correct before starting

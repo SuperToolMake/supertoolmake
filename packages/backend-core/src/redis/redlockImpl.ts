@@ -90,7 +90,7 @@ function getLockName(opts: LockOptions) {
   let name = `lock:${prefix}_${opts.name}`
   // add additional unique name if required
   if (opts.resource) {
-    name = name + `_${opts.resource}`
+    name = `${name}_${opts.resource}`
   }
   return name
 }
@@ -128,7 +128,7 @@ export async function doWithLock<T>(
       // We keep extending the lock while the task is running
       const extendInIntervals = (): void => {
         timeout = setTimeout(async () => {
-          lock = await lock!.extend(ttl, () => opts.onExtend && opts.onExtend())
+          lock = await lock!.extend(ttl, () => opts.onExtend?.())
 
           extendInIntervals()
         }, ttl / 2)

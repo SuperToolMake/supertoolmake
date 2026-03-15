@@ -6,7 +6,7 @@ export let value: string | string[]
 
 const displayLimit = 5
 
-$: arrayValue = Array.isArray(value) ? value : [value].filter((x) => !!x)
+$: arrayValue = Array.isArray(value) ? value : [value].filter((x) => Boolean(x))
 $: badges = arrayValue.slice(0, displayLimit)
 $: leftover = arrayValue.length - badges.length
 </script>

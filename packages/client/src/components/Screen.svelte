@@ -13,10 +13,6 @@ const context = getContext("context")
 const onLoadActions = memo()
 
 // Get the screen definition for the current route
-$: screen = $screenStore.activeScreen
-$: onLoadActions.set(screen?.onLoad)
-$: runOnLoadActions($onLoadActions, params)
-
 // Enrich and execute any on load actions.
 // We manually construct the full context here as this component is the
 // one that provides the url context, so it is not available in $context yet
@@ -31,6 +27,10 @@ const runOnLoadActions = (actions, params) => {
     }
   }
 }
+
+$: screen = $screenStore.activeScreen
+$: onLoadActions.set(screen?.onLoad)
+$: runOnLoadActions($onLoadActions, params)
 
 onMount(() => {
   // Mark the router as loaded whenever the screen mounts

@@ -157,7 +157,11 @@ export class DatasourceStore extends DerivedBudiStore<
   }
 
   async updateSchema(datasource: Datasource, tablesFilter: string[]) {
-    const response = await API.buildDatasourceSchema(datasource?._id!, tablesFilter)
+    const datasourceId = datasource._id
+    if (!datasourceId) {
+      throw new Error("Datasource ID is required to update schema")
+    }
+    const response = await API.buildDatasourceSchema(datasourceId, tablesFilter)
     this.updateDatasourceInStore(response)
   }
 
@@ -235,7 +239,7 @@ export class DatasourceStore extends DerivedBudiStore<
   }
 
   async deleteDatasource(datasource: Datasource) {
-    if (!datasource?._id || !datasource?._rev) {
+    if (!(datasource?._id && datasource?._rev)) {
       return
     }
     await API.deleteDatasource(datasource._id, datasource._rev)
@@ -301,7 +305,7 @@ export class DatasourceStore extends DerivedBudiStore<
 
   async createViewQuery(datasource: Datasource, viewName: string) {
     try {
-      const sql = "SELECT * FROM " + viewName + " \nLIMIT {{ limit }} \nOFFSET {{ offset }}"
+      const sql = `SELECT * FROM ${viewName} \nLIMIT {{ limit }} \nOFFSET {{ offset }}`
 
       const query = {
         datasourceId: datasource._id!,

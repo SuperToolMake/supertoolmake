@@ -12,18 +12,6 @@ import getAppContextMenuItems from "./getAppContextMenuItems.js"
 
 // Initialize Routify store and derive callable function
 $gotoStore
-$: goto = $gotoStore
-
-export let app
-export let lockedAction
-
-let appContextMenuModals
-
-$: contextMenuOpen = `${app.appId}-index` === $contextMenuStore.id
-$: editing = app.sessions?.length
-$: isBuilder = sdk.users.isBuilder($auth.user, app?.devId)
-$: unclickable = !isBuilder && !app.deployed
-
 const handleDefaultClick = () => {
   if (!isBuilder) {
     goToApp()
@@ -35,11 +23,11 @@ const handleDefaultClick = () => {
 }
 
 const goToBuilder = () => {
-  goto && goto(`../../workspace/${app.devId}`)
+  goto?.(`../../workspace/${app.devId}`)
 }
 
 const goToOverview = () => {
-  goto && goto(`../../workspace/${app.devId}/settings`)
+  goto?.(`../../workspace/${app.devId}/settings`)
 }
 
 const goToApp = () => {
@@ -65,6 +53,18 @@ const openContextMenu = (e) => {
     y: e.clientY,
   })
 }
+
+$: goto = $gotoStore
+
+export let app
+export let lockedAction
+
+let appContextMenuModals
+
+$: contextMenuOpen = `${app.appId}-index` === $contextMenuStore.id
+$: editing = app.sessions?.length
+$: isBuilder = sdk.users.isBuilder($auth.user, app?.devId)
+$: unclickable = !(isBuilder || app.deployed)
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

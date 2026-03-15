@@ -7,13 +7,6 @@ import FilterEditor from "./FilterEditor/FilterEditor.svelte"
 export let componentInstance
 
 // Extract which relationship column we're using
-$: column = componentInstance.field
-
-// Find the closest parent form
-$: form = findClosestMatchingComponent($selectedScreen.props, componentInstance._id, (component) =>
-  component._component.endsWith("/form")
-)
-
 const resolveDatasource = (selectedScreen, componentInstance, form) => {
   if (!form && componentInstance._id != $componentStore.selectedComponentId) {
     const block = findComponent(selectedScreen.props, $componentStore.selectedComponentId)
@@ -23,6 +16,13 @@ const resolveDatasource = (selectedScreen, componentInstance, form) => {
     return getDatasourceForProvider(selectedScreen, form)
   }
 }
+
+$: column = componentInstance.field
+
+// Find the closest parent form
+$: form = findClosestMatchingComponent($selectedScreen.props, componentInstance._id, (component) =>
+  component._component.endsWith("/form")
+)
 
 // Get that form's schema
 $: datasource = resolveDatasource($selectedScreen, componentInstance, form)

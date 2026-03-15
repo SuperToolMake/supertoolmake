@@ -37,7 +37,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
       loaded: true,
       user: user,
       tenantId: user?.tenantId || "default",
-      tenantSet: !!user,
+      tenantSet: Boolean(user),
       isSSO: user != null && isSSOUser(user),
       postLogout: sessionTerminated,
     })
@@ -52,7 +52,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
     const prevId = get(this.store).tenantId
     auth.update((store) => {
       store.tenantId = tenantId
-      store.tenantSet = !!tenantId
+      store.tenantSet = Boolean(tenantId)
       return store
     })
     if (prevId !== tenantId) {
@@ -106,7 +106,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
     try {
       const user = await API.fetchBuilderSelf()
       this.setUser(user)
-    } catch (error) {
+    } catch {
       this.setUser()
     }
   }
@@ -130,7 +130,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
       currentPath.startsWith("/builder/invite") ||
       currentPath.startsWith("/builder/admin")
 
-    if (!isPreLoginPage && !CookieUtils.getCookie(Constants.Cookies.ReturnUrl)) {
+    if (!(isPreLoginPage || CookieUtils.getCookie(Constants.Cookies.ReturnUrl))) {
       CookieUtils.setCookie(Constants.Cookies.ReturnUrl, window.location.href)
     }
 
@@ -139,7 +139,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
     this.setUser()
     try {
       await this.setInitInfo({})
-    } catch (error) {
+    } catch {
       // Ignore errors clearing init info after logout
       // User is already logged out, this is just cleanup
     }
@@ -154,7 +154,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
     try {
       const user = await API.fetchBuilderSelf()
       this.setUser(user)
-    } catch (error) {
+    } catch {
       this.setUser()
     }
   }
@@ -200,7 +200,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
       urlTenantId = hostParts[0].replace(/\./g, "")
     }
 
-    if (store.user && store.user?.tenantId) {
+    if (store.user?.tenantId) {
       if (!urlTenantId) {
         // redirect to correct tenantId subdomain
         if (!window.location.host.includes("localhost")) {
@@ -216,7 +216,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
         try {
           await this.logout()
           await this.setOrganisation()
-        } catch (error) {
+        } catch {
           console.error(`Tenant mis-match - "${urlTenantId}" and "${store.user.tenantId}" - logout`)
         }
       }

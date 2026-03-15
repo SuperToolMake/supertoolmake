@@ -28,15 +28,13 @@ let open = false
 const STRIP_NAME_REGEX = /{{\s*env\.([^\s]+)\s*}}/g
 
 // Strips the name out of the value which is {{ env.Variable }} resulting in an array like ["Variable"]
-$: hbsValue = (String(value) && STRIP_NAME_REGEX.exec(String(value))) || []
-
 const updateValue = (newValue: any) => {
   if (readonly) {
     return
   }
   if (type === "number") {
     const float = parseFloat(newValue)
-    newValue = isNaN(float) ? null : float
+    newValue = Number.isNaN(float) ? null : float
   }
   dispatch("change", newValue)
 }
@@ -78,11 +76,6 @@ const handleVarSelect = (variable: string) => {
   updateValue(`{{ env.${variable} }}`)
 }
 
-onMount(() => {
-  focus = autofocus
-  if (focus) field.focus()
-})
-
 function removeVariable() {
   updateValue("")
 }
@@ -91,6 +84,13 @@ function openPopover() {
   open = true
   focus = true
 }
+
+$: hbsValue = (String(value) && STRIP_NAME_REGEX.exec(String(value))) || []
+
+onMount(() => {
+  focus = autofocus
+  if (focus) field.focus()
+})
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

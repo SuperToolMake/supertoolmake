@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Body, Button, Heading, Layout, type Modal } from "@budibase/bbui"
+import { Body, Button, Heading, Layout, Modal } from "@budibase/bbui"
 import { SplitPage } from "@budibase/frontend-core"
 import { sdk } from "@budibase/shared-core"
 import type { CreateWorkspaceResponse } from "@budibase/types"

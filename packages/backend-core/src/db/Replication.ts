@@ -113,7 +113,7 @@ class Replication {
           return false
         }
         if (isData(doc._id)) {
-          return !!tableSyncList?.find((id) => doc._id.includes(id)) || syncAllTables
+          return Boolean(tableSyncList?.find((id) => doc._id.includes(id))) || syncAllTables
         }
         if (startsWithID(doc._id, DocumentType.AUTOMATION_LOG)) {
           return false

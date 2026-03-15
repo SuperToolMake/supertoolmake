@@ -1,6 +1,6 @@
+import fs from "node:fs"
+import path from "node:path"
 import { iifeWrapper } from "@budibase/string-templates"
-import fs from "fs"
-import path from "path"
 import { IsolatedVM } from "../vm"
 
 function runJSWithIsolatedVM(script: string, context: Record<string, any>) {

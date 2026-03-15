@@ -43,7 +43,7 @@ export function getDevWorkspaceID(workspaceId: string) {
  * Convert a development workspace ID to a deployed workspace ID.
  */
 export function getProdWorkspaceID(workspaceId: string) {
-  if (!workspaceId || !workspaceId.startsWith(WORKSPACE_DEV_PREFIX)) {
+  if (!workspaceId?.startsWith(WORKSPACE_DEV_PREFIX)) {
     return workspaceId
   }
   // split to take off the app_dev element, then join it together incase any other app_ exist

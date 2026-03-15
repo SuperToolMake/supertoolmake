@@ -37,15 +37,6 @@ export interface JSONViewerClickEvent {
   let valueExpanded = false
   let clickContext: JSONViewerClickContext
 
-  $: isArray = Array.isArray(value)
-  $: isObject = value?.toString?.() === "[object Object]"
-  $: primitive = !(isArray || isObject)
-  $: keys = getKeys(isArray, isObject, value)
-  $: expandable = keys.length > 0
-  $: displayValue = getDisplayValue(isArray, isObject, keys, value)
-  $: style = getStyle(isArray, isObject, value)
-  $: clickContext = { value, label, path }
-
   const getKeys = (isArray: boolean, isObject: boolean, value: any) => {
     if (isArray) {
       return [...value.keys()]
@@ -56,11 +47,11 @@ export interface JSONViewerClickEvent {
     return []
   }
 
-  const pluralise = (text: string, number: number) => {
+const pluralise = (text: string, number: number) => {
     return number === 1 ? text : text + "s"
   }
 
-  const getDisplayValue = (
+const getDisplayValue = (
     isArray: boolean,
     isObject: boolean,
     keys: any[],
@@ -79,11 +70,11 @@ export interface JSONViewerClickEvent {
     }
   }
 
-  const getStyle = (isArray: boolean, isObject: boolean, value: any) => {
+const getStyle = (isArray: boolean, isObject: boolean, value: any) => {
     return `color:${getColor(isArray, isObject, value)};`
   }
 
-  const getColor = (isArray: boolean, isObject: boolean, value: any) => {
+const getColor = (isArray: boolean, isObject: boolean, value: any) => {
     if (isArray) {
       return Colors.Array
     }
@@ -111,6 +102,25 @@ export interface JSONViewerClickEvent {
     }
     return Colors.Other
   }
+
+$: isArray = Array.isArray(value)
+  $: isObject = value?.toString?.() === "[object Object]"
+  $: primitive = !(isArray || isObject)
+  $: keys = getKeys(isArray, isObject, value)
+  $: expandable = keys.length > 0
+  $: displayValue = getDisplayValue(isArray, isObject, keys, value)
+  $: style = getStyle(isArray, isObject, value)
+  $: clickContext = { value, label, path }
+
+  
+
+  
+
+  
+
+  
+
+  
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

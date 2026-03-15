@@ -18,7 +18,7 @@ export const shouldDisplaySetting = (instance, setting) => {
   return dependsOn.every((condition) => {
     let dependantSetting = condition
     let dependantValues = null
-    const invert = !!condition.invert
+    const invert = Boolean(condition.invert)
     if (typeof condition === "object") {
       dependantSetting = condition.setting
       dependantValues = condition.value

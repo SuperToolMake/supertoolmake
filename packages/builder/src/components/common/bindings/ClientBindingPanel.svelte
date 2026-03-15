@@ -12,8 +12,6 @@ export let autofocusEditor = false
 export let context = null
 export let allowHTML = false
 
-$: enrichedBindings = enrichBindings(bindings)
-
 // Ensure bindings have the correct categories
 const enrichBindings = (bindings) => {
   if (!bindings?.length) {
@@ -24,6 +22,8 @@ const enrichBindings = (bindings) => {
     type: null,
   }))
 }
+
+$: enrichedBindings = enrichBindings(bindings)
 
 onMount(previewStore.requestComponentContext)
 </script>

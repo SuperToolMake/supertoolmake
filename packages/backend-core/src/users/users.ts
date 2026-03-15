@@ -121,7 +121,7 @@ export async function doesUserExist(email: string) {
     if (Array.isArray(user) || user != null) {
       return true
     }
-  } catch (err) {
+  } catch {
     return false
   }
   return false
@@ -138,7 +138,7 @@ export async function searchGlobalUsersByApp(
   const params = getUsersByWorkspaceParams(workspaceId, {
     include_docs: true,
   })
-  params.startkey = opts && opts.startkey ? opts.startkey : params.startkey
+  params.startkey = opts?.startkey ? opts.startkey : params.startkey
   let response = await queryGlobalView<User>(ViewName.USER_BY_WORKSPACE, params)
 
   if (!response) {
@@ -209,7 +209,7 @@ export async function searchGlobalUsersByEmail(
   }
   const lcEmail = email.toLowerCase()
   // handle if passing up startkey for pagination
-  const startkey = opts && opts.startkey ? opts.startkey : lcEmail
+  const startkey = opts?.startkey ? opts.startkey : lcEmail
   let response = await queryGlobalView<User>(ViewName.USER_BY_EMAIL, {
     ...opts,
     startkey,
@@ -324,7 +324,7 @@ export async function addAppBuilder(user: User, appId: string) {
 
 export async function removeAppBuilder(user: User, appId: string) {
   const prodAppId = getProdWorkspaceID(appId)
-  if (user.builder && user.builder.apps?.includes(prodAppId)) {
+  if (user.builder?.apps?.includes(prodAppId)) {
     user.builder.apps = user.builder.apps.filter((id) => id !== prodAppId)
   }
   await UserDB.save(user, { hashPassword: false })

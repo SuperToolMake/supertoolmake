@@ -193,7 +193,7 @@ export type DatasourcePlusQueryResponse =
   | Row[]
   | Record<DSPlusOperation, boolean>[]
   | { total: number }[]
-  | void
+  | undefined
 
 export interface DatasourcePlus extends IntegrationBase {
   // if the datasource supports the use of bindings directly (to protect against SQL injection)

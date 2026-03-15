@@ -20,23 +20,6 @@ let fieldState
 let fieldApi
 let localFiles = []
 
-$: {
-  // If the field state is reset, clear the local files
-  if (!fieldState?.value?.length) {
-    localFiles = []
-  }
-}
-
-const { API, notificationStore, uploadStore } = getContext("sdk")
-const component = getContext("component")
-
-// 5GB cap per item sent via S3 REST API
-const MaxFileSize = 1000000000 * 5
-
-// Actual file data to upload
-let data
-let loading = false
-
 const handleFileTooLarge = () => {
   notificationStore.actions.warning(
     "Files cannot exceed 5GB. Please try again with a smaller file."
@@ -112,6 +95,23 @@ const handleChange = (e) => {
     onChange({ value: files })
   }
 }
+
+$: {
+  // If the field state is reset, clear the local files
+  if (!fieldState?.value?.length) {
+    localFiles = []
+  }
+}
+
+const { API, notificationStore, uploadStore } = getContext("sdk")
+const component = getContext("component")
+
+// 5GB cap per item sent via S3 REST API
+const MaxFileSize = 1000000000 * 5
+
+// Actual file data to upload
+let data
+let loading = false
 
 onMount(() => {
   uploadStore.actions.registerFileUpload($component.id, upload)

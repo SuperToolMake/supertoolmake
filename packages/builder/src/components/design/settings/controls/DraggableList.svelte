@@ -29,19 +29,6 @@ let store = writable({
 
 setContext("draggable", store)
 
-$: if (focus && store) {
-  get(store).actions.select(focus)
-}
-
-const dispatch = createEventDispatcher()
-
-let anchors = {}
-let draggableItems = []
-
-// Used for controlling cursor behaviour in order to limit drag behaviour
-// to the drag handle
-let inactive = true
-
 const buildDraggable = (items) => {
   const seenIds = new Set()
   return items
@@ -54,10 +41,6 @@ const buildDraggable = (items) => {
       }
     })
     .filter(({ id }) => id && !seenIds.has(id) && seenIds.add(id))
-}
-
-$: if (items) {
-  draggableItems = buildDraggable(items)
 }
 
 const updateRowOrder = (e) => {
@@ -79,6 +62,23 @@ const handleFinalize = (e) => {
 
 const onItemChanged = (e) => {
   dispatch("itemChange", e.detail)
+}
+
+$: if (focus && store) {
+  get(store).actions.select(focus)
+}
+
+const dispatch = createEventDispatcher()
+
+let anchors = {}
+let draggableItems = []
+
+// Used for controlling cursor behaviour in order to limit drag behaviour
+// to the drag handle
+let inactive = true
+
+$: if (items) {
+  draggableItems = buildDraggable(items)
 }
 </script>
 

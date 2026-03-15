@@ -89,7 +89,12 @@ export function buildUrl(
 }
 
 export const getBindingContext = (objects: Record<any, any>[]): Record<string, any> => {
-  return objects.reduce((acc, current) => ({ ...acc, ...(current || {}) }), {})
+  return objects.reduce((acc, current) => {
+    if (current) {
+      Object.assign(acc, current)
+    }
+    return acc
+  }, {})
 }
 
 export interface DynamicVariablesResult {
@@ -108,13 +113,10 @@ export const getDynamicVariables = (
       queryId && matchFn
         ? variablesList.filter((variable: any) => matchFn(variable, queryId))
         : variablesList
-    return filtered.reduce(
-      (acc: Record<string, any>, next: any) => ({
-        ...acc,
-        [next.name]: next.value,
-      }),
-      {}
-    )
+    return filtered.reduce((acc: Record<string, any>, next: any) => {
+      acc[next.name] = next.value
+      return acc
+    }, {})
   }
   return {}
 }
@@ -197,7 +199,7 @@ export function buildQueryBindings(
 }
 
 export const shouldShowVariables = (dynamicVariables: Record<string, any>, success: boolean) => {
-  return !!(dynamicVariables && (Object.keys(dynamicVariables).length > 0 || success))
+  return Boolean(dynamicVariables && (Object.keys(dynamicVariables).length > 0 || success))
 }
 
 export function buildQuery(
@@ -313,7 +315,7 @@ export function getDefaultRestAuthConfig(datasource: Datasource | UIInternalData
   | undefined {
   const config = datasource?.config?.authConfigs?.[0]
   if (!isRestAuthConfig(config)) {
-    return undefined
+    return
   }
   return {
     authConfigId: config._id,
@@ -389,7 +391,7 @@ export async function runQuery(
   }
 }
 
-export function getSelectedQuery(queryId: string, datasourceId: string) {
+export function getSelectedQuery(queryId: string | undefined, datasourceId: string) {
   const queryStore = get(queries)
 
   const defaultQuery: Query = {

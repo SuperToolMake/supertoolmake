@@ -35,7 +35,7 @@ class UserStore extends BudiStore<UserState> {
   async get(userId: string) {
     try {
       return await API.getUser(userId)
-    } catch (err) {
+    } catch {
       notifications.error("Error fetching user")
       return null
     }

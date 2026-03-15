@@ -35,7 +35,7 @@ const newClient = (opts?: { production?: boolean }) =>
 
       // In the event that the server has terminated the session, we need to
       // manually clear the auth user, trigger a redirect to auth.
-      const hasAuthCookie = !!CookieUtils.getCookie(Constants.Cookies.Auth)
+      const hasAuthCookie = Boolean(CookieUtils.getCookie(Constants.Cookies.Auth))
 
       if (!hasAuthCookie && get(auth).user) {
         auth.clearSession()
@@ -48,7 +48,7 @@ const newClient = (opts?: { production?: boolean }) =>
         // Remove cookies
         CookieUtils.removeCookie(Constants.Cookies.Auth)
 
-        const isAuthenticated = !!get(auth).user
+        const isAuthenticated = Boolean(get(auth).user)
         if (isAuthenticated) {
           // Clear return URL to prevent redirect loops with invalid URLs
           CookieUtils.removeCookie(Constants.Cookies.ReturnUrl)

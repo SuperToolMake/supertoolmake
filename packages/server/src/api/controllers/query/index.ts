@@ -184,7 +184,7 @@ export async function save(ctx: UserCtx<SaveQueryRequest, SaveQueryResponse>) {
     ctx.throw(400, "Invalid query name")
   }
 
-  if (!query._id && !query._rev) {
+  if (!(query._id || query._rev)) {
     query._id = generateQueryID(query.datasourceId)
     // flag to state whether the default bindings are empty strings (old behaviour) or null
     query.nullDefaultSupport = true
@@ -253,7 +253,7 @@ export async function preview(ctx: UserCtx<PreviewQueryRequest, PreviewQueryResp
   // the body contains the makings of a query, which has not been saved yet
   const query: Query = ctx.request.body
   // hasn't been saved, new query
-  if (!queryId && !query._id) {
+  if (!(queryId || query._id)) {
     query.nullDefaultSupport = true
   }
 
@@ -452,7 +452,7 @@ async function execute(
     if (extra?.raw) {
       delete extra.raw
     }
-    if (opts && opts.rowsOnly) {
+    if (opts?.rowsOnly) {
       ctx.body = rows
     } else {
       ctx.body = { data: rows, pagination, ...extra, ...info }

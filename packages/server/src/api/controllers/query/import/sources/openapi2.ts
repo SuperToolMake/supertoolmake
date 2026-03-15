@@ -1,3 +1,4 @@
+import { URL } from "node:url"
 import {
   BodyType,
   type Query,
@@ -5,7 +6,6 @@ import {
   type RestTemplateQueryMetadata,
 } from "@budibase/types"
 import { OpenAPIV2 } from "openapi-types"
-import { URL } from "url"
 import { QueryVerbToHttpMethod } from "../../../../../constants"
 import type { GetQueriesOptions, ImportInfo } from "./base"
 import { OpenAPISource } from "./base/openapi"
@@ -78,12 +78,12 @@ export class OpenAPI2 extends OpenAPISource {
 
   private getSecuritySchemeHeader(scheme?: OpenAPIV2.SecuritySchemeObject): string | undefined {
     if (!scheme) {
-      return undefined
+      return
     }
     if (scheme.type === "apiKey" && scheme.in === "header" && scheme.name) {
       return scheme.name
     }
-    return undefined
+    return
   }
 
   private isSecurityHeader(name?: string): boolean {
@@ -139,7 +139,7 @@ export class OpenAPI2 extends OpenAPISource {
       } else {
         return false
       }
-    } catch (err) {
+    } catch {
       return false
     }
   }
@@ -150,7 +150,7 @@ export class OpenAPI2 extends OpenAPISource {
     const host = this.document.host
 
     if (!host) {
-      return undefined
+      return
     }
 
     const normalizedBasePath = basePath
@@ -160,8 +160,8 @@ export class OpenAPI2 extends OpenAPISource {
       : ""
     try {
       return new URL(`${scheme}://${host}${normalizedBasePath}`)
-    } catch (_err) {
-      return undefined
+    } catch {
+      return
     }
   }
 

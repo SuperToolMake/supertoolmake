@@ -43,9 +43,6 @@ export const EditorModes = {
   let editor
 
   // Keep editor up to date with value
-  $: editor?.setOption("mode", mode)
-  $: editor?.setValue(value || "")
-
   // Creates an instance of a code mirror editor
   async function createEditor(mode, value) {
     if (!CodeMirror || !textarea) {
@@ -98,7 +95,7 @@ export const EditorModes = {
     })
   }
 
-  // Export a function to expose caret position
+// Export a function to expose caret position
   export const getCaretPosition = () => {
     const cursor = editor.getCursor()
     return {
@@ -106,6 +103,13 @@ export const EditorModes = {
       end: cursor.ch,
     }
   }
+
+$: editor?.setOption("mode", mode)
+  $: editor?.setValue(value || "")
+
+  
+
+  
 
   onMount(() => {
     // Create the editor with initial value

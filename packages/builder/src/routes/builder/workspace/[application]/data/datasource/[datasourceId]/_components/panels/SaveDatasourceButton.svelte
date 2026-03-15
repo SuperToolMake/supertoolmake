@@ -8,8 +8,6 @@ export let updatedDatasource
 export let onSaved
 export let isDirty
 
-$: hasChanged = typeof isDirty === "boolean" ? isDirty : !isEqual(datasource, updatedDatasource)
-
 const save = async () => {
   try {
     await integrations.saveDatasource(updatedDatasource)
@@ -19,6 +17,8 @@ const save = async () => {
     notifications.error(`Error saving datasource: ${error.message}`)
   }
 }
+
+$: hasChanged = typeof isDirty === "boolean" ? isDirty : !isEqual(datasource, updatedDatasource)
 </script>
 
 <Button disabled={!hasChanged} cta on:click={save}>Save</Button>

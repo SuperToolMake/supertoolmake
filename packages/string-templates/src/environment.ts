@@ -14,7 +14,7 @@ export const isJSAllowed = () => {
 }
 
 export const isTestingBackendJS = () => {
-  return process && process.env.BACKEND_JS
+  return process?.env.BACKEND_JS
 }
 
 export const setTestingBackendJS = () => {

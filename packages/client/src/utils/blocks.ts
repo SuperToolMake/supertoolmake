@@ -35,7 +35,7 @@ export const enrichSearchColumns = async (
     }
   >
 ) => {
-  if (!searchColumns?.length || !schema) {
+  if (!(searchColumns?.length && schema)) {
     return []
   }
   const enrichedColumns = []

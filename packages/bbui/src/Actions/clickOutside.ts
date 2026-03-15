@@ -1,4 +1,4 @@
-type ClickOutsideCallback = (event: MouseEvent) => void | undefined
+type ClickOutsideCallback = (event: MouseEvent) => void
 
 interface ClickOutsideOpts {
   callback?: ClickOutsideCallback

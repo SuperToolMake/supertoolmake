@@ -9,6 +9,11 @@ import { datasources, integrations, queries } from "@/stores/builder"
 export let parameters
 export let bindings = []
 
+function fetchQueryDefinition(query) {
+  const source = $datasources.list.find((ds) => ds._id === query.datasourceId).source
+  return $integrations[source].query[query.queryVerb]
+}
+
 $: query = $queries.list.find((q) => q._id === parameters.queryId)
 $: datasource = $datasources.list.find((ds) => ds._id === parameters.datasourceId)
 // Executequery must exclude budibase datasource
@@ -18,11 +23,6 @@ $: {
   if (!parameters.queryParams) {
     parameters.queryParams = {}
   }
-}
-
-function fetchQueryDefinition(query) {
-  const source = $datasources.list.find((ds) => ds._id === query.datasourceId).source
-  return $integrations[source].query[query.queryVerb]
 }
 </script>
 

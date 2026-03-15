@@ -19,8 +19,6 @@ export let maxValue: number = 100
 
 let subMask1Style: string | undefined
 let subMask2Style: string | undefined
-$: calculateSubMasks(value)
-
 function calculateSubMasks(value: number | null): void {
   if (value) {
     let percentage = ((value - minValue) / (maxValue - minValue)) * 100
@@ -36,6 +34,8 @@ function calculateSubMasks(value: number | null): void {
     }
   }
 }
+
+$: calculateSubMasks(value)
 
 export let overBackground: boolean = false
 </script>

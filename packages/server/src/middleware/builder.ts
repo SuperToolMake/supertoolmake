@@ -18,12 +18,12 @@ async function checkDevAppLocks(ctx: UserCtx) {
   const appId = ctx.appId
 
   // if any public usage, don't proceed
-  if (!ctx.user?._id && !ctx.user?.userId) {
+  if (!(ctx.user?._id || ctx.user?.userId)) {
     return
   }
 
   // not a development app, don't need to do anything
-  if (!appId || !appId.startsWith(WORKSPACE_DEV_PREFIX)) {
+  if (!appId?.startsWith(WORKSPACE_DEV_PREFIX)) {
     return
   }
 
@@ -73,7 +73,7 @@ export async function builderMiddleware(ctx: UserCtx) {
     return ctx.throw(403, "Session not authenticated")
   }
 
-  const referer = ctx.headers["referer"]
+  const referer = ctx.headers.referer
 
   const hasAppId = !referer ? false : referer.includes(appId)
   const editingApp = referer ? hasAppId : false

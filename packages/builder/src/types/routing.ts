@@ -111,7 +111,7 @@ export const flatten = (
         return child
       })
 
-      acc = [...acc, ...children]
+      acc.push(...children)
     }
 
     // Presense of a component means that this is a renderable page

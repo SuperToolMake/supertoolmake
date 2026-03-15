@@ -55,7 +55,7 @@ class QueryRunner {
     this.transformer = input.transformer
     this.queryId = input.queryId!
     this.schema = input.schema
-    this.nullDefaultSupport = !!input.nullDefaultSupport
+    this.nullDefaultSupport = Boolean(input.nullDefaultSupport)
     this.noRecursiveQuery = flags.noRecursiveQuery
     this.cachedVariables = []
     // Additional context items for enrichment
@@ -239,7 +239,7 @@ class QueryRunner {
     const { oauth2, providerType, _id } = ctx.user
     const { configId } = ctx.auth
 
-    if (!providerType || !oauth2?.refreshToken) {
+    if (!(providerType && oauth2?.refreshToken)) {
       throw new Error("No refresh token found for authenticated user")
     }
 
@@ -260,7 +260,7 @@ class QueryRunner {
       // In this event the user may have oAuth issues that
       // could require re-authenticating with their provider.
       const errorMessage = resp.err.data ? resp.err.data : resp.err.toString()
-      throw new Error("OAuth2 access token could not be refreshed: " + errorMessage)
+      throw new Error(`OAuth2 access token could not be refreshed: ${errorMessage}`)
     }
 
     return resp
@@ -286,7 +286,7 @@ class QueryRunner {
 
   async addDatasourceVariables() {
     const { datasource, parameters, fields } = this
-    if (!datasource || !datasource.config) {
+    if (!datasource?.config) {
       return parameters
     }
     const staticVars = datasource.config.staticVariables || {}

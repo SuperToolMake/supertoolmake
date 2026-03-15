@@ -29,7 +29,6 @@ const SQL_CLIENT_SOURCE_MAP: Record<SourceName, SqlClient | undefined> = {
   [SourceName.MYSQL]: SqlClient.MY_SQL,
   [SourceName.SQL_SERVER]: SqlClient.MS_SQL,
   [SourceName.MONGODB]: undefined,
-  [SourceName.S3]: undefined,
   [SourceName.REST]: undefined,
   [SourceName.FIRESTORE]: undefined,
   [SourceName.REDIS]: undefined,
@@ -242,9 +241,9 @@ function validateTimeOnlyField(
   } else if (constraints) {
     let castedValue = value
     const stringTimeToDate = (value: string) => {
-      const [hour, minute, second] = value.split(":").map((x: string) => +x)
+      const [hour, minute, second] = value.split(":").map((x: string) => Number(x))
       let date = dayjs("2000-01-01T00:00:00.000Z").hour(hour).minute(minute)
-      if (!isNaN(second)) {
+      if (!Number.isNaN(second)) {
         date = date.second(second)
       }
       return date

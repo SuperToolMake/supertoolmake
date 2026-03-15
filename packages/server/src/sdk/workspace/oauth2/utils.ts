@@ -45,8 +45,8 @@ async function fetchToken(config: {
       ).toString("base64")}`,
     }
   } else {
-    bodyParams["client_id"] = config.clientId
-    bodyParams["client_secret"] = config.clientSecret
+    bodyParams.client_id = config.clientId
+    bodyParams.client_secret = config.clientSecret
   }
   if (config.scope) {
     bodyParams.scope = config.scope

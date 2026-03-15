@@ -26,43 +26,6 @@ setContext("multi-step-form-block", multiStepStore)
 let cachedValue
 let cachedInstance = {}
 
-$: if (!isEqual(cachedValue, value)) {
-  cachedValue = value
-}
-$: if (!isEqual(componentInstance, cachedInstance)) {
-  cachedInstance = componentInstance
-}
-$: stepCount = cachedValue?.length || 0
-$: updateStore(stepCount)
-$: dataSource = getDatasourceForProvider($selectedScreen, cachedInstance)
-$: emitCurrentStep($currentStep)
-$: stepLabel = getStepLabel($multiStepStore)
-$: stepDef = getDefinition(stepLabel)
-$: savedInstance = cachedValue?.[$currentStep] || {}
-$: defaults = Utils.buildMultiStepFormBlockDefaultProps({
-  _id: cachedInstance._id,
-  stepCount: $multiStepStore.stepCount,
-  currentStep: $multiStepStore.currentStep,
-  actionType: cachedInstance.actionType,
-  dataSource: cachedInstance.dataSource,
-})
-// For backwards compatibility we need to sometimes manually set base
-// properties like _id and _component as we didn't used to save these
-$: stepInstance = {
-  _id: savedInstance._id || Helpers.uuid(),
-  _component: savedInstance._component || componentType,
-  _instanceName: `Step ${$currentStep + 1}`,
-  title: savedInstance.title ?? defaults?.title,
-  buttons: savedInstance.buttons || defaults?.buttons,
-  buttonsCollapsed: savedInstance.buttonsCollapsed,
-  buttonsCollapsedText: savedInstance.buttonsCollapsedText,
-  fields: savedInstance.fields,
-  desc: savedInstance.desc,
-
-  // Needed for field configuration
-  dataSource,
-}
-
 const getDefinition = (stepLabel) => {
   let def = cloneDeep(componentStore.getDefinition(componentType))
   def.settings.find((x) => x.key === "steps").label = stepLabel
@@ -157,6 +120,43 @@ const processUpdate = (field, val) => {
   } else {
     updateStep(field, val)
   }
+}
+
+$: if (!isEqual(cachedValue, value)) {
+  cachedValue = value
+}
+$: if (!isEqual(componentInstance, cachedInstance)) {
+  cachedInstance = componentInstance
+}
+$: stepCount = cachedValue?.length || 0
+$: updateStore(stepCount)
+$: dataSource = getDatasourceForProvider($selectedScreen, cachedInstance)
+$: emitCurrentStep($currentStep)
+$: stepLabel = getStepLabel($multiStepStore)
+$: stepDef = getDefinition(stepLabel)
+$: savedInstance = cachedValue?.[$currentStep] || {}
+$: defaults = Utils.buildMultiStepFormBlockDefaultProps({
+  _id: cachedInstance._id,
+  stepCount: $multiStepStore.stepCount,
+  currentStep: $multiStepStore.currentStep,
+  actionType: cachedInstance.actionType,
+  dataSource: cachedInstance.dataSource,
+})
+// For backwards compatibility we need to sometimes manually set base
+// properties like _id and _component as we didn't used to save these
+$: stepInstance = {
+  _id: savedInstance._id || Helpers.uuid(),
+  _component: savedInstance._component || componentType,
+  _instanceName: `Step ${$currentStep + 1}`,
+  title: savedInstance.title ?? defaults?.title,
+  buttons: savedInstance.buttons || defaults?.buttons,
+  buttonsCollapsed: savedInstance.buttonsCollapsed,
+  buttonsCollapsedText: savedInstance.buttonsCollapsedText,
+  fields: savedInstance.fields,
+  desc: savedInstance.desc,
+
+  // Needed for field configuration
+  dataSource,
 }
 </script>
 

@@ -18,12 +18,6 @@ const templateSchema = {
   },
 }
 
-$: emailInfo = getEmailInfo($email.definitions)
-$: hasCustom = ($email.templates || []).find((template) => template._id)
-
-let smtpConfig: FindConfigResponse | null
-let loading = false
-
 function getEmailInfo(definitions: FetchGlobalTemplateDefinitionResponse | undefined) {
   if (!definitions) {
     return []
@@ -32,11 +26,17 @@ function getEmailInfo(definitions: FetchGlobalTemplateDefinitionResponse | undef
   return entries.map(([key, value]) => ({ purpose: key, ...value }))
 }
 
+$: emailInfo = getEmailInfo($email.definitions)
+$: hasCustom = ($email.templates || []).find((template) => template._id)
+
+let smtpConfig: FindConfigResponse | null
+let loading = false
+
 onMount(async () => {
   try {
     smtpConfig = await fetchSmtp()
     await email.fetchTemplates()
-  } catch (error) {
+  } catch {
     notifications.error("Error fetching email templates")
   }
 })

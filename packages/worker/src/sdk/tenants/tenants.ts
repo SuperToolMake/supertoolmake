@@ -79,7 +79,7 @@ async function removeTenantUsers(tenantId: string) {
   try {
     const allUsers = await getTenantUsers(tenantId)
     const allEmails = allUsers.rows.map((row: any) => row.doc.email)
-    const allSsoIds = allUsers.rows.map((row: any) => row.doc.ssoId).filter((id) => !!id)
+    const allSsoIds = allUsers.rows.map((row: any) => row.doc.ssoId).filter((id) => Boolean(id))
 
     // get the id and email doc ids
     let keys = allUsers.rows.map((row: any) => row.id)

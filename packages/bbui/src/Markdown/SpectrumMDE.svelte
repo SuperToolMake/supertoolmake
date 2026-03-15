@@ -31,14 +31,14 @@ onDestroy(() => {
   mde?.toTextArea()
 })
 
-$: styleString = getStyleString(fullScreenOffset)
-
 const getStyleString = (offset: { x?: string; y?: string } | null) => {
   let string = ""
   string += `--fullscreen-offset-x:${offset?.x || "0px"};`
   string += `--fullscreen-offset-y:${offset?.y || "0px"};`
   return string
 }
+
+$: styleString = getStyleString(fullScreenOffset)
 </script>
 
 <div class:disabled style={styleString}>

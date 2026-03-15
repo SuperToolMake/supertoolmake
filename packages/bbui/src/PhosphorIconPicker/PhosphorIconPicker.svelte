@@ -17,8 +17,6 @@ let searchString = ""
 
 const dispatch = createEventDispatcher()
 
-$: icons = searchIcons(searchString)
-
 const searchIcons = (searchString: string) => {
   if (!searchString) {
     return PhosphorIcons
@@ -36,6 +34,8 @@ const openPicker = () => {
   searchString = ""
   open = true
 }
+
+$: icons = searchIcons(searchString)
 </script>
 
 <div class="preview" bind:this={anchor}>

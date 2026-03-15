@@ -52,5 +52,5 @@ function substituteSize(svg) {
 }
 </script>
 
-<!-- eslint-disable-next-line svelte/no-at-html-tags-->
+<!-- biome-ignore lint: svelte/no-at-html-tags-->
 {@html substituteSize(svgHtml)}

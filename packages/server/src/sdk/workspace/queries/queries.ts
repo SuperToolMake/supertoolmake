@@ -83,7 +83,7 @@ export async function enrichContext(
   inputs = {}
 ): Promise<Record<string, any>> {
   const enrichedQuery: Record<string, any> = {}
-  if (!fields || !inputs) {
+  if (!(fields && inputs)) {
     return enrichedQuery
   }
   if (Array.isArray(fields)) {
@@ -115,7 +115,7 @@ export async function enrichContext(
       enrichedQuery.json = JSON.parse(
         enrichedQuery.json || enrichedQuery.customData || enrichedQuery.requestBody
       )
-    } catch (err) {
+    } catch {
       // no json found, ignore
     }
     delete enrichedQuery.customData

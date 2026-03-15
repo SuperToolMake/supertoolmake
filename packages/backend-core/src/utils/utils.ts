@@ -37,7 +37,7 @@ async function resolveAppUrl(ctx: Ctx) {
   const workspace = workspaces.filter((a) => a.url && a.url.toLowerCase() === possibleUrl)[0]
 
   // Multi-workspace functionality has been removed, so assume a default
-  return workspace && workspace.appId ? workspace.appId : "app_workspace"
+  return workspace?.appId ? workspace.appId : "app_workspace"
 }
 
 export function isServingApp(ctx: Ctx) {
@@ -144,7 +144,7 @@ function parseWorkspaceIdFromUrlPath(url?: string) {
  */
 export function openJwt<T>(token?: string): T | undefined {
   if (!token) {
-    return undefined
+    return
   }
   try {
     return jwt.verify(token, env.JWT_SECRET as Secret) as T
@@ -163,7 +163,7 @@ export function isValidInternalAPIKey(apiKey: string) {
     return true
   }
   // fallback to enable rotation
-  return !!(env.INTERNAL_API_KEY_FALLBACK && env.INTERNAL_API_KEY_FALLBACK === apiKey)
+  return Boolean(env.INTERNAL_API_KEY_FALLBACK && env.INTERNAL_API_KEY_FALLBACK === apiKey)
 }
 
 /**
@@ -175,7 +175,7 @@ export function getCookie<T>(ctx: Ctx, name: string) {
   const cookie = ctx.cookies.get(name)
 
   if (!cookie) {
-    return undefined
+    return
   }
 
   return openJwt<T>(cookie)
@@ -189,7 +189,7 @@ export function getCookie<T>(ctx: Ctx, name: string) {
  * @param opts options like whether to sign.
  */
 export function setCookie(ctx: Ctx, value: any, name = "builder", opts = { sign: true }) {
-  if (value && opts && opts.sign) {
+  if (value && opts?.sign) {
     value = jwt.sign(value, env.JWT_SECRET as Secret)
   }
 
@@ -229,7 +229,7 @@ export function timeout(timeMs: number) {
 }
 
 export function isAudited(event: Event) {
-  return !!AuditedEventFriendlyName[event]
+  return Boolean(AuditedEventFriendlyName[event])
 }
 
 export function hasCircularStructure(json: any) {
@@ -247,5 +247,5 @@ export function hasCircularStructure(json: any) {
 }
 
 export function urlHasProtocol(url: string): boolean {
-  return !!url.match(/^.+:\/\/.+$/)
+  return Boolean(url.match(/^.+:\/\/.+$/))
 }

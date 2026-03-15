@@ -44,21 +44,6 @@ let schema
 let enrichedSearchColumns
 let schemaLoaded = false
 
-$: fetchSchema(dataSource)
-$: enrichSearchColumns(searchColumns, schema).then((val) => (enrichedSearchColumns = val))
-$: enrichedFilter = enrichFilter(filter, enrichedSearchColumns, formId)
-$: cardWidth = cardHorizontal ? 420 : 300
-$: fullCardURL = buildFullCardUrl(linkCardTitle, cardURL, repeaterId, linkColumn)
-$: titleButtonAction = [
-  {
-    "##eventHandlerType": "Navigate To",
-    parameters: {
-      peek: titleButtonPeek,
-      url: titleButtonURL,
-    },
-  },
-]
-
 // Provide additional data context for live binding eval
 export const getAdditionalDataContext = () => {
   const rows = get(context)[dataProviderId]?.rows || []
@@ -71,7 +56,7 @@ export const getAdditionalDataContext = () => {
 
 // Builds a full details page URL for the card title
 const buildFullCardUrl = (link, url, repeaterId, linkColumn) => {
-  if (!link || !url || !repeaterId) {
+  if (!(link && url && repeaterId)) {
     return null
   }
   const col = linkColumn || "_id"
@@ -91,6 +76,21 @@ const fetchSchema = async (dataSource) => {
   }
   schemaLoaded = true
 }
+
+$: fetchSchema(dataSource)
+$: enrichSearchColumns(searchColumns, schema).then((val) => (enrichedSearchColumns = val))
+$: enrichedFilter = enrichFilter(filter, enrichedSearchColumns, formId)
+$: cardWidth = cardHorizontal ? 420 : 300
+$: fullCardURL = buildFullCardUrl(linkCardTitle, cardURL, repeaterId, linkColumn)
+$: titleButtonAction = [
+  {
+    "##eventHandlerType": "Navigate To",
+    parameters: {
+      peek: titleButtonPeek,
+      url: titleButtonURL,
+    },
+  },
+]
 </script>
 
 {#if schemaLoaded}

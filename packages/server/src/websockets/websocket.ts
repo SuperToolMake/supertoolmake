@@ -1,8 +1,8 @@
+import type http from "node:http"
 import { auth, Header, redis } from "@budibase/backend-core"
 import { SocketEvent, SocketSessionTTL } from "@budibase/shared-core"
 import type { Ctx, SocketSession } from "@budibase/types"
 import { createAdapter } from "@socket.io/redis-adapter"
-import type http from "http"
 import type Koa from "koa"
 import { userAgent } from "koa-useragent"
 import { Server, type Socket } from "socket.io"
@@ -162,7 +162,7 @@ export class BaseSocket {
     const sessionsExist = await Promise.all(
       sessionIds.map((id) => this.redisClient?.exists(this.getSessionKey(id)))
     )
-    const prunedSessionIds = sessionIds.filter((id, idx) => {
+    const prunedSessionIds = sessionIds.filter((_id, idx) => {
       if (!sessionsExist[idx]) {
         this.io.to(room).emit(SocketEvent.UserDisconnect, {
           sessionId: sessionIds[idx],
@@ -198,7 +198,6 @@ export class BaseSocket {
     }
 
     // Store in redis
-    // @ts-expect-error
     const user: SocketSession = socket.data
     const { sessionId } = user
     const key = this.getSessionKey(sessionId)
@@ -216,7 +215,6 @@ export class BaseSocket {
 
   // Disconnects a socket from its current room
   async leaveRoom(socket: Socket) {
-    // @ts-expect-error
     const user: SocketSession = socket.data
     const { room, sessionId } = user
     if (!room) {

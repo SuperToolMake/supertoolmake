@@ -39,7 +39,7 @@ describe("hbs validator", () => {
 
     describe("expressions with whitespaces", () => {
       const validators = {
-        [`field name`]: {},
+        "field name": {},
       }
 
       it("validates expressions with whitespaces", () => {

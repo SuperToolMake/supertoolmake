@@ -92,7 +92,7 @@ export class RoleHierarchyTraversal {
       allRoles = this.allRoles
     // this will be a full walked list of roles - which may contain duplicates
     let roleList: RoleDoc[] = []
-    if (!role || !role._id) {
+    if (!role?._id) {
       return roleList
     }
     roleList.push(role)
@@ -106,11 +106,7 @@ export class RoleHierarchyTraversal {
     } else {
       const foundRoleIds: string[] = []
       let currentRole: RoleDoc | undefined = role
-      while (
-        currentRole &&
-        currentRole.inherits &&
-        !rolesInList(foundRoleIds, currentRole.inherits)
-      ) {
+      while (currentRole?.inherits && !rolesInList(foundRoleIds, currentRole.inherits)) {
         if (Array.isArray(currentRole.inherits)) {
           return roleList.concat(this.walk(currentRole))
         } else {
@@ -177,7 +173,7 @@ export function prefixRoleIDNoBuiltin(roleId: string) {
 export function getBuiltinRole(roleId: string): Role | undefined {
   const role = Object.values(BUILTIN_ROLES).find((role) => roleId.includes(role._id))
   if (!role) {
-    return undefined
+    return
   }
   return cloneDeep(role)
 }
@@ -191,7 +187,7 @@ export function validInherits(allRoles: RoleDoc[], inherits?: string | string[])
     const filtered = inherits.filter((roleId) => find(roleId))
     return inherits.length !== 0 && filtered.length === inherits.length
   } else {
-    return !!find(inherits)
+    return Boolean(find(inherits))
   }
 }
 
@@ -303,7 +299,7 @@ export function findRole(
     roleId = prefixRoleID(roleId)
   }
   const dbRole = roles.find((role) => role._id && roleIDsAreEqual(role._id, roleId))
-  if (!dbRole && !isBuiltin(roleId) && opts?.defaultPublic) {
+  if (!(dbRole || isBuiltin(roleId)) && opts?.defaultPublic) {
     return cloneDeep(BUILTIN_ROLES.PUBLIC)
   }
   // combine the roles
@@ -423,7 +419,7 @@ export async function getAllRoles(appId?: string): Promise<RoleDoc[]> {
     let appDB
     try {
       appDB = getWorkspaceDB()
-    } catch (error) {
+    } catch {
       // We don't have any apps, so we'll just use the built-in roles
     }
     return internal(appDB)
@@ -493,7 +489,7 @@ export async function getAllRoles(appId?: string): Promise<RoleDoc[]> {
 async function shouldIncludePowerRole(db: Database) {
   const app = await db.tryGet<Workspace>(DocumentType.WORKSPACE_METADATA)
   const creationVersion = app?.creationVersion
-  if (!creationVersion || !semver.valid(creationVersion)) {
+  if (!(creationVersion && semver.valid(creationVersion))) {
     // Old apps don't have creationVersion, so we should include it for backward compatibility
     return true
   }
@@ -544,7 +540,7 @@ export class AccessController {
   }
 
   async checkScreenAccess(screen: Screen, userRoleId: string) {
-    const roleId = screen && screen.routing ? screen.routing.roleId : undefined
+    const roleId = screen?.routing ? screen.routing.roleId : undefined
     if (await this.hasAccess(roleId, userRoleId)) {
       return screen
     }

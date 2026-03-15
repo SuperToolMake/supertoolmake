@@ -58,7 +58,7 @@ export class Thread {
   }
 
   shouldDisableThreading(): boolean {
-    return !!(env.isTest() || env.DISABLE_THREADING || this.count === 0 || env.isInThread())
+    return Boolean(env.isTest() || env.DISABLE_THREADING || this.count === 0 || env.isInThread())
   }
 
   run<T>(job: QueryEvent): Promise<T> {

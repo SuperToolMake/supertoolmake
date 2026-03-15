@@ -19,129 +19,9 @@ import { admin, appsStore, auth, enrichedApps, organisation } from "@/stores/por
 import Branding from "./Branding.svelte"
 
 $isActive
-$: goto = $gotoStore
-
-let initPromise
-let loaded = writable(false)
-let commandPaletteModal
-let settingsModal
-let hasAuthenticated = false
-
-$: multiTenancyEnabled = $admin.multiTenancy
-$: hasAdminUser = $admin?.checklist?.adminUser?.checked
-$: user = $auth.user
-$: isOwner = sdk.users.hasAdminPermissions(user)
-$: isBuilder = sdk.users.hasBuilderPermissions(user)
-// Re-run initBuilder when user logs in
-$: {
-  const isAuthenticated = !!$auth.user
-  if (isAuthenticated && !hasAuthenticated) {
-    initPromise = initBuilder()
-  }
-  hasAuthenticated = isAuthenticated
-}
-
 const isOnPreLoginPage = () => {
   return $isActive("./auth") || $isActive("./invite") || $isActive("./admin")
 }
-
-derivedMemo(
-  [admin, auth, enrichedApps, isActive, appsStore, loaded],
-  ([$admin, $auth, $enrichedApps, $isActive, $appsStore, $loaded]) => {
-    // Only run remaining logic when fully loaded
-    if (!$loaded || !$admin.loaded || !$auth.loaded) {
-      return null
-    }
-
-    // Set the return url on logout
-    if (
-      !$auth.user &&
-      !CookieUtils.getCookie(Constants.Cookies.ReturnUrl) &&
-      !$auth.postLogout &&
-      !isOnPreLoginPage()
-    ) {
-      CookieUtils.setCookie(Constants.Cookies.ReturnUrl, window.location.href)
-      return
-    }
-
-    // if tenant is not set go to it
-    if (multiTenancyEnabled && !$auth.tenantSet) {
-      goto("./auth/org")
-      return
-    }
-
-    // Force creation of an admin user if one doesn't exist
-    if (!hasAdminUser) {
-      goto("./admin")
-      return
-    }
-
-    // Redirect to log in at any time if the user isn't authenticated
-    if (!$auth.user && !isOnPreLoginPage()) {
-      goto(`./auth`)
-      return
-    }
-
-    // Check if password reset required for user
-    if ($auth.user?.forceResetPassword) {
-      goto(`./auth/reset`)
-      return
-    }
-
-    // Authenticated user navigation
-    if ($auth.user) {
-      const returnUrl = CookieUtils.getCookie(Constants.Cookies.ReturnUrl)
-
-      // Return to saved URL first - skip onboarding check if user has a return URL
-      if (returnUrl) {
-        CookieUtils.removeCookie(Constants.Cookies.ReturnUrl)
-        window.location.assign(returnUrl)
-        return
-      }
-
-      // Review if builder users have workspaces. If not, redirect them to get-started
-      const hasEditableWorkspaces = $enrichedApps.some((app) => app.editable)
-      if (
-        ($appsStore.apps.length === 0 || (isBuilder && !hasEditableWorkspaces)) &&
-        !$isActive("./apps") &&
-        !$isActive("./onboarding") &&
-        !$isActive("./get-started")
-      ) {
-        // Tenant owners without apps should be redirected to onboarding
-        if (isOwner) {
-          goto("./onboarding")
-          return
-        }
-        // Regular builders without apps should be redirected to "get started"
-        if (isBuilder && !isOwner) {
-          goto("./get-started")
-          return
-        }
-      }
-
-      // Redirect non-builders to apps unless they're already there
-      if (!isBuilder && !$isActive("./apps")) {
-        goto(`./apps`)
-        return
-      }
-
-      // Default workspace selection for builders
-      const isOnWorkspaceRoute =
-        $isActive("./workspace/[application]") || $isActive("./workspace/updating/[application]")
-      if (isBuilder && $appsStore.apps.length && !isOnWorkspaceRoute && !$isActive("./apps")) {
-        // Find first editable app to redirect to
-        const defaultApp = $enrichedApps.find((app) => app.editable)
-        // Only redirect if enriched apps are loaded and app is editable
-        if (defaultApp?.devId) {
-          goto(`./workspace/[application]`, {
-            application: defaultApp.devId,
-          })
-        }
-        return
-      }
-    }
-  }
-)
 
 async function initBuilder() {
   loaded.set(false)
@@ -190,9 +70,131 @@ const handleKeyDown = (e) => {
   }
 }
 
+$: goto = $gotoStore
+
+let initPromise
+let loaded = writable(false)
+let commandPaletteModal
+let settingsModal
+let hasAuthenticated = false
+
+$: multiTenancyEnabled = $admin.multiTenancy
+$: hasAdminUser = $admin?.checklist?.adminUser?.checked
+$: user = $auth.user
+$: isOwner = sdk.users.hasAdminPermissions(user)
+$: isBuilder = sdk.users.hasBuilderPermissions(user)
+// Re-run initBuilder when user logs in
+$: {
+  const isAuthenticated = Boolean($auth.user)
+  if (isAuthenticated && !hasAuthenticated) {
+    initPromise = initBuilder()
+  }
+  hasAuthenticated = isAuthenticated
+}
+
+derivedMemo(
+  [admin, auth, enrichedApps, isActive, appsStore, loaded],
+  ([$admin, $auth, $enrichedApps, $isActive, $appsStore, $loaded]) => {
+    // Only run remaining logic when fully loaded
+    if (!($loaded && $admin.loaded && $auth.loaded)) {
+      return null
+    }
+
+    // Set the return url on logout
+    if (
+      !(
+        $auth.user ||
+        CookieUtils.getCookie(Constants.Cookies.ReturnUrl) ||
+        $auth.postLogout ||
+        isOnPreLoginPage()
+      )
+    ) {
+      CookieUtils.setCookie(Constants.Cookies.ReturnUrl, window.location.href)
+      return
+    }
+
+    // if tenant is not set go to it
+    if (multiTenancyEnabled && !$auth.tenantSet) {
+      goto("./auth/org")
+      return
+    }
+
+    // Force creation of an admin user if one doesn't exist
+    if (!hasAdminUser) {
+      goto("./admin")
+      return
+    }
+
+    // Redirect to log in at any time if the user isn't authenticated
+    if (!($auth.user || isOnPreLoginPage())) {
+      goto(`./auth`)
+      return
+    }
+
+    // Check if password reset required for user
+    if ($auth.user?.forceResetPassword) {
+      goto(`./auth/reset`)
+      return
+    }
+
+    // Authenticated user navigation
+    if ($auth.user) {
+      const returnUrl = CookieUtils.getCookie(Constants.Cookies.ReturnUrl)
+
+      // Return to saved URL first - skip onboarding check if user has a return URL
+      if (returnUrl) {
+        CookieUtils.removeCookie(Constants.Cookies.ReturnUrl)
+        window.location.assign(returnUrl)
+        return
+      }
+
+      // Review if builder users have workspaces. If not, redirect them to get-started
+      const hasEditableWorkspaces = $enrichedApps.some((app) => app.editable)
+      if (
+        ($appsStore.apps.length === 0 || (isBuilder && !hasEditableWorkspaces)) &&
+        !$isActive("./apps") &&
+        !$isActive("./onboarding") &&
+        !$isActive("./get-started")
+      ) {
+        // Tenant owners without apps should be redirected to onboarding
+        if (isOwner) {
+          goto("./onboarding")
+          return
+        }
+        // Regular builders without apps should be redirected to "get started"
+        if (isBuilder && !isOwner) {
+          goto("./get-started")
+          return
+        }
+      }
+
+      // Redirect non-builders to apps unless they're already there
+      if (!(isBuilder || $isActive("./apps"))) {
+        goto(`./apps`)
+        return
+      }
+
+      // Default workspace selection for builders
+      const isOnWorkspaceRoute =
+        $isActive("./workspace/[application]") || $isActive("./workspace/updating/[application]")
+      if (isBuilder && $appsStore.apps.length && !isOnWorkspaceRoute && !$isActive("./apps")) {
+        // Find first editable app to redirect to
+        const defaultApp = $enrichedApps.find((app) => app.editable)
+        // Only redirect if enriched apps are loaded and app is editable
+        if (defaultApp?.devId) {
+          goto(`./workspace/[application]`, {
+            application: defaultApp.devId,
+          })
+        }
+        return
+      }
+    }
+  }
+)
+
 onMount(() => {
   initPromise = initBuilder()
-  hasAuthenticated = !!$auth.user
+  hasAuthenticated = Boolean($auth.user)
 })
 </script>
 

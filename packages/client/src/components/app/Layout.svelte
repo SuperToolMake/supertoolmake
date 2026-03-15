@@ -58,49 +58,6 @@ let navCollapsed = false
 
 // Set some layout context. This isn't used in bindings but can be used
 // determine things about the current app layout.
-$: mobile = $context.device.mobile
-const store = writable({ headerHeight: 0 })
-$: store.set({
-  screenXOffset: getScreenXOffset(navigation, mobile),
-  screenYOffset: getScreenYOffset(navigation, mobile),
-})
-setContext("layout", store)
-
-$: enrichedNavItems = enrichNavItems(links, $roleStore)
-$: typeClass = NavigationClasses[navigation] || NavigationClasses.None
-$: navWidthClass = WidthClasses[navWidth || width] || WidthClasses.Large
-$: pageWidthClass = WidthClasses[pageWidth || width] || WidthClasses.Large
-$: navStyle = getNavStyle(
-  navBackground,
-  navTextColor,
-  logoHeight,
-  $context.device.width,
-  $context.device.height
-)
-$: autoCloseSidePanel =
-  !$builderStore.inBuilder && $sidePanelStore.open && !$sidePanelStore.ignoreClicksOutside
-
-$: screenId = $builderStore.inBuilder ? `${$builderStore.screen?._id}-screen` : "screen"
-$: navigationId = $builderStore.inBuilder ? `${$builderStore.screen?._id}-navigation` : "navigation"
-
-// Scroll navigation into view if selected.
-// Memoize into a primitive to avoid spamming this whenever builder store
-// changes.
-$: selected = $builderStore.inBuilder && $builderStore.selectedComponentId?.endsWith("-navigation")
-$: {
-  if (selected) {
-    const node = document.getElementsByClassName("nav-wrapper")?.[0]
-    if (node) {
-      node.style.scrollMargin = "100px"
-      node.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "start",
-      })
-    }
-  }
-}
-
 const enrichNavItem = (navItem) => {
   const internalLink = isInternal(navItem.url)
   return {
@@ -151,7 +108,7 @@ function evaluateNavItemConditions(conditions = []) {
   if (visible == null) {
     // If any show condition exists, default to hidden unless one matches
     const hasShow = conditions.some((cond) => cond.action === "show")
-    return hasShow ? false : true
+    return !hasShow
   }
   return visible
 }
@@ -173,6 +130,7 @@ const getScreenXOffset = (navigation, mobile) => {
   }
   return mobile ? "0px" : "250px"
 }
+
 const getScreenYOffset = (navigation, mobile) => {
   if (mobile) {
     return !navigation || navigation === "None" ? 0 : "61px"
@@ -207,6 +165,49 @@ const handleClickLink = () => {
   mobileOpen = false
   sidePanelStore.actions.close()
   modalStore.actions.close()
+}
+
+$: mobile = $context.device.mobile
+const store = writable({ headerHeight: 0 })
+$: store.set({
+  screenXOffset: getScreenXOffset(navigation, mobile),
+  screenYOffset: getScreenYOffset(navigation, mobile),
+})
+setContext("layout", store)
+
+$: enrichedNavItems = enrichNavItems(links, $roleStore)
+$: typeClass = NavigationClasses[navigation] || NavigationClasses.None
+$: navWidthClass = WidthClasses[navWidth || width] || WidthClasses.Large
+$: pageWidthClass = WidthClasses[pageWidth || width] || WidthClasses.Large
+$: navStyle = getNavStyle(
+  navBackground,
+  navTextColor,
+  logoHeight,
+  $context.device.width,
+  $context.device.height
+)
+$: autoCloseSidePanel =
+  !$builderStore.inBuilder && $sidePanelStore.open && !$sidePanelStore.ignoreClicksOutside
+
+$: screenId = $builderStore.inBuilder ? `${$builderStore.screen?._id}-screen` : "screen"
+$: navigationId = $builderStore.inBuilder ? `${$builderStore.screen?._id}-navigation` : "navigation"
+
+// Scroll navigation into view if selected.
+// Memoize into a primitive to avoid spamming this whenever builder store
+// changes.
+$: selected = $builderStore.inBuilder && $builderStore.selectedComponentId?.endsWith("-navigation")
+$: {
+  if (selected) {
+    const node = document.getElementsByClassName("nav-wrapper")?.[0]
+    if (node) {
+      node.style.scrollMargin = "100px"
+      node.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "start",
+      })
+    }
+  }
 }
 </script>
 

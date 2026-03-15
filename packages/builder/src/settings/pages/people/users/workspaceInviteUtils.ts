@@ -71,8 +71,8 @@ export const buildWorkspaceInvitePayload = (
 }
 
 export const getWorkspaceRole = (workspaceId: string, role?: string, appRole?: string) => {
-  if (!workspaceId || !role) {
-    return undefined
+  if (!(workspaceId && role)) {
+    return
   }
   if (role === Constants.BudibaseRoles.Creator) {
     return Constants.Roles.CREATOR
@@ -143,7 +143,7 @@ export const assignExistingUsersToWorkspace = async (
         const saved = await users.save({ ...fullUser, ...roleUpdates })
         rev = saved?._rev || rev
       }
-      if (!user._id || !rev) {
+      if (!(user._id && rev)) {
         throw new Error("User ID or revision missing")
       }
       await users.addUserToWorkspace(user._id, role, rev)
@@ -168,7 +168,7 @@ export const assignCreatedUsersToWorkspace = async (
   sourceUsers: UserInfo[],
   workspaceId: string
 ): Promise<WorkspaceCreatedUserResult> => {
-  if (!workspaceId || !createdUsers.length) {
+  if (!(workspaceId && createdUsers.length)) {
     return {
       addedToWorkspaceEmails: [],
       assignedCount: 0,
@@ -203,7 +203,7 @@ export const assignCreatedUsersToWorkspace = async (
       (result): result is PromiseFulfilledResult<string | null> => result.status === "fulfilled"
     )
     .map((result) => result.value)
-    .filter((email): email is string => !!email)
+    .filter((email): email is string => Boolean(email))
 
   return {
     addedToWorkspaceEmails,

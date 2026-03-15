@@ -8,11 +8,6 @@ import { API } from "@/api"
 import Spinner from "@/components/common/Spinner.svelte"
 import { appsStore, auth } from "@/stores/portal"
 
-$: goto = $gotoStore
-
-let loading = false
-let onboardingFailed = false
-
 const createDefaultWorkspace = async () => {
   if (loading) {
     return
@@ -54,6 +49,11 @@ const createDefaultWorkspace = async () => {
     notifications.error(e.message || "There was a problem creating your workspace")
   }
 }
+
+$: goto = $gotoStore
+
+let loading = false
+let onboardingFailed = false
 
 onMount(() => {
   createDefaultWorkspace()

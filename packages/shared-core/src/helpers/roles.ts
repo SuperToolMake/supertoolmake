@@ -49,5 +49,5 @@ export function checkForRoleInheritanceLoops(roles: Role[]): boolean {
     return false
   }
 
-  return !!roles.find((role) => hasLoop(role._id!))
+  return Boolean(roles.find((role) => hasLoop(role._id!)))
 }

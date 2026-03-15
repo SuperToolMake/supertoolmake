@@ -4,10 +4,10 @@ import { onMount } from "svelte"
 import { builderStore, tables } from "@/stores/builder"
 import NavBar from "./_components/NavBar.svelte"
 
+const validate = (id: string) => $tables.list?.some((table) => table._id === id)
+
 $: tableId = $tables.selectedTableId
 $: builderStore.selectResource(tableId!)
-
-const validate = (id: string) => $tables.list?.some((table) => table._id === id)
 
 onMount(() => {
   const tableId = $params.tableId

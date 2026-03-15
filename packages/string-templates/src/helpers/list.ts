@@ -6,7 +6,6 @@ import comparison from "@budibase/handlebars-helpers/lib/comparison"
 @budibase/handlebars-helpers is not treeshakeable, so we can't use the barrel files. 
 Otherwise, we have issues when generating the isolated-vm bundle because of the treeshaking
 */
-/* eslint-disable local-rules/no-budibase-imports */
 // @ts-expect-error
 import math from "@budibase/handlebars-helpers/lib/math"
 // @ts-expect-error
@@ -22,8 +21,6 @@ import url from "@budibase/handlebars-helpers/lib/url"
 // @ts-expect-error
 import uuid from "@budibase/handlebars-helpers/lib/uuid"
 import { date, difference, duration, durationFromNow } from "./date"
-
-/* eslint-enable local-rules/no-budibase-imports */
 
 // https://github.com/evanw/esbuild/issues/56
 const externalCollections = {

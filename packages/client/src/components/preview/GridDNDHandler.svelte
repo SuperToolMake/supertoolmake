@@ -52,24 +52,6 @@ let dragInfo: GridDragInfo | undefined
 let styles = memo<Record<string, number> | undefined>()
 
 // Grid CSS variables
-$: device = $context.device?.mobile ? Devices.Mobile : Devices.Desktop
-$: vars = {
-  colStart: getGridVar(device, GridParams.ColStart),
-  colEnd: getGridVar(device, GridParams.ColEnd),
-  rowStart: getGridVar(device, GridParams.RowStart),
-  rowEnd: getGridVar(device, GridParams.RowEnd),
-}
-
-// Some memoisation of primitive types for performance
-$: id = dragInfo?.id
-
-// Set ephemeral styles
-$: instance = componentStore.actions.getComponentInstance(id)
-$: applyStyles($instance, $styles)
-
-// Reset when not dragging new components
-$: !$dndIsDragging && stopDragging()
-
 const scrollOffset = () => scrollElement?.scrollTop || 0
 
 const applyStyles = async (instance: any, styles: Record<string, number> | undefined) => {
@@ -90,62 +72,6 @@ const applyStyles = async (instance: any, styles: Record<string, number> | undef
 // Sugar for a combination of both min and max
 const minMax = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
-const processEvent = Utils.domDebounce((mouseX: number, mouseY: number) => {
-  if (!dragInfo?.grid) {
-    return
-  }
-  const { mode, grid, domGrid } = dragInfo
-  const { startX, startY, rowStart, rowEnd, colStart, colEnd } = grid
-  if (!domGrid) {
-    return
-  }
-  const cols = parseInt(domGrid.dataset.cols || "")
-  const colSize = parseInt(domGrid.dataset.colSize || "")
-  if (isNaN(cols) || isNaN(colSize)) {
-    throw "DOM grid missing required dataset attributes"
-  }
-  const diffX = mouseX - startX
-  let deltaX = Math.round(diffX / colSize)
-  const diffY = mouseY - startY + scrollOffset()
-  let deltaY = Math.round(diffY / GridRowHeight)
-  if (mode === GridDragMode.Move) {
-    deltaX = minMax(deltaX, 1 - colStart, cols + 1 - colEnd)
-    deltaY = Math.max(deltaY, 1 - rowStart)
-    const newStyles = {
-      [vars.colStart]: colStart + deltaX,
-      [vars.colEnd]: colEnd + deltaX,
-      [vars.rowStart]: rowStart + deltaY,
-      [vars.rowEnd]: rowEnd + deltaY,
-    }
-    styles.set(newStyles)
-  } else if (mode === GridDragMode.Resize) {
-    const { side } = dragInfo
-    let newStyles: Record<string, number> = {}
-    if (side === "right") {
-      newStyles[vars.colEnd] = Math.max(colEnd + deltaX, colStart + 1)
-    } else if (side === "left") {
-      newStyles[vars.colStart] = Math.min(colStart + deltaX, colEnd - 1)
-    } else if (side === "top") {
-      newStyles[vars.rowStart] = Math.min(rowStart + deltaY, rowEnd - 1)
-    } else if (side === "bottom") {
-      newStyles[vars.rowEnd] = Math.max(rowEnd + deltaY, rowStart + 1)
-    } else if (side === "bottom-right") {
-      newStyles[vars.colEnd] = Math.max(colEnd + deltaX, colStart + 1)
-      newStyles[vars.rowEnd] = Math.max(rowEnd + deltaY, rowStart + 1)
-    } else if (side === "bottom-left") {
-      newStyles[vars.colStart] = Math.min(colStart + deltaX, colEnd - 1)
-      newStyles[vars.rowEnd] = Math.max(rowEnd + deltaY, rowStart + 1)
-    } else if (side === "top-right") {
-      newStyles[vars.colEnd] = Math.max(colEnd + deltaX, colStart + 1)
-      newStyles[vars.rowStart] = Math.min(rowStart + deltaY, rowEnd - 1)
-    } else if (side === "top-left") {
-      newStyles[vars.colStart] = Math.min(colStart + deltaX, colEnd - 1)
-      newStyles[vars.rowStart] = Math.min(rowStart + deltaY, rowEnd - 1)
-    }
-    styles.set(newStyles)
-  }
-})
-
 const handleEvent = (e: DragEvent) => {
   e.preventDefault()
   e.stopPropagation()
@@ -157,7 +83,7 @@ const handleEvent = (e: DragEvent) => {
 const startDraggingPlaceholder = () => {
   const domComponent = document.getElementsByClassName(DNDPlaceholderID)[0]
   const domGrid = domComponent?.closest(".grid")
-  if (!(domComponent instanceof HTMLElement) || !(domGrid instanceof HTMLElement)) {
+  if (!(domComponent instanceof HTMLElement && domGrid instanceof HTMLElement)) {
     return
   }
   const styles = getComputedStyle(domComponent)
@@ -215,7 +141,7 @@ const onDragStart = (e: DragEvent) => {
   // Find grid parent and read from DOM
   const domComponent = document.getElementsByClassName(id)[0]
   const domGrid = domComponent?.closest(".grid")
-  if (!(domComponent instanceof HTMLElement) || !(domGrid instanceof HTMLElement)) {
+  if (!(domComponent instanceof HTMLElement && domGrid instanceof HTMLElement)) {
     return
   }
   const styles = getComputedStyle(domComponent)
@@ -280,6 +206,80 @@ const stopDragging = async () => {
   dragInfo = undefined
   styles.set(undefined)
 }
+
+$: device = $context.device?.mobile ? Devices.Mobile : Devices.Desktop
+$: vars = {
+  colStart: getGridVar(device, GridParams.ColStart),
+  colEnd: getGridVar(device, GridParams.ColEnd),
+  rowStart: getGridVar(device, GridParams.RowStart),
+  rowEnd: getGridVar(device, GridParams.RowEnd),
+}
+
+// Some memoisation of primitive types for performance
+$: id = dragInfo?.id
+
+// Set ephemeral styles
+$: instance = componentStore.actions.getComponentInstance(id)
+$: applyStyles($instance, $styles)
+
+// Reset when not dragging new components
+$: !$dndIsDragging && stopDragging()
+
+const processEvent = Utils.domDebounce((mouseX: number, mouseY: number) => {
+  if (!dragInfo?.grid) {
+    return
+  }
+  const { mode, grid, domGrid } = dragInfo
+  const { startX, startY, rowStart, rowEnd, colStart, colEnd } = grid
+  if (!domGrid) {
+    return
+  }
+  const cols = parseInt(domGrid.dataset.cols || "")
+  const colSize = parseInt(domGrid.dataset.colSize || "")
+  if (Number.isNaN(cols) || Number.isNaN(colSize)) {
+    throw "DOM grid missing required dataset attributes"
+  }
+  const diffX = mouseX - startX
+  let deltaX = Math.round(diffX / colSize)
+  const diffY = mouseY - startY + scrollOffset()
+  let deltaY = Math.round(diffY / GridRowHeight)
+  if (mode === GridDragMode.Move) {
+    deltaX = minMax(deltaX, 1 - colStart, cols + 1 - colEnd)
+    deltaY = Math.max(deltaY, 1 - rowStart)
+    const newStyles = {
+      [vars.colStart]: colStart + deltaX,
+      [vars.colEnd]: colEnd + deltaX,
+      [vars.rowStart]: rowStart + deltaY,
+      [vars.rowEnd]: rowEnd + deltaY,
+    }
+    styles.set(newStyles)
+  } else if (mode === GridDragMode.Resize) {
+    const { side } = dragInfo
+    let newStyles: Record<string, number> = {}
+    if (side === "right") {
+      newStyles[vars.colEnd] = Math.max(colEnd + deltaX, colStart + 1)
+    } else if (side === "left") {
+      newStyles[vars.colStart] = Math.min(colStart + deltaX, colEnd - 1)
+    } else if (side === "top") {
+      newStyles[vars.rowStart] = Math.min(rowStart + deltaY, rowEnd - 1)
+    } else if (side === "bottom") {
+      newStyles[vars.rowEnd] = Math.max(rowEnd + deltaY, rowStart + 1)
+    } else if (side === "bottom-right") {
+      newStyles[vars.colEnd] = Math.max(colEnd + deltaX, colStart + 1)
+      newStyles[vars.rowEnd] = Math.max(rowEnd + deltaY, rowStart + 1)
+    } else if (side === "bottom-left") {
+      newStyles[vars.colStart] = Math.min(colStart + deltaX, colEnd - 1)
+      newStyles[vars.rowEnd] = Math.max(rowEnd + deltaY, rowStart + 1)
+    } else if (side === "top-right") {
+      newStyles[vars.colEnd] = Math.max(colEnd + deltaX, colStart + 1)
+      newStyles[vars.rowStart] = Math.min(rowStart + deltaY, rowEnd - 1)
+    } else if (side === "top-left") {
+      newStyles[vars.colStart] = Math.min(colStart + deltaX, colEnd - 1)
+      newStyles[vars.rowStart] = Math.min(rowStart + deltaY, rowEnd - 1)
+    }
+    styles.set(newStyles)
+  }
+})
 
 onMount(() => {
   scrollElement = document.getElementsByClassName("screen-wrapper")[0] as HTMLElement

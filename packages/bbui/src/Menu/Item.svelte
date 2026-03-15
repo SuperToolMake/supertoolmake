@@ -14,8 +14,6 @@ export let disabled: boolean | undefined = undefined
 export let noClose: boolean = false
 export let keyBind: string | undefined = undefined
 
-$: keys = getKeys(keyBind)
-
 const getKeys = (keyBind: string | undefined): string[] => {
   let keys = keyBind?.split("+") || []
   for (let i = 0; i < keys.length; i++) {
@@ -32,6 +30,8 @@ const onClick = () => {
   }
   dispatch("click")
 }
+
+$: keys = getKeys(keyBind)
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

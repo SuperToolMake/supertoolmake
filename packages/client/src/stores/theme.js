@@ -1,5 +1,3 @@
-/* eslint-disable no-useless-concat */
-
 import { DefaultAppTheme, ensureValidTheme } from "@budibase/shared-core"
 import { derived } from "svelte/store"
 import { appStore } from "./app"
@@ -9,11 +7,11 @@ import { builderStore } from "./builder"
 // think that this is not ES6 compatible and starts throwing errors when using
 // optional chaining. Piss off acorn.
 const defaultCustomTheme = {
-  primaryColor: "var(--spectrum-glo" + "bal-color-blue-600)",
-  primaryColorHover: "var(--spectrum-glo" + "bal-color-blue-500)",
+  primaryColor: "var(--spectrum-global-color-blue-600)",
+  primaryColorHover: "var(--spectrum-global-color-blue-500)",
   buttonBorderRadius: "16px",
-  navBackground: "var(--spectrum-glo" + "bal-color-gray-100)",
-  navTextColor: "var(--spectrum-glo" + "bal-color-gray-800)",
+  navBackground: "var(--spectrum-global-color-gray-100)",
+  navTextColor: "var(--spectrum-global-color-gray-800)",
 }
 
 const createThemeStore = () => {

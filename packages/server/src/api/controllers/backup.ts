@@ -21,7 +21,7 @@ export async function exportAppDump(
   ctx.req.setTimeout(0)
 
   const extension = encryptPassword ? "enc.tar.gz" : "tar.gz"
-  const backupIdentifier = `${workspaceName}-export-${new Date().getTime()}.${extension}`
+  const backupIdentifier = `${workspaceName}-export-${Date.now()}.${extension}`
   ctx.attachment(backupIdentifier)
   ctx.body = await sdk.backups.streamExportApp({
     appId,

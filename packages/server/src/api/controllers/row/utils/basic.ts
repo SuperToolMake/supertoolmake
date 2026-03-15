@@ -40,7 +40,7 @@ export function getInternalRowId(row: Row, table: Table): string {
 
 export function generateIdForRow(row: Row | undefined, table: Table, isLinked = false): string {
   const primary = table.primary
-  if (!row || !primary) {
+  if (!(row && primary)) {
     return ""
   }
   // build id array
@@ -67,7 +67,7 @@ function fixJsonTypes(row: Row, table: Table) {
     if (JsonTypes.includes(schema.type) && typeof row[fieldName] === "string") {
       try {
         row[fieldName] = JSON.parse(row[fieldName])
-      } catch (err) {
+      } catch {
         if (!helpers.schema.isDeprecatedSingleUserColumn(schema)) {
           // couldn't convert back to array, ignore
           delete row[fieldName]

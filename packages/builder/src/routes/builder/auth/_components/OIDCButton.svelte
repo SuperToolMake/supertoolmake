@@ -23,7 +23,7 @@ let preDefinedIcons = {
 onMount(async () => {
   try {
     await oidc.init()
-  } catch (error) {
+  } catch {
     notifications.error("Error getting OIDC config")
   }
 })

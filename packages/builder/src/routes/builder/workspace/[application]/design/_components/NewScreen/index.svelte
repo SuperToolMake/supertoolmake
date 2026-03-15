@@ -1,16 +1,9 @@
 <script lang="ts">
-import {
-  Body,
-  keepOpen,
-  type Modal,
-  ModalCancelFrom,
-  ModalContent,
-  notifications,
-} from "@budibase/bbui"
+import { Body, keepOpen, Modal, ModalCancelFrom, ModalContent, notifications } from "@budibase/bbui"
 import CreationPage from "@/components/common/CreationPage.svelte"
-import type { AutoScreenTypes } from "@/constants"
+import { AutoScreenTypes } from "@/constants"
 import { appStore, screenStore, workspaceAppStore } from "@/stores/builder"
-import type CreateScreenModal from "./CreateScreenModal.svelte"
+import CreateScreenModal from "./CreateScreenModal.svelte"
 import blank from "./images/blank.svg"
 import form from "./images/formUpdate.svg"
 import table from "./images/tableInline.svg"
@@ -26,9 +19,6 @@ let createScreenModal: CreateScreenModal
 let cancelHandler: (_e: CustomEvent<ModalCancelFrom>) => void = () => {}
 let selectedType: AutoScreenTypes | undefined
 let currentStepIndex: number
-
-$: hasScreens = $screenStore.screens?.length
-$: title = hasScreens ? "Create new screen" : "Create your first screen"
 
 export const open = () => {
   currentStepIndex = 0
@@ -69,6 +59,9 @@ async function onConfirm(type = selectedType) {
     }
   }
 }
+
+$: hasScreens = $screenStore.screens?.length
+$: title = hasScreens ? "Create new screen" : "Create your first screen"
 </script>
 
 <Modal bind:this={rootModal} {inline}>

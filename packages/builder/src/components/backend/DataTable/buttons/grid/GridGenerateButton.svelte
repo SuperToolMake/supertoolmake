@@ -1,9 +1,9 @@
 <script lang="ts">
 import { ActionButton, ListItem } from "@budibase/bbui"
 import { getContext } from "svelte"
-import type DetailPopover from "@/components/common/DetailPopover.svelte"
-import type { AutoScreenTypes } from "@/constants"
-import type CreateScreenModal from "@/routes/builder/workspace/[application]/design/_components/NewScreen/CreateScreenModal.svelte"
+import DetailPopover from "@/components/common/DetailPopover.svelte"
+import { AutoScreenTypes } from "@/constants"
+import CreateScreenModal from "@/routes/builder/workspace/[application]/design/_components/NewScreen/CreateScreenModal.svelte"
 import { tables } from "@/stores/builder"
 import MagicWand from "./magic-wand.svg"
 

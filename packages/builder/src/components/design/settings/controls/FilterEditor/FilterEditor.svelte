@@ -16,14 +16,6 @@ export let schema = null
 
 let drawer
 
-$: localFilters = value
-$: datasource = getDatasourceForProvider($selectedScreen, componentInstance)
-$: dsSchema = getSchemaForDatasource($selectedScreen, datasource)?.schema
-$: schemaFields = search.getFields($tables.list, Object.values(schema || dsSchema || {}), {
-  allowLinks: true,
-})
-$: text = getText(value)
-
 async function saveFilter() {
   const update = Utils.parseFilter(localFilters)
   dispatch("change", update)
@@ -37,7 +29,7 @@ const getText = (filters) => {
   }
   const groups = filters?.groups || []
   const allFilters = groups.reduce((acc, group) => {
-    return (acc += group.filters.filter((filter) => filter.field).length)
+    return acc + group.filters.filter((filter) => filter.field).length
   }, 0)
   if (allFilters === 0) {
     return "No filters set"
@@ -45,6 +37,14 @@ const getText = (filters) => {
     return `${allFilters} filter${allFilters === 1 ? "" : "s"} set`
   }
 }
+
+$: localFilters = value
+$: datasource = getDatasourceForProvider($selectedScreen, componentInstance)
+$: dsSchema = getSchemaForDatasource($selectedScreen, datasource)?.schema
+$: schemaFields = search.getFields($tables.list, Object.values(schema || dsSchema || {}), {
+  allowLinks: true,
+})
+$: text = getText(value)
 </script>
 
 <div class="filter-editor">

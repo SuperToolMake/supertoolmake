@@ -91,6 +91,9 @@ const {
 } = context
 
 // Keep config store up to date with props
+// Expose ability to retrieve context externally for external control
+export const getContext = () => context
+
 $: props.set({
   datasource,
   schemaOverrides,
@@ -135,9 +138,6 @@ context = { ...context, minHeight }
 
 // Set context for children to consume
 setContext("grid", context)
-
-// Expose ability to retrieve context externally for external control
-export const getContext = () => context
 
 // Initialise websocket for multi-user
 onMount(() => {

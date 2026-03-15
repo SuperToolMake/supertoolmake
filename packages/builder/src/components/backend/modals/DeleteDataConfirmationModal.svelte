@@ -10,16 +10,6 @@ import { DB_TYPE_EXTERNAL } from "@/constants/backend"
 import { appStore, datasources, queries, screenStore, tables } from "@/stores/builder"
 import { themeStore } from "@/stores/portal"
 
-$: goto = $gotoStore
-$: params = $paramsStore
-$: isDarkTheme = ![Theme.LIGHTEST, Theme.LIGHT].includes($themeStore.theme)
-
-export let source: Table | Datasource | Query | undefined
-
-let confirmDeleteDialog: any
-let affectedScreens: { text: string; url: string }[] = []
-let sourceType: SourceType | undefined
-
 const getDatasourceQueries = () => {
   if (sourceType !== SourceType.DATASOURCE) {
     return ""
@@ -84,7 +74,7 @@ async function deleteDatasource(datasource: Datasource) {
     if (isSelected) {
       goto("./datasource")
     }
-  } catch (error) {
+  } catch {
     notifications.error("Error deleting datasource")
   }
 }
@@ -100,13 +90,13 @@ async function deleteQuery(query: Query) {
     await queries.delete(query)
     await datasources.fetch()
     notifications.success("Query deleted")
-  } catch (error) {
+  } catch {
     notifications.error("Error deleting query")
   }
 }
 
 async function deleteSource() {
-  if (!source || !sourceType) {
+  if (!(source && sourceType)) {
     throw new Error("Unable to delete - no data source found.")
   }
 
@@ -152,6 +142,16 @@ function buildMessage(sourceType: string) {
   }
   return hasChanged() ? message : ""
 }
+
+$: goto = $gotoStore
+$: params = $paramsStore
+$: isDarkTheme = ![Theme.LIGHTEST, Theme.LIGHT].includes($themeStore.theme)
+
+export let source: Table | Datasource | Query | undefined
+
+let confirmDeleteDialog: any
+let affectedScreens: { text: string; url: string }[] = []
+let sourceType: SourceType | undefined
 </script>
 
 <ConfirmDialog

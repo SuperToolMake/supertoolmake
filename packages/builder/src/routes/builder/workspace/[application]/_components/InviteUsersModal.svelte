@@ -1,5 +1,5 @@
 <script lang="ts">
-import { keepOpen, type Modal, notifications } from "@budibase/bbui"
+import { keepOpen, Modal, notifications } from "@budibase/bbui"
 import { sdk } from "@budibase/shared-core"
 import type { BulkUserCreated, InviteUsersResponse } from "@budibase/types"
 import { onMount } from "svelte"
@@ -36,8 +36,6 @@ let createUsersResponse: BulkUserCreated = {
 let addedToWorkspaceEmails: string[] = []
 let createdUsers: UserData["users"] = []
 
-$: currentWorkspaceId = $appStore.appId ? sdk.applications.getProdAppID($appStore.appId) : ""
-
 const removeDuplicates = (userData: UserData): UserData => {
   return dedupeUsersByEmail(userData)
 }
@@ -53,7 +51,7 @@ const inviteUsers = async (userData: UserData) => {
     notifications.error("Error adding some users to workspace")
   }
   if (!usersForInvite.length) {
-    if (!result.assignedCount && !result.failedCount) {
+    if (!(result.assignedCount || result.failedCount)) {
       notifications.info("No users available to invite")
     }
     return
@@ -85,7 +83,7 @@ const createUsers = async (userData: UserData) => {
     notifications.error("Error adding some users to workspace")
   }
   if (!usersForCreation.users.length) {
-    if (!result.assignedCount && !result.failedCount) {
+    if (!(result.assignedCount || result.failedCount)) {
       notifications.info("No users available to create")
     }
     return
@@ -156,6 +154,8 @@ const hidePasswordConfirmationModal = () => {
   showingPasswordConfirmation = false
   onHide()
 }
+
+$: currentWorkspaceId = $appStore.appId ? sdk.applications.getProdAppID($appStore.appId) : ""
 
 onMount(() => {
   roles.fetch()

@@ -75,7 +75,7 @@ export function hasAppBuilderPermissions(user?: UserBuilderInfo): boolean {
     return false
   }
   const appLength = user.builder?.apps?.length
-  const isGlobalBuilder = !!user.builder?.global
+  const isGlobalBuilder = Boolean(user.builder?.global)
   return !isGlobalBuilder && appLength != null && appLength > 0
 }
 
@@ -83,7 +83,7 @@ function hasAppCreatorPermissions(user?: Partial<UserRoleInfo>): boolean {
   if (!user) {
     return false
   }
-  return !!Object.values(user.roles ?? {}).find((x) => x === "CREATOR")
+  return Boolean(Object.values(user.roles ?? {}).find((x) => x === "CREATOR"))
 }
 
 // checks if a user is capable of building any app
@@ -99,14 +99,14 @@ export function hasAdminPermissions(user?: UserAdminInfo): boolean {
   if (!user) {
     return false
   }
-  return !!user.admin?.global
+  return Boolean(user.admin?.global)
 }
 
 export function hasCreatorPermissions(user?: UserBuilderInfo): boolean {
   if (!user) {
     return false
   }
-  return !!user.builder?.creator
+  return Boolean(user.builder?.creator)
 }
 
 export function isCreator(user?: UserBuilderInfo & UserAdminInfo & Partial<UserRoleInfo>): boolean {

@@ -32,8 +32,8 @@ function checkValid(evt) {
 }
 
 const initForm = () => {
-  originalName = table.name + ""
-  updatedName = table.name + ""
+  originalName = String(table.name)
+  updatedName = String(table.name)
 }
 </script>
 

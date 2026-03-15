@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Button, type Modal, notifications, Pagination, Search, Table } from "@budibase/bbui"
+import { Button, Modal, notifications, Pagination, Search, Table } from "@budibase/bbui"
 import { Constants, fetchData, Utils } from "@budibase/frontend-core"
 import { sdk } from "@budibase/shared-core"
 import type { BulkUserCreated, InviteUsersResponse, User as UserDoc } from "@budibase/types"
@@ -80,51 +80,6 @@ let workspaceReady = false
 let isWorkspaceQueryReady = false
 let tableLoading = false
 
-$: currentWorkspaceId = $appStore.appId ? sdk.applications.getProdAppID($appStore.appId) : ""
-$: workspaceReady = !!currentWorkspaceId
-$: isWorkspaceQueryReady =
-  ($fetch.query as { workspaceId?: string })?.workspaceId === currentWorkspaceId
-$: tableLoading = !workspaceReady || !isWorkspaceQueryReady || !$fetch.loaded
-
-$: customRenderers = [
-  { column: "email", component: EmailTableRenderer },
-  { column: "role", component: RoleTableRenderer },
-  { column: "createdAt", component: DateAddedRenderer },
-]
-let userData: UserData = { users: [] }
-
-$: readonly = !sdk.users.isAdmin($auth.user)
-$: debouncedUpdateFetch(searchEmail, currentWorkspaceId)
-$: schema = {
-  email: {
-    displayName: "Email",
-    sortable: false,
-    width: "minmax(200px, max-content)",
-    minWidth: "200px",
-  },
-  role: {
-    displayName: "Access",
-    sortable: false,
-    width: "1fr",
-  },
-  createdAt: {
-    displayName: "Date added",
-    sortable: false,
-    width: "1fr",
-    minWidth: "160px",
-  },
-}
-let inviteUsersResponse: InviteUsersResponse = {
-  successful: [],
-  unsuccessful: [],
-}
-$: enrichedUsers = buildEnrichedUsers($fetch.rows as UserDoc[])
-$: shouldOpenWorkspaceInviteModal =
-  $bb.settings.route?.entry?.path === "/people/workspace" && $bb.settings.route?.hash === "#invite"
-$: if (shouldOpenWorkspaceInviteModal && createUserModal) {
-  createUserModal.show()
-}
-
 const buildEnrichedUsers = (rows: UserDoc[]): EnrichedUser[] => {
   return (
     rows?.map<EnrichedUser>((user) => {
@@ -138,14 +93,13 @@ const buildEnrichedUsers = (rows: UserDoc[]): EnrichedUser[] => {
       const isWorkspaceTenantAdmin = role.value === Constants.BudibaseRoles.Admin
       return {
         ...user,
-        name: user.firstName ? user.firstName + " " + user.lastName : "",
+        name: user.firstName ? `${user.firstName} ${user.lastName}` : "",
         workspaceRole,
-        __selectable:
+        __selectable: !(
           role.value === Constants.BudibaseRoles.Owner ||
           $auth.user?.email === user.email ||
           isWorkspaceTenantAdmin
-            ? false
-            : true,
+        ),
         apps: sdk.users.userAppAccessList(user),
         access: role.sortOrder,
       }
@@ -169,7 +123,6 @@ const updateFetch = (email: string | undefined, workspaceId: string) => {
   }
   fetch.update({ query })
 }
-const debouncedUpdateFetch = Utils.debounce(updateFetch, 250)
 
 const showOnboardingTypeModal = async (addUsersData: UserData, onboardingType?: string) => {
   // no-op if users already exist
@@ -223,7 +176,7 @@ async function createUserFlow() {
     inviteUsersResponse = await users.invite(payload)
     await refreshUserList()
     inviteConfirmationModal.show()
-  } catch (error) {
+  } catch {
     if (assignedExistingUsers) {
       await refreshUserList()
     }
@@ -305,7 +258,7 @@ const assignExistingUsersToWorkspace = async (
         const saved = await users.save({ ...fullUser, ...roleUpdates })
         rev = saved?._rev || rev
       }
-      if (!user._id || !rev) {
+      if (!(user._id && rev)) {
         throw new Error("User ID or revision missing")
       }
       await users.addUserToWorkspace(user._id, role, rev)
@@ -411,14 +364,14 @@ const deleteUsers = async () => {
     notifications.success(`Successfully deleted ${selectedRows.length} users`)
     selectedRows = []
     await refreshUserList()
-  } catch (error) {
+  } catch {
     notifications.error("Error deleting users")
   }
 }
 
 const getWorkspaceRole = (role?: string, appRole?: string) => {
-  if (!currentWorkspaceId || !role) {
-    return undefined
+  if (!(currentWorkspaceId && role)) {
+    return
   }
   if (role === Constants.BudibaseRoles.Creator) {
     return Constants.Roles.CREATOR
@@ -439,6 +392,53 @@ const onRowClick = ({ detail }: { detail: UserDoc }) => {
 
 const onWorkspaceUserSaved = async () => {
   await refreshUserList()
+}
+
+const debouncedUpdateFetch = Utils.debounce(updateFetch, 250)
+
+$: currentWorkspaceId = $appStore.appId ? sdk.applications.getProdAppID($appStore.appId) : ""
+$: workspaceReady = Boolean(currentWorkspaceId)
+$: isWorkspaceQueryReady =
+  ($fetch.query as { workspaceId?: string })?.workspaceId === currentWorkspaceId
+$: tableLoading = !(workspaceReady && isWorkspaceQueryReady && $fetch.loaded)
+
+$: customRenderers = [
+  { column: "email", component: EmailTableRenderer },
+  { column: "role", component: RoleTableRenderer },
+  { column: "createdAt", component: DateAddedRenderer },
+]
+let userData: UserData = { users: [] }
+
+$: readonly = !sdk.users.isAdmin($auth.user)
+$: debouncedUpdateFetch(searchEmail, currentWorkspaceId)
+$: schema = {
+  email: {
+    displayName: "Email",
+    sortable: false,
+    width: "minmax(200px, max-content)",
+    minWidth: "200px",
+  },
+  role: {
+    displayName: "Access",
+    sortable: false,
+    width: "1fr",
+  },
+  createdAt: {
+    displayName: "Date added",
+    sortable: false,
+    width: "1fr",
+    minWidth: "160px",
+  },
+}
+let inviteUsersResponse: InviteUsersResponse = {
+  successful: [],
+  unsuccessful: [],
+}
+$: enrichedUsers = buildEnrichedUsers($fetch.rows as UserDoc[])
+$: shouldOpenWorkspaceInviteModal =
+  $bb.settings.route?.entry?.path === "/people/workspace" && $bb.settings.route?.hash === "#invite"
+$: if (shouldOpenWorkspaceInviteModal && createUserModal) {
+  createUserModal.show()
 }
 </script>
 

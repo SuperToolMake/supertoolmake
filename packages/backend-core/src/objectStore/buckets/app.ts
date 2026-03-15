@@ -1,5 +1,4 @@
-import type { PWAManifestImage } from "@budibase/types"
-import qs from "querystring"
+import qs from "node:querystring"
 import { DEFAULT_TENANT_ID, getTenantId } from "../../context"
 import env from "../../environment"
 import * as cloudfront from "../cloudfront"
@@ -40,26 +39,5 @@ export async function getAppFileUrl(s3Key: string) {
     return cloudfront.getPresignedUrl(s3Key)
   } else {
     return await objectStore.getPresignedUrl(env.APPS_BUCKET_NAME, s3Key)
-  }
-}
-
-export async function enrichPWAImages(images: PWAManifestImage[]): Promise<PWAManifestImage[]> {
-  if (images.length === 0) {
-    return []
-  }
-
-  try {
-    return await Promise.all(
-      images.map(async (image) => {
-        return {
-          ...image,
-          src: await getAppFileUrl(image.src),
-          type: image.type || "image/png",
-        }
-      })
-    )
-  } catch (error) {
-    console.error("Error enriching PWA images:", error)
-    return images
   }
 }

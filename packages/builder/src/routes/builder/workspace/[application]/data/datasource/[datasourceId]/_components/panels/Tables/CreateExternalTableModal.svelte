@@ -11,9 +11,6 @@ export let datasource
 
 let name = ""
 let submitted = false
-$: valid = name && name.length > 0 && !datasource?.entities?.[name]
-$: error = !submitted && name && datasource?.entities?.[name] ? "Table name already in use." : null
-
 function buildDefaultTable(tableName, datasourceId) {
   return {
     name: tableName,
@@ -42,6 +39,9 @@ async function saveTable() {
     notifications.error(`Error saving table - ${error?.message || "unknown error"}`)
   }
 }
+
+$: valid = name && name.length > 0 && !datasource?.entities?.[name]
+$: error = !submitted && name && datasource?.entities?.[name] ? "Table name already in use." : null
 </script>
 
 <ModalContent

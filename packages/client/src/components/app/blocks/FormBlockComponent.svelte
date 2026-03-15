@@ -15,7 +15,6 @@ const FieldTypeToComponentMap = {
   [FieldType.BOOLEAN]: "booleanfield",
   [FieldType.LONGFORM]: "longformfield",
   [FieldType.DATETIME]: "datetimefield",
-  [FieldType.SIGNATURE_SINGLE]: "signaturesinglefield",
   [FieldType.ATTACHMENTS]: "attachmentfield",
   [FieldType.ATTACHMENT_SINGLE]: "attachmentsinglefield",
   [FieldType.LINK]: "relationshipfield",
@@ -26,7 +25,7 @@ const FieldTypeToComponentMap = {
 
 const getFieldSchema = (field) => {
   const fieldSchemaName = field.field || field.name
-  if (!fieldSchemaName || !schema?.[fieldSchemaName]) {
+  if (!(fieldSchemaName && schema?.[fieldSchemaName])) {
     return null
   }
   return schema[fieldSchemaName]

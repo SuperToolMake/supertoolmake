@@ -31,7 +31,6 @@ export interface Workspace extends Document {
   snippets?: Snippet[]
   creationVersion?: string
   updatedBy?: string
-  pwa?: PWAManifest
   scripts?: AppScript[]
   // stores a list of IDs (automations, workspace apps, anything that can be published)
   // and when they were last published (timestamp)
@@ -91,27 +90,6 @@ export interface WorkspaceFeatures {
 
 export interface AutomationSettings {
   chainAutomations?: boolean
-}
-
-export interface PWAManifest {
-  name: string
-  short_name: string
-  description: string
-  scope: string
-  icons: PWAManifestImage[]
-  screenshots: PWAManifestImage[]
-  background_color: string
-  theme_color: string
-  display?: string
-  start_url: string
-}
-
-export interface PWAManifestImage {
-  src: string
-  sizes: string
-  type: string
-  form_factor?: "wide" | "narrow" | undefined
-  label?: string
 }
 
 export interface AppScript {

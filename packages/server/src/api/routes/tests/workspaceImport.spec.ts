@@ -1,4 +1,4 @@
-import path from "path"
+import path from "node:path"
 import { getAppObjectStorageEtags } from "../../../tests/utilities/objectStore"
 import * as setup from "./utilities"
 
@@ -124,7 +124,6 @@ describe("/applications/:appId/import", () => {
       "chunks/ScreenSlot-68962710.js": "6decb6e4e44a2a49bde5cd5f27155236",
       "chunks/Section-9872aa71.js": "f3670bfbc30ee6077e2171d52fd608d9",
       "chunks/SidePanel-cd5a291c.js": "92c3b80b1c39b46d3318ca7456a18eec",
-      "chunks/SignatureField-7558b68b.js": "ff7f93e792465217d6c85a19bff6e402",
       "chunks/SingleRowProvider-63b76c66.js": "9032c0b573ff818cea22d24689f08f32",
       "chunks/SpectrumCard-a5a528eb.js": "31a0c889a4106db57c2817a86c8acfa4",
       "chunks/StackedList-4cc5f377.js": "a71b5816fd410a805a77a19cf42ea6ca",

@@ -3,8 +3,6 @@ export let keybind
 export let padded = false
 export let overlay = false
 
-$: parsedKeys = parseKeys(keybind)
-
 const parseKeys = (keybind) => {
   return keybind?.split("+").map((key) => {
     if (key.toLowerCase() === "ctrl") {
@@ -15,6 +13,8 @@ const parseKeys = (keybind) => {
     return key
   })
 }
+
+$: parsedKeys = parseKeys(keybind)
 </script>
 
 <div class="keys" class:padded class:overlay>

@@ -41,62 +41,6 @@ const MessageTypes = {
 }
 
 // Extract data to pass to the iframe
-$: screen = $selectedScreen
-
-// Determine selected component ID
-$: selectedComponentId = $componentStore.selectedComponentId
-
-$: previewData = {
-  appId: $appStore.appId,
-  layout,
-  screen,
-  selectedComponentId,
-  theme: $appStore.clientFeatures.unifiedThemes
-    ? $themeStore.theme
-    : `${ThemeClassPrefix}${$themeStore.theme}`,
-  customTheme: $themeStore.customTheme,
-  previewDevice: $previewStore.previewDevice,
-  messagePassing: $appStore.clientFeatures.messagePassing,
-  navigation: $navigationStore,
-  hiddenComponentIds:
-    $componentStore.componentToPaste?._id && $componentStore.componentToPaste?.isCut
-      ? [$componentStore.componentToPaste?._id]
-      : [],
-  isBudibaseEvent: true,
-  location: {
-    protocol: window.location.protocol,
-    hostname: window.location.hostname,
-    port: window.location.port,
-  },
-  snippets: $snippets,
-  componentErrors: $screenComponentErrors,
-}
-
-// Refresh the preview when required
-$: json = JSON.stringify(previewData)
-$: refreshContent(json)
-
-// Determine if the add component menu is active
-$: isAddingComponent = $isActive(`./[componentId]`, {
-  componentId: "new",
-})
-
-// Register handler to send custom to the preview
-$: sendPreviewEvent = (name, payload) => {
-  iframe?.contentWindow.postMessage(
-    JSON.stringify({
-      name,
-      payload,
-      isBudibaseEvent: true,
-      runtimeEvent: true,
-    })
-  )
-}
-
-$: previewStore.registerEventHandler((name, payload) => {
-  return sendPreviewEvent(name, payload)
-})
-
 // Update the iframe with the builder info to render the correct preview
 const refreshContent = (message) => {
   iframe?.contentWindow.postMessage(message)
@@ -194,7 +138,7 @@ const handleBudibaseEvent = async (event) => {
     if (context) {
       try {
         context = JSON.parse(context)
-      } catch (error) {
+      } catch {
         context = null
       }
     }
@@ -212,7 +156,7 @@ const confirmDeleteComponent = (componentId) => {
 const deleteComponent = async () => {
   try {
     await componentStore.delete({ _id: idToDelete })
-  } catch (error) {
+  } catch {
     notifications.error("Error deleting component")
   }
   idToDelete = null
@@ -229,6 +173,62 @@ const toggleAddComponent = () => {
     $goto(`./[componentId]`, { componentId: "new" })
   }
 }
+
+$: screen = $selectedScreen
+
+// Determine selected component ID
+$: selectedComponentId = $componentStore.selectedComponentId
+
+$: previewData = {
+  appId: $appStore.appId,
+  layout,
+  screen,
+  selectedComponentId,
+  theme: $appStore.clientFeatures.unifiedThemes
+    ? $themeStore.theme
+    : `${ThemeClassPrefix}${$themeStore.theme}`,
+  customTheme: $themeStore.customTheme,
+  previewDevice: $previewStore.previewDevice,
+  messagePassing: $appStore.clientFeatures.messagePassing,
+  navigation: $navigationStore,
+  hiddenComponentIds:
+    $componentStore.componentToPaste?._id && $componentStore.componentToPaste?.isCut
+      ? [$componentStore.componentToPaste?._id]
+      : [],
+  isBudibaseEvent: true,
+  location: {
+    protocol: window.location.protocol,
+    hostname: window.location.hostname,
+    port: window.location.port,
+  },
+  snippets: $snippets,
+  componentErrors: $screenComponentErrors,
+}
+
+// Refresh the preview when required
+$: json = JSON.stringify(previewData)
+$: refreshContent(json)
+
+// Determine if the add component menu is active
+$: isAddingComponent = $isActive(`./[componentId]`, {
+  componentId: "new",
+})
+
+// Register handler to send custom to the preview
+$: sendPreviewEvent = (name, payload) => {
+  iframe?.contentWindow.postMessage(
+    JSON.stringify({
+      name,
+      payload,
+      isBudibaseEvent: true,
+      runtimeEvent: true,
+    })
+  )
+}
+
+$: previewStore.registerEventHandler((name, payload) => {
+  return sendPreviewEvent(name, payload)
+})
 
 onMount(() => {
   window.addEventListener("message", receiveMessage)
@@ -257,7 +257,7 @@ onDestroy(() => {
   {:else if error}
     <div class="center error">
       <Layout justifyItems="center" gap="S">
-        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+        <!-- biome-ignore lint: svelte/no-at-html-tags -->
         {@html ErrorSVG}
         <Heading size="L">App preview failed to load</Heading>
         <Body size="S">{error}</Body>

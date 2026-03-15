@@ -21,7 +21,7 @@ export async function getSettingsTemplateContext(
     [InternalTemplateBinding.CURRENT_YEAR]: new Date().getFullYear(),
   }
 
-  context["enableEmailBranding"] = false
+  context.enableEmailBranding = false
 
   // attach purpose specific context
   switch (purpose) {

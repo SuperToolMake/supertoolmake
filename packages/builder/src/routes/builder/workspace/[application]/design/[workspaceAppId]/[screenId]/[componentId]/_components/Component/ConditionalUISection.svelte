@@ -14,8 +14,6 @@ export let actionOptions
 let tempValue
 let drawer
 
-$: highlighted = $builderStore.highlightedSetting?.key === "_conditions"
-
 const openDrawer = () => {
   tempValue = JSON.parse(JSON.stringify(componentInstance?._conditions ?? []))
   drawer.show()
@@ -28,11 +26,13 @@ const save = async () => {
     } else {
       await componentStore.updateConditions(tempValue)
     }
-  } catch (error) {
+  } catch {
     notifications.error("Error updating conditions")
   }
   drawer.hide()
 }
+
+$: highlighted = $builderStore.highlightedSetting?.key === "_conditions"
 
 $: conditionCount = componentInstance?._conditions?.length
 $: conditionText = `${conditionCount || "No"} condition${conditionCount !== 1 ? "s" : ""} set`

@@ -40,8 +40,13 @@ describe("/workspace", () => {
       return await config.api.table.save(basicTable(datasource))
     },
 
-    [WorkspaceResource.QUERY]: async () =>
-      await config.api.query.save(basicQuery(datasource?._id!)),
+    [WorkspaceResource.QUERY]: async () => {
+      const datasourceId = datasource?._id
+      if (!datasourceId) {
+        throw new Error("Datasource was not created")
+      }
+      return await config.api.query.save(basicQuery(datasourceId))
+    },
 
     [WorkspaceResource.WORKSPACE_APP]: async () => {
       const resp = await config.api.workspaceApp.create(
@@ -63,6 +68,11 @@ describe("/workspace", () => {
   }
 
   const favouriteAndVerify = async (resourceId: string, resourceType: WorkspaceResource) => {
+    const createdBy = config.user?._id
+    if (!createdBy) {
+      throw new Error("Test user not initialized")
+    }
+
     const resp = await config.api.workspaceFavourites.save({
       resourceType,
       resourceId,
@@ -70,7 +80,7 @@ describe("/workspace", () => {
 
     expect(resp).toEqual(
       expect.objectContaining({
-        createdBy: config.user?._id!,
+        createdBy,
         resourceType,
         resourceId,
       })

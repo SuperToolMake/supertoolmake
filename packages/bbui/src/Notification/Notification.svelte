@@ -11,7 +11,7 @@ export let actionMessage: string | null = null
 export let action: ((_dismiss: () => void) => void) | null = null
 export let wide: boolean = false
 
-const dispatch = createEventDispatcher<{ dismiss: void }>()
+const dispatch = createEventDispatcher<{ dismiss: undefined }>()
 </script>
 
 <div class="spectrum-Toast spectrum-Toast--{type}" class:wide>

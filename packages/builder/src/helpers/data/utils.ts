@@ -82,7 +82,7 @@ export function queryParametersToKeyValue(array: { name: string; default: string
 
 const resolveQueryVerb = (source: QueryVerbSource) => {
   if (!source) {
-    return undefined
+    return
   }
   if (typeof source === "string") {
     return source

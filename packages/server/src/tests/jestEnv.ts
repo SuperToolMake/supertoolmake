@@ -1,4 +1,4 @@
-import { tmpdir } from "os"
+import { tmpdir } from "node:os"
 import { Agent, MockAgent, setGlobalDispatcher, fetch as undiciFetch } from "undici"
 
 process.env.SELF_HOSTED = "1"

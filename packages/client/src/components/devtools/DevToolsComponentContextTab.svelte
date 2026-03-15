@@ -13,11 +13,6 @@ const ReadableBindingMap = {
 
 let category
 
-$: selectedInstance = $componentStore.selectedComponentInstance
-$: context = selectedInstance?.getDataContext()
-$: bindingCategories = getContextProviders(context)
-$: bindings = Object.entries(context?.[category] || {})
-
 const getContextProviders = (context) => {
   const filteredContext = { ...context }
 
@@ -80,7 +75,7 @@ const getContextProviders = (context) => {
 
           // Otherwise we don't know
           categories.push({
-            label: "Unknown - " + category,
+            label: `Unknown - ${category}`,
             value: category,
           })
         }
@@ -89,6 +84,11 @@ const getContextProviders = (context) => {
 
   return categories
 }
+
+$: selectedInstance = $componentStore.selectedComponentInstance
+$: context = selectedInstance?.getDataContext()
+$: bindingCategories = getContextProviders(context)
+$: bindings = Object.entries(context?.[category] || {})
 </script>
 
 <Layout noPadding gap="S">

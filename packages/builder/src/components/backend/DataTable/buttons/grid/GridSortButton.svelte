@@ -9,15 +9,6 @@ const { sort, columns } = getContext("grid")
 
 let popover
 
-$: columnOptions = $columns
-  .filter((col) => canBeSortColumn(col.schema))
-  .map((col) => ({
-    label: col.label || col.name,
-    value: col.name,
-    type: col.schema?.type,
-  }))
-$: orderOptions = getOrderOptions($sort.column, columnOptions)
-
 const getOrderOptions = (column, columnOptions) => {
   const type = columnOptions.find((col) => col.value === column)?.type
 
@@ -60,6 +51,15 @@ const updateSortOrder = (e) => {
     order: e.detail,
   }))
 }
+
+$: columnOptions = $columns
+  .filter((col) => canBeSortColumn(col.schema))
+  .map((col) => ({
+    label: col.label || col.name,
+    value: col.name,
+    type: col.schema?.type,
+  }))
+$: orderOptions = getOrderOptions($sort.column, columnOptions)
 </script>
 
 <DetailPopover bind:this={popover} title="Sorting" width={300}>

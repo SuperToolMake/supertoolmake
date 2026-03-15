@@ -8,8 +8,6 @@ export let fields = {}
 export let schema
 export let editable
 
-$: schemaKeys = Object.keys(schema?.fields || {})
-
 function updateCustomFields({ detail }) {
   fields.customData = detail.value
 }
@@ -23,6 +21,8 @@ function getDisplayName(field) {
   }
   return capitalise(name)
 }
+
+$: schemaKeys = Object.keys(schema?.fields || {})
 </script>
 
 <form on:submit|preventDefault>

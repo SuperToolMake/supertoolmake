@@ -11,7 +11,7 @@ export interface FieldDefinition {
 }
 
 function isArrayOfStrings(value: string[] | Row[]): value is string[] {
-  return Array.isArray(value) && !!value[0] && typeof value[0] !== "object"
+  return Array.isArray(value) && Boolean(value[0]) && typeof value[0] !== "object"
 }
 
 export default class FieldFetch<

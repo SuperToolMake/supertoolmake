@@ -27,19 +27,11 @@ export let hideIcon = false
 
 let updateModal
 
-$: appId = $appStore.appId
-$: updateAvailable =
-  ($appStore.upgradableVersion &&
-    $appStore.version &&
-    $appStore.upgradableVersion !== $appStore.version) ||
-  $admin.isDev
-$: revertAvailable = $appStore.revertableVersion != null
-
 const refreshAppPackage = async () => {
   try {
     const pkg = await API.fetchAppPackage(appId)
     await initialise(pkg)
-  } catch (error) {
+  } catch {
     notifications.error("Error fetching app package")
   }
 }
@@ -58,7 +50,6 @@ const update = async () => {
   updateModal.hide()
 }
 
-let reverting = false
 const revert = async () => {
   reverting = true
   try {
@@ -76,6 +67,16 @@ const revert = async () => {
   }
   updateModal.hide()
 }
+
+$: appId = $appStore.appId
+$: updateAvailable =
+  ($appStore.upgradableVersion &&
+    $appStore.version &&
+    $appStore.upgradableVersion !== $appStore.version) ||
+  $admin.isDev
+$: revertAvailable = $appStore.revertableVersion != null
+
+let reverting = false
 </script>
 
 {#if !hideIcon && updateAvailable}

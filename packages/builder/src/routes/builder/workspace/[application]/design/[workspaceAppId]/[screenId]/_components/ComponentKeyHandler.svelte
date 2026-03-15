@@ -20,26 +20,26 @@ let componentToDelete
 let componentToEject
 
 const keyHandlers = {
-  ["Ctrl+ArrowUp"]: async (component) => {
+  "Ctrl+ArrowUp": async (component) => {
     await componentStore.moveUp(component)
   },
-  ["Ctrl+ArrowDown"]: async (component) => {
+  "Ctrl+ArrowDown": async (component) => {
     await componentStore.moveDown(component)
   },
-  ["Ctrl+c"]: (component) => {
+  "Ctrl+c": (component) => {
     componentStore.copy(component, false)
   },
-  ["Ctrl+x"]: (component) => {
+  "Ctrl+x": (component) => {
     componentStore.copy(component, true)
   },
-  ["Ctrl+v"]: async (component) => {
+  "Ctrl+v": async (component) => {
     await componentStore.paste(component, "inside")
   },
-  ["Ctrl+d"]: async (component) => {
+  "Ctrl+d": async (component) => {
     componentStore.copy(component)
     await componentStore.paste(component, "below")
   },
-  ["Ctrl+e"]: (component) => {
+  "Ctrl+e": (component) => {
     const definition = componentStore.getDefinition(component._component)
     const isBlock = definition?.block === true
     const canEject = !(definition?.ejectable === false)
@@ -48,10 +48,10 @@ const keyHandlers = {
       confirmEjectDialog.show()
     }
   },
-  ["Ctrl+Enter"]: () => {
+  "Ctrl+Enter": () => {
     $goto(`./:componentId/new`)
   },
-  ["Delete"]: (component) => {
+  Delete: (component) => {
     // Don't show confirmation for the screen itself
     if (component?._id === $selectedScreen.props._id) {
       return false
@@ -59,26 +59,26 @@ const keyHandlers = {
     componentToDelete = component
     confirmDeleteDialog.show()
   },
-  ["ArrowUp"]: () => {
+  ArrowUp: () => {
     componentStore.selectPrevious()
   },
-  ["ArrowDown"]: () => {
+  ArrowDown: () => {
     componentStore.selectNext()
   },
-  ["ArrowRight"]: (component) => {
+  ArrowRight: (component) => {
     componentTreeNodesStore.expandNodes([component._id])
   },
-  ["ArrowLeft"]: (component) => {
+  ArrowLeft: (component) => {
     // Select the collapsing root component to ensure the currently selected component is not
     // hidden in a collapsed node
     componentStore.select(component._id)
     componentTreeNodesStore.collapseNodes([component._id])
   },
-  ["Ctrl+ArrowRight"]: (component) => {
+  "Ctrl+ArrowRight": (component) => {
     const childIds = getChildIdsForComponent(component)
     componentTreeNodesStore.expandNodes(childIds)
   },
-  ["Ctrl+ArrowLeft"]: (component) => {
+  "Ctrl+ArrowLeft": (component) => {
     // Select the collapsing root component to ensure the currently selected component is not
     // hidden in a collapsed node
     componentStore.select(component._id)
@@ -86,7 +86,7 @@ const keyHandlers = {
     const childIds = getChildIdsForComponent(component)
     componentTreeNodesStore.collapseNodes(childIds)
   },
-  ["Escape"]: () => {
+  Escape: () => {
     if ($isActive(`./:componentId/new`)) {
       $goto(`./${$componentStore.selectedComponentId}`)
     }
@@ -94,7 +94,7 @@ const keyHandlers = {
 }
 
 const handleKeyAction = async ({ event, component, key, ctrlKey = false, shiftKey = false }) => {
-  if (!component || !key) {
+  if (!(component && key)) {
     return false
   }
   try {
@@ -104,10 +104,10 @@ const handleKeyAction = async ({ event, component, key, ctrlKey = false, shiftKe
     }
     // Prefix keys for modifiers
     if (shiftKey) {
-      key = "Shift+" + key
+      key = `Shift+${key}`
     }
     if (ctrlKey) {
-      key = "Ctrl+" + key
+      key = `Ctrl+${key}`
     }
     const handler = keyHandlers[key]
     if (!handler) {

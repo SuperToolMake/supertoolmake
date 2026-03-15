@@ -17,8 +17,6 @@ export let clickOutsideOverride
 const { gridID } = getContext("grid")
 const dispatch = createEventDispatcher()
 
-$: style = buildStyles(minWidth, maxWidth, maxHeight)
-
 const buildStyles = (minWidth, maxWidth, maxHeight) => {
   let style = ""
   if (minWidth != null) {
@@ -32,6 +30,8 @@ const buildStyles = (minWidth, maxWidth, maxHeight) => {
   }
   return style
 }
+
+$: style = buildStyles(minWidth, maxWidth, maxHeight)
 </script>
 
 <Popover

@@ -50,7 +50,7 @@ export type OIDCUser = User & {
 }
 
 export function isSSOUser(user: User | ContextUser): user is SSOUser {
-  return !!(user as SSOUser).providerType
+  return Boolean((user as SSOUser).providerType)
 }
 
 // USER
@@ -147,5 +147,5 @@ export interface AdminOnlyUser extends User {
 }
 
 export function isUser(user: object): user is User {
-  return !!(user as User).roles
+  return Boolean((user as User).roles)
 }

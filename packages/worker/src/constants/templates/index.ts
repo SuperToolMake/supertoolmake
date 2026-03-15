@@ -1,6 +1,6 @@
+import { join } from "node:path"
 import { context, db as dbCore, tenancy } from "@budibase/backend-core"
 import { EmailTemplatePurpose, type Template } from "@budibase/types"
-import { join } from "path"
 import yaml from "yaml"
 import { readStaticFile } from "../../utilities/fileSystem"
 import { GLOBAL_OWNER, TemplatePurpose, TemplateType } from "../index"
@@ -26,7 +26,7 @@ export async function loadTemplateConfig(pathTo: string) {
     const config = readStaticFile(pathTo)
     const parsed = yaml.parse(config)
 
-    if (!parsed || !parsed.templates) {
+    if (!parsed?.templates) {
       console.log(`No email templates found: ${pathTo}`)
       return
     }

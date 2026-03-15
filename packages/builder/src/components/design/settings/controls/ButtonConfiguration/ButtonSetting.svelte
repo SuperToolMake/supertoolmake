@@ -11,17 +11,13 @@ export let anchor
 export let removeButton
 export let nested
 
-$: readableText = isJSBinding(item.text)
-  ? "(JavaScript function)"
-  : runtimeToReadableBinding([...bindings, componentBindings], item.text)
-
 // If this is a nested setting (for example inside a grid or form block) then
 // we need to mark all the settings of the actual buttons as nested too, to
 // allow us to reference context provided by the block.
 // We will need to update this in future if the normal button component
 // gets broken into multiple settings sections, as we assume a flat array.
 const updatedNestedFlags = (settings) => {
-  if (!nested || !settings?.length) {
+  if (!(nested && settings?.length)) {
     return settings
   }
   let newSettings = settings.map((setting) => ({
@@ -36,6 +32,10 @@ const updatedNestedFlags = (settings) => {
   }
   return newSettings
 }
+
+$: readableText = isJSBinding(item.text)
+  ? "(JavaScript function)"
+  : runtimeToReadableBinding([...bindings, componentBindings], item.text)
 </script>
 
 <div class="list-item-body">

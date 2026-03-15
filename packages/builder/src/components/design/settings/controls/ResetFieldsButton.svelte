@@ -22,7 +22,7 @@ const resetFormFields = async () => {
       "_children",
       fields.map((field) => field.json())
     )
-  } catch (error) {
+  } catch {
     notifications.error("Error resetting form fields")
   }
 }

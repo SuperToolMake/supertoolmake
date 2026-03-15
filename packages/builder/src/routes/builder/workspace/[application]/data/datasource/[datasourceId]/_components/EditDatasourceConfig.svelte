@@ -7,10 +7,6 @@ import EditDatasourceConfigButton from "./EditDatasourceConfigButton.svelte"
 
 export let datasource
 
-$: integration = datasource ? integrationForDatasource($integrations, datasource) : null
-
-let modal
-
 async function saveDatasource({ config, name }) {
   try {
     await datasources.save({
@@ -25,6 +21,10 @@ async function saveDatasource({ config, name }) {
     return keepOpen
   }
 }
+
+$: integration = datasource ? integrationForDatasource($integrations, datasource) : null
+
+let modal
 </script>
 
 {#if datasource}

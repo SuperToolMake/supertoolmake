@@ -33,12 +33,12 @@ const iconsList = [
   "users-three",
 ]
 
-$: phosphorIcon = Helpers.getPhosphorIcon(name)
-
 const save = async () => {
   dispatch("change", { color, name })
   return
 }
+
+$: phosphorIcon = Helpers.getPhosphorIcon(name)
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

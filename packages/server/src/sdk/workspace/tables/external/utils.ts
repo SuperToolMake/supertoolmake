@@ -45,7 +45,7 @@ export function cleanupRelationships(
       const relatedTable = Object.values(tables).find((table) => table._id === schemaTableId)
       const foreignKey =
         schema.relationshipType !== RelationshipType.MANY_TO_MANY && schema.foreignKey
-      if (!relatedTable || !foreignKey) {
+      if (!(relatedTable && foreignKey)) {
         continue
       }
       for (const [relatedKey, relatedSchema] of Object.entries(relatedTable.schema)) {
@@ -78,7 +78,7 @@ export function generateManyLinkSchema(
   table: Table,
   relatedTable: Table
 ): Table {
-  if (!table.primary || !relatedTable.primary) {
+  if (!(table.primary && relatedTable.primary)) {
     const noPrimaryName = !table.primary ? table.name : relatedTable.name
     throw new Error(
       `Unable to generate many link schema, "${noPrimaryName}" does not have a primary key`
@@ -121,7 +121,7 @@ export function generateLinkSchema(
   relatedTable: Table,
   type: RelationshipType.ONE_TO_MANY | RelationshipType.MANY_TO_ONE
 ) {
-  if (!table.primary || !relatedTable.primary) {
+  if (!(table.primary && relatedTable.primary)) {
     throw new Error("Unable to generate link schema, no primary keys")
   }
   const isOneSide = type === RelationshipType.ONE_TO_MANY

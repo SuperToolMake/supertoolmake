@@ -27,14 +27,6 @@ export let noLabel = false
 
 let stepEditors = []
 
-$: sqlEditorMode = SQLModes[datasource?.source] || DEFAULT_SQL_MODE
-
-$: urlDisplay =
-  schema.urlDisplay &&
-  `${datasource.config.url}${
-    query.fields.path ? "/" + query.fields.path : ""
-  }${query.fields.queryString ? "?" + query.fields.queryString : ""}`
-
 function updateQuery({ detail }) {
   query.fields[schema.type] = detail.value
 }
@@ -44,6 +36,7 @@ function updateEditorsOnDelete(deleteIndex) {
     stepEditors[i].update(query.fields.steps[i + 1].value?.value)
   }
 }
+
 function updateEditorsOnSwap(actionIndex, targetIndex) {
   const target = query.fields.steps[targetIndex].value?.value
   stepEditors[targetIndex].update(query.fields.steps[actionIndex].value?.value)
@@ -64,6 +57,14 @@ function setEditorTemplate(fromKey, toKey, index) {
   }
   query.fields.steps[index].key = toKey
 }
+
+$: sqlEditorMode = SQLModes[datasource?.source] || DEFAULT_SQL_MODE
+
+$: urlDisplay =
+  schema.urlDisplay &&
+  `${datasource.config.url}${
+    query.fields.path ? `/${query.fields.path}` : ""
+  }${query.fields.queryString ? `?${query.fields.queryString}` : ""}`
 
 $: shouldDisplayJsonBox =
   schema.type === QueryTypes.JSON && query.fields.extra?.actionType !== "pipeline"

@@ -12,7 +12,7 @@ const foreignKeyNotSet = "Please pick a foreign key"
 const relationshipAlreadyExists = "A relationship between these tables already exists"
 
 function isColumnNameBeingUsed(table, columnName, originalName) {
-  if (!table || !columnName || columnName === originalName) {
+  if (!(table && columnName) || columnName === originalName) {
     return false
   }
   const keys = Object.keys(table.schema).map((key) => key.toLowerCase())
@@ -59,11 +59,11 @@ export class RelationshipErrorChecker {
   }
 
   foreignKeySet(key) {
-    return !this.isMany() && !key ? foreignKeyNotSet : null
+    return !(this.isMany() || key) ? foreignKeyNotSet : null
   }
 
   primaryKeySet(key) {
-    return !this.isMany() && !key ? primaryKeyNotSet : null
+    return !(this.isMany() || key) ? primaryKeyNotSet : null
   }
 
   throughIsNullable() {

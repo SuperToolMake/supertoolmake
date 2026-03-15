@@ -1,3 +1,5 @@
+import type { Server } from "node:http"
+import type { AddressInfo } from "node:net"
 import {
   cache,
   env as coreEnv,
@@ -7,9 +9,7 @@ import {
   users,
 } from "@budibase/backend-core"
 import bson from "bson"
-import type { Server } from "http"
 import type Koa from "koa"
-import type { AddressInfo } from "net"
 import * as api from "../api"
 import env from "../environment"
 import { default as eventEmitter, init as eventInit } from "../events"
@@ -98,7 +98,7 @@ export async function startup(opts: { app?: Koa; server?: Server; force?: boolea
     await tenancy.doInTenant(tenantId, async () => {
       const exists = await users.doesUserExist(bbAdminEmail)
       const checklist = await getChecklist()
-      if (!checklist?.adminUser?.checked || !exists) {
+      if (!(checklist?.adminUser?.checked && exists)) {
         try {
           const user = await users.UserDB.createAdminUser(bbAdminEmail, tenantId, {
             password: bbAdminPassword,

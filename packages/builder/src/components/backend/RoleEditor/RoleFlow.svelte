@@ -36,9 +36,6 @@ const selectedNodes = derived(nodes, ($nodes) => {
 // Derive the bounds of all custom role nodes
 const bounds = derivedMemo(nodes, getBounds)
 
-$: handleExternalRoleChanges($roles)
-$: updateBuiltins($bounds)
-
 // Updates nodes and edges based on external changes to roles
 const handleExternalRoleChanges = (roles) => {
   const currentNodes = $nodes
@@ -140,6 +137,9 @@ const deleteEdge = async (edgeId) => {
 const onConnect = async (connection) => {
   await updateRole(connection.target)
 }
+
+$: handleExternalRoleChanges($roles)
+$: updateBuiltins($bounds)
 
 setContext("flow", {
   nodes,

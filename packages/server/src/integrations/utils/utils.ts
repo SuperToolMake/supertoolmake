@@ -1,3 +1,5 @@
+import fs from "node:fs"
+import { pipeline } from "node:stream/promises"
 import { context, objectStore, sql } from "@budibase/backend-core"
 import { helpers, utils } from "@budibase/shared-core"
 import {
@@ -8,9 +10,7 @@ import {
   StringFieldSubType,
   type Table,
 } from "@budibase/types"
-import fs from "fs"
 import { cloneDeep, merge } from "lodash"
-import { pipeline } from "stream/promises"
 import tmp from "tmp"
 import { v4 } from "uuid"
 import { parseStringPromise as xmlParser } from "xml2js"
@@ -236,7 +236,7 @@ function copyExistingPropsOver(
   entities: Record<string, Table>,
   tableIds: string[]
 ): Table {
-  if (entities && entities[tableName]) {
+  if (entities?.[tableName]) {
     if (entities[tableName]?.primaryDisplay) {
       table.primaryDisplay = entities[tableName].primaryDisplay
     }
@@ -361,7 +361,13 @@ export function finaliseExternalTables(
   // sort the tables by name, this is for the UI to display them in alphabetical order
   return Object.entries(finalTables)
     .sort(([a], [b]) => a.localeCompare(b))
-    .reduce((r, [k, v]) => ({ ...r, [k]: v }), {})
+    .reduce(
+      (r, [k, v]) => {
+        r[k] = v
+        return r
+      },
+      {} as Record<string, Table>
+    )
 }
 
 export function checkExternalTables(tables: Record<string, Table>): Record<string, string> {

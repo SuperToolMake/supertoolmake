@@ -45,7 +45,7 @@ const createAppStore = () => {
         ...appDefinition,
         appId: appDefinition?.application?.appId,
       })
-    } catch (error) {
+    } catch {
       store.set(initialState)
     }
   }

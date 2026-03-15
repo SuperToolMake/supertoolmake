@@ -19,7 +19,7 @@ const dispatch = createEventDispatcher()
 const onChange = (e) => dispatch("change", e.target.value)
 
 const getSortedOptions = (options, getLabel, sort) => {
-  if (!options?.length || !Array.isArray(options)) {
+  if (!(options?.length && Array.isArray(options))) {
     return []
   }
   if (!sort) {

@@ -5,9 +5,9 @@ interface DatasourceBaseActions<TSaveDefinitionRequest = SaveTableRequest> {
   addRow: (row: SaveRowRequest) => Promise<UIRow | undefined>
   updateRow: (row: SaveRowRequest) => Promise<UIRow | undefined>
   deleteRows: (rows: UIRow[]) => Promise<void>
-  getRow: (id: string) => Promise<UIRow | void>
-  isDatasourceValid: (datasource: UIDatasource) => boolean | void
-  canUseColumn: (name: string) => boolean | void
+  getRow: (id: string) => Promise<UIRow | undefined>
+  isDatasourceValid: (datasource: UIDatasource) => boolean | undefined
+  canUseColumn: (name: string) => boolean | undefined
 }
 
 export interface DatasourceTableActions extends DatasourceBaseActions<SaveTableRequest> {}

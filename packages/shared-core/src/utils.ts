@@ -31,7 +31,7 @@ export function unreachable(
   }
 ) {
   const message = opts?.message || `No such case in exhaustive switch: ${value}`
-  const doNotThrow = !!opts?.doNotThrow
+  const doNotThrow = Boolean(opts?.doNotThrow)
   if (!doNotThrow) {
     throw new Error(message)
   }
@@ -76,7 +76,7 @@ export function filterValueToLabel() {
     (acc: { [key: string]: string }, key: string) => {
       const ops: { [key: string]: any } = Constants.OperatorOptions
       const op: { [key: string]: string } = ops[key]
-      acc[op["value"]] = op.label
+      acc[op.value] = op.label
       return acc
     },
     {}
@@ -96,7 +96,10 @@ export function hasSchema(test: any) {
 export function trimOtherProps(object: any, allowedProps: string[]) {
   const result = Object.keys(object)
     .filter((key) => allowedProps.includes(key))
-    .reduce<Record<string, any>>((acc, key) => ({ ...acc, [key]: object[key] }), {})
+    .reduce<Record<string, any>>((acc, key) => {
+      acc[key] = object[key]
+      return acc
+    }, {})
   return result
 }
 
@@ -142,7 +145,7 @@ export function processSearchFilters(
   filterArray?: LegacyFilter[]
 ): Required<UISearchFilter> | undefined {
   if (!filterArray || filterArray.length === 0) {
-    return undefined
+    return
   }
   const { allOr, onEmptyFilter, filters } = splitFiltersArray(filterArray)
   return {
@@ -176,9 +179,8 @@ const resolveWorkspaceName = (name: string) => {
 }
 
 const resolveWorkspaceUrl = (name: string) => {
-  let parsedName
   const resolvedName = resolveWorkspaceName(name)
-  parsedName = resolvedName ? resolvedName.toLowerCase() : ""
+  const parsedName = resolvedName ? resolvedName.toLowerCase() : ""
   const parsedUrl = parsedName ? parsedName.replace(/\s+/g, "-") : ""
   return encodeURI(parsedUrl)
 }

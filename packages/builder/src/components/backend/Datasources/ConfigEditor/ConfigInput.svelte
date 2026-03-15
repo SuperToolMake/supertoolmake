@@ -20,8 +20,6 @@ export let defaultHideConnectionUrl: boolean | undefined = false
 
 // don't pass "number" type as it stops those options from being configurable
 // with an environment variable
-$: filteredType = type === DatasourceFieldType.NUMBER ? DatasourceFieldType.STRING : type
-
 const selectComponent = (type: `${DatasourceFieldType}`) => {
   if (type === "object") {
     return ObjectField
@@ -41,6 +39,8 @@ const selectComponent = (type: `${DatasourceFieldType}`) => {
     return StringField
   }
 }
+
+$: filteredType = type === DatasourceFieldType.NUMBER ? DatasourceFieldType.STRING : type
 
 $: component = selectComponent(filteredType)
 </script>

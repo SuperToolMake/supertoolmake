@@ -367,10 +367,10 @@ export const bindingsToCompletions = (
     acc[ele.category] = acc[ele.category] || {}
 
     if (ele.icon) {
-      acc[ele.category]["icon"] = acc[ele.category]["icon"] || ele.icon
+      acc[ele.category].icon = acc[ele.category].icon || ele.icon
     }
     if (typeof ele.display?.rank == "number") {
-      acc[ele.category]["rank"] = acc[ele.category]["rank"] || ele.display.rank
+      acc[ele.category].rank = acc[ele.category].rank || ele.display.rank
     }
     return acc
   }, {})

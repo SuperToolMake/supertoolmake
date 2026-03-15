@@ -1,3 +1,4 @@
+import crypto from "node:crypto"
 import {
   utils as backendCoreUtils,
   cache,
@@ -49,7 +50,6 @@ import {
   type UserCtx,
   type UserIdentifier,
 } from "@budibase/types"
-import crypto from "crypto"
 import emailValidator from "email-validator"
 import env from "../../../environment"
 import * as userSdk from "../../../sdk/users"
@@ -265,7 +265,7 @@ export const search = async (ctx: UserCtx<SearchUsersRequest, SearchUsersRespons
     }
   }
 
-  const hasWorkspaceId = body && Object.hasOwn(body, "workspaceId")
+  const hasWorkspaceId = Boolean(body) && Object.hasOwn(body, "workspaceId")
 
   if (hasWorkspaceId) {
     const response = await searchWorkspaceUsers(body)
@@ -478,7 +478,7 @@ export const onboardUsers = async (ctx: Ctx<InviteUsersRequest, InviteUsersRespo
       password,
       forceResetPassword: true,
       roles: invite.userInfo.apps || {},
-      admin: { global: !!invite.userInfo.admin },
+      admin: { global: Boolean(invite.userInfo.admin) },
       builder: invite.userInfo.builder,
       tenantId: tenancy.getTenantId(),
     }
@@ -551,7 +551,7 @@ export const getUserInvites = async (ctx: UserCtx<void, GetUserInvitesResponse>)
   try {
     // Restricted to the currently authenticated tenant
     ctx.body = await cache.invite.getInviteCodes()
-  } catch (e) {
+  } catch {
     ctx.throw(400, "There was a problem fetching invites")
   }
 }
@@ -575,7 +575,7 @@ export const addWorkspaceIdToInvite = async (
 
     await cache.invite.updateCode(code, invite)
     ctx.body = { ...invite }
-  } catch (e) {
+  } catch {
     ctx.throw(400, "Invitation is not valid or has expired.")
   }
 }
@@ -599,7 +599,7 @@ export const removeWorkspaceIdFromInvite = async (
 
     await cache.invite.updateCode(code, invite)
     ctx.body = { ...invite }
-  } catch (e) {
+  } catch {
     ctx.throw(400, "Invitation is not valid or has expired.")
   }
 }
@@ -628,14 +628,14 @@ export const inviteAccept = async (ctx: Ctx<AcceptUserInviteRequest, AcceptUserI
 
           const builderApps = [...(info?.builder?.apps || []), ...creatorAppsFromRoles]
           const uniqueBuilderApps = [...new Set(builderApps)]
-          const hasCreatorPerms = !!info?.builder?.creator || creatorAppsFromRoles.length > 0
+          const hasCreatorPerms = Boolean(info?.builder?.creator) || creatorAppsFromRoles.length > 0
 
           let request: any = {
             firstName,
             lastName,
             password,
             email,
-            admin: { global: info?.admin?.global || false },
+            admin: { global: info?.admin?.global },
             roles: appRoles,
             tenantId: info.tenantId,
           }
@@ -644,7 +644,7 @@ export const inviteAccept = async (ctx: Ctx<AcceptUserInviteRequest, AcceptUserI
             creator?: boolean
             apps?: string[]
           } = {
-            global: info?.builder?.global || false,
+            global: Boolean(info?.builder?.global),
           }
 
           if (hasCreatorPerms) {

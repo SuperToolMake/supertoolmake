@@ -18,86 +18,6 @@ export let horizontal
 export let bucketCount = 10
 export let onClick
 
-$: series = getSeries(dataProvider, valueColumn, bucketCount)
-
-$: xAxisFormatter = getFormatter(horizontal, "x")
-$: yAxisFormatter = getFormatter(horizontal, "y")
-
-$: options = {
-  series,
-  colors: palette === "Custom" ? [c1, c2, c3, c4, c5] : [],
-  theme: {
-    palette: parsePalette(palette),
-  },
-  title: {
-    text: title,
-  },
-  dataLabels: {
-    enabled: dataLabels,
-    dropShadow: {
-      enabled: true,
-    },
-  },
-  chart: {
-    height: height == null || height === "" ? "auto" : height,
-    width: width == null || width === "" ? "100%" : width,
-    type: "bar",
-    stacked,
-    animations: {
-      enabled: animate,
-    },
-    toolbar: {
-      show: false,
-    },
-    zoom: {
-      enabled: false,
-    },
-    events: {
-      // Clicking on a bucket
-      dataPointSelection: (event, chartContext, opts) => {
-        const bucketIndex = opts.dataPointIndex
-        const rows = dataProvider.rows || []
-        const values = rows
-          .map((row, i) => ({ row, value: parseFloat(row[valueColumn]), i }))
-          .filter((obj) => !isNaN(obj.value))
-
-        const [min, max] = getValuesRange(values.map((obj) => obj.value))
-        const buckets = getBuckets(min, max, bucketCount)
-        const bucket = buckets[bucketIndex]
-
-        const rowsInBucket = values
-          .filter((obj) => obj.value >= bucket.min && obj.value <= bucket.max)
-          .map((obj) => obj.row)
-
-        handleBucketClick(rowsInBucket, bucket.min, bucket.max)
-      },
-    },
-  },
-  plotOptions: {
-    bar: {
-      horizontal,
-    },
-  },
-  xaxis: {
-    type: "category",
-    title: {
-      text: xAxisLabel,
-    },
-    labels: {
-      formatter: xAxisFormatter,
-    },
-  },
-  yaxis: {
-    decimalsInFloat: 0,
-    title: {
-      text: yAxisLabel,
-    },
-    labels: {
-      formatter: yAxisFormatter,
-    },
-  },
-}
-
 function handleBucketClick(rowsInBucket, lowerLimit, upperLimit) {
   onClick?.({ rowsInBucket, lowerLimit, upperLimit })
 }
@@ -105,7 +25,9 @@ function handleBucketClick(rowsInBucket, lowerLimit, upperLimit) {
 const getSeries = (dataProvider, valueColumn, bucketCount) => {
   const rows = dataProvider.rows ?? []
 
-  const values = rows.map((row) => parseFloat(row[valueColumn])).filter((value) => !isNaN(value))
+  const values = rows
+    .map((row) => parseFloat(row[valueColumn]))
+    .filter((value) => !Number.isNaN(value))
   const [min, max] = getValuesRange(values)
   const buckets = getBuckets(min, max, bucketCount)
   const counts = Array(bucketCount).fill(0)
@@ -173,6 +95,86 @@ const getFormatter = (horizontal, axis) => {
   }
 
   return (value) => value
+}
+
+$: series = getSeries(dataProvider, valueColumn, bucketCount)
+
+$: xAxisFormatter = getFormatter(horizontal, "x")
+$: yAxisFormatter = getFormatter(horizontal, "y")
+
+$: options = {
+  series,
+  colors: palette === "Custom" ? [c1, c2, c3, c4, c5] : [],
+  theme: {
+    palette: parsePalette(palette),
+  },
+  title: {
+    text: title,
+  },
+  dataLabels: {
+    enabled: dataLabels,
+    dropShadow: {
+      enabled: true,
+    },
+  },
+  chart: {
+    height: height == null || height === "" ? "auto" : height,
+    width: width == null || width === "" ? "100%" : width,
+    type: "bar",
+    stacked,
+    animations: {
+      enabled: animate,
+    },
+    toolbar: {
+      show: false,
+    },
+    zoom: {
+      enabled: false,
+    },
+    events: {
+      // Clicking on a bucket
+      dataPointSelection: (_event, _chartContext, opts) => {
+        const bucketIndex = opts.dataPointIndex
+        const rows = dataProvider.rows || []
+        const values = rows
+          .map((row, i) => ({ row, value: parseFloat(row[valueColumn]), i }))
+          .filter((obj) => !Number.isNaN(obj.value))
+
+        const [min, max] = getValuesRange(values.map((obj) => obj.value))
+        const buckets = getBuckets(min, max, bucketCount)
+        const bucket = buckets[bucketIndex]
+
+        const rowsInBucket = values
+          .filter((obj) => obj.value >= bucket.min && obj.value <= bucket.max)
+          .map((obj) => obj.row)
+
+        handleBucketClick(rowsInBucket, bucket.min, bucket.max)
+      },
+    },
+  },
+  plotOptions: {
+    bar: {
+      horizontal,
+    },
+  },
+  xaxis: {
+    type: "category",
+    title: {
+      text: xAxisLabel,
+    },
+    labels: {
+      formatter: xAxisFormatter,
+    },
+  },
+  yaxis: {
+    decimalsInFloat: 0,
+    title: {
+      text: yAxisLabel,
+    },
+    labels: {
+      formatter: yAxisFormatter,
+    },
+  },
 }
 </script>
 

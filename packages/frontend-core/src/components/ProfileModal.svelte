@@ -17,16 +17,6 @@ export let labels: Partial<ProfileModalLabels> = {}
 
 const dispatch = createEventDispatcher()
 
-$: resolvedLabels = {
-  ...DEFAULT_LABELS,
-  ...labels,
-} as ProfileModalLabels
-
-const values = writable({
-  firstName: user?.firstName,
-  lastName: user?.lastName,
-})
-
 const updateInfo = async () => {
   try {
     await API.updateSelf($values)
@@ -37,6 +27,16 @@ const updateInfo = async () => {
     notifyError(resolvedLabels.errorText)
   }
 }
+
+$: resolvedLabels = {
+  ...DEFAULT_LABELS,
+  ...labels,
+} as ProfileModalLabels
+
+const values = writable({
+  firstName: user?.firstName,
+  lastName: user?.lastName,
+})
 </script>
 
 <ModalContent

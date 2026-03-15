@@ -217,7 +217,7 @@ describe("docWritethrough", () => {
         await Promise.all(patches.map((p) => docWritethrough.patch(p)))
 
         return patches.reduce((acc, c) => {
-          acc = { ...acc, ...c }
+          Object.assign(acc, c)
           return acc
         }, {})
       }

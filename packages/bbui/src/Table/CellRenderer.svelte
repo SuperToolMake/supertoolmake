@@ -28,11 +28,6 @@ const typeMap: Record<string, any> = {
   internal: InternalRenderer,
   bb_reference: RelationshipRenderer,
 }
-$: type = getType(schema)
-$: customRenderer = customRenderers?.find((x) => x.column === schema?.name)
-$: renderer = customRenderer?.component ?? typeMap[type] ?? StringRenderer
-$: cellValue = getCellValue(value, schema.template)
-
 const getType = (schema: any): string => {
   // Use a string renderer for dates if we use a custom template
   if (schema?.type === "datetime" && schema?.template) {
@@ -47,6 +42,11 @@ const getCellValue = (value: any, template: string | undefined): any => {
   }
   return processStringSync(template, { value, snippets })
 }
+
+$: type = getType(schema)
+$: customRenderer = customRenderers?.find((x) => x.column === schema?.name)
+$: renderer = customRenderer?.component ?? typeMap[type] ?? StringRenderer
+$: cellValue = getCellValue(value, schema.template)
 </script>
 
 {#if renderer && (customRenderer || (cellValue != null && cellValue !== ""))}

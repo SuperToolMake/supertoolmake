@@ -25,11 +25,7 @@ if (descriptions.length) {
         readable: true,
       }
       const combinedQuery = { ...defaultQuery, ...query }
-      if (
-        combinedQuery.fields &&
-        combinedQuery.fields.extra &&
-        !combinedQuery.fields.extra.collection
-      ) {
+      if (combinedQuery.fields?.extra && !combinedQuery.fields.extra.collection) {
         combinedQuery.fields.extra.collection = collection
       }
       return await config.api.query.save(combinedQuery)

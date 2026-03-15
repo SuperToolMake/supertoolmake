@@ -13,15 +13,6 @@ let selected = getContext("tab")
 let observer
 let ref
 
-$: isSelected = $selected.title === title
-$: {
-  if (isSelected && ref) {
-    observe()
-  } else {
-    stopObserving()
-  }
-}
-
 const setTabInfo = () => {
   const tabInfo = ref?.getBoundingClientRect()
   if (tabInfo) {
@@ -60,6 +51,15 @@ const stopObserving = () => {
   if (observer) {
     observer.unobserve(ref)
     observer = null
+  }
+}
+
+$: isSelected = $selected.title === title
+$: {
+  if (isSelected && ref) {
+    observe()
+  } else {
+    stopObserving()
   }
 }
 

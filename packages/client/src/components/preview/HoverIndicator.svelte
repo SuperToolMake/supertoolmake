@@ -3,10 +3,6 @@ import { onDestroy, onMount } from "svelte"
 import { builderStore, dndIsDragging, hoverStore } from "@/stores"
 import IndicatorSet from "./IndicatorSet.svelte"
 
-$: componentId = $hoverStore.hoveredComponentId
-$: selectedComponentId = $builderStore.selectedComponentId
-$: selected = componentId === selectedComponentId
-
 const onMouseOver = (e: MouseEvent) => {
   const target = e.target as HTMLElement
 
@@ -35,6 +31,10 @@ const onMouseOver = (e: MouseEvent) => {
 const onMouseLeave = () => {
   hoverStore.actions.hoverComponent(null)
 }
+
+$: componentId = $hoverStore.hoveredComponentId
+$: selectedComponentId = $builderStore.selectedComponentId
+$: selected = componentId === selectedComponentId
 
 onMount(() => {
   document.addEventListener("mouseover", onMouseOver)

@@ -1,3 +1,5 @@
+import fs from "node:fs"
+import { join } from "node:path"
 import { db as dbCore, objectStore, tenancy } from "@budibase/backend-core"
 import {
   type Ctx,
@@ -14,8 +16,6 @@ import {
   type SaveGlobalTemplateResponse,
   type UserCtx,
 } from "@budibase/types"
-import fs from "fs"
-import { join } from "path"
 import { v4 } from "uuid"
 import yaml from "yaml"
 import { GLOBAL_OWNER, TemplateBindings, TemplateMetadata } from "../../../constants"
@@ -70,7 +70,6 @@ export async function fetchByType(ctx: UserCtx<void, FetchGlobalTemplateByTypeRe
 }
 
 export async function fetchByOwner(ctx: UserCtx<void, FetchGlobalTemplateByOwnerIDResponse>) {
-  // @ts-expect-error
   ctx.body = await getTemplates({
     ownerId: ctx.params.ownerId,
   })

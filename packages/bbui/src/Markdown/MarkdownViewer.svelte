@@ -6,8 +6,6 @@ export let height: string | undefined = undefined
 
 let ref: HTMLDivElement | undefined
 
-$: updateValue(ref, value)
-
 const updateValue = async (ref: HTMLDivElement | undefined, markdown: string | undefined) => {
   if (!ref) {
     return
@@ -18,6 +16,8 @@ const updateValue = async (ref: HTMLDivElement | undefined, markdown: string | u
   }
   ref.innerHTML = marked.parse(markdown, { async: false })
 }
+
+$: updateValue(ref, value)
 </script>
 
 <div class="markdown-viewer" style="height:{height};" bind:this={ref}></div>

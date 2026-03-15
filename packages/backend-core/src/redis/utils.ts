@@ -80,7 +80,7 @@ export function getRedisConnectionDetails() {
     host,
     password,
     // assume default port for redis if invalid found
-    port: isNaN(portNumber) ? 6379 : portNumber,
+    port: Number.isNaN(portNumber) ? 6379 : portNumber,
   }
 }
 

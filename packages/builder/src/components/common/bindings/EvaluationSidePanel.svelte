@@ -13,16 +13,6 @@ export let expressionLogs: Log[] = []
 export let evaluating = false
 export let expression: string | null = null
 
-$: error = expressionError != null
-$: empty = expression == null || expression?.trim() === ""
-$: success = !error && !empty
-$: highlightedResult = highlight(expressionResult)
-$: highlightedLogs = expressionLogs.map((l) => ({
-  log: l.log.map((part) => highlight(part)).join(", "),
-  line: l.line,
-  type: l.type,
-}))
-
 const formatError = (err: any) => {
   if (err.code === UserScriptError.code) {
     return err.userScriptError.toString()
@@ -39,7 +29,7 @@ const highlight = (json?: JSONValue | null) => {
   // Attempt to parse and then stringify, in case this is valid result
   try {
     json = JSON.stringify(JSON.parse(json as any), null, 2)
-  } catch (err) {
+  } catch {
     // couldn't parse/stringify, just treat it as the raw input
   }
 
@@ -61,6 +51,16 @@ const copy = () => {
   Helpers.copyToClipboard(clipboardVal)
   notifications.success("Value copied to clipboard")
 }
+
+$: error = expressionError != null
+$: empty = expression == null || expression?.trim() === ""
+$: success = !(error || empty)
+$: highlightedResult = highlight(expressionResult)
+$: highlightedLogs = expressionLogs.map((l) => ({
+  log: l.log.map((part) => highlight(part)).join(", "),
+  line: l.line,
+  type: l.type,
+}))
 </script>
 
 <div class="evaluation-side-panel">
@@ -111,7 +111,7 @@ const copy = () => {
               {:else if logLine.type === "warn"}
                 <Icon size="XS" name="warning" color="var(--warning-content)" />
               {/if}
-              <!-- eslint-disable-next-line svelte/no-at-html-tags-->
+              <!-- biome-ignore lint: svelte/no-at-html-tags-->
               <span>{@html logLine.log}</span>
             </div>
             {#if logLine.line}
@@ -123,7 +123,7 @@ const copy = () => {
         {/each}
         <div class="line">
           <div>
-            <!-- eslint-disable-next-line svelte/no-at-html-tags-->
+            <!-- biome-ignore lint: svelte/no-at-html-tags-->
             {@html highlightedResult}
           </div>
         </div>

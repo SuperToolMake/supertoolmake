@@ -18,9 +18,6 @@ export let bodyType
 let text = ""
 let json = ""
 
-$: checkRequestBody(bodyType)
-$: updateRequestBody(bodyType, text, json)
-
 function checkRequestBody(type) {
   if (!bodyType || requestBody === undefined) {
     return
@@ -58,6 +55,9 @@ function updateRequestBody(type, text, json) {
     dispatch("change", { requestBody: text })
   }
 }
+
+$: checkRequestBody(bodyType)
+$: updateRequestBody(bodyType, text, json)
 </script>
 
 <div class="margin">

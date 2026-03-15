@@ -64,27 +64,23 @@ const CONJUNCTIONS = [
 
 export let view = {}
 
-$: viewTable = $tables.list.find(({ _id }) => _id === $views.selected?.tableId)
-$: fields = viewTable && Object.keys(viewTable.schema)
-$: schema = viewTable && viewTable.schema ? viewTable.schema : {}
-
 function saveView() {
   try {
     views.save(view)
     notifications.success(`View ${view.name} saved`)
-  } catch (error) {
+  } catch {
     notifications.error("Error saving view")
   }
 }
 
 function removeFilter(idx) {
   view.filters.splice(idx, 1)
-  view.filters = view.filters
+  view = { ...view, filters: [...view.filters] }
 }
 
 function addFilter() {
   view.filters.push({ conjunction: "AND" })
-  view.filters = view.filters
+  view = { ...view, filters: [...view.filters] }
 }
 
 function isMultipleChoice(field) {
@@ -115,11 +111,16 @@ const fieldChanged = (filter) => (ev) => {
 }
 
 const getOptionLabel = (x) => x.name
+
 const getOptionValue = (x) => x.key
 
 const showValue = (filter) => {
   return !(filter.condition === "EMPTY" || filter.condition === "NOT_EMPTY")
 }
+
+$: viewTable = $tables.list.find(({ _id }) => _id === $views.selected?.tableId)
+$: fields = viewTable && Object.keys(viewTable.schema)
+$: schema = viewTable?.schema ? viewTable.schema : {}
 </script>
 
 <ModalContent title="Filter" confirmText="Save" onConfirm={saveView} size="L">

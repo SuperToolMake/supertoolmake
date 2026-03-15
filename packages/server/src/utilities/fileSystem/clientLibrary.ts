@@ -1,7 +1,7 @@
+import fs from "node:fs"
+import path, { join } from "node:path"
 import { objectStore } from "@budibase/backend-core"
 import { sdk, utils } from "@budibase/shared-core"
-import fs from "fs"
-import path, { join } from "path"
 import { ObjectStoreBuckets } from "../../constants"
 import env from "../../environment"
 import { resolve } from "../centralPath"
@@ -136,9 +136,7 @@ export async function revertClientLibrary(appId: string) {
   if (hasBackup) {
     await forEachObject(appId, async (filePath) => {
       if (
-        !filePath.includes("/.bak/") &&
-        !filePath.endsWith(".bak") &&
-        !restoredFiles.has(filePath)
+        !(filePath.includes("/.bak/") || filePath.endsWith(".bak") || restoredFiles.has(filePath))
       ) {
         await objectStore.deleteFile(ObjectStoreBuckets.APPS, filePath)
       }

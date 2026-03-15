@@ -17,59 +17,11 @@ export let animate
 export let yAxisUnits
 export let onClick
 
-$: series = getSeries(dataProvider, dateColumn, openColumn, highColumn, lowColumn, closeColumn)
-
-$: options = {
-  series,
-  title: {
-    text: title,
-  },
-  chart: {
-    height: height == null || height === "" ? "auto" : height,
-    width: width == null || width === "" ? "100%" : width,
-    type: "candlestick",
-    animations: {
-      enabled: animate,
-    },
-    toolbar: {
-      show: false,
-    },
-    zoom: {
-      enabled: false,
-    },
-    events: {
-      // Clicking on a Candlestick
-      dataPointSelection: (event, chartContext, opts) => {
-        const candlelstickIndex = opts.dataPointIndex
-        const row = dataProvider.rows[candlelstickIndex]
-        handleCandlestickClick(row)
-      },
-    },
-  },
-  xaxis: {
-    tooltip: {
-      formatter: formatters["Datetime"],
-    },
-    type: "datetime",
-    title: {
-      text: xAxisLabel,
-    },
-  },
-  yaxis: {
-    labels: {
-      formatter: formatters[yAxisUnits],
-    },
-    title: {
-      text: yAxisLabel,
-    },
-  },
-}
-
 function handleCandlestickClick(candlestick) {
   onClick?.({ candlestick })
 }
 
-const getValueAsUnixTime = (dataprovider, dateColumn, row) => {
+const getValueAsUnixTime = (_dataprovider, dateColumn, row) => {
   const value = row[dateColumn]
 
   if (dataProvider?.schema?.[dateColumn]?.type === "datetime") {
@@ -89,7 +41,7 @@ const getValueAsUnixTime = (dataprovider, dateColumn, row) => {
   if (isString && value.includes("-")) {
     const unixTime = Date.parse(value)
 
-    if (isNaN(unixTime)) {
+    if (Number.isNaN(unixTime)) {
       return null
     }
 
@@ -99,7 +51,7 @@ const getValueAsUnixTime = (dataprovider, dateColumn, row) => {
   if (isString) {
     const unixTime = parseInt(value, 10)
 
-    if (isNaN(unixTime)) {
+    if (Number.isNaN(unixTime)) {
       return null
     }
 
@@ -122,14 +74,62 @@ const getSeries = (dataProvider, dateColumn, openColumn, highColumn, lowColumn, 
 
         return [
           getValueAsUnixTime(dataProvider, dateColumn, row),
-          isNaN(open) ? 0 : open,
-          isNaN(high) ? 0 : high,
-          isNaN(low) ? 0 : low,
-          isNaN(close) ? 0 : close,
+          Number.isNaN(open) ? 0 : open,
+          Number.isNaN(high) ? 0 : high,
+          Number.isNaN(low) ? 0 : low,
+          Number.isNaN(close) ? 0 : close,
         ]
       }),
     },
   ]
+}
+
+$: series = getSeries(dataProvider, dateColumn, openColumn, highColumn, lowColumn, closeColumn)
+
+$: options = {
+  series,
+  title: {
+    text: title,
+  },
+  chart: {
+    height: height == null || height === "" ? "auto" : height,
+    width: width == null || width === "" ? "100%" : width,
+    type: "candlestick",
+    animations: {
+      enabled: animate,
+    },
+    toolbar: {
+      show: false,
+    },
+    zoom: {
+      enabled: false,
+    },
+    events: {
+      // Clicking on a Candlestick
+      dataPointSelection: (_event, _chartContext, opts) => {
+        const candlelstickIndex = opts.dataPointIndex
+        const row = dataProvider.rows[candlelstickIndex]
+        handleCandlestickClick(row)
+      },
+    },
+  },
+  xaxis: {
+    tooltip: {
+      formatter: formatters.Datetime,
+    },
+    type: "datetime",
+    title: {
+      text: xAxisLabel,
+    },
+  },
+  yaxis: {
+    labels: {
+      formatter: formatters[yAxisUnits],
+    },
+    title: {
+      text: yAxisLabel,
+    },
+  },
 }
 </script>
 

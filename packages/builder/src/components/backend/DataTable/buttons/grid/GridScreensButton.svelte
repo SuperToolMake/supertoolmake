@@ -2,25 +2,14 @@
 import { Button } from "@budibase/bbui"
 import type { Screen, ScreenUsage } from "@budibase/types"
 import { createEventDispatcher, getContext } from "svelte"
-import type ScreensPopover from "@/components/common/ScreensPopover.svelte"
+import ScreensPopover from "@/components/common/ScreensPopover.svelte"
 import { screenStore } from "@/stores/builder"
 
-const dispatch = createEventDispatcher<{ generate: void }>()
+const dispatch = createEventDispatcher<{ generate: undefined }>()
 
 const { datasource } = getContext("grid")
 
 let popover: ScreensPopover
-
-$: ds = $datasource
-$: resourceId = ds?.type === "table" ? ds.tableId : ds?.id
-$: connectedScreens = findConnectedScreens($screenStore.screens, resourceId)
-$: screenUsage = connectedScreens.map(
-  (screen: Screen): ScreenUsage => ({
-    url: screen.routing?.route,
-    _id: screen._id!,
-    workspaceAppId: screen.workspaceAppId,
-  })
-)
 
 const findConnectedScreens = (screens: Screen[], resourceId: string): Screen[] => {
   return screens.filter((screen) => {
@@ -32,6 +21,17 @@ const generateScreen = () => {
   popover?.hide()
   dispatch("generate")
 }
+
+$: ds = $datasource
+$: resourceId = ds?.type === "table" ? ds.tableId : ds?.id
+$: connectedScreens = findConnectedScreens($screenStore.screens, resourceId)
+$: screenUsage = connectedScreens.map(
+  (screen: Screen): ScreenUsage => ({
+    url: screen.routing?.route,
+    _id: screen._id!,
+    workspaceAppId: screen.workspaceAppId,
+  })
+)
 </script>
 
 <ScreensPopover

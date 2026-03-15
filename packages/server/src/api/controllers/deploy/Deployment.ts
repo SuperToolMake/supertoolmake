@@ -51,7 +51,7 @@ export default class Deployment {
     if (this.err) {
       obj.err = this.err
     }
-    if (this.verification && this.verification.cfDistribution) {
+    if (this.verification?.cfDistribution) {
       obj.cfDistribution = this.verification.cfDistribution
     }
     return obj

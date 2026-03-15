@@ -27,7 +27,7 @@ const updateValue = (newValue: any) => {
   }
   if (type === "number") {
     const float = parseFloat(newValue as string)
-    newValue = isNaN(float) ? null : float
+    newValue = Number.isNaN(float) ? null : float
   }
   dispatch("change", newValue)
 }

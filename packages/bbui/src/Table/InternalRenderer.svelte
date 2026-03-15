@@ -10,7 +10,7 @@ const onClick = async (e: MouseEvent): Promise<void> => {
   try {
     await copyToClipboard(value)
     notifications.success("Copied to clipboard")
-  } catch (error) {
+  } catch {
     notifications.error("Failed to copy to clipboard. Check the dev console for the value.")
     console.warn("Failed to copy the value", value)
   }

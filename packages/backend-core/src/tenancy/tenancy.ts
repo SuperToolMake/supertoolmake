@@ -109,8 +109,8 @@ export const getTenantIDFromCtx = (ctx: Ctx, opts: GetTenantIdOptions): string |
   // path
   if (isAllowed(TenantResolutionStrategy.PATH)) {
     // params - have to parse manually due to koa-router not run yet
-    const match = ctx.matched.find(
-      (m: any) => !!m.paramNames.find((p: any) => p.name === "tenantId")
+    const match = ctx.matched.find((m: any) =>
+      Boolean(m.paramNames.find((p: any) => p.name === "tenantId"))
     )
 
     // get the raw path url - without any query params
@@ -134,5 +134,5 @@ export const getTenantIDFromCtx = (ctx: Ctx, opts: GetTenantIdOptions): string |
     ctx.throw(403, "Tenant id not set")
   }
 
-  return undefined
+  return
 }

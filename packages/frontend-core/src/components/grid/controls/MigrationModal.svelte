@@ -8,8 +8,6 @@ const { API, definition, rows } = getContext("grid")
 export let column
 
 let newColumnName = `${column.schema.name} migrated`
-$: error = checkNewColumnName(newColumnName)
-
 const checkNewColumnName = (newColumnName) => {
   if (newColumnName === "") {
     return "Column name can't be empty."
@@ -31,6 +29,8 @@ const migrateUserColumn = async () => {
   }
   await rows.actions.refreshData()
 }
+
+$: error = checkNewColumnName(newColumnName)
 </script>
 
 <ModalContent

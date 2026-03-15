@@ -1,6 +1,6 @@
+import fs from "node:fs"
+import { join } from "node:path"
 import { context, env, objectStore } from "@budibase/backend-core"
-import fs from "fs"
-import { join } from "path"
 import { ObjectStoreBuckets } from "../../constants"
 import environment from "../../environment"
 import { budibaseTempDir } from "../budibaseDir"

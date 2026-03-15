@@ -2,40 +2,14 @@
 import { Icon } from "@budibase/bbui"
 import { goto as gotoStore, isActive, params } from "@roxi/routify"
 import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
-import type UpdateDatasourceModal from "@/components/backend/DatasourceNavigator/modals/UpdateDatasourceModal.svelte"
-import type DeleteDataConfirmModal from "@/components/backend/modals/DeleteDataConfirmationModal.svelte"
+import UpdateDatasourceModal from "@/components/backend/DatasourceNavigator/modals/UpdateDatasourceModal.svelte"
+import DeleteDataConfirmModal from "@/components/backend/modals/DeleteDataConfirmationModal.svelte"
 import NavItem from "@/components/common/NavItem.svelte"
 import { BUDIBASE_INTERNAL_DB_ID } from "@/constants/backend"
 import { contextMenuStore, userSelectedResourceMap } from "@/stores/builder"
 import { restTemplates } from "@/stores/builder/restTemplates"
 
-$: goto = $gotoStore
-$params
-
 export let datasource
-
-$: templateIcon =
-  datasource?.restTemplate && $restTemplates
-    ? restTemplates.getByName(datasource.restTemplate)?.icon
-    : undefined
-
-let editModal: UpdateDatasourceModal
-let deleteConfirmationModal: DeleteDataConfirmModal
-
-let addQueryItem = {
-  icon: "plus",
-  name: datasource?.source === "REST" ? "Add action" : "Create new query",
-  keyBind: null,
-  visible: true,
-  disabled: false,
-  callback: () => {
-    const section = datasource?.source === "REST" ? "apis" : "data"
-    goto(`/builder/workspace/[application]/${section}/query/new/[datasourceId]`, {
-      application: $params.application,
-      datasourceId: datasource._id,
-    })
-  },
-}
 
 const getContextMenuItems = () => {
   return [
@@ -69,6 +43,32 @@ const openContextMenu = (e) => {
 
   const items = getContextMenuItems()
   contextMenuStore.open(datasource._id, items, { x: e.clientX, y: e.clientY })
+}
+
+$: goto = $gotoStore
+$params
+
+$: templateIcon =
+  datasource?.restTemplate && $restTemplates
+    ? restTemplates.getByName(datasource.restTemplate)?.icon
+    : undefined
+
+let editModal: UpdateDatasourceModal
+let deleteConfirmationModal: DeleteDataConfirmModal
+
+let addQueryItem = {
+  icon: "plus",
+  name: datasource?.source === "REST" ? "Add action" : "Create new query",
+  keyBind: null,
+  visible: true,
+  disabled: false,
+  callback: () => {
+    const section = datasource?.source === "REST" ? "apis" : "data"
+    goto(`/builder/workspace/[application]/${section}/query/new/[datasourceId]`, {
+      application: $params.application,
+      datasourceId: datasource._id,
+    })
+  },
 }
 </script>
 

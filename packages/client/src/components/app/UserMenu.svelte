@@ -19,17 +19,6 @@ const { authStore, environmentStore, notificationStore, appStore } = getContext(
 let profileModal: any
 let changePasswordModal: any
 
-$: text = getText($authStore)
-$: isBuilder = sdk.users.hasBuilderPermissions($authStore)
-$: isSSO = $authStore != null && isSSOUser($authStore)
-$: embedded = $appStore.embedded || $appStore.inIframe
-$: translationOverrides = resolveWorkspaceTranslations($appStore.application?.translationOverrides)
-$: userMenuLabels = resolveTranslationGroup("userMenu", translationOverrides)
-$: profileLabels = resolveTranslationGroup("profileModal", translationOverrides)
-$: passwordLabels = resolveTranslationGroup("passwordModal", translationOverrides)
-
-const { builderWorkspacesUrl, builderAppsUrl } = helpers
-
 const getText = (user?: User | ContextUser): string => {
   if (!user) {
     return ""
@@ -52,6 +41,17 @@ const goToPortal = () => {
     : builderAppsUrl(builderBaseUrl)
   window.location.href = targetUrl
 }
+
+$: text = getText($authStore)
+$: isBuilder = sdk.users.hasBuilderPermissions($authStore)
+$: isSSO = $authStore != null && isSSOUser($authStore)
+$: embedded = $appStore.embedded || $appStore.inIframe
+$: translationOverrides = resolveWorkspaceTranslations($appStore.application?.translationOverrides)
+$: userMenuLabels = resolveTranslationGroup("userMenu", translationOverrides)
+$: profileLabels = resolveTranslationGroup("profileModal", translationOverrides)
+$: passwordLabels = resolveTranslationGroup("passwordModal", translationOverrides)
+
+const { builderWorkspacesUrl, builderAppsUrl } = helpers
 
 $: user = $authStore as User
 </script>

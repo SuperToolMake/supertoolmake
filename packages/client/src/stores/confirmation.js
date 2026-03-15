@@ -33,7 +33,7 @@ const createConfirmationStore = () => {
   }
   const confirm = async () => {
     const state = get(store)
-    if (!state.showConfirmation || !state.onConfirm) {
+    if (!(state.showConfirmation && state.onConfirm)) {
       return
     }
     store.set(initialState)

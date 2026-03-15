@@ -7,13 +7,6 @@ export let anchor
 export let visible = false
 export let offset = 0
 
-$: target = getContext(Context.PopoverRoot) || "#app"
-
-let hovering = false
-let tooltip
-let x = 0
-let y = 0
-
 const updatePosition = (anchor, tooltip) => {
   if (anchor == null || tooltip == null) {
     return
@@ -29,8 +22,6 @@ const updatePosition = (anchor, tooltip) => {
   })
 }
 
-$: updatePosition(anchor, tooltip)
-
 const handleMouseenter = () => {
   hovering = true
 }
@@ -38,6 +29,15 @@ const handleMouseenter = () => {
 const handleMouseleave = () => {
   hovering = false
 }
+
+$: target = getContext(Context.PopoverRoot) || "#app"
+
+let hovering = false
+let tooltip
+let x = 0
+let y = 0
+
+$: updatePosition(anchor, tooltip)
 </script>
 
 <Portal {target}>

@@ -18,12 +18,6 @@ let mde: any
 
 // Ensure the value is updated if the value prop changes outside the editor's
 // control
-$: checkValue(value)
-$: mde?.codemirror.on("blur", update)
-$: if (readonly || disabled) {
-  mde?.togglePreview()
-}
-
 const checkValue = (val: string | null) => {
   if (mde && val !== latestValue) {
     mde.value(val)
@@ -33,6 +27,12 @@ const checkValue = (val: string | null) => {
 const update = () => {
   latestValue = mde.value()
   dispatch("change", latestValue)
+}
+
+$: checkValue(value)
+$: mde?.codemirror.on("blur", update)
+$: if (readonly || disabled) {
+  mde?.togglePreview()
 }
 </script>
 

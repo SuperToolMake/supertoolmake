@@ -6,16 +6,6 @@ import { API } from "@/api"
 import { admin, auth } from "@/stores/portal"
 import { handleError, passwordsMatch } from "../auth/_components/utils"
 
-$: goto = $gotoStore
-
-let form
-let errors = {}
-let formData = {}
-let submitted = false
-
-$: tenantId = $auth.tenantId
-$: passwordMinLength = $admin.passwordMinLength ?? 12
-
 async function save() {
   form.validate()
   if (Object.keys(errors).length > 0) {
@@ -42,6 +32,16 @@ const handleKeydown = (evt) => {
     save()
   }
 }
+
+$: goto = $gotoStore
+
+let form
+let errors = {}
+let formData = {}
+let submitted = false
+
+$: tenantId = $auth.tenantId
+$: passwordMinLength = $admin.passwordMinLength ?? 12
 </script>
 
 <svelte:window on:keydown={handleKeydown} />

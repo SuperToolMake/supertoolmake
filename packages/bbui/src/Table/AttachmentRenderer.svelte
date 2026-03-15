@@ -4,13 +4,14 @@ import Link from "../Link/Link.svelte"
 export let value: { name: string; url: string; extension: string }[]
 
 const displayLimit = 5
+const isImage = (extension: string | undefined): boolean => {
+  return imageExtensions.includes(extension?.toLowerCase() ?? "")
+}
+
 $: attachments = value?.slice(0, displayLimit) ?? []
 $: leftover = (value?.length ?? 0) - attachments.length
 
 const imageExtensions: string[] = ["png", "tiff", "gif", "raw", "jpg", "jpeg"]
-const isImage = (extension: string | undefined): boolean => {
-  return imageExtensions.includes(extension?.toLowerCase() ?? "")
-}
 </script>
 
 {#each attachments as attachment}

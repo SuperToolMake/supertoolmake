@@ -4,10 +4,10 @@ import type { Next } from "koa"
 
 export type Method = "post" | "put" | "patch" | "get" | "delete" | "head"
 
-export type UserCtxWithNextFn = (ctx: UserCtx, next: Next) => void | Promise<unknown>
-export type CtxWithNextFn = (ctx: Ctx, next: Next) => void | Promise<unknown>
-export type UserCtxWithoutNextFn = (ctx: UserCtx) => void | Promise<unknown>
-export type CtxWithoutNextFn = (ctx: Ctx) => void | Promise<unknown>
+export type UserCtxWithNextFn = (ctx: UserCtx, next: Next) => undefined | Promise<unknown>
+export type CtxWithNextFn = (ctx: Ctx, next: Next) => undefined | Promise<unknown>
+export type UserCtxWithoutNextFn = (ctx: UserCtx) => undefined | Promise<unknown>
+export type CtxWithoutNextFn = (ctx: Ctx) => undefined | Promise<unknown>
 export type CtxFn = UserCtxWithNextFn | UserCtxWithoutNextFn | CtxWithNextFn | CtxWithoutNextFn
 
 class Endpoint {

@@ -116,7 +116,7 @@ export const deriveStores = (context: StoreContext): DerivedDatasourceStore => {
 
   const hasBudibaseIdentifiers = derived([datasource], ([$datasource]) => {
     const type = $datasource?.type
-    return !!type && ["table", "link"].includes(type)
+    return Boolean(type) && ["table", "link"].includes(type)
   })
 
   return {
@@ -212,7 +212,7 @@ export const createActions = (context: StoreContext): ActionDatasourceStore => {
 
   // Adds a schema mutation for a single field
   const addSchemaMutation = (field: string, mutation: UIFieldMutation) => {
-    if (!field || !mutation) {
+    if (!(field && mutation)) {
       return
     }
     schemaMutations.update(($schemaMutations) => {
@@ -228,7 +228,7 @@ export const createActions = (context: StoreContext): ActionDatasourceStore => {
 
   // Adds a nested schema mutation for a single field
   const addSubSchemaMutation = (field: string, fromField: string, mutation: UIFieldMutation) => {
-    if (!field || !fromField || !mutation) {
+    if (!(field && fromField && mutation)) {
       return
     }
     subSchemaMutations.update(($subSchemaMutations) => {
@@ -237,7 +237,7 @@ export const createActions = (context: StoreContext): ActionDatasourceStore => {
         [fromField]: {
           ...$subSchemaMutations[fromField],
           [field]: {
-            ...($subSchemaMutations[fromField] || {})[field],
+            ...$subSchemaMutations[fromField]?.[field],
             ...mutation,
           },
         },

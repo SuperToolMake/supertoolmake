@@ -43,23 +43,6 @@ let selectedPanel = $params.tab ?? null
 let panelOptions = []
 let templateIcon
 
-$: datasource = $datasources.selected
-$: templateIcon =
-  datasource?.restTemplate && $restTemplates
-    ? restTemplates.getByName(datasource.restTemplate)?.icon
-    : undefined
-
-$: isRestDatasource = datasource?.source === IntegrationTypes.REST
-$: getOptions(datasource)
-
-// Central updated datasource state for REST config edits
-let updatedDatasource
-let restConfigDirty = false
-$: if (datasource && (!updatedDatasource || updatedDatasource._id !== datasource._id)) {
-  updatedDatasource = cloneDeep(datasource)
-  restConfigDirty = false
-}
-
 const markDirty = () => {
   if (!updatedDatasource) {
     return
@@ -96,6 +79,23 @@ const getOptions = (datasource) => {
     panelOptions = isRest ? [] : ["Queries"]
     selectedPanel = isRest ? null : "Queries"
   }
+}
+
+$: datasource = $datasources.selected
+$: templateIcon =
+  datasource?.restTemplate && $restTemplates
+    ? restTemplates.getByName(datasource.restTemplate)?.icon
+    : undefined
+
+$: isRestDatasource = datasource?.source === IntegrationTypes.REST
+$: getOptions(datasource)
+
+// Central updated datasource state for REST config edits
+let updatedDatasource
+let restConfigDirty = false
+$: if (datasource && (!updatedDatasource || updatedDatasource._id !== datasource._id)) {
+  updatedDatasource = cloneDeep(datasource)
+  restConfigDirty = false
 }
 </script>
 

@@ -46,6 +46,26 @@ const dispatch = createEventDispatcher<{
   select: string
 }>()
 
+function calculateIndicatorLength() {
+  if (!vertical) {
+    width = `${$tab.info?.width ?? 0}px`
+  } else {
+    height = `${($tab.info?.height ?? 0) + 4}px`
+  }
+}
+
+function calculateIndicatorOffset() {
+  if (!vertical) {
+    left = `${($tab.info?.left ?? 0) - (container?.getBoundingClientRect().left ?? 0)}px`
+  } else {
+    top = `${($tab.info?.top ?? 0) - (container?.getBoundingClientRect().top ?? 0)}px`
+  }
+}
+
+function id(): string {
+  return `_${Math.random().toString(36).slice(2, 9)}`
+}
+
 $: {
   if (thisSelected !== selected) {
     thisSelected = selected
@@ -75,30 +95,10 @@ $: {
 $: $tab && !disabled && calculateIndicatorLength()
 $: $tab && !disabled && calculateIndicatorOffset()
 
-function calculateIndicatorLength() {
-  if (!vertical) {
-    width = ($tab.info?.width ?? 0) + "px"
-  } else {
-    height = ($tab.info?.height ?? 0) + 4 + "px"
-  }
-}
-
-function calculateIndicatorOffset() {
-  if (!vertical) {
-    left = ($tab.info?.left ?? 0) - (container?.getBoundingClientRect().left ?? 0) + "px"
-  } else {
-    top = ($tab.info?.top ?? 0) - (container?.getBoundingClientRect().top ?? 0) + "px"
-  }
-}
-
 onMount(() => {
   calculateIndicatorLength()
   calculateIndicatorOffset()
 })
-
-function id(): string {
-  return "_" + Math.random().toString(36).slice(2, 9)
-}
 </script>
 
 <div

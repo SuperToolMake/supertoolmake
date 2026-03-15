@@ -9,7 +9,7 @@ export let initialValue = ""
 export let onChange = () => {}
 
 onMount(() => {
-  if (!value && !!initialValue) {
+  if (!value && Boolean(initialValue)) {
     value = initialValue
   }
 })
@@ -18,7 +18,7 @@ function onButtonClicked(v) {
   let val
   if (isMultiSelect) {
     if (value.includes(v)) {
-      let idx = value.findIndex((i) => i === v)
+      let idx = value.indexOf(v)
       val = [...value].splice(idx, 1)
     } else {
       val = [...value, v]

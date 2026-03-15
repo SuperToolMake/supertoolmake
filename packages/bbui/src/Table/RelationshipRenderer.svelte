@@ -10,9 +10,6 @@ export let schema: { name?: string }
 const dispatch = createEventDispatcher()
 const displayLimit = 5
 
-$: relationships = value?.slice(0, displayLimit) ?? []
-$: leftover = (value?.length ?? 0) - relationships.length
-
 const onClick = (e: MouseEvent) => {
   e.stopPropagation()
   dispatch("clickrelationship", {
@@ -21,6 +18,9 @@ const onClick = (e: MouseEvent) => {
     fieldName: schema?.name,
   })
 }
+
+$: relationships = value?.slice(0, displayLimit) ?? []
+$: leftover = (value?.length ?? 0) - relationships.length
 </script>
 
 {#each relationships as relationship}

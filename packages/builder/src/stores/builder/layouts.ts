@@ -62,7 +62,7 @@ export class LayoutStore extends BudiStore<LayoutState> {
   }
 
   async deleteLayout(layout: Layout) {
-    if (!layout?._id || !layout?._rev) {
+    if (!(layout?._id && layout?._rev)) {
       return
     }
     await API.deleteLayout(layout._id, layout._rev)

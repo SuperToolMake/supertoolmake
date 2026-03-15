@@ -46,7 +46,7 @@ export async function exportRows(options: ExportRowsParams): Promise<ExportRowsR
   result = trimFields(result, schema)
 
   // Filter data to only specified columns if required
-  if (columns && columns.length) {
+  if (columns?.length) {
     for (let i = 0; i < result.length; i++) {
       rows[i] = {}
       for (const column of columns) {
@@ -111,7 +111,10 @@ function trimFields(rows: Row[], schema: TableSchema) {
   const result = rows.map((row) =>
     Object.keys(row)
       .filter((key) => allowedFields.includes(key))
-      .reduce((acc, key) => ({ ...acc, [key]: row[key] }), {} as Row)
+      .reduce((acc, key) => {
+        acc[key] = row[key]
+        return acc
+      }, {} as Row)
   )
   return result
 }

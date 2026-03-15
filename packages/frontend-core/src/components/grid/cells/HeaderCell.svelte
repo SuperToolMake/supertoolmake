@@ -49,18 +49,6 @@ let migrationModal
 let searchValue
 let input
 
-$: sortedBy = column.name === $sort.column
-$: canMoveLeft = orderable && idx > 0
-$: canMoveRight = orderable && idx < $scrollableColumns.length - 1
-$: sortingLabels = getSortingLabels(column)
-$: searchable = isColumnSearchable(column)
-$: resetSearchValue(column.name)
-$: searching = searchValue != null
-$: debouncedUpdateFilter(searchValue)
-$: orderable = !column.primaryDisplay
-$: editable = $config.canEditColumns && !column.schema.disabled
-$: keyboardBlocked.set(open)
-
 const close = () => {
   open = false
   editIsOpen = false
@@ -242,6 +230,7 @@ const onBlurInput = () => {
 const updateFilter = () => {
   filter.actions.addInlineFilter(column, searchValue)
 }
+
 const debouncedUpdateFilter = debounce(updateFilter, 250)
 
 const handleDoubleClick = () => {
@@ -251,6 +240,18 @@ const handleDoubleClick = () => {
   open = true
   editColumn()
 }
+
+$: sortedBy = column.name === $sort.column
+$: canMoveLeft = orderable && idx > 0
+$: canMoveRight = orderable && idx < $scrollableColumns.length - 1
+$: sortingLabels = getSortingLabels(column)
+$: searchable = isColumnSearchable(column)
+$: resetSearchValue(column.name)
+$: searching = searchValue != null
+$: debouncedUpdateFilter(searchValue)
+$: orderable = !column.primaryDisplay
+$: editable = $config.canEditColumns && !column.schema.disabled
+$: keyboardBlocked.set(open)
 
 onMount(() => subscribe("close-edit-column", close))
 </script>

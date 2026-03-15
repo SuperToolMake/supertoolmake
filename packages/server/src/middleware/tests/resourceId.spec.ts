@@ -11,7 +11,7 @@ describe("resourceId middleware", () => {
   it("calls next() when there is no request object to parse", () => {
     const ctx = { request: {} } as Ctx
     let called = false
-    paramResource("main")(ctx, () => {
+    paramResource("main")(ctx, async () => {
       called = true
     })
 
@@ -22,7 +22,7 @@ describe("resourceId middleware", () => {
   it("generates a resourceId middleware for context query parameters", () => {
     const ctx = { request: {}, params: { main: "test" } } as unknown as Ctx
     let called = false
-    paramResource("main")(ctx, () => {
+    paramResource("main")(ctx, async () => {
       called = true
     })
 
@@ -36,7 +36,7 @@ describe("resourceId middleware", () => {
       params: { main: "main", sub: "test" },
     } as unknown as Ctx
     let called = false
-    paramSubResource("main", "sub")(ctx, () => {
+    paramSubResource("main", "sub")(ctx, async () => {
       called = true
     })
 
@@ -48,7 +48,7 @@ describe("resourceId middleware", () => {
   it("generates a resourceId middleware for context request body", () => {
     const ctx = { request: {}, body: { main: "main" } } as unknown as Ctx
     let called = false
-    bodyResource("main")(ctx, () => {
+    bodyResource("main")(ctx, async () => {
       called = true
     })
 
@@ -62,7 +62,7 @@ describe("resourceId middleware", () => {
       body: { main: "main", sub: "test" },
     } as unknown as Ctx
     let called = false
-    bodySubResource("main", "sub")(ctx, () => {
+    bodySubResource("main", "sub")(ctx, async () => {
       called = true
     })
 
@@ -82,7 +82,7 @@ describe("resourceId middleware", () => {
       body: { custom: "test", customSub: "subTest" },
     } as unknown as Ctx
     let called = false
-    middleware(ctx, () => {
+    middleware(ctx, async () => {
       called = true
     })
 

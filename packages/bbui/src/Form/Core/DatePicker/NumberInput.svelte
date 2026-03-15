@@ -6,9 +6,9 @@ export let hideArrows = false
 export let width
 export let type = "number"
 
-$: style = width ? `width:${width}px;` : ""
-
 const selectAll = (event) => event.target.select()
+
+$: style = width ? `width:${width}px;` : ""
 </script>
 
 <input

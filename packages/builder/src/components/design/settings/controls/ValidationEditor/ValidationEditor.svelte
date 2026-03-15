@@ -10,10 +10,6 @@ export let type
 const dispatch = createEventDispatcher()
 let drawer
 
-$: active = getActive(value)
-
-$: text = getText(value)
-
 const save = () => {
   dispatch("change", value)
   drawer.hide()
@@ -34,6 +30,10 @@ const getText = (rules) => {
     return `${rules.length} rule${rules.length === 1 ? "" : "s"} set`
   }
 }
+
+$: active = getActive(value)
+
+$: text = getText(value)
 </script>
 
 <div class="validation-editor">

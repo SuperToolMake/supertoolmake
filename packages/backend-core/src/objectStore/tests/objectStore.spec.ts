@@ -1,5 +1,5 @@
+import { PassThrough } from "node:stream"
 import { Upload } from "@aws-sdk/lib-storage"
-import { PassThrough } from "stream"
 import { structures } from "../../../tests"
 import { streamUpload, streamUploadMany, upload } from "../objectStore"
 

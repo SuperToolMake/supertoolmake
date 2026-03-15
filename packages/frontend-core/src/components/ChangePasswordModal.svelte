@@ -18,20 +18,12 @@ export let labels: Partial<PasswordModalLabels> = {}
 
 const dispatch = createEventDispatcher()
 
-$: resolvedLabels = {
-  ...DEFAULT_LABELS,
-  ...labels,
-} as PasswordModalLabels
-
-let password: string = ""
-let error: string = ""
-
 const updatePassword = async () => {
   try {
     await API.updateSelf({ password })
     notifySuccess(resolvedLabels.successText)
     dispatch("save")
-  } catch (error) {
+  } catch {
     notifyError(resolvedLabels.errorText)
   }
 }
@@ -41,6 +33,14 @@ const handleKeydown = (evt: KeyboardEvent) => {
     updatePassword()
   }
 }
+
+$: resolvedLabels = {
+  ...DEFAULT_LABELS,
+  ...labels,
+} as PasswordModalLabels
+
+let password: string = ""
+let error: string = ""
 </script>
 
 <svelte:window on:keydown={handleKeydown} />

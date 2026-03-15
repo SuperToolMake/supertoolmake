@@ -1,5 +1,13 @@
 const sanitize = require("sanitize-s3-objectkey")
 
+import fs, { type PathLike, type ReadStream } from "node:fs"
+import fsp from "node:fs/promises"
+import https from "node:https"
+import { join } from "node:path"
+import stream, { type Readable } from "node:stream"
+import { pipeline } from "node:stream/promises"
+import type { ReadableStream } from "node:stream/web"
+import zlib from "node:zlib"
 import {
   type _Object,
   GetObjectCommand,
@@ -14,17 +22,9 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { utils } from "@budibase/shared-core"
 import { NodeHttpHandler } from "@smithy/node-http-handler"
 import type { NodeJsClient } from "@smithy/types"
-import fs, { type PathLike, type ReadStream } from "fs"
-import fsp from "fs/promises"
-import https from "https"
 import fetch from "node-fetch"
-import { join } from "path"
-import stream, { type Readable } from "stream"
-import { pipeline } from "stream/promises"
-import type { ReadableStream } from "stream/web"
 import tar from "tar-fs"
 import { v4 } from "uuid"
-import zlib from "zlib"
 import { WORKSPACE_DEV_PREFIX, WORKSPACE_PREFIX } from "../db"
 import env from "../environment"
 import { bucketTTLConfig, budibaseTempDir } from "./utils"
@@ -188,7 +188,7 @@ export async function createBucketIfNotExists(
         delete promises[bucketName]
         return { created: true, exists: false }
       } else {
-        throw new Error("Access denied to object store bucket." + err)
+        throw new Error(`Access denied to object store bucket.${err}`)
       }
     } else {
       throw new Error("Unable to write to object store bucket.")
@@ -428,7 +428,7 @@ export async function* listAllObjects(bucketName: string, path: string): AsyncGe
         yield obj
       }
     }
-    isTruncated = !!response.IsTruncated
+    isTruncated = Boolean(response.IsTruncated)
     token = response.NextContinuationToken
   } while (isTruncated && token)
 }
@@ -607,7 +607,7 @@ export async function getReadStream(
     Key: path,
   }
   const response = await client.getObject(params)
-  if (!response.Body || !(response.Body instanceof stream.Readable)) {
+  if (!(response.Body && response.Body instanceof stream.Readable)) {
     throw new Error("Unable to retrieve stream - invalid response")
   }
   return {
@@ -633,7 +633,7 @@ export async function getObjectMetadata(
 
   try {
     return await client.headObject(params)
-  } catch (err: any) {
+  } catch {
     throw new Error("Unable to retrieve metadata from object")
   }
 }
@@ -671,7 +671,7 @@ export function extractBucketAndPath(url: string): { bucket: string; path: strin
   const regex = new RegExp(`^${SIGNED_FILE_PREFIX}/(?<bucket>[^/]+)/(?<path>.+)$`)
   const match = baseUrl.match(regex)
 
-  if (match && match.groups) {
+  if (match?.groups) {
     const { bucket, path } = match.groups
     return { bucket, path }
   }

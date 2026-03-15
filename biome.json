@@ -41,13 +41,76 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noExplicitAny": "off"
+        "noAssignInExpressions": "error",
+        "noDoubleEquals": "off",
+        "noExplicitAny": "off",
+        "noGlobalAssign": "off",
+        "noImplicitAnyLet": "off",
+        "noImportAssign": "warn",
+        "noNonNullAssertedOptionalChain": "error",
+        "noThenProperty": "off",
+        "useIterableCallbackReturn": "off",
+        "noConfusingVoidType": "error",
+        "noGlobalIsNan": "error",
+        "useDefaultSwitchClauseLast": "error",
+        "noDocumentCookie": "off",
+        "noTemplateCurlyInString": "off",
+        "useIsArray": "error"
       },
       "correctness": {
-        "noUnusedVariables": "error"
+        "noConstructorReturn": "error",
+        "noInvalidUseBeforeDeclaration": "error",
+        "noSelfAssign": "error",
+        "noUnusedVariables": "error",
+        "noUnusedFunctionParameters": "error",
+        "noUnusedImports": "error",
+        "noUnusedPrivateClassMembers": "error",
+        "useParseIntRadix": "off"
+      },
+      "security": {
+        "noGlobalEval": "off"
+      },
+      "complexity": {
+        "useOptionalChain": "error",
+        "noBannedTypes": "off",
+        "noStaticOnlyClass": "off",
+        "noCommaOperator": "error"
+      },
+      "style": {
+        "noNonNullAssertion": "off",
+        "useNodejsImportProtocol": "error",
+        "useTemplate": "error",
+        "useConst": "error"
+      },
+      "performance": {
+        "noAccumulatingSpread": "error",
+        "noDynamicNamespaceImportAccess": "off"
       }
     }
   },
+  "overrides": [
+    {
+      "includes": ["packages/**/*.svelte"],
+      "assist": {
+        "actions": {
+          "source": {
+            "organizeImports": "off"
+          }
+        }
+      },
+      "linter": {
+        "rules": {
+          "style": {
+            "useImportType": "off"
+          },
+          "correctness": {
+            "noUnusedVariables": "off",
+            "noUnusedImports": "off"
+          }
+        }
+      }
+    }
+  ],
   "assist": {
     "enabled": true,
     "actions": {

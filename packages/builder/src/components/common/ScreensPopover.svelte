@@ -1,7 +1,7 @@
 <script lang="ts">
 import { ActionButton, List, ListItem, PopoverAlignment } from "@budibase/bbui"
 import type { ScreenUsage } from "@budibase/types"
-import type DetailPopover from "@/components/common/DetailPopover.svelte"
+import DetailPopover from "@/components/common/DetailPopover.svelte"
 import { appStore, workspaceAppStore } from "@/stores/builder"
 
 export let screens: ScreenUsage[] = []
@@ -13,6 +13,14 @@ export let buttonText = "Screens"
 
 let popover: DetailPopover
 
+export function show() {
+  popover?.show()
+}
+
+export function hide() {
+  popover?.hide()
+}
+
 $: screensByApp = screens.reduce<Record<string, ScreenUsage[]>>((acc, screen) => {
   acc[screen.workspaceAppId] ??= []
   acc[screen.workspaceAppId].push(screen)
@@ -21,14 +29,6 @@ $: screensByApp = screens.reduce<Record<string, ScreenUsage[]>>((acc, screen) =>
 }, {})
 
 $: hasManyWorkspaceApps = $workspaceAppStore.workspaceApps.length > 1
-
-export function show() {
-  popover?.show()
-}
-
-export function hide() {
-  popover?.hide()
-}
 </script>
 
 <DetailPopover title={buttonText} bind:this={popover} {align}>

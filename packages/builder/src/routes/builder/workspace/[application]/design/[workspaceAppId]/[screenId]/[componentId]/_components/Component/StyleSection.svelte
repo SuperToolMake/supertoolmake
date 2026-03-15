@@ -8,9 +8,6 @@ export let properties
 export let componentInstance
 export let bindings = []
 
-$: style = componentInstance._styles.normal || {}
-$: changed = properties?.some((prop) => hasPropChanged(style, prop)) ?? false
-
 const hasPropChanged = (style, prop) => {
   return style[prop.key] != null && style[prop.key] !== ""
 }
@@ -26,10 +23,13 @@ const getControlProps = (props) => {
 const updateStyle = async (key, val) => {
   try {
     await componentStore.updateStyle(key, val)
-  } catch (error) {
+  } catch {
     notifications.error("Error updating style")
   }
 }
+
+$: style = componentInstance._styles.normal || {}
+$: changed = properties?.some((prop) => hasPropChanged(style, prop)) ?? false
 </script>
 
 <DetailSummary collapsible={false} name={`${name}${changed ? " *" : ""}`}>

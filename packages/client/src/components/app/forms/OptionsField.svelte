@@ -28,6 +28,13 @@ let fieldState
 let fieldApi
 let fieldSchema
 
+const handleChange = (e) => {
+  const changed = fieldApi.setValue(e.detail)
+  if (onChange && changed) {
+    onChange({ value: e.detail })
+  }
+}
+
 $: flatOptions = optionsSource == null || optionsSource === "schema"
 $: options = getOptions(
   optionsSource,
@@ -38,13 +45,6 @@ $: options = getOptions(
   customOptions
 )
 const pickerLabels = loadTranslationsByGroup("picker")
-
-const handleChange = (e) => {
-  const changed = fieldApi.setValue(e.detail)
-  if (onChange && changed) {
-    onChange({ value: e.detail })
-  }
-}
 </script>
 
 <Field

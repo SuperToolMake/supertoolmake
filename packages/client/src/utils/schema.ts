@@ -34,7 +34,7 @@ export const fetchDatasourceSchema = async <TDatasource extends { type: DataFetc
 ) => {
   const instance = getDatasourceFetchInstance(datasource)
   const definition = await instance?.getDefinition()
-  if (!instance || !definition) {
+  if (!(instance && definition)) {
     return null
   }
 

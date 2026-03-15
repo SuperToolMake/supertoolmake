@@ -23,28 +23,7 @@ let touched = false
 let handlingOnClick = false
 
 // Backwards compatibility: detect if icon is old RemixIcon format or new Phosphor format
-$: isLegacyIcon = icon && (icon.startsWith("ri-") || icon.includes("remix"))
-$: isPhosphorIcon = icon && !isLegacyIcon
-
-// Load Phosphor icon weight for new icons
-$: if (isPhosphorIcon) {
-  loadPhosphorIconWeight("regular")
-}
-
-// Generate appropriate icon class
-$: iconClass = isPhosphorIcon
-  ? (() => {
-      const iconName = icon.replace(/^ph-/, "")
-      return `ph ph-${iconName}`
-    })()
-  : icon
-
-$: $component.editing && node?.focus()
-$: componentText = getComponentText(text, $builderStore, $component)
-$: customBg =
-  $component.styles?.normal?.background || $component.styles?.normal?.["background-image"]
-
-const getComponentText = (text, builderState, componentState) => {
+const getComponentText = (text, _builderState, componentState) => {
   if (componentState.editing) {
     return text || " "
   }
@@ -65,6 +44,27 @@ const handleOnClick = async () => {
   }
   handlingOnClick = false
 }
+
+$: isLegacyIcon = icon && (icon.startsWith("ri-") || icon.includes("remix"))
+$: isPhosphorIcon = icon && !isLegacyIcon
+
+// Load Phosphor icon weight for new icons
+$: if (isPhosphorIcon) {
+  loadPhosphorIconWeight("regular")
+}
+
+// Generate appropriate icon class
+$: iconClass = isPhosphorIcon
+  ? (() => {
+      const iconName = icon.replace(/^ph-/, "")
+      return `ph ph-${iconName}`
+    })()
+  : icon
+
+$: $component.editing && node?.focus()
+$: componentText = getComponentText(text, $builderStore, $component)
+$: customBg =
+  $component.styles?.normal?.background || $component.styles?.normal?.["background-image"]
 </script>
 
 {#key $component.editing}

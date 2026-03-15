@@ -22,7 +22,7 @@ let apiKeyModal
 const logout = async () => {
   try {
     await auth.logout()
-  } catch (error) {
+  } catch {
     // Swallow error and do nothing
   }
 }

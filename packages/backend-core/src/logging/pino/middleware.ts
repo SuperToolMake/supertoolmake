@@ -1,4 +1,4 @@
-import type { IncomingMessage } from "http"
+import type { IncomingMessage } from "node:http"
 import env from "../../environment"
 import { logger } from "./logger"
 
@@ -14,7 +14,7 @@ export function pinoSettings(): Options {
     logger,
     genReqId: correlator.getId,
     autoLogging: {
-      ignore: (req: IncomingMessage) => !!req.url?.includes("/health"),
+      ignore: (req: IncomingMessage) => Boolean(req.url?.includes("/health")),
     },
     serializers: {
       req: (req) => {
@@ -37,7 +37,7 @@ function getMiddleware() {
   if (env.HTTP_LOGGING) {
     return pino(pinoSettings())
   } else {
-    return (ctx: Ctx, next: any) => {
+    return (_ctx: Ctx, next: any) => {
       return next()
     }
   }

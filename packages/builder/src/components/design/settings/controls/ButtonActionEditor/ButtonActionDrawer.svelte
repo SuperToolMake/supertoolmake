@@ -49,55 +49,6 @@ const setUpdateActions = (actions) => {
 // Snapshot original action state
 let updateStateActions = setUpdateActions(actions)
 
-$: {
-  // Ensure parameters object is never null
-  if (selectedAction && !selectedAction.parameters) {
-    selectedAction.parameters = {}
-  }
-}
-$: parsedQuery = typeof actionQuery === "string" ? actionQuery.toLowerCase().trim() : ""
-$: showAvailableActions = !actions?.length
-$: mappedActionTypes = actionTypes.reduce((acc, action) => {
-  let parsedName = action.name.toLowerCase().trim()
-  if (parsedQuery.length && parsedName.indexOf(parsedQuery) < 0) {
-    return acc
-  }
-  acc[action.type] = acc[action.type] || []
-  acc[action.type].push(action)
-  return acc
-}, {})
-
-// These are ephemeral bindings which only exist while executing actions
-$: eventContextBindings = getEventContextBindings({
-  componentInstance,
-  settingKey: key,
-})
-$: actionContextBindings = getActionBindings(actions, selectedAction?.id)
-
-$: allBindings = getAllBindings(
-  bindings,
-  [...eventContextBindings, ...actionContextBindings],
-  actions
-)
-$: {
-  // Ensure each action has a unique ID
-  if (actions) {
-    actions.forEach((action) => {
-      if (!action.id) {
-        action.id = generate()
-      }
-    })
-  }
-}
-$: selectedActionComponent =
-  selectedAction && actionTypes.find((t) => t.name === selectedAction[EVENT_TYPE_KEY])?.component
-$: {
-  // Select the first action if we delete an action
-  if (selectedAction && !actions?.includes(selectedAction)) {
-    selectedAction = actions?.[0]
-  }
-}
-
 const deleteAction = (index) => {
   // Check if we're deleting the selected action
   const selectedIndex = actions.indexOf(selectedAction)
@@ -105,7 +56,7 @@ const deleteAction = (index) => {
 
   // Delete the action
   actions.splice(index, 1)
-  actions = actions
+  actions = [...actions]
 
   // Select a new action if we deleted the selected one
   if (isSelected) {
@@ -154,7 +105,7 @@ const onAddAction = (actionType) => {
 }
 
 const recordOriginalActionIndex = (id) => {
-  if (!actions || !id) {
+  if (!(actions && id)) {
     return
   }
   if (draggingActionId !== id) {
@@ -174,6 +125,7 @@ function handleDndConsider(e) {
   recordOriginalActionIndex(e.detail.info.id)
   actions = e.detail.items
 }
+
 function handleDndFinalize(e) {
   actions = e.detail.items
 
@@ -235,7 +187,7 @@ const getAllBindings = (actionBindings, eventContextBindings, actions) => {
 
   // Based on the above, filter out the asynchronous automations from the bindings
   let contextBindings = asynchronousAutomationIndexes
-    ? eventContextBindings.filter((binding, index) => {
+    ? eventContextBindings.filter((_binding, index) => {
         return !asynchronousAutomationIndexes.includes(index)
       })
     : eventContextBindings
@@ -248,6 +200,55 @@ const getAllBindings = (actionBindings, eventContextBindings, actions) => {
 const toDisplay = (eventKey) => {
   const type = actionTypes.find((action) => action.name == eventKey)
   return type?.displayName || type?.name
+}
+
+$: {
+  // Ensure parameters object is never null
+  if (selectedAction && !selectedAction.parameters) {
+    selectedAction.parameters = {}
+  }
+}
+$: parsedQuery = typeof actionQuery === "string" ? actionQuery.toLowerCase().trim() : ""
+$: showAvailableActions = !actions?.length
+$: mappedActionTypes = actionTypes.reduce((acc, action) => {
+  let parsedName = action.name.toLowerCase().trim()
+  if (parsedQuery.length && parsedName.indexOf(parsedQuery) < 0) {
+    return acc
+  }
+  acc[action.type] = acc[action.type] || []
+  acc[action.type].push(action)
+  return acc
+}, {})
+
+// These are ephemeral bindings which only exist while executing actions
+$: eventContextBindings = getEventContextBindings({
+  componentInstance,
+  settingKey: key,
+})
+$: actionContextBindings = getActionBindings(actions, selectedAction?.id)
+
+$: allBindings = getAllBindings(
+  bindings,
+  [...eventContextBindings, ...actionContextBindings],
+  actions
+)
+$: {
+  // Ensure each action has a unique ID
+  if (actions) {
+    actions.forEach((action) => {
+      if (!action.id) {
+        action.id = generate()
+      }
+    })
+  }
+}
+$: selectedActionComponent =
+  selectedAction && actionTypes.find((t) => t.name === selectedAction[EVENT_TYPE_KEY])?.component
+$: {
+  // Select the first action if we delete an action
+  if (selectedAction && !actions?.includes(selectedAction)) {
+    selectedAction = actions?.[0]
+  }
 }
 </script>
 

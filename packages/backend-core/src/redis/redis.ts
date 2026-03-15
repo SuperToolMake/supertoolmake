@@ -7,7 +7,7 @@ if (env.MOCK_REDIS) {
   try {
     // ioredis mock is all in memory
     MockRedis = require("ioredis-mock")
-  } catch (err) {
+  } catch {
     console.log("Mock redis unavailable")
   }
 }
@@ -116,10 +116,10 @@ class RedisWrapper {
     let stream: ScanStream
     if (isCluster(this.client)) {
       const node = this.client.nodes("master")
-      stream = node[0].scanStream({ match: key + "*", count: 100 })
+      stream = node[0].scanStream({ match: `${key}*`, count: 100 })
     } else {
       stream = (this.client as Redis).scanStream({
-        match: key + "*",
+        match: `${key}*`,
         count: 100,
       })
     }
@@ -140,14 +140,14 @@ class RedisWrapper {
     const response = await this.client.get(this.prefixed(key))
     // overwrite the prefixed key
     // @ts-expect-error TODO(mel): Why are these types wrong?
-    if (response != null && response.key) {
+    if (response?.key) {
       // @ts-expect-error
       response.key = key
     }
     // if its not an object just return the response
     try {
       return JSON.parse(response!)
-    } catch (err) {
+    } catch {
       return response
     }
   }
@@ -167,7 +167,7 @@ class RedisWrapper {
 
         try {
           acc[key] = result ? (JSON.parse(result) as T) : null
-        } catch (err) {
+        } catch {
           // TODO: this is a filthy lie but downstream code expects this, I have
           // no idea how it actually works if if this branch is ever hit in
           // practice.
@@ -233,7 +233,7 @@ class RedisWrapper {
 
   async increment(key: string): Promise<number> {
     const result = await this.client.incr(this.prefixed(key))
-    if (isNaN(result)) {
+    if (Number.isNaN(result)) {
       throw new Error(`Redis ${key} does not contain a number`)
     }
     return result

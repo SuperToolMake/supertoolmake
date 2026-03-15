@@ -277,7 +277,7 @@ function buildCondition(filter: undefined): undefined
 function buildCondition(filter: SearchFilter): SearchFilters
 function buildCondition(filter?: SearchFilter): SearchFilters | undefined {
   // Ignore empty or invalid filters
-  if (!filter || !filter?.operator || !filter?.field) {
+  if (!(filter?.operator && filter?.field)) {
     return
   }
 
@@ -532,7 +532,7 @@ export function search<T extends Record<string, any>>(
  * @param query the JSON query
  */
 export function runQuery<T extends Record<string, any>>(docs: T[], query: SearchFilters): T[] {
-  if (!docs || !Array.isArray(docs)) {
+  if (!(docs && Array.isArray(docs))) {
     return []
   }
   if (!query) {
@@ -555,7 +555,7 @@ export function runQuery<T extends Record<string, any>>(docs: T[], query: Search
         const result = test(valueToCheck, testValue)
         if (query.allOr && result) {
           return true
-        } else if (!query.allOr && !result) {
+        } else if (!(query.allOr || result)) {
           return false
         }
       }
@@ -598,15 +598,15 @@ export function runQuery<T extends Record<string, any>>(docs: T[], query: Search
       return false
     }
 
-    const docNum = +docValue
-    if (!isNaN(docNum)) {
-      const lowNum = +testValue.low
-      const highNum = +testValue.high
-      if (!isNaN(lowNum) && !isNaN(highNum)) {
+    const docNum = Number(docValue)
+    if (!Number.isNaN(docNum)) {
+      const lowNum = Number(testValue.low)
+      const highNum = Number(testValue.high)
+      if (!(Number.isNaN(lowNum) || Number.isNaN(highNum))) {
         return docNum >= lowNum && docNum <= highNum
-      } else if (!isNaN(lowNum)) {
+      } else if (!Number.isNaN(lowNum)) {
         return docNum >= lowNum
-      } else if (!isNaN(highNum)) {
+      } else if (!Number.isNaN(highNum)) {
         return docNum <= highNum
       }
     }
@@ -846,7 +846,7 @@ export function sort<T extends Record<string, any>>(
   sortOrder: SortOrder,
   sortType = SortType.STRING
 ): T[] {
-  if (!sort || !sortOrder || !sortType) {
+  if (!(sort && sortOrder && sortType)) {
     return docs
   }
 
@@ -881,7 +881,7 @@ export function sort<T extends Record<string, any>>(
  */
 export function limit<T>(docs: T[], limit: string | number): T[] {
   const numLimit = typeof limit === "number" ? limit : parseFloat(limit)
-  if (isNaN(numLimit)) {
+  if (Number.isNaN(numLimit)) {
     return docs
   }
   return docs.slice(0, numLimit)

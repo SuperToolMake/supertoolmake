@@ -16,7 +16,7 @@ export async function getFullUser(userId: string): Promise<ContextUserMetadata> 
     const db = context.getWorkspaceDB()
     metadata = await db.get<UserMetadata>(userId)
     delete metadata.csrfToken
-  } catch (err) {
+  } catch {
     // it is fine if there is no user metadata yet
   }
   return {

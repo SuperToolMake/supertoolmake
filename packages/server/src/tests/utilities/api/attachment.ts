@@ -1,5 +1,5 @@
+import type fs from "node:fs"
 import type { ProcessAttachmentResponse } from "@budibase/types"
-import type fs from "fs"
 import { type Expectations, TestAPI } from "./base"
 
 export class AttachmentAPI extends TestAPI {

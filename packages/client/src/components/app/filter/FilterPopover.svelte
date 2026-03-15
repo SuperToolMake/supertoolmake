@@ -61,16 +61,6 @@ let timeOnly: boolean
 let ignoreTimezones: boolean
 
 // Change on update
-$: editableFilter = getDefaultFilter(filter, schema, config)
-$: fieldSchema = config ? schema?.[config?.field] : undefined
-$: options = getOptions(fieldSchema)
-
-$: if (fieldSchema?.type === FieldType.DATETIME) {
-  enableTime = !fieldSchema?.dateOnly
-  timeOnly = !!fieldSchema?.timeOnly
-  ignoreTimezones = !!fieldSchema?.ignoreTimezones
-}
-
 const parseDateRange = (range: { high: string; low: string } | undefined): string[] | undefined => {
   if (!range) {
     return
@@ -127,7 +117,7 @@ const getDefaultFilter = (
 ) => {
   if (filter) {
     return Helpers.cloneDeep(filter)
-  } else if (!schema || !config) {
+  } else if (!(schema && config)) {
     return
   }
   const schemaField = schema[config.field]
@@ -153,7 +143,7 @@ const getDefaultFilter = (
 }
 
 const changeUser = (update: { value: string[] }) => {
-  if (!update || !editableFilter) return
+  if (!(update && editableFilter)) return
 
   editableFilter = sanitizeOperator({
     ...editableFilter,
@@ -171,6 +161,16 @@ const cacheUserRows = (e: CustomEvent) => {
     ...state,
     ...retrieved,
   }))
+}
+
+$: editableFilter = getDefaultFilter(filter, schema, config)
+$: fieldSchema = config ? schema?.[config?.field] : undefined
+$: options = getOptions(fieldSchema)
+
+$: if (fieldSchema?.type === FieldType.DATETIME) {
+  enableTime = !fieldSchema?.dateOnly
+  timeOnly = Boolean(fieldSchema?.timeOnly)
+  ignoreTimezones = Boolean(fieldSchema?.ignoreTimezones)
 }
 </script>
 

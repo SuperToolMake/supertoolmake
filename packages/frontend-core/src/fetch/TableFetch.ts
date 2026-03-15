@@ -46,7 +46,7 @@ export default class TableFetch extends BaseDataFetch<TableDatasource, Table> {
       })
       return {
         rows: res?.rows || [],
-        hasNextPage: res?.hasNextPage || false,
+        hasNextPage: res?.hasNextPage,
         cursor: res?.bookmark || null,
       }
     } catch (error) {

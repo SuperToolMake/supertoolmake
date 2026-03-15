@@ -25,17 +25,12 @@ let focus = false
 // real value. The reactive statement is to ensure that external changes to
 // the value prop are reflected.
 let fieldValue = value
-$: fieldValue = value
-
-// Ensure step is always a numeric value defaulting to 1
-$: step = step == null || isNaN(step) ? 1 : step
-
 const updateValue = (value) => {
   if (readonly) {
     return
   }
   const float = parseFloat(value)
-  value = isNaN(float) ? null : float
+  value = Number.isNaN(float) ? null : float
   if (value != null) {
     if (min != null && value < min) {
       value = min
@@ -79,7 +74,7 @@ const updateValueOnEnter = (event) => {
 }
 
 const stepUp = () => {
-  if (value == null || isNaN(value)) {
+  if (value == null || Number.isNaN(value)) {
     updateValue(step)
   } else {
     updateValue(value + step)
@@ -87,12 +82,17 @@ const stepUp = () => {
 }
 
 const stepDown = () => {
-  if (value == null || isNaN(value)) {
+  if (value == null || Number.isNaN(value)) {
     updateValue(step)
   } else {
     updateValue(value - step)
   }
 }
+
+$: fieldValue = value
+
+// Ensure step is always a numeric value defaulting to 1
+$: step = step == null || Number.isNaN(step) ? 1 : step
 </script>
 
 <div

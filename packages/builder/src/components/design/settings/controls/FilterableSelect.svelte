@@ -7,8 +7,6 @@ import { selectedScreen } from "@/stores/builder"
 
 export let value: string | undefined = undefined
 
-$: providers = getProviders($selectedScreen?.props)
-
 const getProviders = (rootComponent: Component | undefined) => {
   if (!rootComponent) {
     return []
@@ -29,6 +27,8 @@ const getProviders = (rootComponent: Component | undefined) => {
       subtitle: `${provider?.dataSource?.label || provider?.table?.label || "-"}`,
     }))
 }
+
+$: providers = getProviders($selectedScreen?.props)
 </script>
 
 <Select {value} options={providers} on:change />

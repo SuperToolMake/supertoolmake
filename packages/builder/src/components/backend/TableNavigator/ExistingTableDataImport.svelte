@@ -54,10 +54,6 @@ const typeOptions = [
     value: FieldType.ATTACHMENT_SINGLE,
   },
   {
-    label: "Signature",
-    value: FieldType.SIGNATURE_SINGLE,
-  },
-  {
     label: "Attachment list",
     value: FieldType.ATTACHMENTS,
   },
@@ -74,13 +70,6 @@ const typeOptions = [
     value: `${FieldType.BB_REFERENCE_SINGLE}${BBReferenceFieldSubType.USER}`,
   },
 ]
-
-$: {
-  schema = fetchSchema(tableId)
-}
-
-$: table = $tables.list.find((table) => table._id === tableId)
-$: datasource = $datasources.list.find((ds) => ds._id === table?.sourceId)
 
 async function fetchSchema(tableId) {
   try {
@@ -128,6 +117,13 @@ async function validate(rows) {
     allValid = response.allValid
   }
 }
+
+$: {
+  schema = fetchSchema(tableId)
+}
+
+$: table = $tables.list.find((table) => table._id === tableId)
+$: datasource = $datasources.list.find((ds) => ds._id === table?.sourceId)
 </script>
 
 <Layout gap="S" noPadding>

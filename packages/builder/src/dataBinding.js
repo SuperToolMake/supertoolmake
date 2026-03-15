@@ -141,7 +141,7 @@ export const toBindingsArray = (valueMap, prefix, category) => {
  * Utility to covert a map of readable bindings to runtime
  */
 export const readableToRuntimeMap = (bindings, ctx) => {
-  if (!bindings || !ctx) {
+  if (!(bindings && ctx)) {
     return {}
   }
   return Object.keys(ctx).reduce((acc, key) => {
@@ -154,7 +154,7 @@ export const readableToRuntimeMap = (bindings, ctx) => {
  * Utility to covert a map of runtime bindings to readable bindings
  */
 export const runtimeToReadableMap = (bindings, ctx) => {
-  if (!bindings || !ctx) {
+  if (!(bindings && ctx)) {
     return {}
   }
   return Object.keys(ctx).reduce((acc, key) => {
@@ -167,7 +167,7 @@ export const runtimeToReadableMap = (bindings, ctx) => {
  * Gets the bindable properties exposed by a certain component.
  */
 export const getComponentBindableProperties = (asset, componentId) => {
-  if (!asset || !componentId) {
+  if (!(asset && componentId)) {
     return []
   }
 
@@ -199,7 +199,7 @@ export const getAllComponentContexts = (
   type,
   options = { includeSelf: false }
 ) => {
-  if (!asset || !componentId) {
+  if (!(asset && componentId)) {
     return []
   }
   const map = {}
@@ -365,7 +365,7 @@ export const makeReadableKeyPropSafe = (key) => {
  */
 const generateComponentContextBindings = (asset, componentContext) => {
   const { component, definition, contexts } = componentContext
-  if (!component || !definition || !contexts?.length) {
+  if (!(component && definition && contexts?.length)) {
     return []
   }
 
@@ -531,7 +531,7 @@ export const getUserBindings = () => {
   const { schema } = getSchemaForDatasourcePlus(TableNames.USERS)
   // add props that are not in the user metadata table schema
   // but will be there for logged-in user
-  schema["globalId"] = { type: FieldType.STRING }
+  schema.globalId = { type: FieldType.STRING }
   const keys = Object.keys(schema).sort()
   const safeUser = makePropSafe("user")
 
@@ -661,7 +661,7 @@ const getSelectedRowsBindings = (asset) => {
       tableBlocks.map((block) => ({
         type: "context",
         runtimeBinding: `${safeState}.${makePropSafe(
-          block._id + "-table"
+          `${block._id}-table`
         )}.${makePropSafe("selectedRows")}`,
         readableBinding: `${block._instanceName}.Selected Row IDs (deprecated)`,
         category: "Selected Row IDs (deprecated)",
@@ -1005,10 +1005,10 @@ export const getSchemaForDatasource = (asset, datasource, options) => {
     // Add schema properties if required
     if (schema) {
       if (addId) {
-        schema["_id"] = { type: "string" }
+        schema._id = { type: "string" }
       }
       if (addRev) {
-        schema["_rev"] = { type: "string" }
+        schema._rev = { type: "string" }
       }
     }
 
@@ -1060,7 +1060,7 @@ export const buildFormSchema = (component, asset) => {
 
     if (!component.fields) {
       Object.values(info.schema)
-        .filter(({ autocolumn, name }) => !autocolumn && !["_rev", "_id"].includes(name))
+        .filter(({ autocolumn, name }) => !(autocolumn || ["_rev", "_id"].includes(name)))
         .forEach(({ name }) => {
           schema[name] = { type: info?.schema[name].type }
         })
@@ -1398,8 +1398,8 @@ export const updateReferencesInObject = ({ obj, modifiedIndex, action, label, or
     str.replace(`{{ ${label}.${index}.`, `{{ ${label}.${replaceWith}.`)
   for (const key in obj) {
     if (typeof obj[key] === "string") {
-      let matches
-      while ((matches = stepIndexRegex.exec(obj[key])) !== null) {
+      let matches = stepIndexRegex.exec(obj[key])
+      while (matches !== null) {
         const referencedStep = parseInt(matches[1])
         if (action === UpdateReferenceAction.ADD && referencedStep >= modifiedIndex) {
           obj[key] = updateActionStep(obj[key], referencedStep, referencedStep + 1)
@@ -1414,6 +1414,7 @@ export const updateReferencesInObject = ({ obj, modifiedIndex, action, label, or
             obj[key] = updateActionStep(obj[key], referencedStep, referencedStep - 1)
           }
         }
+        matches = stepIndexRegex.exec(obj[key])
       }
     } else if (typeof obj[key] === "object" && obj[key] !== null) {
       updateReferencesInObject({
@@ -1436,11 +1437,12 @@ export const migrateReferencesInObject = ({ obj, label = "steps", steps, origina
 
   for (const key in obj) {
     if (typeof obj[key] === "string") {
-      let matches
-      while ((matches = stepIndexRegex.exec(obj[key])) !== null) {
+      let matches = stepIndexRegex.exec(obj[key])
+      while (matches !== null) {
         const referencedStep = parseInt(matches[1])
 
         obj[key] = updateActionStep(obj[key], referencedStep, steps[referencedStep]?.id)
+        matches = stepIndexRegex.exec(obj[key])
       }
     } else if (typeof obj[key] === "object" && obj[key] !== null) {
       migrateReferencesInObject({

@@ -47,33 +47,17 @@ export interface PopoverAPI {
 
   // Portal library lacks types, so we have to type this as any even though it's
   // actually a string
-  $: target = (portalTarget ||
-    getContext(Context.PopoverRoot) ||
-    ".spectrum") as any
-  $: {
-    // Disable pointer events for the initial part of the animation, because we
-    // fly from top to bottom and initially can be positioned under the cursor,
-    // causing a flashing hover state in the content
-    if (open && animate) {
-      blockPointerEvents = true
-      clearTimeout(timeout)
-      timeout = setTimeout(() => {
-        blockPointerEvents = false
-      }, animationDuration / 2)
-    }
-  }
-
   export const show = () => {
     dispatch("open")
     open = true
   }
 
-  export const hide = () => {
+export const hide = () => {
     dispatch("close")
     open = false
   }
 
-  export const toggle = () => {
+export const toggle = () => {
     if (!open) {
       show()
     } else {
@@ -81,7 +65,7 @@ export interface PopoverAPI {
     }
   }
 
-  const handleOutsideClick = (e: MouseEvent) => {
+const handleOutsideClick = (e: MouseEvent) => {
     if (clickOutsideOverride) {
       return
     }
@@ -102,7 +86,7 @@ export interface PopoverAPI {
     }
   }
 
-  const handleEscape: KeyboardEventHandler<HTMLDivElement> = e => {
+const handleEscape: KeyboardEventHandler<HTMLDivElement> = e => {
     if (!clickOutsideOverride) {
       return
     }
@@ -110,6 +94,32 @@ export interface PopoverAPI {
       hide()
     }
   }
+
+$: target = (portalTarget ||
+    getContext(Context.PopoverRoot) ||
+    ".spectrum") as any
+  $: {
+    // Disable pointer events for the initial part of the animation, because we
+    // fly from top to bottom and initially can be positioned under the cursor,
+    // causing a flashing hover state in the content
+    if (open && animate) {
+      blockPointerEvents = true
+      clearTimeout(timeout)
+      timeout = setTimeout(() => {
+        blockPointerEvents = false
+      }, animationDuration / 2)
+    }
+  }
+
+  
+
+  
+
+  
+
+  
+
+  
 
   onDestroy(() => {
     clearTimeout(timeout)

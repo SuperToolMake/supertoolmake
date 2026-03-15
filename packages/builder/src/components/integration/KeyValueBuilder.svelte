@@ -46,20 +46,7 @@ let fields = Object.entries(object || {}).map(([name, value]) => ({
   value,
 }))
 let fieldActivity = buildFieldActivity(activity)
-$: lockedKeySet = new Set((lockedKeys || []).filter(Boolean))
 const isLocked = (name?: string) => (name ? lockedKeySet.has(name) : false)
-
-$: fullObject = fields.reduce<Record<string, unknown>>((acc, next) => {
-  acc[next.name] = next.value
-  return acc
-}, {})
-
-$: object = Object.entries(fullObject).reduce<Record<string, unknown>>((acc, [key, next]) => {
-  if (key) {
-    acc[key] = next
-  }
-  return acc
-}, {})
 
 function buildFieldActivity(obj: Record<string, boolean>) {
   if (!obj || typeof obj !== "object") {
@@ -90,7 +77,7 @@ function deleteEntry(idx: number) {
 
 function changed() {
   // Required for reactivity
-  fields = fields
+  fields = [...fields]
   const newActivity: Record<string, boolean> = {}
   for (let idx = 0; idx < fields.length; idx++) {
     const fieldName = fields[idx].name
@@ -111,6 +98,20 @@ function isJsonArray(value: any) {
   }
   return value.type === "json" && value.subtype === "array"
 }
+
+$: lockedKeySet = new Set((lockedKeys || []).filter(Boolean))
+
+$: fullObject = fields.reduce<Record<string, unknown>>((acc, next) => {
+  acc[next.name] = next.value
+  return acc
+}, {})
+
+$: object = Object.entries(fullObject).reduce<Record<string, unknown>>((acc, [key, next]) => {
+  if (key) {
+    acc[key] = next
+  }
+  return acc
+}, {})
 </script>
 
 <!-- Builds Objects with Key Value Pairs. Useful for building things like Request Headers. -->

@@ -22,6 +22,23 @@ const rand = generate()
 
 // Create a fake component instance so that we can use the core Component
 // to render this part of the block, taking advantage of binding enrichment
+const getComponent = (type) => {
+  if (!type) {
+    return null
+  }
+  return `@budibase/standard-components/${type}`
+}
+
+const getInstanceName = (name, type) => {
+  if (name) {
+    return name
+  }
+  if (!type) {
+    return "New component"
+  }
+  return type[0].toUpperCase() + type.slice(1)
+}
+
 $: id = `${block.id}-${context ?? rand}`
 $: parentId = $component?.id
 $: inBuilder = $builderStore.inBuilder
@@ -43,23 +60,6 @@ $: {
   if (inBuilder) {
     block.registerComponent(id, parentId, order ?? 0, instance)
   }
-}
-
-const getComponent = (type) => {
-  if (!type) {
-    return null
-  }
-  return `@budibase/standard-components/${type}`
-}
-
-const getInstanceName = (name, type) => {
-  if (name) {
-    return name
-  }
-  if (!type) {
-    return "New component"
-  }
-  return type[0].toUpperCase() + type.slice(1)
 }
 
 onDestroy(() => {

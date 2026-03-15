@@ -17,16 +17,12 @@ export const hide = () => {
   modal.hide()
 }
 
-function checkValid(vars, name) {
+function checkValid(_vars, name) {
   if (!name) {
     return false
   }
   return !allVariableNames.find((varName) => varName.toLowerCase() === name.toLowerCase())
 }
-
-$: valid = checkValid(dynamicVariables, name)
-$: allVariableNames = (datasource?.config?.dynamicVariables || []).map((variable) => variable.name)
-$: error = name && !valid ? "Variable name is already in use." : null
 
 async function saveVariable() {
   const copiedName = name,
@@ -36,6 +32,10 @@ async function saveVariable() {
   dynamicVariables[copiedName] = copiedBinding
   dispatch("change", dynamicVariables)
 }
+
+$: valid = checkValid(dynamicVariables, name)
+$: allVariableNames = (datasource?.config?.dynamicVariables || []).map((variable) => variable.name)
+$: error = name && !valid ? "Variable name is already in use." : null
 </script>
 
 <Modal bind:this={modal}>

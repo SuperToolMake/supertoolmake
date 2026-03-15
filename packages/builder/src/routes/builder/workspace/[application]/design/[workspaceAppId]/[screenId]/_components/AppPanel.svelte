@@ -17,14 +17,6 @@ import ThemeSettings from "./Theme/ThemeSettings.svelte"
 
 let changingStatus = false
 
-$: mobile = $previewStore.previewDevice === "mobile"
-$: isPDF = $selectedScreen?.variant === ScreenVariant.PDF
-$: selectedWorkspaceApp = $workspaceAppStore.selectedWorkspaceApp
-
-$: liveUrl = $selectedAppUrls.liveUrl
-
-$: toggleValue = selectedWorkspaceApp?.publishStatus.state === PublishResourceState.PUBLISHED
-
 const previewApp = () => {
   previewStore.showPreview(true)
 }
@@ -46,6 +38,14 @@ const handleToggleChange = async (e: CustomEvent<boolean>) => {
     changingStatus = false
   }
 }
+
+$: mobile = $previewStore.previewDevice === "mobile"
+$: isPDF = $selectedScreen?.variant === ScreenVariant.PDF
+$: selectedWorkspaceApp = $workspaceAppStore.selectedWorkspaceApp
+
+$: liveUrl = $selectedAppUrls.liveUrl
+
+$: toggleValue = selectedWorkspaceApp?.publishStatus.state === PublishResourceState.PUBLISHED
 </script>
 
 {#if selectedWorkspaceApp}

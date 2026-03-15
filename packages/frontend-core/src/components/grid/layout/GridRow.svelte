@@ -27,8 +27,8 @@ const {
   buttonColumnWidth,
 } = getContext("grid")
 
-$: rowSelected = !!$selectedRows[row._id]
-$: rowHovered = $hoveredRowId === row._id && (!$selectedCellCount || !$isSelectingCells)
+$: rowSelected = Boolean($selectedRows[row._id])
+$: rowHovered = $hoveredRowId === row._id && !($selectedCellCount && $isSelectingCells)
 $: rowFocused = $focusedRow?._id === row._id
 $: reorderSource = $reorder.sourceColumn
 $: hasButtons = $gridProps?.buttons?.length > 0

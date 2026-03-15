@@ -1,7 +1,7 @@
 <script lang="ts">
 import { createEventDispatcher } from "svelte"
 import Layout from "../Layout/Layout.svelte"
-import type Popover from "../Popover/Popover.svelte"
+import Popover from "../Popover/Popover.svelte"
 import "@spectrum-css/popover/dist/index-vars.css"
 import { DefaultAppTheme, ensureValidTheme, getThemeClassNames } from "@budibase/shared-core"
 import type { Theme } from "@budibase/types"
@@ -18,6 +18,62 @@ export let align: PopoverAlignment | undefined = undefined
 
 let dropdown: Popover | undefined
 let preview: HTMLElement | undefined
+
+const getThemeClasses = (theme: Theme | undefined) => {
+  if (!theme) {
+    return ""
+  }
+  theme = ensureValidTheme(theme, DefaultAppTheme)
+  return getThemeClassNames(theme)
+}
+
+const onChange = (value: string | undefined) => {
+  dispatch("change", value)
+  dropdown?.hide()
+}
+
+const getCustomValue = (value: string | undefined) => {
+  if (!value) {
+    return value
+  }
+  let found = false
+  const comparisonValue = value.substring(28, value.length - 1)
+  for (let category of categories) {
+    found = category.colors.includes(comparisonValue)
+    if (found) {
+      break
+    }
+  }
+  return found ? null : value
+}
+
+const prettyPrint = (color: string) => {
+  return capitalise(color.split("-").join(" "))
+}
+
+const getCheckColor = (value: string | undefined) => {
+  // Use dynamic color for theme grays
+  if (value?.includes("-gray-")) {
+    return /^.*(gray-(50|75|100|200|300|400|500))\)$/.test(value)
+      ? "var(--spectrum-global-color-gray-900)"
+      : "var(--spectrum-global-color-gray-50)"
+  }
+
+  // Use contrasting check for the dim colours
+  if (value?.includes("-100")) {
+    return "var(--spectrum-global-color-gray-900)"
+  }
+  if (value?.includes("-1200") || value?.includes("-800")) {
+    return "var(--spectrum-global-color-static-gray-50)"
+  }
+
+  // Use black check for static white
+  if (value?.includes("static-black")) {
+    return "var(--spectrum-global-color-static-gray-50)"
+  }
+
+  return "var(--spectrum-global-color-static-gray-900)"
+}
 
 $: customValue = getCustomValue(value)
 $: checkColor = getCheckColor(value)
@@ -121,62 +177,6 @@ const categories = [
     ],
   },
 ]
-
-const getThemeClasses = (theme: Theme | undefined) => {
-  if (!theme) {
-    return ""
-  }
-  theme = ensureValidTheme(theme, DefaultAppTheme)
-  return getThemeClassNames(theme)
-}
-
-const onChange = (value: string | undefined) => {
-  dispatch("change", value)
-  dropdown?.hide()
-}
-
-const getCustomValue = (value: string | undefined) => {
-  if (!value) {
-    return value
-  }
-  let found = false
-  const comparisonValue = value.substring(28, value.length - 1)
-  for (let category of categories) {
-    found = category.colors.includes(comparisonValue)
-    if (found) {
-      break
-    }
-  }
-  return found ? null : value
-}
-
-const prettyPrint = (color: string) => {
-  return capitalise(color.split("-").join(" "))
-}
-
-const getCheckColor = (value: string | undefined) => {
-  // Use dynamic color for theme grays
-  if (value?.includes("-gray-")) {
-    return /^.*(gray-(50|75|100|200|300|400|500))\)$/.test(value)
-      ? "var(--spectrum-global-color-gray-900)"
-      : "var(--spectrum-global-color-gray-50)"
-  }
-
-  // Use contrasting check for the dim colours
-  if (value?.includes("-100")) {
-    return "var(--spectrum-global-color-gray-900)"
-  }
-  if (value?.includes("-1200") || value?.includes("-800")) {
-    return "var(--spectrum-global-color-static-gray-50)"
-  }
-
-  // Use black check for static white
-  if (value?.includes("static-black")) {
-    return "var(--spectrum-global-color-static-gray-50)"
-  }
-
-  return "var(--spectrum-global-color-static-gray-900)"
-}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
