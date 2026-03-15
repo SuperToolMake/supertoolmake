@@ -16,7 +16,6 @@ import {
   TextArea,
 } from "@budibase/bbui"
 import { goto, params } from "@roxi/routify"
-import Placeholder from "assets/bb-spaceship.svg"
 import { cloneDeep } from "lodash/fp"
 import { onMount } from "svelte"
 import { EditorModes } from "@/components/common/CodeEditor"
@@ -697,7 +696,6 @@ onMount(async () => {
           <Heading size="M">Response</Heading>
           <div class="placeholder">
             <div class="placeholder-internal">
-              <img alt="placeholder" src={Placeholder} />
               <Body size="XS" textAlign="center"
                 >{"enter a url in the textbox above and click send to get a response".toUpperCase()}</Body
               >
