@@ -6,6 +6,7 @@ import {
   invalidationMessage,
   popNumSessionsInvalidated,
 } from "@budibase/frontend-core"
+//@ts-expect-error TODO(mel): fix?
 import ErrorSVG from "@budibase/frontend-core/assets/error.svg?raw"
 import { getThemeClassNames } from "@budibase/shared-core"
 import { onMount, setContext } from "svelte"
