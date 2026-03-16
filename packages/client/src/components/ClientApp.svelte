@@ -6,7 +6,6 @@ import {
   invalidationMessage,
   popNumSessionsInvalidated,
 } from "@budibase/frontend-core"
-//@ts-expect-error TODO(mel): fix?
 import ErrorSVG from "@budibase/frontend-core/assets/error.svg?raw"
 import { getThemeClassNames } from "@budibase/shared-core"
 import { onMount, setContext } from "svelte"
@@ -39,7 +38,6 @@ import SnippetsProvider from "./context/SnippetsProvider.svelte"
 import StateBindingsProvider from "./context/StateBindingsProvider.svelte"
 import TestUrlBindingsProvider from "./context/TestUrlBindingsProvider.svelte"
 import UserBindingsProvider from "./context/UserBindingsProvider.svelte"
-import DevTools from "./devtools/DevTools.svelte"
 import DevToolsHeader from "./devtools/DevToolsHeader.svelte"
 import FreeFooter from "./FreeFooter.svelte"
 import ConfirmationDisplay from "./overlay/ConfirmationDisplay.svelte"
@@ -250,10 +248,6 @@ $: {
                               <ConfirmationDisplay />
                               <PeekScreenDisplay />
                             </CustomThemeWrapper>
-                          {/if}
-
-                          {#if showDevTools}
-                            <DevTools />
                           {/if}
                         </div>
 

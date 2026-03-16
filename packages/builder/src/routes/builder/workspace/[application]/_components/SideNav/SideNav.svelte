@@ -224,7 +224,7 @@ interface UIFavouriteResource {
 }
 interface AllResourceStores {
   apps: UIWorkspaceApp[]
-  datasources: (Datasource)[]
+  datasources: Datasource[]
   tables: Table[]
   queries: Query[]
 }

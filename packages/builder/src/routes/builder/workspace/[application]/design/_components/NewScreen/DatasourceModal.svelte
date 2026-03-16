@@ -13,10 +13,7 @@ export let onConfirm: () => Promise<void> | void
 export let selectedTablesAndViews: SourceOption[]
 
 const dispatch = createEventDispatcher()
-const getTablesAndViews = (
-  datasource: Datasource,
-  datasources: (Datasource)[]
-) => {
+const getTablesAndViews = (datasource: Datasource, datasources: Datasource[]) => {
   let tablesAndViews: SourceOption[] = []
   const tables = Array.isArray(datasource.entities)
     ? datasource.entities
@@ -35,7 +32,7 @@ const getTablesAndViews = (
   return tablesAndViews
 }
 
-const getDatasources = (rawDatasources: (Datasource)[]) => {
+const getDatasources = (rawDatasources: Datasource[]) => {
   const datasources = []
 
   for (const rawDatasource of rawDatasources) {

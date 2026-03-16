@@ -46,15 +46,6 @@ onMount(async () => {
     autoWidth
     on:change={e => devToolsStore.actions.changeRole(e.detail)}
   />
-  {#if !$context.device.mobile}
-    <ActionButton
-      quiet
-      icon="code"
-      on:click={() => devToolsStore.actions.setVisible(!$devToolsStore.visible)}
-    >
-      DevTools
-    </ActionButton>
-  {/if}
   {#if window.parent.isBuilder}
     <ActionButton
       quiet

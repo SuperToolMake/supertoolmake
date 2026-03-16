@@ -38,7 +38,7 @@ interface BuilderDatasourceStore {
 }
 
 interface DerivedDatasourceStore extends BuilderDatasourceStore {
-  list: (Datasource)[]
+  list: Datasource[]
   selected?: Datasource
   hasData: boolean
 }
@@ -53,7 +53,7 @@ export class DatasourceStore extends DerivedBudiStore<
 
   constructor() {
     const makeDerivedStore = (store: Writable<BuilderDatasourceStore>) => {
-      return derived([store, tables], ([$store, $tables]) => {
+      return derived([store], ([$store]) => {
         const externalDS = $store.rawList?.filter((ds) => ds._id !== BUDIBASE_INTERNAL_DB_ID)
 
         // Build up enriched DS list

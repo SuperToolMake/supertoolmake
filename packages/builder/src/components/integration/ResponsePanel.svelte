@@ -1,10 +1,6 @@
 <script lang="ts">
 import { Body, Label, Layout, Select, Tab, Tabs } from "@budibase/bbui"
-import type {
-  Datasource,
-  PreviewQueryResponse,
-  QuerySchema,
-} from "@budibase/types"
+import type { Datasource, PreviewQueryResponse, QuerySchema } from "@budibase/types"
 import { createEventDispatcher } from "svelte"
 import { SchemaTypeOptionsExpanded } from "@/constants/backend"
 import { EditorModes } from "../common/CodeEditor"
