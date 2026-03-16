@@ -24,7 +24,12 @@ onMount(() => {
   }
   if ($datasources.hasData && tableId) {
     $goto(`../table/[tableId]`, { tableId })
-  } else {
+  } else if ($datasources.hasData) {
+    $goto(`../datasource/[datasourceId]`, {
+      datasourceId: $datasources.list[0]._id!
+    })
+  } 
+  else {
     $goto("../new")
   }
 })

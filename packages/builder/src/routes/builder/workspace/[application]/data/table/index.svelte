@@ -9,7 +9,7 @@ onMount(() => {
   if ($tables.selected) {
     $goto(`../[tableId]`, { tableId: $tables.selected._id })
   } else {
-    $goto("../new")
+    $goto("../../new")
   }
 })
 </script>

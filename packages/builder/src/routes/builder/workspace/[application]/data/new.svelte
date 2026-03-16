@@ -26,7 +26,7 @@ $: disabled = externalDatasourceLoading
 
 <CreationPage
   showClose={hasData($datasources, $tables)}
-  onClose={() => goto("../table")}
+  onClose={() => goto("../")}
   heading="Add new data source"
 >
   <div class="subHeading">
