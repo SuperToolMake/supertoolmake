@@ -16,7 +16,6 @@ import {
   PublishResourceState,
   type Query,
   type Table,
-  type UIInternalDatasource,
   type UIWorkspaceApp,
   type WorkspaceFavourite,
   WorkspaceResource,
@@ -225,7 +224,7 @@ interface UIFavouriteResource {
 }
 interface AllResourceStores {
   apps: UIWorkspaceApp[]
-  datasources: (Datasource | UIInternalDatasource)[]
+  datasources: (Datasource)[]
   tables: Table[]
   queries: Query[]
 }

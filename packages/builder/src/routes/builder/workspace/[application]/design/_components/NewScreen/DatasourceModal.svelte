@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Body, Layout, Link, ModalContent } from "@budibase/bbui"
-import type { Datasource, UIInternalDatasource } from "@budibase/types"
+import type { Datasource } from "@budibase/types"
 import { createEventDispatcher } from "svelte"
 import ICONS from "@/components/backend/DatasourceNavigator/icons"
 import { IntegrationNames } from "@/constants"
@@ -14,8 +14,8 @@ export let selectedTablesAndViews: SourceOption[]
 
 const dispatch = createEventDispatcher()
 const getTablesAndViews = (
-  datasource: Datasource | UIInternalDatasource,
-  datasources: (Datasource | UIInternalDatasource)[]
+  datasource: Datasource,
+  datasources: (Datasource)[]
 ) => {
   let tablesAndViews: SourceOption[] = []
   const tables = Array.isArray(datasource.entities)
@@ -35,7 +35,7 @@ const getTablesAndViews = (
   return tablesAndViews
 }
 
-const getDatasources = (rawDatasources: (Datasource | UIInternalDatasource)[]) => {
+const getDatasources = (rawDatasources: (Datasource)[]) => {
   const datasources = []
 
   for (const rawDatasource of rawDatasources) {

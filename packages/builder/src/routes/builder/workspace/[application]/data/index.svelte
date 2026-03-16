@@ -1,35 +1,32 @@
 <script lang="ts">
 import { goto } from "@roxi/routify"
 import { onMount } from "svelte"
+import type { Datasource, Table } from "@budibase/types"
 import { datasources } from "@/stores/builder"
 
 $goto
 
+const getFirstTableId = (datasource: Datasource): string | undefined => {
+  const entities = datasource.entities
+  if (!entities) return undefined
+
+  const entries = Object.entries(entities as Record<string, Table>)
+  return entries.find(([_, table]) => table?._id)?.[1]?._id
+}
+
 onMount(() => {
-  // Get first valid table ID of first datasource
   let tableId: string | undefined
   for (let ds of $datasources.list) {
-    if (Array.isArray(ds.entities) && ds.entities.length > 0) {
-      if (ds.entities[0]?._id) {
-        tableId = ds.entities[0]._id
-        break
-      }
-    } else {
-      const keys = Object.keys(ds.entities || {})
-      if (keys.length > 0 && keys[0]) {
-        tableId = keys[0]
-        break
-      }
-    }
+    tableId = getFirstTableId(ds)
+    if (tableId) break
   }
   if ($datasources.hasData && tableId) {
     $goto(`../table/[tableId]`, { tableId })
   } else if ($datasources.hasData) {
     $goto(`../datasource/[datasourceId]`, {
-      datasourceId: $datasources.list[0]._id!
+      datasourceId: $datasources.list[0]._id!,
     })
-  } 
-  else {
+  } else {
     $goto("../new")
   }
 })

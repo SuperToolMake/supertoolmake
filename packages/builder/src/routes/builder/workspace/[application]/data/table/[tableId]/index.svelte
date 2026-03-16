@@ -7,7 +7,6 @@ import {
   type Datasource,
   type Table,
   type UIDatasource,
-  type UIInternalDatasource,
 } from "@budibase/types"
 import { getContext, onDestroy } from "svelte"
 import { productionAPI } from "@/api"
@@ -78,7 +77,7 @@ const syncProductionRowSubscription = (shouldSubscribe: boolean, context?: GridS
   }
 }
 
-const relationshipSupport = (datasource?: Datasource | UIDatasource | UIInternalDatasource) => {
+const relationshipSupport = (datasource?: Datasource | UIDatasource) => {
   if (!(datasource && "source" in datasource)) {
     return false
   }

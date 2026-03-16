@@ -5,13 +5,10 @@ import {
   type RestTemplateName,
   type RestTemplateSpecVersion,
   SourceName,
-  type Table,
   type UIIntegration,
-  type UIInternalDatasource,
 } from "@budibase/types"
 import { derived, get, type Readable, type Writable } from "svelte/store"
 import { API } from "@/api"
-import { TableNames } from "@/constants"
 import { BUDIBASE_INTERNAL_DB_ID } from "@/constants/backend"
 import { DerivedBudiStore } from "@/stores/BudiStore"
 import { queries } from "./queries"
@@ -41,8 +38,8 @@ interface BuilderDatasourceStore {
 }
 
 interface DerivedDatasourceStore extends BuilderDatasourceStore {
-  list: (Datasource | UIInternalDatasource)[]
-  selected?: Datasource | UIInternalDatasource
+  list: (Datasource)[]
+  selected?: Datasource
   hasData: boolean
 }
 
@@ -57,30 +54,10 @@ export class DatasourceStore extends DerivedBudiStore<
   constructor() {
     const makeDerivedStore = (store: Writable<BuilderDatasourceStore>) => {
       return derived([store, tables], ([$store, $tables]) => {
-        // Set the internal datasource entities from the table list, which we're
-        // able to keep updated unlike the egress generated definition of the
-        // internal datasource
-        let internalDS: Datasource | UIInternalDatasource | undefined = $store.rawList?.find(
-          (ds) => ds._id === BUDIBASE_INTERNAL_DB_ID
-        )
-        const otherDS = $store.rawList?.filter((ds) => ds._id !== BUDIBASE_INTERNAL_DB_ID)
-        if (internalDS) {
-          const tables: Table[] = $tables.list?.filter((table: Table) => {
-            return table.sourceId === BUDIBASE_INTERNAL_DB_ID && table._id !== TableNames.USERS
-          })
-          internalDS = {
-            ...internalDS,
-            entities: tables,
-          }
-        }
+        const externalDS = $store.rawList?.filter((ds) => ds._id !== BUDIBASE_INTERNAL_DB_ID)
 
         // Build up enriched DS list
-        // Only add the internal DS if we have at least one non-users table
-        let list: (UIInternalDatasource | Datasource)[] = []
-        if (internalDS?.entities?.length) {
-          list.push(internalDS)
-        }
-        list = list.concat(otherDS || [])
+        const list = externalDS || []
 
         return {
           ...$store,

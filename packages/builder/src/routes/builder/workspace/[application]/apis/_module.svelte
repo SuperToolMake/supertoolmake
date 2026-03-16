@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Layout } from "@budibase/bbui"
-import type { Datasource, UIInternalDatasource } from "@budibase/types"
+import type { Datasource } from "@budibase/types"
 import { goto as gotoStore, isActive } from "@roxi/routify"
 import { onMount } from "svelte"
 import DatasourceNavigator from "@/components/backend/DatasourceNavigator/DatasourceNavigator.svelte"
@@ -35,7 +35,7 @@ const datasourceFilter = (datasource: any) => datasource.source === IntegrationT
 
 $: goto = $gotoStore
 
-type SortableDatasource = Pick<Datasource | UIInternalDatasource, "name">
+type SortableDatasource = Pick<Datasource, "name">
 
 const [resizable, resizableHandle] = getHorizontalResizeActions(panelWidth, (width: number) => {
   if (width) {

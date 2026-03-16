@@ -5,7 +5,6 @@ import type {
   Query,
   QuerySchema,
   RestAuthConfig,
-  UIInternalDatasource,
 } from "@budibase/types"
 import { RestAuthType } from "@budibase/types"
 import { cloneDeep } from "lodash"
@@ -279,7 +278,7 @@ export function prettifyQueryRequestBody(query: Query, mergedBindings: EnrichedB
 }
 
 export function buildAuthConfigs(
-  datasource: Datasource | UIInternalDatasource | undefined
+  datasource: Datasource | undefined
 ): Array<{ label: string; value: string }> {
   if (datasource?.config?.authConfigs) {
     return datasource.config.authConfigs.map((c: RestAuthConfig) => ({
@@ -307,7 +306,7 @@ const isRestAuthConfig = (value: unknown): value is RestAuthConfig => {
   return typeof value._id === "string" && isRestAuthType(value.type)
 }
 
-export function getDefaultRestAuthConfig(datasource: Datasource | UIInternalDatasource | undefined):
+export function getDefaultRestAuthConfig(datasource: Datasource | undefined):
   | {
       authConfigId: string
       authConfigType: RestAuthType

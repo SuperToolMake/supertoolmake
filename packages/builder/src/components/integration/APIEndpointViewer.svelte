@@ -20,7 +20,6 @@ import {
   type Query,
   type RestTemplate,
   type RestTemplateSpec,
-  type UIInternalDatasource,
 } from "@budibase/types"
 import { goto as gotoStore, params } from "@roxi/routify"
 import { isEqual } from "lodash"
@@ -524,7 +523,7 @@ let baseUrl: string | undefined
 let response: PreviewQueryResponse
 let query: Query | undefined
 let template: RestTemplate | undefined
-let datasource: Datasource | UIInternalDatasource | undefined
+let datasource: Datasource | undefined
 let authConfigs: AuthConfigOption[] = []
 let defaultAuthApplied = false
 let defaultAuthKey: string | undefined
