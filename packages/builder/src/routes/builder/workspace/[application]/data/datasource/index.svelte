@@ -8,11 +8,11 @@ $goto
 onMount(async () => {
   const { list, selected, hasData } = $datasources
   if (selected) {
-    $goto(`./${selected?._id}`)
+    $goto(`../[datasourceId]`, { datasourceId: selected?._id })
   } else if (hasData && list?.length) {
-    $goto(`./${list[0]._id}`)
+    $goto(`../[datasourceId]`, { datasourceId: list[0]._id })
   } else {
-    $goto("../new")
+    $goto("../../new")
   }
 })
 </script>
