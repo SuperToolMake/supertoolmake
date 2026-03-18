@@ -2,10 +2,12 @@ import { helpers, RoleColor } from "@budibase/shared-core"
 import {
   BuiltinPermissionID,
   type Database,
+  InternalTable,
   PermissionLevel,
   type Role as RoleDoc,
   type RoleUIMetadata,
   type Screen,
+  type Table,
   type Workspace,
 } from "@budibase/types"
 import { uniqBy } from "lodash"
@@ -487,6 +489,10 @@ export async function getAllRoles(appId?: string): Promise<RoleDoc[]> {
 }
 
 async function shouldIncludePowerRole(db: Database) {
+  if (await hasLegacyPowerRole(db)) {
+    return true
+  }
+
   const app = await db.tryGet<Workspace>(DocumentType.WORKSPACE_METADATA)
   const creationVersion = app?.creationVersion
   if (!(creationVersion && semver.valid(creationVersion))) {
@@ -496,6 +502,24 @@ async function shouldIncludePowerRole(db: Database) {
 
   const isGreaterThan3x = semver.gte(creationVersion, env.MIN_VERSION_WITHOUT_POWER_ROLE)
   return !isGreaterThan3x
+}
+
+async function hasLegacyPowerRole(db: Database) {
+  const usersTable = await db.tryGet<Table>(InternalTable.USER_METADATA)
+  const inclusion = usersTable?.schema?.roleId?.constraints?.inclusion
+  if (!Array.isArray(inclusion)) {
+    return false
+  }
+
+  const containsPower = inclusion.some(roleId =>
+    roleIDsAreEqual(roleId, BUILTIN_IDS.POWER)
+  )
+  if (!containsPower) {
+    return false
+  }
+
+  // Imported workspaces can still carry POWER as part of the legacy custom-role set.
+  return inclusion.some(roleId => !isBuiltin(roleId))
 }
 
 export class AccessController {
