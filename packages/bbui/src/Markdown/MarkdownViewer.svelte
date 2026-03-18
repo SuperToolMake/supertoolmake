@@ -70,4 +70,9 @@ $: updateValue(ref, value)
   .markdown-viewer :global(a:hover) {
     color: var(--primaryColorHover);
   }
+  /* Markdown italics */
+  .markdown-viewer :global(em),
+  .markdown-viewer :global(i) {
+    font-style: italic !important;
+  }
 </style>
