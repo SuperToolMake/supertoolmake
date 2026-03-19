@@ -5,8 +5,8 @@ import {
   isBasicSearchOperator,
   isLogicalSearchOperator,
   isRangeSearchOperator,
-  SearchFilters,
-  Table,
+  type SearchFilters,
+  type Table,
 } from "@budibase/types"
 import sdk from "../.."
 import { isInternal } from "../tables/utils"
@@ -25,11 +25,8 @@ const isAllowedFilterKey = (key: string): boolean =>
   isRangeSearchOperator(key) ||
   isLogicalSearchOperator(key)
 
-export const validateFilters = (
-  filters: SearchFilters,
-  validFields: string[]
-) => {
-  validFields = validFields.map(f => f.toLowerCase())
+export const validateFilters = (filters: SearchFilters, validFields: string[]) => {
+  validFields = validFields.map((f) => f.toLowerCase())
   for (const key of Object.keys(filters || {}) as (keyof SearchFilters)[]) {
     if (!isAllowedFilterKey(key)) {
       throw new HTTPError(`Invalid filter operator: ${key}`, 400)
