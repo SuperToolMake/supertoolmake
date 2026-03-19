@@ -101,7 +101,7 @@ const generateResourceLookup = (allResourceStores: Readable<AllResourceStores>) 
 
         const entry: UIFavouriteResource = {
           name: resource.name,
-          icon: isRestQuery ? "webhooks-logo" : ResourceIcons[favourite.resourceType],
+          icon: isRestQuery ? "globe-simple" : ResourceIcons[favourite.resourceType],
         }
 
         if (favourite.resourceType === WorkspaceResource.WORKSPACE_APP) {
@@ -309,7 +309,7 @@ onDestroy(() => {
             />
 
             <SideNavLink
-              icon="webhooks-logo"
+              icon="globe-simple"
               text="APIs"
               url={$url("./apis", { application: appId })}
               isActive={$isActive("./apis", { application: appId })}

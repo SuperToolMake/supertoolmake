@@ -58,7 +58,7 @@ const datasourceCommands = (datasourceList) => {
   return datasourceList.map((datasource) => ({
     type: "Datasource",
     name: datasource.name,
-    icon: datasource.source === IntegrationTypes.REST ? "webhooks-logo" : "database",
+    icon: datasource.source === IntegrationTypes.REST ? "globe-simple" : "database",
     action: () =>
       $goto(
         datasource.source === IntegrationTypes.REST
