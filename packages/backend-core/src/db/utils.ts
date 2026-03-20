@@ -14,8 +14,6 @@ import { directCouchAllDbs, doWithDB } from "./db"
 export * from "../docIds"
 
 /**
- * if in production this will use the CouchDB _all_dbs call to retrieve a list of databases. If testing
- * when using Pouch it will use the pouchdb-all-dbs package.
  * opts.efficient can be provided to make sure this call is always quick in a multi-tenant environment,
  * but it may not be 100% accurate in full efficiency mode (some tenantless workspaces may be missed).
  */

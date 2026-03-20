@@ -62,8 +62,6 @@
     "passport-google-oauth": "2.0.0",
     "passport-local": "1.0.0",
     "pouchdb": "7.3.0",
-    "pouchdb-all-dbs": "1.1.1",
-    "server-destroy": "1.0.1",
     "undici": "^7.24.0",
     "uuid": "^8.3.2",
     "yaml": "^2.8.0"
@@ -76,7 +74,6 @@
     "@types/maildev": "^0.0.7",
     "@types/node-fetch": "2.6.4",
     "@types/nodemailer": "^6.4.17",
-    "@types/server-destroy": "1.0.1",
     "@types/supertest": "2.0.14",
     "@types/uuid": "8.3.4",
     "cheerio": "^1.0.0",
