@@ -15,7 +15,7 @@ import {
   Tabs,
   TextArea,
 } from "@budibase/bbui"
-import { goto, params } from "@roxi/routify"
+import { goto as gotoStore, params } from "@roxi/routify"
 import { cloneDeep } from "lodash/fp"
 import { onMount } from "svelte"
 import { EditorModes } from "@/components/common/CodeEditor"
@@ -53,7 +53,7 @@ import {
 import RestBodyInput from "./RestBodyInput.svelte"
 import AuthPicker from "./rest/AuthPicker.svelte"
 
-$goto
+$: goto = $gotoStore
 $params
 
 export let queryId
@@ -181,8 +181,9 @@ async function saveQuery(redirectIfNew = true) {
 
     queryNameLabel.disableEditingState()
     return { ok: true }
-  } catch {
-    notifications.error(`Error saving query`)
+  } catch (e) {
+    console.error("Error saving query:", e)
+    notifications.error(`Error saving query: ${e?.message || e}`)
   } finally {
     saving = false
   }

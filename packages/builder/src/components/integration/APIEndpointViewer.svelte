@@ -339,7 +339,8 @@ async function saveQuery(redirectIfNew = true) {
     localDynamicVariables = undefined
 
     return { ok: true }
-  } catch {
+  } catch (e) {
+    console.error("Error saving query:", e)
     notifications.error(`Error saving query`)
   } finally {
     savingQuery = false
