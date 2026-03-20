@@ -14,6 +14,7 @@ export type RestTemplateName =
   | "GitHub"
   | "Jira Cloud"
   | "Microsoft Teams"
+  | "MinIO"
   | "Okta Management"
   | "PagerDuty"
   | "ServiceNow"
