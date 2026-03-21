@@ -141,6 +141,21 @@ describe("rest", () => {
     restoreEnv?.()
   })
 
+  it("should save a query twice without conflict", async () => {
+    const query1 = await createQuery({ path: "example.com" })
+    expect(query1._id).toBeDefined()
+    expect(query1._rev).toBeDefined()
+
+    const query2 = await config.api.query.save({
+      ...query1,
+      name: "Updated",
+      _rev: undefined,
+    })
+    expect(query2.name).toBe("Updated")
+    expect(query2._rev).toBeDefined()
+    expect(query2._rev).not.toBe(query1._rev)
+  })
+
   it("should automatically retry on fail with cached dynamics", async () => {
     const basedOnQuery = await createQuery({
       path: "example.com",

@@ -189,12 +189,11 @@ export async function save(ctx: UserCtx<SaveQueryRequest, SaveQueryResponse>) {
     // flag to state whether the default bindings are empty strings (old behaviour) or null
     query.nullDefaultSupport = true
   } else {
-    // check if flag has previously been set, don't let it change
-    // allow it to be explicitly set to false via API incase this is ever needed
     const existingQuery = await db.get<Query>(query._id)
     if (existingQuery.nullDefaultSupport && query.nullDefaultSupport == null) {
       query.nullDefaultSupport = true
     }
+    query._rev = existingQuery._rev
   }
   const response = await db.put(query)
   query._rev = response.rev
