@@ -796,8 +796,8 @@ $: if (
       <CodeEditor
         value={requestURL}
         mode={EditorModes.Handlebars}
-        readonly
         lineWrapping={false}
+        enabledLineNumbers={false}
       />
     </div>
     <div class="send" class:loaded={selectedEndpointOption}>

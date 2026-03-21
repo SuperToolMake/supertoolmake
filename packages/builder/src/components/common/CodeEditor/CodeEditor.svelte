@@ -79,6 +79,7 @@ export const DropdownPosition = {
   export let jsBindingWrapping = true
   export let readonly = false
   export let readonlyLineNumbers = false
+  export let enabledLineNumbers = true
   export let dropdown = DropdownPosition.Relative
   export let bindings: EnrichedBinding[] = []
   export let bindingIcons: Record<string, string | undefined> = {}
@@ -341,10 +342,6 @@ const getCompletionIcon = (completion: Completion) => {
       complete = [
         ...complete,
         history(),
-        highlightActiveLine(),
-        highlightActiveLineGutter(),
-        lineNumbers(),
-        foldGutter(),
         keymap.of(buildKeymap()),
         EditorView.domEventHandlers({
           blur: () => {
@@ -359,6 +356,12 @@ const getCompletionIcon = (completion: Completion) => {
           dispatch("change", docStr)
         }),
       ]
+      if (enabledLineNumbers) {
+        complete.push(lineNumbers())
+        complete.push(highlightActiveLineGutter())
+        complete.push(foldGutter())
+        complete.push(highlightActiveLine())
+      }
     }
 
     return complete

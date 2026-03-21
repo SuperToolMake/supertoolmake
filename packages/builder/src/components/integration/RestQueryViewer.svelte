@@ -295,9 +295,6 @@ const shouldShowVariables = (dynamicVariables, variablesReadOnly) => {
 }
 
 const urlChanged = (evt) => {
-  if (isTemplateDatasource) {
-    return
-  }
   breakQs = {}
   const fullUrl = evt.detail
   if (!fullUrl) return
@@ -558,7 +555,6 @@ onMount(async () => {
               on:blur={urlChanged}
               value={url}
               placeholder="http://www.api.com/endpoint"
-              readonly={isTemplateDatasource}
             />
           </div>
           <Button primary disabled={!url} on:click={runQuery}>Send</Button>
