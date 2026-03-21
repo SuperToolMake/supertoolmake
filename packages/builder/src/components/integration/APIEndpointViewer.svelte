@@ -383,6 +383,28 @@ const onUpdateParams = (e: CustomEvent<Array<{ name: string; value: string }>>) 
   queryParams = keyValueArrayToRecord(e.detail)
 }
 
+const onChangeUrl = (e: CustomEvent<string>) => {
+  const fullUrl = e.detail
+  if (!fullUrl || !query) return
+
+  const [basePath, qs] = fullUrl?.split("?") || []
+  query.fields.path = basePath || fullUrl
+
+  if (qs && qs.length > 0) {
+    const parts = qs.split("&")
+    const newParams: Record<string, string> = {}
+    for (const part of parts) {
+      const [key, value] = part.split("=")
+      if (key) {
+        newParams[key] = value || ""
+      }
+    }
+    queryParams = newParams
+  } else if (queryParams && Object.keys(queryParams).length > 0) {
+    queryParams = {}
+  }
+}
+
 const onUpdateBindings = (e: CustomEvent<Array<{ name: string; value: string }>>) => {
   const newBindings = keyValueArrayToRecord(e.detail)
   requestBindings = newBindings
@@ -798,6 +820,7 @@ $: if (
         mode={EditorModes.Handlebars}
         lineWrapping={false}
         enabledLineNumbers={false}
+        on:change={onChangeUrl}
       />
     </div>
     <div class="send" class:loaded={selectedEndpointOption}>
