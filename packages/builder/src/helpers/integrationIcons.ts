@@ -1,13 +1,34 @@
 import type { ComponentType } from "svelte"
 import { get } from "svelte/store"
-import ICONS from "@/components/backend/DatasourceNavigator/icons"
 import { integrations } from "@/stores/builder/integrations"
-
-type IntegrationIcon = (typeof ICONS)[keyof typeof ICONS]
+import MinIO from "@/components/backend/DatasourceNavigator/icons/MinIO.svelte"
+import MySQL from "@/components/backend/DatasourceNavigator/icons/MySQL.svelte"
 
 export type IconInfo =
-  | { icon: IntegrationIcon | ComponentType; url?: never }
-  | { url: string; icon?: never }
+  | { icon: string; color?: string; component?: never; url?: never }
+  | { component: ComponentType; color?: string; icon?: never; url?: never }
+  | { url: string; icon?: never; component?: never; color?: never }
+
+export const PHOSPHOR_ICONS: Record<string, { name: string; weight?: string; color?: string }> = {
+  POSTGRES: { name: "lightning", weight: "duotone", color: "#3DD08E" },
+  MONGODB: { name: "leaf", weight: "duotone", color: "#4B9E46" },
+  SQL_SERVER: { name: "database", weight: "duotone", color: "#0072C6" },
+  REST: { name: "globe-simple", weight: "duotone" },
+  FIRESTORE: { name: "flame", weight: "duotone", color: "#FFA000" },
+  REDIS: { name: "shapes", weight: "duotone", color: "#DC382D" },
+  CUSTOM: { name: "plugs-connected", weight: "duotone", color: "#6B6B6B" },
+}
+
+export const SVELTE_COMPONENT_ICONS: Record<string, { component: ComponentType; color: string }> = {
+  MINIO: {
+    component: MinIO,
+    color: "#C72E49",
+  },
+  MYSQL: {
+    component: MySQL,
+    color: "#00758F",
+  },
+}
 
 export const getIntegrationIcon = (
   integrationType: string,
@@ -25,11 +46,18 @@ export const getIntegrationIcon = (
   if (integration?.iconUrl) {
     return { url: integration.iconUrl }
   }
-  const icon = ICONS[integrationType as keyof typeof ICONS]
+
+  if (SVELTE_COMPONENT_ICONS[integrationType]) {
+    const { component, color } = SVELTE_COMPONENT_ICONS[integrationType]
+    return { component, color }
+  }
+
   const isCustom =
     typeof schema === "object" && schema !== null && "custom" in schema && schema.custom
-  if (isCustom || !icon) {
-    return { icon: ICONS.CUSTOM }
+  const iconData = PHOSPHOR_ICONS[integrationType] || (isCustom ? PHOSPHOR_ICONS.CUSTOM : undefined)
+  if (!iconData) {
+    return
   }
-  return { icon }
+  const weightClass = iconData.weight ? ` ph-${iconData.weight}` : ""
+  return { icon: `ph-${iconData.name}${weightClass}`, color: iconData.color }
 }

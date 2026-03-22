@@ -2,7 +2,7 @@
 import { Body, Layout, Link, ModalContent } from "@budibase/bbui"
 import type { Datasource } from "@budibase/types"
 import { createEventDispatcher } from "svelte"
-import ICONS from "@/components/backend/DatasourceNavigator/icons"
+import { PHOSPHOR_ICONS, SVELTE_COMPONENT_ICONS } from "@/helpers/integrationIcons"
 import { IntegrationNames } from "@/constants"
 import { appStore, datasources as datasourcesStore } from "@/stores/builder"
 import TableOrViewOption from "./TableOrViewOption.svelte"
@@ -40,13 +40,24 @@ const getDatasources = (rawDatasources: Datasource[]) => {
       continue
     }
 
-    const datasource = {
-      name: rawDatasource.name,
-      iconComponent: ICONS[rawDatasource.source],
-      tablesAndViews: getTablesAndViews(rawDatasource, rawDatasources),
+    if (SVELTE_COMPONENT_ICONS[rawDatasource.source]) {
+      const { component, color } = SVELTE_COMPONENT_ICONS[rawDatasource.source]
+      datasources.push({
+        name: rawDatasource.name,
+        iconComponent: component,
+        iconColor: color,
+        tablesAndViews: getTablesAndViews(rawDatasource, rawDatasources),
+      })
+    } else {
+      const iconData = PHOSPHOR_ICONS[rawDatasource.source] || PHOSPHOR_ICONS.CUSTOM
+      const weightClass = iconData.weight ? ` ph-${iconData.weight}` : ""
+      datasources.push({
+        name: rawDatasource.name,
+        iconClass: `ph-${iconData.name}${weightClass}`,
+        iconColor: iconData.color,
+        tablesAndViews: getTablesAndViews(rawDatasource, rawDatasources),
+      })
     }
-
-    datasources.push(datasource)
   }
 
   return datasources
@@ -78,11 +89,18 @@ $: dataUrl = $appStore.appId ? `/builder/workspace/${$appStore.appId}/data` : ""
       {#each datasources as datasource}
         <div class="datasource">
           <div class="header">
-            <svelte:component
-              this={datasource.iconComponent}
-              height="18"
-              width="18"
-            />
+            {#if datasource.iconComponent}
+              <svelte:component
+                this={datasource.iconComponent}
+                width="18"
+                height="18"
+              />
+            {:else}
+              <i
+                class={datasource.iconClass}
+                style="font-size: 18px; color: {datasource.iconColor};"
+              ></i>
+            {/if}
             <h2>{datasource.name}</h2>
           </div>
           <!-- List all tables -->

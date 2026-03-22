@@ -1,4 +1,5 @@
 <script>
+import { onMount } from "svelte"
 import { BannerDisplay, Context, NotificationDisplay } from "@budibase/bbui"
 import { Router } from "@roxi/routify"
 import { parse, stringify } from "qs"
@@ -8,6 +9,18 @@ import routes from "../.routify/routes.default.js"
 const queryHandler = { parse, stringify }
 
 setContext(Context.PopoverRoot, "body")
+
+onMount(() => {
+  const links = [
+    "https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/duotone/style.css",
+  ]
+  for (const href of links) {
+    const link = document.createElement("link")
+    link.rel = "stylesheet"
+    link.href = href
+    document.head.appendChild(link)
+  }
+})
 </script>
 
 <div class="banner-container"></div>

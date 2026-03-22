@@ -3,11 +3,12 @@ import { Body } from "@budibase/bbui"
 
 export let title
 export let disabled
+export let large = false
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div on:click class:disabled class="option">
+<div on:click class:disabled class="option" class:large>
   <div class="header">
     <div class="icon">
       <slot />
@@ -50,5 +51,13 @@ export let disabled
   .disabled {
     opacity: 0.5;
     pointer-events: none;
+  }
+
+  .large {
+    padding: 20px 24px;
+  }
+
+  .large :global(p) {
+    font-size: 1rem;
   }
 </style>

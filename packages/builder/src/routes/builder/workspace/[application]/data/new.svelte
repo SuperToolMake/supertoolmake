@@ -38,10 +38,12 @@ $: disabled = externalDatasourceLoading
         on:click={() => externalDatasourceModal.show(integration)}
         title={integration.friendlyName}
         {disabled}
+        large
       >
         <IntegrationIcon
           integrationType={integration.name}
           schema={integration}
+          size="32"
         />
       </DatasourceOption>
     {/each}
@@ -64,10 +66,10 @@ $: disabled = externalDatasourceLoading
     display: grid;
     column-gap: 24px;
     row-gap: 24px;
-    grid-template-columns: repeat(auto-fit, 235px);
+    grid-template-columns: repeat(3, 1fr);
     justify-content: center;
     margin-bottom: 48px;
-    max-width: 1050px;
+    max-width: 1200px;
   }
   .options {
     grid-column: 1 / -1;

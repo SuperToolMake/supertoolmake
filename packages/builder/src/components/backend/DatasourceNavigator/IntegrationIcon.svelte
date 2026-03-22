@@ -8,9 +8,15 @@ export let size = "18"
 $: iconInfo = getIntegrationIcon(integrationType, schema, iconUrl)
 </script>
 
-{#if iconInfo.icon}
-  <svelte:component this={iconInfo.icon} height={size} width={size} />
-{:else if iconInfo.url}
+{#if iconInfo?.component}
+  <svelte:component this={iconInfo.component} width={size} height={size} />
+{:else if iconInfo?.icon}
+  <i
+    class={iconInfo.icon}
+    style="font-size: {size}px; display: flex; align-items: center; color: {iconInfo.color ||
+      'inherit'};"
+  ></i>
+{:else if iconInfo?.url}
   <img
     src={iconInfo.url}
     alt=""
