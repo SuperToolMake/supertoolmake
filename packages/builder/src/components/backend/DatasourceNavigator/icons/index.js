@@ -6,6 +6,7 @@ import Postgres from "./Postgres.svelte"
 import Redis from "./Redis.svelte"
 import Rest from "./Rest.svelte"
 import SqlServer from "./SQLServer.svelte"
+import MinIO from "./MinIO.svelte"
 
 const ICONS = {
   POSTGRES: Postgres,
@@ -15,6 +16,7 @@ const ICONS = {
   REST: Rest,
   FIRESTORE: Firebase,
   REDIS: Redis,
+  MINIO: MinIO,
   CUSTOM: Custom,
 }
 

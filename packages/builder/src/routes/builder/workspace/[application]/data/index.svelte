@@ -2,6 +2,7 @@
 import { goto } from "@roxi/routify"
 import { onMount } from "svelte"
 import type { Datasource, Table } from "@budibase/types"
+import { IntegrationTypes } from "@/constants/backend"
 import { datasources } from "@/stores/builder"
 
 $goto
@@ -15,16 +16,17 @@ const getFirstTableId = (datasource: Datasource): string | undefined => {
 }
 
 onMount(() => {
+  const nonRestDatasources = $datasources.list.filter((ds) => ds.source !== IntegrationTypes.REST)
   let tableId: string | undefined
-  for (let ds of $datasources.list) {
+  for (let ds of nonRestDatasources) {
     tableId = getFirstTableId(ds)
     if (tableId) break
   }
-  if ($datasources.hasData && tableId) {
+  if (nonRestDatasources.length > 0 && tableId) {
     $goto(`../table/[tableId]`, { tableId })
-  } else if ($datasources.hasData) {
+  } else if (nonRestDatasources.length > 0) {
     $goto(`../datasource/[datasourceId]`, {
-      datasourceId: $datasources.list[0]._id!,
+      datasourceId: nonRestDatasources[0]._id!,
     })
   } else {
     $goto("../new")

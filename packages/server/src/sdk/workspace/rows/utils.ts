@@ -32,6 +32,7 @@ const SQL_CLIENT_SOURCE_MAP: Record<SourceName, SqlClient | undefined> = {
   [SourceName.REST]: undefined,
   [SourceName.FIRESTORE]: undefined,
   [SourceName.REDIS]: undefined,
+  [SourceName.MINIO]: undefined,
 }
 
 const XSS_INPUT_REGEX =

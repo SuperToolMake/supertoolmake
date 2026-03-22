@@ -16,7 +16,6 @@ import IntercomLogo from "assets/rest-template-icons/intercom.svg"
 import JiraLogo from "assets/rest-template-icons/jira.svg"
 import MicrosoftSharepointLogo from "assets/rest-template-icons/microsoft-sharepoint.svg"
 import MicrosoftTeamsLogo from "assets/rest-template-icons/microsoft-teams.svg"
-import MinIOLogo from "assets/rest-template-icons/minio.svg"
 import NotionLogo from "assets/rest-template-icons/notion.svg"
 import OktaLogo from "assets/rest-template-icons/okta.svg"
 import OpenRouterLogo from "assets/rest-template-icons/openrouter.svg"
@@ -1892,18 +1891,6 @@ const INITIAL_REST_TEMPLATES_STATE: RestTemplatesState = {
       ],
       operationsCount: 552,
       icon: MicrosoftTeamsLogo,
-    },
-    {
-      name: "MinIO",
-      description: "High-performance object storage system, ideal for AI/DL workloads.",
-      specs: [
-        {
-          version: "0.1.0",
-          url: "https://raw.githubusercontent.com/Budibase/openapi-rest-templates/main/minio/openapi.yaml",
-        },
-      ],
-      operationsCount: 36,
-      icon: MinIOLogo,
     },
     {
       name: "Notion",

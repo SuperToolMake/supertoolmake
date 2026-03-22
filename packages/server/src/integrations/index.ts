@@ -7,6 +7,7 @@ import {
 import cloneDeep from "lodash/cloneDeep"
 import firebase from "./firebase"
 import sqlServer from "./microsoftSqlServer"
+import minio from "./minio"
 import mongodb from "./mongodb"
 import mysql from "./mysql"
 import postgres from "./postgres"
@@ -21,6 +22,7 @@ const DEFINITIONS: Record<SourceName, Integration | undefined> = {
   [SourceName.REST]: rest.schema,
   [SourceName.FIRESTORE]: firebase.schema,
   [SourceName.REDIS]: redis.schema,
+  [SourceName.MINIO]: minio.schema,
 }
 
 type IntegrationBaseConstructor = new (...args: any[]) => IntegrationBase
@@ -40,6 +42,7 @@ const INTEGRATIONS: Record<SourceName, IntegrationBaseConstructor | undefined> =
   [SourceName.REST]: rest.integration,
   [SourceName.FIRESTORE]: firebase.integration,
   [SourceName.REDIS]: redis.integration,
+  [SourceName.MINIO]: minio.integration,
 }
 
 export async function getDefinition(source: SourceName): Promise<Integration | undefined> {
