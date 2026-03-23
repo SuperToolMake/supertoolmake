@@ -71,7 +71,7 @@ export function getComponentStructure({ chatbox } = { chatbox: false }) {
         "relationshipfield",
         "datetimefield",
         "multifieldselect",
-        "s3upload",
+        "fileupload",
         "signaturesinglefield",
         "bbreferencesinglefield",
         "bbreferencefield",

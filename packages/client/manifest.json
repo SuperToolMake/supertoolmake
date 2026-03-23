@@ -5144,8 +5144,8 @@
       ]
     }
   },
-  "s3upload": {
-    "name": "S3 File Upload",
+  "fileupload": {
+    "name": "File Upload",
     "icon": "cloud-arrow-up",
     "styles": ["size"],
     "editable": true,
@@ -5155,7 +5155,7 @@
     },
     "settings": [
       {
-        "type": "field/s3",
+        "type": "field/fileupload",
         "label": "Field",
         "key": "field"
       },
@@ -5165,10 +5165,9 @@
         "key": "label"
       },
       {
-        "type": "dataSource/s3",
-        "label": "S3 datasource",
-        "key": "datasourceId",
-        "info": "This component can't be used with S3 datasources that use custom endpoints"
+        "type": "dataSource/store",
+        "label": "Object store",
+        "key": "datasourceId"
       },
       {
         "type": "text",

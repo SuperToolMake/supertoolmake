@@ -1,12 +1,16 @@
 import fs from "node:fs"
 import path from "node:path"
-import { BadRequestError, configs, context, objectStore } from "@budibase/backend-core"
+import { PutObjectCommand, S3 } from "@aws-sdk/client-s3"
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+import { BadRequestError, configs, context, objectStore, utils } from "@budibase/backend-core"
 import { InvalidFileExtensions } from "@budibase/shared-core"
 import { processString } from "@budibase/string-templates"
 import {
   type AppProps,
   type Ctx,
   DocumentType,
+  type GetSignedUploadUrlRequest,
+  type GetSignedUploadUrlResponse,
   type ProcessAttachmentResponse,
   type ServeAppResponse,
   type ServeBuilderPreviewResponse,
@@ -277,4 +281,55 @@ export const serveServiceWorker = async (ctx: Ctx) => {
 
   ctx.set("Content-Type", "application/javascript")
   ctx.body = serviceWorkerContent
+}
+
+export const getSignedUploadURL = async (
+  ctx: Ctx<GetSignedUploadUrlRequest, GetSignedUploadUrlResponse>
+) => {
+  // Ensure datasource is valid
+  let datasource
+  try {
+    const { datasourceId } = ctx.params
+    datasource = await sdk.datasources.get(datasourceId, { enriched: true })
+    if (!datasource) {
+      ctx.throw(400, "The specified datasource could not be found")
+    }
+  } catch (error) {
+    ctx.throw(400, "The specified datasource could not be found")
+  }
+
+  // Determine type of datasource and generate signed URL
+  let signedUrl
+  let publicUrl
+  const awsRegion = (datasource?.config?.region || "eu-west-1") as string
+  const { bucket, key } = ctx.request.body || {}
+  if (!bucket || !key) {
+    ctx.throw(400, "bucket and key values are required")
+  }
+  try {
+    let endpoint = datasource?.config?.endpoint
+    const useSSL = datasource?.config?.useSSL ?? true
+    if (endpoint && !utils.urlHasProtocol(endpoint)) {
+      endpoint = `${useSSL ? "https" : "http"}://${endpoint}`
+    }
+    const s3 = new S3({
+      region: awsRegion,
+      endpoint,
+      credentials: {
+        accessKeyId: datasource?.config?.accessKey as string,
+        secretAccessKey: datasource?.config?.secretKey as string,
+      },
+    })
+    const params = { Bucket: bucket, Key: key }
+    signedUrl = await getSignedUrl(s3, new PutObjectCommand(params))
+    if (endpoint) {
+      publicUrl = `${endpoint}/${bucket}/${key}`
+    } else {
+      throw Error("You must provide an endpoint.")
+    }
+  } catch (error: any) {
+    ctx.throw(400, error)
+  }
+
+  ctx.body = { signedUrl, publicUrl }
 }

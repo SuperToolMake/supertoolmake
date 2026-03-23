@@ -26,7 +26,7 @@ import MultiFieldSelect from "./controls/MultiFieldSelect.svelte"
 import OptionsEditor from "./controls/OptionsEditor/OptionsEditor.svelte"
 import { PhosphorIconSelect } from "./controls/PhosphorIconSelect"
 import RelationshipFilterEditor from "./controls/RelationshipFilterEditor.svelte"
-import S3DataSourceSelect from "./controls/S3DataSourceSelect.svelte"
+import StoreDataSourceSelect from "./controls/ObjectStoreDataSourceSelect.svelte"
 import SchemaSelect from "./controls/SchemaSelect.svelte"
 import SearchFieldSelect from "./controls/SearchFieldSelect.svelte"
 import SectionSelect from "./controls/SectionSelect.svelte"
@@ -43,7 +43,7 @@ const componentMap = {
   select: Select,
   radio: RadioGroup,
   dataSource: DataSourceSelect,
-  "dataSource/s3": S3DataSourceSelect,
+  "dataSource/store": StoreDataSourceSelect,
   "dataSource/filterable": FilterableSelect,
   dataProvider: DataProviderSelect,
   boolean: Checkbox,
@@ -86,7 +86,7 @@ const componentMap = {
   "field/datetime": FormFieldSelect,
   "field/attachment": FormFieldSelect,
   "field/attachment_single": FormFieldSelect,
-  "field/s3": Input,
+  "field/fileupload": Input,
   "field/link": FormFieldSelect,
   "field/array": FormFieldSelect,
   "field/json": FormFieldSelect,

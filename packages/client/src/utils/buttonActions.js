@@ -511,7 +511,7 @@ const handlerMap = {
   "Log Out": logoutHandler,
   "Close Screen Modal": closeScreenModalHandler,
   "Update State": updateStateHandler,
-  "Upload File to S3": s3UploadHandler,
+  "Upload File to Bucket": s3UploadHandler,
   "Export Data": exportDataHandler,
   "Continue if / Stop if": continueIfHandler,
   "Show Notification": showNotificationHandler,

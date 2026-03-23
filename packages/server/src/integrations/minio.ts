@@ -10,7 +10,7 @@ import { Client } from "minio"
 import { HOST_ADDRESS } from "./utils"
 
 export interface MinioConfig {
-  endPoint: string
+  endpoint: string
   port: number
   useSSL: boolean
   accessKey: string
@@ -35,7 +35,7 @@ const getSchema = () => {
       [DatasourceFeature.CONNECTION_CHECKING]: true,
     },
     datasource: {
-      endPoint: {
+      endpoint: {
         type: DatasourceFieldType.STRING,
         required: true,
         default: HOST_ADDRESS,
@@ -50,7 +50,7 @@ const getSchema = () => {
       useSSL: {
         type: DatasourceFieldType.BOOLEAN,
         required: false,
-        default: false,
+        default: true,
         display: "Use SSL",
       },
       accessKey: {
@@ -59,7 +59,7 @@ const getSchema = () => {
         display: "Access Key",
       },
       secretKey: {
-        type: DatasourceFieldType.STRING,
+        type: DatasourceFieldType.PASSWORD,
         required: true,
         display: "Secret Key",
       },
@@ -105,7 +105,7 @@ export class MinioIntegration implements IntegrationBase {
   constructor(config: MinioConfig) {
     this.config = config
     this.client = new Client({
-      endPoint: config.endPoint,
+      endPoint: config.endpoint,
       port: config.port,
       useSSL: config.useSSL,
       accessKey: config.accessKey,

@@ -127,7 +127,7 @@ onDestroy(() => {
   {field}
   {disabled}
   {validation}
-  type="s3upload"
+  type="fileupload"
   bind:fieldState
   bind:fieldApi
   defaultValue={[]}
