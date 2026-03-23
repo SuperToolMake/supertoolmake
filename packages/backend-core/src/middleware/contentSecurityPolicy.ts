@@ -1,6 +1,7 @@
 import crypto from "node:crypto"
 import type { Ctx } from "@budibase/types"
 import type { Middleware, Next } from "koa"
+import environment from "../environment"
 
 const CSP_DIRECTIVES = {
   "default-src": ["'self'"],
@@ -75,6 +76,13 @@ export const contentSecurityPolicy = (async (ctx: Ctx, next: Next) => {
   ctx.state.nonce = nonce
   const directives = { ...CSP_DIRECTIVES }
   directives["script-src"] = [...CSP_DIRECTIVES["script-src"], `'nonce-${nonce}'`]
+
+  const additionalConnectSrc = environment.CSP_ADDITIONAL_DIRECTIVES
+    ? environment.CSP_ADDITIONAL_DIRECTIVES.split(",").map((s) => s.trim())
+    : []
+  if (additionalConnectSrc.length > 0) {
+    directives["connect-src"] = [...CSP_DIRECTIVES["connect-src"], ...additionalConnectSrc]
+  }
 
   const cspHeader = Object.entries(directives)
     .map(([key, sources]) => `${key} ${sources.join(" ")}`)
