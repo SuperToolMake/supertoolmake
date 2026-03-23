@@ -74,7 +74,13 @@ const upload = async () => {
   const processedFileKey = processStringSync(key, $context)
   loading = true
   try {
-    const res = await API.externalUpload(datasourceId, bucket, processedFileKey, data, compressImages ? { maxWidth: imageWidth, quality: compressionQuality } : undefined)
+    const res = await API.externalUpload(
+      datasourceId,
+      bucket,
+      processedFileKey,
+      data,
+      compressImages ? { maxWidth: imageWidth, quality: compressionQuality } : undefined
+    )
     notificationStore.actions.success("File uploaded successfully")
     loading = false
     return res

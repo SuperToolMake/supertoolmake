@@ -381,9 +381,7 @@ export const uploadExternalFile = async (ctx: Ctx) => {
     const image = sharp(buffer)
     const metadata = await image.metadata()
     if (!compress.maxWidth) {
-buffer = await image
-        .avif({ quality })
-        .toBuffer()
+      buffer = await image.avif({ quality }).toBuffer()
     }
     if (metadata.width && metadata.width > compress.maxWidth) {
       buffer = await image
@@ -391,7 +389,7 @@ buffer = await image
         .avif({ quality })
         .toBuffer()
     }
-      uploadKey = key.replace(/\.[^.]+$/, ".avif")
+    uploadKey = key.replace(/\.[^.]+$/, ".avif")
   }
 
   await s3.send(
