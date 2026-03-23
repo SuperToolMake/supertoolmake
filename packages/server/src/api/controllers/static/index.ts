@@ -19,6 +19,7 @@ import {
   type Workspace,
 } from "@budibase/types"
 import send from "koa-send"
+import sharp from "sharp"
 import { render } from "svelte/server"
 import * as uuid from "uuid"
 import { ObjectStoreBuckets } from "../../../constants"
@@ -332,4 +333,76 @@ export const getSignedUploadURL = async (
   }
 
   ctx.body = { signedUrl, publicUrl }
+}
+
+export const uploadExternalFile = async (ctx: Ctx) => {
+  const { datasourceId } = ctx.params
+  const file = ctx.request?.files?.file
+  let { bucket, key, compress } = ctx.request?.body || {}
+
+  if (typeof compress === "string") {
+    compress = JSON.parse(compress)
+  }
+
+  if (!file) {
+    throw new BadRequestError("No file provided")
+  }
+  if (!bucket || !key) {
+    throw new BadRequestError("bucket and key values are required")
+  }
+
+  const datasource = await sdk.datasources.get(datasourceId, { enriched: true })
+  if (!datasource) {
+    throw new BadRequestError("The specified datasource could not be found")
+  }
+
+  const awsRegion = (datasource?.config?.region || "eu-west-1") as string
+  let endpoint = datasource?.config?.endpoint
+  const useSSL = datasource?.config?.useSSL ?? true
+  if (endpoint && !utils.urlHasProtocol(endpoint)) {
+    endpoint = `${useSSL ? "https" : "http"}://${endpoint}`
+  }
+
+  const s3 = new S3({
+    region: awsRegion,
+    endpoint,
+    credentials: {
+      accessKeyId: datasource?.config?.accessKey as string,
+      secretAccessKey: datasource?.config?.secretKey as string,
+    },
+  })
+
+  const filePath = (file as any).filepath
+  let buffer = await fs.promises.readFile(filePath)
+  let uploadKey = key
+
+  if (compress) {
+    const quality = compress.quality
+    const image = sharp(buffer)
+    const metadata = await image.metadata()
+    if (!compress.maxWidth) {
+buffer = await image
+        .avif({ quality })
+        .toBuffer()
+    }
+    if (metadata.width && metadata.width > compress.maxWidth) {
+      buffer = await image
+        .resize(compress.maxWidth, null, { withoutEnlargement: true })
+        .avif({ quality })
+        .toBuffer()
+    }
+      uploadKey = key.replace(/\.[^.]+$/, ".avif")
+  }
+
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: bucket,
+      Key: uploadKey,
+      Body: buffer,
+    })
+  )
+
+  await fs.promises.unlink(filePath)
+
+  ctx.body = { success: true }
 }

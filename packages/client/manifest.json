@@ -5201,6 +5201,25 @@
         "type": "validation/attachment",
         "label": "Validation",
         "key": "validation"
+      },
+      {
+        "type": "boolean",
+        "label": "AVIF compression",
+        "key": "compressImages",
+        "defaultValue": false
+      },
+      {
+        "type": "number",
+        "label": "Image width (px)",
+        "key": "imageWidth",
+        "dependsOn": "compressImages"
+      },
+      {
+        "type": "number",
+        "label": "Quality (%)",
+        "key": "compressionQuality",
+        "dependsOn": "compressImages",
+        "defaultValue": 80
       }
     ],
     "context": {

@@ -30,5 +30,6 @@ router
   .get("/app/:appUrl/:path*", controller.serveApp)
   .get(`/${devAppIdPath}/:path*`, controller.serveApp)
   .post("/api/attachments/:datasourceId/url", controller.getSignedUploadURL)
+  .post("/api/attachments/:datasourceId/external/upload", controller.uploadExternalFile)
 
 export default router

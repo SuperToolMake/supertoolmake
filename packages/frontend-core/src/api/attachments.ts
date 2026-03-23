@@ -23,7 +23,11 @@ export interface AttachmentEndpoints {
     datasourceId: string,
     bucket: string,
     key: string,
-    data: any
+    data: any,
+    compress?: {
+      maxWidth?: number
+      quality?: number
+    }
   ) => Promise<{ publicUrl: string | undefined }>
 }
 
@@ -90,23 +94,28 @@ export const buildAttachmentEndpoints = (API: BaseAPIClient): AttachmentEndpoint
      * @param bucket the name of the bucket to upload to
      * @param key the name of the file to upload to
      * @param data the file to upload
+     * @param compress optional compression options
      */
-    externalUpload: async (datasourceId, bucket, key, data) => {
-      const { signedUrl, publicUrl } = await endpoints.getSignedDatasourceURL(
-        datasourceId,
-        bucket,
-        key
-      )
-      if (!signedUrl) {
+    externalUpload: async (datasourceId, bucket, key, data, compress) => {
+      const { publicUrl } = await endpoints.getSignedDatasourceURL(datasourceId, bucket, key)
+      if (!publicUrl) {
         return { publicUrl: undefined }
       }
-      await API.put({
-        url: signedUrl,
-        body: data,
+
+      const formData = new FormData()
+      formData.append("file", data)
+      formData.append("bucket", bucket)
+      formData.append("key", key)
+      if (compress) {
+        formData.append("compress", JSON.stringify(compress))
+      }
+
+      await API.post({
+        url: `/api/attachments/${datasourceId}/external/upload`,
+        body: formData,
         json: false,
-        external: true,
-        parseResponse: (response) => response as any,
       })
+
       return { publicUrl }
     },
   }

@@ -13,6 +13,9 @@ export let label
 export let disabled = false
 export let validation
 export let onChange
+export let compressImages = false
+export let imageWidth
+export let compressionQuality = 80
 
 const context = getContext("context")
 
@@ -71,7 +74,7 @@ const upload = async () => {
   const processedFileKey = processStringSync(key, $context)
   loading = true
   try {
-    const res = await API.externalUpload(datasourceId, bucket, processedFileKey, data)
+    const res = await API.externalUpload(datasourceId, bucket, processedFileKey, data, compressImages ? { maxWidth: imageWidth, quality: compressionQuality } : undefined)
     notificationStore.actions.success("File uploaded successfully")
     loading = false
     return res
