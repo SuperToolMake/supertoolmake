@@ -1,14 +1,14 @@
 <script lang="ts">
 import { Body, Icon, Input, keepOpen, Modal, ModalContent, notifications } from "@budibase/bbui"
 import { PublishResourceState, type UIWorkspaceApp, type WorkspaceApp } from "@budibase/types"
-import { goto } from "@roxi/routify"
+import { goto as gotoStore } from "@roxi/routify"
 import type { ZodType } from "zod"
 import { z } from "zod"
 import { buildLiveUrl } from "@/helpers/urls"
 import { screenStore, workspaceAppStore } from "@/stores/builder"
 import * as screenTemplating from "@/templates/screenTemplating"
 
-$goto
+$: goto = $gotoStore
 
 export let workspaceApp: UIWorkspaceApp | null = null
 
@@ -17,8 +17,7 @@ export const show = () => modal.show()
 
 let data: WorkspaceApp
 
-const requiredString = (errorMessage: string) =>
-  z.string({ required_error: errorMessage }).trim().min(1, errorMessage)
+const requiredString = (errorMessage: string) => z.string().trim().min(1, { message: errorMessage })
 
 const validateWorkspaceApp = (workspaceApp: Partial<WorkspaceApp>) => {
   const validator = z.object({
@@ -52,14 +51,12 @@ const validateWorkspaceApp = (workspaceApp: Partial<WorkspaceApp>) => {
   const validationResult = validator.safeParse(workspaceApp)
   validationState.errors = {}
   if (!validationResult.success) {
-    validationState.errors = Object.entries(validationResult.error.formErrors.fieldErrors).reduce<
-      Record<string, string>
-    >((acc, [field, errors]) => {
-      if (errors[0]) {
-        acc[field] = errors[0]
+    const issues = validationResult.error.issues
+    for (const issue of issues) {
+      if (issue.path[0]) {
+        validationState.errors[issue.path[0] as keyof WorkspaceApp] = issue.message
       }
-      return acc
-    }, {})
+    }
   }
 
   return validationResult
@@ -103,7 +100,7 @@ async function onConfirm() {
         workspaceAppId: workspaceApp._id,
       })
       notifications.success("App created successfully")
-      $goto("../[workspaceAppId]/[screenId]", {
+      goto("../[workspaceAppId]/[screenId]", {
         workspaceAppId: workspaceApp._id,
         screenId: newScreen._id!,
       })
