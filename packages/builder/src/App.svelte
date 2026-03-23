@@ -11,9 +11,7 @@ const queryHandler = { parse, stringify }
 setContext(Context.PopoverRoot, "body")
 
 onMount(() => {
-  const links = [
-    "https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/duotone/style.css",
-  ]
+  const links = ["https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/duotone/style.css"]
   for (const href of links) {
     const link = document.createElement("link")
     link.rel = "stylesheet"

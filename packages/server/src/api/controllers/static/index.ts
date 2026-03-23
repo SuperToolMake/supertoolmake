@@ -294,7 +294,7 @@ export const getSignedUploadURL = async (
     if (!datasource) {
       ctx.throw(400, "The specified datasource could not be found")
     }
-  } catch (error) {
+  } catch (_error) {
     ctx.throw(400, "The specified datasource could not be found")
   }
 

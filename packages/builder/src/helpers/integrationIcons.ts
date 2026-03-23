@@ -1,8 +1,8 @@
 import type { ComponentType } from "svelte"
 import { get } from "svelte/store"
-import { integrations } from "@/stores/builder/integrations"
 import MinIO from "@/components/backend/DatasourceNavigator/icons/MinIO.svelte"
 import MySQL from "@/components/backend/DatasourceNavigator/icons/MySQL.svelte"
+import { integrations } from "@/stores/builder/integrations"
 
 export type IconInfo =
   | { icon: string; color?: string; component?: never; url?: never }

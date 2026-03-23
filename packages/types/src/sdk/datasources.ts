@@ -56,7 +56,7 @@ export enum SourceName {
   REDIS = "REDIS",
   REST = "REST",
   SQL_SERVER = "SQL_SERVER",
-  MINIO = "MINIO"
+  MINIO = "MINIO",
 }
 
 export enum IncludeRelationship {
