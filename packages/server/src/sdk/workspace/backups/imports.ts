@@ -86,8 +86,8 @@ export function getListOfAppsInMulti(tmpPath: string) {
   return fs.readdirSync(tmpPath).filter((dir) => dir !== GLOBAL_DB_EXPORT_FILE)
 }
 
-export async function importApp(appId: string, db: Database, template: TemplateType) {
-  const prodAppId = dbCore.getProdWorkspaceID(appId)
+export async function importWorkspace(workspaceId: string, db: Database, template: TemplateType) {
+  const prodAppId = dbCore.getProdWorkspaceID(workspaceId)
   let dbStream: fs.ReadStream
   const isTar = template?.file?.type?.endsWith("gzip")
   const isDirectory = template.file && (await fsp.lstat(template.file.path)).isDirectory()

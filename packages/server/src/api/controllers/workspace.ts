@@ -385,7 +385,7 @@ async function performWorkspaceCreate(
 
     if (shouldImportTemplate) {
       try {
-        await sdk.backups.importApp(workspaceId, db, {
+        await sdk.backups.importWorkspace(workspaceId, db, {
           file: instanceConfig.file,
           key: instanceConfig.key,
         })

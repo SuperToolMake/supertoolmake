@@ -18,7 +18,7 @@ export enum DocumentType {
   ACCOUNT_METADATA = "acc_metadata",
   DATASOURCE = "datasource",
   DATASOURCE_PLUS = "datasource_plus",
-  APP_BACKUP = "backup",
+  WORKSPACE_BACKUP = "backup",
   TABLE = "ta",
   ROW = "ro",
   LINK = "li",

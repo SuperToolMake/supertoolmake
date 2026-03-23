@@ -6,15 +6,18 @@ import type {
   ExportWorkspaceDumpRequest,
   ExportWorkspaceDumpResponse,
   UserCtx,
+  Workspace
 } from "@budibase/types"
+import { DocumentType } from "@budibase/types"
 import sdk from "../../sdk"
 
-export async function exportAppDump(
+export async function exportWorkspaceDump(
   ctx: Ctx<ExportWorkspaceDumpRequest, ExportWorkspaceDumpResponse>
 ) {
-  const { appId } = ctx.query as any
+  const { appId: workspaceId } = ctx.query as any
   const { encryptPassword } = ctx.request.body
-  const [workspace] = await db.getWorkspacesByIDs([appId])
+
+  const [workspace] = await db.getWorkspacesByIDs([workspaceId])
   const workspaceName = workspace.name
 
   // remove the 120 second limit for the request
@@ -23,9 +26,14 @@ export async function exportAppDump(
   const extension = encryptPassword ? "enc.tar.gz" : "tar.gz"
   const backupIdentifier = `${workspaceName}-export-${Date.now()}.${extension}`
   ctx.attachment(backupIdentifier)
-  ctx.body = await sdk.backups.streamExportApp({
-    appId,
+  ctx.body = await sdk.backups.streamExportWorkspace({
+    workspaceId,
     encryptPassword,
+  })
+
+  await context.doInWorkspaceContext(workspaceId, async () => {
+    const appDb = context.getWorkspaceDB()
+    const app = await appDb.get<Workspace>(DocumentType.WORKSPACE_METADATA)
   })
 }
 
