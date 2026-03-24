@@ -26,7 +26,13 @@ const createIntegrationsStore = () => {
 
   const saveDatasource = async (datasource: Datasource) => {
     const integration = integrationForDatasource(get(store), datasource)
-    await datasources.save({ datasource, integration })
+    if (!integration) {
+      throw new Error("Unable to find integration for datasource")
+    }
+    await datasources.save({
+      datasource,
+      integration,
+    })
   }
 
   return {

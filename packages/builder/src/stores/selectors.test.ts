@@ -9,7 +9,9 @@ describe("selectors", () => {
   describe("integrationForDatasource", () => {
     it("returns the integration corresponding to the given datasource", () => {
       expect(
-        integrationForDatasource({ integrationOne: { some: "data" } }, { source: "integrationOne" })
+        integrationForDatasource({ integrationOne: { some: "data" } } as any, {
+          source: "integrationOne",
+        })
       ).toEqual({ some: "data", name: "integrationOne" })
     })
 
@@ -25,19 +27,19 @@ describe("selectors", () => {
   describe("hasData", () => {
     describe("when the user has created a datasource in addition to the premade DB source", () => {
       it("returns true", () => {
-        expect(hasData({ list: [1, 1] }, { list: [] })).toBe(true)
+        expect(hasData([{ source: "POSTGRES" }, {}], { list: [] })).toBe(true)
       })
     })
 
     describe("when the user has created a table in addition to the premade users table", () => {
       it("returns true", () => {
-        expect(hasData({ list: [] }, { list: [1, 1] })).toBe(true)
+        expect(hasData([], { list: [1, 1] })).toBe(true)
       })
     })
 
     describe("when the user doesn't have data", () => {
       it("returns false", () => {
-        expect(hasData({ list: [] }, { list: [] })).toBe(false)
+        expect(hasData([], { list: [] })).toBe(false)
       })
     })
   })
