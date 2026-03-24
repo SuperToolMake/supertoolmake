@@ -7,6 +7,7 @@ import { InvalidFileExtensions } from "@budibase/shared-core"
 import { processString } from "@budibase/string-templates"
 import {
   type AppProps,
+  type BBUploadedFile,
   type Ctx,
   DocumentType,
   type GetSignedUploadUrlRequest,
@@ -372,11 +373,11 @@ export const uploadExternalFile = async (ctx: Ctx) => {
     },
   })
 
-  const filePath = (file as any).filepath
+  const filePath = (file as BBUploadedFile).filepath
   let buffer = await fs.promises.readFile(filePath)
   let uploadKey = key
 
-  if (compress) {
+  if (compress && (file as BBUploadedFile).mimetype?.startsWith("image/")) {
     const quality = compress.quality
     const image = sharp(buffer)
     const metadata = await image.metadata()
