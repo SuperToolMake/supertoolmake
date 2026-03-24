@@ -85,6 +85,9 @@ export const createRelationshipSelectionStore = (datasource: Datasource) => {
       if (importedCount > 0) {
         // Save the updated datasource
         const integration = integrationForDatasource(get(integrations), datasource)
+        if (!integration) {
+          throw Error("No integration found for datasource.")
+        }
         await datasources.save({ datasource, integration })
 
         // Refresh tables to show the new relationship columns
