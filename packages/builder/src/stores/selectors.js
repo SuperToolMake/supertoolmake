@@ -9,8 +9,8 @@ export const integrationForDatasource = (integrations, datasource) => {
   }
 }
 
-export const hasData = (datasources, tables) =>
-  datasources.list.length > 0 || tables.list.length > 1
+export const hasData = (datasourceList, tables) =>
+  datasourceList.length > 0 || tables.list.length > 1
 
 export const configFromIntegration = (integration) => {
   const config = {}

@@ -25,7 +25,7 @@ $: disabled = externalDatasourceLoading
 />
 
 <CreationPage
-  showClose={hasData($datasources, $tables)}
+  showClose={hasData($datasources.list.filter(ds => ds.source !== "REST"), $tables)}
   onClose={() => goto("../")}
   heading="Add new data source"
 >
