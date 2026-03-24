@@ -6,9 +6,7 @@ import type {
   ExportWorkspaceDumpRequest,
   ExportWorkspaceDumpResponse,
   UserCtx,
-  Workspace
 } from "@budibase/types"
-import { DocumentType } from "@budibase/types"
 import sdk from "../../sdk"
 
 export async function exportWorkspaceDump(
@@ -29,11 +27,6 @@ export async function exportWorkspaceDump(
   ctx.body = await sdk.backups.streamExportWorkspace({
     workspaceId,
     encryptPassword,
-  })
-
-  await context.doInWorkspaceContext(workspaceId, async () => {
-    const appDb = context.getWorkspaceDB()
-    const app = await appDb.get<Workspace>(DocumentType.WORKSPACE_METADATA)
   })
 }
 

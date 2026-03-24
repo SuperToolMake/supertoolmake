@@ -98,7 +98,11 @@ export async function exportWorkspace(workspaceId: string, config?: ExportOpts) 
 
   toExclude.push(/\/attachments\/.*/)
 
-  const tmpPath = await objectStore.retrieveDirectory(ObjectStoreBuckets.APPS, workspacePath, toExclude)
+  const tmpPath = await objectStore.retrieveDirectory(
+    ObjectStoreBuckets.APPS,
+    workspacePath,
+    toExclude
+  )
 
   const downloadedPath = join(tmpPath, workspacePath)
   if (fs.existsSync(downloadedPath)) {
