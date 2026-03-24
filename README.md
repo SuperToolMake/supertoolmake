@@ -6,7 +6,7 @@
 </h1>
 
 <h3 align="center">
-  A light weight fork of <a href="https://github.com/Budibase/budibase">Budibase</a>
+  A lightweight fork of <a href="https://github.com/Budibase/budibase">Budibase</a>
 </h3>
 <p align="center">
   SuperToolMake is an open-source low-code platform that saves you time building forms, portals, and approval apps, securely.
