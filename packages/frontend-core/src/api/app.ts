@@ -54,9 +54,6 @@ export interface AppEndpoints {
   getApps: () => Promise<FetchWorkspacesResponse>
   fetchComponentLibDefinitions: (workspaceId: string) => Promise<FetchAppDefinitionResponse>
   getPublishedApps: () => Promise<FetchPublishedAppsResponse["apps"]>
-
-  // Missing request or response types
-  importApps: (apps: any) => Promise<any>
 }
 
 export const buildAppEndpoints = (API: BaseAPIClient): AppEndpoints => ({
@@ -178,18 +175,6 @@ export const buildAppEndpoints = (API: BaseAPIClient): AppEndpoints => ({
     return await API.post({
       url: `/api/applications/${devId}/import`,
       body: formData,
-      json: false,
-    })
-  },
-
-  /**
-   * Imports an export of all apps.
-   * @param apps the FormData containing the apps to import
-   */
-  importApps: async (apps) => {
-    return await API.post({
-      url: "/api/cloud/import",
-      body: apps,
       json: false,
     })
   },
