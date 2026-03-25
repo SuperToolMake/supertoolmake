@@ -22,11 +22,11 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { utils } from "@budibase/shared-core"
 import { NodeHttpHandler } from "@smithy/node-http-handler"
 import type { NodeJsClient } from "@smithy/types"
-import fetch from "node-fetch"
 import tar from "tar-fs"
 import { v4 } from "uuid"
 import { WORKSPACE_DEV_PREFIX, WORKSPACE_PREFIX } from "../db"
 import env from "../environment"
+import { fetchWithBlacklist } from "../utils/outboundFetch"
 import { bucketTTLConfig, budibaseTempDir } from "./utils"
 
 // use this as a temporary store of buckets that are being created
@@ -570,7 +570,7 @@ export async function uploadDirectory(bucketName: string, localPath: string, buc
 
 export async function downloadTarballDirect(url: string, path: string, headers = {}) {
   path = sanitizeKey(path)
-  const response = await fetch(url, { headers })
+  const response = await fetchWithBlacklist(url, { headers })
   if (!response.ok) {
     throw new Error(`unexpected response ${response.statusText}`)
   }
@@ -581,7 +581,7 @@ export async function downloadTarballDirect(url: string, path: string, headers =
 export async function downloadTarball(url: string, bucketName: string, path: string) {
   bucketName = sanitizeBucket(bucketName)
   path = sanitizeKey(path)
-  const response = await fetch(url)
+  const response = await fetchWithBlacklist(url)
   if (!response.ok) {
     throw new Error(`unexpected response ${response.statusText}`)
   }
