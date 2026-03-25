@@ -5,7 +5,7 @@ import * as setup from "./utilities"
 import { checkBuilderEndpoint, runInProd } from "./utilities/TestFunctions"
 
 const { BUILTIN_ROLE_IDS } = roles
-const { basicScreen, powerScreen } = setup.structures
+const { basicScreen } = setup.structures
 const route = "/test"
 
 // there are checks which are disabled in test env,
@@ -13,14 +13,13 @@ const route = "/test"
 
 describe("/routing", () => {
   const config = setup.getConfig()
-  let basic: Screen, power: Screen
+  let basic: Screen
 
   afterAll(setup.afterAll)
 
   beforeAll(async () => {
     await config.init()
     basic = await config.createScreen(basicScreen(route))
-    power = await config.createScreen(powerScreen(route))
     await config.publish()
   })
 
@@ -78,28 +77,6 @@ describe("/routing", () => {
       )
     })
 
-    it("returns the correct routing for power user", async () => {
-      await config.withHeaders(
-        await config.roleHeaders({
-          roleId: BUILTIN_ROLE_IDS.POWER,
-        }),
-        async () => {
-          const res = await config.api.routing.client({
-            status: 200,
-          })
-          expect(res.routes).toBeDefined()
-          expect(res.routes[route]).toEqual({
-            subpaths: {
-              [route]: {
-                screenId: power._id,
-                roleId: power.routing.roleId,
-              },
-            },
-          })
-        }
-      )
-    })
-
     it("shouldn't return screens if workspace app disabled", async () => {
       const { workspaceApp } = await config.api.workspaceApp.create(
         structures.workspaceApps.createRequest({
@@ -125,25 +102,6 @@ describe("/routing", () => {
   })
 
   describe("fetch all", () => {
-    it("should fetch all routes for builder", async () => {
-      await config.withHeaders(
-        await config.roleHeaders({
-          roleId: BUILTIN_ROLE_IDS.POWER,
-          builder: true,
-        }),
-        async () => {
-          const res = await config.api.routing.fetchAll({
-            status: 200,
-          })
-          expect(res.routes).toBeDefined()
-          expect(res.routes[route].subpaths[route]).toBeDefined()
-          const subpath = res.routes[route].subpaths[route]
-          expect(subpath.screens[power.routing.roleId]).toEqual(power._id)
-          expect(subpath.screens[basic.routing.roleId]).toEqual(basic._id)
-        }
-      )
-    })
-
     it("make sure it is a builder only endpoint", async () => {
       await checkBuilderEndpoint({
         config,

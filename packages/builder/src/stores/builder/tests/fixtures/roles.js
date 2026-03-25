@@ -10,12 +10,6 @@ export const ROLES = [
     _id: "ADMIN",
     name: "Admin",
     permissionId: "admin",
-    inherits: "POWER",
-  },
-  {
-    _id: "POWER",
-    name: "Power",
-    permissionId: "power",
     inherits: "BASIC",
   },
   {

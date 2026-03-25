@@ -155,7 +155,6 @@ export const HostingTypes = Hosting
 
 export const Roles = {
   ADMIN: "ADMIN",
-  POWER: "POWER",
   BASIC: "BASIC",
   PUBLIC: "PUBLIC",
   BUILDER: "BUILDER",

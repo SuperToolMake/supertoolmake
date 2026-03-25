@@ -430,7 +430,7 @@ export const SOME_TABLES = [
         constraints: {
           type: "string",
           presence: false,
-          inclusion: ["ADMIN", "POWER", "BASIC", "PUBLIC", "BUILDER"],
+          inclusion: ["ADMIN", "BASIC", "PUBLIC", "BUILDER"],
         },
       },
       status: {

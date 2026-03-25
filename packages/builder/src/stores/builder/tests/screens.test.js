@@ -556,7 +556,6 @@ describe("Screens store", () => {
   }) => {
     const expectedRoles = [
       Constants.Roles.BASIC,
-      Constants.Roles.POWER,
       Constants.Roles.PUBLIC,
       Constants.Roles.ADMIN,
     ]
@@ -618,9 +617,6 @@ describe("Screens store", () => {
 
     expect(results[Constants.Roles.PUBLIC].length).toBe(1)
     expect(screens[9].routing.homeScreen).toBe(true)
-
-    // Homescreen was never set for POWER
-    expect(results[Constants.Roles.POWER]).not.toBeDefined()
   })
 
   it("Sequential patch check. Exit if the screenId is not valid.", async ({ bb }) => {

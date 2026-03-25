@@ -52,7 +52,6 @@ export const getAdminPosition = (bounds) => ({
 // Filters out invalid nodes and edges
 const preProcessLayout = ({ nodes, edges }) => {
   const ignoredIds = [Roles.PUBLIC, Roles.BASIC, Roles.ADMIN, EmptyStateID]
-  const targetlessIds = [Roles.POWER]
   return {
     nodes: nodes.filter((node) => {
       // Filter out ignored IDs
@@ -68,10 +67,6 @@ const preProcessLayout = ({ nodes, edges }) => {
       }
       // Filter out edges which have the same source and target
       if (edge.source === edge.target) {
-        return false
-      }
-      // Filter out edges which target targetless roles
-      if (targetlessIds.includes(edge.target)) {
         return false
       }
       return true
@@ -165,10 +160,10 @@ export const autoLayout = ({ nodes, edges }) => {
 
 // Converts a role doc into a node structure
 export const roleToNode = (role) => {
-  const custom = ![Roles.PUBLIC, Roles.BASIC, Roles.POWER, Roles.ADMIN, Roles.BUILDER].includes(
+  const custom = ![Roles.PUBLIC, Roles.BASIC, Roles.ADMIN, Roles.BUILDER].includes(
     role._id
   )
-  const interactive = custom || role._id === Roles.POWER
+  const interactive = custom
   return {
     id: role._id,
     sourcePosition: Position.Right,

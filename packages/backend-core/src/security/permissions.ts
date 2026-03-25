@@ -85,17 +85,6 @@ export const BUILTIN_PERMISSIONS: BuiltinPermissions = {
       new PermissionImpl(PermissionType.WORKSPACE, PermissionLevel.READ),
     ],
   },
-  POWER: {
-    _id: BuiltinPermissionID.POWER,
-    name: "Power",
-    permissions: [
-      new PermissionImpl(PermissionType.TABLE, PermissionLevel.WRITE),
-      new PermissionImpl(PermissionType.USER, PermissionLevel.READ),
-      new PermissionImpl(PermissionType.AUTOMATION, PermissionLevel.EXECUTE),
-      new PermissionImpl(PermissionType.LEGACY_VIEW, PermissionLevel.READ),
-      new PermissionImpl(PermissionType.WORKSPACE, PermissionLevel.READ),
-    ],
-  },
   ADMIN: {
     _id: BuiltinPermissionID.ADMIN,
     name: "Admin",

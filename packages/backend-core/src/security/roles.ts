@@ -2,24 +2,18 @@ import { helpers, RoleColor } from "@budibase/shared-core"
 import {
   BuiltinPermissionID,
   type Database,
-  InternalTable,
   PermissionLevel,
   type Role as RoleDoc,
   type RoleUIMetadata,
   type Screen,
-  type Table,
-  type Workspace,
 } from "@budibase/types"
 import { uniqBy } from "lodash"
 import cloneDeep from "lodash/fp/cloneDeep"
-import semver from "semver"
 import { getWorkspaceDB } from "../context"
 import { DocumentType, doWithDB, getRoleParams, prefixRoleID, SEPARATOR } from "../db"
-import { default as env } from "../environment"
 
 export const BUILTIN_ROLE_IDS = {
   ADMIN: "ADMIN",
-  POWER: "POWER",
   BASIC: "BASIC",
   PUBLIC: "PUBLIC",
 }
@@ -133,11 +127,6 @@ const BUILTIN_ROLES = {
     displayName: "Admin user",
     description: "Can do everything",
     color: RoleColor.ADMIN,
-  }).addInheritance(BUILTIN_IDS.POWER),
-  POWER: new Role(BUILTIN_IDS.POWER, BUILTIN_IDS.POWER, BuiltinPermissionID.POWER, {
-    displayName: "App power user",
-    description: "An app user with more access",
-    color: RoleColor.POWER,
   }).addInheritance(BUILTIN_IDS.BASIC),
   BASIC: new Role(BUILTIN_IDS.BASIC, BUILTIN_IDS.BASIC, BuiltinPermissionID.WRITE, {
     displayName: "Basic user",
@@ -442,10 +431,9 @@ export async function getAllRoles(appId?: string): Promise<RoleDoc[]> {
     // exclude internal roles like builder
     let externalBuiltinRoles = []
 
-    if (!db || (await shouldIncludePowerRole(db))) {
+    if (!db) {
       externalBuiltinRoles = [
         BUILTIN_IDS.ADMIN,
-        BUILTIN_IDS.POWER,
         BUILTIN_IDS.BASIC,
         BUILTIN_IDS.PUBLIC,
       ]
@@ -486,40 +474,6 @@ export async function getAllRoles(appId?: string): Promise<RoleDoc[]> {
     }
     return roles
   }
-}
-
-async function shouldIncludePowerRole(db: Database) {
-  if (await hasLegacyPowerRole(db)) {
-    return true
-  }
-
-  const app = await db.tryGet<Workspace>(DocumentType.WORKSPACE_METADATA)
-  const creationVersion = app?.creationVersion
-  if (!(creationVersion && semver.valid(creationVersion))) {
-    // Old apps don't have creationVersion, so we should include it for backward compatibility
-    return true
-  }
-
-  const isGreaterThan3x = semver.gte(creationVersion, env.MIN_VERSION_WITHOUT_POWER_ROLE)
-  return !isGreaterThan3x
-}
-
-async function hasLegacyPowerRole(db: Database) {
-  const usersTable = await db.tryGet<Table>(InternalTable.USER_METADATA)
-  const inclusion = usersTable?.schema?.roleId?.constraints?.inclusion
-  if (!Array.isArray(inclusion)) {
-    return false
-  }
-
-  const containsPower = inclusion.some(roleId =>
-    roleIDsAreEqual(roleId, BUILTIN_IDS.POWER)
-  )
-  if (!containsPower) {
-    return false
-  }
-
-  // Imported workspaces can still carry POWER as part of the legacy custom-role set.
-  return inclusion.some(roleId => !isBuiltin(roleId))
 }
 
 export class AccessController {

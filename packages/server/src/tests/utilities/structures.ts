@@ -185,13 +185,6 @@ export function basicScreen(route = "/") {
   })
 }
 
-export function powerScreen(route = "/") {
-  return createHomeScreen({
-    roleId: BUILTIN_ROLE_IDS.POWER,
-    route,
-  })
-}
-
 export function customScreen(config: { roleId: string; route: string }) {
   return createHomeScreen(config)
 }

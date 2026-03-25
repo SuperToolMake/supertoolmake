@@ -10,7 +10,7 @@ import { permissions as permissionsStore, roles } from "@/stores/builder"
 export let resourceId
 
 const inheritedRoleId = "inherited"
-const builtins = [Roles.ADMIN, Roles.POWER, Roles.BASIC, Roles.PUBLIC]
+const builtins = [Roles.ADMIN, Roles.BASIC, Roles.PUBLIC]
 
 let permissions
 let showPopover = true

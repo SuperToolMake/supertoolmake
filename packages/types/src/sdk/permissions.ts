@@ -13,7 +13,6 @@ export enum BuiltinPermissionID {
   READ_ONLY = "read_only",
   WRITE = "write",
   ADMIN = "admin",
-  POWER = "power",
 }
 
 // these are the global types, that govern the underlying default behaviour

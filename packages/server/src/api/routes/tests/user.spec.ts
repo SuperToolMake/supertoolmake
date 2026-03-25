@@ -73,7 +73,7 @@ describe("/users", () => {
       const res2 = await config.api.user.update({
         ...user,
         _rev: res1.rev,
-        roleId: roles.BUILTIN_ROLE_IDS.POWER,
+        roleId: roles.BUILTIN_ROLE_IDS.ADMIN,
       })
       expect(res2.ok).toEqual(true)
     })
@@ -87,7 +87,7 @@ describe("/users", () => {
         roleId: roles.BUILTIN_ROLE_IDS.BASIC,
       })
       await config.api.user.update(
-        { ...user, roleId: roles.BUILTIN_ROLE_IDS.POWER },
+        { ...user, roleId: roles.BUILTIN_ROLE_IDS.ADMIN },
         { status: 409 }
       )
     })

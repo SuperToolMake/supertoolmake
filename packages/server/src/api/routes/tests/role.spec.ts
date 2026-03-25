@@ -99,40 +99,6 @@ describe("/roles", () => {
       )
     })
 
-    it("disallow more complex loops", async () => {
-      const role1 = await config.api.roles.save({
-        ...basicRole(),
-        name: "role1",
-        inherits: [BUILTIN_ROLE_IDS.POWER],
-      })
-      const role2 = await config.api.roles.save({
-        ...basicRole(),
-        name: "role2",
-        inherits: [BUILTIN_ROLE_IDS.POWER, role1._id!],
-      })
-      const role3 = await config.api.roles.save({
-        ...basicRole(),
-        name: "role3",
-        inherits: [BUILTIN_ROLE_IDS.POWER, role1._id!, role2._id!],
-      })
-      // go back to role1
-      await config.api.roles.save(
-        {
-          ...role1,
-          inherits: [BUILTIN_ROLE_IDS.POWER, role2._id!, role3._id!],
-        },
-        { status: 400, body: { message: LOOP_ERROR } }
-      )
-      // go back to role2
-      await config.api.roles.save(
-        {
-          ...role2,
-          inherits: [BUILTIN_ROLE_IDS.POWER, role1._id!, role3._id!],
-        },
-        { status: 400, body: { message: LOOP_ERROR } }
-      )
-    })
-
     it("frontend example - should deny", async () => {
       const id1 = "cb27c4ec9415042f4800411adb346fb7c",
         id2 = "cbc72a9d61ab64d49b31d90d1df4c1fdb"
@@ -142,7 +108,7 @@ describe("/roles", () => {
         permissions: {},
         permissionId: BuiltinPermissionID.WRITE,
         version: "name",
-        inherits: ["POWER"],
+        inherits: ["BASIC"],
       })
       await config.api.roles.save({
         _id: id2,
@@ -155,7 +121,7 @@ describe("/roles", () => {
       await config.api.roles.save(
         {
           ...role1,
-          inherits: [BUILTIN_ROLE_IDS.POWER, id2],
+          inherits: [BUILTIN_ROLE_IDS.BASIC, id2],
         },
         { status: 400, body: { message: LOOP_ERROR } }
       )
@@ -205,13 +171,8 @@ describe("/roles", () => {
 
       const adminRole = res.find((r) => r._id === BUILTIN_ROLE_IDS.ADMIN)
       expect(adminRole).toBeDefined()
-      expect(adminRole!.inherits).toEqual(BUILTIN_ROLE_IDS.POWER)
+      expect(adminRole!.inherits).toEqual(BUILTIN_ROLE_IDS.BASIC)
       expect(adminRole!.permissionId).toEqual(BuiltinPermissionID.ADMIN)
-
-      const powerUserRole = res.find((r) => r._id === BUILTIN_ROLE_IDS.POWER)
-      expect(powerUserRole).toBeDefined()
-      expect(powerUserRole!.inherits).toEqual(BUILTIN_ROLE_IDS.BASIC)
-      expect(powerUserRole!.permissionId).toEqual(BuiltinPermissionID.POWER)
 
       const customRoleFetched = res.find((r) => r._id === customRole.name)
       expect(customRoleFetched).toBeDefined()
@@ -225,14 +186,14 @@ describe("/roles", () => {
       const datasource = await config.api.datasource.create(rawDatasource!)
       const table = await config.api.table.save(basicTable(datasource))
       await config.api.permission.add({
-        roleId: BUILTIN_ROLE_IDS.POWER,
+        roleId: BUILTIN_ROLE_IDS.BASIC,
         resourceId: table._id!,
         level: PermissionLevel.READ,
       })
       const res = await config.api.roles.fetch()
       expect(res.length).toBeGreaterThan(0)
-      const power = res.find((role) => role._id === BUILTIN_ROLE_IDS.POWER)
-      expect(power?.permissions[table._id!]).toEqual(["read"])
+      const basic = res.find((role) => role._id === BUILTIN_ROLE_IDS.BASIC)
+      expect(basic?.permissions[table._id!]).toEqual(["read"])
     })
   })
 
@@ -360,8 +321,8 @@ describe("/roles", () => {
       })
       const { _id: roleId2 } = await config.api.roles.save({
         name: role2,
-        inherits: roles.BUILTIN_ROLE_IDS.POWER,
-        permissionId: BuiltinPermissionID.POWER,
+        inherits: roles.BUILTIN_ROLE_IDS.ADMIN,
+        permissionId: BuiltinPermissionID.ADMIN,
         version: "name",
       })
       await config.api.roles.save({
@@ -377,7 +338,7 @@ describe("/roles", () => {
         const res = await config.api.roles.accessible({
           status: 200,
         })
-        expect(res).toEqual([role3, role1, "BASIC", "PUBLIC", role2, "POWER"])
+        expect(res).toEqual([role3, role1, "BASIC", "PUBLIC", role2, "ADMIN"])
       })
     })
   })
