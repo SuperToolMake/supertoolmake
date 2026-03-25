@@ -1,6 +1,7 @@
 import { PassThrough } from "node:stream"
 import { Upload } from "@aws-sdk/lib-storage"
 import { structures } from "../../../tests"
+import { fetchWithBlacklist } from "../../utils/outboundFetch"
 import {
   downloadTarball,
   downloadTarballDirect,
@@ -8,13 +9,10 @@ import {
   streamUploadMany,
   upload,
 } from "../objectStore"
-import { fetchWithBlacklist } from "../../utils/outboundFetch"
 
 // Get mock instances
 const mockUpload = Upload as jest.MockedClass<typeof Upload>
-const fetchWithBlacklistMock = fetchWithBlacklist as jest.MockedFunction<
-  typeof fetchWithBlacklist
->
+const fetchWithBlacklistMock = fetchWithBlacklist as jest.MockedFunction<typeof fetchWithBlacklist>
 
 jest.mock("../../utils/outboundFetch", () => ({
   fetchWithBlacklist: jest.fn(),
@@ -399,10 +397,9 @@ describe("objectStore", () => {
         downloadTarballDirect("http://169.254.169.254/metadata/v1/", "tmp")
       ).rejects.toThrow("URL is blocked or could not be resolved safely.")
 
-      expect(fetchWithBlacklistMock).toHaveBeenCalledWith(
-        "http://169.254.169.254/metadata/v1/",
-        { headers: {} }
-      )
+      expect(fetchWithBlacklistMock).toHaveBeenCalledWith("http://169.254.169.254/metadata/v1/", {
+        headers: {},
+      })
     })
 
     it("uses fetchWithBlacklist in downloadTarball", async () => {
@@ -414,9 +411,7 @@ describe("objectStore", () => {
         downloadTarball("http://169.254.169.254/metadata/v1/", "bucket", "tmp")
       ).rejects.toThrow("URL is blocked or could not be resolved safely.")
 
-      expect(fetchWithBlacklistMock).toHaveBeenCalledWith(
-        "http://169.254.169.254/metadata/v1/"
-      )
+      expect(fetchWithBlacklistMock).toHaveBeenCalledWith("http://169.254.169.254/metadata/v1/")
     })
   })
 })

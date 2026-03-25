@@ -554,11 +554,7 @@ describe("Screens store", () => {
   it("Ensure only one homescreen per role when updating screen setting. Multiple screen roles", async ({
     bb,
   }) => {
-    const expectedRoles = [
-      Constants.Roles.BASIC,
-      Constants.Roles.PUBLIC,
-      Constants.Roles.ADMIN,
-    ]
+    const expectedRoles = [Constants.Roles.BASIC, Constants.Roles.PUBLIC, Constants.Roles.ADMIN]
 
     // Build 12 screens, 3 of each role
     const existingScreens = Array(12)

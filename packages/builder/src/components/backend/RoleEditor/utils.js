@@ -160,9 +160,7 @@ export const autoLayout = ({ nodes, edges }) => {
 
 // Converts a role doc into a node structure
 export const roleToNode = (role) => {
-  const custom = ![Roles.PUBLIC, Roles.BASIC, Roles.ADMIN, Roles.BUILDER].includes(
-    role._id
-  )
+  const custom = ![Roles.PUBLIC, Roles.BASIC, Roles.ADMIN, Roles.BUILDER].includes(role._id)
   const interactive = custom
   return {
     id: role._id,

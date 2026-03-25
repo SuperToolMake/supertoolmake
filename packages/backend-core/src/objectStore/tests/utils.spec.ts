@@ -26,8 +26,6 @@ describe("objectStore attachment utils", () => {
       })
     ).rejects.toThrow("URL is blocked or could not be resolved safely.")
 
-    expect(fetchWithBlacklistMock).toHaveBeenCalledWith(
-      "http://169.254.169.254/metadata/v1/"
-    )
+    expect(fetchWithBlacklistMock).toHaveBeenCalledWith("http://169.254.169.254/metadata/v1/")
   })
 })

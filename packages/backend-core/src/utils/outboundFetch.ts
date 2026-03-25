@@ -1,14 +1,9 @@
+import fetch, { Headers, type RequestInit, type Response } from "node-fetch"
 import { isBlacklisted } from "../blacklist"
-import fetch, { Headers, RequestInit, Response } from "node-fetch"
 
 const MAX_REDIRECTS = 5
 const ALLOWED_PROTOCOLS = new Set(["http:", "https:"])
-const SENSITIVE_REDIRECT_HEADERS = [
-  "authorization",
-  "cookie",
-  "cookie2",
-  "proxy-authorization",
-]
+const SENSITIVE_REDIRECT_HEADERS = ["authorization", "cookie", "cookie2", "proxy-authorization"]
 
 function parseUrl(url: string): URL {
   let parsed: URL
@@ -61,21 +56,16 @@ function nextRequestForRedirect(
   }
 }
 
-function shouldStripSensitiveHeadersForRedirect(
-  currentUrl: string,
-  redirectUrl: string
-): boolean {
+function shouldStripSensitiveHeadersForRedirect(currentUrl: string, redirectUrl: string): boolean {
   return new URL(currentUrl).origin !== new URL(redirectUrl).origin
 }
 
-function stripSensitiveHeadersForRedirect(
-  request: RedirectSafeRequest
-): RedirectSafeRequest {
+function stripSensitiveHeadersForRedirect(request: RedirectSafeRequest): RedirectSafeRequest {
   if (!request.headers) {
     return request
   }
   const headers = new Headers(request.headers)
-  SENSITIVE_REDIRECT_HEADERS.forEach(header => headers.delete(header))
+  SENSITIVE_REDIRECT_HEADERS.forEach((header) => headers.delete(header))
   return {
     ...request,
     headers,
@@ -119,9 +109,7 @@ export async function fetchWithBlacklist(
 
     releaseResponseBody(response)
 
-    const redirectUrl = parseUrl(
-      new URL(location, nextUrl).toString()
-    ).toString()
+    const redirectUrl = parseUrl(new URL(location, nextUrl).toString()).toString()
     nextRequest = nextRequestForRedirect(nextRequest, response.status)
     if (shouldStripSensitiveHeadersForRedirect(nextUrl, redirectUrl)) {
       nextRequest = stripSensitiveHeadersForRedirect(nextRequest)

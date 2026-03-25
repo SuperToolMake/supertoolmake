@@ -152,7 +152,7 @@ export async function save(ctx: UserCtx<SaveRoleRequest, SaveRoleResponse>) {
     ctx.throw(400, "Role inheritance contains a loop, this is not supported")
   }
 
-  const foundRev = dbRole?._rev || _rev 
+  const foundRev = dbRole?._rev || _rev
   if (foundRev) {
     role._rev = foundRev
   }

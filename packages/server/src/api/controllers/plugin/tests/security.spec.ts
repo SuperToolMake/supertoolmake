@@ -1,8 +1,8 @@
 import { utils as coreUtils } from "@budibase/backend-core"
+import { getPluginMetadata } from "../../../../utilities/fileSystem"
 import { githubUpload } from "../github"
 import { npmUpload } from "../npm"
 import { downloadUnzipTarball } from "../utils"
-import { getPluginMetadata } from "../../../../utilities/fileSystem"
 
 jest.mock("@budibase/backend-core", () => ({
   utils: {
@@ -20,31 +20,28 @@ jest.mock("../../../../utilities/fileSystem", () => ({
 }))
 
 describe("plugin SSRF hardening", () => {
-  const fetchWithBlacklistMock =
-    coreUtils.fetchWithBlacklist as jest.MockedFunction<
-      typeof coreUtils.fetchWithBlacklist
-    >
+  const fetchWithBlacklistMock = coreUtils.fetchWithBlacklist as jest.MockedFunction<
+    typeof coreUtils.fetchWithBlacklist
+  >
   const downloadUnzipTarballMock = downloadUnzipTarball as jest.MockedFunction<
     typeof downloadUnzipTarball
   >
-  const getPluginMetadataMock = getPluginMetadata as jest.MockedFunction<
-    typeof getPluginMetadata
-  >
+  const getPluginMetadataMock = getPluginMetadata as jest.MockedFunction<typeof getPluginMetadata>
 
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
   it("rejects github urls outside github.com", async () => {
-    await expect(
-      githubUpload("https://example.com/owner/repo", "plugin-name")
-    ).rejects.toThrow("The plugin origin must be from Github")
+    await expect(githubUpload("https://example.com/owner/repo", "plugin-name")).rejects.toThrow(
+      "The plugin origin must be from Github"
+    )
   })
 
   it("rejects npm urls outside npm hosts", async () => {
-    await expect(
-      npmUpload("https://example.com/package/foo", "plugin-name")
-    ).rejects.toThrow("The plugin origin must be from NPM")
+    await expect(npmUpload("https://example.com/package/foo", "plugin-name")).rejects.toThrow(
+      "The plugin origin must be from NPM"
+    )
   })
 
   it("resolves npm package metadata through fetchWithBlacklist", async () => {
@@ -67,9 +64,7 @@ describe("plugin SSRF hardening", () => {
 
     await npmUpload("https://www.npmjs.com/package/foo", "plugin-name")
 
-    expect(fetchWithBlacklistMock).toHaveBeenCalledWith(
-      "https://registry.npmjs.org/foo"
-    )
+    expect(fetchWithBlacklistMock).toHaveBeenCalledWith("https://registry.npmjs.org/foo")
     expect(downloadUnzipTarballMock).toHaveBeenCalledWith(
       "https://registry.npmjs.org/foo/-/foo-1.0.0.tgz",
       "foo",

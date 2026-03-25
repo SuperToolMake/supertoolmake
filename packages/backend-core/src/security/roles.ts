@@ -432,11 +432,7 @@ export async function getAllRoles(appId?: string): Promise<RoleDoc[]> {
     let externalBuiltinRoles = []
 
     if (!db) {
-      externalBuiltinRoles = [
-        BUILTIN_IDS.ADMIN,
-        BUILTIN_IDS.BASIC,
-        BUILTIN_IDS.PUBLIC,
-      ]
+      externalBuiltinRoles = [BUILTIN_IDS.ADMIN, BUILTIN_IDS.BASIC, BUILTIN_IDS.PUBLIC]
     } else {
       externalBuiltinRoles = [BUILTIN_IDS.ADMIN, BUILTIN_IDS.BASIC, BUILTIN_IDS.PUBLIC]
     }

@@ -29,13 +29,13 @@ interface Props {
 
 let { user = null, workspaceId, readonly = false, onsaved }: Props = $props()
 
-  const builtInEndUserRoles = [Constants.Roles.BASIC, Constants.Roles.ADMIN]
-  const excludedRoleIds = [
-    ...builtInEndUserRoles,
-    Constants.Roles.PUBLIC,
-    Constants.Roles.CREATOR,
-    Constants.Roles.GROUP,
-  ]
+const builtInEndUserRoles = [Constants.Roles.BASIC, Constants.Roles.ADMIN]
+const excludedRoleIds = [
+  ...builtInEndUserRoles,
+  Constants.Roles.PUBLIC,
+  Constants.Roles.CREATOR,
+  Constants.Roles.GROUP,
+]
 
 const roleColorLookup = $derived(
   ($roles || []).reduce<Record<string, string | undefined>>((acc, role) => {

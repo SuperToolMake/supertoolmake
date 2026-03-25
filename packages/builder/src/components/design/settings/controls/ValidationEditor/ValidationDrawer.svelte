@@ -1,52 +1,46 @@
 <script>
-  import {
-    Button,
-    Icon,
-    DrawerContent,
-    Layout,
-    Select,
-    Heading,
-    Body,
-    Input,
-    DatePicker,
-  } from "@budibase/bbui"
-  import { selectedScreen, selectedComponent } from "@/stores/builder"
-  import { findClosestMatchingComponent } from "@/helpers/components"
-  import {
-    getSchemaForDatasource,
-    getDatasourceForProvider,
-  } from "@/dataBinding"
-  import { getConstraintsForType } from "./constraints"
-  import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
-  import { generate } from "shortid"
+import {
+  Button,
+  Icon,
+  DrawerContent,
+  Layout,
+  Select,
+  Heading,
+  Body,
+  Input,
+  DatePicker,
+} from "@budibase/bbui"
+import { selectedScreen, selectedComponent } from "@/stores/builder"
+import { findClosestMatchingComponent } from "@/helpers/components"
+import { getSchemaForDatasource, getDatasourceForProvider } from "@/dataBinding"
+import { getConstraintsForType } from "./constraints"
+import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import { generate } from "shortid"
 
 export let fieldName = null
 export let rules = []
 export let bindings = []
 export let type
 
-  const resolveDatasource = (selectedScreen, componentInstance, parent) => {
-    return (
-      getDatasourceForProvider(selectedScreen, parent || componentInstance) ||
-      {}
-    )
-  }
+const resolveDatasource = (selectedScreen, componentInstance, parent) => {
+  return getDatasourceForProvider(selectedScreen, parent || componentInstance) || {}
+}
 
-  const getDataSourceSchema = (asset, component) => {
-    if (!asset || !component) {
-      return null
-    }
-    const formParent = findClosestMatchingComponent(
-      asset.props,
-      component._id,
-      component =>
-        component._component.endsWith("/form") ||
-        component._component.endsWith("/formblock") ||
-        component._component.endsWith("/tableblock")
-    )
-    const dataSource = resolveDatasource(asset, component, formParent)
-    return getSchemaForDatasource(asset, dataSource)
+const getDataSourceSchema = (asset, component) => {
+  if (!asset || !component) {
+    return null
   }
+  const formParent = findClosestMatchingComponent(
+    asset.props,
+    component._id,
+    (component) =>
+      component._component.endsWith("/form") ||
+      component._component.endsWith("/formblock") ||
+      component._component.endsWith("/tableblock")
+  )
+  const dataSource = resolveDatasource(asset, component, formParent)
+  return getSchemaForDatasource(asset, dataSource)
+}
 
 const exists = (value) => {
   return value != null && value !== ""
@@ -64,23 +58,23 @@ const addRule = () => {
   ]
 }
 
-    // String length constraint
-    if (exists(constraints.length?.minimum)) {
-      const length = constraints.length.minimum
-      rules.push({
-        constraint: "minLength",
-        value: length,
-        error: `Minimum ${length} characters`,
-      })
-    }
-    if (exists(constraints.length?.maximum)) {
-      const length = constraints.length.maximum
-      rules.push({
-        constraint: "maxLength",
-        value: length,
-        error: `Maximum ${length} characters`,
-      })
-    }
+// String length constraint
+if (exists(constraints.length?.minimum)) {
+  const length = constraints.length.minimum
+  rules.push({
+    constraint: "minLength",
+    value: length,
+    error: `Minimum ${length} characters`,
+  })
+}
+if (exists(constraints.length?.maximum)) {
+  const length = constraints.length.maximum
+  rules.push({
+    constraint: "maxLength",
+    value: length,
+    error: `Maximum ${length} characters`,
+  })
+}
 
 const duplicateRule = (id) => {
   const existingRule = rules.find((rule) => rule.id === id)

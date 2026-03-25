@@ -83,11 +83,7 @@ const ConstraintMap: Record<string, ValidationConstraintOption[]> = {
     Constraints.Equal,
     Constraints.NotEqual,
   ],
-  ["attachment"]: [
-    Constraints.Required,
-    Constraints.MaxFileSize,
-    Constraints.MaxUploadSize,
-  ],
+  ["attachment"]: [Constraints.Required, Constraints.MaxFileSize, Constraints.MaxUploadSize],
   ["attachment_single"]: [Constraints.Required, Constraints.MaxUploadSize],
   ["signature_single"]: [Constraints.Required],
   ["link"]: [
@@ -106,8 +102,6 @@ const ConstraintMap: Record<string, ValidationConstraintOption[]> = {
   ],
 }
 
-export const getConstraintsForType = (
-  type: string
-): ValidationConstraintOption[] => {
+export const getConstraintsForType = (type: string): ValidationConstraintOption[] => {
   return ConstraintMap[type] || []
 }

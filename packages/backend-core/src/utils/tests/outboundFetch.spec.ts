@@ -9,9 +9,7 @@ jest.mock("../../blacklist", () => ({
 
 describe("outboundFetch", () => {
   const fetchMock = fetch as jest.MockedFunction<typeof fetch>
-  const isBlacklistedMock = isBlacklisted as jest.MockedFunction<
-    typeof isBlacklisted
-  >
+  const isBlacklistedMock = isBlacklisted as jest.MockedFunction<typeof isBlacklisted>
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -20,9 +18,9 @@ describe("outboundFetch", () => {
   it("blocks blacklisted urls", async () => {
     isBlacklistedMock.mockResolvedValue(true)
 
-    await expect(
-      fetchWithBlacklist("http://169.254.169.254/metadata/v1/")
-    ).rejects.toThrow("URL is blocked or could not be resolved safely.")
+    await expect(fetchWithBlacklist("http://169.254.169.254/metadata/v1/")).rejects.toThrow(
+      "URL is blocked or could not be resolved safely."
+    )
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
@@ -36,9 +34,9 @@ describe("outboundFetch", () => {
       body: { resume },
     } as any)
 
-    await expect(
-      fetchWithBlacklist("https://example.com/spec.json")
-    ).rejects.toThrow("URL is blocked or could not be resolved safely.")
+    await expect(fetchWithBlacklist("https://example.com/spec.json")).rejects.toThrow(
+      "URL is blocked or could not be resolved safely."
+    )
     expect(fetchMock).toHaveBeenCalledTimes(1)
     expect(resume).toHaveBeenCalledTimes(1)
   })
