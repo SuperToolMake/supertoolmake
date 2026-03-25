@@ -74,7 +74,8 @@
         "useOptionalChain": "error",
         "noBannedTypes": "off",
         "noStaticOnlyClass": "off",
-        "noCommaOperator": "error"
+        "noCommaOperator": "error",
+        "useLiteralKeys": "error"
       },
       "style": {
         "noNonNullAssertion": "off",

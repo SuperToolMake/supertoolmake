@@ -1,10 +1,5 @@
 import { context, db, roles } from "@budibase/backend-core"
-import {
-  BuiltinPermissionID,
-  type Database,
-  type WithoutDocMetadata,
-  type Workspace,
-} from "@budibase/types"
+import { BuiltinPermissionID, type Database } from "@budibase/types"
 import { structures, TestConfiguration } from "../../../../tests"
 
 jest.mock("@budibase/backend-core", () => {
@@ -32,34 +27,6 @@ async function addAppMetadata() {
     name: "New App",
     version: "version",
     url: "url",
-  })
-}
-
-async function updateAppMetadata(update: Partial<WithoutDocMetadata<Workspace>>) {
-  const app = await workspaceDb.get("app_metadata")
-  await workspaceDb.put({
-    ...app,
-    ...update,
-  })
-}
-
-async function addUsersTable(roleInclusion: string[]) {
-  await workspaceDb.put({
-    _id: "ta_users",
-    type: "table",
-    name: "Users",
-    sourceType: "internal",
-    sourceId: "bb_internal",
-    schema: {
-      roleId: {
-        name: "roleId",
-        type: "options",
-        constraints: {
-          type: "string",
-          inclusion: roleInclusion,
-        },
-      },
-    },
   })
 }
 

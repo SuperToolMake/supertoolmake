@@ -58,8 +58,10 @@ const Constraints = {
   },
 }
 
-const ConstraintMap: Record<string, ValidationConstraintOption[]> = {
-  ["string"]: [
+type FieldType = "string" | "number" | "boolean" | "datetime" | "link" | "array"
+
+const ConstraintMap: Record<FieldType, ValidationConstraintOption[]> = {
+  string: [
     Constraints.Required,
     Constraints.MinLength,
     Constraints.MaxLength,
@@ -68,32 +70,29 @@ const ConstraintMap: Record<string, ValidationConstraintOption[]> = {
     Constraints.Regex,
     Constraints.NotRegex,
   ],
-  ["number"]: [
+  number: [
     Constraints.Required,
     Constraints.MaxValue,
     Constraints.MinValue,
     Constraints.Equal,
     Constraints.NotEqual,
   ],
-  ["boolean"]: [Constraints.Required, Constraints.Equal, Constraints.NotEqual],
-  ["datetime"]: [
+  boolean: [Constraints.Required, Constraints.Equal, Constraints.NotEqual],
+  datetime: [
     Constraints.Required,
     Constraints.MaxValue,
     Constraints.MinValue,
     Constraints.Equal,
     Constraints.NotEqual,
   ],
-  ["attachment"]: [Constraints.Required, Constraints.MaxFileSize, Constraints.MaxUploadSize],
-  ["attachment_single"]: [Constraints.Required, Constraints.MaxUploadSize],
-  ["signature_single"]: [Constraints.Required],
-  ["link"]: [
+  link: [
     Constraints.Required,
     Constraints.Contains,
     Constraints.NotContains,
     Constraints.MinLength,
     Constraints.MaxLength,
   ],
-  ["array"]: [
+  array: [
     Constraints.Required,
     Constraints.MinLength,
     Constraints.MaxLength,
@@ -102,6 +101,6 @@ const ConstraintMap: Record<string, ValidationConstraintOption[]> = {
   ],
 }
 
-export const getConstraintsForType = (type: string): ValidationConstraintOption[] => {
+export const getConstraintsForType = (type: FieldType): ValidationConstraintOption[] => {
   return ConstraintMap[type] || []
 }
