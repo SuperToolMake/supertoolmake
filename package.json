@@ -29,6 +29,7 @@
     "testcontainers": "^11.7.2",
     "typescript": "5.9.2",
     "update-dotenv": "1.1.1",
+    "audit-ci": "7.1.0",
     "yargs": "^17.7.2"
   },
   "scripts": {
