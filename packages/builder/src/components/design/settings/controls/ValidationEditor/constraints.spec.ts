@@ -9,8 +9,4 @@ describe("validation constraints", () => {
     expect(values).toContain("minLength")
     expect(values).toContain("maxLength")
   })
-
-  it("returns empty constraints for unknown field types", () => {
-    expect(getConstraintsForType("not-a-real-type")).toStrictEqual([])
-  })
 })

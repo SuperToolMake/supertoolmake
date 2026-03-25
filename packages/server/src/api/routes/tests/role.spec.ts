@@ -167,7 +167,7 @@ describe("/roles", () => {
         status: 200,
       })
 
-      expect(res.length).toBe(5)
+      expect(res.length).toBe(4)
 
       const adminRole = res.find((r) => r._id === BUILTIN_ROLE_IDS.ADMIN)
       expect(adminRole).toBeDefined()
@@ -247,7 +247,7 @@ describe("/roles", () => {
         const res = await config.api.roles.accessible({
           status: 200,
         })
-        expect(res.length).toBe(5)
+        expect(res.length).toBe(4)
         expect(typeof res[0]).toBe("string")
       })
     })

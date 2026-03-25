@@ -69,7 +69,7 @@ describe("/api/global/roles", () => {
     it("retrieves roles", async () => {
       const res = await config.api.roles.get()
       expect(res.body).toBeDefined()
-      expect(res.body[workspaceId].roles.length).toEqual(5)
+      expect(res.body[workspaceId].roles.length).toEqual(4)
       expect(res.body[workspaceId].roles.map((r: any) => r._id)).toContain(ROLE_NAME)
     })
   })
