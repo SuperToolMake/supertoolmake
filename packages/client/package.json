@@ -29,13 +29,13 @@
     "@budibase/string-templates": "*",
     "@budibase/types": "*",
     "@spectrum-css/card": "3.0.3",
-    "apexcharts": "^3.48.0",
-    "dayjs": "^1.10.8",
+    "apexcharts": "3.48.0",
+    "dayjs": "1.10.8",
     "downloadjs": "1.4.7",
-    "sanitize-html": "^2.13.0",
-    "shortid": "^2.2.15",
+    "sanitize-html": "2.13.0",
+    "shortid": "2.2.15",
     "svelte-legacy": "npm:svelte@4.2.20",
-    "svelte-spa-router": "^4.0.1"
+    "svelte-spa-router": "4.0.1"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^6.1.3",

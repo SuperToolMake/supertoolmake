@@ -21,10 +21,10 @@
     "manifest": "ts-node ./scripts/gen-collection-info.ts"
   },
   "dependencies": {
-    "@budibase/handlebars-helpers": "^0.13.2",
-    "@budibase/vm-browserify": "^1.1.4",
-    "dayjs": "^1.10.8",
-    "handlebars": "^4.7.8"
+    "@budibase/handlebars-helpers": "0.13.2",
+    "@budibase/vm-browserify": "1.1.4",
+    "dayjs": "1.10.8",
+    "handlebars": "4.7.8"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.1.0",

@@ -73,11 +73,11 @@
     "@spectrum-css/typography": "3.0.1",
     "@spectrum-css/underlay": "2.0.9",
     "@spectrum-css/vars": "3.0.1",
-    "date-fns": "^4.1.0",
-    "dayjs": "^1.10.8",
-    "easymde": "^2.16.1",
-    "svelte-dnd-action": "^0.9.8",
-    "svelte-portal": "^2.2.1"
+    "date-fns": "4.1.0",
+    "dayjs": "1.10.8",
+    "easymde": "2.16.1",
+    "svelte-dnd-action": "0.9.8",
+    "svelte-portal": "2.2.1"
   },
   "resolutions": {
     "loader-utils": "1.4.1"
