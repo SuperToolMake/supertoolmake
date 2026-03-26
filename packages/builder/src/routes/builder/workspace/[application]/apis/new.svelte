@@ -34,11 +34,11 @@ let externalDatasourceModal: CreateExternalDatasourceModal
 let externalDatasourceLoading = false
 
 $: restIntegration = ($integrations || []).find(
-  integration => integration.name === IntegrationTypes.REST
+  (integration) => integration.name === IntegrationTypes.REST
 )
 
 $: restDatasources = ($datasources.list || []).filter(
-  datasource => datasource.source === SourceName.REST
+  (datasource) => datasource.source === SourceName.REST
 )
 
 $: hasRestDatasources = restDatasources.length > 0

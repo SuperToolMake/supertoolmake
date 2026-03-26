@@ -88,8 +88,7 @@ function validateConstraints(
   }
 
   if (constraints.length) {
-    const valueLength =
-      typeof value === "string" || Array.isArray(value) ? value.length : undefined
+    const valueLength = typeof value === "string" || Array.isArray(value) ? value.length : undefined
     const minimum = parseLimit(constraints.length.minimum)
     const maximum = parseLimit(constraints.length.maximum)
 
