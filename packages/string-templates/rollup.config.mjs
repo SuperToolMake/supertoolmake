@@ -2,9 +2,9 @@ import commonjs from "@rollup/plugin-commonjs"
 import inject from "@rollup/plugin-inject"
 import json from "@rollup/plugin-json"
 import resolve from "@rollup/plugin-node-resolve"
+import terser from "@rollup/plugin-terser"
 import typescript from "@rollup/plugin-typescript"
 import polyfillNode from "rollup-plugin-polyfill-node"
-import { terser } from "rollup-plugin-terser"
 
 const production = !process.env.ROLLUP_WATCH
 
@@ -32,7 +32,11 @@ const config = (input, outputFile, format) => ({
     }),
     commonjs(),
     json(),
-    inject({ Buffer: ["buffer", "Buffer"], process: "process/browser" }),
+    inject({
+      exclude: ["**/*.ts", "**/*.tsx"],
+      Buffer: ["buffer", "Buffer"],
+      process: "process/browser",
+    }),
     production && terser(),
   ],
 })

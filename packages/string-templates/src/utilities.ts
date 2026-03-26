@@ -1,3 +1,5 @@
+import { Buffer } from "buffer"
+import process from "process"
 import { isTest, isTestingBackendJS } from "./environment"
 
 const ALPHA_NUMERIC_REGEX = /^[A-Za-z0-9]+$/g
