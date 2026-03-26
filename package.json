@@ -108,7 +108,8 @@
     "globals": "15.13.0",
     "esm": "npm:esm-wallaby@3.2.35",
     "@types/koa": "3.0.1",
-    "brace-expansion": "5.0.5"
+    "brace-expansion": "5.0.5",
+    "@smithy/node-http-handler": "4.4.16"
   },
   "engines": {
     "node": ">=22.0.0 <23.0.0"
