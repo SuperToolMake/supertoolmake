@@ -36,7 +36,6 @@ import { dataEnvironmentStore, dataAPI } from "./dataEnvironment"
 
 import type { FetchAppPackageResponse } from "@budibase/types"
 import { selectedAppUrls } from "./appUrls"
-import { restTemplates } from "./restTemplates"
 
 export {
   appStore,
@@ -57,7 +56,6 @@ export {
   permissions,
   previewStore,
   queries,
-  restTemplates,
   roles,
   rowActions,
   screenComponentErrorList,

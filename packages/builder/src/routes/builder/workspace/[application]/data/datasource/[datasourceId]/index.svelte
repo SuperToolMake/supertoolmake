@@ -5,7 +5,6 @@ import { cloneDeep } from "lodash/fp"
 import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
 import { IntegrationTypes } from "@/constants/backend"
 import { datasources, integrations } from "@/stores/builder"
-import { restTemplates } from "@/stores/builder/restTemplates"
 import EditDatasourceConfig from "./_components/EditDatasourceConfig.svelte"
 import PromptQueryModal from "./_components/PromptQueryModal.svelte"
 import RestAuthenticationPanel from "./_components/panels/Authentication/index.svelte"
@@ -41,7 +40,6 @@ $params
 
 let selectedPanel = $params.tab ?? null
 let panelOptions = []
-let templateIcon
 
 const markDirty = () => {
   if (!updatedDatasource) {
@@ -82,10 +80,6 @@ const getOptions = (datasource) => {
 }
 
 $: datasource = $datasources.selected
-$: templateIcon =
-  datasource?.restTemplate && $restTemplates
-    ? restTemplates.getByName(datasource.restTemplate)?.icon
-    : undefined
 
 $: isRestDatasource = datasource?.source === IntegrationTypes.REST
 $: getOptions(datasource)
@@ -108,7 +102,6 @@ $: if (datasource && (!updatedDatasource || updatedDatasource._id !== datasource
         <IntegrationIcon
           integrationType={datasource?.source}
           schema={$integrations?.[datasource?.source]}
-          iconUrl={templateIcon}
           size="26"
         />
         <Heading size="M">{$datasources.selected?.name}</Heading>

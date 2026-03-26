@@ -1,6 +1,5 @@
 <script>
 import { goto } from "@roxi/routify"
-import APIEndpointViewer from "@/components/integration/APIEndpointViewer.svelte"
 import RestQueryViewer from "@/components/integration/RestQueryViewer.svelte"
 import { IntegrationTypes } from "@/constants/backend"
 import { datasources, queries } from "@/stores/builder"
@@ -17,9 +16,5 @@ $: {
 </script>
 
 {#if query && isRestSource}
-  {#if datasource.restTemplate}
-    <APIEndpointViewer queryId={$queries.selectedQueryId} />
-  {:else}
-    <RestQueryViewer queryId={$queries.selectedQueryId} />
-  {/if}
+  <RestQueryViewer queryId={$queries.selectedQueryId} />
 {/if}

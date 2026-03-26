@@ -12,9 +12,6 @@ export let markDirty
 
 // Use parent-provided updatedDatasource when available
 const getTemplateStaticVariableKeys = (datasource) => {
-  if (!datasource?.restTemplate) {
-    return []
-  }
   const configured = datasource?.config?.templateStaticVariables || []
   return Array.from(new Set(configured.filter(Boolean)))
 }

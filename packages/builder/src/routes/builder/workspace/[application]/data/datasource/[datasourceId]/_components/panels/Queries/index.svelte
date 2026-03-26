@@ -8,7 +8,6 @@ import Panel from "../Panel.svelte"
 import Tooltip from "../Tooltip.svelte"
 import RestImportButton from "./RestImportButton.svelte"
 import RestImportQueriesModal from "./RestImportQueriesModal.svelte"
-import RestTemplateImportModal from "./RestTemplateImportModal.svelte"
 
 $goto
 
@@ -21,8 +20,7 @@ let restImportModal
 
 $: supportsViews = datasource.source === "POSTGRES" || datasource.source === "MYSQL"
 $: isRestDatasource = datasource?.source === "REST"
-$: isTemplateDatasource = Boolean(datasource?.restTemplate)
-$: showImportButton = isRestDatasource && !isTemplateDatasource
+$: showImportButton = isRestDatasource
 $: createQueryLabel = isRestDatasource ? "Add action" : "Create new query"
 </script>
 
@@ -40,17 +38,10 @@ $: createQueryLabel = isRestDatasource ? "Add action" : "Create new query"
 
 {#if isRestDatasource}
   <Modal bind:this={restImportModal}>
-    {#if isTemplateDatasource}
-      <RestTemplateImportModal
-        datasourceId={datasource._id}
-        createDatasource={false}
-      />
-    {:else}
-      <RestImportQueriesModal
-        datasourceId={datasource._id}
-        createDatasource={false}
-      />
-    {/if}
+    <RestImportQueriesModal
+      datasourceId={datasource._id}
+      createDatasource={false}
+    />
   </Modal>
 {/if}
 

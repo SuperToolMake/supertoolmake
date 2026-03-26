@@ -72,7 +72,6 @@ let nestedSchemaFields = {}
 let saving
 let queryNameLabel
 let mounted = false
-let isTemplateDatasource = false
 let defaultAuthApplied = false
 let defaultAuthKey
 let lastSyncedQueryId
@@ -356,7 +355,6 @@ $: mergedBindings = [
   ...globalDynamicRequestBindings,
 ]
 
-$: isTemplateDatasource = Boolean(datasource?.restTemplate)
 $: bindingPreviewContext = getBindingContext([
   requestBindings,
   globalDynamicBindings,
@@ -546,8 +544,6 @@ onMount(async () => {
               getOptionValue={option => option.value}
               getOptionLabel={option => option.label}
               getOptionColour={option => option.colour}
-              readonly={isTemplateDatasource}
-              hideChevron={isTemplateDatasource}
             />
           </div>
           <div class="url">

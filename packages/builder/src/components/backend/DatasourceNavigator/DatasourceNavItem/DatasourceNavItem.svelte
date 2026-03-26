@@ -7,7 +7,6 @@ import DeleteDataConfirmModal from "@/components/backend/modals/DeleteDataConfir
 import NavItem from "@/components/common/NavItem.svelte"
 import { BUDIBASE_INTERNAL_DB_ID } from "@/constants/backend"
 import { contextMenuStore, userSelectedResourceMap } from "@/stores/builder"
-import { restTemplates } from "@/stores/builder/restTemplates"
 
 export let datasource
 
@@ -48,11 +47,6 @@ const openContextMenu = (e) => {
 $: goto = $gotoStore
 $params
 
-$: templateIcon =
-  datasource?.restTemplate && $restTemplates
-    ? restTemplates.getByName(datasource.restTemplate)?.icon
-    : undefined
-
 let editModal: UpdateDatasourceModal
 let deleteConfirmationModal: DeleteDataConfirmModal
 
@@ -88,7 +82,6 @@ let addQueryItem = {
     <IntegrationIcon
       integrationType={datasource.source}
       schema={datasource.schema}
-      iconUrl={templateIcon}
       size="18"
     />
   </div>
