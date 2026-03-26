@@ -8,18 +8,11 @@ import {
   type Row,
   type Table,
 } from "@budibase/types"
-import validateJs from "validate.js"
 import * as utils from "../../../../db/utils"
 import sdk from "../../../../sdk"
 import { processDates } from "../../../../utilities/rowProcessor"
 import { basicProcessing, generateIdForRow } from "./basic"
 import { isKnexRows } from "./sqlUtils"
-
-validateJs.extend(validateJs.validators.datetime, {
-  parse: (value: string) => new Date(value).getTime(),
-  // Input is a unix timestamp
-  format: (value: string) => new Date(value).toISOString(),
-})
 
 export async function processRelationshipFields(
   table: Table,

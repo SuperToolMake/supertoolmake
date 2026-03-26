@@ -1,7 +1,7 @@
 {
   "name": "@budibase/worker",
   "email": "hi@budibase.com",
-  "version": "0.0.0",
+  "version": "3.23.32",
   "description": "Background service",
   "main": "src/index.ts",
   "repository": {
@@ -33,7 +33,7 @@
     "@budibase/string-templates": "*",
     "@budibase/types": "*",
     "@koa/router": "13.1.0",
-    "@techpass/passport-openidconnect": "0.3.3",
+    "@techpass/passport-openidconnect": "1.0.0",
     "@types/global-agent": "2.1.1",
     "aws-sdk": "2.1692.0",
     "bcrypt": "6.0.0",
@@ -55,7 +55,7 @@
     "koa-session": "5.13.1",
     "koa-static": "5.0.0",
     "koa-useragent": "4.1.0",
-    "lodash": "4.17.21",
+    "lodash": "4.17.23",
     "marked": "15.0.11",
     "node-fetch": "2.6.7",
     "nodemailer": "7.0.11",
@@ -64,7 +64,7 @@
     "pouchdb": "7.3.0",
     "undici": "7.24.0",
     "uuid": "8.3.2",
-    "yaml": "2.8.0"
+    "yaml": "2.8.3"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "9.0.3",

@@ -16,7 +16,6 @@ import {
 } from "@budibase/types"
 import dayjs from "dayjs"
 import cloneDeep from "lodash/fp/cloneDeep"
-import validateJs from "validate.js"
 import { getTableFromSource } from "../../../api/controllers/row/utils"
 import { Format } from "../../../api/controllers/table/exporters"
 import { isRelationshipColumn } from "../../../db/utils"
@@ -37,6 +36,107 @@ const SQL_CLIENT_SOURCE_MAP: Record<SourceName, SqlClient | undefined> = {
 
 const XSS_INPUT_REGEX =
   /[<>;"'(){}]|--|\/\*|\*\/|union|select|insert|drop|delete|update|exec|script/i
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+function isRequired(presence: FieldConstraints["presence"]) {
+  return (
+    presence === true ||
+    (typeof presence === "object" && presence != null && presence.allowEmpty === false)
+  )
+}
+
+function parseLimit(limit: string | number | null | undefined): number | undefined {
+  if (limit == null || limit === "") {
+    return undefined
+  }
+  const value = Number(limit)
+  return Number.isFinite(value) ? value : undefined
+}
+
+function parseDate(value: unknown): Date | undefined {
+  if (value == null || value === "") {
+    return undefined
+  }
+  const date = new Date(value as string | number | Date)
+  return Number.isNaN(date.getTime()) ? undefined : date
+}
+
+function validateConstraints(
+  value: unknown,
+  constraints: FieldConstraints | undefined
+): string[] | undefined {
+  if (!constraints) {
+    return undefined
+  }
+
+  const errors: string[] = []
+  if (isRequired(constraints.presence) && (value == null || value === "")) {
+    errors.push("can't be blank")
+  }
+
+  // Validate.js ignored optional empty values unless presence was required.
+  if (value == null || value === "") {
+    return errors.length ? errors : undefined
+  }
+
+  if (constraints.email && (typeof value !== "string" || !EMAIL_REGEX.test(value))) {
+    errors.push("is not a valid email")
+  }
+
+  if (constraints.inclusion?.length && !constraints.inclusion.includes(value as string)) {
+    errors.push("is not included in the list")
+  }
+
+  if (constraints.length) {
+    const valueLength =
+      typeof value === "string" || Array.isArray(value) ? value.length : undefined
+    const minimum = parseLimit(constraints.length.minimum)
+    const maximum = parseLimit(constraints.length.maximum)
+
+    if (valueLength != null) {
+      if (minimum != null && valueLength < minimum) {
+        errors.push(constraints.length.message || `is too short (minimum is ${minimum})`)
+      }
+      if (maximum != null && valueLength > maximum) {
+        errors.push(constraints.length.message || `is too long (maximum is ${maximum})`)
+      }
+    }
+  }
+
+  if (constraints.numericality) {
+    const numericValue = Number(value)
+    if (!Number.isFinite(numericValue)) {
+      errors.push("is not a number")
+    } else {
+      const minimum = parseLimit(constraints.numericality.greaterThanOrEqualTo)
+      const maximum = parseLimit(constraints.numericality.lessThanOrEqualTo)
+      if (minimum != null && numericValue < minimum) {
+        errors.push(`must be greater than or equal to ${minimum}`)
+      }
+      if (maximum != null && numericValue > maximum) {
+        errors.push(`must be less than or equal to ${maximum}`)
+      }
+    }
+  }
+
+  if (constraints.datetime && value) {
+    const dateValue = parseDate(value)
+    if (!dateValue) {
+      errors.push("is not a valid date")
+    } else {
+      const earliest = parseDate(constraints.datetime.earliest)
+      const latest = parseDate(constraints.datetime.latest)
+      if (earliest && dateValue.getTime() < earliest.getTime()) {
+        errors.push(`must be no earlier than ${constraints.datetime.earliest}`)
+      }
+      if (latest && dateValue.getTime() > latest.getTime()) {
+        errors.push(`must be no later than ${constraints.datetime.latest}`)
+      }
+    }
+  }
+
+  return errors.length ? errors : undefined
+}
 
 export function getSQLClient(datasource: Datasource): SqlClient {
   if (!isSQL(datasource)) {
@@ -217,7 +317,7 @@ export async function validate({ source, row }: { source: Table; row: Row }): Pr
     } else if (type === FieldType.DATETIME && column.timeOnly) {
       res = validateTimeOnlyField(fieldName, row[fieldName], constraints)
     } else {
-      res = validateJs.single(row[fieldName], constraints)
+      res = validateConstraints(row[fieldName], constraints)
     }
 
     if (env.XSS_SAFE_MODE && typeof row[fieldName] === "string") {
@@ -286,7 +386,7 @@ function validateTimeOnlyField(
       }
     }
 
-    let jsValidation = validateJs.single(castedValue?.toISOString(), castedConstraints)
+    let jsValidation = validateConstraints(castedValue?.toISOString(), castedConstraints)
     jsValidation = jsValidation?.map((m: string) =>
       m
         ?.replace(castedConstraints.datetime?.earliest || "", easliestTimeString || "")
