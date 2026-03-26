@@ -141,9 +141,7 @@ export class DatasourceStore extends DerivedBudiStore<
   }
 
   sourceCount(source: string) {
-    return get(this.store).rawList.filter(
-      (datasource) => datasource.source === source
-    ).length
+    return get(this.store).rawList.filter((datasource) => datasource.source === source).length
   }
 
   async checkDatasourceValidity(
