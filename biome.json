@@ -120,6 +120,19 @@
           }
         }
       }
+    },
+    {
+      "includes": [
+        "packages/string-templates/src/environment.ts",
+        "packages/string-templates/src/utilities.ts"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "useNodejsImportProtocol": "off"
+          }
+        }
+      }
     }
   ],
   "assist": {
