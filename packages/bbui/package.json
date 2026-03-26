@@ -1,7 +1,7 @@
 {
   "name": "@budibase/bbui",
   "description": "A UI solution used in the different Budibase projects.",
-  "version": "0.0.0",
+  "version": "3.23.32",
   "license": "MPL-2.0",
   "module": "dist/bbui.mjs",
   "exports": {

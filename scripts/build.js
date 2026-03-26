@@ -5,16 +5,29 @@ const start = Date.now()
 const fs = require("fs")
 const { readdir, copyFile, mkdir } = require("node:fs/promises")
 const path = require("path")
+const { createRequire } = require("node:module")
 
 const { build } = require("esbuild")
-const { compile, preprocess } = require("svelte/compiler")
-const sveltePreprocess = require("svelte-preprocess")
 const { loadTsConfig } = require("load-tsconfig")
 
 const {
   default: TsconfigPathsPlugin,
 } = require("@esbuild-plugins/tsconfig-paths")
 const { nodeExternalsPlugin } = require("esbuild-node-externals")
+
+// Prefer dependencies from the current workspace (process.cwd()), so the
+// Svelte compiler version matches the runtime used by that package.
+const localRequire = createRequire(path.join(process.cwd(), "package.json"))
+function requireWorkspace(moduleName) {
+  try {
+    return localRequire(moduleName)
+  } catch {
+    return require(moduleName)
+  }
+}
+
+const { compile, preprocess } = requireWorkspace("svelte/compiler")
+const sveltePreprocess = requireWorkspace("svelte-preprocess")
 
 const svelteCompilePlugin = {
   name: "svelteCompile",

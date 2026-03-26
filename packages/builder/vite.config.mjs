@@ -31,10 +31,6 @@ const copyFonts = dest =>
         dest,
       },
       {
-        src: "./assets/rest-template-icons",
-        dest,
-      },
-      {
         src: "../../node_modules/remixicon/fonts/*",
         dest,
       },

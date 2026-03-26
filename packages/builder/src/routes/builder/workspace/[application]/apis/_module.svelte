@@ -10,11 +10,9 @@ import TopBar from "@/components/common/TopBar.svelte"
 import Panel from "@/components/design/Panel.svelte"
 import { IntegrationTypes } from "@/constants/backend"
 import { builderStore, datasources } from "@/stores/builder"
-import APIModal from "./_components/APIModal.svelte"
 
 let searchValue: string
 let panelWidth = 260
-let apiModal: APIModal
 
 const loadPanelWidth = () => {
   const saved = localStorage.getItem("api-panel-width")
@@ -62,8 +60,6 @@ $: if (shouldRedirectToNew) {
 }
 </script>
 
-<APIModal bind:this={apiModal} />
-
 <!-- routify:options index=1 -->
 <div class="wrapper" class:resizing-panel={$builderStore.isResizingPanel}>
   <TopBar icon="globe-simple" breadcrumbs={[{ text: "APIs" }]}></TopBar>
@@ -77,7 +73,7 @@ $: if (shouldRedirectToNew) {
               placeholder="Search APIs"
               bind:value={searchValue}
               onAdd={() => {
-                apiModal.show()
+                goto("./new")
               }}
             />
           </span>
