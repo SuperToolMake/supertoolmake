@@ -2,8 +2,6 @@ import {
   type Datasource,
   DatasourceFeature,
   type Integration,
-  type RestTemplateName,
-  type RestTemplateSpecVersion,
   SourceName,
   type UIIntegration,
 } from "@budibase/types"
@@ -142,11 +140,9 @@ export class DatasourceStore extends DerivedBudiStore<
     this.updateDatasourceInStore(response)
   }
 
-  sourceCount(source: string, restTemplate?: string) {
+  sourceCount(source: string) {
     return get(this.store).rawList.filter(
-      (datasource) =>
-        datasource.source === source &&
-        (restTemplate !== undefined ? datasource.restTemplate === restTemplate : true)
+      (datasource) => datasource.source === source
     ).length
   }
 
@@ -169,16 +165,12 @@ export class DatasourceStore extends DerivedBudiStore<
     integration,
     config,
     name,
-    restTemplate,
-    restTemplateVersion,
   }: {
     integration: UIIntegration
     config: Record<string, any>
     name?: string
-    restTemplate?: RestTemplateName
-    restTemplateVersion?: RestTemplateSpecVersion
   }) {
-    const count = this.sourceCount(integration.name, restTemplate)
+    const count = this.sourceCount(integration.name)
     const nameModifier = count === 0 ? "" : ` ${count + 1}`
 
     const datasource: Datasource = {
@@ -188,8 +180,6 @@ export class DatasourceStore extends DerivedBudiStore<
       name: `${name || integration.friendlyName}${nameModifier}`,
       plus: integration.plus && integration.name !== SourceName.REST,
       isSQL: integration.isSQL,
-      ...(restTemplate && { restTemplate }),
-      ...(restTemplateVersion && { restTemplateVersion }),
     }
 
     const { valid, error } = await this.checkDatasourceValidity(integration, datasource)
