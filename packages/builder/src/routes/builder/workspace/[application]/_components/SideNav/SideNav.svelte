@@ -22,7 +22,7 @@ import {
 } from "@budibase/types"
 import { goto as gotoStore, isActive, url } from "@roxi/routify"
 import BBLogo from "assets/BBLogo.svelte"
-import { onDestroy, setContext } from "svelte"
+import { onDestroy, onMount, setContext } from "svelte"
 import { derived, get, type Readable } from "svelte/store"
 import { IntegrationTypes } from "@/constants/backend"
 import { buildLiveUrl } from "@/helpers/urls"
@@ -124,6 +124,12 @@ const initFavourites = () => {
   const stores = initResourceStores()
   resourceLookup = generateResourceLookup(stores)
 }
+
+onMount(() => {
+  if ($pinned) {
+    initFavourites()
+  }
+})
 
 const resourceLink = (favourite: WorkspaceFavourite) => {
   const appPrefix = `/builder/workspace/[application]`
