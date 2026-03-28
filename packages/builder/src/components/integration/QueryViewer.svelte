@@ -24,7 +24,6 @@ import { datasources, integrations, queries } from "@/stores/builder"
 import AccessLevelSelect from "./AccessLevelSelect.svelte"
 import ConnectedQueryScreens from "./ConnectedQueryScreens.svelte"
 import ExtraQueryConfig from "./ExtraQueryConfig.svelte"
-import QueryViewerSavePromptModal from "./QueryViewerSavePromptModal.svelte"
 import QueryViewerSidePanel from "./QueryViewerSidePanel/index.svelte"
 
 $goto
@@ -154,10 +153,6 @@ $: debouncedCheckIsModified(newQuery)
 </script>
 
 <svelte:window on:keydown={handleKeyDown} on:keyup={handleKeyUp} />
-<QueryViewerSavePromptModal
-  checkIsModified={() => checkIsModified(newQuery)}
-  attemptSave={() => runQuery({ suppressErrors: false }).then(saveQuery)}
-/>
 <div class="queryViewer">
   <div class="main">
     <div class="header" class:scrolling>
