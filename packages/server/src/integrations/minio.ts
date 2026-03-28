@@ -197,7 +197,8 @@ export class MinioIntegration implements IntegrationBase {
 
       switch (query.extra.actionType) {
         case "removeObject": {
-          return await this.client.removeObject(bucketName, object as string)
+          await this.client.removeObject(bucketName, object as string)
+          return { deleted: "ok" }
         }
         case "removeObjects": {
           const objects = Array.isArray(query.json) ? query.json : [query.json]
@@ -205,7 +206,7 @@ export class MinioIntegration implements IntegrationBase {
           for (const objName of objectNames) {
             await this.client.removeObject(bucketName, objName)
           }
-          return { deleted: objectNames.length }
+          return { deleted: "ok" }
         }
         default: {
           throw new Error(`actionType ${query.extra.actionType} does not exist for delete`)
