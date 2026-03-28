@@ -131,24 +131,50 @@ onMount(() => {
   }
 })
 
-const resourceLink = (favourite: WorkspaceFavourite) => {
-  const appPrefix = `/builder/workspace/[application]`
-  const link: Record<WorkspaceResource, ResourceLinkFn> = {
+interface ResourceLinkResult {
+  path: string
+  params: Record<string, string>
+}
+
+const resourceLink = (favourite: WorkspaceFavourite): ResourceLinkResult | null => {
+  const appPrefix = "./"
+  const currentAppId = $appStore.appId
+  const link: Record<WorkspaceResource, (id: string) => ResourceLinkResult> = {
     [WorkspaceResource.DATASOURCE]: (id: string) => {
       const datasourceMap = get(datasourceLookup) || {}
       const datasource = datasourceMap[id]
       return datasource?.source === IntegrationTypes.REST
-        ? `${appPrefix}/apis/datasource/[datasourceId]`
-        : `${appPrefix}/data/datasource/[datasourceId]`
+        ? {
+            path: `${appPrefix}apis/datasource/[datasourceId]`,
+            params: { application: currentAppId, datasourceId: id },
+          }
+        : {
+            path: `${appPrefix}data/datasource/[datasourceId]`,
+            params: { application: currentAppId, datasourceId: id },
+          }
     },
-    [WorkspaceResource.TABLE]: (id: string) => `${appPrefix}/data/table/${id}`,
+    [WorkspaceResource.TABLE]: (id: string) => ({
+      path: `${appPrefix}data/table/[tableId]`,
+      params: { application: currentAppId, tableId: id },
+    }),
     [WorkspaceResource.WORKSPACE_APP]: (id: string) => {
       const wsa = $workspaceAppStore.workspaceApps.find((app: UIWorkspaceApp) => app._id === id)
-      if (!wsa) {
+      const screenId = wsa?.screens?.[0]?._id
+      if (!wsa || !screenId) {
         notifications.error("Could not resolve the workspace app URL")
-        return ""
+        return {
+          path: "",
+          params: {
+            application: currentAppId,
+            workspaceAppId: id,
+            screenId: "",
+          },
+        }
       }
-      return `${appPrefix}/design/${wsa.screens[0]?._id}`
+      return {
+        path: `./design/[workspaceAppId]/[screenId]`,
+        params: { application: currentAppId, workspaceAppId: id, screenId },
+      }
     },
     [WorkspaceResource.QUERY]: (id: string) => {
       const queriesStore = get(queries)
@@ -156,7 +182,10 @@ const resourceLink = (favourite: WorkspaceFavourite) => {
       const query = queriesStore.list?.find((q) => q._id === id)
       const datasource = query?.datasourceId ? datasourceMap[query.datasourceId] : undefined
       const basePath = datasource?.source === IntegrationTypes.REST ? "apis" : "data"
-      return `${appPrefix}/${basePath}/query/${id}`
+      return {
+        path: `${appPrefix}${basePath}/query/[queryId]`,
+        params: { application: currentAppId, queryId: id },
+      }
     },
   }
   if (!link[favourite.resourceType]) return null
@@ -220,8 +249,6 @@ $: backupErrors = getBackupErrors($enrichedApps || [], appId)
 $: backupErrorCount = Object.keys(backupErrors).length
 
 $: goto = $gotoStore
-
-type ResourceLinkFn = (_id: string) => string
 
 interface UIFavouriteResource {
   name: string
@@ -381,13 +408,12 @@ onDestroy(() => {
                       icon={lookup?.icon}
                       text={lookup?.name}
                       {collapsed}
-                      isActive={$isActive(resourceLink(favourite) ?? "", {
-                        application: appId,
-                        datasourceId: favourite.resourceId,
+                      isActive={$isActive(resourceLink(favourite)?.path ?? "", {
+                        ...resourceLink(favourite)?.params,
                       })}
                       on:click={() => {
                         const targetLink = resourceLink(favourite)
-                        if (targetLink) goto(targetLink)
+                        if (targetLink) goto(targetLink.path, targetLink.params)
                         keepCollapsed()
                       }}
                     >
