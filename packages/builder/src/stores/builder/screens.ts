@@ -404,6 +404,14 @@ export class ScreenStore extends BudiStore<ScreenState> {
           delete state.selectedComponentId
           return state
         })
+
+        // Auto-select another screen if available
+        const remainingScreens = state.screens.filter((screen) => !deletedIds.includes(screen._id))
+        if (remainingScreens.length > 0) {
+          // Prefer home screen, otherwise select first available
+          const homeScreen = remainingScreens.find((s) => s.routing.homeScreen)
+          state.selectedScreenId = homeScreen?._id || remainingScreens[0]._id
+        }
       }
 
       // Update routing
