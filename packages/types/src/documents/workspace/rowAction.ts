@@ -6,11 +6,10 @@ export interface TableRowActions extends Document {
 }
 
 export interface RowActionData {
-  automationId: string
+  name: string
   permissions: RowActionPermissions
 }
 
 export interface RowActionPermissions {
   table: { runAllowed: boolean }
-  views: Record<string, { runAllowed: boolean }>
 }

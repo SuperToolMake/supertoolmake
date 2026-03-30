@@ -180,11 +180,6 @@
       "component": "DownloadFile"
     },
     {
-      "name": "Row Action",
-      "type": "data",
-      "component": "RowAction"
-    },
-    {
       "name": "Copy To Clipboard",
       "type": "data",
       "component": "CopyToClipboard",

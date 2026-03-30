@@ -8,7 +8,7 @@ import GridScrollWrapper from "./GridScrollWrapper.svelte"
 const {
   renderedRows,
   hoveredRowId,
-  gridProps,
+  props: gridProps,
   width,
   rows,
   focusedRow,

@@ -491,15 +491,6 @@ const downloadFileHandler = async (action) => {
   }
 }
 
-const rowActionHandler = async (action) => {
-  const { resourceId, rowId, rowActionId } = action.parameters
-  await API.rowActions.trigger(resourceId, rowActionId, rowId)
-  // Refresh related datasources
-  await dataSourceStore.actions.invalidateDataSource(resourceId, {
-    invalidateRelationships: true,
-  })
-}
-
 const handlerMap = {
   "Fetch Row": fetchRowHandler,
   "Save Row": saveRowHandler,
@@ -521,7 +512,6 @@ const handlerMap = {
   "Open Modal": openModalHandler,
   "Close Modal": closeModalHandler,
   "Download File": downloadFileHandler,
-  "Row Action": rowActionHandler,
   "Copy To Clipboard": copyToClipboardHandler,
 }
 
