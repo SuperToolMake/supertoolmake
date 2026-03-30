@@ -1,6 +1,5 @@
 import type {
   CreateRowActionRequest,
-  RowActionPermissionsResponse,
   RowActionResponse,
   RowActionsResponse,
   RowActionTriggerRequest,
@@ -45,80 +44,6 @@ export class RowActionAPI extends TestAPI {
       expectations,
       ...config,
     })
-  }
-
-  setTablePermission = async (
-    tableId: string,
-    rowActionId: string,
-    expectations?: Expectations,
-    config?: { publicUser?: boolean }
-  ) => {
-    return await this._post<RowActionPermissionsResponse>(
-      `/api/tables/${tableId}/actions/${rowActionId}/permissions`,
-      {
-        expectations: {
-          status: 200,
-          ...expectations,
-        },
-        ...config,
-      }
-    )
-  }
-
-  unsetTablePermission = async (
-    tableId: string,
-    rowActionId: string,
-    expectations?: Expectations,
-    config?: { publicUser?: boolean }
-  ) => {
-    return await this._delete<RowActionPermissionsResponse>(
-      `/api/tables/${tableId}/actions/${rowActionId}/permissions`,
-      {
-        expectations: {
-          status: 200,
-          ...expectations,
-        },
-        ...config,
-      }
-    )
-  }
-
-  setViewPermission = async (
-    tableId: string,
-    viewId: string,
-    rowActionId: string,
-    expectations?: Expectations,
-    config?: { publicUser?: boolean }
-  ) => {
-    return await this._post<RowActionPermissionsResponse>(
-      `/api/tables/${tableId}/actions/${rowActionId}/permissions/${viewId}`,
-      {
-        expectations: {
-          status: 200,
-          ...expectations,
-        },
-        ...config,
-      }
-    )
-  }
-
-  unsetViewPermission = async (
-    tableId: string,
-    viewId: string,
-    rowActionId: string,
-    expectations?: Expectations,
-    config?: { publicUser?: boolean }
-  ) => {
-    return await this._delete<RowActionPermissionsResponse>(
-      `/api/tables/${tableId}/actions/${rowActionId}/permissions/${viewId}`,
-      {
-        expectations: {
-          status: 200,
-          ...expectations,
-        },
-        ...config,
-      }
-    )
   }
 
   trigger = async (

@@ -22,5 +22,3 @@ export interface RowActionTriggerRequest {
 export interface RowActionTriggerResponse {
   message: string
 }
-
-export interface RowActionPermissionsResponse extends RowActionPermissionsData {}
