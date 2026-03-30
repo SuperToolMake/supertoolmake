@@ -8,7 +8,6 @@ import {
   Modal,
   ModalContent,
   notifications,
-  Toggle,
 } from "@budibase/bbui"
 import { goto, url } from "@roxi/routify"
 import { getContext } from "svelte"
@@ -25,14 +24,6 @@ let popover
 let createModal
 let newName
 
-const toggleAction = async (action, enabled) => {
-  if (enabled) {
-    await rowActions.enableView(tableId, action.id, viewId)
-  } else {
-    await rowActions.disableView(tableId, action.id, viewId)
-  }
-}
-
 const showCreateModal = () => {
   newName = null
   popover.hide()
@@ -41,7 +32,7 @@ const showCreateModal = () => {
 
 const createRowAction = async () => {
   try {
-    const newRowAction = await rowActions.createRowAction(tableId, viewId, newName)
+    const newRowAction = await rowActions.createRowAction(tableId, newName)
     notifications.success("Row action created successfully")
     $goto($rowActionUrl(newRowAction))
   } catch (error) {
@@ -52,11 +43,8 @@ const createRowAction = async () => {
 
 $: ds = $datasource
 $: tableId = ds?.tableId
-$: viewId = ds?.id
-$: isView = ds?.type === "viewV2"
 $: tableRowActions = $rowActions[tableId] || []
-$: viewRowActions = $rowActions[viewId] || []
-$: actionCount = isView ? viewRowActions.length : tableRowActions.length
+$: actionCount = tableRowActions.length
 $: newNameInvalid = newName && tableRowActions.some((x) => x.name === newName)
 
 const rowActionUrl = derived([url, appStore], ([$url, $appStore]) => {
@@ -78,9 +66,6 @@ const rowActionUrl = derived([url, appStore], ([$url, $appStore]) => {
     </ActionButton>
   </svelte:fragment>
   A row action is a user-triggered automation for a chosen row.
-  {#if isView && rowActions.length}
-    Use the toggle to enable/disable row actions for this view.
-  {/if}
   {#if !tableRowActions.length}
     You haven't created any row actions.
   {:else}
@@ -88,14 +73,6 @@ const rowActionUrl = derived([url, appStore], ([$url, $appStore]) => {
       {#each tableRowActions as action}
         <ListItem title={action.name} url={$rowActionUrl(action)} showArrow>
           <svelte:fragment slot="right">
-            {#if isView}
-              <span>
-                <Toggle
-                  value={action.allowedSources?.includes(viewId)}
-                  on:change={e => toggleAction(action, e.detail)}
-                />
-              </span>
-            {/if}
           </svelte:fragment>
         </ListItem>
       {/each}
@@ -129,14 +106,3 @@ const rowActionUrl = derived([url, appStore], ([$url, $appStore]) => {
     />
   </ModalContent>
 </Modal>
-
-<style>
-  span :global(.spectrum-Switch) {
-    min-height: 0;
-    margin-right: 0;
-  }
-  span :global(.spectrum-Switch-switch) {
-    margin-bottom: 0;
-    margin-top: 2px;
-  }
-</style>
