@@ -46,7 +46,7 @@ export class RowActionStore extends BudiStore<RowActionState> {
     }))
   }
 
-  createRowAction = async (tableId: string, viewId?: string, name?: string) => {
+  createRowAction = async (tableId: string, name?: string) => {
     if (!tableId) {
       return
     }
@@ -65,25 +65,9 @@ export class RowActionStore extends BudiStore<RowActionState> {
 
     // Create the action
     const res = await API.rowActions.create(tableId, name)
-
-    // Enable action on this view if adding via a view
-    if (viewId) {
-      await Promise.all([this.enableView(tableId, res.id, viewId)])
-    } else {
-      await Promise.all([this.refreshRowActions(tableId)])
-    }
+    await Promise.all([this.refreshRowActions(tableId)])
 
     return res
-  }
-
-  enableView = async (tableId: string, rowActionId: string, viewId: string) => {
-    await API.rowActions.enableView(tableId, rowActionId, viewId)
-    await this.refreshRowActions(tableId)
-  }
-
-  disableView = async (tableId: string, rowActionId: string, viewId: string) => {
-    await API.rowActions.disableView(tableId, rowActionId, viewId)
-    await this.refreshRowActions(tableId)
   }
 
   delete = async (tableId: string, rowActionId: string) => {
