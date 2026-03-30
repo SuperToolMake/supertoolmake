@@ -23,11 +23,6 @@ function flattenAllowedSources(tableId: string, permissions: RowActionPermission
   if (permissions?.table?.runAllowed !== false) {
     allowedSources.push(tableId)
   }
-  allowedSources.push(
-    ...Object.keys(permissions?.views || {}).filter(
-      (viewId) => permissions.views[viewId]?.runAllowed
-    )
-  )
   return allowedSources
 }
 

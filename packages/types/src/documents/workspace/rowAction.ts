@@ -12,5 +12,4 @@ export interface RowActionData {
 
 export interface RowActionPermissions {
   table: { runAllowed: boolean }
-  views: Record<string, { runAllowed: boolean }>
 }
