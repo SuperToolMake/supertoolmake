@@ -76,10 +76,6 @@ export class RowActionStore extends BudiStore<RowActionState> {
     // We don't need to refresh automations as we can only delete row actions
     // from the automations store, so we already handle the state update there
   }
-
-  trigger = async (sourceId: string, rowActionId: string, rowId: string) => {
-    await API.rowActions.trigger(sourceId, rowActionId, rowId)
-  }
 }
 
 const store = new RowActionStore()

@@ -1,30 +1,13 @@
-import { middleware, permissions } from "@budibase/backend-core"
+import { middleware } from "@budibase/backend-core"
 import Joi from "joi"
-import { authorizedMiddleware as authorized } from "../../middleware/authorized"
 import { paramResource } from "../../middleware/resourceId"
 import * as rowActionController from "../controllers/rowAction"
-import { builderRoutes, endpointGroupList } from "./endpointGroups"
-
-const { PermissionType, PermissionLevel } = permissions
-
-const readRoutes = endpointGroupList.group({
-  middleware: authorized(PermissionType.TABLE, PermissionLevel.READ),
-  first: false,
-})
+import { builderRoutes } from "./endpointGroups"
 
 function rowActionValidator() {
   return middleware.joiValidator.body(
     Joi.object({
       name: Joi.string().required(),
-    }),
-    { allowUnknown: false }
-  )
-}
-
-function rowTriggerValidator() {
-  return middleware.joiValidator.body(
-    Joi.object({
-      rowId: Joi.string().required(),
     }),
     { allowUnknown: false }
   )
@@ -43,10 +26,3 @@ builderRoutes
     paramResource("tableId"),
     rowActionController.remove
   )
-
-readRoutes.post(
-  "/api/tables/:sourceId/actions/:rowActionId/trigger",
-  paramResource("sourceId"),
-  rowTriggerValidator(),
-  rowActionController.run
-)

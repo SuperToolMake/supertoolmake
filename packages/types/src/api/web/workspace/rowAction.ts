@@ -14,10 +14,3 @@ export interface RowActionResponse extends RowActionData, RowActionPermissionsDa
 export interface RowActionsResponse {
   actions: Record<string, RowActionResponse>
 }
-
-export interface RowActionTriggerRequest {
-  rowId: string
-}
-export interface RowActionTriggerResponse {
-  message: string
-}

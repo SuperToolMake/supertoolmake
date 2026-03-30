@@ -1,10 +1,4 @@
-import type {
-  CreateRowActionRequest,
-  RowActionResponse,
-  RowActionsResponse,
-  RowActionTriggerRequest,
-  RowActionTriggerResponse,
-} from "@budibase/types"
+import type { CreateRowActionRequest, RowActionResponse, RowActionsResponse } from "@budibase/types"
 import { type Expectations, TestAPI } from "./base"
 
 export class RowActionAPI extends TestAPI {
@@ -45,22 +39,5 @@ export class RowActionAPI extends TestAPI {
       expectations,
       ...config,
     })
-  }
-
-  trigger = async (
-    tableId: string,
-    rowActionId: string,
-    body: RowActionTriggerRequest,
-    expectations?: Expectations,
-    config?: { publicUser?: boolean; useProdApp?: boolean }
-  ) => {
-    return await this._post<RowActionTriggerResponse>(
-      `/api/tables/${tableId}/actions/${rowActionId}/trigger`,
-      {
-        body,
-        expectations,
-        ...{ ...config, useProdApp: config?.useProdApp ?? true },
-      }
-    )
   }
 }

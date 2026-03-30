@@ -69,26 +69,4 @@ describe("/rowActions", () => {
       actions: {},
     })
   })
-
-  it("triggers a row action for an existing row", async () => {
-    const created = await config.api.rowAction.save(tableId, {
-      name: "Trigger me",
-    })
-
-    const response = await config.api.rowAction.trigger(
-      tableId,
-      created.id,
-      {
-        rowId: "ro_fake_row",
-      },
-      undefined,
-      {
-        useProdApp: false,
-      }
-    )
-
-    expect(response).toEqual({
-      message: "Row action triggered.",
-    })
-  })
 })

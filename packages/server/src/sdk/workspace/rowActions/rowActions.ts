@@ -116,11 +116,3 @@ export async function remove(tableId: string, rowActionId: string): Promise<void
 
   await db.put(doc)
 }
-
-export async function run(sourceId: string, rowActionId: string, rowId: string): Promise<void> {
-  // Keep the trigger endpoint as a lightweight validity check.
-  // Row actions are no longer automation-backed, so there is no server-side
-  // execution beyond confirming the action exists for the source table.
-  void rowId
-  await get(sourceId, rowActionId)
-}

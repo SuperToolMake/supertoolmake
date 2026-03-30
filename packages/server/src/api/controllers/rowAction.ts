@@ -3,8 +3,6 @@ import type {
   RowActionPermissions,
   RowActionResponse,
   RowActionsResponse,
-  RowActionTriggerRequest,
-  RowActionTriggerResponse,
   Table,
   UserCtx,
 } from "@budibase/types"
@@ -72,17 +70,4 @@ export async function remove(ctx: UserCtx<void, void>) {
   const table = await getTable(ctx)
   await sdk.rowActions.remove(table._id!, ctx.params.rowActionId)
   ctx.status = 204
-}
-
-export async function run(ctx: UserCtx<RowActionTriggerRequest, RowActionTriggerResponse>) {
-  const rowId = ctx.request.body?.rowId
-  if (!rowId) {
-    ctx.throw(400, "rowId is required")
-  }
-
-  await sdk.rowActions.run(ctx.params.sourceId, ctx.params.rowActionId, rowId)
-  ctx.status = 200
-  ctx.body = {
-    message: "Row action triggered.",
-  }
 }
