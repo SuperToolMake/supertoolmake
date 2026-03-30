@@ -1,9 +1,9 @@
 <script lang="ts">
-import { goto, params } from "@roxi/routify"
+import { goto as gotoStore, params } from "@roxi/routify"
 import { onMount } from "svelte"
 import { screenStore, workspaceAppStore } from "@/stores/builder"
 
-$goto
+$: goto = $gotoStore
 $params
 
 const validate = (id: string) => $workspaceAppStore.workspaceApps.some((app) => app._id === id)
@@ -15,13 +15,13 @@ const fallback = () => {
   // Fall back to the first screen if one exists
   if (workspaceAppScreens.length && workspaceAppScreens[0]._id) {
     screenStore.select(workspaceAppScreens[0]._id)
-    $goto("./[screenId]", {
+    goto("./[screenId]", {
       screenId: workspaceAppScreens[0]._id,
     })
     return
   }
 
-  $goto("../new")
+  goto("../new")
   return
 }
 
@@ -31,7 +31,7 @@ onMount(() => {
   if (validate(id)) {
     workspaceAppStore.select(id)
   } else {
-    $goto("../../design")
+    goto("../../design")
     return
   }
 
