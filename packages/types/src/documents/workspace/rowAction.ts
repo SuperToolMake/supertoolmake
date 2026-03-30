@@ -6,7 +6,7 @@ export interface TableRowActions extends Document {
 }
 
 export interface RowActionData {
-  automationId: string
+  name: string
   permissions: RowActionPermissions
 }
 

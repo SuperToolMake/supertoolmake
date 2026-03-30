@@ -9,7 +9,6 @@ export interface CreateRowActionRequest extends RowActionData {}
 export interface RowActionResponse extends RowActionData, RowActionPermissionsData {
   id: string
   tableId: string
-  automationId: string
 }
 
 export interface RowActionsResponse {

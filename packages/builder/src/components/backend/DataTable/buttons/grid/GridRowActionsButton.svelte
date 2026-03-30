@@ -9,14 +9,9 @@ import {
   ModalContent,
   notifications,
 } from "@budibase/bbui"
-import { goto, url } from "@roxi/routify"
 import { getContext } from "svelte"
-import { derived } from "svelte/store"
 import DetailPopover from "@/components/common/DetailPopover.svelte"
-import { appStore, rowActions } from "@/stores/builder"
-
-$goto
-$url
+import { rowActions } from "@/stores/builder"
 
 const { datasource } = getContext("grid")
 
@@ -32,9 +27,8 @@ const showCreateModal = () => {
 
 const createRowAction = async () => {
   try {
-    const newRowAction = await rowActions.createRowAction(tableId, newName)
+    await rowActions.createRowAction(tableId, newName)
     notifications.success("Row action created successfully")
-    $goto($rowActionUrl(newRowAction))
   } catch (error) {
     console.error(error)
     notifications.error("Error creating row action")
@@ -46,12 +40,6 @@ $: tableId = ds?.tableId
 $: tableRowActions = $rowActions[tableId] || []
 $: actionCount = tableRowActions.length
 $: newNameInvalid = newName && tableRowActions.some((x) => x.name === newName)
-
-const rowActionUrl = derived([url, appStore], ([$url, $appStore]) => {
-  return ({ automationId }) => {
-    return $url(`/builder/workspace/${$appStore.appId}/automation/${automationId}`)
-  }
-})
 </script>
 
 <DetailPopover title="Row actions" bind:this={popover}>
@@ -65,16 +53,13 @@ const rowActionUrl = derived([url, appStore], ([$url, $appStore]) => {
       Row actions{actionCount ? `: ${actionCount}` : ""}
     </ActionButton>
   </svelte:fragment>
-  A row action is a user-triggered automation for a chosen row.
+  A row action is a reusable action for a chosen row.
   {#if !tableRowActions.length}
     You haven't created any row actions.
   {:else}
     <List>
       {#each tableRowActions as action}
-        <ListItem title={action.name} url={$rowActionUrl(action)} showArrow>
-          <svelte:fragment slot="right">
-          </svelte:fragment>
-        </ListItem>
+        <ListItem title={action.name} />
       {/each}
     </List>
   {/if}
