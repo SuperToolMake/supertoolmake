@@ -19,7 +19,6 @@ function buildDefaultPermissions(): RowActionPermissions {
     table: {
       runAllowed: true,
     },
-    views: {},
   }
 }
 
