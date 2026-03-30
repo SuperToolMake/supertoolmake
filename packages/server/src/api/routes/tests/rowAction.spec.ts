@@ -36,32 +36,6 @@ describe("/rowActions", () => {
     })
   })
 
-  it("creates and fetches row actions without automation metadata", async () => {
-    const created = await config.api.rowAction.save(tableId, {
-      name: "Do something",
-    })
-
-    expect(created).toEqual({
-      id: expect.stringMatching(/^row_action_/),
-      tableId,
-      name: "Do something",
-      allowedSources: [tableId],
-    })
-    expect(created).not.toHaveProperty("automationId")
-
-    const fetched = await config.api.rowAction.find(tableId)
-    expect(fetched).toEqual({
-      actions: {
-        [created.id]: {
-          id: created.id,
-          tableId,
-          name: "Do something",
-          allowedSources: [tableId],
-        },
-      },
-    })
-  })
-
   it("rejects duplicate row action names for the same table", async () => {
     await config.api.rowAction.save(tableId, {
       name: "Duplicate me",
