@@ -12,7 +12,6 @@ const fallback = () => {
   const workspaceAppScreens = $screenStore.screens.filter(
     (s) => s.workspaceAppId === $params.workspaceAppId
   )
-  // Fall back to the first screen if one exists
   if (workspaceAppScreens.length && workspaceAppScreens[0]._id) {
     screenStore.select(workspaceAppScreens[0]._id)
     goto("./[screenId]", {
@@ -22,7 +21,13 @@ const fallback = () => {
   }
 
   goto("../new")
-  return
+}
+
+$: if ($screenStore && $params.screenId) {
+  const screenExists = $screenStore.screens.some((s) => s._id === $params.screenId)
+  if (!screenExists) {
+    fallback()
+  }
 }
 
 onMount(() => {
