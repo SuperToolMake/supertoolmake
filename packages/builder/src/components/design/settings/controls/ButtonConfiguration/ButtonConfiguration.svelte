@@ -64,11 +64,6 @@ const addCustomButton = () => {
   popover.hide()
 }
 
-const addRowActionTemplate = (template) => {
-  dispatch("change", [...buttonList, template])
-  popover.hide()
-}
-
 const addButton = () => {
   addCustomButton()
 }
