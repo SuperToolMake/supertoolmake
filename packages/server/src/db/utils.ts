@@ -224,15 +224,3 @@ export function generateJunctionTableID(tableId1: string, tableId2: string) {
 export function isRelationshipColumn(column: FieldSchema): column is RelationshipFieldMetadata {
   return column.type === FieldType.LINK
 }
-
-/**
- * Generates a new row actions ID.
- * @returns The new row actions ID which the row actions doc can be stored under.
- */
-export function generateRowActionsID(tableId: string) {
-  return `${DocumentType.ROW_ACTIONS}${SEPARATOR}${tableId}`
-}
-
-export function extractTableIdFromRowActionsID(rowActionIds: string) {
-  return rowActionIds.replace(new RegExp(`^${DocumentType.ROW_ACTIONS}${SEPARATOR}`), "")
-}

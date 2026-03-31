@@ -3,7 +3,6 @@ import { makePropSafe as safe } from "@budibase/string-templates"
 import type { Screen as ScreenDoc, UIPermissions } from "@budibase/types"
 import { capitalise } from "@/helpers"
 import type { SourceOption } from "@/routes/builder/workspace/[application]/design/_components/NewScreen/utils"
-import { getRowActionButtonTemplates } from "@/templates/rowActions"
 import { Component } from "../../Component"
 import getValidRoute from "../getValidRoute"
 import { Screen } from "../Screen"
@@ -104,7 +103,7 @@ const getTableScreenTemplate = ({
   }
 }
 
-const getUpdateScreenTemplate = async ({
+const getUpdateScreenTemplate = ({
   route,
   tableScreenRoute,
   tableOrView,
@@ -186,15 +185,10 @@ const getUpdateScreenTemplate = async ({
       title: `Update ${tableOrView.name} row`,
     })
 
-  // Generate button config including row actions
   const baseButtons = [saveButton.json(), deleteButton.json()]
-  const rowActionButtons = await getRowActionButtonTemplates({
-    instance: updateFormBlock.json(),
-  })
-  const buttons = [...(baseButtons || []), ...rowActionButtons]
   updateFormBlock = updateFormBlock.customProps({
-    buttons,
-    buttonsCollapsed: buttons.length > 5,
+    buttons: baseButtons,
+    buttonsCollapsed: baseButtons.length > 5,
   })
 
   const template = new Screen(workspaceAppId)

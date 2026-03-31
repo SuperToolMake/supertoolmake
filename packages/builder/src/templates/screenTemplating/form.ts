@@ -2,7 +2,6 @@ import { Helpers } from "@budibase/bbui"
 import { utils } from "@budibase/shared-core"
 import type { Screen as ScreenDoc, UIPermissions } from "@budibase/types"
 import { componentStore } from "@/stores/builder"
-import { getRowActionButtonTemplates } from "@/templates/rowActions"
 import { Component } from "../Component"
 import getValidRoute from "./getValidRoute"
 import { Screen } from "./Screen"
@@ -50,7 +49,7 @@ const getTitle = (type: FormType) => {
   return "Row details"
 }
 
-const form = async ({
+const form = ({
   tableOrView,
   type,
   permissions,
@@ -80,21 +79,6 @@ const form = async ({
 
   // Add default button config
   componentStore.migrateSettings(formBlock)
-
-  // Add row action buttons if required
-  if (type !== "create") {
-    const rowActionButtons = await getRowActionButtonTemplates({
-      instance: formBlock,
-    })
-    if (rowActionButtons.length) {
-      formBlock.buttons = [...(formBlock.buttons || []), ...rowActionButtons]
-
-      // Collapse buttons if more than 3 row actions
-      if (rowActionButtons.length > 3) {
-        formBlock.buttonsCollapsed = true
-      }
-    }
-  }
 
   const template = new Screen(workspaceAppId)
     .route(getValidRoute(screens, typeSpecificRoute, role, workspaceAppId))

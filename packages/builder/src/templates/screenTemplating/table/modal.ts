@@ -4,12 +4,11 @@ import type { Screen as ScreenDoc, UIPermissions } from "@budibase/types"
 import { generate } from "shortid"
 import { capitalise } from "@/helpers"
 import type { SourceOption } from "@/routes/builder/workspace/[application]/design/_components/NewScreen/utils"
-import { getRowActionButtonTemplates } from "@/templates/rowActions"
 import { Component } from "../../Component"
 import getValidRoute from "../getValidRoute"
 import { Screen } from "../Screen"
 
-const modal = async ({
+const modal = ({
   tableOrView,
   permissions,
   screens,
@@ -113,13 +112,9 @@ const modal = async ({
     actionType: "Update",
     dataSource: tableOrView.tableSelectFormat,
   })
-  const rowActionButtons = await getRowActionButtonTemplates({
-    instance: editFormBlock.json(),
-  })
-  const buttons = [...(formButtons || []), ...rowActionButtons]
   editFormBlock = editFormBlock.customProps({
-    buttons,
-    buttonsCollapsed: buttons.length > 5,
+    buttons: formButtons,
+    buttonsCollapsed: (formButtons?.length || 0) > 5,
   })
 
   detailsModal.addChild(editFormBlock)

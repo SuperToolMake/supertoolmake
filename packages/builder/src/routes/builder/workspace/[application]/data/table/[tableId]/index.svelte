@@ -16,7 +16,6 @@ import GridGenerateButton from "@/components/backend/DataTable/buttons/grid/Grid
 import GridImportButton from "@/components/backend/DataTable/buttons/grid/GridImportButton.svelte"
 import GridManageAccessButton from "@/components/backend/DataTable/buttons/grid/GridManageAccessButton.svelte"
 import GridRelationshipButton from "@/components/backend/DataTable/buttons/grid/GridRelationshipButton.svelte"
-import GridRowActionsButton from "@/components/backend/DataTable/buttons/grid/GridRowActionsButton.svelte"
 import GridScreensButton from "@/components/backend/DataTable/buttons/grid/GridScreensButton.svelte"
 import GridUsersTableButton from "@/components/backend/DataTable/buttons/grid/GridUsersTableButton.svelte"
 import GridAddColumnModal from "@/components/backend/DataTable/modals/grid/GridCreateColumnModal.svelte"
@@ -318,7 +317,6 @@ onDestroy(() => {
             {#if !isUsersTable}
               <GridImportButton />
               <GridExportButton />
-              <GridRowActionsButton />
               <GridScreensButton on:generate={() => generateButton?.show()} />
               <GridGenerateButton bind:this={generateButton} />
             {/if}

@@ -20,7 +20,6 @@ import { buildRelationshipEndpoints } from "./relationships"
 import { buildResourceEndpoints } from "./resource"
 import { buildRoleEndpoints } from "./roles"
 import { buildRouteEndpoints } from "./routes"
-import { buildRowActionEndpoints } from "./rowActions"
 import { buildRowEndpoints } from "./rows"
 import { buildScreenEndpoints } from "./screens"
 import { buildSelfEndpoints } from "./self"
@@ -281,7 +280,6 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
     ...buildLogsEndpoints(API),
     ...buildMigrationEndpoints(API),
     deployment: buildDeploymentEndpoints(API),
-    rowActions: buildRowActionEndpoints(API),
     oauth2: buildOAuth2Endpoints(API),
     navigation: buildNavigationEndpoints(API),
     workspaceApp: buildWorkspaceAppEndpoints(API),

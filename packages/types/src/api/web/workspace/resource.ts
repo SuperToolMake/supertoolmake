@@ -6,7 +6,6 @@ export enum UsedByType {
 export enum ResourceType {
   DATASOURCE = "datasource",
   TABLE = "table",
-  ROW_ACTION = "row_action",
   QUERY = "query",
   WORKSPACE_APP = "workspace_app",
   SCREEN = "screen",

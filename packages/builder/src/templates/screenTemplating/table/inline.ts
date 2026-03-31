@@ -1,7 +1,6 @@
 import type { Screen as ScreenDoc, UIPermissions } from "@budibase/types"
 import { capitalise } from "@/helpers"
 import type { SourceOption } from "@/routes/builder/workspace/[application]/design/_components/NewScreen/utils"
-import { getRowActionButtonTemplates } from "@/templates/rowActions"
 import { Component } from "../../Component"
 import getValidRoute from "../getValidRoute"
 import { Screen } from "../Screen"
@@ -25,24 +24,13 @@ const inline = async ({
     .gridDesktopColSpan(1, 13)
     .gridDesktopRowSpan(1, 3)
 
-  let tableBlock = new Component("@budibase/standard-components/gridblock")
+  const tableBlock = new Component("@budibase/standard-components/gridblock")
     .instanceName(`${tableOrView.name} - Table`)
     .customProps({
       table: tableOrView.datasourceSelectFormat,
     })
     .gridDesktopColSpan(1, 13)
     .gridDesktopRowSpan(3, 21)
-
-  // Add row actions to table
-  const rowActionButtons = await getRowActionButtonTemplates({
-    instance: tableBlock.json(),
-  })
-  if (rowActionButtons.length) {
-    tableBlock = tableBlock.customProps({
-      buttons: rowActionButtons,
-      buttonsCollapsed: rowActionButtons.length > 1,
-    })
-  }
 
   const screenTemplate = new Screen(workspaceAppId)
     .route(getValidRoute(screens, tableOrView.name, permissions.write, workspaceAppId))

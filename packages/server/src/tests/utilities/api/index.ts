@@ -15,7 +15,6 @@ import { ResourceAPI } from "./resource"
 import { RoleAPI } from "./role"
 import { RoutingAPI } from "./routing"
 import { RowAPI } from "./row"
-import { RowActionAPI } from "./rowAction"
 import { ScreenAPI } from "./screen"
 import { TableAPI } from "./table"
 import { TemplateAPI } from "./template"
@@ -36,7 +35,6 @@ export default class API {
   query: QueryAPI
   roles: RoleAPI
   row: RowAPI
-  rowAction: RowActionAPI
   screen: ScreenAPI
   table: TableAPI
   templates: TemplateAPI
@@ -65,7 +63,6 @@ export default class API {
     this.query = new QueryAPI(config)
     this.roles = new RoleAPI(config)
     this.row = new RowAPI(config)
-    this.rowAction = new RowActionAPI(config)
     this.screen = new ScreenAPI(config)
     this.table = new TableAPI(config)
     this.templates = new TemplateAPI(config)

@@ -11,7 +11,7 @@ import * as oauth2 from "./workspace/oauth2"
 import * as permissions from "./workspace/permissions"
 import { default as queries } from "./workspace/queries"
 import * as resources from "./workspace/resources"
-import { default as rowActions } from "./workspace/rowActions"
+
 import { default as rows } from "./workspace/rows"
 import * as screens from "./workspace/screens"
 import { default as tables } from "./workspace/tables"
@@ -23,7 +23,6 @@ const sdk = {
   tables,
   workspaces,
   rows,
-  rowActions,
   users,
   datasources,
   queries,

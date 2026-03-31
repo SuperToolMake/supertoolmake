@@ -148,7 +148,6 @@ async function getDestinationDb(toWorkspace: string) {
 const resourceTypeIdPrefixes: Record<ResourceType, string> = {
   [ResourceType.DATASOURCE]: prefixed(DocumentType.DATASOURCE),
   [ResourceType.TABLE]: prefixed(DocumentType.TABLE),
-  [ResourceType.ROW_ACTION]: prefixed(DocumentType.ROW_ACTIONS),
   [ResourceType.QUERY]: prefixed(DocumentType.QUERY),
   [ResourceType.WORKSPACE_APP]: prefixed(DocumentType.WORKSPACE_APP),
   [ResourceType.SCREEN]: prefixed(DocumentType.SCREEN),

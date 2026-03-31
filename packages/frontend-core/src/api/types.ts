@@ -16,7 +16,6 @@ import type { RelationshipEndpoints } from "./relationships"
 import type { ResourceEndpoints } from "./resource"
 import type { RoleEndpoints } from "./roles"
 import type { RouteEndpoints } from "./routes"
-import type { RowActionEndpoints } from "./rowActions"
 import type { RowEndpoints } from "./rows"
 import type { ScreenEndpoints } from "./screens"
 import type { SelfEndpoints } from "./self"
@@ -109,7 +108,6 @@ export type APIClient = BaseAPIClient &
   TemplateEndpoints &
   UserEndpoints & {
     resource: ResourceEndpoints
-    rowActions: RowActionEndpoints
     oauth2: OAuth2Endpoints
     navigation: NavigationEndpoints
     workspaceApp: WorkspaceAppEndpoints

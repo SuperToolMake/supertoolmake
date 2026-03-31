@@ -29,7 +29,6 @@ import { datasources } from "./datasources"
 import { integrations } from "./integrations"
 import { sortedIntegrations } from "./sortedIntegrations"
 import { queries } from "./queries"
-import { rowActions } from "./rowActions"
 import componentTreeNodesStore from "./componentTreeNodes"
 import { oauth2 } from "./oauth2"
 import { dataEnvironmentStore, dataAPI } from "./dataEnvironment"
@@ -57,7 +56,6 @@ export {
   previewStore,
   queries,
   roles,
-  rowActions,
   screenComponentErrorList,
   screenComponentErrors,
   screenComponentsList,
@@ -84,7 +82,6 @@ export const reset = () => {
   componentStore.reset()
   layoutStore.reset()
   navigationStore.reset()
-  rowActions.reset()
   workspaceDeploymentStore.reset()
 }
 

@@ -4,7 +4,6 @@ import { cloneDeep, isEqual } from "lodash/fp"
 import { createEventDispatcher } from "svelte"
 import { getEventContextBindings } from "@/dataBinding"
 import { componentStore } from "@/stores/builder"
-import { getRowActionButtonTemplates } from "@/templates/rowActions"
 import DraggableList from "../DraggableList.svelte"
 import ButtonSetting from "./ButtonSetting.svelte"
 
@@ -19,7 +18,6 @@ export let max
 const dispatch = createEventDispatcher()
 
 let cachedValue
-let rowActionTemplates = []
 let anchor
 let popover
 
@@ -71,15 +69,8 @@ const addRowActionTemplate = (template) => {
   popover.hide()
 }
 
-const addButton = async () => {
-  rowActionTemplates = await getRowActionButtonTemplates({
-    component: componentInstance,
-  })
-  if (rowActionTemplates.length) {
-    popover.show()
-  } else {
-    addCustomButton()
-  }
+const addButton = () => {
+  addCustomButton()
 }
 
 const removeButton = (id) => {
@@ -136,11 +127,6 @@ $: canAddButtons = max == null || buttonList.length < max
 <Popover bind:this={popover} {anchor} useAnchorWidth resizable={false}>
   <Menu>
     <MenuItem on:click={addCustomButton}>Custom button</MenuItem>
-    {#each rowActionTemplates as template}
-      <MenuItem on:click={() => addRowActionTemplate(template)}>
-        {template.text}
-      </MenuItem>
-    {/each}
   </Menu>
 </Popover>
 
