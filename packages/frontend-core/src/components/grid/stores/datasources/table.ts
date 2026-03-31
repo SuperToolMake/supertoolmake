@@ -45,10 +45,16 @@ export const createActions = (context: StoreContext): TableActions => {
   }
 
   const getRow = async (id: any) => {
-    if (!id) {
-      return
-    }
-    const row = await API.fetchRow(get(datasource).tableId, id, SuppressErrors)
+    const res = await API.searchTable(get(datasource).tableId, {
+      limit: 1,
+      query: {
+        equal: {
+          _id: id,
+        },
+      },
+      paginate: false,
+    })
+    const row = res?.rows?.[0]
     if (!row) {
       return
     }
