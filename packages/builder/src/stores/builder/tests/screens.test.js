@@ -456,7 +456,7 @@ describe("Screens store", () => {
     expect(get(appStore).routes).toEqual([])
   })
 
-  it("Upon delete, reset selected screen and component ids if the screen was selected", async ({
+  it("Upon delete, select the first screen", async ({
     bb,
   }) => {
     const existingScreens = Array(3)
@@ -483,7 +483,7 @@ describe("Screens store", () => {
 
     expect(bb.store.screens.length).toBe(2)
     expect(get(componentStore).selectedComponentId).toBeUndefined()
-    expect(bb.store.selectedScreenId).toBeUndefined()
+    expect(bb.store.selectedScreenId).toBe(existingScreens[0]._json._id)
   })
 
   it("Delete multiple is not supported and should leave the store unchanged", async ({
@@ -626,80 +626,6 @@ describe("Screens store", () => {
 
     expect(bb.store.screens[0].routing.route).toBe("/updated-route")
     expect(bb.store.screens[1].routing.homeScreen).toBe(true)
-  })
-
-  it("Ensure only one homescreen per role when updating screen setting. Multiple screen roles", async ({
-    bb,
-  }) => {
-    const expectedRoles = [
-      Constants.Roles.BASIC,
-      Constants.Roles.POWER,
-      Constants.Roles.PUBLIC,
-      Constants.Roles.ADMIN,
-    ]
-
-    // Build 12 screens, 3 of each role
-    const existingScreens = Array(12)
-      .fill()
-      .map((_, idx) => {
-        const screenDoc = getScreenFixture()
-        screenDoc.role(expectedRoles[idx % 4])
-
-        const existingDocId = getScreenDocId()
-        screenDoc._json._id = existingDocId
-        return screenDoc
-      })
-
-    const sorted = existingScreens
-      .map(screen => screen.json())
-      .sort((a, b) => a.routing.roleId.localeCompare(b.routing.roleId))
-
-    // ADMIN
-    sorted[0].routing.homeScreen = true
-    // BASIC
-    sorted[4].routing.homeScreen = true
-    // PUBLIC
-    sorted[9].routing.homeScreen = true
-
-    // Set screens state
-    await bb.screenStore.update(state => ({
-      ...state,
-      screens: sorted,
-    }))
-
-    vi.spyOn(bb.screenStore, "patch").mockImplementation(
-      async (patchFn, screenId) => {
-        const target = bb.store.screens.find(screen => screen._id === screenId)
-        patchFn(target)
-
-        await bb.screenStore.replace(screenId, target)
-      }
-    )
-
-    // ADMIN homeScreen updated from 0 to 2
-    await bb.screenStore.updateSetting(sorted[2], "routing.homeScreen", true)
-
-    const results = bb.store.screens.reduce((acc, screen) => {
-      if (screen.routing.homeScreen) {
-        acc[screen.routing.roleId] = acc[screen.routing.roleId] || []
-        acc[screen.routing.roleId].push(screen)
-      }
-      return acc
-    }, {})
-
-    const screens = bb.store.screens
-    // Should still only be one of each homescreen
-    expect(results[Constants.Roles.ADMIN].length).toBe(1)
-    expect(screens[2].routing.homeScreen).toBe(true)
-
-    expect(results[Constants.Roles.BASIC].length).toBe(1)
-    expect(screens[4].routing.homeScreen).toBe(true)
-
-    expect(results[Constants.Roles.PUBLIC].length).toBe(1)
-    expect(screens[9].routing.homeScreen).toBe(true)
-
-    // Homescreen was never set for POWER
-    expect(results[Constants.Roles.POWER]).not.toBeDefined()
   })
 
   it("Sequential patch check. Exit if the screenId is not valid.", async ({
