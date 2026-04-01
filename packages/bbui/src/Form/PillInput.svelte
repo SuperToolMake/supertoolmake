@@ -19,9 +19,9 @@ export let splitOnSpace = false
 export let allowDuplicates = false
 export let maxItems: number | undefined = undefined
 
-let inputValue = ""
-let focused = false
-let inputEl: HTMLInputElement | null = null
+  export let inputValue = ""
+  let focused = false
+  let inputEl: HTMLInputElement | null = null
 
 const dispatch = createEventDispatcher()
 

@@ -26,6 +26,8 @@ export let inviteTitle = "Invite users to workspace"
 
 const password = generatePassword(12)
 let emailsInput: string[] = []
+let parsedEmails = []
+  let pendingEmailInput = ""
 let emailError: string | null = null
 const maxItems = 15
 let selectedRole = Constants.BudibaseRoles.Creator
@@ -199,7 +201,17 @@ let userData: UserData[] = [
   },
 ]
 $: hasError = userData.find((x) => x.error != null)
-$: parsedEmails = useWorkspaceInviteModal ? emailsInput : []
+$: {
+    if (!useWorkspaceInviteModal) {
+      parsedEmails = []
+    } else {
+      const pendingEmail = pendingEmailInput.trim()
+      parsedEmails =
+        emailsInput.length === 0 && emailValidator(pendingEmail) === true
+          ? [pendingEmail]
+          : emailsInput
+    }
+  }
 $: smtpConfigured = $admin.loaded && ($admin.cloud || Boolean($admin.checklist?.smtp?.checked))
 $: emailInviteDisabled = $admin.loaded ? !smtpConfigured : false
 $: passwordInviteDisabled = $organisation.isSSOEnforced
@@ -257,6 +269,7 @@ $: if (emailInviteDisabled && passwordInviteDisabled) {
         <PillInput
           label="Type or paste emails below, separated by commas"
           bind:value={emailsInput}
+          bind:inputValue={pendingEmailInput}
           error={emailError ?? undefined}
           splitOnSpace={true}
           maxItems={maxItems + 1}
