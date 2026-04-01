@@ -36,7 +36,7 @@ function copyFile(file) {
 
 // create output dir
 console.log(`Creating ${OUTPUT_DIR} for build..`)
-fs.rmdirSync(OUTPUT_DIR, { recursive: true })
+fs.rmSync(OUTPUT_DIR, { recursive: true })
 fs.mkdirSync(OUTPUT_DIR)
 
 // package images into tar files

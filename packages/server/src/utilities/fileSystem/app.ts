@@ -73,7 +73,7 @@ export const cleanup = (appIds: string[]) => {
   for (const appId of appIds) {
     const path = join(budibaseTempDir(), appId)
     if (fs.existsSync(path)) {
-      fs.rmdirSync(path, { recursive: true })
+      fs.rmSync(path, { recursive: true })
     }
   }
 }
