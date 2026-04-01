@@ -31,6 +31,19 @@ const handleTooManyFiles = (fileLimit) => {
   notificationStore.actions.warning(`Please select a maximum of ${fileLimit} files.`)
 }
 
+// crypto.randomUUID is not available in all environments
+const generateUUID = () => {
+  const array = new Uint8Array(16)
+  window.crypto.getRandomValues(array)
+
+  // RFC 4122 version 4 bits
+  array[6] = (array[6] & 0x0f) | 0x40
+  array[8] = (array[8] & 0x3f) | 0x80
+
+  const hex = Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join("")
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
+}
+
 // Process the file input and return a serializable structure expected by
 // the dropzone component to display the file
 const processFiles = async (fileList) => {
@@ -44,8 +57,7 @@ const processFiles = async (fileList) => {
     }
 
     const processFile = (file) => {
-      const uuid = crypto.randomUUID()
-      const key = uuid
+      const key = generateUUID()
 
       if (!file.type?.startsWith("image")) {
         return Promise.resolve({
