@@ -12,7 +12,6 @@ import bson from "bson"
 import type Koa from "koa"
 import * as api from "../api"
 import env from "../environment"
-import { default as eventEmitter, init as eventInit } from "../events"
 import * as jsRunner from "../jsRunner"
 import sdk from "../sdk"
 import * as fileSystem from "../utilities/fileSystem"
@@ -28,7 +27,6 @@ export function getState(): State {
 }
 
 async function initRoutes(app: Koa) {
-  app.context.eventEmitter = eventEmitter
   app.context.auth = {}
 
   // api routes
@@ -52,9 +50,6 @@ export async function startup(opts: { app?: Koa; server?: Server; force?: boolea
     env._set("PORT", address.port)
   }
 
-  console.log("Emitting port event")
-  eventEmitter.emitPort(env.PORT)
-
   console.log("Initialising file system")
   fileSystem.init()
 
@@ -63,9 +58,6 @@ export async function startup(opts: { app?: Koa; server?: Server; force?: boolea
 
   console.log("Initialising writethrough cache")
   cache.docWritethrough.init()
-
-  console.log("Initialising events")
-  eventInit()
 
   if (app && server) {
     console.log("Initialising websockets")

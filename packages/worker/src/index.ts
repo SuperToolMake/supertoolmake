@@ -15,7 +15,6 @@ import { bootstrap } from "global-agent"
 import gracefulShutdown from "http-graceful-shutdown"
 import Application, { type Middleware } from "koa"
 import koaBody, { HttpMethodEnum } from "koa-body"
-import RedisStore from "koa-redis"
 import api from "./api"
 import { loadTemplateConfig } from "./constants/templates"
 import * as db from "./db"
@@ -62,8 +61,18 @@ let store: any
 const sessionMiddleware: Middleware = async (ctx: any, next: any) => {
   if (!store) {
     const redisClient = await redis.clients.getSessionClient()
-    // @ts-expect-error - koa-redis types are weird
-    store = RedisStore({ client: redisClient.client })
+    store = {
+      async get(key: string) {
+        const data = await redisClient.client.get(key)
+        return data ? JSON.parse(data) : null
+      },
+      async set(key: string, sess: any, maxAge: number) {
+        await redisClient.client.setex(key, maxAge / 1000, JSON.stringify(sess))
+      },
+      async destroy(key: string) {
+        await redisClient.client.del(key)
+      },
+    }
   }
 
   return koaSession(

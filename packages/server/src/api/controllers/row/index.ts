@@ -5,7 +5,6 @@ import {
   type DeleteRow,
   type DeleteRowRequest,
   type DeleteRows,
-  EventType,
   type ExportRowsRequest,
   type ExportRowsResponse,
   type FetchEnrichedRowResponse,
@@ -43,7 +42,6 @@ function pickApi() {
 }
 
 export async function patch(ctx: UserCtx<PatchRowRequest, PatchRowResponse>): Promise<any> {
-  const appId = ctx.appId
   const { tableId } = utils.getSourceId(ctx)
   const body = ctx.request.body
 
@@ -57,21 +55,11 @@ export async function patch(ctx: UserCtx<PatchRowRequest, PatchRowResponse>): Pr
       const response = await api.patch(ctx)
       return response
     }
-    const { row, table, oldRow } = isExternalTableID(tableId)
-      ? await api.patch(ctx)
-      : await runQuery()
+    const { row, table } = isExternalTableID(tableId) ? await api.patch(ctx) : await runQuery()
     if (!row) {
       ctx.throw(404, "Row not found")
     }
 
-    ctx.eventEmitter?.emitRow({
-      eventName: EventType.ROW_UPDATE,
-      appId,
-      row,
-      table,
-      oldRow,
-      user: sdk.users.getUserContextBindings(ctx.user),
-    })
     ctx.message = `${table.name} updated successfully.`
     ctx.body = row
     gridSocket?.emitRowUpdate(ctx, row)
@@ -83,8 +71,6 @@ export async function patch(ctx: UserCtx<PatchRowRequest, PatchRowResponse>): Pr
 export const save = async (ctx: UserCtx<SaveRowRequest, SaveRowResponse>) => {
   const { tableId, viewId } = utils.getSourceId(ctx)
   const sourceId = viewId || tableId
-
-  const appId = ctx.appId
   const body = ctx.request.body
 
   // user metadata doesn't exist yet - don't allow creation
@@ -104,13 +90,6 @@ export const save = async (ctx: UserCtx<SaveRowRequest, SaveRowResponse>) => {
     ? await sdk.rows.save(sourceId, ctx.request.body, ctx.user?._id)
     : await saveQuery()
 
-  ctx.eventEmitter?.emitRow({
-    eventName: EventType.ROW_SAVE,
-    appId,
-    row,
-    table,
-    user: sdk.users.getUserContextBindings(ctx.user),
-  })
   ctx.message = `${table.name} saved successfully`
   ctx.body = row
   gridSocket?.emitRowUpdate(ctx, row)
@@ -158,8 +137,6 @@ async function processDeleteRowsRequest(ctx: UserCtx<DeleteRowRequest>) {
 }
 
 async function deleteRows(ctx: UserCtx<DeleteRowRequest>) {
-  const appId = ctx.appId
-
   const deleteRequest = ctx.request.body as DeleteRows
 
   deleteRequest.rows = await processDeleteRowsRequest(ctx)
@@ -167,28 +144,15 @@ async function deleteRows(ctx: UserCtx<DeleteRowRequest>) {
   const { rows } = await pickApi().bulkDestroy(ctx)
 
   for (const row of rows) {
-    ctx.eventEmitter?.emitRow({
-      eventName: EventType.ROW_DELETE,
-      appId,
-      row,
-      user: sdk.users.getUserContextBindings(ctx.user),
-    })
     gridSocket?.emitRowDeletion(ctx, row)
   }
   return rows
 }
 
 async function deleteRow(ctx: UserCtx<DeleteRowRequest>) {
-  const appId = ctx.appId
   const api = pickApi()
   const resp = await api.destroy(ctx)
 
-  ctx.eventEmitter?.emitRow({
-    eventName: EventType.ROW_DELETE,
-    appId,
-    row: resp.row,
-    user: sdk.users.getUserContextBindings(ctx.user),
-  })
   gridSocket?.emitRowDeletion(ctx, resp.row)
 
   return resp

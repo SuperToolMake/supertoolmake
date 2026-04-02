@@ -77,10 +77,6 @@ enum BullEvent {
 }
 
 enum QueueEventType {
-  AUTOMATION_EVENT = "automation-event",
-  APP_BACKUP_EVENT = "app-backup-event",
-  AUDIT_LOG_EVENT = "audit-log-event",
-  SYSTEM_EVENT = "system-event",
   APP_MIGRATION = "app-migration",
   DOC_WRITETHROUGH = "doc-writethrough",
   DEV_REVERT_EVENT = "dev-revert-event",
@@ -88,10 +84,6 @@ enum QueueEventType {
 }
 
 const EventTypeMap: { [key in JobQueue]: QueueEventType } = {
-  [JobQueue.AUTOMATION]: QueueEventType.AUTOMATION_EVENT,
-  [JobQueue.APP_BACKUP]: QueueEventType.APP_BACKUP_EVENT,
-  [JobQueue.AUDIT_LOG]: QueueEventType.AUDIT_LOG_EVENT,
-  [JobQueue.SYSTEM_EVENT_QUEUE]: QueueEventType.SYSTEM_EVENT,
   [JobQueue.APP_MIGRATION]: QueueEventType.APP_MIGRATION,
   [JobQueue.DOC_WRITETHROUGH_QUEUE]: QueueEventType.DOC_WRITETHROUGH,
   [JobQueue.DEV_REVERT_PROCESSOR]: QueueEventType.DEV_REVERT_EVENT,

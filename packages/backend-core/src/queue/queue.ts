@@ -54,7 +54,7 @@ export class BudibaseQueue<T> {
   }
 
   private initQueue() {
-    const redisOpts = getRedisOptions()
+    const redisOpts = getRedisOptions() as QueueOptions["redis"]
     const queueConfig: QueueOptions = {
       redis: redisOpts,
       settings: {
@@ -75,7 +75,10 @@ export class BudibaseQueue<T> {
     ) {
       queue = new BullQueue(this.jobQueue, {
         ...queueConfig,
-        redis: { host: "localhost", port: Number(process.env.BULL_TEST_REDIS_PORT) },
+        redis: {
+          host: "localhost",
+          port: Number(process.env.BULL_TEST_REDIS_PORT),
+        },
       })
     } else {
       queue = new InMemoryQueue(this.jobQueue, queueConfig) as any
