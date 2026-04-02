@@ -57,7 +57,7 @@
     "bcrypt": "6.0.0",
     "bson": "6.9.0",
     "buffer": "6.0.3",
-    "bull": "4.16.5",
+    "bull": "4.10.1",
     "chokidar": "3.5.3",
     "content-disposition": "0.5.4",
     "cookies": "0.8.0",
