@@ -12,7 +12,6 @@ import bson from "bson"
 import type Koa from "koa"
 import * as api from "../api"
 import env from "../environment"
-import { init as eventInit } from "../events"
 import * as jsRunner from "../jsRunner"
 import sdk from "../sdk"
 import * as fileSystem from "../utilities/fileSystem"
@@ -59,9 +58,6 @@ export async function startup(opts: { app?: Koa; server?: Server; force?: boolea
 
   console.log("Initialising writethrough cache")
   cache.docWritethrough.init()
-
-  console.log("Initialising events")
-  eventInit()
 
   if (app && server) {
     console.log("Initialising websockets")

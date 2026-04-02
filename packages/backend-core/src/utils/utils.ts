@@ -1,7 +1,5 @@
 import {
-  AuditedEventFriendlyName,
   type Ctx,
-  type Event,
   TenantResolutionStrategy,
   type Workspace,
 } from "@budibase/types"
@@ -226,10 +224,6 @@ export function isClient(ctx: Ctx) {
 
 export function timeout(timeMs: number) {
   return new Promise((resolve) => setTimeout(resolve, timeMs))
-}
-
-export function isAudited(event: Event) {
-  return Boolean(AuditedEventFriendlyName[event])
 }
 
 export function hasCircularStructure(json: any) {
