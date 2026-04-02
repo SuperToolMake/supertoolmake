@@ -17,8 +17,7 @@
     "test:watch": "yarn test --watchAll"
   },
   "dependencies": {
-    "@budibase/types": "*",
-    "cron-validate": "1.4.5"
+    "@budibase/types": "*"
   },
   "devDependencies": {
     "rimraf": "3.0.2"
