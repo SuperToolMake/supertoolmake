@@ -36,7 +36,8 @@ import {
   workspaceAppStore,
   workspaceFavouriteStore,
 } from "@/stores/builder"
-import { enrichedApps } from "@/stores/portal"
+import { auth, enrichedApps } from "@/stores/portal"
+import { sdk } from "@budibase/shared-core"
 import type { EnrichedApp } from "@/types"
 import SideNavLink from "./SideNavLink.svelte"
 import SideNavUserSettings from "./SideNavUserSettings.svelte"
@@ -452,7 +453,7 @@ onDestroy(() => {
       </div>
 
       <div class="links">
-        {#if appId}
+        {#if appId && sdk.users.hasAdminPermissions($auth.user)}
           <SideNavLink
             icon="user-gear"
             text="Custom roles"
@@ -461,8 +462,6 @@ onDestroy(() => {
             {collapsed}
             on:click={keepCollapsed}
           />
-        {/if}
-        {#if appId}
           <SideNavLink
             icon="users"
             text="Users"

@@ -15,7 +15,7 @@ import { Constants, emailValidator } from "@budibase/frontend-core"
 import GlobalRoleSelect from "@/components/common/GlobalRoleSelect.svelte"
 import { OnboardingType } from "@/constants"
 import { roles } from "@/stores/builder"
-import { admin } from "@/stores/portal"
+import { admin } from "@/stores/portal/admin"
 import { organisation } from "@/stores/portal/organisation"
 
 export let showOnboardingTypeModal
@@ -27,7 +27,7 @@ export let inviteTitle = "Invite users to workspace"
 const password = generatePassword(12)
 let emailsInput: string[] = []
 let parsedEmails = []
-  let pendingEmailInput = ""
+let pendingEmailInput = ""
 let emailError: string | null = null
 const maxItems = 15
 let selectedRole = Constants.BudibaseRoles.Creator
@@ -202,16 +202,16 @@ let userData: UserData[] = [
 ]
 $: hasError = userData.find((x) => x.error != null)
 $: {
-    if (!useWorkspaceInviteModal) {
-      parsedEmails = []
-    } else {
-      const pendingEmail = pendingEmailInput.trim()
-      parsedEmails =
-        emailsInput.length === 0 && emailValidator(pendingEmail) === true
-          ? [pendingEmail]
-          : emailsInput
-    }
+  if (!useWorkspaceInviteModal) {
+    parsedEmails = []
+  } else {
+    const pendingEmail = pendingEmailInput.trim()
+    parsedEmails =
+      emailsInput.length === 0 && emailValidator(pendingEmail) === true
+        ? [pendingEmail]
+        : emailsInput
   }
+}
 $: smtpConfigured = $admin.loaded && ($admin.cloud || Boolean($admin.checklist?.smtp?.checked))
 $: emailInviteDisabled = $admin.loaded ? !smtpConfigured : false
 $: passwordInviteDisabled = $organisation.isSSOEnforced

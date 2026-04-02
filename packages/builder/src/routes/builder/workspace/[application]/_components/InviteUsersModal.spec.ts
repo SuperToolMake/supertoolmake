@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/svelte"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
-vi.mock("svelte", async importOriginal => {
+vi.mock("svelte", async (importOriginal) => {
   const actual = await importOriginal<typeof import("svelte")>()
   return {
     ...actual,
@@ -31,7 +31,7 @@ const {
       },
       set(nextValue: T) {
         value = nextValue
-        subscribers.forEach(callback => callback(value))
+        subscribers.forEach((callback) => callback(value))
       },
     }
   }
@@ -79,7 +79,7 @@ const {
   }
 })
 
-vi.mock("@budibase/bbui", async importOriginal => {
+vi.mock("@budibase/bbui", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@budibase/bbui")>()
   const [
     { default: MockBody },
@@ -122,34 +122,26 @@ vi.mock("@budibase/bbui", async importOriginal => {
 })
 
 vi.mock("@/components/common/GlobalRoleSelect.svelte", async () => {
-  const { default: MockGlobalRoleSelect } = await import(
-    "@/test/mocks/MockGlobalRoleSelect.svelte"
-  )
+  const { default: MockGlobalRoleSelect } = await import("@/test/mocks/MockGlobalRoleSelect.svelte")
 
   return {
     default: MockGlobalRoleSelect,
   }
 })
 
-vi.mock(
-  "@/settings/pages/people/users/_components/InvitedModal.svelte",
-  async () => {
-    const { default: MockBody } = await import("@/test/mocks/MockBody.svelte")
-    return {
-      default: MockBody,
-    }
+vi.mock("@/settings/pages/people/users/_components/InvitedModal.svelte", async () => {
+  const { default: MockBody } = await import("@/test/mocks/MockBody.svelte")
+  return {
+    default: MockBody,
   }
-)
+})
 
-vi.mock(
-  "@/settings/pages/people/users/_components/PasswordModal.svelte",
-  async () => {
-    const { default: MockBody } = await import("@/test/mocks/MockBody.svelte")
-    return {
-      default: MockBody,
-    }
+vi.mock("@/settings/pages/people/users/_components/PasswordModal.svelte", async () => {
+  const { default: MockBody } = await import("@/test/mocks/MockBody.svelte")
+  return {
+    default: MockBody,
   }
-)
+})
 
 vi.mock("@/stores/builder", () => ({
   appStore,
@@ -176,7 +168,7 @@ vi.mock("@/stores/portal", () => ({
   users: usersMock,
 }))
 
-vi.mock("@budibase/shared-core", async importOriginal => {
+vi.mock("@budibase/shared-core", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@budibase/shared-core")>()
   return {
     ...actual,
@@ -252,9 +244,7 @@ describe("InviteUsersModal", () => {
     })
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: "Invite users" })
-      ).toBeDisabled()
+      expect(screen.getByRole("button", { name: "Invite users" })).toBeDisabled()
     })
   })
 
