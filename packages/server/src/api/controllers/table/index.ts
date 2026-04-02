@@ -99,7 +99,6 @@ export async function find(ctx: UserCtx<void, FindTableResponse>) {
 }
 
 export async function save(ctx: UserCtx<SaveTableRequest, SaveTableResponse>) {
-  const appId = ctx.appId
   const { rows, ...table } = ctx.request.body
   const renaming = ctx.request.body._rename
 
@@ -124,7 +123,6 @@ export async function save(ctx: UserCtx<SaveTableRequest, SaveTableResponse>) {
 }
 
 export async function destroy(ctx: UserCtx<void, DeleteTableResponse>) {
-  const appId = ctx.appId
   const tableId = ctx.params.tableId
   const deletedTable = await external.destroy(ctx)
 

@@ -1,8 +1,4 @@
-import {
-  type Ctx,
-  TenantResolutionStrategy,
-  type Workspace,
-} from "@budibase/types"
+import { type Ctx, TenantResolutionStrategy, type Workspace } from "@budibase/types"
 import type { SetOption } from "cookies"
 import jwt, { type Secret } from "jsonwebtoken"
 import { DocumentType, Header, MAX_VALID_DATE, SEPARATOR } from "../constants"
