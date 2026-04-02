@@ -12,7 +12,6 @@ import {
   type CsvToJsonResponse,
   type DeleteTableResponse,
   DocumentType,
-  EventType,
   type FetchTablesResponse,
   FieldType,
   type FindTableResponse,
@@ -119,7 +118,6 @@ export async function save(ctx: UserCtx<SaveTableRequest, SaveTableResponse>) {
     savedTable = await processTable(savedTable)
   }
   ctx.message = `Table ${table.name} saved successfully.`
-  ctx.eventEmitter?.emitTable(EventType.TABLE_SAVE, appId, { ...savedTable })
 
   ctx.body = savedTable
   builderSocket?.emitTableUpdate(ctx, cloneDeep(savedTable))
@@ -130,7 +128,6 @@ export async function destroy(ctx: UserCtx<void, DeleteTableResponse>) {
   const tableId = ctx.params.tableId
   const deletedTable = await external.destroy(ctx)
 
-  ctx.eventEmitter?.emitTable(EventType.TABLE_DELETE, appId, deletedTable)
   ctx.table = deletedTable
   ctx.body = { message: `Table ${tableId} deleted.` }
   builderSocket?.emitTableDeletion(ctx, deletedTable)
