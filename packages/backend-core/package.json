@@ -1,6 +1,6 @@
 {
   "name": "@budibase/backend-core",
-  "version": "0.0.0",
+  "version": "3.35.2",
   "description": "Budibase backend core libraries used in server and worker",
   "main": "dist/index.js",
   "types": "dist/src/index.d.ts",
