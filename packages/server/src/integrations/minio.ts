@@ -26,7 +26,7 @@ interface MinioQuery {
 }
 
 const getSchema = () => {
-  const schema = {
+  const schema: Integration = {
     docs: "https://github.com/minio/minio",
     friendlyName: "MinIO",
     type: "Object store",
@@ -71,6 +71,9 @@ const getSchema = () => {
       read: {
         type: QueryType.JSON,
       },
+      copy: {
+        type: QueryType.JSON,
+      },
       delete: {
         type: QueryType.JSON,
       },
@@ -81,6 +84,11 @@ const getSchema = () => {
         type: DatasourceFieldType.STRING,
         required: true,
       },
+      destinationBucket: {
+        displayName: "Target bucket",
+        type: DatasourceFieldType.STRING,
+        required: false,
+      },
       actionType: {
         displayName: "Operation",
         type: DatasourceFieldType.LIST,
@@ -88,6 +96,7 @@ const getSchema = () => {
         data: {
           create: ["putObject"],
           read: ["getObject", "listObjects", "statObject", "listObjectsV2"],
+          copy: ["copyObject", "copyObjects"],
           delete: ["removeObject", "removeObjects"],
         },
       },
@@ -187,6 +196,43 @@ export class MinioIntegration implements IntegrationBase {
       }
     } catch (err) {
       console.error("Error reading from MinIO", err)
+      throw err
+    }
+  }
+
+  async copy(query: MinioQuery): Promise<unknown> {
+    try {
+      const { object, bucketName } = this.parseQuery(query)
+      const destinationBucket = query.extra.destinationBucket || bucketName
+
+      switch (query.extra.actionType) {
+        case "copyObject": {
+          return await this.client.copyObject(
+            destinationBucket,
+            object as string,
+            `${bucketName}/${object as string}`
+          )
+        }
+        case "copyObjects": {
+          const objects = Array.isArray(query.json) ? query.json : [query.json]
+          const objectNames = objects.map((obj: any) => (typeof obj === "string" ? obj : obj.name))
+          const results = []
+          for (const objName of objectNames) {
+            const result = await this.client.copyObject(
+              destinationBucket,
+              objName,
+              `${bucketName}/${objName}`
+            )
+            results.push(result)
+          }
+          return { copied: results }
+        }
+        default: {
+          throw new Error(`actionType ${query.extra.actionType} does not exist for copy`)
+        }
+      }
+    } catch (err) {
+      console.error("Error copying in MinIO", err)
       throw err
     }
   }
