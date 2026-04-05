@@ -3,6 +3,7 @@ import { CoreDropzone, Helpers, ProgressCircle } from "@budibase/bbui"
 import { getContext, onDestroy, onMount } from "svelte"
 import { builderStore } from "@/stores/builder"
 import Field from "./Field.svelte"
+import ExifReader from "exifreader"
 
 export let datasourceId
 export let bucket
@@ -71,12 +72,16 @@ const processFiles = async (fileList) => {
         const reader = new FileReader()
         reader.addEventListener(
           "load",
-          () => {
+          async () => {
+            const tags = await ExifReader.load(reader.result)
             res({
               url: reader.result,
               name: file.name,
               type: file.type,
               key,
+              metadata: Object.fromEntries(
+                Object.entries(tags).map(([key, val]) => [key, val.value])
+              )
             })
           },
           false
