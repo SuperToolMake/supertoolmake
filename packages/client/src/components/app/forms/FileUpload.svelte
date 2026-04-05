@@ -81,7 +81,7 @@ const processFiles = async (fileList) => {
               key,
               metadata: Object.fromEntries(
                 Object.entries(tags).map(([key, val]) => [key, val.value])
-              )
+              ),
             })
           },
           false
