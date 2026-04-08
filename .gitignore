@@ -53,6 +53,7 @@ dist/
 
 # TypeScript v1 declaration files
 typings/
+*.tsbuildinfo
 
 # Optional npm cache directory
 .npm
@@ -72,6 +73,7 @@ typings/
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
+.svelte-check/
 
 # next.js build output
 .next
@@ -100,8 +102,17 @@ typings/
 
 bin/
 hosting/.generated*
+hosting/redis-tls/certs/
 stats.html
+
+
+# plugins
+budibase-component
+budibase-datasource
 
 *.iml
 .nx
 .claude
+.opencode
+.env
+docker-compose.yaml
