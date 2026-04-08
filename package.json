@@ -25,7 +25,7 @@
     "proper-lockfile": "4.1.2",
     "rollup-plugin-visualizer": "6.0.3",
     "svelte": "5.55.0",
-    "svelte-check": "4.3.1",
+    "svelte-check": "4.4.6",
     "svelte-preprocess": "6.0.3",
     "testcontainers": "11.13.0",
     "typescript": "5.9.2",
