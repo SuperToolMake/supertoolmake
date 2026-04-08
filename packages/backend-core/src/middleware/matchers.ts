@@ -21,13 +21,13 @@ export const buildMatcherRegex = (patterns: EndpointMatcher[]): RegexMatcher[] =
       }
     }
 
-    return { regex: new RegExp(route), method, route }
+    return { regex: new RegExp(`^${route}`), method, route }
   })
 }
 
 export const matches = (ctx: Ctx, options: RegexMatcher[]) => {
   return options.find(({ regex, method }) => {
-    const urlMatch = regex.test(ctx.request.url)
+    const urlMatch = regex.test(ctx.path)
     const methodMatch =
       method === "ALL" ? true : ctx.request.method.toLowerCase() === method.toLowerCase()
     return urlMatch && methodMatch
