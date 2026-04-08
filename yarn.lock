@@ -10246,7 +10246,7 @@ fd-slicer@~1.1.0:
   dependencies:
     pend "~1.2.0"
 
-fdir@^6.2.0, fdir@^6.4.3, fdir@^6.4.6, fdir@^6.5.0:
+fdir@^6.2.0, fdir@^6.4.3, fdir@^6.5.0:
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/fdir/-/fdir-6.5.0.tgz#ed2ab967a331ade62f18d077dae192684d50d350"
   integrity sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==
@@ -19162,24 +19162,10 @@ vite@7.1.11:
   optionalDependencies:
     fsevents "~2.3.3"
 
-vite@7.1.2:
-  version "7.1.2"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-7.1.2.tgz#62ffd8a915977ff387fbe7a731af1a650ec5006e"
-  integrity sha512-J0SQBPlQiEXAF7tajiH+rUooJPo0l8KQgyg4/aMunNtrOa7bwuZJsJbDWzeljqQpgftxuq5yNJxQ91O9ts29UQ==
-  dependencies:
-    esbuild "^0.25.0"
-    fdir "^6.4.6"
-    picomatch "^4.0.3"
-    postcss "^8.5.6"
-    rollup "^4.43.0"
-    tinyglobby "^0.2.14"
-  optionalDependencies:
-    fsevents "~2.3.3"
-
-"vite@^5.0.0 || ^6.0.0 || ^7.0.0-0":
-  version "7.3.1"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-7.3.1.tgz#7f6cfe8fb9074138605e822a75d9d30b814d6507"
-  integrity sha512-w+N7Hifpc3gRjZ63vYBXA56dvvRlNWRczTdmCBBa+CotUzAPf5b7YMdMR/8CQoeYE5LX3W4wj6RYTgonm1b9DA==
+vite@7.3.2, "vite@^5.0.0 || ^6.0.0 || ^7.0.0-0":
+  version "7.3.2"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-7.3.2.tgz#cb041794d4c1395e28baea98198fd6e8f4b96b5c"
+  integrity sha512-Bby3NOsna2jsjfLVOHKes8sGwgl4TT0E6vvpYgnAYDIF/tie7MRaFthmKuHx1NSXjiTueXH3do80FMQgvEktRg==
   dependencies:
     esbuild "^0.27.0"
     fdir "^6.5.0"
