@@ -4917,6 +4917,11 @@
         "key": "bucket"
       },
       {
+        "type": "text",
+        "label": "Folder",
+        "key": "folder"
+      },
+      {
         "type": "event",
         "label": "On change",
         "key": "onChange",

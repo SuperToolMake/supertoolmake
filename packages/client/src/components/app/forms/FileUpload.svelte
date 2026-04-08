@@ -7,6 +7,7 @@ import ExifReader from "exifreader"
 
 export let datasourceId
 export let bucket
+export let folder = ""
 export let field
 export let label
 export let disabled = false
@@ -119,7 +120,9 @@ const upload = async () => {
         const isImage = rawFile.type?.startsWith("image/")
         const shouldCompress = compressImages && isImage
         const ext = shouldCompress ? "avif" : rawFile.name.split(".").pop()
-        const uploadKey = `${processedFile.key}.${ext}`
+        const uploadKey = folder
+          ? `${folder}/${processedFile.key}.${ext}`
+          : `${processedFile.key}.${ext}`
         return API.externalUpload(
           datasourceId,
           bucket,
