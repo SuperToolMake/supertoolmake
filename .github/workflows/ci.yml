@@ -117,10 +117,10 @@ jobs:
       - name: Test
         run: |
           if ${{ env.ONLY_AFFECTED_TASKS }}; then
-            yarn test -- --ignore=@supertoolmake/worker --ignore=@supertoolmake/server --ignore=@supertoolmake/builder --ignore=@supertoolmake/upgrade-tests --ignore=@supertoolmake/client --no-prefix --since=${{ env.NX_BASE_BRANCH }} -- --verbose --reporters=default --reporters=github-actions
+            yarn test -- --ignore=@supertoolmake/worker --ignore=@supertoolmake/server --ignore=@supertoolmake/builder --ignore=@supertoolmake/upgrade-tests --ignore=@supertoolmake/client --no-prefix --since=${{ env.NX_BASE_BRANCH }} -- --reporters=default --reporters=github-actions
             yarn test -- --scope=@supertoolmake/builder --scope=@supertoolmake/client --since=${{ env.NX_BASE_BRANCH }}
           else
-            yarn test -- --ignore=@supertoolmake/worker --ignore=@supertoolmake/server --ignore=@supertoolmake/builder --ignore=@supertoolmake/upgrade-tests --ignore=@supertoolmake/client --no-prefix -- --verbose --reporters=default --reporters=github-actions
+            yarn test -- --ignore=@supertoolmake/worker --ignore=@supertoolmake/server --ignore=@supertoolmake/builder --ignore=@supertoolmake/upgrade-tests --ignore=@supertoolmake/client --no-prefix -- --reporters=default --reporters=github-actions
             yarn test -- --scope=@supertoolmake/builder --scope=@supertoolmake/client --no-prefix
           fi
 
@@ -151,7 +151,7 @@ jobs:
           fi
 
           cd packages/worker
-          yarn test --verbose --reporters=default --reporters=github-actions
+          yarn test --reporters=default --reporters=github-actions
 
   test-server:
     runs-on: ubuntu-24.04
@@ -248,7 +248,7 @@ jobs:
           fi
 
           cd packages/server
-          yarn test --filter $FILTER --verbose --reporters=default --reporters=github-actions
+          yarn test --filter $FILTER --reporters=default --reporters=github-actions
 
   check-client-build-size:
     runs-on: ubuntu-24.04
