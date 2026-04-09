@@ -1,3 +1,4 @@
+import { Firestore, type WhereFilterOp } from "@google-cloud/firestore"
 import {
   type ConnectionInfo,
   DatasourceFeature,
@@ -6,7 +7,6 @@ import {
   type IntegrationBase,
   QueryType,
 } from "@supertoolmake/types"
-import { Firestore, type WhereFilterOp } from "@google-cloud/firestore"
 
 interface FirebaseConfig {
   email: string

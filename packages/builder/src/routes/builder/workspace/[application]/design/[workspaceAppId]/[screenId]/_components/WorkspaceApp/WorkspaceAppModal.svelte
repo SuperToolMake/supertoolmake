@@ -1,5 +1,13 @@
 <script lang="ts">
-import { Body, Icon, Input, keepOpen, Modal, ModalContent, notifications } from "@supertoolmake/bbui"
+import {
+  Body,
+  Icon,
+  Input,
+  keepOpen,
+  Modal,
+  ModalContent,
+  notifications,
+} from "@supertoolmake/bbui"
 import { PublishResourceState, type UIWorkspaceApp, type WorkspaceApp } from "@supertoolmake/types"
 import { goto as gotoStore } from "@roxi/routify"
 import type { ZodType } from "zod"

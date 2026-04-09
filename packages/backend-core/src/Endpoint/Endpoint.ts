@@ -1,5 +1,5 @@
-import type { Ctx, UserCtx } from "@supertoolmake/types"
 import type Router from "@koa/router"
+import type { Ctx, UserCtx } from "@supertoolmake/types"
 import type { Next } from "koa"
 
 export type Method = "post" | "put" | "patch" | "get" | "delete" | "head"

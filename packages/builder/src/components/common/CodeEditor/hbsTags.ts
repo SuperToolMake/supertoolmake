@@ -1,5 +1,5 @@
-import { FIND_ANY_HBS_REGEX } from "@supertoolmake/string-templates"
 import { Decoration, EditorView, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view"
+import { FIND_ANY_HBS_REGEX } from "@supertoolmake/string-templates"
 
 export class HbsTagWidget extends WidgetType {
   text: string

@@ -1,5 +1,13 @@
 <script>
-import { Body, Button, FancyForm, FancyInput, Heading, Layout, notifications } from "@supertoolmake/bbui"
+import {
+  Body,
+  Button,
+  FancyForm,
+  FancyInput,
+  Heading,
+  Layout,
+  notifications,
+} from "@supertoolmake/bbui"
 import { BUILDER_URLS } from "@supertoolmake/shared-core"
 import { goto as gotoStore, params } from "@roxi/routify"
 import Logo from "assets/supertoolmake-emblem.svg"

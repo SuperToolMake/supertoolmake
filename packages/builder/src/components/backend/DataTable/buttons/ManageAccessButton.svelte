@@ -1,5 +1,13 @@
 <script>
-import { ActionButton, Input, Label, List, ListItem, notifications, Select } from "@supertoolmake/bbui"
+import {
+  ActionButton,
+  Input,
+  Label,
+  List,
+  ListItem,
+  notifications,
+  Select,
+} from "@supertoolmake/bbui"
 import { PermissionSource } from "@supertoolmake/types"
 import DetailPopover from "@/components/common/DetailPopover.svelte"
 import { Roles } from "@/constants/backend"

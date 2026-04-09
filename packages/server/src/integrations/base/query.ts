@@ -1,4 +1,8 @@
-import type { DatasourcePlusQueryResponse, EnrichedQueryJson, QueryJson } from "@supertoolmake/types"
+import type {
+  DatasourcePlusQueryResponse,
+  EnrichedQueryJson,
+  QueryJson,
+} from "@supertoolmake/types"
 import sdk from "../../sdk"
 import { enrichQueryJson } from "../../sdk/workspace/rows/utils"
 import { getIntegration, isDatasourcePlusConstructor } from "../index"

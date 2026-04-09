@@ -1,4 +1,8 @@
-import { type DatasourceConfig, DatasourceFieldType, type UIIntegration } from "@supertoolmake/types"
+import {
+  type DatasourceConfig,
+  DatasourceFieldType,
+  type UIIntegration,
+} from "@supertoolmake/types"
 import { type AnySchema, number, object, string } from "yup"
 
 const propertyValidator = (type: string) => {

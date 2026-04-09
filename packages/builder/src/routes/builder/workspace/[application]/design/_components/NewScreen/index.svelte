@@ -1,5 +1,12 @@
 <script lang="ts">
-import { Body, keepOpen, Modal, ModalCancelFrom, ModalContent, notifications } from "@supertoolmake/bbui"
+import {
+  Body,
+  keepOpen,
+  Modal,
+  ModalCancelFrom,
+  ModalContent,
+  notifications,
+} from "@supertoolmake/bbui"
 import CreationPage from "@/components/common/CreationPage.svelte"
 import { AutoScreenTypes } from "@/constants"
 import { appStore, screenStore, workspaceAppStore } from "@/stores/builder"

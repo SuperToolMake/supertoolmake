@@ -1,5 +1,5 @@
-import { permissions } from "@supertoolmake/backend-core"
 import Router from "@koa/router"
+import { permissions } from "@supertoolmake/backend-core"
 import { devAppIdPath } from "../../constants/paths"
 import { authorizedMiddleware as authorized } from "../../middleware/authorized"
 import { paramResource } from "../../middleware/resourceId"

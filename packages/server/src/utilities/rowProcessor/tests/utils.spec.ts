@@ -1,4 +1,9 @@
-import { AutoFieldSubType, type FieldSchema, FieldType, RelationshipType } from "@supertoolmake/types"
+import {
+  AutoFieldSubType,
+  type FieldSchema,
+  FieldType,
+  RelationshipType,
+} from "@supertoolmake/types"
 import { AutoFieldDefaultNames } from "../../../constants"
 import { fixAutoColumnSubType } from "../utils"
 

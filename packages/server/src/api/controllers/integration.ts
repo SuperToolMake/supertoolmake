@@ -1,4 +1,8 @@
-import type { FetchIntegrationsResponse, FindIntegrationResponse, UserCtx } from "@supertoolmake/types"
+import type {
+  FetchIntegrationsResponse,
+  FindIntegrationResponse,
+  UserCtx,
+} from "@supertoolmake/types"
 import { getDefinition, getDefinitions } from "../../integrations"
 
 export async function fetch(ctx: UserCtx<void, FetchIntegrationsResponse>) {

@@ -1,6 +1,10 @@
 <script lang="ts">
 import { JsonFormatter } from "@supertoolmake/frontend-core"
-import { decodeJSBinding, encodeJSBinding, processObjectSync } from "@supertoolmake/string-templates"
+import {
+  decodeJSBinding,
+  encodeJSBinding,
+  processObjectSync,
+} from "@supertoolmake/string-templates"
 import type {
   CaretPositionFn,
   EnrichedBinding,
