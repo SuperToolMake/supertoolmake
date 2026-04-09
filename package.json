@@ -100,7 +100,7 @@
     "semver": "7.5.3",
     "http-cache-semantics": "4.1.1",
     "msgpackr": "1.10.1",
-    "axios": "1.13.5",
+    "axios": "1.15.0",
     "xml2js": "0.6.2",
     "passport": "0.6.0",
     "nodemailer": "8.0.5",
