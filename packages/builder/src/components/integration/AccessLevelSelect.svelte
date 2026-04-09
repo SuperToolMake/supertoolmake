@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Label, notifications } from "@budibase/bbui"
-import { Constants } from "@budibase/frontend-core"
-import { PermissionLevel, type Query } from "@budibase/types"
+import { Label, notifications } from "@supertoolmake/bbui"
+import { Constants } from "@supertoolmake/frontend-core"
+import { PermissionLevel, type Query } from "@supertoolmake/types"
 import RoleSelect from "@/components/design/settings/controls/RoleSelect.svelte"
 import { permissions } from "@/stores/builder"
 

@@ -5,7 +5,7 @@ import type {
   InsertWorkspaceAppResponse,
   UpdateWorkspaceAppRequest,
   UpdateWorkspaceAppResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { type Expectations, TestAPI } from "./base"
 
 export class WorkspaceAppAPI extends TestAPI {

@@ -1,5 +1,5 @@
 <script>
-import { Body } from "@budibase/bbui"
+import { Body } from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 import { EditorModes } from "@/components/common/CodeMirrorEditor.svelte"
 import KeyValueBuilder from "@/components/integration/KeyValueBuilder.svelte"

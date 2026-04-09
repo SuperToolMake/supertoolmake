@@ -9,7 +9,7 @@ import {
   ModalContent,
   notifications,
   Select,
-} from "@budibase/bbui"
+} from "@supertoolmake/bbui"
 import { tables, views } from "@/stores/builder"
 
 const CONDITIONS = [

@@ -1,5 +1,5 @@
 <script>
-import { Checkbox } from "@budibase/bbui"
+import { Checkbox } from "@supertoolmake/bbui"
 import { onMount } from "svelte"
 
 export let value

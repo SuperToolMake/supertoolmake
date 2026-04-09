@@ -1,11 +1,11 @@
-import manifest from "@budibase/client/manifest.json"
+import manifest from "@supertoolmake/client/manifest.json"
 import {
   type ComponentDefinition,
   type FetchAppPackageResponse,
   FieldType,
   type Layout,
   type Screen as ScreenDoc,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { Writable } from "svelte/store"
 import { get } from "svelte/store"
 import { v4 } from "uuid"

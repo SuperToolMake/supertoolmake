@@ -1,5 +1,5 @@
 <script>
-import { Input, Modal, ModalContent, notifications } from "@budibase/bbui"
+import { Input, Modal, ModalContent, notifications } from "@supertoolmake/bbui"
 import { API } from "@/api"
 import { appStore, initialise } from "@/stores/builder"
 

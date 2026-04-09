@@ -1,6 +1,6 @@
-import { db as dbCore } from "@budibase/backend-core"
-import { structures } from "@budibase/backend-core/tests"
-import { PublishResourceState, type WorkspaceApp } from "@budibase/types"
+import { db as dbCore } from "@supertoolmake/backend-core"
+import { structures } from "@supertoolmake/backend-core/tests"
+import { PublishResourceState, type WorkspaceApp } from "@supertoolmake/types"
 import * as setup from "./utilities"
 
 describe("/api/deploy", () => {

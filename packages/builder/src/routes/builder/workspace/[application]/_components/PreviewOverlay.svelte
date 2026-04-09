@@ -1,5 +1,5 @@
 <script>
-import { ProgressCircle } from "@budibase/bbui"
+import { ProgressCircle } from "@supertoolmake/bbui"
 import { onMount } from "svelte"
 import { fade, fly } from "svelte/transition"
 import { previewStore, selectedAppUrls, themeStore } from "@/stores/builder"

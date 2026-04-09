@@ -8,7 +8,7 @@ import {
   RelationshipType,
   type Table,
   TableSourceType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { cloneDeep } from "lodash/fp"
 import {
   foreignKeyStructure,

@@ -1,8 +1,8 @@
 {
-  "name": "@budibase/sdk",
+  "name": "@supertoolmake/sdk",
   "private": true,
   "version": "0.0.0",
-  "description": "Budibase Public API SDK",
+  "description": "SuperToolMake Public API SDK",
   "author": "Budibase",
   "license": "MPL-2.0",
   "module": "dist/sdk.mjs",

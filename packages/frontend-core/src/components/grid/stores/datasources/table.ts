@@ -4,7 +4,7 @@ import {
   type SaveTableRequest,
   SortOrder,
   type UIDatasource,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { get } from "svelte/store"
 import type TableFetch from "../../../../fetch/TableFetch"
 import type { Store as StoreContext } from ".."

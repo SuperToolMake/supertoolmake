@@ -5,7 +5,7 @@ import {
   LoginMethod,
   type SessionCookie,
   type User,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { Middleware, Next } from "koa"
 import { getUser } from "../cache/user"
 import { Cookie, Header } from "../constants"

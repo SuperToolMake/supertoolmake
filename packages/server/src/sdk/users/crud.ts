@@ -1,5 +1,5 @@
-import { context } from "@budibase/backend-core"
-import type { User } from "@budibase/types"
+import { context } from "@supertoolmake/backend-core"
+import type { User } from "@supertoolmake/types"
 
 export function get(userId: string) {
   const db = context.getWorkspaceDB()

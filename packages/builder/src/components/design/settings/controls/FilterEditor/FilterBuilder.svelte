@@ -1,5 +1,5 @@
 <script>
-import { CoreFilterBuilder } from "@budibase/frontend-core"
+import { CoreFilterBuilder } from "@supertoolmake/frontend-core"
 import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
 import { readableToRuntimeBinding, runtimeToReadableBinding } from "@/dataBinding"
 import { tables } from "@/stores/builder"

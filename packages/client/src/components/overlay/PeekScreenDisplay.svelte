@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, Modal, ModalContent } from "@budibase/bbui"
+import { ActionButton, Modal, ModalContent } from "@supertoolmake/bbui"
 import { onDestroy } from "svelte"
 import { PeekMessages } from "@/constants"
 import { dataSourceStore, notificationStore, peekStore, routeStore, stateStore } from "@/stores"

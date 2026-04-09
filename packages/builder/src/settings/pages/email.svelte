@@ -1,5 +1,5 @@
 <script>
-import { Button, Checkbox, Input, Label, Layout, notifications, Select } from "@budibase/bbui"
+import { Button, Checkbox, Input, Label, Layout, notifications, Select } from "@supertoolmake/bbui"
 import { cloneDeep } from "lodash/fp"
 import { onMount } from "svelte"
 import { API } from "@/api"

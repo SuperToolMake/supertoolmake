@@ -1,4 +1,4 @@
-import type { Screen as ScreenDoc } from "@budibase/types"
+import type { Screen as ScreenDoc } from "@supertoolmake/types"
 import { Roles } from "@/constants/backend"
 import { capitalise } from "@/helpers"
 import getValidRoute from "./getValidRoute"

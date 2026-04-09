@@ -1,4 +1,4 @@
-import type { UpdateNavigationRequest } from "@budibase/types"
+import type { UpdateNavigationRequest } from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface NavigationEndpoints {

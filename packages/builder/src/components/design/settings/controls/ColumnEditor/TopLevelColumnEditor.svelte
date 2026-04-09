@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { TableSchema } from "@budibase/types"
+import type { TableSchema } from "@supertoolmake/types"
 import ColumnEditor from "./ColumnEditor.svelte"
 
 const getTopLevelSchemaFields = (schema: TableSchema) => {

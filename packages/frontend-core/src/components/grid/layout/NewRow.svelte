@@ -1,5 +1,5 @@
 <script>
-import { Button, Icon, TempTooltip, TooltipType } from "@budibase/bbui"
+import { Button, Icon, TempTooltip, TooltipType } from "@supertoolmake/bbui"
 import { getContext, onDestroy, onMount, tick } from "svelte"
 import { fade } from "svelte/transition"
 import DataCell from "../cells/DataCell.svelte"

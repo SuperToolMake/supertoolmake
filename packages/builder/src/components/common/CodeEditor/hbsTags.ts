@@ -1,4 +1,4 @@
-import { FIND_ANY_HBS_REGEX } from "@budibase/string-templates"
+import { FIND_ANY_HBS_REGEX } from "@supertoolmake/string-templates"
 import { Decoration, EditorView, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view"
 
 export class HbsTagWidget extends WidgetType {

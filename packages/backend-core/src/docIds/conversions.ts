@@ -1,4 +1,4 @@
-import type { Workspace } from "@budibase/types"
+import type { Workspace } from "@supertoolmake/types"
 import { WORKSPACE_DEV_PREFIX, WORKSPACE_PREFIX } from "../constants"
 
 const NO_WORKSPACE_ERROR = "No app provided"

@@ -9,7 +9,7 @@ import type {
   WithoutDocMetadata,
   WorkspaceApp,
   WorkspaceAppResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { defaultAppNavigator } from "../../constants/definitions"
 import sdk from "../../sdk"
 

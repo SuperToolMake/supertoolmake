@@ -1,4 +1,4 @@
-import { constants } from "@budibase/backend-core"
+import { constants } from "@supertoolmake/backend-core"
 import { structures, TestConfiguration } from "../../tests"
 
 describe("tenancy middleware", () => {

@@ -1,10 +1,10 @@
-import { tenancy, users as usersCore } from "@budibase/backend-core"
+import { tenancy, users as usersCore } from "@supertoolmake/backend-core"
 import {
   EmailTemplatePurpose,
   type InviteUserRequest,
   type InviteUsersRequest,
   type InviteUsersResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { sendEmail } from "../../utilities/email"
 
 export async function invite(users: InviteUsersRequest): Promise<InviteUsersResponse> {

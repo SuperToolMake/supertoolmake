@@ -2,7 +2,7 @@ import type {
   GetResourcePermsResponse,
   PermissionLevel,
   ResourcePermissionInfo,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { API } from "@/api"
 import { BudiStore } from "../BudiStore"
 

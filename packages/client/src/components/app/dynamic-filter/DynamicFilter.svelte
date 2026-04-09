@@ -1,6 +1,6 @@
 <script>
-import { Helpers, Modal, ModalContent } from "@budibase/bbui"
-import { Constants, CoreFilterBuilder, QueryUtils, Utils } from "@budibase/frontend-core"
+import { Helpers, Modal, ModalContent } from "@supertoolmake/bbui"
+import { Constants, CoreFilterBuilder, QueryUtils, Utils } from "@supertoolmake/frontend-core"
 import { getContext, onDestroy } from "svelte"
 import { get } from "svelte/store"
 import Button from "../Button.svelte"

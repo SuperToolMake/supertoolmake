@@ -1,5 +1,5 @@
 <script>
-import { Button, Input, Label, Layout, notifications, ProgressCircle } from "@budibase/bbui"
+import { Button, Input, Label, Layout, notifications, ProgressCircle } from "@supertoolmake/bbui"
 import { writable } from "svelte/store"
 import { admin } from "@/stores/portal/admin"
 import { organisation } from "@/stores/portal/organisation"

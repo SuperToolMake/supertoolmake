@@ -1,5 +1,5 @@
-import { logging } from "@budibase/backend-core"
-import type { Ctx, ErrorOpsRequest, LogOpsRequest } from "@budibase/types"
+import { logging } from "@supertoolmake/backend-core"
+import type { Ctx, ErrorOpsRequest, LogOpsRequest } from "@supertoolmake/types"
 
 export async function log(ctx: Ctx<LogOpsRequest, void>) {
   const body = ctx.request.body

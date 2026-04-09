@@ -1,5 +1,5 @@
 <script>
-import { keepOpen, ModalContent, notifications } from "@budibase/bbui"
+import { keepOpen, ModalContent, notifications } from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 import { dataAPI, tables } from "@/stores/builder"
 import RowFieldControl from "../RowFieldControl.svelte"

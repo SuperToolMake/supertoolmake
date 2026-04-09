@@ -1,5 +1,5 @@
 <script>
-import { Body, ModalContent, notifications } from "@budibase/bbui"
+import { Body, ModalContent, notifications } from "@supertoolmake/bbui"
 import { goto } from "@roxi/routify"
 import { users } from "@/stores/portal/users"
 

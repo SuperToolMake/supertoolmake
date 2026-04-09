@@ -1,6 +1,6 @@
 <script>
-import { Helpers } from "@budibase/bbui"
-import { Utils } from "@budibase/frontend-core"
+import { Helpers } from "@supertoolmake/bbui"
+import { Utils } from "@supertoolmake/frontend-core"
 import { getContext, setContext } from "svelte"
 import { get, writable } from "svelte/store"
 import BlockComponent from "@/components/BlockComponent.svelte"

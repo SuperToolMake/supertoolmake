@@ -1,5 +1,5 @@
-import { auth, constants, context, roles, tenancy, users, utils } from "@budibase/backend-core"
-import type { ContextUser, UserCtx } from "@budibase/types"
+import { auth, constants, context, roles, tenancy, users, utils } from "@supertoolmake/backend-core"
+import type { ContextUser, UserCtx } from "@supertoolmake/types"
 import type { Middleware, Next } from "koa"
 import { generateUserMetadataID, isDevWorkspaceID } from "../db/utils"
 import env from "../environment"

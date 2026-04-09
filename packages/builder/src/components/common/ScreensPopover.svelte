@@ -1,6 +1,6 @@
 <script lang="ts">
-import { ActionButton, List, ListItem, PopoverAlignment } from "@budibase/bbui"
-import type { ScreenUsage } from "@budibase/types"
+import { ActionButton, List, ListItem, PopoverAlignment } from "@supertoolmake/bbui"
+import type { ScreenUsage } from "@supertoolmake/types"
 import DetailPopover from "@/components/common/DetailPopover.svelte"
 import { appStore, workspaceAppStore } from "@/stores/builder"
 

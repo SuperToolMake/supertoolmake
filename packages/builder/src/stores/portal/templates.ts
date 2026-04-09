@@ -1,4 +1,4 @@
-import type { TemplateMetadata } from "@budibase/types"
+import type { TemplateMetadata } from "@supertoolmake/types"
 import { API } from "@/api"
 import { BudiStore } from "../BudiStore"
 

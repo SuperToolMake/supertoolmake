@@ -1,4 +1,4 @@
-import type { Database, Installation } from "@budibase/types"
+import type { Database, Installation } from "@supertoolmake/types"
 import { bustCache, CacheKey, TTL, withCache } from "./cache/generic"
 import { doWithDB, StaticDatabases } from "./db"
 import environment from "./environment"

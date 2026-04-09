@@ -10,9 +10,9 @@ import {
   Layout,
   Multiselect,
   Select,
-} from "@budibase/bbui"
-import { Constants, FilterUsers, QueryUtils } from "@budibase/frontend-core"
-import { FieldType } from "@budibase/types"
+} from "@supertoolmake/bbui"
+import { Constants, FilterUsers, QueryUtils } from "@supertoolmake/frontend-core"
+import { FieldType } from "@supertoolmake/types"
 import { cloneDeep } from "lodash"
 import { generate } from "shortid"
 import { createEventDispatcher } from "svelte"

@@ -1,13 +1,13 @@
 <script lang="ts">
-import { JsonFormatter } from "@budibase/frontend-core"
-import { decodeJSBinding, encodeJSBinding, processObjectSync } from "@budibase/string-templates"
+import { JsonFormatter } from "@supertoolmake/frontend-core"
+import { decodeJSBinding, encodeJSBinding, processObjectSync } from "@supertoolmake/string-templates"
 import type {
   CaretPositionFn,
   EnrichedBinding,
   InsertAtPositionFn,
   JSONValue,
   Snippet,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { createEventDispatcher } from "svelte"
 import { readableToRuntimeBinding, runtimeToReadableBinding } from "@/dataBinding"
 import { snippets } from "@/stores/builder"

@@ -1,4 +1,4 @@
-import type { OAuth2CredentialsMethod, OAuth2GrantType } from "@budibase/types"
+import type { OAuth2CredentialsMethod, OAuth2GrantType } from "@supertoolmake/types"
 
 export interface OAuth2ConfigResponse {
   _id: string

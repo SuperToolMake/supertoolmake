@@ -1,4 +1,4 @@
-import type { Database, IdentityContext, Snippet, Table, Workspace } from "@budibase/types"
+import type { Database, IdentityContext, Snippet, Table, Workspace } from "@supertoolmake/types"
 import { DEFAULT_TENANT_ID, DocumentType, SEPARATOR, StaticDatabases } from "../constants"
 import { getDB } from "../db/db"
 import * as conversions from "../docIds/conversions"

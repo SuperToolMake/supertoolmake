@@ -1,4 +1,4 @@
-import { BUILDER_URLS } from "@budibase/shared-core"
+import { BUILDER_URLS } from "@supertoolmake/shared-core"
 import { type Readable, readable } from "svelte/store"
 
 interface MenuItem {

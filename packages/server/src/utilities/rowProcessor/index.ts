@@ -1,12 +1,12 @@
-import { cache, context, HTTPError, utils } from "@budibase/backend-core"
+import { cache, context, HTTPError, utils } from "@supertoolmake/backend-core"
 import {
   helpers,
   isExternalColumnName,
   isInternalColumnName,
   PROTECTED_EXTERNAL_COLUMNS,
   PROTECTED_INTERNAL_COLUMNS,
-} from "@budibase/shared-core"
-import { processStringSync } from "@budibase/string-templates"
+} from "@supertoolmake/shared-core"
+import { processStringSync } from "@supertoolmake/string-templates"
 import {
   AutoFieldSubType,
   FieldType,
@@ -14,7 +14,7 @@ import {
   type Row,
   type Table,
   type User,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { cloneDeep } from "lodash/fp"
 import { getTableFromSource, isUserMetadataTable } from "../../api/controllers/row/utils"
 import { InternalTables } from "../../db/utils"

@@ -1,6 +1,6 @@
 <script>
-import { Body, Button, Layout } from "@budibase/bbui"
-import { downloadStream } from "@budibase/frontend-core"
+import { Body, Button, Layout } from "@supertoolmake/bbui"
+import { downloadStream } from "@supertoolmake/frontend-core"
 import { API } from "@/api"
 import Spinner from "@/components/common/Spinner.svelte"
 

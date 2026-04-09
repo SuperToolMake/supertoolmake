@@ -1,4 +1,4 @@
-import type { DataFetchDatasource, Table } from "@budibase/types"
+import type { DataFetchDatasource, Table } from "@supertoolmake/types"
 import type { APIClient } from "../api/types"
 import CustomFetch from "./CustomFetch"
 import FieldFetch from "./FieldFetch"

@@ -1,6 +1,6 @@
-import { db as dbCore } from "@budibase/backend-core"
-import { dataFilters } from "@budibase/shared-core"
-import { processObjectSync } from "@budibase/string-templates"
+import { db as dbCore } from "@supertoolmake/backend-core"
+import { dataFilters } from "@supertoolmake/shared-core"
+import { processObjectSync } from "@supertoolmake/string-templates"
 import {
   AutoFieldSubType,
   AutoReason,
@@ -24,7 +24,7 @@ import {
   type SortJson,
   SortType,
   type Table,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import dayjs from "dayjs"
 import { isEqual, omit } from "lodash"
 import { cloneDeep } from "lodash/fp"

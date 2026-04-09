@@ -1,4 +1,4 @@
-import type { Document } from "@budibase/types"
+import type { Document } from "@supertoolmake/types"
 import tk from "timekeeper"
 import { structures } from "../../../tests"
 import { DBTestConfiguration } from "../../../tests/extra"

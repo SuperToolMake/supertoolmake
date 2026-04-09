@@ -1,5 +1,5 @@
-import { context } from "@budibase/backend-core"
-import type { Datasource, DatasourcePlus, IntegrationBase, Schema, Table } from "@budibase/types"
+import { context } from "@supertoolmake/backend-core"
+import type { Datasource, DatasourcePlus, IntegrationBase, Schema, Table } from "@supertoolmake/types"
 
 import { getIntegration } from "../../../integrations"
 import tableSdk from "../tables"

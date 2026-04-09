@@ -8,7 +8,7 @@ import {
   keepOpen,
   ModalContent,
   Select,
-} from "@budibase/bbui"
+} from "@supertoolmake/bbui"
 import { onMount } from "svelte"
 import RelationshipSelector from "@/components/common/RelationshipSelector.svelte"
 import { PrettyRelationshipDefinitions, RelationshipType } from "@/constants/backend"

@@ -1,5 +1,5 @@
 <script>
-import { Icon, Modal } from "@budibase/bbui"
+import { Icon, Modal } from "@supertoolmake/bbui"
 import { getContext } from "svelte"
 
 const component = getContext("component")

@@ -26,7 +26,7 @@ import type {
   UpdateSelfMetadataRequest,
   UpdateSelfMetadataResponse,
   UserIdentifier,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface UserEndpoints {

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { DatasourceFieldType } from "@budibase/types"
+import { DatasourceFieldType } from "@supertoolmake/types"
 import BooleanField from "./fields/Boolean.svelte"
 import ConnectionField from "./fields/Connection.svelte"
 import FieldGroupField from "./fields/FieldGroup.svelte"

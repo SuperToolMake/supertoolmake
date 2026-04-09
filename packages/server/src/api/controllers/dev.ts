@@ -1,10 +1,10 @@
-import { env as envCore } from "@budibase/backend-core"
+import { env as envCore } from "@supertoolmake/backend-core"
 import type {
   ClearDevLockResponse,
   Ctx,
   GetVersionResponse,
   RevertWorkspaceResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import fetch from "node-fetch"
 import env from "../../environment"
 import sdk from "../../sdk"

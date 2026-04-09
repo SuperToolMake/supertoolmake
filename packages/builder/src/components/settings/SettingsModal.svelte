@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Body, Divider, Icon, Modal, StatusLight } from "@budibase/bbui"
+import { Body, Divider, Icon, Modal, StatusLight } from "@supertoolmake/bbui"
 import { beforeUrlChange, goto } from "@roxi/routify"
 import { tick } from "svelte"
 import NewPill from "@/components/common/NewPill.svelte"

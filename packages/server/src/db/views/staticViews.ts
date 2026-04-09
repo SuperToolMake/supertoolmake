@@ -1,5 +1,5 @@
-import { context } from "@budibase/backend-core"
-import { type DBView, DocumentType, type LinkDocument } from "@budibase/types"
+import { context } from "@supertoolmake/backend-core"
+import { type DBView, DocumentType, type LinkDocument } from "@supertoolmake/types"
 import { SEPARATOR, ViewName } from "../utils"
 
 const SCREEN_PREFIX = DocumentType.SCREEN + SEPARATOR

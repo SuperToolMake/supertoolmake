@@ -1,4 +1,4 @@
-import type { SaveSSOUserFunction, SSOAuthDetails, SSOUser, User } from "@budibase/types"
+import type { SaveSSOUserFunction, SSOAuthDetails, SSOUser, User } from "@supertoolmake/types"
 import * as context from "../../../context"
 import { generateGlobalUserID } from "../../../db"
 import * as users from "../../../users"

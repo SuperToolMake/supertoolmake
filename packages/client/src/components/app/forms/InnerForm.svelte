@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Helpers } from "@budibase/bbui"
+import { Helpers } from "@supertoolmake/bbui"
 import {
   type DataFetchDatasource,
   type FieldSchema,
@@ -7,7 +7,7 @@ import {
   type Table,
   type TableSchema,
   type UIFieldValidationRule,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { getContext, setContext } from "svelte"
 import type { Readable, Writable } from "svelte/store"
 import { derived, get, writable } from "svelte/store"

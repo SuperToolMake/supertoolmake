@@ -1,8 +1,8 @@
 <script lang="ts">
-import { Link, notifications } from "@budibase/bbui"
-import { utils } from "@budibase/shared-core"
-import type { Datasource, Query, Table } from "@budibase/types"
-import { SourceType, Theme } from "@budibase/types"
+import { Link, notifications } from "@supertoolmake/bbui"
+import { utils } from "@supertoolmake/shared-core"
+import type { Datasource, Query, Table } from "@supertoolmake/types"
+import { SourceType, Theme } from "@supertoolmake/types"
 import { goto as gotoStore, params as paramsStore } from "@roxi/routify"
 import { get } from "svelte/store"
 import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"

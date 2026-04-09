@@ -3,7 +3,7 @@ import type {
   JSONArrayFieldDatasource,
   QueryArrayFieldDatasource,
   Row,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import BaseDataFetch from "./DataFetch"
 
 export interface FieldDefinition {

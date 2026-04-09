@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, Body, Button, notifications } from "@budibase/bbui"
+import { ActionButton, Body, Button, notifications } from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 import ExistingTableDataImport from "@/components/backend/TableNavigator/ExistingTableDataImport.svelte"
 import DetailPopover from "@/components/common/DetailPopover.svelte"

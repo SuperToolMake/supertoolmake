@@ -1,4 +1,4 @@
-import { utils } from "@budibase/shared-core"
+import { utils } from "@supertoolmake/shared-core"
 import {
   type AutoFieldSubType,
   type DateFieldMetadata,
@@ -6,7 +6,7 @@ import {
   type NumberFieldMetadata,
   type RelationshipFieldMetadata,
   RelationshipType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { TableNames } from "@/constants"
 import { AUTO_COLUMN_DISPLAY_NAMES, AUTO_COLUMN_SUB_TYPES, FIELDS } from "@/constants/backend"
 

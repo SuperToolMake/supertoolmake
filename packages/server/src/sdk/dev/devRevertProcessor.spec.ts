@@ -1,6 +1,6 @@
-import { db } from "@budibase/backend-core"
-import { generator } from "@budibase/backend-core/tests"
-import type { DevRevertQueueData } from "@budibase/types"
+import { db } from "@supertoolmake/backend-core"
+import { generator } from "@supertoolmake/backend-core/tests"
+import type { DevRevertQueueData } from "@supertoolmake/types"
 import TestConfiguration from "../../tests/utilities/TestConfiguration"
 import { devRevertProcessor } from "./devRevertProcessor"
 

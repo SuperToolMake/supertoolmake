@@ -1,5 +1,5 @@
 <script lang="ts">
-import { AbsTooltip, Menu, MenuItem, Popover, TooltipPosition } from "@budibase/bbui"
+import { AbsTooltip, Menu, MenuItem, Popover, TooltipPosition } from "@supertoolmake/bbui"
 import { contextMenuStore } from "@/stores/builder"
 import NewPill from "./common/NewPill.svelte"
 

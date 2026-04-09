@@ -1,4 +1,4 @@
-import type { SortOrder, UICondition, UIDatasource, UISearchFilter } from "@budibase/types"
+import type { SortOrder, UICondition, UIDatasource, UISearchFilter } from "@supertoolmake/types"
 import type { Writable } from "svelte/store"
 import type { APIClient } from "../../../api/types"
 import type * as GridClipboard from "../../../stores/gridClipboard"

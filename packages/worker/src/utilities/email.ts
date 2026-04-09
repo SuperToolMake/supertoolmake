@@ -1,11 +1,11 @@
-import { cache, configs, HTTPError } from "@budibase/backend-core"
-import { processString } from "@budibase/string-templates"
+import { cache, configs, HTTPError } from "@supertoolmake/backend-core"
+import { processString } from "@supertoolmake/string-templates"
 import {
   EmailTemplatePurpose,
   type SendEmailOpts,
   type SMTPInnerConfig,
   type User,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import ical from "ical-generator"
 import { marked } from "marked"
 import nodemailer from "nodemailer"

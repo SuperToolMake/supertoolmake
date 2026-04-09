@@ -1,5 +1,5 @@
 <script>
-import ClientAppSkeleton from "@budibase/frontend-core/src/components/ClientAppSkeleton.svelte"
+import ClientAppSkeleton from "@supertoolmake/frontend-core/src/components/ClientAppSkeleton.svelte"
 
 export let props
 </script>

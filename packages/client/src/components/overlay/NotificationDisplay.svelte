@@ -1,5 +1,5 @@
 <script>
-import { Notification } from "@budibase/bbui"
+import { Notification } from "@supertoolmake/bbui"
 import { fly } from "svelte/transition"
 import { notificationStore } from "@/stores"
 </script>

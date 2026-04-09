@@ -1,4 +1,4 @@
-import { helpers, utils } from "@budibase/shared-core"
+import { helpers, utils } from "@supertoolmake/shared-core"
 import {
   type EnrichedQueryJson,
   FieldType,
@@ -10,7 +10,7 @@ import {
   type SqlQuery,
   type Table,
   TableSourceType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { Knex, knex } from "knex"
 import { breakExternalTableId, getNativeSql } from "./utils"
 

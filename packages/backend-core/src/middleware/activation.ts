@@ -1,4 +1,4 @@
-import { ConfigType, type SettingsConfig } from "@budibase/types"
+import { ConfigType, type SettingsConfig } from "@supertoolmake/types"
 import type { Context, Middleware, Next } from "koa"
 import { getConfig } from "../configs"
 

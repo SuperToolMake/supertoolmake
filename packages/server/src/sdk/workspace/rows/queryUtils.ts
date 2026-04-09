@@ -1,4 +1,4 @@
-import { db, HTTPError } from "@budibase/backend-core"
+import { db, HTTPError } from "@supertoolmake/backend-core"
 import {
   FieldType,
   isArraySearchOperator,
@@ -7,7 +7,7 @@ import {
   isRangeSearchOperator,
   type SearchFilters,
   type Table,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import sdk from "../.."
 import { isInternal } from "../tables/utils"
 

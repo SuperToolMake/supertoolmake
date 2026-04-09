@@ -10,11 +10,11 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "paths": {
-      "@budibase/*": [
+      "@supertoolmake/*": [
         "../*/src/index.ts",
         "../*/src/index.js",
         "../*",
-        "../../node_modules/@budibase/*"
+        "../../node_modules/@supertoolmake/*"
       ],
       "@/*": ["./src/*"],
       "*": ["./src/*"]

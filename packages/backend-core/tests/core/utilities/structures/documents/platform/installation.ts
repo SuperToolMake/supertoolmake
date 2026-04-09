@@ -1,4 +1,4 @@
-import type { Installation } from "@budibase/types"
+import type { Installation } from "@supertoolmake/types"
 import * as db from "../../db"
 import { generator } from "../../generator"
 

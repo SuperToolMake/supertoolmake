@@ -1,4 +1,4 @@
-import { Theme } from "@budibase/types"
+import { Theme } from "@supertoolmake/types"
 import { ensureValidTheme, getThemeClassNames } from "../themes"
 
 describe("theme class names", () => {

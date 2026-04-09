@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Avatar, TooltipPosition } from "@budibase/bbui"
-import { UserAvatar } from "@budibase/frontend-core"
-import type { UIUser } from "@budibase/types"
+import { Avatar, TooltipPosition } from "@supertoolmake/bbui"
+import { UserAvatar } from "@supertoolmake/frontend-core"
+import type { UIUser } from "@supertoolmake/types"
 
 type OrderType = "ltr" | "rtl"
 

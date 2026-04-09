@@ -1,5 +1,5 @@
 <script>
-import { AbsTooltip, Icon, TooltipPosition } from "@budibase/bbui"
+import { AbsTooltip, Icon, TooltipPosition } from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 import active from "svelte-spa-router/active"
 import { builderStore } from "@/stores"

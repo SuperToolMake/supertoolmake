@@ -1,8 +1,8 @@
 <script>
-import { ActionButton, Body, Button, Helpers, Icon, Layout, Select } from "@budibase/bbui"
-import { Constants, QueryUtils } from "@budibase/frontend-core"
-import { utils } from "@budibase/shared-core"
-import { EmptyFilterOption, FieldType, UILogicalOperator } from "@budibase/types"
+import { ActionButton, Body, Button, Helpers, Icon, Layout, Select } from "@supertoolmake/bbui"
+import { Constants, QueryUtils } from "@supertoolmake/frontend-core"
+import { utils } from "@supertoolmake/shared-core"
+import { EmptyFilterOption, FieldType, UILogicalOperator } from "@supertoolmake/types"
 import { createEventDispatcher, getContext } from "svelte"
 import ConditionField from "./ConditionField.svelte"
 import FilterField from "./FilterField.svelte"

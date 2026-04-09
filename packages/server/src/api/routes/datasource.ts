@@ -1,4 +1,4 @@
-import { permissions } from "@budibase/backend-core"
+import { permissions } from "@supertoolmake/backend-core"
 import { authorizedMiddleware as authorized } from "../../middleware/authorized"
 import * as datasourceController from "../controllers/datasource"
 import { builderRoutes, endpointGroupList } from "./endpointGroups"

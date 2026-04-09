@@ -1,4 +1,4 @@
-import type { Database, Workspace } from "@budibase/types"
+import type { Database, Workspace } from "@supertoolmake/types"
 import {
   type DeletedWorkspace,
   getWorkspaceMetadata,

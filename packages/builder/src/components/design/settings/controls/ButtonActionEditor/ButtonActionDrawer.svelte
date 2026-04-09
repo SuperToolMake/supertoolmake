@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, Button, DrawerContent, Icon, Layout, Search } from "@budibase/bbui"
+import { ActionButton, Button, DrawerContent, Icon, Layout, Search } from "@supertoolmake/bbui"
 import { cloneDeep } from "lodash/fp"
 import { generate } from "shortid"
 import { tick } from "svelte"

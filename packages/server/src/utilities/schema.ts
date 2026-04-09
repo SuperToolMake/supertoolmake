@@ -1,5 +1,5 @@
-import { db, HTTPError, sql } from "@budibase/backend-core"
-import { helpers, utils, ValidColumnNameRegex } from "@budibase/shared-core"
+import { db, HTTPError, sql } from "@supertoolmake/backend-core"
+import { helpers, utils, ValidColumnNameRegex } from "@supertoolmake/shared-core"
 import {
   BBReferenceFieldSubType,
   type FieldSchema,
@@ -7,7 +7,7 @@ import {
   type Row,
   type Table,
   type TableSchema,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 
 type Rows = Array<Row>
 

@@ -2,7 +2,7 @@ import type {
   DuplicateResourceToWorkspaceRequest,
   DuplicateResourceToWorkspaceResponse,
   ResourceDependenciesResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface ResourceEndpoints {

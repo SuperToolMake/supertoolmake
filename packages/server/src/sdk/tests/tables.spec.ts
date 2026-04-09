@@ -1,4 +1,4 @@
-import type { Table } from "@budibase/types"
+import type { Table } from "@supertoolmake/types"
 import { type DatabaseName, getDatasource } from "../../integrations/tests/utils"
 import { basicTable } from "../../tests/utilities/structures"
 import TestConfig from "../../tests/utilities/TestConfiguration"

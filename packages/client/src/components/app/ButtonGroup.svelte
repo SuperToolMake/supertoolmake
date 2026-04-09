@@ -1,5 +1,5 @@
 <script>
-import { CollapsedButtonGroup } from "@budibase/bbui"
+import { CollapsedButtonGroup } from "@supertoolmake/bbui"
 import { getContext } from "svelte"
 import { resolveCollapsedButtons } from "@/utils/collapsedButtonGroup"
 import Block from "../Block.svelte"

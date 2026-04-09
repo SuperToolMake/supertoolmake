@@ -1,5 +1,5 @@
 <script>
-import { Button, notifications } from "@budibase/bbui"
+import { Button, notifications } from "@supertoolmake/bbui"
 import { isEqual } from "lodash"
 import { integrations } from "@/stores/builder"
 

@@ -1,7 +1,7 @@
 <script>
-import { AbsTooltip, Icon } from "@budibase/bbui"
-import { UserAvatars } from "@budibase/frontend-core"
-import { DataEnvironmentMode } from "@budibase/types"
+import { AbsTooltip, Icon } from "@supertoolmake/bbui"
+import { UserAvatars } from "@supertoolmake/frontend-core"
+import { DataEnvironmentMode } from "@supertoolmake/types"
 import { params, url } from "@roxi/routify"
 import { derived } from "svelte/store"
 import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"

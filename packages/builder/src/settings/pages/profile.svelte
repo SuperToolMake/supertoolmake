@@ -12,10 +12,10 @@ import {
   Modal,
   notifications,
   Select,
-} from "@budibase/bbui"
-import ChangePasswordModal from "@budibase/frontend-core/src/components/ChangePasswordModal.svelte"
-import { ThemeOptions } from "@budibase/shared-core"
-import type { UpdateSelfRequest } from "@budibase/types"
+} from "@supertoolmake/bbui"
+import ChangePasswordModal from "@supertoolmake/frontend-core/src/components/ChangePasswordModal.svelte"
+import { ThemeOptions } from "@supertoolmake/shared-core"
+import type { UpdateSelfRequest } from "@supertoolmake/types"
 import { onMount } from "svelte"
 import { writable } from "svelte/store"
 import { API } from "@/api"

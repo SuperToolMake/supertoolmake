@@ -1,4 +1,4 @@
-import { FieldType, type Table } from "@budibase/types"
+import { FieldType, type Table } from "@supertoolmake/types"
 import { PROTECTED_INTERNAL_COLUMNS } from "./constants"
 
 const allowDisplayColumnByType: Record<FieldType, boolean> = {

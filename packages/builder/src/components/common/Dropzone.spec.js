@@ -1,4 +1,4 @@
-import { notifications } from "@budibase/bbui"
+import { notifications } from "@supertoolmake/bbui"
 import { fireEvent, render } from "@testing-library/svelte"
 import { writable } from "svelte/store"
 import { describe, expect, it, vi } from "vitest"

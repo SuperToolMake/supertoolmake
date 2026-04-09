@@ -1,5 +1,5 @@
 <script>
-import { Button, Modal } from "@budibase/bbui"
+import { Button, Modal } from "@supertoolmake/bbui"
 import TableImportSelection from "@/components/backend/Datasources/TableImportSelection/index.svelte"
 import { integrations, tables } from "@/stores/builder"
 import { integrationForDatasource } from "@/stores/selectors"

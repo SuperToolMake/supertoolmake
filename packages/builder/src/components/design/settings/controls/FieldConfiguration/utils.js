@@ -1,4 +1,4 @@
-import { FieldType } from "@budibase/types"
+import { FieldType } from "@supertoolmake/types"
 
 export const convertOldFieldFormat = (fields) => {
   if (!fields) {

@@ -1,5 +1,5 @@
 <script>
-import { StatusLight } from "@budibase/bbui"
+import { StatusLight } from "@supertoolmake/bbui"
 import { roles } from "@/stores/builder"
 
 export let id

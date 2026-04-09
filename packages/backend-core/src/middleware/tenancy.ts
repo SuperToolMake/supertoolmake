@@ -3,7 +3,7 @@ import {
   type EndpointMatcher,
   type GetTenantIdOptions,
   TenantResolutionStrategy,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { Middleware, Next } from "koa"
 import { Header } from "../constants"
 import { doInTenant } from "../context"

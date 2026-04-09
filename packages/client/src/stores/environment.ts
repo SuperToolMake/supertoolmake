@@ -1,4 +1,4 @@
-import type { GetEnvironmentResponse } from "@budibase/types"
+import type { GetEnvironmentResponse } from "@supertoolmake/types"
 import { writable } from "svelte/store"
 import { API } from "@/api"
 

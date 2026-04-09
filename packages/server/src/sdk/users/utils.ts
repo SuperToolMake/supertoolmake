@@ -1,4 +1,4 @@
-import { context, roles as rolesCore } from "@budibase/backend-core"
+import { context, roles as rolesCore } from "@supertoolmake/backend-core"
 import {
   type ContextUser,
   type ContextUserMetadata,
@@ -6,7 +6,7 @@ import {
   isSSOUser,
   type UserBindings,
   type UserMetadata,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import isEqual from "lodash/isEqual"
 import {
   generateUserMetadataID,

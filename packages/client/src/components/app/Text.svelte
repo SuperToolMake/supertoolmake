@@ -1,5 +1,5 @@
 <script lang="ts">
-import { MarkdownViewer } from "@budibase/bbui"
+import { MarkdownViewer } from "@supertoolmake/bbui"
 import { getContext } from "svelte"
 
 export let text: any = ""

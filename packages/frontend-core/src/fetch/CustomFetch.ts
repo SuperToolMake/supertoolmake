@@ -1,4 +1,4 @@
-import type { CustomDatasource } from "@budibase/types"
+import type { CustomDatasource } from "@supertoolmake/types"
 import BaseDataFetch from "./DataFetch"
 
 type CustomDefinition = Record<string, any>

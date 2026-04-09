@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { UIComponentError } from "@budibase/types"
+import type { UIComponentError } from "@supertoolmake/types"
 import { getContext } from "svelte"
 
 export let error: UIComponentError | undefined

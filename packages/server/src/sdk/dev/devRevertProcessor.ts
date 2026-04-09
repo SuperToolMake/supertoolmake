@@ -1,10 +1,10 @@
-import { cache, context, db as dbCore, queue } from "@budibase/backend-core"
+import { cache, context, db as dbCore, queue } from "@supertoolmake/backend-core"
 import {
   type DeploymentDoc,
   type DevRevertQueueData,
   DocumentType,
   type Workspace,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { isWorkspacePublished } from "../workspace/workspaces/utils"
 
 let _devRevertProcessor: DevRevertProcessor | undefined

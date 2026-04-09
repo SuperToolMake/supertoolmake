@@ -4,7 +4,7 @@ import type {
   FetchTemplateResponse,
   SaveGlobalTemplateRequest,
   SaveGlobalTemplateResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface TemplateEndpoints {

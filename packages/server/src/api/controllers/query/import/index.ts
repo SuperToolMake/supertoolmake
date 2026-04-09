@@ -1,5 +1,5 @@
-import { context } from "@budibase/backend-core"
-import type { Datasource, Query } from "@budibase/types"
+import { context } from "@supertoolmake/backend-core"
+import type { Datasource, Query } from "@supertoolmake/types"
 import { generateQueryID } from "../../../../db/utils"
 import { queryValidation } from "../validation"
 import type { ImportInfo, ImportSource } from "./sources/base"

@@ -1,11 +1,11 @@
-import { utils } from "@budibase/shared-core"
+import { utils } from "@supertoolmake/shared-core"
 import type {
   SearchFilters,
   SearchUsersRequest,
   StrippedUser,
   User,
   UserDatasource,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { get } from "svelte/store"
 import BaseDataFetch, { type DataFetchParams } from "./DataFetch"
 

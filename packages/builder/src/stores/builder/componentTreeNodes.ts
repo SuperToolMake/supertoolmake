@@ -1,4 +1,4 @@
-import type { Component, Screen } from "@budibase/types"
+import type { Component, Screen } from "@supertoolmake/types"
 import { get } from "svelte/store"
 import { findComponentPath } from "@/helpers/components"
 import { BudiStore, PersistenceType } from "@/stores/BudiStore"

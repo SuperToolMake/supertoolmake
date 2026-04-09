@@ -1,4 +1,4 @@
-import type { QueryArrayFieldDatasource } from "@budibase/types"
+import type { QueryArrayFieldDatasource } from "@supertoolmake/types"
 import { generateQueryArraySchemas, getJSONArrayDatasourceSchema } from "../utils/json"
 import FieldFetch from "./FieldFetch"
 

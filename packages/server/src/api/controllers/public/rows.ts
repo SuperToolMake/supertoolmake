@@ -1,4 +1,4 @@
-import type { Row, UserCtx } from "@budibase/types"
+import type { Row, UserCtx } from "@supertoolmake/types"
 import type { Next } from "koa"
 import { convertBookmark } from "../../../utilities"
 import * as rowController from "../row"

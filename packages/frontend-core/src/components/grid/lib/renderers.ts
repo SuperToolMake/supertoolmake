@@ -1,4 +1,4 @@
-import { FieldType, type UIColumn } from "@budibase/types"
+import { FieldType, type UIColumn } from "@supertoolmake/types"
 import BBReferenceCell from "../cells/BBReferenceCell.svelte"
 import BBReferenceSingleCell from "../cells/BBReferenceSingleCell.svelte"
 import BooleanCell from "../cells/BooleanCell.svelte"

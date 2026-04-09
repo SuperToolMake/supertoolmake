@@ -1,5 +1,5 @@
-import { DataFetchMap, type DataFetchType } from "@budibase/frontend-core"
-import { FieldType, type TableSchema } from "@budibase/types"
+import { DataFetchMap, type DataFetchType } from "@supertoolmake/frontend-core"
+import { FieldType, type TableSchema } from "@supertoolmake/types"
 import { API } from "@/api"
 
 /**

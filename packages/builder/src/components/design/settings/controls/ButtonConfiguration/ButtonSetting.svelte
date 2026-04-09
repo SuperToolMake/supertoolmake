@@ -1,6 +1,6 @@
 <script>
-import { Icon } from "@budibase/bbui"
-import { isJSBinding } from "@budibase/string-templates"
+import { Icon } from "@supertoolmake/bbui"
+import { isJSBinding } from "@supertoolmake/string-templates"
 import { runtimeToReadableBinding } from "@/dataBinding"
 import EditComponentPopover from "../EditComponentPopover.svelte"
 

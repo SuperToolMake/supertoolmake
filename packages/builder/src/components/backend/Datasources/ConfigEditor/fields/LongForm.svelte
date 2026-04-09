@@ -1,5 +1,5 @@
 <script>
-import { Label, TextArea } from "@budibase/bbui"
+import { Label, TextArea } from "@supertoolmake/bbui"
 
 export let type
 export let name

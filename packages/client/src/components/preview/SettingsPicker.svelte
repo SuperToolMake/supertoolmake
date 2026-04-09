@@ -1,5 +1,5 @@
 <script>
-import { Select } from "@budibase/bbui"
+import { Select } from "@supertoolmake/bbui"
 import { builderStore } from "@/stores"
 
 export let prop

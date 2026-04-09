@@ -1,5 +1,5 @@
 <script>
-import { Icon } from "@budibase/bbui"
+import { Icon } from "@supertoolmake/bbui"
 import { builderStore } from "@/stores"
 
 export let style

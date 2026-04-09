@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Icon, TooltipPosition, TooltipType } from "@budibase/bbui"
-import { UserAvatars } from "@budibase/frontend-core"
-import type { UIUser } from "@budibase/types"
+import { Icon, TooltipPosition, TooltipType } from "@supertoolmake/bbui"
+import { UserAvatars } from "@supertoolmake/frontend-core"
+import type { UIUser } from "@supertoolmake/types"
 import { createEventDispatcher, getContext } from "svelte"
 
 export let icon: string | null = null

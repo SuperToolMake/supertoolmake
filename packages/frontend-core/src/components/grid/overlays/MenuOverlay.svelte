@@ -1,5 +1,5 @@
 <script>
-import { Helpers, Menu, MenuItem } from "@budibase/bbui"
+import { Helpers, Menu, MenuItem } from "@supertoolmake/bbui"
 import { getContext } from "svelte"
 import { NewRowID } from "../lib/constants"
 import { getCellID } from "../lib/utils"

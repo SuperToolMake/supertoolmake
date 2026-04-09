@@ -1,4 +1,4 @@
-import { auth as authCore } from "@budibase/backend-core"
+import { auth as authCore } from "@supertoolmake/backend-core"
 import Joi from "joi"
 import { TemplatePurpose, TemplateType } from "../../../constants"
 import * as controller from "../../controllers/global/templates"

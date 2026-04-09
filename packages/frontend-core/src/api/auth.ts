@@ -9,7 +9,7 @@ import type {
   PasswordResetUpdateResponse,
   SetInitInfoRequest,
   SetInitInfoResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface ExtendedLoginResponse extends LoginResponse {

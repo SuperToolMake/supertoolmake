@@ -3,7 +3,7 @@ const yargs = require("yargs")
 const fs = require("node:fs")
 const { join } = require("node:path")
 require("../src/db").init()
-const { db: dbCore } = require("@budibase/backend-core")
+const { db: dbCore } = require("@supertoolmake/backend-core")
 // load environment
 const env = require("../src/environment")
 const { USER_METDATA_PREFIX, LINK_USER_METADATA_PREFIX } = require("../src/db/utils")

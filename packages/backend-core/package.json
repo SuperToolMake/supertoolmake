@@ -1,8 +1,8 @@
 {
-  "name": "@budibase/backend-core",
+  "name": "@supertoolmake/backend-core",
   "private": true,
   "version": "0.0.0",
-  "description": "Budibase backend core libraries used in server and worker",
+  "description": "SuperToolMake backend core libraries used in server and worker",
   "main": "dist/index.js",
   "types": "dist/src/index.d.ts",
   "exports": {
@@ -36,8 +36,8 @@
     "@smithy/node-http-handler": "4.1.1",
     "nano": "11.0.3",
     "@budibase/pouchdb-replication-stream": "1.2.11",
-    "@budibase/shared-core": "*",
-    "@budibase/types": "*",
+    "@supertoolmake/shared-core": "*",
+    "@supertoolmake/types": "*",
     "@techpass/passport-openidconnect": "1.0.0",
     "aws-cloudfront-sign": "3.0.2",
     "aws-sdk": "2.1692.0",
@@ -98,8 +98,8 @@
         "dependsOn": [
           {
             "projects": [
-              "@budibase/shared-core",
-              "@budibase/types"
+              "@supertoolmake/shared-core",
+              "@supertoolmake/types"
             ],
             "target": "build"
           }

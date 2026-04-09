@@ -1,7 +1,7 @@
 <script>
-import { Icon, Menu, MenuItem, Modal } from "@budibase/bbui"
-import { canBeDisplayColumn, canBeSortColumn } from "@budibase/frontend-core"
-import { FieldType, SortOrder } from "@budibase/types"
+import { Icon, Menu, MenuItem, Modal } from "@supertoolmake/bbui"
+import { canBeDisplayColumn, canBeSortColumn } from "@supertoolmake/frontend-core"
+import { FieldType, SortOrder } from "@supertoolmake/types"
 import { getContext, onMount, tick } from "svelte"
 import { TableNames } from "../../../constants"
 import { getColumnIcon } from "../../../utils/schema"

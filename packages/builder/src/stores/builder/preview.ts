@@ -1,4 +1,4 @@
-import type { AppContext, ComponentContext, PreviewDevice } from "@budibase/types"
+import type { AppContext, ComponentContext, PreviewDevice } from "@supertoolmake/types"
 import { get } from "svelte/store"
 import { BudiStore } from "../BudiStore"
 

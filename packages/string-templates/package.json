@@ -1,5 +1,5 @@
 {
-  "name": "@budibase/string-templates",
+  "name": "@supertoolmake/string-templates",
   "private": true,
   "version": "0.0.0",
   "description": "Handlebars wrapper for templating.",

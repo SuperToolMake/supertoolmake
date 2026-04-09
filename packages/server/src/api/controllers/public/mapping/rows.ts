@@ -1,4 +1,4 @@
-import type { RequiredKeys } from "@budibase/types"
+import type { RequiredKeys } from "@supertoolmake/types"
 import type { Row, RowSearch } from "./types"
 
 function row(body: any): RequiredKeys<Row> {

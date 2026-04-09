@@ -26,8 +26,8 @@ function mockReset() {
 function mockAuthWithNoCookie() {
   jest.resetModules()
   mockWorker()
-  jest.mock("@budibase/backend-core", () => {
-    const core = jest.requireActual("@budibase/backend-core")
+  jest.mock("@supertoolmake/backend-core", () => {
+    const core = jest.requireActual("@supertoolmake/backend-core")
     return {
       ...core,
       db: {
@@ -55,8 +55,8 @@ function mockAuthWithNoCookie() {
 function mockAuthWithCookie() {
   jest.resetModules()
   mockWorker()
-  jest.mock("@budibase/backend-core", () => {
-    const core = jest.requireActual("@budibase/backend-core")
+  jest.mock("@supertoolmake/backend-core", () => {
+    const core = jest.requireActual("@supertoolmake/backend-core")
     return {
       ...core,
       db: {
@@ -170,8 +170,8 @@ describe("Current app middleware", () => {
 
     it("should perform correct on a first call", async () => {
       mockReset()
-      jest.mock("@budibase/backend-core", () => {
-        const core = jest.requireActual("@budibase/backend-core")
+      jest.mock("@supertoolmake/backend-core", () => {
+        const core = jest.requireActual("@supertoolmake/backend-core")
         return {
           ...core,
           db: {

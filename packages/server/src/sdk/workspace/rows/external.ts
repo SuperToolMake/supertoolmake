@@ -1,5 +1,5 @@
-import { HTTPError } from "@budibase/backend-core"
-import { IncludeRelationship, Operation, type Row, type Table } from "@budibase/types"
+import { HTTPError } from "@supertoolmake/backend-core"
+import { IncludeRelationship, Operation, type Row, type Table } from "@supertoolmake/types"
 import cloneDeep from "lodash/fp/cloneDeep"
 import { handleRequest } from "../../../api/controllers/row/external"
 import { breakRowIdField } from "../../../integrations/utils"

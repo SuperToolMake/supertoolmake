@@ -1,5 +1,5 @@
-import { dataFilters } from "@budibase/shared-core"
-import type { Database, DatabaseOpts } from "@budibase/types"
+import { dataFilters } from "@supertoolmake/shared-core"
+import type { Database, DatabaseOpts } from "@supertoolmake/types"
 import { CouchDatabase, directCouchQuery } from "./couch"
 import { DDInstrumentedDatabase } from "./instrumentation"
 

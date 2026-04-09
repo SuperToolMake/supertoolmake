@@ -1,4 +1,4 @@
-import { SearchIndex, type User } from "@budibase/types"
+import { SearchIndex, type User } from "@supertoolmake/types"
 import { getGlobalDB } from "../../context"
 
 export async function createUserIndex() {

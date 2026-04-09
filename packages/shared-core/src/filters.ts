@@ -25,7 +25,7 @@ import {
   type Table,
   UILogicalOperator,
   type UISearchFilter,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import dayjs from "dayjs"
 import isEmpty from "lodash/isEmpty"
 import isPlainObject from "lodash/isPlainObject"

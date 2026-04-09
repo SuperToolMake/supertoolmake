@@ -1,4 +1,4 @@
-import type { BBReferenceFieldSubType } from "@budibase/types"
+import type { BBReferenceFieldSubType } from "@supertoolmake/types"
 
 export class InvalidBBRefError extends Error {
   constructor(id: string, subtype: BBReferenceFieldSubType) {

@@ -1,11 +1,11 @@
-import { generator, structures } from "@budibase/backend-core/tests"
+import { generator, structures } from "@supertoolmake/backend-core/tests"
 import {
   BBReferenceFieldSubType,
   FieldType,
   INTERNAL_TABLE_SOURCE_ID,
   type Table,
   TableSourceType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import TestConfiguration from "../../../tests/utilities/TestConfiguration"
 import { outputProcessing } from ".."
 import * as bbReferenceProcessor from "../bbReferenceProcessor"

@@ -1,4 +1,4 @@
-import type { DeleteLayoutResponse, SaveLayoutRequest, SaveLayoutResponse } from "@budibase/types"
+import type { DeleteLayoutResponse, SaveLayoutRequest, SaveLayoutResponse } from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface LayoutEndpoints {

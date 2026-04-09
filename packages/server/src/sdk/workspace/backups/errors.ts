@@ -1,5 +1,5 @@
-import { cache, context } from "@budibase/backend-core"
-import { DocumentType, type Workspace } from "@budibase/types"
+import { cache, context } from "@supertoolmake/backend-core"
+import { DocumentType, type Workspace } from "@supertoolmake/types"
 
 export async function clearErrors(backupId?: string) {
   const database = context.getProdWorkspaceDB()

@@ -1,5 +1,5 @@
-import { context, Header, HTTPError } from "@budibase/backend-core"
-import type { UserCtx } from "@budibase/types"
+import { context, Header, HTTPError } from "@supertoolmake/backend-core"
+import type { UserCtx } from "@supertoolmake/types"
 import { ensureTenantAppOwnershipMiddleware } from "../ensureTenantAppOwnership"
 
 function ctx(opts?: { appId: string }) {

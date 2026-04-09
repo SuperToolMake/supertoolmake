@@ -12,7 +12,7 @@ let InstanceSettingsCache = {}
   import { getContext, setContext, onMount } from "svelte"
   import { writable, get } from "svelte/store"
   import { enrichProps, propsAreSame } from "@/utils/componentProps"
-  import { getSettingsDefinition } from "@budibase/frontend-core"
+  import { getSettingsDefinition } from "@supertoolmake/frontend-core"
   import {
     builderStore,
     devToolsStore,
@@ -21,7 +21,7 @@ let InstanceSettingsCache = {}
     dndComponentPath,
     dndIsDragging,
   } from "@/stores"
-  import { Helpers } from "@budibase/bbui"
+  import { Helpers } from "@supertoolmake/bbui"
   import {
     getActiveConditions,
     reduceConditionActions,
@@ -33,7 +33,7 @@ let InstanceSettingsCache = {}
     decodeJSBinding,
     findHBSBlocks,
     isJSBinding,
-  } from "@budibase/string-templates"
+  } from "@supertoolmake/string-templates"
   import {
     getActionContextKey,
     getActionDependentContextKeys,

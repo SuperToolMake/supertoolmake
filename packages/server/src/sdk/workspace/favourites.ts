@@ -1,10 +1,10 @@
-import { context, db as dbCore } from "@budibase/backend-core"
+import { context, db as dbCore } from "@supertoolmake/backend-core"
 import {
   DocumentType,
   SEPARATOR,
   type WithoutDocMetadata,
   type WorkspaceFavourite,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 
 export async function fetch(userId?: string): Promise<WorkspaceFavourite[]> {
   const db = context.getWorkspaceDB()

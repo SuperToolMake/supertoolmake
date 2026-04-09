@@ -1,5 +1,5 @@
-import { constants, utils } from "@budibase/backend-core"
-import type { UserCtx } from "@budibase/types"
+import { constants, utils } from "@supertoolmake/backend-core"
+import type { UserCtx } from "@supertoolmake/types"
 import env from "../environment"
 
 /**

@@ -1,12 +1,12 @@
-import { roles } from "@budibase/backend-core"
-import { structures } from "@budibase/backend-core/tests"
+import { roles } from "@supertoolmake/backend-core"
+import { structures } from "@supertoolmake/backend-core/tests"
 import {
   BuiltinPermissionID,
   type Role,
   type Screen,
   SourceType,
   type UsageInScreensResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { ONBOARDING_WELCOME_SCREEN_NAME } from "../../../constants/screens"
 import { type DatabaseName, getDatasource } from "../../../integrations/tests/utils"
 import { basicDatasourcePlus } from "../../../tests/utilities/structures"

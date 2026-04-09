@@ -1,4 +1,4 @@
-import type { LockReason } from "@budibase/types"
+import type { LockReason } from "@supertoolmake/types"
 import type { DevInfo, User } from "../../../documents"
 
 export interface GenerateAPIKeyRequest {

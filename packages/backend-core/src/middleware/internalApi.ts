@@ -1,4 +1,4 @@
-import type { Ctx } from "@budibase/types"
+import type { Ctx } from "@supertoolmake/types"
 import { Header } from "../constants"
 import { isValidInternalAPIKey } from "../utils"
 

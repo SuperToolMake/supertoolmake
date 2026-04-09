@@ -4,7 +4,7 @@ import type {
   FetchRolesResponse,
   SaveRoleRequest,
   SaveRoleResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface RoleEndpoints {

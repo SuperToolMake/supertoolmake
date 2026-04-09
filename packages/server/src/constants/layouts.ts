@@ -1,4 +1,4 @@
-import type { Layout } from "@budibase/types"
+import type { Layout } from "@supertoolmake/types"
 
 export const BASE_LAYOUT_PROP_IDS = {
   PRIVATE: "layout_private_master",

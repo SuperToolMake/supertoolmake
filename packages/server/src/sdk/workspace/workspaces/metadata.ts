@@ -1,5 +1,5 @@
-import { context, DocumentType } from "@budibase/backend-core"
-import type { Workspace } from "@budibase/types"
+import { context, DocumentType } from "@supertoolmake/backend-core"
+import type { Workspace } from "@supertoolmake/types"
 
 /**
  * @deprecated the plan is to get everything using `tryGet` instead, then rename

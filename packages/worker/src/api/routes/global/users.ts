@@ -1,4 +1,4 @@
-import { auth } from "@budibase/backend-core"
+import { auth } from "@supertoolmake/backend-core"
 import Joi from "joi"
 import * as controller from "../../controllers/global/users"
 import {

@@ -1,5 +1,5 @@
 <script>
-import { notifications } from "@budibase/bbui"
+import { notifications } from "@supertoolmake/bbui"
 import { goto, isActive } from "@roxi/routify"
 import { onMount } from "svelte"
 import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"

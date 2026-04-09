@@ -1,5 +1,5 @@
-import { env as coreEnv, timers } from "@budibase/backend-core"
-import { testContainerUtils } from "@budibase/backend-core/tests"
+import { env as coreEnv, timers } from "@supertoolmake/backend-core"
+import { testContainerUtils } from "@supertoolmake/backend-core/tests"
 import * as matchers from "jest-extended"
 import nock from "nock"
 import env from "../environment"

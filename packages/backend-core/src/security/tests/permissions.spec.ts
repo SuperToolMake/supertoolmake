@@ -1,4 +1,4 @@
-import { BuiltinPermissionID } from "@budibase/types"
+import { BuiltinPermissionID } from "@supertoolmake/types"
 import cloneDeep from "lodash/cloneDeep"
 import * as permissions from "../permissions"
 import { BUILTIN_ROLE_IDS } from "../roles"

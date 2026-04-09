@@ -1,4 +1,4 @@
-import { constants } from "@budibase/backend-core"
+import { constants } from "@supertoolmake/backend-core"
 import { setEnv } from "../../../environment"
 import { afterAll as _afterAll, getConfig, getRequest } from "./utilities"
 

@@ -1,5 +1,5 @@
-import { platform } from "@budibase/backend-core"
-import type { User } from "@budibase/types"
+import { platform } from "@supertoolmake/backend-core"
+import type { User } from "@supertoolmake/types"
 import * as usersSdk from "../../sdk/users"
 
 /**

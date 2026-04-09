@@ -5,7 +5,7 @@ import {
   encryption,
   tenancy,
   utils,
-} from "@budibase/backend-core"
+} from "@supertoolmake/backend-core"
 import type {
   DevInfo,
   FetchAPIKeyResponse,
@@ -16,7 +16,7 @@ import type {
   UpdateSelfResponse,
   User,
   UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import env from "../../../environment"
 import * as userSdk from "../../../sdk/users"
 

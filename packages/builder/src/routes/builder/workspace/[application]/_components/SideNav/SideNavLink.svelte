@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Icon } from "@budibase/bbui"
+import { Icon } from "@supertoolmake/bbui"
 
 export let text: string
 export let icon: string | undefined = undefined

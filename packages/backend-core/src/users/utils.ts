@@ -1,5 +1,5 @@
-import { sdk } from "@budibase/shared-core"
-import type { ContextUser, User } from "@budibase/types"
+import { sdk } from "@supertoolmake/shared-core"
+import type { ContextUser, User } from "@supertoolmake/types"
 import env from "../environment"
 import { EmailUnavailableError } from "../errors"
 import { getFirstPlatformUser } from "./lookup"

@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Body, Dropzone, Input, Layout, ModalContent, notifications, Toggle } from "@budibase/bbui"
-import { sdk } from "@budibase/shared-core"
-import type { ImportToUpdateWorkspaceRequest } from "@budibase/types"
+import { Body, Dropzone, Input, Layout, ModalContent, notifications, Toggle } from "@supertoolmake/bbui"
+import { sdk } from "@supertoolmake/shared-core"
+import type { ImportToUpdateWorkspaceRequest } from "@supertoolmake/types"
 import { API } from "@/api"
 import { initialise } from "@/stores/builder"
 

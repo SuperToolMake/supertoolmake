@@ -8,7 +8,7 @@ import {
   type Snippet,
   type Theme,
   type UIComponentError,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { get, writable } from "svelte/store"
 import { devToolsStore } from "./devTools.js"
 import { eventStore } from "./events.js"

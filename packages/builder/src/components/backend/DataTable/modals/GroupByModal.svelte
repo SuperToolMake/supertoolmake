@@ -1,5 +1,5 @@
 <script>
-import { ModalContent, notifications, Select } from "@budibase/bbui"
+import { ModalContent, notifications, Select } from "@supertoolmake/bbui"
 import { FIELDS } from "@/constants/backend"
 import { tables, views } from "@/stores/builder"
 

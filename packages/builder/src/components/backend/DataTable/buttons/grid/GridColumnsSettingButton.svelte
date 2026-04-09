@@ -8,7 +8,7 @@ export const FieldPermissions = {
 
 <script>
   import { getContext } from "svelte"
-  import { ActionButton } from "@budibase/bbui"
+  import { ActionButton } from "@supertoolmake/bbui"
   import ColumnsSettingContent from "./ColumnsSettingContent.svelte"
   import DetailPopover from "@/components/common/DetailPopover.svelte"
 

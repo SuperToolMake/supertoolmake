@@ -1,4 +1,4 @@
-import { db } from "@budibase/backend-core"
+import { db } from "@supertoolmake/backend-core"
 
 const URL_REGEX_SLASH = /\/|\\/g
 

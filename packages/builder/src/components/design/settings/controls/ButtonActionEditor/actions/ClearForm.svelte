@@ -1,5 +1,5 @@
 <script>
-import { Label, Select } from "@budibase/bbui"
+import { Label, Select } from "@supertoolmake/bbui"
 import { getActionProviders } from "@/dataBinding"
 import { componentStore, selectedScreen } from "@/stores/builder"
 

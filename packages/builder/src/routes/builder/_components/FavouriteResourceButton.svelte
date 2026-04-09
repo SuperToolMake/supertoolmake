@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Icon, TooltipPosition, TooltipType } from "@budibase/bbui"
-import type { WorkspaceFavourite } from "@budibase/types"
+import { Icon, TooltipPosition, TooltipType } from "@supertoolmake/bbui"
+import type { WorkspaceFavourite } from "@supertoolmake/types"
 import { API } from "@/api"
 import { workspaceFavouriteStore } from "@/stores/builder"
 

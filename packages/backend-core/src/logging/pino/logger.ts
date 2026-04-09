@@ -1,4 +1,4 @@
-import type { IdentityType } from "@budibase/types"
+import type { IdentityType } from "@supertoolmake/types"
 import pino, { type LoggerOptions } from "pino"
 import pinoPretty from "pino-pretty"
 import * as context from "../../context"

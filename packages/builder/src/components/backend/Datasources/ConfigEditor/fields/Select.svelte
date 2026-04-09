@@ -1,5 +1,5 @@
 <script>
-import { Label, Select } from "@budibase/bbui"
+import { Label, Select } from "@supertoolmake/bbui"
 
 export let type
 export let name

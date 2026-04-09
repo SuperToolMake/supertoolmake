@@ -1,5 +1,5 @@
 <script>
-import { TempTooltip, TooltipType } from "@budibase/bbui"
+import { TempTooltip, TooltipType } from "@supertoolmake/bbui"
 import { getContext } from "svelte"
 import HeaderCell from "../cells/HeaderCell.svelte"
 import GridScrollWrapper from "./GridScrollWrapper.svelte"

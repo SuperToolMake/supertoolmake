@@ -1,5 +1,5 @@
 <script>
-import { Icon, Layout, Popover } from "@budibase/bbui"
+import { Icon, Layout, Popover } from "@supertoolmake/bbui"
 import { cloneDeep } from "lodash/fp"
 import { createEventDispatcher, getContext } from "svelte"
 import { getComponentBindableProperties } from "@/dataBinding"

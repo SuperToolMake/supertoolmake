@@ -10,7 +10,7 @@ export interface JSONViewerClickEvent {
 </script>
 
 <script lang="ts">
-  import { Icon } from "@budibase/bbui"
+  import { Icon } from "@supertoolmake/bbui"
   import { createEventDispatcher } from "svelte"
 
   export let label: string | undefined = undefined

@@ -1,5 +1,5 @@
-import { generator } from "@budibase/backend-core/tests"
-import type { Datasource, Query, QueryPreview } from "@budibase/types"
+import { generator } from "@supertoolmake/backend-core/tests"
+import type { Datasource, Query, QueryPreview } from "@supertoolmake/types"
 import type { Knex } from "knex"
 import { datasourceDescribe } from "../../../../integrations/tests/utils"
 import type { Expectations } from "../../../../tests/utilities/api/base"

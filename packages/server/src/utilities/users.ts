@@ -1,5 +1,5 @@
-import { context, roles } from "@budibase/backend-core"
-import type { ContextUserMetadata, UserCtx, UserMetadata } from "@budibase/types"
+import { context, roles } from "@supertoolmake/backend-core"
+import type { ContextUserMetadata, UserCtx, UserMetadata } from "@supertoolmake/types"
 import { InternalTables } from "../db/utils"
 import { getGlobalUser } from "./global"
 

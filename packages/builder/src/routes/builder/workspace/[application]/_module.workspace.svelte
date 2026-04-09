@@ -1,5 +1,5 @@
 <script>
-import { Body, Heading, Layout } from "@budibase/bbui"
+import { Body, Heading, Layout } from "@supertoolmake/bbui"
 import { API } from "@/api"
 import { bb } from "@/stores/bb"
 import {

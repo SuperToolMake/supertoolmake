@@ -1,5 +1,5 @@
-import { Helpers } from "@budibase/bbui"
-import type { ExecuteQueryRequest, Query, QueryDatasource } from "@budibase/types"
+import { Helpers } from "@supertoolmake/bbui"
+import type { ExecuteQueryRequest, Query, QueryDatasource } from "@supertoolmake/types"
 import { get } from "svelte/store"
 import BaseDataFetch from "./DataFetch"
 

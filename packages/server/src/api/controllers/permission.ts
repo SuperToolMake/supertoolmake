@@ -1,4 +1,4 @@
-import { context, permissions, roles } from "@budibase/backend-core"
+import { context, permissions, roles } from "@supertoolmake/backend-core"
 import type {
   AddPermissionRequest,
   AddPermissionResponse,
@@ -10,7 +10,7 @@ import type {
   RemovePermissionResponse,
   ResourcePermissionInfo,
   UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import sdk from "../../sdk"
 import { PermissionUpdateType } from "../../sdk/workspace/permissions"
 import { CURRENTLY_SUPPORTED_LEVELS, getBasePermissions } from "../../utilities/security"

@@ -1,18 +1,18 @@
 <script lang="ts">
-import { Select } from "@budibase/bbui"
+import { Select } from "@supertoolmake/bbui"
 import {
   decodeJSBinding,
   findHBSBlocks,
   isJSBinding,
   processStringSync,
-} from "@budibase/string-templates"
+} from "@supertoolmake/string-templates"
 import type {
   Component,
   ComponentCondition,
   ComponentSetting,
   EventHandler,
   Screen,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { onMount } from "svelte"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
 import { getAllStateVariables, getBindableProperties } from "@/dataBinding"

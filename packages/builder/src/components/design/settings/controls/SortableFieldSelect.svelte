@@ -1,6 +1,6 @@
 <script>
-import { Select } from "@budibase/bbui"
-import { canBeSortColumn } from "@budibase/frontend-core"
+import { Select } from "@supertoolmake/bbui"
+import { canBeSortColumn } from "@supertoolmake/frontend-core"
 import { createEventDispatcher } from "svelte"
 import { getDatasourceForProvider, getSchemaForDatasource } from "@/dataBinding"
 import { selectedScreen } from "@/stores/builder"

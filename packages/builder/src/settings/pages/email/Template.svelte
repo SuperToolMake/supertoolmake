@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Body, Button, Heading, Layout, notifications, Tab, Tabs } from "@budibase/bbui"
-import type { GlobalTemplateBinding, Template } from "@budibase/types"
+import { Body, Button, Heading, Layout, notifications, Tab, Tabs } from "@supertoolmake/bbui"
+import type { GlobalTemplateBinding, Template } from "@supertoolmake/types"
 import { getContext, onMount, tick } from "svelte"
 import type { Readable } from "svelte/store"
 import Editor from "@/components/integration/QueryEditor.svelte"

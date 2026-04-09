@@ -1,4 +1,4 @@
-import { notifications } from "@budibase/bbui"
+import { notifications } from "@supertoolmake/bbui"
 import { get } from "svelte/store"
 import { componentStore } from "@/stores/builder"
 

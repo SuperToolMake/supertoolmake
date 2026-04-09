@@ -1,7 +1,7 @@
 <script lang="ts">
-import { AbsTooltip, Avatar, TooltipPosition } from "@budibase/bbui"
-import { helpers } from "@budibase/shared-core"
-import type { User } from "@budibase/types"
+import { AbsTooltip, Avatar, TooltipPosition } from "@supertoolmake/bbui"
+import { helpers } from "@supertoolmake/shared-core"
+import type { User } from "@supertoolmake/types"
 
 export let user: User | undefined
 export let size: "XS" | "S" | "M" = "S"

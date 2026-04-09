@@ -1,5 +1,5 @@
 <script>
-import { Body, Label, Select } from "@budibase/bbui"
+import { Body, Label, Select } from "@supertoolmake/bbui"
 import { findAllMatchingComponents } from "@/helpers/components"
 import { selectedScreen } from "@/stores/builder"
 

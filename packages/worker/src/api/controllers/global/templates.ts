@@ -1,6 +1,6 @@
 import fs from "node:fs"
 import { join } from "node:path"
-import { db as dbCore, objectStore, tenancy } from "@budibase/backend-core"
+import { db as dbCore, objectStore, tenancy } from "@supertoolmake/backend-core"
 import {
   type Ctx,
   type DeleteGlobalTemplateResponse,
@@ -15,7 +15,7 @@ import {
   type SaveGlobalTemplateRequest,
   type SaveGlobalTemplateResponse,
   type UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { v4 } from "uuid"
 import yaml from "yaml"
 import { GLOBAL_OWNER, TemplateBindings, TemplateMetadata } from "../../../constants"

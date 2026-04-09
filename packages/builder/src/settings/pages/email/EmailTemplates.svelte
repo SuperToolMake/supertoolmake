@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Body, Button, ButtonGroup, Layout, notifications, Table } from "@budibase/bbui"
-import { downloadFile } from "@budibase/frontend-core"
-import type { FetchGlobalTemplateDefinitionResponse, FindConfigResponse } from "@budibase/types"
+import { Body, Button, ButtonGroup, Layout, notifications, Table } from "@supertoolmake/bbui"
+import { downloadFile } from "@supertoolmake/frontend-core"
+import type { FetchGlobalTemplateDefinitionResponse, FindConfigResponse } from "@supertoolmake/types"
 import { onMount } from "svelte"
 import { bb } from "@/stores/bb"
 import { email } from "@/stores/portal/email"

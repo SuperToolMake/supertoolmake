@@ -1,4 +1,4 @@
-import { JSONUtils } from "@budibase/frontend-core"
+import { JSONUtils } from "@supertoolmake/frontend-core"
 import { describe, expect, it, vi } from "vitest"
 import {
   getSchemaForDatasource,

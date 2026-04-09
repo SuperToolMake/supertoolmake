@@ -1,5 +1,5 @@
 <script>
-import { Detail, Icon } from "@budibase/bbui"
+import { Detail, Icon } from "@supertoolmake/bbui"
 
 export let title = ""
 export let actionIcon

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Combobox } from "@budibase/bbui"
+import { Combobox } from "@supertoolmake/bbui"
 import { getComponentFieldOptions } from "@/helpers/formFields"
 import { selectedScreen } from "@/stores/builder"
 

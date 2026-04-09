@@ -15,7 +15,7 @@ import type {
   UpdateDatasourceResponse,
   VerifyDatasourceRequest,
   VerifyDatasourceResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface DatasourceEndpoints {

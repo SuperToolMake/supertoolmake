@@ -1,5 +1,5 @@
 <script>
-import { Modal } from "@budibase/bbui"
+import { Modal } from "@supertoolmake/bbui"
 import { cloneDeep } from "lodash/fp"
 import { getContext, onMount } from "svelte"
 import CreateEditUser from "../../modals/CreateEditUser.svelte"

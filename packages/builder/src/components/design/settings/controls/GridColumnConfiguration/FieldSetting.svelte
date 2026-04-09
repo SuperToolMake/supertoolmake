@@ -1,7 +1,7 @@
 <script>
-import { Icon, Toggle } from "@budibase/bbui"
-import { Constants } from "@budibase/frontend-core"
-import { FieldType } from "@budibase/types"
+import { Icon, Toggle } from "@supertoolmake/bbui"
+import { Constants } from "@supertoolmake/frontend-core"
+import { FieldType } from "@supertoolmake/types"
 import { cloneDeep } from "lodash/fp"
 import { createEventDispatcher } from "svelte"
 import { FIELDS } from "@/constants/backend"

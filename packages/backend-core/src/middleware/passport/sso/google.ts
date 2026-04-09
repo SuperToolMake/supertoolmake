@@ -5,7 +5,7 @@ import {
   type SSOAuthDetails,
   type SSOProfile,
   SSOProviderType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { ssoCallbackUrl } from "../utils"
 import * as sso from "./sso"
 

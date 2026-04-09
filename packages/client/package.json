@@ -1,5 +1,5 @@
 {
-  "name": "@budibase/client",
+  "name": "@supertoolmake/client",
   "private": true,
   "version": "0.0.0",
   "license": "MPL-2.0",
@@ -24,11 +24,11 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@budibase/bbui": "*",
-    "@budibase/frontend-core": "*",
-    "@budibase/shared-core": "*",
-    "@budibase/string-templates": "*",
-    "@budibase/types": "*",
+    "@supertoolmake/bbui": "*",
+    "@supertoolmake/frontend-core": "*",
+    "@supertoolmake/shared-core": "*",
+    "@supertoolmake/string-templates": "*",
+    "@supertoolmake/types": "*",
     "@spectrum-css/card": "3.0.3",
     "apexcharts": "3.48.0",
     "dayjs": "1.10.8",
@@ -54,7 +54,7 @@
         "dependsOn": [
           {
             "projects": [
-              "@budibase/string-templates"
+              "@supertoolmake/string-templates"
             ],
             "target": "build"
           }
@@ -64,7 +64,7 @@
         "dependsOn": [
           {
             "projects": [
-              "@budibase/string-templates"
+              "@supertoolmake/string-templates"
             ],
             "target": "build"
           }

@@ -1,5 +1,5 @@
 <script>
-import { Select } from "@budibase/bbui"
+import { Select } from "@supertoolmake/bbui"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import { getContext, onDestroy } from "svelte"

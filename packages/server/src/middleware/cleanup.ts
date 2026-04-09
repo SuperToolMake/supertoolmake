@@ -1,5 +1,5 @@
-import { context } from "@budibase/backend-core"
-import type { Ctx } from "@budibase/types"
+import { context } from "@supertoolmake/backend-core"
+import type { Ctx } from "@supertoolmake/types"
 import type { Middleware, Next } from "koa"
 
 export const cleanupMiddleware = (async (_ctx: Ctx, next: Next) => {

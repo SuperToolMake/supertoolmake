@@ -1,5 +1,5 @@
-import { db as dbCore } from "@budibase/backend-core"
-import { dataFilters, utils } from "@budibase/shared-core"
+import { db as dbCore } from "@supertoolmake/backend-core"
+import { dataFilters, utils } from "@supertoolmake/shared-core"
 import {
   BBReferenceFieldSubType,
   DocumentType,
@@ -8,7 +8,7 @@ import {
   SEPARATOR,
   type SearchFilters,
   type Table,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 
 function findColumnInQueries(
   column: string,

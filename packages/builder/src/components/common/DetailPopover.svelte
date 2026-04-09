@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Icon, Popover, PopoverAlignment, type PopoverAPI } from "@budibase/bbui"
+import { Icon, Popover, PopoverAlignment, type PopoverAPI } from "@supertoolmake/bbui"
 
 export let title: string = ""
 export let subtitle: string | undefined = undefined

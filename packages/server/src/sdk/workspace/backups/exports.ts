@@ -1,7 +1,7 @@
 import fs from "node:fs"
 import fsp from "node:fs/promises"
 import { join } from "node:path"
-import { db as dbCore, encryption, objectStore } from "@budibase/backend-core"
+import { db as dbCore, encryption, objectStore } from "@supertoolmake/backend-core"
 import * as tar from "tar"
 import { v4 as uuid } from "uuid"
 import { ObjectStoreBuckets } from "../../../constants"

@@ -1,5 +1,5 @@
 <script>
-import { Label, Multiselect, Select } from "@budibase/bbui"
+import { Label, Multiselect, Select } from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 import { API } from "@/api"
 import { capitalise } from "@/helpers"

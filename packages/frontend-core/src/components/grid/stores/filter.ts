@@ -6,7 +6,7 @@ import {
   type UILegacyFilter,
   UILogicalOperator,
   type UISearchFilter,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { derived, get, type Readable, type Writable } from "svelte/store"
 import { memo } from "../../../utils/memo"
 import type { Store as StoreContext } from "."

@@ -1,6 +1,6 @@
-import * as backendCore from "@budibase/backend-core"
-import { DBTestConfiguration, generator, structures } from "@budibase/backend-core/tests"
-import { BBReferenceFieldSubType, type User } from "@budibase/types"
+import * as backendCore from "@supertoolmake/backend-core"
+import { DBTestConfiguration, generator, structures } from "@supertoolmake/backend-core/tests"
+import { BBReferenceFieldSubType, type User } from "@supertoolmake/types"
 import _ from "lodash"
 import {
   processInputBBReference,
@@ -10,8 +10,8 @@ import {
 } from "../bbReferenceProcessor"
 import { InvalidBBRefError } from "../errors"
 
-jest.mock("@budibase/backend-core", (): typeof backendCore => {
-  const actual: typeof backendCore = jest.requireActual("@budibase/backend-core")
+jest.mock("@supertoolmake/backend-core", (): typeof backendCore => {
+  const actual: typeof backendCore = jest.requireActual("@supertoolmake/backend-core")
   return {
     ...actual,
     cache: {

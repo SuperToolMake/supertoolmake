@@ -6,8 +6,8 @@ import {
   db as dbCore,
   objectStore,
   tenancy,
-} from "@budibase/backend-core"
-import { BUILDER_URLS } from "@budibase/shared-core"
+} from "@supertoolmake/backend-core"
+import { BUILDER_URLS } from "@supertoolmake/shared-core"
 import {
   type Config,
   type ConfigChecklistResponse,
@@ -31,7 +31,7 @@ import {
   type SSOConfigType,
   type UploadConfigFileResponse,
   type UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import env from "../../../environment"
 import * as email from "../../../utilities/email"
 import { checkAnyUserExists } from "../../../utilities/users"

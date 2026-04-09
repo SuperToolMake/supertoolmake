@@ -117,11 +117,11 @@ jobs:
       - name: Test
         run: |
           if ${{ env.ONLY_AFFECTED_TASKS }}; then
-            yarn test -- --ignore=@budibase/worker --ignore=@budibase/server --ignore=@budibase/builder --ignore=@budibase/upgrade-tests --ignore=@budibase/client --no-prefix --since=${{ env.NX_BASE_BRANCH }} -- --verbose --reporters=default --reporters=github-actions
-            yarn test -- --scope=@budibase/builder --scope=@budibase/client --since=${{ env.NX_BASE_BRANCH }}
+            yarn test -- --ignore=@supertoolmake/worker --ignore=@supertoolmake/server --ignore=@supertoolmake/builder --ignore=@supertoolmake/upgrade-tests --ignore=@supertoolmake/client --no-prefix --since=${{ env.NX_BASE_BRANCH }} -- --verbose --reporters=default --reporters=github-actions
+            yarn test -- --scope=@supertoolmake/builder --scope=@supertoolmake/client --since=${{ env.NX_BASE_BRANCH }}
           else
-            yarn test -- --ignore=@budibase/worker --ignore=@budibase/server --ignore=@budibase/builder --ignore=@budibase/upgrade-tests --ignore=@budibase/client --no-prefix -- --verbose --reporters=default --reporters=github-actions
-            yarn test -- --scope=@budibase/builder --scope=@budibase/client --no-prefix
+            yarn test -- --ignore=@supertoolmake/worker --ignore=@supertoolmake/server --ignore=@supertoolmake/builder --ignore=@supertoolmake/upgrade-tests --ignore=@supertoolmake/client --no-prefix -- --verbose --reporters=default --reporters=github-actions
+            yarn test -- --scope=@supertoolmake/builder --scope=@supertoolmake/client --no-prefix
           fi
 
   test-worker:
@@ -143,7 +143,7 @@ jobs:
       - name: Test worker
         run: |
           if ${{ env.ONLY_AFFECTED_TASKS }}; then
-            AFFECTED=$(yarn --silent nx show projects --affected -t test --base=${{ env.NX_BASE_BRANCH }} -p @budibase/worker)
+            AFFECTED=$(yarn --silent nx show projects --affected -t test --base=${{ env.NX_BASE_BRANCH }} -p @supertoolmake/worker)
             if [ -z "$AFFECTED" ]; then
               echo "No affected tests to run"
               exit 0
@@ -235,7 +235,7 @@ jobs:
           # DEBUG: testcontainers*
         run: |
           if ${{ env.ONLY_AFFECTED_TASKS }}; then
-            AFFECTED=$(yarn --silent nx show projects --affected -t test --base=${{ env.NX_BASE_BRANCH }} -p @budibase/server)
+            AFFECTED=$(yarn --silent nx show projects --affected -t test --base=${{ env.NX_BASE_BRANCH }} -p @supertoolmake/server)
             if [ -z "$AFFECTED" ]; then
               echo "No affected tests to run"
               exit 0

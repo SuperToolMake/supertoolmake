@@ -1,4 +1,4 @@
-import { type Database, type Document, LockName, LockType } from "@budibase/types"
+import { type Database, type Document, LockName, LockType } from "@supertoolmake/types"
 import { logWarn } from "../logging"
 import { getWritethroughClient } from "../redis/init"
 import * as locks from "../redis/redlockImpl"

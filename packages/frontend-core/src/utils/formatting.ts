@@ -1,11 +1,11 @@
-import { Helpers } from "@budibase/bbui"
+import { Helpers } from "@supertoolmake/bbui"
 import {
   BBReferenceFieldSubType,
   type FieldSchema,
   FieldType,
   type Row,
   type TableSchema,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 
 // Singleton formatter to save us creating one every time
 const NumberFormatter = Intl.NumberFormat()

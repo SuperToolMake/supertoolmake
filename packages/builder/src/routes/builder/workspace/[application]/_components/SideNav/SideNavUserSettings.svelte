@@ -1,7 +1,7 @@
 <script lang="ts">
-import { PopoverAlignment } from "@budibase/bbui"
-import { UserAvatar } from "@budibase/frontend-core"
-import type { User } from "@budibase/types"
+import { PopoverAlignment } from "@supertoolmake/bbui"
+import { UserAvatar } from "@supertoolmake/frontend-core"
+import type { User } from "@supertoolmake/types"
 import UserDropdown from "@/routes/builder/_components/UserDropdown.svelte"
 import { auth } from "@/stores/portal"
 import SideNavLink from "./SideNavLink.svelte"

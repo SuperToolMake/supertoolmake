@@ -4,7 +4,7 @@ import {
   type Query,
   type QueryParameter,
   type RestTemplateQueryMetadata,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { type OpenAPI, OpenAPIV3 } from "openapi-types"
 import { QueryVerbToHttpMethod } from "../../../../../constants"
 import type { GetQueriesOptions, ImportInfo } from "./base"

@@ -1,4 +1,4 @@
-import type { IdentityContext, Snippet, Table, VM } from "@budibase/types"
+import type { IdentityContext, Snippet, Table, VM } from "@supertoolmake/types"
 
 export type ContextMap = {
   tenantId?: string

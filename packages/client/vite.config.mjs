@@ -71,15 +71,15 @@ export default defineConfig(({ mode }) => {
           replacement: path.resolve("./manifest.json"),
         },
         {
-          find: "@budibase/types",
+          find: "@supertoolmake/types",
           replacement: path.resolve("../types/src"),
         },
         {
-          find: "@budibase/shared-core",
+          find: "@supertoolmake/shared-core",
           replacement: path.resolve("../shared-core/src"),
         },
         {
-          find: "@budibase/bbui",
+          find: "@supertoolmake/bbui",
           replacement: path.resolve("../bbui/src"),
         },
         {

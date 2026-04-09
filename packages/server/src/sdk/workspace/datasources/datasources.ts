@@ -1,6 +1,6 @@
-import { context, db as dbCore } from "@budibase/backend-core"
-import { helpers } from "@budibase/shared-core"
-import { findHBSBlocks, processObjectSync } from "@budibase/string-templates"
+import { context, db as dbCore } from "@supertoolmake/backend-core"
+import { helpers } from "@supertoolmake/shared-core"
+import { findHBSBlocks, processObjectSync } from "@supertoolmake/string-templates"
 import {
   type Datasource,
   DatasourceFieldType,
@@ -13,7 +13,7 @@ import {
   type RestConfig,
   type Row,
   SourceName,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { cloneDeep } from "lodash/fp"
 import merge from "lodash/merge"
 import {

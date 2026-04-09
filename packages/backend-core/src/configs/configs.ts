@@ -10,7 +10,7 @@ import {
   type SettingsInnerConfig,
   type SMTPConfig,
   type SMTPInnerConfig,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { DocumentType, SEPARATOR } from "../constants"
 import * as context from "../context"
 import env from "../environment"

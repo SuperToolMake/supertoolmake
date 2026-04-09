@@ -1,4 +1,4 @@
-import { ArrayOperator } from "@budibase/types"
+import { ArrayOperator } from "@supertoolmake/types"
 import type { Operator } from "@/types"
 
 /**

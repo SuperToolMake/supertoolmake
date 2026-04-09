@@ -1,4 +1,4 @@
-import { context } from "@budibase/backend-core"
+import { context } from "@supertoolmake/backend-core"
 import {
   type BuildSchemaFromSourceRequest,
   type BuildSchemaFromSourceResponse,
@@ -24,7 +24,7 @@ import {
   type UserCtx,
   type VerifyDatasourceRequest,
   type VerifyDatasourceResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { isEqual } from "lodash"
 import { getQueryParams } from "../../db/utils"
 import sdk from "../../sdk"

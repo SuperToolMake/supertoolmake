@@ -1,5 +1,5 @@
 <script>
-import { Body, Button, Divider, Heading, Input, Layout, notifications } from "@budibase/bbui"
+import { Body, Button, Divider, Heading, Input, Layout, notifications } from "@supertoolmake/bbui"
 import { goto } from "@roxi/routify"
 import Logo from "assets/supertoolmake-emblem.svg"
 import { onMount } from "svelte"

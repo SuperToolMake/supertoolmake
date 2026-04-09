@@ -1,5 +1,5 @@
 <script>
-import { Icon } from "@budibase/bbui"
+import { Icon } from "@supertoolmake/bbui"
 import { runtimeToReadableBinding } from "@/dataBinding"
 import EditNavItemPopover from "./EditNavItemPopover.svelte"
 

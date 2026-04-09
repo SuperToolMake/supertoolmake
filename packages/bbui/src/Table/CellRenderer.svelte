@@ -1,5 +1,5 @@
 <script lang="ts">
-import { processStringSync } from "@budibase/string-templates"
+import { processStringSync } from "@supertoolmake/string-templates"
 import ArrayRenderer from "./ArrayRenderer.svelte"
 import AttachmentRenderer from "./AttachmentRenderer.svelte"
 import BooleanRenderer from "./BooleanRenderer.svelte"

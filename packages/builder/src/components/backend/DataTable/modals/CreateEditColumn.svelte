@@ -15,8 +15,8 @@ import {
   Toggle,
   TooltipPosition,
   TooltipType,
-} from "@budibase/bbui"
-import { canBeDisplayColumn } from "@budibase/frontend-core"
+} from "@supertoolmake/bbui"
+import { canBeDisplayColumn } from "@supertoolmake/frontend-core"
 import {
   canHaveDefaultColumn,
   helpers,
@@ -25,8 +25,8 @@ import {
   PROTECTED_INTERNAL_COLUMNS,
   SWITCHABLE_TYPES,
   ValidColumnNameRegex,
-} from "@budibase/shared-core"
-import { makePropSafe } from "@budibase/string-templates"
+} from "@supertoolmake/shared-core"
+import { makePropSafe } from "@supertoolmake/string-templates"
 import type {
   AutoFieldSubType,
   Datasource,
@@ -35,8 +35,8 @@ import type {
   Table,
   UIField,
   UIFieldSchema,
-} from "@budibase/types"
-import { BBReferenceFieldSubType, FieldType, SourceName } from "@budibase/types"
+} from "@supertoolmake/types"
+import { BBReferenceFieldSubType, FieldType, SourceName } from "@supertoolmake/types"
 import { cloneDeep } from "lodash/fp"
 import { createEventDispatcher, getContext, onMount } from "svelte"
 import ModalBindableInput from "@/components/common/bindings/ModalBindableInput.svelte"

@@ -1,5 +1,5 @@
 <script>
-import { Label, Toggle } from "@budibase/bbui"
+import { Label, Toggle } from "@supertoolmake/bbui"
 
 export let value
 export let name

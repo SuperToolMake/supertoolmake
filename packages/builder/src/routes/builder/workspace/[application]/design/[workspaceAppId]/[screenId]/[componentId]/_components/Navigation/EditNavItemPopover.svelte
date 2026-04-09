@@ -1,5 +1,5 @@
 <script>
-import { Icon, PhosphorIconPicker, Popover, RadioGroup } from "@budibase/bbui"
+import { Icon, PhosphorIconPicker, Popover, RadioGroup } from "@supertoolmake/bbui"
 import { createEventDispatcher, getContext } from "svelte"
 import DrawerBindableCombobox from "@/components/common/bindings/DrawerBindableCombobox.svelte"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"

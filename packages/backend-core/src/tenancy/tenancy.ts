@@ -1,4 +1,4 @@
-import { type Ctx, type GetTenantIdOptions, TenantResolutionStrategy } from "@budibase/types"
+import { type Ctx, type GetTenantIdOptions, TenantResolutionStrategy } from "@supertoolmake/types"
 import { Header } from "../constants"
 import {
   DEFAULT_TENANT_ID,

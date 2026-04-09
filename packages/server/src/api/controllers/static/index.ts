@@ -2,9 +2,9 @@ import fs from "node:fs"
 import path from "node:path"
 import { PutObjectCommand, S3 } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-import { BadRequestError, configs, context, objectStore, utils } from "@budibase/backend-core"
-import { InvalidFileExtensions } from "@budibase/shared-core"
-import { processString } from "@budibase/string-templates"
+import { BadRequestError, configs, context, objectStore, utils } from "@supertoolmake/backend-core"
+import { InvalidFileExtensions } from "@supertoolmake/shared-core"
+import { processString } from "@supertoolmake/string-templates"
 import {
   type AppProps,
   type BBUploadedFile,
@@ -18,7 +18,7 @@ import {
   type ServeClientLibraryResponse,
   type UserCtx,
   type Workspace,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import send from "koa-send"
 import sharp from "sharp"
 import { render } from "svelte/server"
@@ -220,14 +220,11 @@ export const serveBuilderPreview = async (ctx: Ctx<void, ServeBuilderPreviewResp
 }
 
 function serveLocalFile(ctx: Ctx, fileName: string) {
-  // Resolve via the package.json to avoid ESM/CJS export resolution issues
-  // with require.resolve on packages that mark "type":"module".
-  const pkgJsonPath = require.resolve("@budibase/client/package.json")
+  const pkgJsonPath = require.resolve("@supertoolmake/client/package.json")
   const pkgDir = path.dirname(pkgJsonPath)
   const distFromPkg = join(pkgDir, "dist")
-  //normal fallback
-  const nodeModulesDist = join(NODE_MODULES_PATH, "@budibase", "client", "dist")
-  const root = nodeModulesDist || distFromPkg
+  const fallbackDist = join(NODE_MODULES_PATH, "@supertoolmake", "client", "dist")
+  const root = distFromPkg || fallbackDist
   return send(ctx, fileName, { root })
 }
 

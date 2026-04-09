@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Layout, notifications, Table } from "@budibase/bbui"
-import { sdk } from "@budibase/shared-core"
-import type { GetUserInvitesResponse, InviteWithCode } from "@budibase/types"
+import { Layout, notifications, Table } from "@supertoolmake/bbui"
+import { sdk } from "@supertoolmake/shared-core"
+import type { GetUserInvitesResponse, InviteWithCode } from "@supertoolmake/types"
 import { onMount } from "svelte"
 import DeleteRowsButton from "@/components/backend/DataTable/buttons/DeleteRowsButton.svelte"
 import { auth } from "@/stores/portal/auth"

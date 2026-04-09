@@ -1,5 +1,5 @@
 <script>
-import { Icon } from "@budibase/bbui"
+import { Icon } from "@supertoolmake/bbui"
 import { getContext, onMount } from "svelte"
 import GridPopover from "../overlays/GridPopover.svelte"
 

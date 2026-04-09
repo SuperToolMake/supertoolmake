@@ -6,7 +6,7 @@ import type {
   Table,
   UIRow,
   UISearchFilter,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 
 export interface UITable extends Table {
   name: string

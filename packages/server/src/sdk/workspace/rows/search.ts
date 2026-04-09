@@ -1,4 +1,4 @@
-import { dataFilters } from "@budibase/shared-core"
+import { dataFilters } from "@supertoolmake/shared-core"
 import {
   EmptyFilterOption,
   type Row,
@@ -6,7 +6,7 @@ import {
   type SearchResponse,
   type SortOrder,
   type Table,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { enrichSearchContext } from "../../../api/controllers/row/utils"
 import { isExternalTableID } from "../../../integrations/utils"
 import sdk from "../../index"

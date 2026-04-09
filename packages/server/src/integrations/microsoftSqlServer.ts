@@ -1,6 +1,6 @@
 import { ConfidentialClientApplication } from "@azure/msal-node"
-import { sql } from "@budibase/backend-core"
-import { utils } from "@budibase/shared-core"
+import { sql } from "@supertoolmake/backend-core"
+import { utils } from "@supertoolmake/shared-core"
 import {
   type ConnectionInfo,
   DatasourceFeature,
@@ -18,7 +18,7 @@ import {
   type Table,
   type TableSchema,
   TableSourceType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import sqlServer from "mssql"
 import env from "../environment"
 import { getReadableErrorMessage } from "./base/errorMapping"

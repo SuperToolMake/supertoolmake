@@ -1,6 +1,6 @@
 <script>
-import { Label, Layout, Select, Toggle } from "@budibase/bbui"
-import { BBReferenceFieldSubType, FieldType, SourceName } from "@budibase/types"
+import { Label, Layout, Select, Toggle } from "@supertoolmake/bbui"
+import { BBReferenceFieldSubType, FieldType, SourceName } from "@supertoolmake/types"
 import { API } from "@/api"
 import { datasources, tables } from "@/stores/builder"
 import { parseFile } from "./utils"

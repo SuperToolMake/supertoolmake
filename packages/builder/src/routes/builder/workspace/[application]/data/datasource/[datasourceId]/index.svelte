@@ -1,5 +1,5 @@
 <script>
-import { Body, Heading, Layout, Tab, Tabs } from "@budibase/bbui"
+import { Body, Heading, Layout, Tab, Tabs } from "@supertoolmake/bbui"
 import { params } from "@roxi/routify"
 import { cloneDeep } from "lodash/fp"
 import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"

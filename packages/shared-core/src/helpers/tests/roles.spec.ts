@@ -1,4 +1,4 @@
-import { BuiltinPermissionID, type Role } from "@budibase/types"
+import { BuiltinPermissionID, type Role } from "@supertoolmake/types"
 import { checkForRoleInheritanceLoops } from "../roles"
 
 /**

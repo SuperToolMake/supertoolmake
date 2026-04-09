@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, Button, Drawer, notifications } from "@budibase/bbui"
+import { ActionButton, Button, Drawer, notifications } from "@supertoolmake/bbui"
 import { cloneDeep } from "lodash/fp"
 import { createEventDispatcher } from "svelte"
 import ButtonActionDrawer from "./ButtonActionDrawer.svelte"

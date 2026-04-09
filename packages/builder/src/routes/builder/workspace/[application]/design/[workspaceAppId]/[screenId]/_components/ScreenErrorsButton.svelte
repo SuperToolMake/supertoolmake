@@ -7,8 +7,8 @@ import {
   Popover,
   PopoverAlignment,
   TooltipPosition,
-} from "@budibase/bbui"
-import type { UIComponentError } from "@budibase/types"
+} from "@supertoolmake/bbui"
+import type { UIComponentError } from "@supertoolmake/types"
 import CircleIndicator from "@/components/common/Icons/CircleIndicator.svelte"
 import {
   builderStore,

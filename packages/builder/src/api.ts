@@ -1,5 +1,5 @@
-import { Constants, CookieUtils, createAPIClient } from "@budibase/frontend-core"
-import { ClientHeader, Header, sdk } from "@budibase/shared-core"
+import { Constants, CookieUtils, createAPIClient } from "@supertoolmake/frontend-core"
+import { ClientHeader, Header, sdk } from "@supertoolmake/shared-core"
 import { get } from "svelte/store"
 import { appStore } from "@/stores/builder"
 import { auth, navigation } from "./stores/portal"

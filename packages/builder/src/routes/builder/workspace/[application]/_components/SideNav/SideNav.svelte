@@ -9,8 +9,8 @@ import {
   StatusLight,
   TooltipPosition,
   TooltipType,
-} from "@budibase/bbui"
-import { createLocalStorageStore, derivedMemo } from "@budibase/frontend-core"
+} from "@supertoolmake/bbui"
+import { createLocalStorageStore, derivedMemo } from "@supertoolmake/frontend-core"
 import {
   type Datasource,
   PublishResourceState,
@@ -19,7 +19,7 @@ import {
   type UIWorkspaceApp,
   type WorkspaceFavourite,
   WorkspaceResource,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { goto as gotoStore, isActive, url } from "@roxi/routify"
 import BBLogo from "assets/BBLogo.svelte"
 import { onDestroy, onMount, setContext } from "svelte"
@@ -37,7 +37,7 @@ import {
   workspaceFavouriteStore,
 } from "@/stores/builder"
 import { auth, enrichedApps } from "@/stores/portal"
-import { sdk } from "@budibase/shared-core"
+import { sdk } from "@supertoolmake/shared-core"
 import type { EnrichedApp } from "@/types"
 import SideNavLink from "./SideNavLink.svelte"
 import SideNavUserSettings from "./SideNavUserSettings.svelte"

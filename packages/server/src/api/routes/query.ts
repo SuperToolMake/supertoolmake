@@ -1,4 +1,4 @@
-import { permissions } from "@budibase/backend-core"
+import { permissions } from "@supertoolmake/backend-core"
 import { authorizedMiddleware as authorized } from "../../middleware/authorized"
 import { bodyResource, bodySubResource, paramResource } from "../../middleware/resourceId"
 import * as queryController from "../controllers/query"

@@ -1,5 +1,5 @@
-import { env as coreEnv } from "@budibase/backend-core"
-import type { Ctx, SystemStatusResponse } from "@budibase/types"
+import { env as coreEnv } from "@supertoolmake/backend-core"
+import type { Ctx, SystemStatusResponse } from "@supertoolmake/types"
 
 export const fetch = async (ctx: Ctx<void, SystemStatusResponse>) => {
   let status: SystemStatusResponse | undefined

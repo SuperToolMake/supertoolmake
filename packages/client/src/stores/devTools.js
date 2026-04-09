@@ -1,4 +1,4 @@
-import { createLocalStorageStore } from "@budibase/frontend-core"
+import { createLocalStorageStore } from "@supertoolmake/frontend-core"
 import { get } from "svelte/store"
 import { API } from "../api"
 import { authStore } from "./auth"

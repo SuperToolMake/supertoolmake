@@ -1,11 +1,11 @@
-import { cache, context, db as dbCore, roles, tenancy } from "@budibase/backend-core"
+import { cache, context, db as dbCore, roles, tenancy } from "@supertoolmake/backend-core"
 import type {
   Ctx,
   FetchGlobalRolesResponse,
   FindGlobalRoleResponse,
   RemoveWorkspaceRoleResponse,
   Workspace,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import sdk from "../../../sdk"
 
 export async function fetch(ctx: Ctx<void, FetchGlobalRolesResponse>) {

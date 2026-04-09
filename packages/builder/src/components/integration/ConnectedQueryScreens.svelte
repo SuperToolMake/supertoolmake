@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { ScreenUsage } from "@budibase/types"
+import type { ScreenUsage } from "@supertoolmake/types"
 import { onMount } from "svelte"
 import ScreensPopover from "@/components/common/ScreensPopover.svelte"
 import { screenStore } from "@/stores/builder"

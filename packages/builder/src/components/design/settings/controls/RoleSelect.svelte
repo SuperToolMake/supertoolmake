@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Select } from "@budibase/bbui"
+import { Select } from "@supertoolmake/bbui"
 import { roles } from "@/stores/builder"
 
 export let value: string

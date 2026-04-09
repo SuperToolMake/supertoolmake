@@ -1,4 +1,4 @@
-import { FieldType, RelationshipType, type SearchFilters, type Table } from "@budibase/types"
+import { FieldType, RelationshipType, type SearchFilters, type Table } from "@supertoolmake/types"
 import { structures } from "../../../../api/routes/tests/utilities"
 import { type DatabaseName, getDatasource } from "../../../../integrations/tests/utils"
 import TestConfiguration from "../../../../tests/utilities/TestConfiguration"

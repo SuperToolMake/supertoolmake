@@ -1,4 +1,4 @@
-import { createLocalStorageStore, createSessionStorageStore } from "@budibase/frontend-core"
+import { createLocalStorageStore, createSessionStorageStore } from "@supertoolmake/frontend-core"
 import { type Readable, type Writable, writable } from "svelte/store"
 
 export enum PersistenceType {

@@ -4,7 +4,7 @@ import {
   type Integration,
   SourceName,
   type UIIntegration,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { derived, get, type Readable, type Writable } from "svelte/store"
 import { API } from "@/api"
 import { BUDIBASE_INTERNAL_DB_ID } from "@/constants/backend"

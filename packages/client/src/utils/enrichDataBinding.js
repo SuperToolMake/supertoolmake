@@ -1,5 +1,5 @@
-import { Helpers } from "@budibase/bbui"
-import { processObjectSync } from "@budibase/string-templates"
+import { Helpers } from "@supertoolmake/bbui"
+import { processObjectSync } from "@supertoolmake/string-templates"
 
 /**
  * Recursively enriches all props in a props object and returns the new props.

@@ -1,4 +1,4 @@
-import type { APIError } from "@budibase/types"
+import type { APIError } from "@supertoolmake/types"
 import type { Next, ParameterizedContext } from "koa"
 import environment from "../environment"
 import * as errors from "../errors"

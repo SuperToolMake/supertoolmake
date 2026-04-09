@@ -13,7 +13,7 @@ import {
   isDocument,
   type RowResponse,
   type RowValue,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import Nano, { type DocumentListParams } from "nano"
 import { newid } from "../../docIds/newid"
 import { checkSlashesInUrl } from "../../helpers"

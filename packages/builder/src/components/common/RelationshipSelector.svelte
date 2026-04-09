@@ -1,5 +1,5 @@
 <script>
-import { Input, Select } from "@budibase/bbui"
+import { Input, Select } from "@supertoolmake/bbui"
 
 export let relationshipPart1
 export let relationshipPart2

@@ -1,6 +1,6 @@
 <script>
-import { ModalContent, Select } from "@budibase/bbui"
-import { ThemeOptions } from "@budibase/shared-core"
+import { ModalContent, Select } from "@supertoolmake/bbui"
+import { ThemeOptions } from "@supertoolmake/shared-core"
 import { themeStore } from "@/stores/portal"
 </script>
 

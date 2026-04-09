@@ -1,5 +1,5 @@
 <script>
-import { Checkbox, Icon } from "@budibase/bbui"
+import { Checkbox, Icon } from "@supertoolmake/bbui"
 import { createEventDispatcher, getContext } from "svelte"
 import { GutterWidth } from "../lib/constants"
 import GridCell from "./GridCell.svelte"

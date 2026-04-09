@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Body, Icon } from "@budibase/bbui"
+import { Body, Icon } from "@supertoolmake/bbui"
 import { tick } from "svelte"
 import { keyUtils } from "@/helpers/keyUtils"
 

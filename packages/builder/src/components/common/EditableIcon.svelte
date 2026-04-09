@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Icon, Modal } from "@budibase/bbui"
+import { Icon, Modal } from "@supertoolmake/bbui"
 import ChooseIconModal from "@/components/start/ChooseIconModal.svelte"
 
 export let name: string

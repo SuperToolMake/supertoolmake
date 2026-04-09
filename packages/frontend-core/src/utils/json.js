@@ -1,4 +1,4 @@
-import { utils } from "@budibase/shared-core"
+import { utils } from "@supertoolmake/shared-core"
 
 /**
  * Gets the schema for a datasource which is targeting a JSON array, including

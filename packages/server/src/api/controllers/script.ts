@@ -1,5 +1,5 @@
-import { iifeWrapper, UserScriptError } from "@budibase/string-templates"
-import type { Ctx } from "@budibase/types"
+import { iifeWrapper, UserScriptError } from "@supertoolmake/string-templates"
+import type { Ctx } from "@supertoolmake/types"
 import { IsolatedVM } from "../../jsRunner/vm"
 
 export async function execute(ctx: Ctx) {

@@ -1,4 +1,4 @@
-import type { Row, SearchRowRequest } from "@budibase/types"
+import type { Row, SearchRowRequest } from "@supertoolmake/types"
 import { type Expectations, PublicAPI } from "../base"
 
 export interface PublicSearchResponse {

@@ -1,4 +1,4 @@
-import type { ContextUser, Datasource, Query, Row, SSOUser } from "@budibase/types"
+import type { ContextUser, Datasource, Query, Row, SSOUser } from "@supertoolmake/types"
 
 export type WorkerCallback = (error: any, response?: any) => void
 

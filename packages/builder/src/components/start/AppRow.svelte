@@ -1,8 +1,8 @@
 <script>
-import { Body, Button, Icon } from "@budibase/bbui"
-import { UserAvatars } from "@budibase/frontend-core"
-import { sdk } from "@budibase/shared-core"
-import { processStringSync } from "@budibase/string-templates"
+import { Body, Button, Icon } from "@supertoolmake/bbui"
+import { UserAvatars } from "@supertoolmake/frontend-core"
+import { sdk } from "@supertoolmake/shared-core"
+import { processStringSync } from "@supertoolmake/string-templates"
 import { goto as gotoStore } from "@roxi/routify"
 import FavouriteAppButton from "@/routes/builder/portal/workspaces/_components/FavouriteAppButton.svelte"
 import { contextMenuStore } from "@/stores/builder"

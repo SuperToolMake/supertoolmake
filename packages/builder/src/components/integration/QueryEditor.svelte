@@ -1,6 +1,6 @@
 <script>
-import { Label } from "@budibase/bbui"
-import { Theme } from "@budibase/types"
+import { Label } from "@supertoolmake/bbui"
+import { Theme } from "@supertoolmake/types"
 import { createEventDispatcher, onMount } from "svelte"
 import { themeStore } from "@/stores/portal"
 import CodeMirror from "./codemirror"

@@ -1,4 +1,4 @@
-import type { ContextUserMetadata, GetGlobalSelfResponse, SelfResponse } from "@budibase/types"
+import type { ContextUserMetadata, GetGlobalSelfResponse, SelfResponse } from "@supertoolmake/types"
 import { writable } from "svelte/store"
 import { API } from "@/api"
 

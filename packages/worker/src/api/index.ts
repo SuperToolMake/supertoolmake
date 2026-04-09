@@ -3,7 +3,7 @@ import Router from "@koa/router"
 const compress = require("koa-compress")
 
 import zlib from "node:zlib"
-import { auth, middleware } from "@budibase/backend-core"
+import { auth, middleware } from "@supertoolmake/backend-core"
 import { routes } from "./routes"
 
 const PUBLIC_ENDPOINTS = [

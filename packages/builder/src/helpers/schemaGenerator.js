@@ -1,4 +1,4 @@
-import { FieldType } from "@budibase/types"
+import { FieldType } from "@supertoolmake/types"
 
 function baseConversion(type) {
   if (type === "string") {

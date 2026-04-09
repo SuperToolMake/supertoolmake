@@ -5,7 +5,7 @@ import {
   type Integration,
   type IntegrationBase,
   QueryType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { Firestore, type WhereFilterOp } from "@google-cloud/firestore"
 
 interface FirebaseConfig {

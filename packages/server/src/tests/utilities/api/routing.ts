@@ -1,4 +1,4 @@
-import type { FetchClientScreenRoutingResponse, FetchScreenRoutingResponse } from "@budibase/types"
+import type { FetchClientScreenRoutingResponse, FetchScreenRoutingResponse } from "@supertoolmake/types"
 import { type Expectations, TestAPI } from "./base"
 
 export class RoutingAPI extends TestAPI {

@@ -6,7 +6,7 @@ import {
   SourceName,
   type Table,
   TableSourceType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { isEqual } from "lodash"
 import { cloneDeep } from "lodash/fp"
 import { generateDatasourceID } from "../../../../db/utils"

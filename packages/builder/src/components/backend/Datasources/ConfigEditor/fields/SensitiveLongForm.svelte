@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Icon, Label, TextArea } from "@budibase/bbui"
+import { Icon, Label, TextArea } from "@supertoolmake/bbui"
 import { onMount } from "svelte"
 
 export let name

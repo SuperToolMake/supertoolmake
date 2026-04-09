@@ -1,5 +1,5 @@
 export * from "./users"
 
-import { users } from "@budibase/backend-core"
+import { users } from "@supertoolmake/backend-core"
 export const db = users.UserDB
-export { users as core } from "@budibase/backend-core"
+export { users as core } from "@supertoolmake/backend-core"

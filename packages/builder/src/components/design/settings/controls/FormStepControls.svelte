@@ -1,5 +1,5 @@
 <script>
-import { AbsTooltip, ActionButton } from "@budibase/bbui"
+import { AbsTooltip, ActionButton } from "@supertoolmake/bbui"
 import { createEventDispatcher, getContext } from "svelte"
 
 const multiStepStore = getContext("multi-step-form-block")

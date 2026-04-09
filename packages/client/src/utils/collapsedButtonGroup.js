@@ -1,4 +1,4 @@
-import { getSettingsDefinition } from "@budibase/frontend-core"
+import { getSettingsDefinition } from "@supertoolmake/frontend-core"
 import { componentStore } from "@/stores/components"
 import { enrichProps } from "@/utils/componentProps"
 import { getActiveConditions, reduceConditionActions } from "@/utils/conditions"

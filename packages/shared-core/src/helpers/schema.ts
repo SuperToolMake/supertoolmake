@@ -3,7 +3,7 @@ import {
   type FieldConstraints,
   type FieldSchema,
   FieldType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 
 export function isDeprecatedSingleUserColumn(
   schema: Pick<FieldSchema, "type" | "subtype" | "constraints">

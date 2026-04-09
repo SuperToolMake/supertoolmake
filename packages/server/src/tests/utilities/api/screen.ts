@@ -1,4 +1,4 @@
-import type { Screen, UsageInScreensResponse } from "@budibase/types"
+import type { Screen, UsageInScreensResponse } from "@supertoolmake/types"
 import { TEST_WORKSPACEAPPID_PLACEHOLDER } from "../structures"
 import { type Expectations, TestAPI } from "./base"
 

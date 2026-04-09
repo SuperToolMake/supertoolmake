@@ -1,8 +1,8 @@
 <script lang="ts">
-import type { PopoverAlignment } from "@budibase/bbui"
-import { FancySelect, Select } from "@budibase/bbui"
-import { Constants } from "@budibase/frontend-core"
-import type { UIRole } from "@budibase/types"
+import type { PopoverAlignment } from "@supertoolmake/bbui"
+import { FancySelect, Select } from "@supertoolmake/bbui"
+import { Constants } from "@supertoolmake/frontend-core"
+import type { UIRole } from "@supertoolmake/types"
 import { createEventDispatcher } from "svelte"
 import { roles } from "@/stores/builder"
 

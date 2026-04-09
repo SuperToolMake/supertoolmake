@@ -12,7 +12,7 @@ import type {
   PreviewQueryResponse,
   SaveQueryRequest,
   SaveQueryResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface QueryEndpoints {

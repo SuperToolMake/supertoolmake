@@ -1,5 +1,5 @@
-import { encodeJSBinding, processStringSync } from "@budibase/string-templates"
-import { runJsHelpersTests } from "@budibase/string-templates/test/utils"
+import { encodeJSBinding, processStringSync } from "@supertoolmake/string-templates"
+import { runJsHelpersTests } from "@supertoolmake/string-templates/test/utils"
 import tk from "timekeeper"
 import { validate as isValidUUID } from "uuid"
 import TestConfiguration from "../../tests/utilities/TestConfiguration"

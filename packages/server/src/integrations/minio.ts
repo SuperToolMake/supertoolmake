@@ -5,7 +5,7 @@ import {
   type Integration,
   type IntegrationBase,
   QueryType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { Client } from "minio"
 import { HOST_ADDRESS } from "./utils"
 

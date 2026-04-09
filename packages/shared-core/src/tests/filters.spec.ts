@@ -4,7 +4,7 @@ import {
   FieldType,
   UILogicalOperator,
   type UISearchFilter,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { buildQuery } from "../filters"
 
 describe("filter to query conversion", () => {

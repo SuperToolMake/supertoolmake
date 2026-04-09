@@ -1,4 +1,4 @@
-import { iifeWrapper } from "@budibase/string-templates"
+import { iifeWrapper } from "@supertoolmake/string-templates"
 
 export default new Proxy(
   {},

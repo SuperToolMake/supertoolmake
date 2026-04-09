@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Button, Icon, Layout } from "@budibase/bbui"
+import { Button, Icon, Layout } from "@supertoolmake/bbui"
 
 enum ResourceType {
   App = "app",

@@ -6,7 +6,7 @@ import {
   SortOrder,
   SortType,
   type TableSchema,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import cloneDeep from "lodash/fp/cloneDeep"
 import { derived, get, type Readable, type Writable, writable } from "svelte/store"
 import type { APIClient } from "../api/types"

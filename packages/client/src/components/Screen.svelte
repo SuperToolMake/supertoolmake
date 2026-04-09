@@ -1,5 +1,5 @@
 <script>
-import { memo } from "@budibase/frontend-core"
+import { memo } from "@supertoolmake/frontend-core"
 import { getContext, onMount } from "svelte"
 import { get } from "svelte/store"
 import { builderStore, routeStore, screenStore } from "@/stores"

@@ -1,5 +1,5 @@
 <script>
-import { ActionButton } from "@budibase/bbui"
+import { ActionButton } from "@supertoolmake/bbui"
 import Panel from "@/components/design/Panel.svelte"
 import JSONPanel from "./JSONPanel.svelte"
 import PreviewPanel from "./PreviewPanel.svelte"

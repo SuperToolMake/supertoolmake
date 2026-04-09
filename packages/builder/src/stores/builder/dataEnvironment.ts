@@ -1,4 +1,4 @@
-import { DataEnvironmentMode } from "@budibase/types"
+import { DataEnvironmentMode } from "@supertoolmake/types"
 import { derived } from "svelte/store"
 import { API, productionAPI } from "@/api"
 import { BudiStore, PersistenceType } from "../BudiStore"

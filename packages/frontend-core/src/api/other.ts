@@ -4,7 +4,7 @@ import type {
   GetEnvironmentResponse,
   GetVersionResponse,
   SystemStatusResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface OtherEndpoints {

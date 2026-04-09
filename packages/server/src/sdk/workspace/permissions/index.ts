@@ -1,5 +1,5 @@
-import { context, roles } from "@budibase/backend-core"
-import { type Database, PermissionLevel, PermissionSource, type Role } from "@budibase/types"
+import { context, roles } from "@supertoolmake/backend-core"
+import { type Database, PermissionLevel, PermissionSource, type Role } from "@supertoolmake/types"
 import { getRoleParams } from "../../../db/utils"
 import { removeFromArray } from "../../../utilities"
 import { CURRENTLY_SUPPORTED_LEVELS, getBasePermissions } from "../../../utilities/security"

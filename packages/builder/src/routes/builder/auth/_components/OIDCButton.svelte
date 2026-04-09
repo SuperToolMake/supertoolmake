@@ -1,5 +1,5 @@
 <script>
-import { FancyButton, notifications } from "@budibase/bbui"
+import { FancyButton, notifications } from "@supertoolmake/bbui"
 import Auth0Logo from "assets/auth0-logo.png"
 import MicrosoftLogo from "assets/microsoft-logo.png"
 import OidcLogo from "assets/oidc-logo.png"

@@ -1,4 +1,4 @@
-import { INTERNAL_TABLE_SOURCE_ID } from "@budibase/types"
+import { INTERNAL_TABLE_SOURCE_ID } from "@supertoolmake/types"
 import { TableNames } from "@/constants"
 
 const showDatasourceOpen = ({

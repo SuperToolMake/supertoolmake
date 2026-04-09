@@ -1,4 +1,4 @@
-import { constants, env as coreEnv, logging, tenancy } from "@budibase/backend-core"
+import { constants, env as coreEnv, logging, tenancy } from "@supertoolmake/backend-core"
 import {
   type Ctx,
   type EmailAttachment,
@@ -7,7 +7,7 @@ import {
   type SendEmailRequest,
   type SendEmailResponse,
   type User,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { default as fetch, type RequestInit, type Response } from "node-fetch"
 import env from "../environment"
 import { checkSlashesInUrl } from "./index"

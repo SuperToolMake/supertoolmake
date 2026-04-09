@@ -1,6 +1,6 @@
 <script lang="ts">
-import type { PopoverAPI } from "@budibase/bbui"
-import { Body, Icon, Popover, PopoverAlignment } from "@budibase/bbui"
+import type { PopoverAPI } from "@supertoolmake/bbui"
+import { Body, Icon, Popover, PopoverAlignment } from "@supertoolmake/bbui"
 import { deploymentStore, workspaceAppStore } from "@/stores/builder"
 
 let publishPopoverAnchor: HTMLElement | undefined

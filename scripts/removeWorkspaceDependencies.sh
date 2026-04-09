@@ -1,6 +1,6 @@
 #!/bin/sh
 
-packages_to_remove="@budibase/backend-core @budibase/bbui @budibase/builder @budibase/client @budibase/frontend-core @budibase/sdk @budibase/server @budibase/shared-core @budibase/string-templates @budibase/types @budibase/worker"
+packages_to_remove="@supertoolmake/backend-core @supertoolmake/bbui @supertoolmake/builder @supertoolmake/client @supertoolmake/frontend-core @supertoolmake/sdk @supertoolmake/server @supertoolmake/shared-core @supertoolmake/string-templates @supertoolmake/types @supertoolmake/worker"
 
 package_json_path="$1"
 

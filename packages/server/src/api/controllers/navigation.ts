@@ -1,4 +1,4 @@
-import type { Ctx, UpdateNavigationRequest } from "@budibase/types"
+import type { Ctx, UpdateNavigationRequest } from "@supertoolmake/types"
 import sdk from "../../sdk"
 import { builderSocket } from "../../websockets"
 

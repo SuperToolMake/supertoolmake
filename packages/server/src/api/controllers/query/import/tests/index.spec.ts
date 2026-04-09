@@ -1,6 +1,6 @@
 import fs from "node:fs"
 import path from "node:path"
-import { BodyType, type Datasource, SourceName } from "@budibase/types"
+import { BodyType, type Datasource, SourceName } from "@supertoolmake/types"
 import TestConfig from "../../../../../tests/utilities/TestConfiguration"
 import { RestImporter } from "../index"
 

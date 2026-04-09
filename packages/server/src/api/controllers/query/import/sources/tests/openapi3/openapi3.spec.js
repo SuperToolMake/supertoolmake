@@ -1,7 +1,7 @@
 const fs = require("node:fs")
 const path = require("node:path")
 const SwaggerParser = require("@apidevtools/swagger-parser")
-const { BodyType } = require("@budibase/types")
+const { BodyType } = require("@supertoolmake/types")
 
 const { OpenAPI3 } = require("../../openapi3")
 

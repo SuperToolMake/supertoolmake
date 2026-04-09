@@ -1,5 +1,5 @@
-import { helpers } from "@budibase/shared-core"
-import type { UIUser } from "@budibase/types"
+import { helpers } from "@supertoolmake/shared-core"
+import type { UIUser } from "@supertoolmake/types"
 import { derived, get, type Readable, type Writable, writable } from "svelte/store"
 import type { Store as StoreContext } from "."
 

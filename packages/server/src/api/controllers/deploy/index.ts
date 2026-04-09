@@ -1,4 +1,4 @@
-import { cache, context, db as dbCore, errors } from "@budibase/backend-core"
+import { cache, context, db as dbCore, errors } from "@supertoolmake/backend-core"
 import {
   type DeploymentDoc,
   type DeploymentProgressResponse,
@@ -11,7 +11,7 @@ import {
   type PublishWorkspaceResponse,
   type Table,
   type UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { DocumentType } from "../../../db/utils"
 import sdk from "../../../sdk"
 import { builderSocket } from "../../../websockets"

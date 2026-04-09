@@ -1,5 +1,5 @@
 <script>
-import { Select } from "@budibase/bbui"
+import { Select } from "@supertoolmake/bbui"
 import { datasources } from "@/stores/builder"
 
 export let value = null

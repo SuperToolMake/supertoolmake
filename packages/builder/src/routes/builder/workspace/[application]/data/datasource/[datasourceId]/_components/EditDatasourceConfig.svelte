@@ -1,5 +1,5 @@
 <script>
-import { keepOpen, Modal, notifications } from "@budibase/bbui"
+import { keepOpen, Modal, notifications } from "@supertoolmake/bbui"
 import DatasourceConfigEditor from "@/components/backend/Datasources/ConfigEditor/index.svelte"
 import { datasources, integrations } from "@/stores/builder"
 import { integrationForDatasource } from "@/stores/selectors"

@@ -1,5 +1,5 @@
-import { roles } from "@budibase/backend-core"
-import { BuiltinPermissionID, PermissionLevel } from "@budibase/types"
+import { roles } from "@supertoolmake/backend-core"
+import { BuiltinPermissionID, PermissionLevel } from "@supertoolmake/types"
 import {
   generateUserMetadataID,
   getGlobalIDFromUserMetadataID,

@@ -1,5 +1,5 @@
 <script>
-import { TextArea } from "@budibase/bbui"
+import { TextArea } from "@supertoolmake/bbui"
 
 export let data
 export let height

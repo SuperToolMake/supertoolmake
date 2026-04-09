@@ -1,11 +1,11 @@
-import { DocumentType, InternalTable, prefixed, SEPARATOR } from "@budibase/types"
+import { DocumentType, InternalTable, prefixed, SEPARATOR } from "@supertoolmake/types"
 
 export {
   DocumentType,
   InternalTable,
   SEPARATOR,
   UNICODE_MAX,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 
 /**
  * Can be used to create a few different forms of querying a view.

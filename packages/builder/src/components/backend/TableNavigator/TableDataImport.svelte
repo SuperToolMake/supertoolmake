@@ -1,7 +1,7 @@
 <script>
-import { Icon, Label, Layout, Select } from "@budibase/bbui"
-import { canBeDisplayColumn } from "@budibase/frontend-core"
-import { utils } from "@budibase/shared-core"
+import { Icon, Label, Layout, Select } from "@supertoolmake/bbui"
+import { canBeDisplayColumn } from "@supertoolmake/frontend-core"
+import { utils } from "@supertoolmake/shared-core"
 import { API } from "@/api"
 import { FIELDS } from "@/constants/backend"
 import { parseFile } from "./utils"

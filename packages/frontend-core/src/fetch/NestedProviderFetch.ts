@@ -1,4 +1,4 @@
-import type { NestedProviderDatasource, TableSchema } from "@budibase/types"
+import type { NestedProviderDatasource, TableSchema } from "@supertoolmake/types"
 import BaseDataFetch from "./DataFetch"
 
 interface NestedProviderDefinition {

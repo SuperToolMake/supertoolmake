@@ -1,4 +1,4 @@
-import { context, db } from "@budibase/backend-core"
+import { context, db } from "@supertoolmake/backend-core"
 import type {
   ClearBackupErrorRequest,
   ClearBackupErrorResponse,
@@ -6,7 +6,7 @@ import type {
   ExportWorkspaceDumpRequest,
   ExportWorkspaceDumpResponse,
   UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import sdk from "../../sdk"
 
 export async function exportWorkspaceDump(

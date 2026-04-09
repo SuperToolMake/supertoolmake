@@ -1,6 +1,6 @@
 <script lang="ts">
-import { ActionButton, Divider, Icon, Toggle } from "@budibase/bbui"
-import { PublishResourceState, ScreenVariant } from "@budibase/types"
+import { ActionButton, Divider, Icon, Toggle } from "@supertoolmake/bbui"
+import { PublishResourceState, ScreenVariant } from "@supertoolmake/types"
 import PublishStatusBadge from "@/components/common/PublishStatusBadge.svelte"
 import UndoRedoControl from "@/components/common/UndoRedoControl.svelte"
 import {

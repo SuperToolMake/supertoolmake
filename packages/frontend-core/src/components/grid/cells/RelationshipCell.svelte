@@ -1,5 +1,5 @@
 <script>
-import { Icon, Input, ProgressCircle } from "@budibase/bbui"
+import { Icon, Input, ProgressCircle } from "@supertoolmake/bbui"
 import { getContext, onMount } from "svelte"
 import { OptionColours } from "../../../constants"
 import { loadTranslationsByGroup } from "../../../utils/translationGroups"

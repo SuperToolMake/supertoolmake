@@ -1,4 +1,4 @@
-import { SourceName } from "@budibase/types"
+import { SourceName } from "@supertoolmake/types"
 
 const mysqlErrorMessages: Record<number, string> = {
   1045: "Access denied for the specified user. User does not have the necessary privileges or the provided credentials are incorrect. Please verify the credentials, and ensure that the user has appropriate permissions.",

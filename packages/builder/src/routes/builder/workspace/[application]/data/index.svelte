@@ -1,7 +1,7 @@
 <script lang="ts">
 import { goto } from "@roxi/routify"
 import { onMount } from "svelte"
-import type { Datasource, Table } from "@budibase/types"
+import type { Datasource, Table } from "@supertoolmake/types"
 import { IntegrationTypes } from "@/constants/backend"
 import { datasources } from "@/stores/builder"
 

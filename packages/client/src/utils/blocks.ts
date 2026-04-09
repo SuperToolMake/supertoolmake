@@ -1,12 +1,12 @@
-import { Constants } from "@budibase/frontend-core"
-import { makePropSafe as safe } from "@budibase/string-templates"
+import { Constants } from "@supertoolmake/frontend-core"
+import { makePropSafe as safe } from "@supertoolmake/string-templates"
 import {
   BasicOperator,
   type LegacyFilter,
   type UIColumn,
   UILogicalOperator,
   type UISearchFilter,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { API } from "../api"
 
 // Map of data types to component types for search fields inside blocks

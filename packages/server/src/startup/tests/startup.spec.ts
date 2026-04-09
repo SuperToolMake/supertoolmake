@@ -1,5 +1,5 @@
-import { tenancy, users, utils, withEnv as withCoreEnv } from "@budibase/backend-core"
-import { structures } from "@budibase/backend-core/tests"
+import { tenancy, users, utils, withEnv as withCoreEnv } from "@supertoolmake/backend-core"
+import { structures } from "@supertoolmake/backend-core/tests"
 import nock from "nock"
 import { withEnv } from "../../environment"
 import TestConfiguration from "../../tests/utilities/TestConfiguration"

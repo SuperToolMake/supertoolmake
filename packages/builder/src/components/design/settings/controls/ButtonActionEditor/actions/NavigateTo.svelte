@@ -1,5 +1,5 @@
 <script>
-import { Checkbox, Label, Select } from "@budibase/bbui"
+import { Checkbox, Label, Select } from "@supertoolmake/bbui"
 import { onMount } from "svelte"
 import DrawerBindableCombobox from "@/components/common/bindings/DrawerBindableCombobox.svelte"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"

@@ -1,4 +1,4 @@
-import type { RequiredKeys } from "@budibase/types"
+import type { RequiredKeys } from "@supertoolmake/types"
 import type { ExecuteQuery, Query } from "./types"
 
 function query(body: any): RequiredKeys<Query> {

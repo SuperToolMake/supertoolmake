@@ -1,4 +1,4 @@
-import { context } from "@budibase/backend-core"
+import { context } from "@supertoolmake/backend-core"
 import {
   type DeleteMetadataResponse,
   type FindMetadataResponse,
@@ -7,7 +7,7 @@ import {
   type SaveMetadataRequest,
   type SaveMetadataResponse,
   type UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { generateMetadataID } from "../../db/utils"
 import { deleteEntityMetadata, saveEntityMetadata } from "../../utilities"
 

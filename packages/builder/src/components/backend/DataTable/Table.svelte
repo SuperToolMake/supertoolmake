@@ -1,6 +1,6 @@
 <script>
-import { Heading, Layout, Table } from "@budibase/bbui"
-import { canBeSortColumn } from "@budibase/frontend-core"
+import { Heading, Layout, Table } from "@supertoolmake/bbui"
+import { canBeSortColumn } from "@supertoolmake/frontend-core"
 import { goto, params } from "@roxi/routify"
 import { createEventDispatcher } from "svelte"
 import { fade } from "svelte/transition"

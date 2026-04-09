@@ -1,4 +1,4 @@
-import { sdk } from "@budibase/shared-core"
+import { sdk } from "@supertoolmake/shared-core"
 import type {
   ClearDevLockResponse,
   CreateWorkspaceRequest,
@@ -21,7 +21,7 @@ import type {
   UpdateAppClientResponse,
   UpdateWorkspaceRequest,
   UpdateWorkspaceResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface AppEndpoints {

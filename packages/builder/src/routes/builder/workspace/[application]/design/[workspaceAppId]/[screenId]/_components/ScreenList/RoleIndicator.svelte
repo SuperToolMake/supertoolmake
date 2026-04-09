@@ -1,5 +1,5 @@
 <script lang="ts">
-import { AbsTooltip, StatusLight } from "@budibase/bbui"
+import { AbsTooltip, StatusLight } from "@supertoolmake/bbui"
 import { Roles } from "@/constants/backend"
 import { roles } from "@/stores/builder"
 

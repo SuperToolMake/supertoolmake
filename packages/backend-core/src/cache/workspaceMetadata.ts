@@ -1,4 +1,4 @@
-import type { Database, Workspace } from "@budibase/types"
+import type { Database, Workspace } from "@supertoolmake/types"
 import { DocumentType, doWithDB } from "../db"
 import { getWorkspaceClient } from "../redis/init"
 

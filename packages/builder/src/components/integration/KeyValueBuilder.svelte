@@ -8,7 +8,7 @@ import {
   MenuItem,
   Select,
   Toggle,
-} from "@budibase/bbui"
+} from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
 import { lowercase } from "@/helpers"

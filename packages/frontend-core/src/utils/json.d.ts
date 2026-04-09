@@ -1,4 +1,4 @@
-import { JsonFieldMetadata, QuerySchema } from "@budibase/types"
+import { JsonFieldMetadata, QuerySchema } from "@supertoolmake/types"
 
 type Schema = Record<string, QuerySchema | string>
 

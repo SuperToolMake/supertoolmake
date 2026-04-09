@@ -1,4 +1,4 @@
-import { RelationshipType } from "@budibase/types"
+import { RelationshipType } from "@supertoolmake/types"
 
 const typeMismatch = "Column type of the foreign key must match the primary key"
 const columnBeingUsed = "Column name cannot be an existing column"

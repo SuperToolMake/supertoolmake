@@ -1,5 +1,5 @@
 <script>
-import { Button, Slider } from "@budibase/bbui"
+import { Button, Slider } from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 
 export let customTheme

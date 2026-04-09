@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Body, Modal, ModalContent } from "@budibase/bbui"
+import { Body, Modal, ModalContent } from "@supertoolmake/bbui"
 
 export let title: string = ""
 export let body: string = ""

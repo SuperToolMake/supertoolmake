@@ -1,4 +1,4 @@
-import { notifications as BBUINotifications } from "@budibase/bbui"
+import { notifications as BBUINotifications } from "@supertoolmake/bbui"
 import { derived, type Readable } from "svelte/store"
 import type { Store as StoreContext } from "."
 

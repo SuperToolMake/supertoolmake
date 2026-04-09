@@ -1,9 +1,9 @@
-import { cache } from "@budibase/backend-core"
+import { cache } from "@supertoolmake/backend-core"
 import env from "../../environment"
 import * as userSdk from "../../sdk/users"
 import lockout from "../lockout"
 
-jest.mock("@budibase/backend-core", () => ({
+jest.mock("@supertoolmake/backend-core", () => ({
   cache: {
     get: jest.fn(),
   },

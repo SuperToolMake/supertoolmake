@@ -1,5 +1,5 @@
-import { configs, db as dbCore, platform, tenancy } from "@budibase/backend-core"
-import { ConfigType, type LockReason, type SettingsConfig } from "@budibase/types"
+import { configs, db as dbCore, platform, tenancy } from "@supertoolmake/backend-core"
+import { ConfigType, type LockReason, type SettingsConfig } from "@supertoolmake/types"
 
 export async function deleteTenant(tenantId: string) {
   await removeTenantUsers(tenantId)

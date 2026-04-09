@@ -4,7 +4,7 @@ type Option = any
 
 <script lang="ts">
   import Picker from "./Picker.svelte"
-  import type { Primitive } from "@budibase/types"
+  import type { Primitive } from "@supertoolmake/types"
   import { createEventDispatcher } from "svelte"
 
   export let value: Primitive[] = []

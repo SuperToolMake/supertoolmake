@@ -1,5 +1,5 @@
-import { keepOpen, notifications } from "@budibase/bbui"
-import type { Datasource, Query } from "@budibase/types"
+import { keepOpen, notifications } from "@supertoolmake/bbui"
+import type { Datasource, Query } from "@supertoolmake/types"
 import { derived, get, writable } from "svelte/store"
 import { datasources, queries } from "@/stores/builder"
 

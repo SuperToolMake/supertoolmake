@@ -2,7 +2,7 @@ import type {
   FetchUserMetadataResponse,
   FindUserMetadataResponse,
   UserMetadata,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { DocumentInsertResponse } from "nano"
 import { type Expectations, TestAPI } from "./base"
 

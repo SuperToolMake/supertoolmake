@@ -1,6 +1,6 @@
 <script>
-import { Body, Button, DatePicker, DrawerContent, Icon, Layout, Select } from "@budibase/bbui"
-import { Constants, QueryUtils } from "@budibase/frontend-core"
+import { Body, Button, DatePicker, DrawerContent, Icon, Layout, Select } from "@supertoolmake/bbui"
+import { Constants, QueryUtils } from "@supertoolmake/frontend-core"
 import { generate } from "shortid"
 import { flip } from "svelte/animate"
 import { dndzone } from "svelte-dnd-action"

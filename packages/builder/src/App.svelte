@@ -1,6 +1,6 @@
 <script>
 import { onMount } from "svelte"
-import { BannerDisplay, Context, NotificationDisplay } from "@budibase/bbui"
+import { BannerDisplay, Context, NotificationDisplay } from "@supertoolmake/bbui"
 import { Router } from "@roxi/routify"
 import { parse, stringify } from "qs"
 import { setContext } from "svelte"

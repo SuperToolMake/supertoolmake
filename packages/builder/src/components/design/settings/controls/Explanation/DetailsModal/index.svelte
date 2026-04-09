@@ -1,5 +1,5 @@
 <script>
-import { ContextTooltip } from "@budibase/bbui"
+import { ContextTooltip } from "@supertoolmake/bbui"
 import subjects from "../subjects"
 import {
   Column,

@@ -8,7 +8,7 @@ import {
   type Table,
   type TableRequest,
   type UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { isEqual } from "lodash"
 import { breakExternalTableId } from "../../../integrations/utils"
 import sdk from "../../../sdk"

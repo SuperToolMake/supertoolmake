@@ -2,8 +2,8 @@ import path from "node:path"
 import { performance } from "node:perf_hooks"
 import qs from "node:querystring"
 import { URLSearchParams } from "node:url"
-import { blacklist } from "@budibase/backend-core"
-import { utils } from "@budibase/shared-core"
+import { blacklist } from "@supertoolmake/backend-core"
+import { utils } from "@supertoolmake/shared-core"
 import {
   BodyType,
   DatasourceFieldType,
@@ -17,7 +17,7 @@ import {
   RestAuthType,
   type RestConfig,
   type RestQueryFields as RestQuery,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { parse } from "content-disposition"
 import get from "lodash/get"
 import {

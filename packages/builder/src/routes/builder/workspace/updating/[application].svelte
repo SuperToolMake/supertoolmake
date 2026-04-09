@@ -1,5 +1,5 @@
 <script>
-import { Updating } from "@budibase/frontend-core"
+import { Updating } from "@supertoolmake/frontend-core"
 import { goto, params } from "@roxi/routify"
 import { get } from "svelte/store"
 

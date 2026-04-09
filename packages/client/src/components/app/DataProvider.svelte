@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Pagination, ProgressCircle } from "@budibase/bbui"
-import { fetchData, QueryUtils } from "@budibase/frontend-core"
+import { Pagination, ProgressCircle } from "@supertoolmake/bbui"
+import { fetchData, QueryUtils } from "@supertoolmake/frontend-core"
 import type {
   DataFetchDatasource,
   DataFetchOptions,
@@ -9,8 +9,8 @@ import type {
   TableSchema,
   UISearchFilter,
   UserDatasource,
-} from "@budibase/types"
-import { EmptyFilterOption, LogicalOperator } from "@budibase/types"
+} from "@supertoolmake/types"
+import { EmptyFilterOption, LogicalOperator } from "@supertoolmake/types"
 import { getContext, onDestroy } from "svelte"
 import { createAutoRefresh } from "@/utils/autoRefresh"
 

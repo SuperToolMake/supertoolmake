@@ -1,5 +1,5 @@
-import { sdk } from "@budibase/shared-core"
-import type { UpdateWorkspaceRequest, Workspace } from "@budibase/types"
+import { sdk } from "@supertoolmake/shared-core"
+import type { UpdateWorkspaceRequest, Workspace } from "@supertoolmake/types"
 import { derived } from "svelte/store"
 import { API } from "@/api"
 import { AppStatus } from "@/constants"

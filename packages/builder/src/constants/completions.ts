@@ -1,5 +1,5 @@
-import { getManifest, helpersToRemoveForJs } from "@budibase/string-templates"
-import type { Helper } from "@budibase/types"
+import { getManifest, helpersToRemoveForJs } from "@supertoolmake/string-templates"
+import type { Helper } from "@supertoolmake/types"
 
 export function handlebarsCompletions(): Helper[] {
   const manifest = getManifest()

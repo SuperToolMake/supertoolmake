@@ -1,6 +1,6 @@
-import { context, docIds, HTTPError } from "@budibase/backend-core"
-import { helpers } from "@budibase/shared-core"
-import type { RequiredKeys, WithoutDocMetadata, WorkspaceApp } from "@budibase/types"
+import { context, docIds, HTTPError } from "@supertoolmake/backend-core"
+import { helpers } from "@supertoolmake/shared-core"
+import type { RequiredKeys, WithoutDocMetadata, WorkspaceApp } from "@supertoolmake/types"
 import sdk from "../.."
 
 async function guardName(name: string, id?: string) {

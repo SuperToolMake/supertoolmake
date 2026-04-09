@@ -8,7 +8,7 @@ import type {
   DatabaseQueryOpts,
   Document,
   RowValue,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type Nano from "nano"
 import type {
   DocumentBulkResponse,

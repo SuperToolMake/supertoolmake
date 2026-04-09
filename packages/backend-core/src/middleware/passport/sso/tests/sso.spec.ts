@@ -1,4 +1,4 @@
-import type { SSOAuthDetails, User } from "@budibase/types"
+import type { SSOAuthDetails, User } from "@supertoolmake/types"
 import nock from "nock"
 import { structures } from "../../../../../tests"
 import { testEnv } from "../../../../../tests/extra"

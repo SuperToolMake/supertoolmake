@@ -1,6 +1,6 @@
-import { Constants } from "@budibase/frontend-core"
-import { sdk } from "@budibase/shared-core"
-import type { User } from "@budibase/types"
+import { Constants } from "@supertoolmake/frontend-core"
+import { sdk } from "@supertoolmake/shared-core"
+import type { User } from "@supertoolmake/types"
 
 export const getRoleFlags = (role: string, currentUser?: User) => {
   if (role === Constants.BudibaseRoles.Developer) {

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Icon, ProgressCircle } from "@budibase/bbui"
+import { Icon, ProgressCircle } from "@supertoolmake/bbui"
 
 export let backgroundColour: string
 export let imageSrc: string

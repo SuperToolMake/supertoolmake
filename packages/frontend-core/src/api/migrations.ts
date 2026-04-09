@@ -1,4 +1,4 @@
-import type { GetMigrationStatus } from "@budibase/types"
+import type { GetMigrationStatus } from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface MigrationEndpoints {

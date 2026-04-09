@@ -1,13 +1,13 @@
 import path from "node:path"
-import { db, Header, roles } from "@budibase/backend-core"
-import { structures } from "@budibase/backend-core/tests"
+import { db, Header, roles } from "@supertoolmake/backend-core"
+import { structures } from "@supertoolmake/backend-core/tests"
 import {
   BuiltinPermissionID,
   PermissionLevel,
   type Screen,
   type Workspace,
   type WorkspaceApp,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import nock from "nock"
 import tk from "timekeeper"
 import { USERS_TABLE_SCHEMA } from "../../../constants"

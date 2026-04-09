@@ -1,5 +1,5 @@
 <script>
-import { Body, Icon, Layout, notifications, Search } from "@budibase/bbui"
+import { Body, Icon, Layout, notifications, Search } from "@supertoolmake/bbui"
 import { goto as gotoStore } from "@roxi/routify"
 import { onMount } from "svelte"
 import NewPill from "@/components/common/NewPill.svelte"

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { PublishResourceState } from "@budibase/types"
+import { PublishResourceState } from "@supertoolmake/types"
 
 export let status: PublishResourceState
 export let loading: boolean = false

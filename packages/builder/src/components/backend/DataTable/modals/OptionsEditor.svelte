@@ -1,6 +1,6 @@
 <script>
-import { Icon, Popover } from "@budibase/bbui"
-import { Constants } from "@budibase/frontend-core"
+import { Icon, Popover } from "@supertoolmake/bbui"
+import { Constants } from "@supertoolmake/frontend-core"
 import { tick } from "svelte"
 import { flip } from "svelte/animate"
 import { derived, writable } from "svelte/store"

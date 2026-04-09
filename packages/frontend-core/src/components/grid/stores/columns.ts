@@ -1,4 +1,4 @@
-import type { UIColumn } from "@budibase/types"
+import type { UIColumn } from "@supertoolmake/types"
 import { derived, get, type Readable, type Writable, writable } from "svelte/store"
 import { DefaultColumnWidth, GutterWidth } from "../lib/constants"
 import type { Store as StoreContext } from "."

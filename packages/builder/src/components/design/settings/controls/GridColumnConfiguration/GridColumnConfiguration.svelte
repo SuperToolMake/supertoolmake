@@ -1,5 +1,5 @@
 <script>
-import { enrichSchemaWithRelColumns } from "@budibase/frontend-core"
+import { enrichSchemaWithRelColumns } from "@supertoolmake/frontend-core"
 import { createEventDispatcher } from "svelte"
 import { getDatasourceForProvider, getSchemaForDatasource } from "@/dataBinding"
 import InfoDisplay from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"

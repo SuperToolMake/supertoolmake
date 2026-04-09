@@ -1,4 +1,4 @@
-import type { Screen, UIPermissions } from "@budibase/types"
+import type { Screen, UIPermissions } from "@supertoolmake/types"
 import type { SourceOption } from "@/routes/builder/workspace/[application]/design/_components/NewScreen/utils"
 import inline from "./inline"
 import modal from "./modal"

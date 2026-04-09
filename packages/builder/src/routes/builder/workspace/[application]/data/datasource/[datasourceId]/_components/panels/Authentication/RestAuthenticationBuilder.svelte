@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, Helpers, Layout, Modal, Table } from "@budibase/bbui"
+import { ActionButton, Helpers, Layout, Modal, Table } from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 import AuthTypeRenderer from "./AuthTypeRenderer.svelte"
 import RestAuthenticationModal from "./RestAuthenticationModal.svelte"

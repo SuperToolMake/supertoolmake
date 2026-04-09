@@ -1,4 +1,4 @@
-import type { Ctx } from "@budibase/types"
+import type { Ctx } from "@supertoolmake/types"
 import send from "koa-send"
 import env from "../../environment"
 import { join } from "../../utilities/centralPath"

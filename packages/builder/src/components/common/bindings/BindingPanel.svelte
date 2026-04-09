@@ -1,13 +1,13 @@
 <script lang="ts">
-import { ActionButton, Body, Button, DrawerContent, Heading, Icon } from "@budibase/bbui"
-import { JsonFormatter, Utils } from "@budibase/frontend-core"
-import type { Log } from "@budibase/string-templates"
+import { ActionButton, Body, Button, DrawerContent, Heading, Icon } from "@supertoolmake/bbui"
+import { JsonFormatter, Utils } from "@supertoolmake/frontend-core"
+import type { Log } from "@supertoolmake/string-templates"
 import {
   decodeJSBinding,
   encodeJSBinding,
   processObjectSync,
   processStringWithLogsSync,
-} from "@budibase/string-templates"
+} from "@supertoolmake/string-templates"
 import type {
   CaretPositionFn,
   EnrichedBinding,
@@ -15,8 +15,8 @@ import type {
   InsertAtPositionFn,
   JSONValue,
   Snippet,
-} from "@budibase/types"
-import { BindingMode } from "@budibase/types"
+} from "@supertoolmake/types"
+import { BindingMode } from "@supertoolmake/types"
 import { createEventDispatcher, onMount } from "svelte"
 import { readableToRuntimeBinding } from "@/dataBinding"
 import { capitalise } from "@/helpers"

@@ -1,5 +1,5 @@
 <script>
-import { Checkbox, DetailSummary, notifications, Select, Stepper, Toggle } from "@budibase/bbui"
+import { Checkbox, DetailSummary, notifications, Select, Stepper, Toggle } from "@supertoolmake/bbui"
 import { get } from "svelte/store"
 import DrawerBindableCombobox from "@/components/common/bindings/DrawerBindableCombobox.svelte"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"

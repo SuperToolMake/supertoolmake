@@ -5,7 +5,7 @@ import {
   FieldType,
   type Row,
   type Table,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { AutoFieldDefaultNames } from "../../constants"
 
 /**

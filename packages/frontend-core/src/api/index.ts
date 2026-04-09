@@ -1,5 +1,5 @@
-import { Helpers } from "@budibase/bbui"
-import { Header } from "@budibase/shared-core"
+import { Helpers } from "@supertoolmake/bbui"
+import { Header } from "@supertoolmake/shared-core"
 import { ApiVersion } from "../constants"
 import { buildAppEndpoints } from "./app"
 import { buildAttachmentEndpoints } from "./attachments"

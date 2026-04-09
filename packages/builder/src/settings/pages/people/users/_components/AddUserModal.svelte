@@ -10,8 +10,8 @@ import {
   PillInput,
   RadioGroup,
   Select,
-} from "@budibase/bbui"
-import { Constants, emailValidator } from "@budibase/frontend-core"
+} from "@supertoolmake/bbui"
+import { Constants, emailValidator } from "@supertoolmake/frontend-core"
 import GlobalRoleSelect from "@/components/common/GlobalRoleSelect.svelte"
 import { OnboardingType } from "@/constants"
 import { roles } from "@/stores/builder"

@@ -7,7 +7,7 @@ import {
   logging,
   tenancy,
   users,
-} from "@budibase/backend-core"
+} from "@supertoolmake/backend-core"
 import bson from "bson"
 import type Koa from "koa"
 import * as api from "../api"

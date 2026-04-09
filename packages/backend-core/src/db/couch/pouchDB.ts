@@ -1,4 +1,4 @@
-import type { PouchOptions } from "@budibase/types"
+import type { PouchOptions } from "@supertoolmake/types"
 import PouchDB from "pouchdb"
 import env from "../../environment"
 import { getCouchInfo } from "./connections"

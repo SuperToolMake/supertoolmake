@@ -1,4 +1,4 @@
-import type { PublicOIDCConfig } from "@budibase/types"
+import type { PublicOIDCConfig } from "@supertoolmake/types"
 import { get } from "svelte/store"
 import { API } from "@/api"
 import { auth } from "@/stores/portal"

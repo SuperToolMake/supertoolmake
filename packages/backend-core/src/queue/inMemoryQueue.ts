@@ -1,5 +1,5 @@
 import events from "node:events"
-import { helpers } from "@budibase/shared-core"
+import { helpers } from "@supertoolmake/shared-core"
 import type { DoneCallback, Job, JobId, JobInformation } from "bull"
 import { newid, timeout } from "../utils"
 import type { JobOptions, Queue, QueueOptions } from "./queue"

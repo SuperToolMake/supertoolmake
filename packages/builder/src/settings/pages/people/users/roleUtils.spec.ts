@@ -1,5 +1,5 @@
-import { Constants } from "@budibase/frontend-core"
-import type { User } from "@budibase/types"
+import { Constants } from "@supertoolmake/frontend-core"
+import type { User } from "@supertoolmake/types"
 import { describe, expect, it } from "vitest"
 import { getRoleFlags, shouldSyncGlobalRole } from "./roleUtils"
 

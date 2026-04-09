@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Button } from "@budibase/bbui"
-import type { Screen, ScreenUsage } from "@budibase/types"
+import { Button } from "@supertoolmake/bbui"
+import type { Screen, ScreenUsage } from "@supertoolmake/types"
 import { createEventDispatcher, getContext } from "svelte"
 import ScreensPopover from "@/components/common/ScreensPopover.svelte"
 import { screenStore } from "@/stores/builder"

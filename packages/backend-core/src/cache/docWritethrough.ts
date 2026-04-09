@@ -1,4 +1,4 @@
-import { type AnyDocument, type Database, type Document, DocumentType } from "@budibase/types"
+import { type AnyDocument, type Database, type Document, DocumentType } from "@supertoolmake/types"
 import * as dbUtils from "../db"
 import { BudibaseQueue, JobQueue } from "../queue"
 

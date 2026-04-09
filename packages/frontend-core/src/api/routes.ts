@@ -1,4 +1,4 @@
-import type { FetchClientScreenRoutingResponse, FetchScreenRoutingResponse } from "@budibase/types"
+import type { FetchClientScreenRoutingResponse, FetchScreenRoutingResponse } from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface RouteEndpoints {

@@ -5,7 +5,7 @@ import {
   type UIWorkspaceApp,
   type UpdateWorkspaceAppRequest,
   type WorkspaceApp,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { derived, get, type Readable } from "svelte/store"
 import { API } from "@/api"
 import { DerivedBudiStore } from "@/stores/BudiStore"

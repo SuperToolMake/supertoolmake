@@ -1,5 +1,5 @@
-import { isTableIdOrExternalTableId } from "@budibase/shared-core"
-import { type Table, TableSourceType } from "@budibase/types"
+import { isTableIdOrExternalTableId } from "@supertoolmake/shared-core"
+import { type Table, TableSourceType } from "@supertoolmake/types"
 import { isExternalTableID } from "../../../integrations/utils"
 
 export function isExternal(opts: { table?: Table; tableId?: string }): boolean {

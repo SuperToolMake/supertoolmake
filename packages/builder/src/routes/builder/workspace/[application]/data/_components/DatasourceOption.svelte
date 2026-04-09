@@ -1,5 +1,5 @@
 <script>
-import { Body } from "@budibase/bbui"
+import { Body } from "@supertoolmake/bbui"
 
 export let title
 export let disabled

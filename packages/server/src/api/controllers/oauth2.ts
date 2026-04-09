@@ -10,7 +10,7 @@ import {
   type UpdateOAuth2ConfigResponse,
   type ValidateConfigRequest,
   type ValidateConfigResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import sdk from "../../sdk"
 
 function toFetchOAuth2ConfigsResponse(config: OAuth2Config): OAuth2ConfigResponse {

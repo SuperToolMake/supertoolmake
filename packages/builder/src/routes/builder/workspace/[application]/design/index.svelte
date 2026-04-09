@@ -9,8 +9,8 @@ import {
   notifications,
   StatusLight,
   TooltipPosition,
-} from "@budibase/bbui"
-import { PublishResourceState, type UIWorkspaceApp, WorkspaceResource } from "@budibase/types"
+} from "@supertoolmake/bbui"
+import { PublishResourceState, type UIWorkspaceApp, WorkspaceResource } from "@supertoolmake/types"
 import { url } from "@roxi/routify"
 import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
 import PublishStatusBadge from "@/components/common/PublishStatusBadge.svelte"

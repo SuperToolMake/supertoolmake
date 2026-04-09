@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ColorPicker, Helpers, Icon, Label, ModalContent } from "@budibase/bbui"
+import { ColorPicker, Helpers, Icon, Label, ModalContent } from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 
 export let name: string

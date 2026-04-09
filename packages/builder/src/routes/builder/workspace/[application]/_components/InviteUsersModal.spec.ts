@@ -79,8 +79,8 @@ const {
   }
 })
 
-vi.mock("@budibase/bbui", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@budibase/bbui")>()
+vi.mock("@supertoolmake/bbui", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@supertoolmake/bbui")>()
   const [
     { default: MockBody },
     { default: MockInput },
@@ -168,8 +168,8 @@ vi.mock("@/stores/portal", () => ({
   users: usersMock,
 }))
 
-vi.mock("@budibase/shared-core", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@budibase/shared-core")>()
+vi.mock("@supertoolmake/shared-core", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@supertoolmake/shared-core")>()
   return {
     ...actual,
     sdk: {

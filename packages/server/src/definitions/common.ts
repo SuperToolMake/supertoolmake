@@ -1,4 +1,4 @@
-import type { Document } from "@budibase/types"
+import type { Document } from "@supertoolmake/types"
 
 export {
   Datasource,
@@ -8,7 +8,7 @@ export {
   Row,
   Table,
   TableSchema,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 
 export interface Application extends Document {
   _id: string

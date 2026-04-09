@@ -4,7 +4,7 @@ import { logger } from "./logger"
 
 const pino = require("koa-pino-logger")
 
-import type { Ctx } from "@budibase/types"
+import type { Ctx } from "@supertoolmake/types"
 import type { Options } from "pino-http"
 
 const correlator = require("correlation-id")

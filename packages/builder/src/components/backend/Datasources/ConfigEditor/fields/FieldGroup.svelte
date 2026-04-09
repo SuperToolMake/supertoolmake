@@ -1,5 +1,5 @@
 <script>
-import { Accordion, Layout } from "@budibase/bbui"
+import { Accordion, Layout } from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 import ConfigInput from "../ConfigInput.svelte"
 

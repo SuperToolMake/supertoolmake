@@ -10,8 +10,8 @@ import {
   tenancy,
   users,
   utils,
-} from "@budibase/backend-core"
-import { DefaultAppTheme, sdk as sharedCoreSDK } from "@budibase/shared-core"
+} from "@supertoolmake/backend-core"
+import { DefaultAppTheme, sdk as sharedCoreSDK } from "@supertoolmake/shared-core"
 import {
   BBReferenceFieldSubType,
   type CreateWorkspaceRequest,
@@ -38,7 +38,7 @@ import {
   type UpdateWorkspaceResponse,
   type UserCtx,
   type Workspace,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { File, Files } from "formidable"
 import { USERS_TABLE_SCHEMA } from "../../constants"
 import { defaultAppNavigator } from "../../constants/definitions"

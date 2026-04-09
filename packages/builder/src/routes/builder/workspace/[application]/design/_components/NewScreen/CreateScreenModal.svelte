@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Modal, ModalCancelFrom, notifications } from "@budibase/bbui"
-import type { SaveScreenRequest, Screen, Table } from "@budibase/types"
+import { Modal, ModalCancelFrom, notifications } from "@supertoolmake/bbui"
+import type { SaveScreenRequest, Screen, Table } from "@supertoolmake/types"
 import { goto } from "@roxi/routify"
 import ScreenDetailsModal from "@/components/design/ScreenDetailsModal.svelte"
 import { AutoScreenTypes } from "@/constants"

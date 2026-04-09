@@ -4,7 +4,7 @@ import {
   configs,
   constants,
   utils as utilsCore,
-} from "@budibase/backend-core"
+} from "@supertoolmake/backend-core"
 import {
   ConfigType,
   type Ctx,
@@ -23,7 +23,7 @@ import {
   type SSOUser,
   type User,
   type UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { Next } from "koa"
 import env from "../../../environment"
 
@@ -241,7 +241,7 @@ export const resetUpdate = async (
 
 export const datasourcePreAuth = async (ctx: UserCtx<void, void>, next: Next) => {
   const provider = ctx.params.provider
-  const { middleware } = require(`@budibase/backend-core`)
+  const { middleware } = require(`@supertoolmake/backend-core`)
   const handler = middleware.datasource[provider]
 
   setCookie(
@@ -262,7 +262,7 @@ export const datasourceAuth = async (ctx: UserCtx<void, void>, next: Next) => {
     throw new Error("Unable to retrieve datasource authentication cookie")
   }
   const provider = authStateCookie.provider
-  const { middleware } = require(`@budibase/backend-core`)
+  const { middleware } = require(`@supertoolmake/backend-core`)
   const handler = middleware.datasource[provider]
   return handler.postAuth(passport, ctx, next)
 }

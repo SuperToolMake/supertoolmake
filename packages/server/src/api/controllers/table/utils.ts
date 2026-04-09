@@ -1,4 +1,4 @@
-import { context, HTTPError } from "@budibase/backend-core"
+import { context, HTTPError } from "@supertoolmake/backend-core"
 import {
   AutoFieldSubType,
   type Database,
@@ -9,7 +9,7 @@ import {
   type RenameColumn,
   type Row,
   type Table,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { cloneDeep } from "lodash/fp"
 import { CanSwitchTypes, SwitchableTypes, USERS_TABLE_SCHEMA } from "../../../constants"
 import { generateRowID, getRowParams, InternalTables } from "../../../db/utils"

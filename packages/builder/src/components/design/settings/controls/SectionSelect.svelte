@@ -1,5 +1,5 @@
 <script>
-import { Select } from "@budibase/bbui"
+import { Select } from "@supertoolmake/bbui"
 
 export let value = ""
 </script>

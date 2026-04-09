@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Icon } from "@budibase/bbui"
-import type { FieldSchema, UIFieldValidationRule } from "@budibase/types"
-import { FieldType } from "@budibase/types"
+import { Icon } from "@supertoolmake/bbui"
+import type { FieldSchema, UIFieldValidationRule } from "@supertoolmake/types"
+import { FieldType } from "@supertoolmake/types"
 import type { FieldApi, FieldState } from "@/types"
 import Field from "./Field.svelte"
 

@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Body, keepOpen, Layout, ModalContent } from "@budibase/bbui"
-import type { UIIntegration } from "@budibase/types"
-import { SourceName } from "@budibase/types"
+import { Body, keepOpen, Layout, ModalContent } from "@supertoolmake/bbui"
+import type { UIIntegration } from "@supertoolmake/types"
+import { SourceName } from "@supertoolmake/types"
 import { get } from "svelte/store"
 import InfoDisplay from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
 import ConfigInput from "./ConfigInput.svelte"

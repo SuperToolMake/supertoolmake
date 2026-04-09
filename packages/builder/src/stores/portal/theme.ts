@@ -4,8 +4,8 @@ import {
   getThemeClassNames,
   ThemeClassPrefix,
   ThemeOptions,
-} from "@budibase/shared-core"
-import type { Theme } from "@budibase/types"
+} from "@supertoolmake/shared-core"
+import type { Theme } from "@supertoolmake/types"
 import { derived, type Writable } from "svelte/store"
 import { DerivedBudiStore, PersistenceType } from "../BudiStore"
 

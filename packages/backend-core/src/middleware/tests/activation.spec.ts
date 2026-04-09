@@ -1,4 +1,4 @@
-import { ConfigType } from "@budibase/types"
+import { ConfigType } from "@supertoolmake/types"
 import * as configs from "../../configs"
 import { activeTenant } from "../activation"
 

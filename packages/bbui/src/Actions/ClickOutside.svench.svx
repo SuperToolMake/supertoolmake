@@ -18,7 +18,7 @@ This action can be used to listen for when you want to call a function whenever 
 
 ```html
 <script>
-  import { clickOutside } from '@budibase/bbui'
+  import { clickOutside } from '@supertoolmake/bbui'
   const someFunction = () => {
     // Some logic to close a dropdown or stop the user from doing something without saving?
   }

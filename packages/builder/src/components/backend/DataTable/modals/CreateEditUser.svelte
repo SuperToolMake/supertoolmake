@@ -1,6 +1,6 @@
 <script>
-import { keepOpen, Link, ModalContent, notifications, Select } from "@budibase/bbui"
-import { BUILDER_URLS } from "@budibase/shared-core"
+import { keepOpen, Link, ModalContent, notifications, Select } from "@supertoolmake/bbui"
+import { BUILDER_URLS } from "@supertoolmake/shared-core"
 import { goto } from "@roxi/routify"
 import { createEventDispatcher } from "svelte"
 import { API } from "@/api"

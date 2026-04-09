@@ -1,5 +1,5 @@
 <script lang="ts" generics="Value extends UIFile|File">
-import type { UIFile } from "@budibase/types"
+import type { UIFile } from "@supertoolmake/types"
 import "@spectrum-css/dropzone/dist/index-vars.css"
 import "@spectrum-css/illustratedmessage/dist/index-vars.css"
 import "@spectrum-css/typography/dist/index-vars.css"

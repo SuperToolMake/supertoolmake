@@ -1,5 +1,5 @@
 <script>
-import { ActionButton } from "@budibase/bbui"
+import { ActionButton } from "@supertoolmake/bbui"
 import { cloneDeep, isEqual } from "lodash/fp"
 import KeyValueBuilder from "@/components/integration/KeyValueBuilder.svelte"
 import { getRestBindings, readableToRuntimeBinding, runtimeToReadableMap } from "@/dataBinding"

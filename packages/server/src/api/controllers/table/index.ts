@@ -1,10 +1,10 @@
-import { cache, context, csv, db as dbCore, HTTPError } from "@budibase/backend-core"
+import { cache, context, csv, db as dbCore, HTTPError } from "@supertoolmake/backend-core"
 import {
   canBeDisplayColumn,
   helpers,
   PROTECTED_EXTERNAL_COLUMNS,
   PROTECTED_INTERNAL_COLUMNS,
-} from "@budibase/shared-core"
+} from "@supertoolmake/shared-core"
 import {
   type BulkImportRequest,
   type BulkImportResponse,
@@ -28,7 +28,7 @@ import {
   type ValidateNewTableImportRequest,
   type ValidateTableImportRequest,
   type ValidateTableImportResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { cloneDeep } from "lodash"
 import { isExternalTable, isSQL } from "../../../integrations/utils"
 import sdk from "../../../sdk"

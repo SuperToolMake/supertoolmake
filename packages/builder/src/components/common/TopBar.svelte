@@ -6,10 +6,10 @@ interface Breadcrumb {
 </script>
 
 <script lang="ts">
-  import { Body, Icon, Popover, PopoverAlignment } from "@budibase/bbui"
+  import { Body, Icon, Popover, PopoverAlignment } from "@supertoolmake/bbui"
   import PublishMenu from "./PublishMenu.svelte"
   import { deploymentStore } from "@/stores/builder"
-  import type { PopoverAPI } from "@budibase/bbui"
+  import type { PopoverAPI } from "@supertoolmake/bbui"
   import { url } from "@roxi/routify"
 
   $url

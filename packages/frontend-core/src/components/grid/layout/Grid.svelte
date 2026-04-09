@@ -1,5 +1,5 @@
 <script lang="ts">
-import { clickOutside, ProgressCircle } from "@budibase/bbui"
+import { clickOutside, ProgressCircle } from "@supertoolmake/bbui"
 import { onMount, setContext } from "svelte"
 import { derived, writable } from "svelte/store"
 import { fade } from "svelte/transition"

@@ -1,4 +1,4 @@
-import type { Layout, Screen, Workspace } from "@budibase/types"
+import type { Layout, Screen, Workspace } from "@supertoolmake/types"
 import { derived, get, writable } from "svelte/store"
 import { API } from "@/api"
 

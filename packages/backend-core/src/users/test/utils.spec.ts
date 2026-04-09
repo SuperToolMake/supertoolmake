@@ -1,4 +1,4 @@
-import type { User } from "@budibase/types"
+import type { User } from "@supertoolmake/types"
 import { structures } from "../../../tests"
 import { isCreatorSync } from "../utils"
 

@@ -1,6 +1,6 @@
-import { notifications } from "@budibase/bbui"
-import { Constants } from "@budibase/frontend-core"
-import { sdk } from "@budibase/shared-core"
+import { notifications } from "@supertoolmake/bbui"
+import { Constants } from "@supertoolmake/frontend-core"
+import { sdk } from "@supertoolmake/shared-core"
 import type {
   DeleteInviteUsersRequest,
   InviteUsersRequest,
@@ -9,7 +9,7 @@ import type {
   UnsavedUser,
   User,
   UserIdentifier,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { API } from "@/api"
 import type { UserInfo } from "@/types"
 import { BudiStore } from "../BudiStore"

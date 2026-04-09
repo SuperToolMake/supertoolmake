@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, Button } from "@budibase/bbui"
+import { ActionButton, Button } from "@supertoolmake/bbui"
 import { useSvelteFlow } from "@xyflow/svelte"
 import { getContext } from "svelte"
 import { ZoomDuration } from "./constants"

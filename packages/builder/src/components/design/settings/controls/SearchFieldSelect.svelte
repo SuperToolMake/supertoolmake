@@ -1,6 +1,6 @@
 <script>
-import { Multiselect } from "@budibase/bbui"
-import { search } from "@budibase/frontend-core"
+import { Multiselect } from "@supertoolmake/bbui"
+import { search } from "@supertoolmake/frontend-core"
 import { createEventDispatcher } from "svelte"
 import { getDatasourceForProvider, getSchemaForDatasource } from "@/dataBinding"
 import { selectedScreen, tables } from "@/stores/builder"

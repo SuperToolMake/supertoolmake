@@ -1,4 +1,4 @@
-import type { SearchFilters, SortOrder } from "@budibase/types"
+import type { SearchFilters, SortOrder } from "@supertoolmake/types"
 import type { Format } from "../../../../api/controllers/table/exporters"
 
 export interface ExportRowsParams {

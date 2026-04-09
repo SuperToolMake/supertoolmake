@@ -1,5 +1,5 @@
 <script>
-import { Constants } from "@budibase/frontend-core"
+import { Constants } from "@supertoolmake/frontend-core"
 import { roles } from "@/stores/builder"
 import { users } from "@/stores/portal/users"
 

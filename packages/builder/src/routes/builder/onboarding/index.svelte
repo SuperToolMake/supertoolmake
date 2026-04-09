@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Body, Button, Layout, notifications } from "@budibase/bbui"
-import { sdk } from "@budibase/shared-core"
+import { Body, Button, Layout, notifications } from "@supertoolmake/bbui"
+import { sdk } from "@supertoolmake/shared-core"
 import { goto as gotoStore } from "@roxi/routify"
 import BBLogo from "assets/BBLogo.svelte"
 import { onMount } from "svelte"

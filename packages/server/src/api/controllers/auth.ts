@@ -1,5 +1,5 @@
-import { context, db as dbCore, roles } from "@budibase/backend-core"
-import type { ContextUser, SelfResponse, UserCtx } from "@budibase/types"
+import { context, db as dbCore, roles } from "@supertoolmake/backend-core"
+import type { ContextUser, SelfResponse, UserCtx } from "@supertoolmake/types"
 import { InternalTables } from "../../db/utils"
 import sdk from "../../sdk"
 import { processUser } from "../../utilities/global"

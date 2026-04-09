@@ -1,4 +1,4 @@
-import type { SSOUser, User } from "@budibase/types"
+import type { SSOUser, User } from "@supertoolmake/types"
 
 jest.mock("nodemailer")
 
@@ -6,7 +6,7 @@ import { generator, mocks, structures, TestConfiguration } from "../../../../tes
 
 const sendMailMock = mocks.email.mock()
 
-import { constants } from "@budibase/backend-core"
+import { constants } from "@supertoolmake/backend-core"
 import nock from "nock"
 import type { Response } from "superagent"
 import * as userSdk from "../../../../sdk/users"
@@ -142,7 +142,7 @@ describe("/api/global/auth", () => {
 
               // Clear any remaining lockout state to ensure clean test
               await config.doInTenant(async () => {
-                const { cache } = require("@budibase/backend-core")
+                const { cache } = require("@supertoolmake/backend-core")
                 const normalizeEmail = (e: string) => (e || "").toLowerCase()
                 const lockKey = (email: string) => `auth:login:lock:${normalizeEmail(email)}`
                 await cache.destroy(lockKey(email))

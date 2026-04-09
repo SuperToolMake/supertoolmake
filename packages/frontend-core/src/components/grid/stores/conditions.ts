@@ -4,7 +4,7 @@ import {
   FieldType,
   type UICondition,
   type UIRow,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { derived, get, type Readable, type Writable, writable } from "svelte/store"
 import { derivedMemo, QueryUtils } from "../../../utils"
 import type { Store as StoreContext } from "."

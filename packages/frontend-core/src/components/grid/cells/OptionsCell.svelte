@@ -1,5 +1,5 @@
 <script>
-import { Icon } from "@budibase/bbui"
+import { Icon } from "@supertoolmake/bbui"
 import { onMount } from "svelte"
 import { OptionColours } from "../../../constants"
 import GridPopover from "../overlays/GridPopover.svelte"

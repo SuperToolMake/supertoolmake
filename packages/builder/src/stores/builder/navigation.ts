@@ -1,5 +1,5 @@
-import { notifications } from "@budibase/bbui"
-import type { AppNavigation, AppNavigationLink, UIObject } from "@budibase/types"
+import { notifications } from "@supertoolmake/bbui"
+import type { AppNavigation, AppNavigationLink, UIObject } from "@supertoolmake/types"
 import { derived, get, type Writable } from "svelte/store"
 import { API } from "@/api"
 import { appStore, workspaceAppStore } from "@/stores/builder"

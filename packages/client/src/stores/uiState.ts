@@ -1,4 +1,4 @@
-import { createLocalStorageStore } from "@budibase/frontend-core"
+import { createLocalStorageStore } from "@supertoolmake/frontend-core"
 import type { Writable } from "svelte/store"
 
 /**

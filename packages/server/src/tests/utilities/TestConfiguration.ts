@@ -12,8 +12,8 @@ import {
   sessions,
   tenancy,
   utils,
-} from "@budibase/backend-core"
-import { generator, structures } from "@budibase/backend-core/tests"
+} from "@supertoolmake/backend-core"
+import { generator, structures } from "@supertoolmake/backend-core/tests"
 import {
   type AuthToken,
   type Datasource,
@@ -34,7 +34,7 @@ import {
   type UserCtx,
   type WithRequired,
   type Workspace,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import jwt, { type Secret } from "jsonwebtoken"
 import supertest from "supertest"
 import { init as dbInit } from "../../db"

@@ -1,5 +1,5 @@
 <script>
-import { ContextTooltip, Multiselect } from "@budibase/bbui"
+import { ContextTooltip, Multiselect } from "@supertoolmake/bbui"
 import { params } from "@roxi/routify"
 import { debounce } from "lodash"
 import { createEventDispatcher } from "svelte"

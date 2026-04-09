@@ -1,5 +1,5 @@
-import { getManifest } from "@budibase/string-templates"
-import type { EditorModesMap, EnrichedBinding, Helper, Snippet } from "@budibase/types"
+import { getManifest } from "@supertoolmake/string-templates"
+import type { EditorModesMap, EnrichedBinding, Helper, Snippet } from "@supertoolmake/types"
 import type { CompletionContext } from "@codemirror/autocomplete"
 import type { EditorView } from "@codemirror/view"
 import { groupBy } from "lodash"

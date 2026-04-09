@@ -1,5 +1,5 @@
-import { utils } from "@budibase/shared-core"
-import { type LockOptions, LockType } from "@budibase/types"
+import { utils } from "@supertoolmake/shared-core"
+import { type LockOptions, LockType } from "@supertoolmake/types"
 import Redlock from "redlock"
 import * as context from "../context"
 import { Duration } from "../utils"

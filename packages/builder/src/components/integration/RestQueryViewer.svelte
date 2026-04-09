@@ -14,7 +14,7 @@ import {
   Table,
   Tabs,
   TextArea,
-} from "@budibase/bbui"
+} from "@supertoolmake/bbui"
 import { goto as gotoStore, params } from "@roxi/routify"
 import { cloneDeep } from "lodash/fp"
 import { onMount } from "svelte"

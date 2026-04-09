@@ -1,4 +1,4 @@
-import type { FieldSchema, FieldType, UICondition, UIRow } from "@budibase/types"
+import type { FieldSchema, FieldType, UICondition, UIRow } from "@supertoolmake/types"
 
 export type UIColumn = FieldSchema & {
   label: string

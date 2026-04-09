@@ -1,6 +1,6 @@
-import { Helpers } from "@budibase/bbui"
-import { makePropSafe as safe } from "@budibase/string-templates"
-import type { SearchFilterGroup, UISearchFilter, UITableResource } from "@budibase/types"
+import { Helpers } from "@supertoolmake/bbui"
+import { makePropSafe as safe } from "@supertoolmake/string-templates"
+import type { SearchFilterGroup, UISearchFilter, UITableResource } from "@supertoolmake/types"
 import cloneDeep from "lodash/cloneDeep"
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))

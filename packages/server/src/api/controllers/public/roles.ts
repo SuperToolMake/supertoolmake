@@ -1,4 +1,4 @@
-import type { UserCtx } from "@budibase/types"
+import type { UserCtx } from "@supertoolmake/types"
 import type { Next } from "koa"
 import { syncUsersAgainstWorkspaces } from "../../../sdk/workspace/workspaces/sync"
 import type {

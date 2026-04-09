@@ -1,5 +1,5 @@
 <script>
-import { Accordion } from "@budibase/bbui"
+import { Accordion } from "@supertoolmake/bbui"
 
 export let bold
 export let initialOpen

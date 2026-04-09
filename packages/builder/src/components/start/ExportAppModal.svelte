@@ -7,10 +7,10 @@ import {
   ModalContent,
   notifications,
   Toggle,
-} from "@budibase/bbui"
-import { downloadFile } from "@budibase/frontend-core"
-import { createValidationStore } from "@budibase/frontend-core/src/utils/validation/yup"
-import { sdk } from "@budibase/shared-core"
+} from "@supertoolmake/bbui"
+import { downloadFile } from "@supertoolmake/frontend-core"
+import { createValidationStore } from "@supertoolmake/frontend-core/src/utils/validation/yup"
+import { sdk } from "@supertoolmake/shared-core"
 
 export let appId: string
 export let published

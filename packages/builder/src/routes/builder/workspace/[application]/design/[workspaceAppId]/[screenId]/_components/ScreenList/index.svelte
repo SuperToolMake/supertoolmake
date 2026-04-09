@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Layout } from "@budibase/bbui"
-import type { Screen } from "@budibase/types"
+import { Layout } from "@supertoolmake/bbui"
+import type { Screen } from "@supertoolmake/types"
 import { params } from "@roxi/routify"
 import NavHeader from "@/components/common/NavHeader.svelte"
 import { getVerticalResizeActions } from "@/components/common/resizable"

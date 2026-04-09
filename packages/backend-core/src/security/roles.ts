@@ -1,4 +1,4 @@
-import { helpers, RoleColor } from "@budibase/shared-core"
+import { helpers, RoleColor } from "@supertoolmake/shared-core"
 import {
   BuiltinPermissionID,
   type Database,
@@ -6,7 +6,7 @@ import {
   type Role as RoleDoc,
   type RoleUIMetadata,
   type Screen,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { uniqBy } from "lodash"
 import cloneDeep from "lodash/fp/cloneDeep"
 import { getWorkspaceDB } from "../context"

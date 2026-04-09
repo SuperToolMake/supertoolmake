@@ -1,5 +1,5 @@
 <script>
-import { Body, BoldRenderer, CodeRenderer, Table } from "@budibase/bbui"
+import { Body, BoldRenderer, CodeRenderer, Table } from "@supertoolmake/bbui"
 import { goto } from "@roxi/routify"
 import { queries } from "@/stores/builder"
 

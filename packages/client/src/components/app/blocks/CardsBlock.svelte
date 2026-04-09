@@ -1,5 +1,5 @@
 <script>
-import { makePropSafe as safe } from "@budibase/string-templates"
+import { makePropSafe as safe } from "@supertoolmake/string-templates"
 import { getContext } from "svelte"
 import { get } from "svelte/store"
 import Block from "@/components/Block.svelte"

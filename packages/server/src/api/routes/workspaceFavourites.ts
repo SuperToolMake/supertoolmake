@@ -1,5 +1,5 @@
-import { middleware } from "@budibase/backend-core"
-import { WorkspaceResource } from "@budibase/types"
+import { middleware } from "@supertoolmake/backend-core"
+import { WorkspaceResource } from "@supertoolmake/types"
 import Joi from "joi"
 import * as controller from "../controllers/workspaceFavourites"
 import { builderRoutes } from "./endpointGroups"

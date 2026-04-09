@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Helpers, notifications } from "@budibase/bbui"
-import { processObjectSync } from "@budibase/string-templates"
+import { Helpers, notifications } from "@supertoolmake/bbui"
+import { processObjectSync } from "@supertoolmake/string-templates"
 import { onMount } from "svelte"
 import JSONViewer, { type JSONViewerClickEvent } from "@/components/common/JSONViewer.svelte"
 import { getBindableProperties } from "@/dataBinding"

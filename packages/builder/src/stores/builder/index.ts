@@ -33,7 +33,7 @@ import componentTreeNodesStore from "./componentTreeNodes"
 import { oauth2 } from "./oauth2"
 import { dataEnvironmentStore, dataAPI } from "./dataEnvironment"
 
-import type { FetchAppPackageResponse } from "@budibase/types"
+import type { FetchAppPackageResponse } from "@supertoolmake/types"
 import { selectedAppUrls } from "./appUrls"
 
 export {

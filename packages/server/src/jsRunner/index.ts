@@ -1,10 +1,10 @@
-import { context, logging } from "@budibase/backend-core"
+import { context, logging } from "@supertoolmake/backend-core"
 import {
   JsTimeoutError,
   setJSRunner,
   setOnErrorLog,
   setTestingBackendJS,
-} from "@budibase/string-templates"
+} from "@supertoolmake/string-templates"
 import { serializeError } from "serialize-error"
 import env from "../environment"
 import { IsolatedVM } from "./vm"

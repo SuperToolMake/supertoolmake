@@ -15,9 +15,9 @@ import {
   ProgressCircle,
   Select,
   Table,
-} from "@budibase/bbui"
-import { Constants, UserAvatar } from "@budibase/frontend-core"
-import { sdk } from "@budibase/shared-core"
+} from "@supertoolmake/bbui"
+import { Constants, UserAvatar } from "@supertoolmake/frontend-core"
+import { sdk } from "@supertoolmake/shared-core"
 import { goto as gotoStore } from "@roxi/routify"
 import { getContext, onMount } from "svelte"
 import { bb } from "@/stores/bb"

@@ -1,13 +1,13 @@
 <script lang="ts">
-import { Banner, Button, notifications } from "@budibase/bbui"
-import { Grid, gridClipboard } from "@budibase/frontend-core"
-import type { Store as GridStore } from "@budibase/frontend-core/src/components/grid/stores"
+import { Banner, Button, notifications } from "@supertoolmake/bbui"
+import { Grid, gridClipboard } from "@supertoolmake/frontend-core"
+import type { Store as GridStore } from "@supertoolmake/frontend-core/src/components/grid/stores"
 import {
   DataEnvironmentMode,
   type Datasource,
   type Table,
   type UIDatasource,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { getContext, onDestroy } from "svelte"
 import { productionAPI } from "@/api"
 import ProductionBlankState from "@/components/backend/DataTable/blankstates/ProductionBlankState.svelte"

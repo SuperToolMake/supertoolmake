@@ -1,5 +1,5 @@
 <script>
-import { Body, Heading, Icon, Input, Layout } from "@budibase/bbui"
+import { Body, Heading, Icon, Input, Layout } from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
 import { readableToRuntimeBinding, runtimeToReadableBinding } from "@/dataBinding"

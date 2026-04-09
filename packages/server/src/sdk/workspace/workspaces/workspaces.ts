@@ -1,5 +1,5 @@
-import { db, db as dbCore, users } from "@budibase/backend-core"
-import type { ContextUser, User, Workspace } from "@budibase/types"
+import { db, db as dbCore, users } from "@supertoolmake/backend-core"
+import type { ContextUser, User, Workspace } from "@supertoolmake/types"
 import { WorkspaceStatus } from "../../../db/utils"
 import { getLocksById } from "../../../utilities/redis"
 import sdk from "../.."

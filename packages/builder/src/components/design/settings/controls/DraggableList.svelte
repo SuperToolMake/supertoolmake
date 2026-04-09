@@ -1,5 +1,5 @@
 <script>
-import { Icon } from "@budibase/bbui"
+import { Icon } from "@supertoolmake/bbui"
 import { generate } from "shortid"
 import { createEventDispatcher, setContext } from "svelte"
 import { get, writable } from "svelte/store"

@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, notifications } from "@budibase/bbui"
+import { ActionButton, notifications } from "@supertoolmake/bbui"
 import Panel from "@/components/design/Panel.svelte"
 import { getBindableProperties, getComponentBindableProperties } from "@/dataBinding"
 import { capitalise } from "@/helpers"

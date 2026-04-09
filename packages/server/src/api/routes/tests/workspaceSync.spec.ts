@@ -1,4 +1,4 @@
-import { db as dbCore, roles } from "@budibase/backend-core"
+import { db as dbCore, roles } from "@supertoolmake/backend-core"
 import * as setup from "./utilities"
 
 describe("/api/applications/:appId/sync", () => {

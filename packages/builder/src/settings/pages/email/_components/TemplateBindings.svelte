@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Body, Detail } from "@budibase/bbui"
-import type { GlobalTemplateBinding } from "@budibase/types"
+import { Body, Detail } from "@supertoolmake/bbui"
+import type { GlobalTemplateBinding } from "@supertoolmake/types"
 
 export let bindings: GlobalTemplateBinding[] | undefined
 export let onBindingClick = (_: GlobalTemplateBinding) => {}

@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, Label } from "@budibase/bbui"
+import { ActionButton, Label } from "@supertoolmake/bbui"
 import { getContext } from "svelte"
 import DetailPopover from "@/components/common/DetailPopover.svelte"
 

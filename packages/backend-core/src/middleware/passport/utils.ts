@@ -1,4 +1,4 @@
-import type { ConfigType, GoogleInnerConfig } from "@budibase/types"
+import type { ConfigType, GoogleInnerConfig } from "@supertoolmake/types"
 import * as configs from "../../configs"
 import { getTenantId, isMultiTenant } from "../../context"
 

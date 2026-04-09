@@ -1,5 +1,5 @@
-jest.mock("@budibase/backend-core", () => {
-  const actual = jest.requireActual("@budibase/backend-core")
+jest.mock("@supertoolmake/backend-core", () => {
+  const actual = jest.requireActual("@supertoolmake/backend-core")
   return {
     ...actual,
     objectStore: {
@@ -40,7 +40,7 @@ jest.mock("../filesystem", () => ({
 }))
 
 import fs from "node:fs"
-import { context, objectStore } from "@budibase/backend-core"
+import { context, objectStore } from "@supertoolmake/backend-core"
 import { ObjectStoreBuckets } from "../../../constants"
 import env from "../../../environment"
 import { revertClientLibrary, shouldServeLocally, updateClientLibrary } from "../clientLibrary"

@@ -1,4 +1,4 @@
-import * as core from "@budibase/backend-core"
+import * as core from "@supertoolmake/backend-core"
 import env from "../environment"
 
 export function init() {

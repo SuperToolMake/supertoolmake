@@ -1,3 +1,3 @@
-import { utils } from "@budibase/backend-core"
+import { utils } from "@supertoolmake/backend-core"
 
 export const { getProxyDispatcher } = utils

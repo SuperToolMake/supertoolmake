@@ -1,6 +1,6 @@
 <script>
-import { Helpers } from "@budibase/bbui"
-import { Utils } from "@budibase/frontend-core"
+import { Helpers } from "@supertoolmake/bbui"
+import { Utils } from "@supertoolmake/frontend-core"
 import { cloneDeep, isEqual } from "lodash"
 import { createEventDispatcher, setContext } from "svelte"
 import { derived, writable } from "svelte/store"

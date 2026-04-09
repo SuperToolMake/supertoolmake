@@ -2,7 +2,7 @@ import type {
   ConfigChecklistResponse,
   GetEnvironmentResponse,
   SystemStatusResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { get } from "svelte/store"
 import { API } from "@/api"
 import { BudiStore } from "../BudiStore"

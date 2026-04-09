@@ -1,9 +1,9 @@
 <script>
-import { Heading, Helpers, notifications } from "@budibase/bbui"
+import { Heading, Helpers, notifications } from "@supertoolmake/bbui"
 import { Background, BackgroundVariant, SvelteFlow, useSvelteFlow } from "@xyflow/svelte"
 import { derived, writable } from "svelte/store"
 import "@xyflow/svelte/dist/style.css"
-import { derivedMemo } from "@budibase/frontend-core"
+import { derivedMemo } from "@supertoolmake/frontend-core"
 import { setContext, tick } from "svelte"
 import { Roles } from "@/constants/backend"
 import { getSequentialName } from "@/helpers/duplicate"

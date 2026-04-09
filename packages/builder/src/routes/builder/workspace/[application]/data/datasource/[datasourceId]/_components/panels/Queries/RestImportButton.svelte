@@ -1,5 +1,5 @@
 <script>
-import { Button, Modal } from "@budibase/bbui"
+import { Button, Modal } from "@supertoolmake/bbui"
 import ImportQueriesModal from "./RestImportQueriesModal.svelte"
 
 export let datasourceId

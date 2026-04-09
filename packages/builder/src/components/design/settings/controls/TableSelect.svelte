@@ -1,5 +1,5 @@
 <script>
-import { Popover, Select } from "@budibase/bbui"
+import { Popover, Select } from "@supertoolmake/bbui"
 import { createEventDispatcher, onMount } from "svelte"
 import { sortAndFormat } from "@/helpers/data/format"
 import { datasources as datasourceStore, tables as tableStore } from "@/stores/builder"

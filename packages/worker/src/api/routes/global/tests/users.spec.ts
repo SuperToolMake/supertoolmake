@@ -1,5 +1,5 @@
-import { tenancy } from "@budibase/backend-core"
-import type { InviteUsersResponse, OIDCUser, User } from "@budibase/types"
+import { tenancy } from "@supertoolmake/backend-core"
+import type { InviteUsersResponse, OIDCUser, User } from "@supertoolmake/types"
 import * as userSdk from "../../../../sdk/users"
 import { mocks, structures, TestConfiguration } from "../../../../tests"
 

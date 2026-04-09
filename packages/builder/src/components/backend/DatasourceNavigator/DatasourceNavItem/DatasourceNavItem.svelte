@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Icon } from "@budibase/bbui"
+import { Icon } from "@supertoolmake/bbui"
 import { goto as gotoStore, isActive, params } from "@roxi/routify"
 import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
 import UpdateDatasourceModal from "@/components/backend/DatasourceNavigator/modals/UpdateDatasourceModal.svelte"

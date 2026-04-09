@@ -1,5 +1,5 @@
-import { cache } from "@budibase/backend-core"
-import { generator } from "@budibase/backend-core/tests"
+import { cache } from "@supertoolmake/backend-core"
+import { generator } from "@supertoolmake/backend-core/tests"
 import {
   DocumentType,
   type InsertOAuth2ConfigRequest,
@@ -7,7 +7,7 @@ import {
   OAuth2CredentialsMethod,
   OAuth2GrantType,
   PASSWORD_REPLACEMENT,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import _ from "lodash/fp"
 import nock from "nock"
 import * as setup from "./utilities"

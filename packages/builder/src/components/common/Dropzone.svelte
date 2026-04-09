@@ -1,5 +1,5 @@
 <script>
-import { Dropzone, notifications } from "@budibase/bbui"
+import { Dropzone, notifications } from "@supertoolmake/bbui"
 import { API } from "@/api"
 import { admin } from "@/stores/portal"
 

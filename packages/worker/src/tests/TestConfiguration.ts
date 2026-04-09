@@ -14,7 +14,7 @@ import {
   sessions,
   users,
   utils,
-} from "@budibase/backend-core"
+} from "@supertoolmake/backend-core"
 import {
   type AuthToken,
   ConfigType,
@@ -23,7 +23,7 @@ import {
   type SMTPConfig,
   type SMTPInnerConfig,
   type User,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import jwt, { type Secret } from "jsonwebtoken"
 import supertest from "supertest"
 import { Config } from "../constants"

@@ -1,5 +1,5 @@
 <script>
-import { notifications } from "@budibase/bbui"
+import { notifications } from "@supertoolmake/bbui"
 import { goto as gotoStore } from "@roxi/routify"
 import { onMount } from "svelte"
 import { auth } from "@/stores/portal"

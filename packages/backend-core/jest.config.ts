@@ -8,8 +8,8 @@ const baseConfig: Config = {
     "^.+\\.ts?$": "@swc/jest",
   },
   moduleNameMapper: {
-    "@budibase/types": "<rootDir>/../types/src",
-    "@budibase/shared-core": ["<rootDir>/../shared-core/src"],
+    "@supertoolmake/types": "<rootDir>/../types/src",
+    "@supertoolmake/shared-core": ["<rootDir>/../shared-core/src"],
   },
 }
 

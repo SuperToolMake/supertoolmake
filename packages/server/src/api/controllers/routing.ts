@@ -1,10 +1,10 @@
-import { roles } from "@budibase/backend-core"
+import { roles } from "@supertoolmake/backend-core"
 import type {
   FetchClientScreenRoutingResponse,
   FetchScreenRoutingResponse,
   ScreenRoutingJson,
   UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { getRoutingInfo } from "../../utilities/routing"
 
 const URL_SEPARATOR = "/"

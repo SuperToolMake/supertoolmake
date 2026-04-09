@@ -1,4 +1,4 @@
-import type { APIClient } from "@budibase/frontend-core"
+import type { APIClient } from "@supertoolmake/frontend-core"
 import type {
   AppCustomTheme,
   AppNavigation,
@@ -9,7 +9,7 @@ import type {
   Table,
   Theme,
   UIComponentError,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { mount } from "svelte"
 import { get } from "svelte/store"
 import type { ActionTypes } from "@/constants"

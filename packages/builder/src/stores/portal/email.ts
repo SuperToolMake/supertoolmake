@@ -1,4 +1,4 @@
-import type { FetchGlobalTemplateDefinitionResponse, Template } from "@budibase/types"
+import type { FetchGlobalTemplateDefinitionResponse, Template } from "@supertoolmake/types"
 import { API } from "@/api"
 import { BudiStore } from "../BudiStore"
 

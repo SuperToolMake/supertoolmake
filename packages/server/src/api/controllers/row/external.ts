@@ -8,7 +8,7 @@ import {
   type Row,
   type Table,
   type UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { cloneDeep } from "lodash"
 import { breakExternalTableId, breakRowIdField } from "../../../integrations/utils"
 import sdk from "../../../sdk"

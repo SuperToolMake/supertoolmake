@@ -1,5 +1,5 @@
 <script>
-import { Checkbox, Label } from "@budibase/bbui"
+import { Checkbox, Label } from "@supertoolmake/bbui"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
 
 export let parameters

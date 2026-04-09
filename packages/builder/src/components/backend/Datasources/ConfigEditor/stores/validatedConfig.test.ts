@@ -1,4 +1,4 @@
-import { DatasourceFieldType, SourceName } from "@budibase/types"
+import { DatasourceFieldType, SourceName } from "@supertoolmake/types"
 import { get } from "svelte/store"
 import { describe, expect, it } from "vitest"
 import { createValidatedConfigStore } from "./validatedConfig"

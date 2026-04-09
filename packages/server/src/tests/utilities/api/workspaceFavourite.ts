@@ -4,7 +4,7 @@ import type {
   WithoutDocMetadata,
   WorkspaceFavourite,
   WorkspaceFavouriteResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { type Expectations, TestAPI } from "./base"
 
 export type CreateRequestRaw = Omit<WithoutDocMetadata<WorkspaceFavourite>, "createdBy">

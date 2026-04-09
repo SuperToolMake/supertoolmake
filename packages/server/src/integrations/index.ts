@@ -3,7 +3,7 @@ import {
   type Integration,
   type IntegrationBase,
   SourceName,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import cloneDeep from "lodash/cloneDeep"
 import firebase from "./firebase"
 import sqlServer from "./microsoftSqlServer"

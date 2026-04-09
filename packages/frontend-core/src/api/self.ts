@@ -5,7 +5,7 @@ import type {
   SelfResponse,
   UpdateSelfRequest,
   UpdateSelfResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface SelfEndpoints {

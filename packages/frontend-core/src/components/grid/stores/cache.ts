@@ -1,4 +1,4 @@
-import type { FindTableResponse } from "@budibase/types"
+import type { FindTableResponse } from "@supertoolmake/types"
 import type { Store as StoreContext } from "."
 
 interface CacheActionStore {

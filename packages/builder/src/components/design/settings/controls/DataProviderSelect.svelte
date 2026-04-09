@@ -1,6 +1,6 @@
 <script>
-import { Select } from "@budibase/bbui"
-import { makePropSafe } from "@budibase/string-templates"
+import { Select } from "@supertoolmake/bbui"
+import { makePropSafe } from "@supertoolmake/string-templates"
 import { findAllMatchingComponents } from "@/helpers/components"
 import { selectedScreen } from "@/stores/builder"
 

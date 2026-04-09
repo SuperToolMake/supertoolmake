@@ -1,5 +1,5 @@
 <script>
-import { Button, Helpers, Icon, Layout, notifications, Select } from "@budibase/bbui"
+import { Button, Helpers, Icon, Layout, notifications, Select } from "@supertoolmake/bbui"
 import { AppStatus } from "@/constants"
 import { appStore, workspaceAppStore } from "@/stores/builder"
 import { appsStore } from "@/stores/portal/apps"

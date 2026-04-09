@@ -1,4 +1,4 @@
-import type { JSONValue } from "@budibase/types"
+import type { JSONValue } from "@supertoolmake/types"
 
 export type ColorsOptions = {
   keyColor?: string

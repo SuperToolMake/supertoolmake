@@ -1,5 +1,5 @@
-import { generator, type testContainerUtils } from "@budibase/backend-core/tests"
-import { type Datasource, SourceName } from "@budibase/types"
+import { generator, type testContainerUtils } from "@supertoolmake/backend-core/tests"
+import { type Datasource, SourceName } from "@supertoolmake/types"
 import knex, { type Knex } from "knex"
 import { GenericContainer, Wait } from "testcontainers"
 import { startContainer } from "."

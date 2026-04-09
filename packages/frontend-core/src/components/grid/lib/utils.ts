@@ -1,4 +1,4 @@
-import { Helpers } from "@budibase/bbui"
+import { Helpers } from "@supertoolmake/bbui"
 import { CellIDSeparator, GeneratedIDPrefix } from "./constants"
 
 export const parseCellID = (cellId: string | null) => {

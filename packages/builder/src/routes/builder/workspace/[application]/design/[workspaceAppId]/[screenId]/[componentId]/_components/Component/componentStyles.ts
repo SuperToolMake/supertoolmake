@@ -1,4 +1,4 @@
-import { Input, Select } from "@budibase/bbui"
+import { Input, Select } from "@supertoolmake/bbui"
 import type { Component } from "svelte"
 import ColorPicker from "@/components/design/settings/controls/ColorPicker.svelte"
 

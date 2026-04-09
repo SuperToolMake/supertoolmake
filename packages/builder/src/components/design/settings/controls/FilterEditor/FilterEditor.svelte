@@ -1,7 +1,7 @@
 <script>
-import { ActionButton, Button, Drawer, DrawerContent, notifications } from "@budibase/bbui"
-import { search, Utils } from "@budibase/frontend-core"
-import { utils } from "@budibase/shared-core"
+import { ActionButton, Button, Drawer, DrawerContent, notifications } from "@supertoolmake/bbui"
+import { search, Utils } from "@supertoolmake/frontend-core"
+import { utils } from "@supertoolmake/shared-core"
 import { createEventDispatcher } from "svelte"
 import { getDatasourceForProvider, getSchemaForDatasource } from "@/dataBinding"
 import { selectedScreen, tables } from "@/stores/builder"

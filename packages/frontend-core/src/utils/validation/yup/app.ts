@@ -1,4 +1,4 @@
-import type { Workspace } from "@budibase/types"
+import type { Workspace } from "@supertoolmake/types"
 import { mixed, string } from "yup"
 import { APP_NAME_REGEX, APP_URL_REGEX } from "../../../constants"
 import type { ValidationStore } from "."

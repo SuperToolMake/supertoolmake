@@ -1,8 +1,8 @@
 <script>
-import { ActionButton, Icon, Input, notifications, Popover } from "@budibase/bbui"
-import { SchemaUtils } from "@budibase/frontend-core"
-import { helpers } from "@budibase/shared-core"
-import { FieldType } from "@budibase/types"
+import { ActionButton, Icon, Input, notifications, Popover } from "@supertoolmake/bbui"
+import { SchemaUtils } from "@supertoolmake/frontend-core"
+import { helpers } from "@supertoolmake/shared-core"
+import { FieldType } from "@supertoolmake/types"
 import { getContext } from "svelte"
 import ToggleActionButtonGroup from "@/components/common/ToggleActionButtonGroup.svelte"
 import { FieldPermissions } from "./GridColumnsSettingButton.svelte"

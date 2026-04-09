@@ -7,7 +7,7 @@ import {
   type SSOAuthDetails,
   type SSOProfile,
   SSOProviderType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import fetch from "node-fetch"
 import { validEmail } from "../../../utils"
 import { ssoCallbackUrl } from "../utils"

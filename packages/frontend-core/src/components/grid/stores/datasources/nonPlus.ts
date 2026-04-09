@@ -1,4 +1,4 @@
-import { SortOrder, type UIDatasource } from "@budibase/types"
+import { SortOrder, type UIDatasource } from "@supertoolmake/types"
 import { get } from "svelte/store"
 import type { Store as StoreContext } from ".."
 import type { DatasourceNonPlusActions } from "."

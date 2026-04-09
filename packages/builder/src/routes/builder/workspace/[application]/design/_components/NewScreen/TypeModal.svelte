@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Body, Layout, ModalContent } from "@budibase/bbui"
+import { Body, Layout, ModalContent } from "@supertoolmake/bbui"
 
 type SelectableType = {
   id: string

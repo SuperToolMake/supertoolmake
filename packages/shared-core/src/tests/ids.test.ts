@@ -1,4 +1,4 @@
-import { DocumentType } from "@budibase/types"
+import { DocumentType } from "@supertoolmake/types"
 import {
   isDatasourceOrDatasourcePlusId,
   isQueryId,

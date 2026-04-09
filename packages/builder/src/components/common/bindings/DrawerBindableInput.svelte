@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Button, Drawer, Icon, Input, TextArea } from "@budibase/bbui"
-import { isJSBinding } from "@budibase/string-templates"
+import { Button, Drawer, Icon, Input, TextArea } from "@supertoolmake/bbui"
+import { isJSBinding } from "@supertoolmake/string-templates"
 import { createEventDispatcher, setContext } from "svelte"
 import type { HTMLInputTypeAttribute } from "svelte/elements"
 import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"

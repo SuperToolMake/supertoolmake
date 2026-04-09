@@ -7,7 +7,7 @@ import type {
   Row,
   SaveRowRequest,
   SaveRowResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface RowEndpoints {

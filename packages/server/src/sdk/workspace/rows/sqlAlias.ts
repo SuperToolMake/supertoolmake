@@ -1,4 +1,4 @@
-import { dataFilters } from "@budibase/shared-core"
+import { dataFilters } from "@supertoolmake/shared-core"
 import {
   type Datasource,
   type DatasourcePlusQueryResponse,
@@ -8,7 +8,7 @@ import {
   type SearchFilters,
   SqlClient,
   type Table,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { cloneDeep } from "lodash"
 import { getSQLClient } from "./utils"
 

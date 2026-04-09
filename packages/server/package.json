@@ -1,9 +1,9 @@
 {
-  "name": "@budibase/server",
+  "name": "@supertoolmake/server",
   "private": true,
   "email": "hi@budibase.com",
   "version": "0.0.0",
-  "description": "Budibase Web Server",
+  "description": "SuperToolMake Web Server",
   "main": "src/index.ts",
   "repository": {
     "type": "git",
@@ -44,12 +44,12 @@
     "@aws-sdk/client-s3": "3.1017.0",
     "@aws-sdk/s3-request-presigner": "3.1017.0",
     "@azure/msal-node": "3.8.10",
-    "@budibase/backend-core": "*",
-    "@budibase/client": "*",
-    "@budibase/frontend-core": "*",
-    "@budibase/shared-core": "*",
-    "@budibase/string-templates": "*",
-    "@budibase/types": "*",
+    "@supertoolmake/backend-core": "*",
+    "@supertoolmake/client": "*",
+    "@supertoolmake/frontend-core": "*",
+    "@supertoolmake/shared-core": "*",
+    "@supertoolmake/string-templates": "*",
+    "@supertoolmake/types": "*",
     "@google-cloud/firestore": "7.8.0",
     "@koa/cors": "5.0.0",
     "@koa/router": "13.1.0",
@@ -164,7 +164,7 @@
           {
             "comment": "Required for pro usage when submodule not loaded",
             "projects": [
-              "@budibase/backend-core"
+              "@supertoolmake/backend-core"
             ],
             "target": "build:oss"
           }
@@ -188,8 +188,8 @@
         "dependsOn": [
           {
             "projects": [
-              "@budibase/client",
-              "@budibase/builder"
+              "@supertoolmake/client",
+              "@supertoolmake/builder"
             ],
             "target": "build"
           }

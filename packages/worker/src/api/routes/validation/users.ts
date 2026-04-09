@@ -1,4 +1,4 @@
-import { auth } from "@budibase/backend-core"
+import { auth } from "@supertoolmake/backend-core"
 import Joi from "joi"
 
 const OPTIONAL_STRING = Joi.string().allow(null, "")

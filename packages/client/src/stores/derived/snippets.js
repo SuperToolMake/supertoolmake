@@ -1,4 +1,4 @@
-import { derivedMemo } from "@budibase/frontend-core"
+import { derivedMemo } from "@supertoolmake/frontend-core"
 import { appStore } from "../app"
 import { builderStore } from "../builder"
 

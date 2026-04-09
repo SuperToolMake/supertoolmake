@@ -1,5 +1,5 @@
 <script>
-import { ActionButton } from "@budibase/bbui"
+import { ActionButton } from "@supertoolmake/bbui"
 import { createEventDispatcher, tick } from "svelte"
 import { bb } from "@/stores/bb"
 

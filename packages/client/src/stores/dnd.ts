@@ -1,5 +1,5 @@
-import { derivedMemo } from "@budibase/frontend-core"
-import type { ComponentDefinition } from "@budibase/types"
+import { derivedMemo } from "@supertoolmake/frontend-core"
+import type { ComponentDefinition } from "@supertoolmake/types"
 import { get, writable } from "svelte/store"
 import { ScreenslotID } from "@/constants"
 import { componentStore, isGridScreen, screenStore } from "@/stores"

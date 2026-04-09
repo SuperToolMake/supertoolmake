@@ -1,5 +1,5 @@
-import { sql } from "@budibase/backend-core"
-import { FieldType } from "@budibase/types"
+import { sql } from "@supertoolmake/backend-core"
+import { FieldType } from "@supertoolmake/types"
 
 const parseArrayString = (value: string | unknown) => {
   if (typeof value === "string") {

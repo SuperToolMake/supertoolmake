@@ -1,4 +1,4 @@
-import type { Screen } from "@budibase/types"
+import type { Screen } from "@supertoolmake/types"
 import sdk from "../.."
 
 export async function ensureHomepageUniqueness(screen: Screen) {

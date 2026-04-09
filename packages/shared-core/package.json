@@ -1,5 +1,5 @@
 {
-  "name": "@budibase/shared-core",
+  "name": "@supertoolmake/shared-core",
   "private": true,
   "version": "0.0.0",
   "description": "Shared data utils",
@@ -18,7 +18,7 @@
     "test:watch": "yarn test --watchAll"
   },
   "dependencies": {
-    "@budibase/types": "*"
+    "@supertoolmake/types": "*"
   },
   "devDependencies": {
     "rimraf": "3.0.2"
@@ -29,7 +29,7 @@
         "dependsOn": [
           {
             "projects": [
-              "@budibase/types"
+              "@supertoolmake/types"
             ],
             "target": "build"
           }

@@ -1,4 +1,4 @@
-import type { SearchWorkspaceBackupsRequest } from "@budibase/types"
+import type { SearchWorkspaceBackupsRequest } from "@supertoolmake/types"
 import { API } from "@/api"
 import { BudiStore } from "../BudiStore"
 

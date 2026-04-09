@@ -1,4 +1,4 @@
-import type { Document } from "@budibase/types"
+import type { Document } from "@supertoolmake/types"
 import * as jsonpatch from "fast-json-patch"
 import { derived, get, type Readable, writable } from "svelte/store"
 

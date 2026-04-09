@@ -1,9 +1,9 @@
 /**
  * Operator options for lucene queries
  */
-export { OperatorOptions, SqlNumberTypeRangeMap } from "@budibase/shared-core"
+export { OperatorOptions, SqlNumberTypeRangeMap } from "@supertoolmake/shared-core"
 
-import { BBReferenceFieldSubType, FieldType } from "@budibase/types"
+import { BBReferenceFieldSubType, FieldType } from "@supertoolmake/types"
 
 export const BannedSearchTypes = [FieldType.LINK, FieldType.JSON, "jsonarray", "queryarray"]
 
@@ -86,7 +86,7 @@ export const EventPublishType = {
   ENV_VAR_UPGRADE_PANEL_OPENED: "environment_variable_upgrade_panel_opened",
 }
 
-export { ComponentContextScopes as ContextScopes } from "@budibase/types"
+export { ComponentContextScopes as ContextScopes } from "@supertoolmake/types"
 
 export const TypeIconMap = {
   [FieldType.STRING]: "text-align-left",

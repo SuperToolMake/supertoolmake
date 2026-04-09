@@ -1,4 +1,4 @@
-import { Constants } from "@budibase/frontend-core"
+import { Constants } from "@supertoolmake/frontend-core"
 import {
   AutoFieldSubType,
   BBReferenceFieldSubType,
@@ -6,14 +6,14 @@ import {
   Hosting,
   INTERNAL_TABLE_SOURCE_ID,
   type UIField,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 
 const { TypeIconMap } = Constants
 
 export {
   RelationshipType,
   RowExportFormat as ROW_EXPORT_FORMATS,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 
 export const AUTO_COLUMN_SUB_TYPES = AutoFieldSubType
 

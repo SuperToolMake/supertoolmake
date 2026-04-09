@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Utils } from "@budibase/frontend-core"
-import type { TableSchema, UITableResource } from "@budibase/types"
+import { Utils } from "@supertoolmake/frontend-core"
+import type { TableSchema, UITableResource } from "@supertoolmake/types"
 import { getContext } from "svelte"
 import { get } from "svelte/store"
 import FormBlockWrapper from "./FormBlockWrapper.svelte"

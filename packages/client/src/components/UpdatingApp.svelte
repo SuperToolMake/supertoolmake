@@ -1,6 +1,6 @@
 <script>
-import { Updating } from "@budibase/frontend-core"
-import { getThemeClassNames } from "@budibase/shared-core"
+import { Updating } from "@supertoolmake/frontend-core"
+import { getThemeClassNames } from "@supertoolmake/shared-core"
 import { onMount } from "svelte"
 import { themeStore } from "@/stores"
 import { API } from "../api"

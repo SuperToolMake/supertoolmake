@@ -1,5 +1,5 @@
-import { HTTPError } from "@budibase/backend-core"
-import { PROTECTED_EXTERNAL_COLUMNS, utils } from "@budibase/shared-core"
+import { HTTPError } from "@supertoolmake/backend-core"
+import { PROTECTED_EXTERNAL_COLUMNS, utils } from "@supertoolmake/shared-core"
 import {
   IncludeRelationship,
   Operation,
@@ -11,7 +11,7 @@ import {
   type SortJson,
   SortOrder,
   type Table,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import pick from "lodash/pick"
 import { handleRequest } from "../../../../api/controllers/row/external"
 import * as exporters from "../../../../api/controllers/table/exporters"

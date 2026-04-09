@@ -1,5 +1,5 @@
-import { generator } from "@budibase/backend-core/tests"
-import type { User } from "@budibase/types"
+import { generator } from "@supertoolmake/backend-core/tests"
+import type { User } from "@supertoolmake/types"
 import nock from "nock"
 import type supertest from "supertest"
 import environment from "../../../../environment"

@@ -10,7 +10,7 @@ import type {
   SaveConfigRequest,
   SaveConfigResponse,
   UploadConfigFileResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface ConfigEndpoints {

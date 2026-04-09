@@ -1,5 +1,5 @@
 <script>
-import { ActionButton } from "@budibase/bbui"
+import { ActionButton } from "@supertoolmake/bbui"
 import { getHorizontalResizeActions } from "@/components/common/resizable"
 import BindingsPanel from "./BindingsPanel.svelte"
 import ComponentKeyHandler from "./ComponentKeyHandler.svelte"

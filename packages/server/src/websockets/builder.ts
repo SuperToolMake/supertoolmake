@@ -1,6 +1,6 @@
 import type http from "node:http"
-import { permissions } from "@budibase/backend-core"
-import { BuilderSocketEvent } from "@budibase/shared-core"
+import { permissions } from "@supertoolmake/backend-core"
+import { BuilderSocketEvent } from "@supertoolmake/shared-core"
 import type {
   ContextUser,
   Ctx,
@@ -11,7 +11,7 @@ import type {
   Table,
   Workspace,
   WorkspaceApp,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type Koa from "koa"
 import type { Socket } from "socket.io"
 import { authorizedMiddleware as authorized } from "../middleware/authorized"

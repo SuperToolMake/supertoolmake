@@ -1,5 +1,5 @@
-import { Helpers } from "@budibase/bbui"
-import { RoleUtils, Utils } from "@budibase/frontend-core"
+import { Helpers } from "@supertoolmake/bbui"
+import { RoleUtils, Utils } from "@supertoolmake/frontend-core"
 import {
   type Component,
   type ComponentDefinition,
@@ -10,7 +10,7 @@ import {
   type Screen,
   ScreenVariant,
   type WithRequired,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { cloneDeep } from "lodash/fp"
 import { derived, get } from "svelte/store"
 import { API } from "@/api"

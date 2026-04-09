@@ -3,7 +3,7 @@ import type {
   ConfigTypeToConfig,
   SaveConfigRequest,
   SaveConfigResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { TestAPI } from "./base"
 
 export class ConfigAPI extends TestAPI {

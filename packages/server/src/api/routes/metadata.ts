@@ -1,4 +1,4 @@
-import { permissions } from "@budibase/backend-core"
+import { permissions } from "@supertoolmake/backend-core"
 import { AppType, middleware as appInfoMiddleware } from "../../middleware/appInfo"
 import { authorizedMiddleware as authorized } from "../../middleware/authorized"
 import * as controller from "../controllers/metadata"

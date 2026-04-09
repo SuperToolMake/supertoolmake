@@ -3,7 +3,7 @@ import {
   resolveWorkspaceTranslations,
   type TranslationCategory,
   type TranslationOverrides,
-} from "@budibase/shared-core"
+} from "@supertoolmake/shared-core"
 import { getContext } from "svelte"
 import { get, type Readable } from "svelte/store"
 

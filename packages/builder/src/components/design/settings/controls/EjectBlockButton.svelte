@@ -1,5 +1,5 @@
 <script>
-import { ActionButton } from "@budibase/bbui"
+import { ActionButton } from "@supertoolmake/bbui"
 
 const eject = () => {
   document.dispatchEvent(new KeyboardEvent("keydown", { key: "e", ctrlKey: true }))

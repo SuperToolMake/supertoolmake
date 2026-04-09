@@ -1,4 +1,4 @@
-import type { ActivationRequest, LockRequest } from "@budibase/types"
+import type { ActivationRequest, LockRequest } from "@supertoolmake/types"
 import type TestConfiguration from "../TestConfiguration"
 import { TestAPI, type TestAPIOpts } from "./base"
 

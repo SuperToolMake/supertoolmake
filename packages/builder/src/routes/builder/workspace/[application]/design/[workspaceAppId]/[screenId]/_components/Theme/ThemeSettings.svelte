@@ -8,7 +8,7 @@ import {
   Layout,
   notifications,
   PopoverAlignment,
-} from "@budibase/bbui"
+} from "@supertoolmake/bbui"
 import DetailPopover from "@/components/common/DetailPopover.svelte"
 import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
 import { DefaultAppTheme } from "@/constants"

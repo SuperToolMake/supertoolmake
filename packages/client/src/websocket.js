@@ -1,4 +1,4 @@
-import { createWebsocket } from "@budibase/frontend-core"
+import { createWebsocket } from "@supertoolmake/frontend-core"
 import { get } from "svelte/store"
 import { builderStore, environmentStore } from "@/stores"
 

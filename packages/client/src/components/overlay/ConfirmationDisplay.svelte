@@ -1,5 +1,5 @@
 <script>
-import { Modal, ModalContent } from "@budibase/bbui"
+import { Modal, ModalContent } from "@supertoolmake/bbui"
 import { confirmationStore } from "@/stores"
 </script>
 

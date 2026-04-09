@@ -1,5 +1,5 @@
 <script>
-import { Body, Label, Layout } from "@budibase/bbui"
+import { Body, Label, Layout } from "@supertoolmake/bbui"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
 
 export let parameters

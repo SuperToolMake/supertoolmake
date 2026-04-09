@@ -1,5 +1,5 @@
-import { constants } from "@budibase/backend-core"
-import { EmailTemplatePurpose } from "@budibase/types"
+import { constants } from "@supertoolmake/backend-core"
+import { EmailTemplatePurpose } from "@supertoolmake/types"
 
 export const LOGO_URL =
   "https://avatars.githubusercontent.com/u/252235214?s=400&u=7ebfd7c321d8e7d9b2752a83a9ffb828a89e9e45&v=4"

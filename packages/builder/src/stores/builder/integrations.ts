@@ -1,4 +1,4 @@
-import type { Datasource, Integration, SourceName } from "@budibase/types"
+import type { Datasource, Integration, SourceName } from "@supertoolmake/types"
 import { get, type Writable, writable } from "svelte/store"
 import { API } from "@/api"
 import { integrationForDatasource } from "@/stores/selectors"

@@ -1,5 +1,5 @@
 <script>
-import { shouldDisplaySetting, Utils } from "@budibase/frontend-core"
+import { shouldDisplaySetting, Utils } from "@supertoolmake/frontend-core"
 import { getContext, onDestroy, onMount } from "svelte"
 import { builderStore, componentStore, dndIsDragging } from "@/stores"
 import { Devices, GridParams, getGridVar } from "@/utils/grid"

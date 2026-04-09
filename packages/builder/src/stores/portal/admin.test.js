@@ -29,7 +29,7 @@ vi.mock("@/api", () => {
   }
 })
 
-vi.mock("@budibase/bbui", () => {
+vi.mock("@supertoolmake/bbui", () => {
   return {
     banner: { showStatus: vi.fn() },
     Helpers: {

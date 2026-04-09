@@ -14,13 +14,13 @@ const baseConfig: Config = {
   },
   transformIgnorePatterns: ["/node_modules/(?!svelte/|esm-env/|devalue/).*"],
   moduleNameMapper: {
-    "@budibase/backend-core/(.*)": "<rootDir>/../backend-core/$1",
-    "@budibase/shared-core/(.*)": "<rootDir>/../shared-core/$1",
-    "@budibase/backend-core": "<rootDir>/../backend-core/src",
-    "@budibase/shared-core": "<rootDir>/../shared-core/src",
-    "@budibase/types": "<rootDir>/../types/src",
-    "@budibase/string-templates/(.*)": ["<rootDir>/../string-templates/$1"],
-    "@budibase/string-templates": ["<rootDir>/../string-templates/src"],
+    "@supertoolmake/backend-core/(.*)": "<rootDir>/../backend-core/$1",
+    "@supertoolmake/shared-core/(.*)": "<rootDir>/../shared-core/$1",
+    "@supertoolmake/backend-core": "<rootDir>/../backend-core/src",
+    "@supertoolmake/shared-core": "<rootDir>/../shared-core/src",
+    "@supertoolmake/types": "<rootDir>/../types/src",
+    "@supertoolmake/string-templates/(.*)": ["<rootDir>/../string-templates/$1"],
+    "@supertoolmake/string-templates": ["<rootDir>/../string-templates/src"],
   },
 }
 

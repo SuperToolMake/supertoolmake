@@ -1,5 +1,5 @@
-import { Helpers } from "@budibase/bbui"
-import { FieldType, type Row, type UIRow } from "@budibase/types"
+import { Helpers } from "@supertoolmake/bbui"
+import { FieldType, type Row, type UIRow } from "@supertoolmake/types"
 import { tick } from "svelte"
 import { derived, get, type Readable, type Writable, writable } from "svelte/store"
 import { type DataFetch, type DataFetchDefinition, fetchData } from "../../../fetch"

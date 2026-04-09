@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Utils } from "@budibase/frontend-core"
-import type { Component } from "@budibase/types"
-import { DropPosition } from "@budibase/types"
+import { Utils } from "@supertoolmake/frontend-core"
+import type { Component } from "@supertoolmake/types"
+import { DropPosition } from "@supertoolmake/types"
 import { onDestroy, onMount } from "svelte"
 import { get } from "svelte/store"
 import { DNDPlaceholderID } from "@/constants"

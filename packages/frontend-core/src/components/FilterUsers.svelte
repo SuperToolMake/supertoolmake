@@ -1,6 +1,6 @@
 <script>
-import { Multiselect, Select } from "@budibase/bbui"
-import { fetchData, loadTranslationsByGroup } from "@budibase/frontend-core"
+import { Multiselect, Select } from "@supertoolmake/bbui"
+import { fetchData, loadTranslationsByGroup } from "@supertoolmake/frontend-core"
 import { createAPIClient } from "../api"
 
 export let API = createAPIClient()

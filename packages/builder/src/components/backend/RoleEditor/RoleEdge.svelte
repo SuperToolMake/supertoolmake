@@ -1,5 +1,5 @@
 <script>
-import { Icon, TooltipPosition } from "@budibase/bbui"
+import { Icon, TooltipPosition } from "@supertoolmake/bbui"
 import { BaseEdge, EdgeLabelRenderer, getBezierPath } from "@xyflow/svelte"
 import { getContext, onMount } from "svelte"
 import { roles } from "@/stores/builder"

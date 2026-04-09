@@ -1,5 +1,5 @@
-import { context, roles } from "@budibase/backend-core"
-import { sdk as sharedSdk } from "@budibase/shared-core"
+import { context, roles } from "@supertoolmake/backend-core"
+import { sdk as sharedSdk } from "@supertoolmake/shared-core"
 import type {
   DeleteScreenResponse,
   FetchScreenResponse,
@@ -9,7 +9,7 @@ import type {
   ScreenUsage,
   UsageInScreensResponse,
   UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import sdk from "../../sdk"
 import { builderSocket } from "../../websockets"
 

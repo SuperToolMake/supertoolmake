@@ -1,6 +1,6 @@
 <script>
-import { Button, Combobox, Drawer, Icon } from "@budibase/bbui"
-import { isJSBinding } from "@budibase/string-templates"
+import { Button, Combobox, Drawer, Icon } from "@supertoolmake/bbui"
+import { isJSBinding } from "@supertoolmake/string-templates"
 import { createEventDispatcher, setContext } from "svelte"
 import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
 import { readableToRuntimeBinding, runtimeToReadableBinding } from "@/dataBinding"

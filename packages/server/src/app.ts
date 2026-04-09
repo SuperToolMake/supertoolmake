@@ -2,8 +2,8 @@ import * as db from "./db"
 
 db.init()
 
-import { env as coreEnv } from "@budibase/backend-core"
-import { ServiceType } from "@budibase/types"
+import { env as coreEnv } from "@supertoolmake/backend-core"
+import { ServiceType } from "@supertoolmake/types"
 
 coreEnv._set("SERVICE_TYPE", ServiceType.APPS)
 

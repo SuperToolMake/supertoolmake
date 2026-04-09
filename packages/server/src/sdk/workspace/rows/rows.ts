@@ -1,5 +1,5 @@
-import { context, db as dbCore } from "@budibase/backend-core"
-import type { Database, Row } from "@budibase/types"
+import { context, db as dbCore } from "@supertoolmake/backend-core"
+import type { Database, Row } from "@supertoolmake/types"
 import { getRowParams } from "../../../db/utils"
 import * as external from "./external"
 

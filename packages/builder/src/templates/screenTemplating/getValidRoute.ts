@@ -1,4 +1,4 @@
-import type { Screen } from "@budibase/types"
+import type { Screen } from "@supertoolmake/types"
 import sanitizeUrl from "@/helpers/sanitizeUrl"
 
 const arbitraryMax = 10000

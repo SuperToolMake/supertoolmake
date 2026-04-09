@@ -1,6 +1,6 @@
 <script>
-import { Combobox } from "@budibase/bbui"
-import { isJSBinding } from "@budibase/string-templates"
+import { Combobox } from "@supertoolmake/bbui"
+import { isJSBinding } from "@supertoolmake/string-templates"
 import { createEventDispatcher } from "svelte"
 import { readableToRuntimeBinding, runtimeToReadableBinding } from "@/dataBinding"
 

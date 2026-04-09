@@ -1,6 +1,6 @@
 <script>
-import { Context, Detail, Icon, Input, ModalContent, notifications } from "@budibase/bbui"
-import { BUILDER_URLS, ThemeOptions } from "@budibase/shared-core"
+import { Context, Detail, Icon, Input, ModalContent, notifications } from "@supertoolmake/bbui"
+import { BUILDER_URLS, ThemeOptions } from "@supertoolmake/shared-core"
 import { goto, isActive, params } from "@roxi/routify"
 import { getContext } from "svelte"
 import { API } from "@/api"

@@ -4,7 +4,7 @@ import type {
   PlatformUserById,
   PlatformUserBySsoId,
   User,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { DEFAULT_TENANT_ID } from "../constants"
 import env from "../environment"
 import { getPlatformDB } from "./platformDb"

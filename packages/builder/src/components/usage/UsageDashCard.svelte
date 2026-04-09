@@ -1,5 +1,5 @@
 <script>
-import { Body, Button, Detail, Heading, Layout, TooltipWrapper } from "@budibase/bbui"
+import { Body, Button, Detail, Heading, Layout, TooltipWrapper } from "@supertoolmake/bbui"
 
 export let description = ""
 export let title = ""

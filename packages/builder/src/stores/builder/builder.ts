@@ -1,5 +1,5 @@
-import { BuilderSocketEvent } from "@budibase/shared-core"
-import type { Workspace } from "@budibase/types"
+import { BuilderSocketEvent } from "@supertoolmake/shared-core"
+import type { Workspace } from "@supertoolmake/types"
 import type { Socket } from "socket.io-client"
 import { get } from "svelte/store"
 import { BudiStore } from "../BudiStore.js"

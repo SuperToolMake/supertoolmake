@@ -1,5 +1,5 @@
 import type { URL } from "node:url"
-import { ValidQueryNameRegex } from "@budibase/shared-core"
+import { ValidQueryNameRegex } from "@supertoolmake/shared-core"
 import {
   BodyType,
   type ImportEndpoint,
@@ -7,7 +7,7 @@ import {
   type QueryParameter,
   type QueryVerb,
   type RestTemplateQueryMetadata,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { buildKeyValueRequestBody, serialiseRequestBody } from "../utils/requestBody"
 
 export interface ImportInfo {

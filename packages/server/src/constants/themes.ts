@@ -1,5 +1,5 @@
-import { ensureValidTheme } from "@budibase/shared-core"
-import { Theme } from "@budibase/types"
+import { ensureValidTheme } from "@supertoolmake/shared-core"
+import { Theme } from "@supertoolmake/types"
 
 export const getThemeVariables = (theme: Theme | undefined) => {
   theme = ensureValidTheme(theme, Theme.LIGHT)

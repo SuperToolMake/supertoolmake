@@ -1,5 +1,5 @@
 <script>
-import { ColorPicker } from "@budibase/bbui"
+import { ColorPicker } from "@supertoolmake/bbui"
 import { builderStore } from "@/stores"
 
 export let prop

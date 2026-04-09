@@ -1,4 +1,4 @@
-import type { Ctx, UserCtx } from "@budibase/types"
+import type { Ctx, UserCtx } from "@supertoolmake/types"
 import type Router from "@koa/router"
 import type { Next } from "koa"
 

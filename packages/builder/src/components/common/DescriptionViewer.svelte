@@ -1,7 +1,7 @@
 <script lang="ts">
 import { onMount } from "svelte"
 import "@spectrum-css/link/dist/index-vars.css"
-import { MarkdownViewer } from "@budibase/bbui"
+import { MarkdownViewer } from "@supertoolmake/bbui"
 
 const COLLAPSED_HEIGHT_EM = 5
 

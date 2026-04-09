@@ -4,11 +4,11 @@ import {
   type Permission,
   PermissionLevel,
   PermissionType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import flatten from "lodash/flatten"
 import cloneDeep from "lodash/fp/cloneDeep"
 
-export { PermissionLevel, PermissionType } from "@budibase/types"
+export { PermissionLevel, PermissionType } from "@supertoolmake/types"
 
 export type RoleHierarchy = {
   permissionId: string

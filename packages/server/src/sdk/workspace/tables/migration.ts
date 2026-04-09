@@ -1,5 +1,5 @@
-import { BadRequestError, context, db as dbCore } from "@budibase/backend-core"
-import { isInternalColumnName } from "@budibase/shared-core"
+import { BadRequestError, context, db as dbCore } from "@supertoolmake/backend-core"
+import { isInternalColumnName } from "@supertoolmake/shared-core"
 import {
   type BBReferenceFieldMetadata,
   BBReferenceFieldSubType,
@@ -14,7 +14,7 @@ import {
   RelationshipType,
   type Row,
   type Table,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { isExternalTableID } from "../../../integrations/utils"
 import sdk from "../.."
 

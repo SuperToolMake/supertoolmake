@@ -1,5 +1,5 @@
-import { cache, context, sessions, utils } from "@budibase/backend-core"
-import { generator, structures } from "@budibase/backend-core/tests"
+import { cache, context, sessions, utils } from "@supertoolmake/backend-core"
+import { generator, structures } from "@supertoolmake/backend-core/tests"
 import { TestConfiguration } from "../../../tests"
 import { loginUser, resetUpdate } from "../auth"
 

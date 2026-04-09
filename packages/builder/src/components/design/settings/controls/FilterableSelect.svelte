@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Select } from "@budibase/bbui"
-import { makePropSafe as safe } from "@budibase/string-templates"
-import type { Component } from "@budibase/types"
+import { Select } from "@supertoolmake/bbui"
+import { makePropSafe as safe } from "@supertoolmake/string-templates"
+import type { Component } from "@supertoolmake/types"
 import { findAllComponents, getComponentContexts } from "@/helpers/components"
 import { selectedScreen } from "@/stores/builder"
 

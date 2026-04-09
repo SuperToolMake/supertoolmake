@@ -1,4 +1,4 @@
-import type { JSONArrayFieldDatasource } from "@budibase/types"
+import type { JSONArrayFieldDatasource } from "@supertoolmake/types"
 import { getJSONArrayDatasourceSchema } from "../utils/json"
 import FieldFetch from "./FieldFetch"
 

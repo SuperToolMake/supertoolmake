@@ -1,4 +1,4 @@
-import type { Workspace } from "@budibase/types"
+import type { Workspace } from "@supertoolmake/types"
 
 export type AppTemplate =
   | {

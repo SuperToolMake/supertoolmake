@@ -1,5 +1,5 @@
 <script>
-import { Button, Label } from "@budibase/bbui"
+import { Button, Label } from "@supertoolmake/bbui"
 import KeyValueBuilder from "@/components/integration/KeyValueBuilder.svelte"
 
 export let name

@@ -25,7 +25,7 @@ export const EditorModes = {
 </script>
 
 <script>
-  import { Label } from "@budibase/bbui"
+  import { Label } from "@supertoolmake/bbui"
   import CodeMirror from "@/components/integration/codemirror"
   import { themeStore } from "@/stores/portal"
   import { createEventDispatcher, onMount } from "svelte"

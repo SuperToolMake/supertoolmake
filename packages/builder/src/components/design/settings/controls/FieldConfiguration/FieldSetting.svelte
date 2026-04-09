@@ -1,6 +1,6 @@
 <script>
-import { Icon, Toggle } from "@budibase/bbui"
-import { isJSBinding } from "@budibase/string-templates"
+import { Icon, Toggle } from "@supertoolmake/bbui"
+import { isJSBinding } from "@supertoolmake/string-templates"
 import { cloneDeep } from "lodash/fp"
 import { createEventDispatcher } from "svelte"
 import { runtimeToReadableBinding } from "@/dataBinding"

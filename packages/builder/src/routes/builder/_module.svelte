@@ -1,13 +1,13 @@
 <script>
-import { Body, Button, Heading, Layout, Modal, notifications } from "@budibase/bbui"
+import { Body, Button, Heading, Layout, Modal, notifications } from "@supertoolmake/bbui"
 import {
   Constants,
   CookieUtils,
   derivedMemo,
   invalidationMessage,
   popNumSessionsInvalidated,
-} from "@budibase/frontend-core"
-import { sdk } from "@budibase/shared-core"
+} from "@supertoolmake/frontend-core"
+import { sdk } from "@supertoolmake/shared-core"
 import { goto as gotoStore, isActive } from "@roxi/routify"
 import { onMount } from "svelte"
 import { writable } from "svelte/store"

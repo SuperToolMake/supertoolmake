@@ -1,14 +1,14 @@
 import fs from "node:fs"
 import path, { join } from "node:path"
-import { objectStore } from "@budibase/backend-core"
-import { sdk, utils } from "@budibase/shared-core"
+import { objectStore } from "@supertoolmake/backend-core"
+import { sdk, utils } from "@supertoolmake/shared-core"
 import { ObjectStoreBuckets } from "../../constants"
 import env from "../../environment"
 import { resolve } from "../centralPath"
 import { TOP_LEVEL_PATH } from "./filesystem"
 
 export function devClientLibPath() {
-  return require.resolve("@budibase/client")
+  return require.resolve("@supertoolmake/client")
 }
 
 /**

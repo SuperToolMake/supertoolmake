@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Label, Select } from "@budibase/bbui"
-import type { EnrichedBinding } from "@budibase/types"
+import { Label, Select } from "@supertoolmake/bbui"
+import type { EnrichedBinding } from "@supertoolmake/types"
 import { onMount } from "svelte"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
 

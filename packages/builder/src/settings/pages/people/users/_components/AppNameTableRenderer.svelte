@@ -1,5 +1,5 @@
 <script>
-import { IconAvatar } from "@budibase/bbui"
+import { IconAvatar } from "@supertoolmake/bbui"
 
 export let value
 export let row

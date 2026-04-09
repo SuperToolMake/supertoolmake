@@ -1,11 +1,11 @@
-import { constants } from "@budibase/backend-core"
+import { constants } from "@supertoolmake/backend-core"
 import type {
   ExecuteQueryRequest,
   ExecuteV2QueryResponse,
   PreviewQueryRequest,
   PreviewQueryResponse,
   Query,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { type Expectations, TestAPI } from "./base"
 
 export class QueryAPI extends TestAPI {

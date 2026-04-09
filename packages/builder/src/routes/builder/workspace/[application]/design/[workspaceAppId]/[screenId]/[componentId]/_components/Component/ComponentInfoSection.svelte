@@ -1,5 +1,5 @@
 <script>
-import { DetailSummary } from "@budibase/bbui"
+import { DetailSummary } from "@supertoolmake/bbui"
 import InfoDisplay from "./InfoDisplay.svelte"
 
 export let componentDefinition

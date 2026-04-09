@@ -1,4 +1,4 @@
-import { DesignDocuments, db as dbCore, HTTPError } from "@budibase/backend-core"
+import { DesignDocuments, db as dbCore, HTTPError } from "@supertoolmake/backend-core"
 import {
   type Database,
   type Document,
@@ -9,7 +9,7 @@ import {
   type Table,
   TableSourceType,
   type Workspace,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import backups from "../backups"
 
 export type FileAttributes = {

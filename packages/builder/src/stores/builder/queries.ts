@@ -7,7 +7,7 @@ import type {
   QueryPreview,
   QuerySchema,
   SaveQueryRequest,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { derived, get, type Writable } from "svelte/store"
 import { API } from "@/api"
 import { duplicateName } from "@/helpers/duplicate"

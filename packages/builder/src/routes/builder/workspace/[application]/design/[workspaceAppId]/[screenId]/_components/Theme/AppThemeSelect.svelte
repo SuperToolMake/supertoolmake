@@ -1,6 +1,6 @@
 <script>
-import { notifications } from "@budibase/bbui"
-import { getThemeClassNames, ThemeOptions } from "@budibase/shared-core"
+import { notifications } from "@supertoolmake/bbui"
+import { getThemeClassNames, ThemeOptions } from "@supertoolmake/shared-core"
 import { appStore, themeStore } from "@/stores/builder"
 
 const onChangeTheme = async (theme) => {

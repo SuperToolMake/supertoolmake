@@ -6,9 +6,9 @@ export const DropdownPosition = {
 </script>
 
 <script lang="ts">
-  import { Label } from "@budibase/bbui"
+  import { Label } from "@supertoolmake/bbui"
   import { onMount, createEventDispatcher, onDestroy } from "svelte"
-  import { FIND_ANY_HBS_REGEX } from "@budibase/string-templates"
+  import { FIND_ANY_HBS_REGEX } from "@supertoolmake/string-templates"
   import {
     autocompletion,
     closeBrackets,
@@ -60,7 +60,7 @@ export const DropdownPosition = {
     type EditorMode,
     type CaretPositionFn,
     type InsertAtPositionFn,
-  } from "@budibase/types"
+  } from "@supertoolmake/types"
   import { tooltips } from "@codemirror/view"
   import type { BindingCompletion, CodeValidator } from "@/types"
   import { validateHbsTemplate } from "./validator/hbs"

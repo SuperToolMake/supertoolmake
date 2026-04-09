@@ -1,6 +1,6 @@
 <script>
 import "@spectrum-css/card/dist/index-vars.css"
-import { Button } from "@budibase/bbui"
+import { Button } from "@supertoolmake/bbui"
 import { getContext } from "svelte"
 
 export let title

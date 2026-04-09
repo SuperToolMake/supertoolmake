@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Toggle } from "@budibase/bbui"
-import { search } from "@budibase/frontend-core"
+import { Toggle } from "@supertoolmake/bbui"
+import { search } from "@supertoolmake/frontend-core"
 import type {
   Component,
   FilterConfig,
@@ -8,7 +8,7 @@ import type {
   Table,
   TableSchema,
   UIFieldSchema,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { createEventDispatcher } from "svelte"
 import {
   extractLiteralHandlebarsID,

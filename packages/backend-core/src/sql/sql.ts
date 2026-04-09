@@ -1,4 +1,4 @@
-import { dataFilters, helpers } from "@budibase/shared-core"
+import { dataFilters, helpers } from "@supertoolmake/shared-core"
 import {
   type AnySearchFilter,
   type ArrayFilter,
@@ -24,7 +24,7 @@ import {
   type SqlQuery,
   type SqlQueryBinding,
   type Table,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { type Knex, knex } from "knex"
 import { cloneDeep } from "lodash"
 import * as dbCore from "../db"

@@ -1,4 +1,4 @@
-import { SocketEvent, SocketSessionTTL } from "@budibase/shared-core"
+import { SocketEvent, SocketSessionTTL } from "@supertoolmake/shared-core"
 import { io, type Socket } from "socket.io-client"
 import { APISessionID } from "../api"
 

@@ -1,5 +1,5 @@
-import { context } from "@budibase/backend-core"
-import { type Document, DocumentType, type Row, SEPARATOR, type Table } from "@budibase/types"
+import { context } from "@supertoolmake/backend-core"
+import { type Document, DocumentType, type Row, SEPARATOR, type Table } from "@supertoolmake/types"
 import { getRowParams } from "../../db/utils"
 
 const AUTO_COLUMN_STATE_DOC_PREFIX = `${DocumentType.AUTO_COLUMN_STATE}${SEPARATOR}`

@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Body, Checkbox, Label, Select } from "@budibase/bbui"
-import type { EnrichedBinding } from "@budibase/types"
+import { Body, Checkbox, Label, Select } from "@supertoolmake/bbui"
+import type { EnrichedBinding } from "@supertoolmake/types"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
 import { getDatasourceLikeProviders } from "@/components/design/settings/controls/ButtonActionEditor/actions/utils"
 import { getSchemaForDatasourcePlus } from "@/dataBinding"

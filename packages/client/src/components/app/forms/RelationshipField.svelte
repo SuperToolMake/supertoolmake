@@ -4,7 +4,7 @@ type OptionsMap = Record<string, BasicRelatedRow>
 </script>
 
 <script lang="ts" generics="ValueType extends string | string[]">
-  import { CoreSelect, CoreMultiselect } from "@budibase/bbui"
+  import { CoreSelect, CoreMultiselect } from "@supertoolmake/bbui"
   import {
     BasicOperator,
     EmptyFilterOption,
@@ -18,17 +18,17 @@ type OptionsMap = Record<string, BasicRelatedRow>
     type Row,
     type UIFieldValidationRule,
     type DataFetchDatasource,
-  } from "@budibase/types"
+  } from "@supertoolmake/types"
   import { getContext, createEventDispatcher } from "svelte"
   import {
     fetchData,
     Utils,
     loadTranslationsByGroup,
     Constants,
-  } from "@budibase/frontend-core"
+  } from "@supertoolmake/frontend-core"
   import Field from "./Field.svelte"
   import type { FieldApi, FieldState } from "@/types"
-  import { utils } from "@budibase/shared-core"
+  import { utils } from "@supertoolmake/shared-core"
 
   export let field: string | undefined = undefined
   export let label: string | undefined = undefined

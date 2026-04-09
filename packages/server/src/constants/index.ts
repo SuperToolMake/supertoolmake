@@ -1,11 +1,11 @@
-import { constants, objectStore, roles } from "@budibase/backend-core"
+import { constants, objectStore, roles } from "@supertoolmake/backend-core"
 import {
   FieldType,
   INTERNAL_TABLE_SOURCE_ID,
   type QueryVerb,
   type Table,
   TableSourceType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 
 import env from "../environment"
 

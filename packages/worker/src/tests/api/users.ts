@@ -1,4 +1,4 @@
-import { generator } from "@budibase/backend-core/tests"
+import { generator } from "@supertoolmake/backend-core/tests"
 import type {
   BulkUserRequest,
   BulkUserResponse,
@@ -7,7 +7,7 @@ import type {
   InviteUsersResponse,
   SearchUsersRequest,
   User,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import structures from "../structures"
 import { TestAPI, type TestAPIOpts } from "./base"
 

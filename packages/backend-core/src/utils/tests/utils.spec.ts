@@ -1,4 +1,4 @@
-import type { Ctx } from "@budibase/types"
+import type { Ctx } from "@supertoolmake/types"
 import { structures } from "../../../tests"
 import { DBTestConfiguration } from "../../../tests/extra"
 import { Header } from "../../constants"

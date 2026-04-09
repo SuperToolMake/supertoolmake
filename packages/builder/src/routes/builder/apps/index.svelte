@@ -10,11 +10,11 @@ import {
   Modal,
   notifications,
   Page,
-} from "@budibase/bbui"
-import { ChangePasswordModal, ProfileModal, UserAvatar } from "@budibase/frontend-core"
-import { helpers, sdk } from "@budibase/shared-core"
-import { processStringSync } from "@budibase/string-templates"
-import type { PublishedWorkspaceData } from "@budibase/types"
+} from "@supertoolmake/bbui"
+import { ChangePasswordModal, ProfileModal, UserAvatar } from "@supertoolmake/frontend-core"
+import { helpers, sdk } from "@supertoolmake/shared-core"
+import { processStringSync } from "@supertoolmake/string-templates"
+import type { PublishedWorkspaceData } from "@supertoolmake/types"
 import { goto } from "@roxi/routify"
 import Logo from "assets/supertoolmake-emblem.svg"
 import { onMount } from "svelte"

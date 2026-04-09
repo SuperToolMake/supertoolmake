@@ -1,5 +1,5 @@
 <script>
-import { Body, Button, Heading } from "@budibase/bbui"
+import { Body, Button, Heading } from "@supertoolmake/bbui"
 import { getContext } from "svelte"
 
 const { builderStore } = getContext("sdk")

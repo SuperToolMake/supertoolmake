@@ -1,4 +1,4 @@
-export { dataFilters as QueryUtils } from "@budibase/shared-core"
+export { dataFilters as QueryUtils } from "@supertoolmake/shared-core"
 export * from "./components"
 export * as CookieUtils from "./cookies"
 export * from "./download"

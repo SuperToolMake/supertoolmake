@@ -1,4 +1,4 @@
-import { ConfigType } from "@budibase/types"
+import { ConfigType } from "@supertoolmake/types"
 import { generator, structures } from "../../../tests"
 import { DBTestConfiguration, testEnv } from "../../../tests/extra"
 import env from "../../environment"

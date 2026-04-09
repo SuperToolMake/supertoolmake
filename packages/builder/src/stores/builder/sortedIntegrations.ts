@@ -1,4 +1,4 @@
-import type { Integration, SourceName, UIIntegration } from "@budibase/types"
+import type { Integration, SourceName, UIIntegration } from "@supertoolmake/types"
 import { derived } from "svelte/store"
 import { DatasourceTypes } from "@/constants/backend"
 import { BudiStore } from "@/stores/BudiStore"

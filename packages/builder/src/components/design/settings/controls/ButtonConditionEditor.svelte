@@ -9,15 +9,15 @@ import {
   Icon,
   Layout,
   Select,
-} from "@budibase/bbui"
-import { Constants, QueryUtils } from "@budibase/frontend-core"
+} from "@supertoolmake/bbui"
+import { Constants, QueryUtils } from "@supertoolmake/frontend-core"
 import type {
   ArrayOperator,
   ComponentCondition,
   ComponentSetting,
   EnrichedBinding,
-} from "@budibase/types"
-import { BasicOperator, FieldType } from "@budibase/types"
+} from "@supertoolmake/types"
+import { BasicOperator, FieldType } from "@supertoolmake/types"
 import { cloneDeep } from "lodash"
 import { generate } from "shortid"
 import { createEventDispatcher } from "svelte"

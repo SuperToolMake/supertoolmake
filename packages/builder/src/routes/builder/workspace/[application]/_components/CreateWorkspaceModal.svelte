@@ -1,8 +1,8 @@
 <script lang="ts">
-import { Button, Dropzone, Input, keepOpen, ModalContent, notifications } from "@budibase/bbui"
-import { createValidationStore } from "@budibase/frontend-core/src/utils/validation/yup"
-import * as workspaceValidation from "@budibase/frontend-core/src/utils/validation/yup/app"
-import { sdk } from "@budibase/shared-core"
+import { Button, Dropzone, Input, keepOpen, ModalContent, notifications } from "@supertoolmake/bbui"
+import { createValidationStore } from "@supertoolmake/frontend-core/src/utils/validation/yup"
+import * as workspaceValidation from "@supertoolmake/frontend-core/src/utils/validation/yup/app"
+import { sdk } from "@supertoolmake/shared-core"
 import { goto } from "@roxi/routify"
 import { createEventDispatcher, onMount } from "svelte"
 import { get, writable } from "svelte/store"

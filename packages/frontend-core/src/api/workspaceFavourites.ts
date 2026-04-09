@@ -2,7 +2,7 @@ import type {
   AddWorkspaceFavouriteRequest,
   AddWorkspaceFavouriteResponse,
   WorkspaceFavouriteResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface WorkspaceFavouriteEndpoints {

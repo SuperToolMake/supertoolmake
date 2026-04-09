@@ -1,6 +1,6 @@
-import { roles } from "@budibase/backend-core"
-import { structures } from "@budibase/backend-core/tests"
-import type { Screen } from "@budibase/types"
+import { roles } from "@supertoolmake/backend-core"
+import { structures } from "@supertoolmake/backend-core/tests"
+import type { Screen } from "@supertoolmake/types"
 import * as setup from "./utilities"
 import { checkBuilderEndpoint, runInProd } from "./utilities/TestFunctions"
 

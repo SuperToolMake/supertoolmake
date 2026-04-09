@@ -1,6 +1,6 @@
 <script>
-import { ActionButton, Button, Drawer } from "@budibase/bbui"
-import { search } from "@budibase/frontend-core"
+import { ActionButton, Button, Drawer } from "@supertoolmake/bbui"
+import { search } from "@supertoolmake/frontend-core"
 import { cloneDeep } from "lodash/fp"
 import { createEventDispatcher } from "svelte"
 import { getDatasourceForProvider, getSchemaForDatasource } from "@/dataBinding"

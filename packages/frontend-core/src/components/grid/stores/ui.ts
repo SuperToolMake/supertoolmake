@@ -1,4 +1,4 @@
-import type { Row } from "@budibase/types"
+import type { Row } from "@supertoolmake/types"
 import { tick } from "svelte"
 import { derived, get, type Readable, type Writable, writable } from "svelte/store"
 import { DefaultRowHeight, LargeRowHeight, MediumRowHeight, NewRowID } from "../lib/constants"

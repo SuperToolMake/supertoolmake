@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { Row, TableDatasource } from "@budibase/types"
+import type { Row, TableDatasource } from "@supertoolmake/types"
 import { getContext } from "svelte"
 
 export let datasource: TableDatasource

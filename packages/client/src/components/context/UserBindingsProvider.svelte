@@ -1,5 +1,5 @@
 <script>
-import { Constants } from "@budibase/frontend-core"
+import { Constants } from "@supertoolmake/frontend-core"
 import { ActionTypes } from "@/constants"
 import { authStore, currentRole } from "@/stores"
 import Provider from "./Provider.svelte"

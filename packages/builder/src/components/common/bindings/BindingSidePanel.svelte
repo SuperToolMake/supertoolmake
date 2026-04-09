@@ -1,8 +1,8 @@
 <script lang="ts">
-import { Icon, Input, Layout, Popover } from "@budibase/bbui"
-import { convertToJS } from "@budibase/string-templates"
-import type { EnrichedBinding, Helper } from "@budibase/types"
-import { BindingMode } from "@budibase/types"
+import { Icon, Input, Layout, Popover } from "@supertoolmake/bbui"
+import { convertToJS } from "@supertoolmake/string-templates"
+import type { EnrichedBinding, Helper } from "@supertoolmake/types"
+import { BindingMode } from "@supertoolmake/types"
 import groupBy from "lodash/fp/groupBy"
 import { handlebarsCompletions } from "@/constants/completions"
 import { EditorModes } from "../CodeEditor"

@@ -1,6 +1,6 @@
 <script>
-import { Button, Modal, notifications, Table } from "@budibase/bbui"
-import { DatasourceFeature } from "@budibase/types"
+import { Button, Modal, notifications, Table } from "@supertoolmake/bbui"
+import { DatasourceFeature } from "@supertoolmake/types"
 import { API } from "@/api"
 import CreateEditRelationshipModal from "@/components/backend/Datasources/CreateEditRelationshipModal.svelte"
 import RelationshipImportSelection from "@/components/backend/Datasources/TableImportSelection/RelationshipImportSelection.svelte"

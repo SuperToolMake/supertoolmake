@@ -1,4 +1,4 @@
-import { SSOProviderType } from "@budibase/types"
+import { SSOProviderType } from "@supertoolmake/types"
 import { generator, structures } from "../../../../../tests"
 
 jest.mock("passport-google-oauth")

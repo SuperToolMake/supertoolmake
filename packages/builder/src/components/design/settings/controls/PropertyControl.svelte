@@ -1,5 +1,5 @@
 <script>
-import { Label } from "@budibase/bbui"
+import { Label } from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 import { readableToRuntimeBinding, runtimeToReadableBinding } from "@/dataBinding"
 import { builderStore } from "@/stores/builder"

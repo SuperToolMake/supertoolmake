@@ -1,9 +1,9 @@
 <script lang="ts">
-import { Helpers, Icon, notifications, ProgressCircle } from "@budibase/bbui"
-import { JsonFormatter } from "@budibase/frontend-core"
-import type { Log } from "@budibase/string-templates"
-import { UserScriptError } from "@budibase/string-templates"
-import type { JSONValue } from "@budibase/types"
+import { Helpers, Icon, notifications, ProgressCircle } from "@supertoolmake/bbui"
+import { JsonFormatter } from "@supertoolmake/frontend-core"
+import type { Log } from "@supertoolmake/string-templates"
+import { UserScriptError } from "@supertoolmake/string-templates"
+import type { JSONValue } from "@supertoolmake/types"
 import { fade } from "svelte/transition"
 
 // this can be essentially any primitive response from the JS function

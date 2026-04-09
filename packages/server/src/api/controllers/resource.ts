@@ -2,7 +2,7 @@ import type {
   DuplicateResourceToWorkspaceRequest,
   ResourceDependenciesResponse,
   UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import sdk from "../../sdk"
 
 export async function getResourceDependencies(ctx: UserCtx<void, ResourceDependenciesResponse>) {

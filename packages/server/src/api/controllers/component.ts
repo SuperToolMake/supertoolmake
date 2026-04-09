@@ -1,5 +1,5 @@
-import { context } from "@budibase/backend-core"
-import type { FetchComponentDefinitionResponse, UserCtx, Workspace } from "@budibase/types"
+import { context } from "@supertoolmake/backend-core"
+import type { FetchComponentDefinitionResponse, UserCtx, Workspace } from "@supertoolmake/types"
 import { DocumentType } from "../../db/utils"
 import { getComponentLibraryManifest } from "../../utilities/fileSystem"
 
@@ -22,7 +22,7 @@ export async function fetchAppComponentDefinitions(
     const definitions: { [key: string]: any } = {}
     for (const { manifest, library } of componentManifests) {
       for (const key of Object.keys(manifest)) {
-        // These keys are not components, and should not be preprended with the `@budibase/` prefix
+        // These keys are not components, and should not be preprended with the `@supertoolmake/` prefix
         if (key === "features" || key === "typeSupportPresets") {
           definitions[key] = manifest[key]
         } else {

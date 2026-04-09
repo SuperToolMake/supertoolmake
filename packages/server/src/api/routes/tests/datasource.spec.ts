@@ -1,5 +1,5 @@
-import { context } from "@budibase/backend-core"
-import { generator } from "@budibase/backend-core/tests"
+import { context } from "@supertoolmake/backend-core"
+import { generator } from "@supertoolmake/backend-core/tests"
 import {
   BBReferenceFieldSubType,
   type Datasource,
@@ -11,7 +11,7 @@ import {
   type SupportedSqlTypes,
   type Table,
   type TableSchema,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { Knex } from "knex"
 import nock from "nock"
 import { datasourceDescribe } from "../../../integrations/tests/utils"

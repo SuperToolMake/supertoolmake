@@ -1,4 +1,4 @@
-import { db as dbCore, tenancy } from "@budibase/backend-core"
+import { db as dbCore, tenancy } from "@supertoolmake/backend-core"
 
 export async function checkAnyUserExists() {
   try {

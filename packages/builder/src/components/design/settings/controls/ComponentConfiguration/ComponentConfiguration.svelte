@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Helpers } from "@budibase/bbui"
-import type { Component, ComponentDefinition, UIBinding } from "@budibase/types"
+import { Helpers } from "@supertoolmake/bbui"
+import type { Component, ComponentDefinition, UIBinding } from "@supertoolmake/types"
 import { cloneDeep, isEqual } from "lodash/fp"
 import { createEventDispatcher } from "svelte"
 import { getEventContextBindings } from "@/dataBinding"

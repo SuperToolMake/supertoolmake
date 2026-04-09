@@ -1,13 +1,13 @@
 <script lang="ts">
-import { CoreCheckboxGroup, CoreMultiselect } from "@budibase/bbui"
-import { loadTranslationsByGroup } from "@budibase/frontend-core"
+import { CoreCheckboxGroup, CoreMultiselect } from "@supertoolmake/bbui"
+import { loadTranslationsByGroup } from "@supertoolmake/frontend-core"
 import {
   type FieldSchema,
   FieldType,
   type UIFieldDataProviderContext,
   type UIFieldOnChange,
   type UIFieldValidationRule,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { FieldApi, FieldState } from "@/types"
 import Field from "./Field.svelte"
 import { getOptions } from "./optionsParser"

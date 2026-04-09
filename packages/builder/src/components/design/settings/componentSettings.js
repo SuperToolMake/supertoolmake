@@ -1,4 +1,4 @@
-import { Checkbox, Input, RadioGroup, Select, Stepper } from "@budibase/bbui"
+import { Checkbox, Input, RadioGroup, Select, Stepper } from "@supertoolmake/bbui"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
 import MultilineDrawerBindableInput from "@/components/common/MultilineDrawerBindableInput.svelte"
 import BarButtonList from "./controls/BarButtonList.svelte"

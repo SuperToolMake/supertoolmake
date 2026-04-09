@@ -1,4 +1,4 @@
-import { type Datasource, SourceName } from "@budibase/types"
+import { type Datasource, SourceName } from "@supertoolmake/types"
 
 export function isSQL(datasource: Datasource): boolean {
   if (!datasource?.source) {

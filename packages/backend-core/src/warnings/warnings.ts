@@ -1,6 +1,6 @@
 // BASE
 
-import { APIWarningCode } from "@budibase/types"
+import { APIWarningCode } from "@supertoolmake/types"
 
 export abstract class APIWarning extends Error {
   code: string

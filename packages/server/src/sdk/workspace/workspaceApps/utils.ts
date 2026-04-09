@@ -1,5 +1,5 @@
-import { db } from "@budibase/backend-core"
-import type { WorkspaceApp } from "@budibase/types"
+import { db } from "@supertoolmake/backend-core"
+import type { WorkspaceApp } from "@supertoolmake/types"
 import sdk from "../.."
 
 export async function getMatchedWorkspaceApp(fromUrl: string): Promise<WorkspaceApp | undefined> {

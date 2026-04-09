@@ -5,7 +5,7 @@ import type {
   DeleteWorkspaceBackupsResponse,
   ImportWorkspaceBackupResponse,
   SearchWorkspaceBackupsRequest,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface BackupEndpoints {

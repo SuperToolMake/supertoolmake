@@ -1,5 +1,5 @@
-import { HTTPError } from "@budibase/backend-core"
-import type { AppNavigation } from "@budibase/types"
+import { HTTPError } from "@supertoolmake/backend-core"
+import type { AppNavigation } from "@supertoolmake/types"
 import sdk from "../.."
 
 export async function addLink({

@@ -10,11 +10,11 @@ const config: Config = {
     "^.+\\.ts?$": "@swc/jest",
   },
   moduleNameMapper: {
-    "@budibase/backend-core/(.*)": "<rootDir>/../backend-core/$1",
-    "@budibase/backend-core": "<rootDir>/../backend-core/src",
-    "@budibase/types": "<rootDir>/../types/src",
-    "@budibase/shared-core": ["<rootDir>/../shared-core/src"],
-    "@budibase/string-templates": ["<rootDir>/../string-templates/src"],
+    "@supertoolmake/backend-core/(.*)": "<rootDir>/../backend-core/$1",
+    "@supertoolmake/backend-core": "<rootDir>/../backend-core/src",
+    "@supertoolmake/types": "<rootDir>/../types/src",
+    "@supertoolmake/shared-core": ["<rootDir>/../shared-core/src"],
+    "@supertoolmake/string-templates": ["<rootDir>/../string-templates/src"],
   },
 }
 

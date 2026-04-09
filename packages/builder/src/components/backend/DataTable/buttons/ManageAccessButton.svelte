@@ -1,6 +1,6 @@
 <script>
-import { ActionButton, Input, Label, List, ListItem, notifications, Select } from "@budibase/bbui"
-import { PermissionSource } from "@budibase/types"
+import { ActionButton, Input, Label, List, ListItem, notifications, Select } from "@supertoolmake/bbui"
+import { PermissionSource } from "@supertoolmake/types"
 import DetailPopover from "@/components/common/DetailPopover.svelte"
 import { Roles } from "@/constants/backend"
 import { capitalise } from "@/helpers"

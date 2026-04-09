@@ -1,5 +1,5 @@
 <script>
-import { Icon, notifications } from "@budibase/bbui"
+import { Icon, notifications } from "@supertoolmake/bbui"
 import { get } from "svelte/store"
 import NavItem from "@/components/common/NavItem.svelte"
 import { findComponentPath, getComponentName, getComponentText } from "@/helpers/components"

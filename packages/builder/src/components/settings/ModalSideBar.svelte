@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Context, Icon } from "@budibase/bbui"
-import { createLocalStorageStore } from "@budibase/frontend-core"
+import { Context, Icon } from "@supertoolmake/bbui"
+import { createLocalStorageStore } from "@supertoolmake/frontend-core"
 import { createEventDispatcher, onDestroy, onMount, setContext } from "svelte"
 
 setContext(Context.PopoverRoot, ".nav .popover-container")

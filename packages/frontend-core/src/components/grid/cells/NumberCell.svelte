@@ -1,5 +1,5 @@
 <script>
-import { formatNumber } from "@budibase/frontend-core"
+import { formatNumber } from "@supertoolmake/frontend-core"
 import TextCell from "./TextCell.svelte"
 
 export let api

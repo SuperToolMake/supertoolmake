@@ -1,10 +1,10 @@
-import { Constants, CookieUtils } from "@budibase/frontend-core"
+import { Constants, CookieUtils } from "@supertoolmake/frontend-core"
 import {
   type GetGlobalSelfResponse,
   isSSOUser,
   type SetInitInfoRequest,
   type UpdateSelfRequest,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { get } from "svelte/store"
 import { API } from "@/api"
 import { BudiStore } from "@/stores/BudiStore"

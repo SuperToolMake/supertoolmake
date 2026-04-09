@@ -1,6 +1,6 @@
 <script>
-import { Table } from "@budibase/bbui"
-import { canBeSortColumn } from "@budibase/frontend-core"
+import { Table } from "@supertoolmake/bbui"
+import { canBeSortColumn } from "@supertoolmake/frontend-core"
 import { getContext, onDestroy } from "svelte"
 import Provider from "@/components/context/Provider.svelte"
 import SlotRenderer from "./SlotRenderer.svelte"

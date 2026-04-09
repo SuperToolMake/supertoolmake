@@ -1,4 +1,4 @@
-import { Theme, type ThemeMeta } from "@budibase/types"
+import { Theme, type ThemeMeta } from "@supertoolmake/types"
 
 export const ThemeClassPrefix = "spectrum--"
 export const DefaultBuilderTheme = Theme.DARKEST

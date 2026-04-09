@@ -1,4 +1,4 @@
-import type { FetchEnrichedRowResponse, Row } from "@budibase/types"
+import type { FetchEnrichedRowResponse, Row } from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface RelationshipEndpoints {

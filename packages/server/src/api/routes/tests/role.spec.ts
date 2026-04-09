@@ -1,5 +1,5 @@
-import { db as dbCore, roles } from "@budibase/backend-core"
-import { BuiltinPermissionID, PermissionLevel } from "@budibase/types"
+import { db as dbCore, roles } from "@supertoolmake/backend-core"
+import { BuiltinPermissionID, PermissionLevel } from "@supertoolmake/types"
 import { type DatabaseName, getDatasource } from "../../../integrations/tests/utils"
 import * as setup from "./utilities"
 

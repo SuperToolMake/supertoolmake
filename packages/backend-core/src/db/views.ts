@@ -5,7 +5,7 @@ import type {
   DBView,
   DesignDocument,
   Document,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { DeprecatedViews, DocumentType, SEPARATOR, StaticDatabases, ViewName } from "../constants"
 import { getGlobalDB } from "../context"
 import env from "../environment"

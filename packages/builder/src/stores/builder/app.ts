@@ -1,4 +1,4 @@
-import { resolveWorkspaceTranslations } from "@budibase/shared-core"
+import { resolveWorkspaceTranslations } from "@supertoolmake/shared-core"
 import type {
   AppScript,
   AutomationSettings,
@@ -7,7 +7,7 @@ import type {
   Workspace,
   WorkspaceFeatures,
   WorkspaceIcon,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { get } from "svelte/store"
 import { API } from "@/api"
 import { BudiStore } from "../BudiStore"

@@ -1,5 +1,5 @@
 {
-  "name": "@budibase/worker",
+  "name": "@supertoolmake/worker",
   "private": true,
   "email": "hi@budibase.com",
   "version": "0.0.0",
@@ -29,10 +29,10 @@
   "author": "Budibase",
   "license": "GPL-3.0",
   "dependencies": {
-    "@budibase/backend-core": "*",
-    "@budibase/shared-core": "*",
-    "@budibase/string-templates": "*",
-    "@budibase/types": "*",
+    "@supertoolmake/backend-core": "*",
+    "@supertoolmake/shared-core": "*",
+    "@supertoolmake/string-templates": "*",
+    "@supertoolmake/types": "*",
     "@koa/router": "13.1.0",
     "@techpass/passport-openidconnect": "1.0.0",
     "@types/global-agent": "2.1.1",
@@ -92,7 +92,7 @@
           {
             "comment": "Required for pro usage when submodule not loaded",
             "projects": [
-              "@budibase/backend-core"
+              "@supertoolmake/backend-core"
             ],
             "target": "build:oss"
           }

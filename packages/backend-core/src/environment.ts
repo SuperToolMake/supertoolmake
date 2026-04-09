@@ -1,7 +1,7 @@
 import { createSecretKey } from "node:crypto"
 import { existsSync, readFileSync } from "node:fs"
 import { join, resolve } from "node:path"
-import { ServiceType } from "@budibase/types"
+import { ServiceType } from "@supertoolmake/types"
 import { cloneDeep } from "lodash"
 
 const TOP_LEVEL_PATH =

@@ -1,9 +1,9 @@
-import { DropPosition } from "@budibase/types"
+import { DropPosition } from "@supertoolmake/types"
 import { get, writable } from "svelte/store"
 import { findComponentParent, findComponentPath } from "@/helpers/components"
 import { componentStore, selectedScreen } from "@/stores/builder"
 
-export { DropPosition } from "@budibase/types"
+export { DropPosition } from "@supertoolmake/types"
 
 const initialState = {
   source: null,

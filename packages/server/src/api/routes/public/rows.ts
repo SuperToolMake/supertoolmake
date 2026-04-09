@@ -1,4 +1,4 @@
-import { Endpoint } from "@budibase/backend-core"
+import { Endpoint } from "@supertoolmake/backend-core"
 import controller from "../../controllers/public/rows"
 import { externalSearchValidator } from "../utils/validators"
 

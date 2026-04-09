@@ -1,4 +1,4 @@
-import { helpers } from "@budibase/shared-core"
+import { helpers } from "@supertoolmake/shared-core"
 
 // Util to check if a setting can be rendered for a certain instance, based on
 // the "dependsOn" metadata in the manifest

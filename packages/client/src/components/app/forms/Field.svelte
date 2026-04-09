@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Icon } from "@budibase/bbui"
-import { memo } from "@budibase/frontend-core"
-import type { FieldSchema, FieldType, UIFieldValidationRule } from "@budibase/types"
+import { Icon } from "@supertoolmake/bbui"
+import { memo } from "@supertoolmake/frontend-core"
+import type { FieldSchema, FieldType, UIFieldValidationRule } from "@supertoolmake/types"
 import { getContext, onDestroy } from "svelte"
 import type { Readable } from "svelte/store"
 import { writable } from "svelte/store"

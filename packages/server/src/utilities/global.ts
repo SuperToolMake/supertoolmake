@@ -1,5 +1,5 @@
-import { cache, context, db as dbCore, roles, tenancy, users } from "@budibase/backend-core"
-import type { ContextUser, User, UserCtx } from "@budibase/types"
+import { cache, context, db as dbCore, roles, tenancy, users } from "@supertoolmake/backend-core"
+import type { ContextUser, User, UserCtx } from "@supertoolmake/types"
 import cloneDeep from "lodash/cloneDeep"
 import { getGlobalIDFromUserMetadataID } from "../db/utils"
 import env from "../environment"

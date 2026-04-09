@@ -1,5 +1,5 @@
-import { cache, db as dbCore } from "@budibase/backend-core"
-import { type Database, DocumentType, type UserCtx } from "@budibase/types"
+import { cache, db as dbCore } from "@supertoolmake/backend-core"
+import { type Database, DocumentType, type UserCtx } from "@supertoolmake/types"
 import { getGlobalIDFromUserMetadataID, WORKSPACE_DEV_PREFIX } from "../db/utils"
 import { checkDebounce, doesUserHaveLock, setDebounce, updateLock } from "../utilities/redis"
 

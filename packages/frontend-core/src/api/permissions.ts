@@ -3,7 +3,7 @@ import type {
   GetResourcePermsResponse,
   PermissionLevel,
   RemovePermissionResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface PermissionEndpoints {

@@ -1,4 +1,4 @@
-import type { Template } from "@budibase/types"
+import type { Template } from "@supertoolmake/types"
 import { type Expectations, TestAPI } from "./base"
 
 export class TemplateAPI extends TestAPI {

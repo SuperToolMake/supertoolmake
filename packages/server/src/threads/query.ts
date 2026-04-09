@@ -1,5 +1,5 @@
-import { auth, cache, context } from "@budibase/backend-core"
-import { findHBSBlocks, iifeWrapper, processStringSync } from "@budibase/string-templates"
+import { auth, cache, context } from "@supertoolmake/backend-core"
+import { findHBSBlocks, iifeWrapper, processStringSync } from "@supertoolmake/string-templates"
 import {
   type Datasource,
   type DatasourcePlus,
@@ -8,7 +8,7 @@ import {
   type Row,
   SourceName,
   type SSOUser,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { cloneDeep } from "lodash/fp"
 import { getGlobalIDFromUserMetadataID } from "../db/utils"
 import { getIntegration } from "../integrations"

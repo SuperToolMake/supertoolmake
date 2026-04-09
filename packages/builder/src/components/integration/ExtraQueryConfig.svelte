@@ -1,5 +1,5 @@
 <script>
-import { Input, Label, Select } from "@budibase/bbui"
+import { Input, Label, Select } from "@supertoolmake/bbui"
 
 /**
  * This component takes the query object and populates the 'extra' property

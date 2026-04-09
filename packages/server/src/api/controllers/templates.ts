@@ -2,7 +2,7 @@ import type {
   DownloadTemplateResponse,
   FetchGlobalTemplateResponse,
   UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import nodeFetch from "node-fetch"
 import env from "../../environment"
 import { downloadTemplate as dlTemplate } from "../../utilities/fileSystem"

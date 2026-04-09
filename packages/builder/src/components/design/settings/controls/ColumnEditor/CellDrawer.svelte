@@ -1,5 +1,5 @@
 <script>
-import { ColorPicker, DrawerContent, Input, Label, Layout, Select } from "@budibase/bbui"
+import { ColorPicker, DrawerContent, Input, Label, Layout, Select } from "@supertoolmake/bbui"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
 import { previewStore, themeStore } from "@/stores/builder"
 

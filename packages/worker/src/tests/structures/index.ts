@@ -1,4 +1,4 @@
-import { structures } from "@budibase/backend-core/tests"
+import { structures } from "@supertoolmake/backend-core/tests"
 import { v4 as uuid } from "uuid"
 import * as configs from "./configs"
 

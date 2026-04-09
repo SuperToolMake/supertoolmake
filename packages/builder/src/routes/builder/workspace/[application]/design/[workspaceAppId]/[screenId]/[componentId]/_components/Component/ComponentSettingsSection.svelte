@@ -1,6 +1,6 @@
 <script>
-import { DetailSummary, notifications } from "@budibase/bbui"
-import { shouldDisplaySetting } from "@budibase/frontend-core"
+import { DetailSummary, notifications } from "@supertoolmake/bbui"
+import { shouldDisplaySetting } from "@supertoolmake/frontend-core"
 import { getContext, setContext } from "svelte"
 import { getComponentForSetting } from "@/components/design/settings/componentSettings"
 import EjectBlockButton from "@/components/design/settings/controls/EjectBlockButton.svelte"

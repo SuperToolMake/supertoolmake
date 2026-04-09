@@ -1,4 +1,4 @@
-import { getJsHelperList } from "@budibase/string-templates/src/helpers/list"
+import { getJsHelperList } from "@supertoolmake/string-templates/src/helpers/list"
 
 export default {
   ...getJsHelperList(),

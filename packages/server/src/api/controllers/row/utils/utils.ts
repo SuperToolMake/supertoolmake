@@ -1,5 +1,5 @@
-import { sql } from "@budibase/backend-core"
-import { processStringSync } from "@budibase/string-templates"
+import { sql } from "@supertoolmake/backend-core"
+import { processStringSync } from "@supertoolmake/string-templates"
 import {
   type Ctx,
   type DatasourcePlusQueryResponse,
@@ -7,7 +7,7 @@ import {
   type RelationshipsJson,
   type Row,
   type Table,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import * as utils from "../../../../db/utils"
 import sdk from "../../../../sdk"
 import { processDates } from "../../../../utilities/rowProcessor"

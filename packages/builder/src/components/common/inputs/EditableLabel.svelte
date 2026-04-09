@@ -1,5 +1,5 @@
 <script>
-import { Body, Heading, Icon, Input, Label } from "@budibase/bbui"
+import { Body, Heading, Icon, Input, Label } from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 
 let dispatch = createEventDispatcher()

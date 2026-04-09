@@ -1,4 +1,4 @@
-import type { PublishStatusResponse } from "@budibase/types"
+import type { PublishStatusResponse } from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface DeploymentEndpoints {

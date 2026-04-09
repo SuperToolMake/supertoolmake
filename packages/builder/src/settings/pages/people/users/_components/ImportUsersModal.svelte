@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Body, ModalContent, notifications, Select } from "@budibase/bbui"
-import { Constants, emailValidator } from "@budibase/frontend-core"
+import { Body, ModalContent, notifications, Select } from "@supertoolmake/bbui"
+import { Constants, emailValidator } from "@supertoolmake/frontend-core"
 import { parseUserEmailsFromCSV } from "@/helpers"
 import { admin } from "@/stores/portal/admin"
 

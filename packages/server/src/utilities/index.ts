@@ -1,8 +1,8 @@
 export * from "./fetch"
 export * from "./fileUtils"
 
-import { context } from "@budibase/backend-core"
-import type { Document } from "@budibase/types"
+import { context } from "@supertoolmake/backend-core"
+import type { Document } from "@supertoolmake/types"
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import { generateMetadataID } from "../db/utils"

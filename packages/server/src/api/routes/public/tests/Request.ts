@@ -1,4 +1,4 @@
-import type { Row, SearchFilters, Table, User } from "@budibase/types"
+import type { Row, SearchFilters, Table, User } from "@supertoolmake/types"
 import type TestConfiguration from "../../../../tests/utilities/TestConfiguration"
 import { generateMakeRequest, type HttpMethod, type MakeRequestResponse } from "./utils"
 

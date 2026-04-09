@@ -1,5 +1,5 @@
 <script>
-import { Toggle } from "@budibase/bbui"
+import { Toggle } from "@supertoolmake/bbui"
 import { cloneDeep, isEqual } from "lodash/fp"
 import { createEventDispatcher } from "svelte"
 import {

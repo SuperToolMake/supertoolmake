@@ -1,5 +1,5 @@
 <script>
-import { CoreDropzone, Helpers, ProgressCircle } from "@budibase/bbui"
+import { CoreDropzone, Helpers, ProgressCircle } from "@supertoolmake/bbui"
 import { getContext, onDestroy, onMount } from "svelte"
 import { builderStore } from "@/stores/builder"
 import Field from "./Field.svelte"

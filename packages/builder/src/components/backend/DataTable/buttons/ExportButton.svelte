@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, Body, Button, notifications, Select } from "@budibase/bbui"
+import { ActionButton, Body, Button, notifications, Select } from "@supertoolmake/bbui"
 import download from "downloadjs"
 import DetailPopover from "@/components/common/DetailPopover.svelte"
 import { ROW_EXPORT_FORMATS } from "@/constants/backend"

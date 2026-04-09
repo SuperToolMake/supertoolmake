@@ -1,5 +1,5 @@
 <script lang="ts">
-import { MarkdownViewer } from "@budibase/bbui"
+import { MarkdownViewer } from "@supertoolmake/bbui"
 // @ts-expect-error
 import LICENSE from "../../../../../LICENSE?raw"
 

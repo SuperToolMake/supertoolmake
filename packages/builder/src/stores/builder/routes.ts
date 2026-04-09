@@ -1,4 +1,4 @@
-import type { Screen } from "@budibase/types"
+import type { Screen } from "@supertoolmake/types"
 import { derived } from "svelte/store"
 import { screenStore, workspaceAppStore } from "@/stores/builder"
 import { DerivedBudiStore } from "../BudiStore"

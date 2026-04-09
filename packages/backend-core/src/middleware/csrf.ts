@@ -1,4 +1,4 @@
-import type { Ctx, EndpointMatcher } from "@budibase/types"
+import type { Ctx, EndpointMatcher } from "@supertoolmake/types"
 import type { Middleware, Next } from "koa"
 import { Header } from "../constants"
 import { buildMatcherRegex, matches } from "./matchers"

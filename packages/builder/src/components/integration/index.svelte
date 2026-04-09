@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, Button, Icon, Input, Label, Layout, Select } from "@budibase/bbui"
+import { ActionButton, Button, Icon, Input, Label, Layout, Select } from "@supertoolmake/bbui"
 import { IntegrationTypes } from "@/constants/backend"
 import Editor from "./QueryEditor.svelte"
 import FieldsBuilder from "./QueryFieldsBuilder.svelte"

@@ -1,4 +1,4 @@
-import type { AnyDocument } from "@budibase/types"
+import type { AnyDocument } from "@supertoolmake/types"
 import _ from "lodash"
 import { generator } from "../../../tests"
 import { newid } from "../../utils"

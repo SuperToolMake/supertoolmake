@@ -1,5 +1,5 @@
 <script lang="ts">
-import { memo, Utils } from "@budibase/frontend-core"
+import { memo, Utils } from "@supertoolmake/frontend-core"
 import { onDestroy, onMount } from "svelte"
 import { builderStore } from "@/stores"
 import Indicator from "./Indicator.svelte"

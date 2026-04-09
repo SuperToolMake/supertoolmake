@@ -1,5 +1,5 @@
-import { structures } from "@budibase/backend-core/tests"
-import type { WorkspaceApp } from "@budibase/types"
+import { structures } from "@supertoolmake/backend-core/tests"
+import type { WorkspaceApp } from "@supertoolmake/types"
 import TestConfiguration from "../../../../tests/utilities/TestConfiguration"
 import { getMatchedWorkspaceApp } from "../utils"
 

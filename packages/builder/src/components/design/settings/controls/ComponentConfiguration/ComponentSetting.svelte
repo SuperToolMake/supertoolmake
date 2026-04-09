@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Icon } from "@budibase/bbui"
-import type { ComponentSetting } from "@budibase/types"
+import { Icon } from "@supertoolmake/bbui"
+import type { ComponentSetting } from "@supertoolmake/types"
 import { componentStore } from "@/stores/builder"
 import EditComponentPopover from "../EditComponentPopover.svelte"
 

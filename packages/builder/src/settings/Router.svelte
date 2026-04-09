@@ -1,5 +1,5 @@
 <script lang="ts">
-import { memo } from "@budibase/frontend-core"
+import { memo } from "@supertoolmake/frontend-core"
 import type { Component } from "svelte"
 import { setContext } from "svelte"
 import { writable } from "svelte/store"

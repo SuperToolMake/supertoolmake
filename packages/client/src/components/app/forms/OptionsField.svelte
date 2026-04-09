@@ -1,6 +1,6 @@
 <script>
-import { CoreRadioGroup, CoreSelect } from "@budibase/bbui"
-import { loadTranslationsByGroup } from "@budibase/frontend-core"
+import { CoreRadioGroup, CoreSelect } from "@supertoolmake/bbui"
+import { loadTranslationsByGroup } from "@supertoolmake/frontend-core"
 import Field from "./Field.svelte"
 import { getOptions } from "./optionsParser"
 

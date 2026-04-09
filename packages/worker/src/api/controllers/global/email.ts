@@ -1,5 +1,5 @@
-import { tenancy } from "@budibase/backend-core"
-import type { SendEmailRequest, SendEmailResponse, User, UserCtx } from "@budibase/types"
+import { tenancy } from "@supertoolmake/backend-core"
+import type { SendEmailRequest, SendEmailResponse, User, UserCtx } from "@supertoolmake/types"
 import { sendEmail as sendEmailFn } from "../../../utilities/email"
 
 export async function sendEmail(ctx: UserCtx<SendEmailRequest, SendEmailResponse>) {

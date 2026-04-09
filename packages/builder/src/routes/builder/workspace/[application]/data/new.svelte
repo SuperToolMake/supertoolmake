@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Body } from "@budibase/bbui"
+import { Body } from "@supertoolmake/bbui"
 import { goto as gotoStore, params } from "@roxi/routify"
 import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
 import CreationPage from "@/components/common/CreationPage.svelte"

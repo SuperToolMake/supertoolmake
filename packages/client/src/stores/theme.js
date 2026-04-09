@@ -1,4 +1,4 @@
-import { DefaultAppTheme, ensureValidTheme } from "@budibase/shared-core"
+import { DefaultAppTheme, ensureValidTheme } from "@supertoolmake/shared-core"
 import { derived } from "svelte/store"
 import { appStore } from "./app"
 import { builderStore } from "./builder"

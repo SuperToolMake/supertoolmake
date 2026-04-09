@@ -1,5 +1,5 @@
-import { roles, utils } from "@budibase/backend-core"
-import { generator } from "@budibase/backend-core/tests"
+import { roles, utils } from "@supertoolmake/backend-core"
+import { generator } from "@supertoolmake/backend-core/tests"
 import {
   BuiltinPermissionID,
   type Datasource,
@@ -11,7 +11,7 @@ import {
   SourceName,
   type Table,
   TableSourceType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { merge } from "lodash"
 import { cloneDeep } from "lodash/fp"
 import { BASE_LAYOUT_PROP_IDS, EMPTY_LAYOUT } from "../../constants/layouts"

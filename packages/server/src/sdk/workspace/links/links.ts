@@ -1,7 +1,7 @@
-import { context } from "@budibase/backend-core"
+import { context } from "@supertoolmake/backend-core"
 
-import { isTableIdOrExternalTableId } from "@budibase/shared-core"
-import type { DatabaseQueryOpts, LinkDocument, LinkDocumentValue } from "@budibase/types"
+import { isTableIdOrExternalTableId } from "@supertoolmake/shared-core"
+import type { DatabaseQueryOpts, LinkDocument, LinkDocumentValue } from "@supertoolmake/types"
 import { getQueryIndex, ViewName } from "../../../db/utils"
 
 export async function fetch(tableId: string): Promise<LinkDocumentValue[]> {

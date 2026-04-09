@@ -1,4 +1,4 @@
-import type { FieldType } from "@budibase/types"
+import type { FieldType } from "@supertoolmake/types"
 
 export * from "./codeEditor"
 export * from "./errors"

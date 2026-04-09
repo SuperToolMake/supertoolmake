@@ -1,4 +1,4 @@
-import type { Table, UserCtx } from "@budibase/types"
+import type { Table, UserCtx } from "@supertoolmake/types"
 import type { Next } from "koa"
 import * as controller from "../table"
 import { addRev, search as stringSearch } from "./utils"

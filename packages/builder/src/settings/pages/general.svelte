@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Body, Button, Divider, Heading, Icon, Layout, Modal } from "@budibase/bbui"
+import { Body, Button, Divider, Heading, Icon, Layout, Modal } from "@supertoolmake/bbui"
 import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
 import UpdateAppForm from "@/components/common/UpdateAppForm.svelte"
 import RevertModal from "@/components/deploy/RevertModal.svelte"

@@ -1,6 +1,6 @@
-import { auth, permissions } from "@budibase/backend-core"
-import { ValidSnippetNameRegex } from "@budibase/shared-core"
-import { BuiltinPermissionID, EmptyFilterOption, type SearchFilters } from "@budibase/types"
+import { auth, permissions } from "@supertoolmake/backend-core"
+import { ValidSnippetNameRegex } from "@supertoolmake/shared-core"
+import { BuiltinPermissionID, EmptyFilterOption, type SearchFilters } from "@supertoolmake/types"
 import Joi from "joi"
 
 const OPTIONAL_STRING = Joi.string().optional().allow(null).allow("")

@@ -1,4 +1,4 @@
-import type { WorkspaceFavourite, WorkspaceFavouriteResponse } from "@budibase/types"
+import type { WorkspaceFavourite, WorkspaceFavouriteResponse } from "@supertoolmake/types"
 import { derived, type Readable } from "svelte/store"
 import { API } from "@/api"
 import { BudiStore } from "../BudiStore"

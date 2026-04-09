@@ -1,4 +1,4 @@
-import { LockName, type LockOptions, LockType } from "@budibase/types"
+import { LockName, type LockOptions, LockType } from "@supertoolmake/types"
 import { DBTestConfiguration, generator } from "../../../tests"
 import { AUTO_EXTEND_POLLING_MS, doWithLock } from "../redlockImpl"
 

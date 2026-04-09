@@ -1,4 +1,4 @@
-import type { SSOProfile, UserCtx } from "@budibase/types"
+import type { SSOProfile, UserCtx } from "@supertoolmake/types"
 import * as cache from "../../../cache"
 import * as configs from "../../../configs"
 import { Cookie } from "../../../constants"

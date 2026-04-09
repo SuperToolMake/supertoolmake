@@ -1,4 +1,4 @@
-import { createAPIClient } from "@budibase/frontend-core"
+import { createAPIClient } from "@supertoolmake/frontend-core"
 import { get } from "svelte/store"
 import { appStore, devToolsEnabled, devToolsStore, notificationStore } from "../stores"
 import { authStore } from "../stores/auth"

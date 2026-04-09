@@ -1,4 +1,4 @@
-import type { SaveRowRequest, SaveTableRequest, UIDatasource, UIRow } from "@budibase/types"
+import type { SaveRowRequest, SaveTableRequest, UIDatasource, UIRow } from "@supertoolmake/types"
 
 interface DatasourceBaseActions<TSaveDefinitionRequest = SaveTableRequest> {
   saveDefinition: (newDefinition: TSaveDefinitionRequest) => Promise<void>

@@ -1,9 +1,9 @@
 // TODO: analise and fix all the undefined ! and ?
 
-import { Helpers } from "@budibase/bbui"
-import { Utils } from "@budibase/frontend-core"
-import { utils } from "@budibase/shared-core"
-import { makePropSafe as safe } from "@budibase/string-templates"
+import { Helpers } from "@supertoolmake/bbui"
+import { Utils } from "@supertoolmake/frontend-core"
+import { utils } from "@supertoolmake/shared-core"
+import { makePropSafe as safe } from "@supertoolmake/string-templates"
 import {
   type Component,
   type ComponentCondition,
@@ -12,7 +12,7 @@ import {
   FieldType,
   type Screen,
   type Table,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { cloneDeep } from "lodash/fp"
 import { derived, get } from "svelte/store"
 import { API } from "@/api"

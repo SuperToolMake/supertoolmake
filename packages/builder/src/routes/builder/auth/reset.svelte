@@ -1,6 +1,6 @@
 <script>
-import { Body, Button, Heading, Layout, notifications, ProgressCircle } from "@budibase/bbui"
-import { PasswordRepeatInput } from "@budibase/frontend-core"
+import { Body, Button, Heading, Layout, notifications, ProgressCircle } from "@supertoolmake/bbui"
+import { PasswordRepeatInput } from "@supertoolmake/frontend-core"
 import { goto as gotoStore } from "@roxi/routify"
 import Logo from "assets/supertoolmake-emblem.svg"
 import { onMount } from "svelte"

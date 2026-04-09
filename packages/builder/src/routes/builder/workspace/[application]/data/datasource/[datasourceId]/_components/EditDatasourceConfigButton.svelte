@@ -1,5 +1,5 @@
 <script>
-import { Body, Icon } from "@budibase/bbui"
+import { Body, Icon } from "@supertoolmake/bbui"
 import { IntegrationTypes } from "@/constants/backend"
 
 export let datasource

@@ -1,4 +1,4 @@
-import type { Row } from "@budibase/types"
+import type { Row } from "@supertoolmake/types"
 import { derived, type Readable } from "svelte/store"
 import { MinColumnWidth } from "../lib/constants"
 import type { Store as StoreContext } from "."

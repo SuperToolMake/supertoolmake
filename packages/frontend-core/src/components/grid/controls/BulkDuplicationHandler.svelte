@@ -1,5 +1,5 @@
 <script>
-import { Modal, ModalContent, ProgressBar } from "@budibase/bbui"
+import { Modal, ModalContent, ProgressBar } from "@supertoolmake/bbui"
 import { getContext, onMount } from "svelte"
 import { sleep } from "../../../utils/utils"
 import { getCellID } from "../lib/utils"

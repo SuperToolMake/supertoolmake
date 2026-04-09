@@ -1,5 +1,5 @@
-import { env as coreEnv } from "@budibase/backend-core"
-import type { Ctx, GetEnvironmentResponse } from "@budibase/types"
+import { env as coreEnv } from "@supertoolmake/backend-core"
+import type { Ctx, GetEnvironmentResponse } from "@supertoolmake/types"
 import env from "../../../environment"
 
 export const fetch = async (ctx: Ctx<void, GetEnvironmentResponse>) => {

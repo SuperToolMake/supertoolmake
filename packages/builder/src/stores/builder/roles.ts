@@ -1,5 +1,5 @@
-import { RoleUtils } from "@budibase/frontend-core"
-import type { Role, UIRole } from "@budibase/types"
+import { RoleUtils } from "@supertoolmake/frontend-core"
+import type { Role, UIRole } from "@supertoolmake/types"
 import { derived, get, type Writable } from "svelte/store"
 import { API } from "@/api"
 import { DerivedBudiStore } from "../BudiStore"

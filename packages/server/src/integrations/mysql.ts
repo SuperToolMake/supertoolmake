@@ -1,4 +1,4 @@
-import { sql } from "@budibase/backend-core"
+import { sql } from "@supertoolmake/backend-core"
 import {
   type ConnectionInfo,
   DatasourceFeature,
@@ -16,7 +16,7 @@ import {
   type Table,
   type TableSchema,
   TableSourceType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import mysql from "mysql2/promise"
 import { isDate, NUMBER_REGEX } from "../utilities"
 import { getReadableErrorMessage } from "./base/errorMapping"

@@ -4,7 +4,7 @@ import {
   IdentityType,
   type User,
   type UserContext,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import * as context from "."
 
 export function getIdentity(): IdentityContext | undefined {

@@ -1,4 +1,4 @@
-import { FieldType } from "@budibase/types"
+import { FieldType } from "@supertoolmake/types"
 import { get as svelteGet } from "svelte/store"
 import { FIELDS } from "@/constants/backend"
 import { makeReadableKeyPropSafe } from "@/dataBinding"

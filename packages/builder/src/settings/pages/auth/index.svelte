@@ -15,7 +15,7 @@ import {
   Tag,
   Tags,
   Toggle,
-} from "@budibase/bbui"
+} from "@supertoolmake/bbui"
 import Auth0Logo from "assets/auth0-logo.png"
 import MicrosoftLogo from "assets/microsoft-logo.png"
 import OidcLogoPng from "assets/oidc-logo.png"

@@ -5,8 +5,8 @@ import {
   memo,
   QueryUtils,
   RowUtils,
-} from "@budibase/frontend-core"
-import { makePropSafe, processStringSync } from "@budibase/string-templates"
+} from "@supertoolmake/frontend-core"
+import { makePropSafe, processStringSync } from "@supertoolmake/string-templates"
 import { API } from "@/api"
 import { createValidatorFromConstraints } from "@/components/app/forms/validation"
 import Block from "@/components/Block.svelte"

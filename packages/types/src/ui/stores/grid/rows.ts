@@ -1,4 +1,4 @@
-import type { Row } from "@budibase/types"
+import type { Row } from "@supertoolmake/types"
 
 export type UIRow = Row & {
   _id: string

@@ -8,7 +8,7 @@ import {
   Icon,
   Layout,
   notifications,
-} from "@budibase/bbui"
+} from "@supertoolmake/bbui"
 import { goto } from "@roxi/routify"
 import Logo from "assets/supertoolmake-emblem.svg"
 import { onMount } from "svelte"

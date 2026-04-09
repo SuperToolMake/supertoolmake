@@ -1,4 +1,4 @@
-import { type Document, DocumentType } from "@budibase/types"
+import { type Document, DocumentType } from "@supertoolmake/types"
 import PouchDB from "pouchdb"
 import { DesignDocuments, SEPARATOR, USER_METADATA_PREFIX } from "../constants"
 import { closePouchDB, getPouchDB } from "./couch"

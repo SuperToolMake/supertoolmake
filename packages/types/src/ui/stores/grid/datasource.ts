@@ -1,4 +1,4 @@
-import type { UITable } from "@budibase/types"
+import type { UITable } from "@supertoolmake/types"
 
 export type UIDatasource = UITable
 

@@ -1,4 +1,4 @@
-import type { Ctx } from "@budibase/types"
+import type { Ctx } from "@supertoolmake/types"
 
 export const handleScimBody = (ctx: Ctx, next: any) => {
   let type = ctx.req.headers["content-type"] || ""

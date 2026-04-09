@@ -1,6 +1,6 @@
 <script>
-import { Button, Drawer, Icon, Input } from "@budibase/bbui"
-import { isJSBinding } from "@budibase/string-templates"
+import { Button, Drawer, Icon, Input } from "@supertoolmake/bbui"
+import { isJSBinding } from "@supertoolmake/string-templates"
 import { createEventDispatcher } from "svelte"
 
 export let filter

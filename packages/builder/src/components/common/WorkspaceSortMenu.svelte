@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Icon, Menu, MenuItem, TooltipPosition } from "@budibase/bbui"
+import { Icon, Menu, MenuItem, TooltipPosition } from "@supertoolmake/bbui"
 import { createEventDispatcher, onDestroy, onMount } from "svelte"
 import Portal from "svelte-portal"
 

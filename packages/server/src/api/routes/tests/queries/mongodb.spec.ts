@@ -1,5 +1,5 @@
-import { generator } from "@budibase/backend-core/tests"
-import type { Datasource, Query } from "@budibase/types"
+import { generator } from "@supertoolmake/backend-core/tests"
+import type { Datasource, Query } from "@supertoolmake/types"
 import { BSON, type Collection, type Db, MongoClient } from "mongodb"
 import { DatabaseName, datasourceDescribe } from "../../../../integrations/tests/utils"
 

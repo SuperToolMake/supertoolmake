@@ -1,5 +1,5 @@
-import type { Constants } from "@budibase/frontend-core"
-import type { User as UserDoc } from "@budibase/types"
+import type { Constants } from "@supertoolmake/frontend-core"
+import type { User as UserDoc } from "@supertoolmake/types"
 
 export interface UserInfo {
   email: string

@@ -1,4 +1,4 @@
-import { constants, db as dbCore } from "@budibase/backend-core"
+import { constants, db as dbCore } from "@supertoolmake/backend-core"
 import type {
   CreateWorkspaceRequest,
   DuplicateWorkspaceResponse,
@@ -12,7 +12,7 @@ import type {
   UpdateWorkspaceResponse,
   WithRequired,
   Workspace,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { WorkspaceStatus } from "../../../db/utils"
 import { type Expectations, type RequestOpts, TestAPI } from "./base"
 

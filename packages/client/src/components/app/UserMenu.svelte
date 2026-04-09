@@ -1,13 +1,13 @@
 <script lang="ts">
-import { ActionMenu, Icon, MenuItem, Modal } from "@budibase/bbui"
-import { ChangePasswordModal, ProfileModal, UserAvatar } from "@budibase/frontend-core"
+import { ActionMenu, Icon, MenuItem, Modal } from "@supertoolmake/bbui"
+import { ChangePasswordModal, ProfileModal, UserAvatar } from "@supertoolmake/frontend-core"
 import {
   helpers,
   resolveTranslationGroup,
   resolveWorkspaceTranslations,
   sdk,
-} from "@budibase/shared-core"
-import { type ContextUser, isSSOUser, type User } from "@budibase/types"
+} from "@supertoolmake/shared-core"
+import { type ContextUser, isSSOUser, type User } from "@supertoolmake/types"
 import { getContext } from "svelte"
 import { API } from "@/api"
 

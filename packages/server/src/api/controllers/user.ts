@@ -1,4 +1,4 @@
-import { context } from "@budibase/backend-core"
+import { context } from "@supertoolmake/backend-core"
 import type {
   ContextUserMetadata,
   Ctx,
@@ -10,7 +10,7 @@ import type {
   UpdateUserMetadataRequest,
   UpdateUserMetadataResponse,
   UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { InternalTables } from "../../db/utils"
 import sdk from "../../sdk"
 import { getFullUser } from "../../utilities/users"

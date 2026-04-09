@@ -1,4 +1,4 @@
-import type { Component, Document } from "@budibase/types"
+import type { Component, Document } from "@supertoolmake/types"
 import { cloneDeep } from "lodash/fp"
 
 export class BaseStructure<T extends Document> {

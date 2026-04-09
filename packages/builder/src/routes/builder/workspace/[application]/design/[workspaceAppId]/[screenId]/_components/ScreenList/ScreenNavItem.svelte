@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Helpers, Icon, Modal, notifications } from "@budibase/bbui"
-import type { Screen } from "@budibase/types"
+import { Helpers, Icon, Modal, notifications } from "@supertoolmake/bbui"
+import type { Screen } from "@supertoolmake/types"
 import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
 import NavItem from "@/components/common/NavItem.svelte"
 import ScreenDetailsModal from "@/components/design/ScreenDetailsModal.svelte"

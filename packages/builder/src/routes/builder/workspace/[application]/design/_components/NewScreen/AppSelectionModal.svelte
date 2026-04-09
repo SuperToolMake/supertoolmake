@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Body, ModalContent, Select } from "@budibase/bbui"
+import { Body, ModalContent, Select } from "@supertoolmake/bbui"
 import { workspaceAppStore } from "@/stores/builder"
 
 export let onConfirm: (_selectedAppId: string) => Promise<void> | void

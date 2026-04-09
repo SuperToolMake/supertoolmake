@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Body, FancyCheckboxGroup, InlineAlert, Layout, ModalContent } from "@budibase/bbui"
-import type { Datasource, DatasourceRelationshipConfig } from "@budibase/types"
+import { Body, FancyCheckboxGroup, InlineAlert, Layout, ModalContent } from "@supertoolmake/bbui"
+import type { Datasource, DatasourceRelationshipConfig } from "@supertoolmake/types"
 import Spinner from "@/components/common/Spinner.svelte"
 import { createRelationshipSelectionStore } from "./relationshipSelectionStore"
 

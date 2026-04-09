@@ -1,5 +1,5 @@
 <script>
-import { Table } from "@budibase/bbui"
+import { Table } from "@supertoolmake/bbui"
 import { goto } from "@roxi/routify"
 import ArrayRenderer from "@/components/common/renderers/ArrayRenderer.svelte"
 import Panel from "../Panel.svelte"

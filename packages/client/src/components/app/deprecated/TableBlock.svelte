@@ -1,6 +1,6 @@
 <script>
-import { Utils } from "@budibase/frontend-core"
-import { makePropSafe as safe } from "@budibase/string-templates"
+import { Utils } from "@supertoolmake/frontend-core"
+import { makePropSafe as safe } from "@supertoolmake/string-templates"
 import { generate } from "shortid"
 import { getContext } from "svelte"
 import { get } from "svelte/store"

@@ -1,8 +1,8 @@
 <script lang="ts">
-import { Body, Button, Heading, Layout, Modal } from "@budibase/bbui"
-import { SplitPage } from "@budibase/frontend-core"
-import { sdk } from "@budibase/shared-core"
-import type { CreateWorkspaceResponse } from "@budibase/types"
+import { Body, Button, Heading, Layout, Modal } from "@supertoolmake/bbui"
+import { SplitPage } from "@supertoolmake/frontend-core"
+import { sdk } from "@supertoolmake/shared-core"
+import type { CreateWorkspaceResponse } from "@supertoolmake/types"
 import { goto } from "@roxi/routify"
 import BBLogo from "assets/BBLogo.svelte"
 import { appsStore } from "@/stores/portal/apps"

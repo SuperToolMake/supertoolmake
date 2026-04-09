@@ -1,4 +1,4 @@
-import { Utils } from "@budibase/frontend-core"
+import { Utils } from "@supertoolmake/frontend-core"
 import { describe, expect, it } from "vitest"
 
 const { createSseToJsonTransformStream } = Utils

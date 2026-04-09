@@ -1,5 +1,5 @@
 <script>
-import { Helpers } from "@budibase/bbui"
+import { Helpers } from "@supertoolmake/bbui"
 
 export let size
 export let svgHtml

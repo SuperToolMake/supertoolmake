@@ -1,5 +1,5 @@
-import { context, utils } from "@budibase/backend-core"
-import type { DeploymentStatus } from "@budibase/types"
+import { context, utils } from "@supertoolmake/backend-core"
+import type { DeploymentStatus } from "@supertoolmake/types"
 
 /**
  * This is used to pass around information about the deployment that is occurring

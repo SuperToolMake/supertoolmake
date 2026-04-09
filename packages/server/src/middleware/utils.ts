@@ -1,4 +1,4 @@
-import { LoginMethod, type UserCtx } from "@budibase/types"
+import { LoginMethod, type UserCtx } from "@supertoolmake/types"
 
 export function isBrowser(ctx: UserCtx) {
   const browser = ctx.userAgent?.browser

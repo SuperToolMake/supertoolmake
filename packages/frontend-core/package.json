@@ -1,8 +1,8 @@
 {
-  "name": "@budibase/frontend-core",
+  "name": "@supertoolmake/frontend-core",
   "private": true,
   "version": "0.0.0",
-  "description": "Budibase frontend core libraries used in builder and client",
+  "description": "SuperToolMake frontend core libraries used in builder and client",
   "author": "Budibase",
   "license": "MPL-2.0",
   "svelte": "./src/index.ts",
@@ -12,9 +12,9 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@budibase/bbui": "*",
-    "@budibase/shared-core": "*",
-    "@budibase/types": "*",
+    "@supertoolmake/bbui": "*",
+    "@supertoolmake/shared-core": "*",
+    "@supertoolmake/types": "*",
     "dayjs": "1.10.8",
     "lodash": "4.18.1",
     "shortid": "2.2.17",

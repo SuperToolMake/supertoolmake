@@ -1,4 +1,4 @@
-import type { Component, Screen } from "@budibase/types"
+import type { Component, Screen } from "@supertoolmake/types"
 
 export function findInSettings(screen: Screen, toFind: string) {
   const foundIn: { setting: string; value: string }[] = []

@@ -1,4 +1,4 @@
-import { db as dbCore, tenancy } from "@budibase/backend-core"
+import { db as dbCore, tenancy } from "@supertoolmake/backend-core"
 import type {
   ApiKeyDoc,
   ApiKeyFetchResponse,
@@ -6,7 +6,7 @@ import type {
   UpdateApiKeyRequest,
   UpdateApiKeyResponse,
   UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 
 const KEYS_DOC = dbCore.StaticDatabases.GLOBAL.docs.apiKeys
 

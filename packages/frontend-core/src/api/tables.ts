@@ -20,7 +20,7 @@ import type {
   ValidateNewTableImportRequest,
   ValidateTableImportRequest,
   ValidateTableImportResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface TableEndpoints {

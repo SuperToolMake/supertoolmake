@@ -2,8 +2,8 @@ import {
   isDatasourceOrDatasourcePlusId,
   isQueryId,
   isTableIdOrExternalTableId,
-} from "@budibase/shared-core"
-import { SourceType } from "@budibase/types"
+} from "@supertoolmake/shared-core"
+import { SourceType } from "@supertoolmake/types"
 
 export function getSourceType(sourceId: string): SourceType {
   if (isTableIdOrExternalTableId(sourceId)) {

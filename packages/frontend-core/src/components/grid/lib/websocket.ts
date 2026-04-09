@@ -1,5 +1,5 @@
-import { GridSocketEvent, SocketEvent } from "@budibase/shared-core"
-import type { UIDatasource, UIUser } from "@budibase/types"
+import { GridSocketEvent, SocketEvent } from "@supertoolmake/shared-core"
+import type { UIDatasource, UIUser } from "@supertoolmake/types"
 import { get } from "svelte/store"
 import { createWebsocket } from "../../../utils"
 import type { Store } from "../stores"

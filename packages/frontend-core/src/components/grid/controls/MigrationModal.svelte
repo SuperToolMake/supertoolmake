@@ -1,6 +1,6 @@
 <script>
-import { InlineAlert, Input, ModalContent, notifications } from "@budibase/bbui"
-import { ValidColumnNameRegex } from "@budibase/shared-core"
+import { InlineAlert, Input, ModalContent, notifications } from "@supertoolmake/bbui"
+import { ValidColumnNameRegex } from "@supertoolmake/shared-core"
 import { getContext } from "svelte"
 
 const { API, definition, rows } = getContext("grid")

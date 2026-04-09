@@ -1,5 +1,5 @@
 <script>
-import { DetailSummary, notifications } from "@budibase/bbui"
+import { DetailSummary, notifications } from "@supertoolmake/bbui"
 import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
 import { componentStore } from "@/stores/builder"
 

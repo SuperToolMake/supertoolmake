@@ -1,5 +1,5 @@
 <script>
-import { clickOutside, Popover } from "@budibase/bbui"
+import { clickOutside, Popover } from "@supertoolmake/bbui"
 import { createEventDispatcher, getContext } from "svelte"
 import { PopoverMaxHeight, PopoverMaxWidth, PopoverMinWidth } from "../lib/constants"
 

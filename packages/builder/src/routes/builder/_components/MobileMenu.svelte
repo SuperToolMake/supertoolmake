@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, Layout } from "@budibase/bbui"
+import { ActionButton, Layout } from "@supertoolmake/bbui"
 import { isActive } from "@roxi/routify"
 import { createEventDispatcher } from "svelte"
 import { fade } from "svelte/transition"

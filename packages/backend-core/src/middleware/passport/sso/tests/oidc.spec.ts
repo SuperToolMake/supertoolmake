@@ -3,7 +3,7 @@ import {
   type OIDCInnerConfig,
   type SSOAuthDetails,
   SSOProviderType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import nock from "nock"
 import { generator, structures } from "../../../../../tests"
 import * as oidc from "../oidc"

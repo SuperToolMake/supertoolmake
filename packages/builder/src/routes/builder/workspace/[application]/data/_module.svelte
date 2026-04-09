@@ -1,5 +1,5 @@
 <script>
-import { Layout } from "@budibase/bbui"
+import { Layout } from "@supertoolmake/bbui"
 import { goto, isActive } from "@roxi/routify"
 import { onDestroy, onMount, setContext } from "svelte"
 import DatasourceNavigator from "@/components/backend/DatasourceNavigator/DatasourceNavigator.svelte"

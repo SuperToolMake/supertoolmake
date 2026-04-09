@@ -1,5 +1,5 @@
 <script>
-import { CookieUtils } from "@budibase/frontend-core"
+import { CookieUtils } from "@supertoolmake/frontend-core"
 import { goto } from "@roxi/routify"
 import { admin, auth } from "@/stores/portal"
 

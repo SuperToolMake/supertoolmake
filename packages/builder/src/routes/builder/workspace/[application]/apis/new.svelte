@@ -1,6 +1,6 @@
 <script lang="ts">
-import { notifications } from "@budibase/bbui"
-import { SourceName } from "@budibase/types"
+import { notifications } from "@supertoolmake/bbui"
+import { SourceName } from "@supertoolmake/types"
 import { goto as gotoStore } from "@roxi/routify"
 import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
 import CreationPage from "@/components/common/CreationPage.svelte"

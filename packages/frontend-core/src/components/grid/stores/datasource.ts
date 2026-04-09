@@ -4,7 +4,7 @@ import type {
   UIFieldMutation,
   UIFieldSchema,
   UIRow,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import cloneDeep from "lodash/cloneDeep"
 import { derived, get, type Readable, type Writable } from "svelte/store"
 import {

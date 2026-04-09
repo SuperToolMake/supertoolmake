@@ -1,5 +1,5 @@
 <script>
-import { Body, Label } from "@budibase/bbui"
+import { Body, Label } from "@supertoolmake/bbui"
 import { onMount } from "svelte"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
 

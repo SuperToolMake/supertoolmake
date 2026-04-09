@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Heading, Icon } from "@budibase/bbui"
+import { Heading, Icon } from "@supertoolmake/bbui"
 
 export let showClose: boolean = false
 export let onClose: (() => void) | null = () => {}

@@ -1,4 +1,4 @@
-import { decodeJSBinding } from "@budibase/string-templates"
+import { decodeJSBinding } from "@supertoolmake/string-templates"
 import { enrichButtonActions } from "./buttonActions"
 import { enrichDataBindings } from "./enrichDataBinding"
 

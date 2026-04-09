@@ -1,4 +1,4 @@
-import type { Ctx } from "@budibase/types"
+import type { Ctx } from "@supertoolmake/types"
 import { UserStatus } from "../../constants"
 import * as users from "../../users"
 import { compare } from "../../utils"

@@ -1,4 +1,4 @@
-import type { UnsavedUser, User } from "@budibase/types"
+import type { UnsavedUser, User } from "@supertoolmake/types"
 import { type Expectations, PublicAPI } from "../base"
 
 export class UserPublicAPI extends PublicAPI {

@@ -9,8 +9,8 @@ import {
   Select,
   Tab,
   Tabs,
-} from "@budibase/bbui"
-import { JsonFieldSubType } from "@budibase/types"
+} from "@supertoolmake/bbui"
+import { JsonFieldSubType } from "@supertoolmake/types"
 import { isPlainObject } from "lodash"
 import { createEventDispatcher, onMount } from "svelte"
 import Editor from "@/components/integration/QueryEditor.svelte"

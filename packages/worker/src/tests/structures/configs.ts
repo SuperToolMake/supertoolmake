@@ -1,4 +1,4 @@
-import { utils } from "@budibase/backend-core"
+import { utils } from "@supertoolmake/backend-core"
 import {
   ConfigType,
   type GoogleConfig,
@@ -9,7 +9,7 @@ import {
   type SettingsInnerConfig,
   type SMTPConfig,
   type SMTPInnerConfig,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 
 export function oidc(conf?: Partial<OIDCInnerConfig>): OIDCConfig {
   return {

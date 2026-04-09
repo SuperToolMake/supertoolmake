@@ -1,4 +1,4 @@
-import type { Snippet, UpdateWorkspaceResponse } from "@budibase/types"
+import type { Snippet, UpdateWorkspaceResponse } from "@supertoolmake/types"
 import { get } from "svelte/store"
 import { API } from "@/api"
 import { BudiStore } from "../BudiStore"

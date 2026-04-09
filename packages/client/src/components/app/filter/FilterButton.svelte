@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Helpers, Icon, type PopoverAPI } from "@budibase/bbui"
+import { Helpers, Icon, type PopoverAPI } from "@supertoolmake/bbui"
 import {
   type FieldSchema,
   FieldType,
@@ -7,7 +7,7 @@ import {
   RangeOperator,
   type SearchFilter,
   type TableSchema,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { createEventDispatcher, getContext } from "svelte"
 import type { Writable } from "svelte/store"
 import { isArrayOperator } from "@/utils/filtering"

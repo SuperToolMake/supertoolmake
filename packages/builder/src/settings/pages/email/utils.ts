@@ -1,5 +1,5 @@
-import { notifications } from "@budibase/bbui"
-import { type Config, ConfigType, type FindConfigResponse } from "@budibase/types"
+import { notifications } from "@supertoolmake/bbui"
+import { type Config, ConfigType, type FindConfigResponse } from "@supertoolmake/types"
 import { API } from "@/api"
 
 export function hasConfig<T = any>(doc: any): doc is Config<T> {

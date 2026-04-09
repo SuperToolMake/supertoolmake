@@ -1,12 +1,12 @@
-import { Helpers } from "@budibase/bbui"
-import { RoleUtils } from "@budibase/frontend-core"
+import { Helpers } from "@supertoolmake/bbui"
+import { RoleUtils } from "@supertoolmake/frontend-core"
 import {
   type Component,
   type Layout,
   type Screen,
   type ScreenProps,
   ScreenVariant,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { derived } from "svelte/store"
 import { DNDPlaceholderID, ScreenslotID, ScreenslotType } from "@/constants"
 import { findComponentById, findComponentParent } from "../utils/components.js"

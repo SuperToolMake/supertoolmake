@@ -1,5 +1,5 @@
-import { context, db as coreDb } from "@budibase/backend-core"
-import type { ScreenRoutesViewOutput } from "@budibase/types"
+import { context, db as coreDb } from "@supertoolmake/backend-core"
+import type { ScreenRoutesViewOutput } from "@supertoolmake/types"
 import { getQueryIndex, UNICODE_MAX, ViewName } from "../../db/utils"
 import { createRoutingView } from "../../db/views/staticViews"
 import sdk from "../../sdk"

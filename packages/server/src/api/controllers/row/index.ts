@@ -1,5 +1,5 @@
-import { context } from "@budibase/backend-core"
-import { dataFilters } from "@budibase/shared-core"
+import { context } from "@supertoolmake/backend-core"
+import { dataFilters } from "@supertoolmake/shared-core"
 import {
   type Ctx,
   type DeleteRow,
@@ -25,7 +25,7 @@ import {
   type UserCtx,
   type ValidateRowRequest,
   type ValidateRowResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { isExternalTableID } from "../../../integrations/utils"
 import sdk from "../../../sdk"
 import { apiFileReturn } from "../../../utilities/fileSystem"

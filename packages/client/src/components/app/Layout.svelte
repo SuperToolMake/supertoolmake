@@ -1,6 +1,6 @@
 <script>
-import { clickOutside, Heading, Icon } from "@budibase/bbui"
-import { Constants } from "@budibase/frontend-core"
+import { clickOutside, Heading, Icon } from "@supertoolmake/bbui"
+import { Constants } from "@supertoolmake/frontend-core"
 import { getContext, setContext } from "svelte"
 import { writable } from "svelte/store"
 import { getActiveConditions, reduceConditionActions } from "@/utils/conditions"

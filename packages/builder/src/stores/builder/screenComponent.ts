@@ -1,5 +1,5 @@
-import { getSettingsDefinition } from "@budibase/frontend-core"
-import { helpers, utils } from "@budibase/shared-core"
+import { getSettingsDefinition } from "@supertoolmake/frontend-core"
+import { helpers, utils } from "@supertoolmake/shared-core"
 import type {
   Component,
   ComponentDefinition,
@@ -7,7 +7,7 @@ import type {
   Screen,
   UIComponentError,
   UIDatasourceType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { derived } from "svelte/store"
 import { getBindableProperties } from "@/dataBinding"
 import { bindings } from "@/helpers"

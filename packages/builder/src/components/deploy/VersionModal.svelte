@@ -8,7 +8,7 @@ import {
   notifications,
   ProgressCircle,
   StatusLight,
-} from "@budibase/bbui"
+} from "@supertoolmake/bbui"
 import { API } from "@/api"
 import { CHANGELOG_URL } from "@/constants"
 import { appStore, initialise } from "@/stores/builder"

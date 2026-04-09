@@ -1,4 +1,4 @@
-import type { UserCtx } from "@budibase/types"
+import type { UserCtx } from "@supertoolmake/types"
 import env from "../environment"
 import { hasBuilderPermissions, isAdmin, isBuilder } from "../users"
 import { getWorkspaceIdFromCtx } from "../utils"

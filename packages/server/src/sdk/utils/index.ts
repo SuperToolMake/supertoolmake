@@ -1,5 +1,5 @@
-import { context } from "@budibase/backend-core"
-import { processString } from "@budibase/string-templates"
+import { context } from "@supertoolmake/backend-core"
+import { processString } from "@supertoolmake/string-templates"
 
 export async function getEnvironmentVariables() {
   const envVars = context.getEnvironmentVariables()

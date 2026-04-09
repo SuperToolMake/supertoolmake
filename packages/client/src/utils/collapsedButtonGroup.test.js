@@ -6,7 +6,7 @@ const mockEnrichProps = vi.fn()
 const mockGetActiveConditions = vi.fn()
 const mockReduceConditionActions = vi.fn()
 
-vi.mock("@budibase/frontend-core", () => ({
+vi.mock("@supertoolmake/frontend-core", () => ({
   getSettingsDefinition: (...args) => mockGetSettingsDefinition(...args),
 }))
 

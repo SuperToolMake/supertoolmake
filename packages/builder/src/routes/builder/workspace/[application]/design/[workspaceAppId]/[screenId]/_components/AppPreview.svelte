@@ -1,8 +1,8 @@
 <script>
-import { Body, Heading, Icon, Layout, notifications } from "@budibase/bbui"
-import { ClientAppSkeleton } from "@budibase/frontend-core"
-import ErrorSVG from "@budibase/frontend-core/assets/error.svg?raw"
-import { getThemeClassNames, ThemeClassPrefix } from "@budibase/shared-core"
+import { Body, Heading, Icon, Layout, notifications } from "@supertoolmake/bbui"
+import { ClientAppSkeleton } from "@supertoolmake/frontend-core"
+import ErrorSVG from "@supertoolmake/frontend-core/assets/error.svg?raw"
+import { getThemeClassNames, ThemeClassPrefix } from "@supertoolmake/shared-core"
 import { goto, isActive } from "@roxi/routify"
 import { onDestroy, onMount } from "svelte"
 import { get } from "svelte/store"

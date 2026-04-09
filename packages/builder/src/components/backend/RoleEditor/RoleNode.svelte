@@ -1,5 +1,5 @@
 <script>
-import { ColorPicker, FieldLabel, Icon, Input, Modal, ModalContent } from "@budibase/bbui"
+import { ColorPicker, FieldLabel, Icon, Input, Modal, ModalContent } from "@supertoolmake/bbui"
 import { Handle, Position } from "@xyflow/svelte"
 import { getContext } from "svelte"
 import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"

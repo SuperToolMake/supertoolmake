@@ -1,4 +1,4 @@
-import type { Ctx } from "@budibase/types"
+import type { Ctx } from "@supertoolmake/types"
 import type { ZodType } from "zod"
 import { fromZodError } from "zod-validation-error"
 

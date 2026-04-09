@@ -1,11 +1,11 @@
-import { context } from "@budibase/backend-core"
+import { context } from "@supertoolmake/backend-core"
 import {
   type Database,
   INTERNAL_TABLE_SOURCE_ID,
   type RowValue,
   type Table,
   TableSourceType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { getRowParams, getTableParams, InternalTables } from "../../../db/utils"
 import { breakExternalTableId, isExternalTableID, isSQL } from "../../../integrations/utils"
 import sdk from "../.."

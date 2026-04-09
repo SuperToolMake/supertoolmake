@@ -1,4 +1,4 @@
-import { middleware } from "@budibase/backend-core"
+import { middleware } from "@supertoolmake/backend-core"
 import Joi from "joi"
 
 import * as controller from "../controllers/workspaceApp"

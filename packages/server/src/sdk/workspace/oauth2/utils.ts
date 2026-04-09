@@ -1,5 +1,5 @@
-import { cache, context, docIds } from "@budibase/backend-core"
-import { type Document, OAuth2CredentialsMethod, type OAuth2GrantType } from "@budibase/types"
+import { cache, context, docIds } from "@supertoolmake/backend-core"
+import { type Document, OAuth2CredentialsMethod, type OAuth2GrantType } from "@supertoolmake/types"
 import { HttpError } from "koa"
 import fetch, { type RequestInit } from "node-fetch"
 import { processEnvironmentVariable } from "../../utils"

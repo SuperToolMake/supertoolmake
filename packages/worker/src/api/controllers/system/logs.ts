@@ -1,5 +1,5 @@
-import { installation, logging } from "@budibase/backend-core"
-import type { GetLogResponse, UserCtx } from "@budibase/types"
+import { installation, logging } from "@supertoolmake/backend-core"
+import type { GetLogResponse, UserCtx } from "@supertoolmake/types"
 
 export async function getLogs(ctx: UserCtx<void, GetLogResponse>) {
   const logReadStream = logging.system.getLogReadStream()

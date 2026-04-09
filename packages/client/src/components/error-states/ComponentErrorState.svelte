@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Icon } from "@budibase/bbui"
-import type { UIComponentError } from "@budibase/types"
+import { Icon } from "@supertoolmake/bbui"
+import type { UIComponentError } from "@supertoolmake/types"
 import { getContext } from "svelte"
 import ComponentErrorStateCta from "./ComponentErrorStateCTA.svelte"
 

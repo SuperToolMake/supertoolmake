@@ -1,5 +1,5 @@
 <script>
-import { Combobox, Label, Select } from "@budibase/bbui"
+import { Combobox, Label, Select } from "@supertoolmake/bbui"
 import { buildFormSchema, getActionProviders } from "@/dataBinding"
 import { findComponent } from "@/helpers/components"
 import { componentStore, selectedScreen } from "@/stores/builder"

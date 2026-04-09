@@ -1,5 +1,5 @@
-import { makePropSafe } from "@budibase/string-templates"
-import type { UIBinding } from "@budibase/types"
+import { makePropSafe } from "@supertoolmake/string-templates"
+import type { UIBinding } from "@supertoolmake/types"
 
 export function extractRelationships(bindings: UIBinding[]) {
   return (

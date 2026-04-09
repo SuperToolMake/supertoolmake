@@ -1,5 +1,5 @@
 <script>
-import { Icon } from "@budibase/bbui"
+import { Icon } from "@supertoolmake/bbui"
 import { getContext } from "svelte"
 import { cloneDeep } from "./utils"
 

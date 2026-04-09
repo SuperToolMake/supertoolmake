@@ -5,8 +5,8 @@ import type {
   Query,
   QuerySchema,
   RestAuthConfig,
-} from "@budibase/types"
-import { RestAuthType } from "@budibase/types"
+} from "@supertoolmake/types"
+import { RestAuthType } from "@supertoolmake/types"
 import { cloneDeep } from "lodash"
 import { get } from "svelte/store"
 import {

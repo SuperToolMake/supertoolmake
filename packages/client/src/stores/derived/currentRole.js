@@ -1,4 +1,4 @@
-import { Constants } from "@budibase/frontend-core"
+import { Constants } from "@supertoolmake/frontend-core"
 import { derived } from "svelte/store"
 import { authStore } from "../auth"
 import { devToolsStore } from "../devTools.js"

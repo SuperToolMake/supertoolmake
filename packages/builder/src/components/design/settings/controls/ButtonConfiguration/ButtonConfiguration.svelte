@@ -1,5 +1,5 @@
 <script>
-import { Helpers, Menu, MenuItem, Popover } from "@budibase/bbui"
+import { Helpers, Menu, MenuItem, Popover } from "@supertoolmake/bbui"
 import { cloneDeep, isEqual } from "lodash/fp"
 import { createEventDispatcher } from "svelte"
 import { getEventContextBindings } from "@/dataBinding"

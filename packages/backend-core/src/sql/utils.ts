@@ -6,7 +6,7 @@ import {
   type SqlQuery,
   type Table,
   TableSourceType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { Knex } from "knex"
 import environment from "../environment"
 

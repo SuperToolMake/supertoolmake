@@ -1,5 +1,5 @@
 <script>
-import { CoreTextField } from "@budibase/bbui"
+import { CoreTextField } from "@supertoolmake/bbui"
 import Field from "./Field.svelte"
 
 export let field

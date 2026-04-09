@@ -1,4 +1,4 @@
-import { helpers } from "@budibase/shared-core"
+import { helpers } from "@supertoolmake/shared-core"
 import dayjs from "dayjs"
 
 export const deepGet = helpers.deepGet

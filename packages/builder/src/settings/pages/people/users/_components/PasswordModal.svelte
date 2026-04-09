@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Body, Icon, ModalContent, Table } from "@budibase/bbui"
-import type { BulkUserCreated } from "@budibase/types"
+import { Body, Icon, ModalContent, Table } from "@supertoolmake/bbui"
+import type { BulkUserCreated } from "@supertoolmake/types"
 import { onMount } from "svelte"
 import { parseToCsv } from "@/helpers/data/utils"
 import InviteResponseRenderer from "./InviteResponseRenderer.svelte"

@@ -1,4 +1,4 @@
-import type { PlatformUser, PlatformUserByEmail, User } from "@budibase/types"
+import type { PlatformUser, PlatformUserByEmail, User } from "@supertoolmake/types"
 import { getExistingInvites } from "../cache/invite"
 import { ViewName } from "../constants"
 import * as dbUtils from "../db"

@@ -1,5 +1,5 @@
 <script>
-import { decodeJSBinding } from "@budibase/string-templates"
+import { decodeJSBinding } from "@supertoolmake/string-templates"
 import { getBindings } from "@/components/backend/DataTable/formula"
 import { EditorModes } from "@/components/common/CodeEditor"
 import CodeEditor from "@/components/common/CodeEditor/CodeEditor.svelte"

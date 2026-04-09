@@ -1,5 +1,5 @@
-import { DefaultAppTheme, ensureValidTheme } from "@budibase/shared-core"
-import type { AppCustomTheme, Theme, UpdateWorkspaceResponse, Workspace } from "@budibase/types"
+import { DefaultAppTheme, ensureValidTheme } from "@supertoolmake/shared-core"
+import type { AppCustomTheme, Theme, UpdateWorkspaceResponse, Workspace } from "@supertoolmake/types"
 import { get } from "svelte/store"
 import { API } from "@/api"
 import { BudiStore } from "../BudiStore"

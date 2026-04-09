@@ -1,5 +1,5 @@
-import { context, db as dbCore, Header, roles } from "@budibase/backend-core"
-import { helpers, RoleColor, sdk as sharedSdk } from "@budibase/shared-core"
+import { context, db as dbCore, Header, roles } from "@supertoolmake/backend-core"
+import { helpers, RoleColor, sdk as sharedSdk } from "@supertoolmake/shared-core"
 import {
   type AccessibleRolesResponse,
   BuiltinPermissionID,
@@ -13,7 +13,7 @@ import {
   type SaveRoleResponse,
   type UserCtx,
   type UserMetadata,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { getUserMetadataParams, InternalTables } from "../../db/utils"
 import sdk from "../../sdk"
 import { builderSocket } from "../../websockets"

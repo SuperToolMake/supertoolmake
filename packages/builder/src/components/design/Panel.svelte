@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Body, Icon, TooltipPosition, TooltipType } from "@budibase/bbui"
+import { Body, Icon, TooltipPosition, TooltipType } from "@supertoolmake/bbui"
 
 export let title: string | undefined = ""
 export let icon: string | undefined = ""

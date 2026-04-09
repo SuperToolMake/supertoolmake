@@ -8,7 +8,7 @@ import {
   Select,
   TextArea,
   Toggle,
-} from "@budibase/bbui"
+} from "@supertoolmake/bbui"
 import Dropzone from "@/components/common/Dropzone.svelte"
 import LinkedRowSelector from "@/components/common/LinkedRowSelector.svelte"
 import { capitalise } from "@/helpers"

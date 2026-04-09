@@ -1,5 +1,5 @@
 <script>
-import { TextArea } from "@budibase/bbui"
+import { TextArea } from "@supertoolmake/bbui"
 import { join } from "lodash/fp"
 
 export let values

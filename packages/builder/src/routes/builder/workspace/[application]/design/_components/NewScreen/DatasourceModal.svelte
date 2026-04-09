@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Body, Layout, Link, ModalContent } from "@budibase/bbui"
-import type { Datasource } from "@budibase/types"
+import { Body, Layout, Link, ModalContent } from "@supertoolmake/bbui"
+import type { Datasource } from "@supertoolmake/types"
 import { createEventDispatcher } from "svelte"
 import { PHOSPHOR_ICONS, SVELTE_COMPONENT_ICONS } from "@/helpers/integrationIcons"
 import { IntegrationNames } from "@/constants"

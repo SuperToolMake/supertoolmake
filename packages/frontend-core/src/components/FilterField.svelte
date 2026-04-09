@@ -1,7 +1,7 @@
 <script>
-import { Button, Combobox, DatePicker, Drawer, Icon, Input, Multiselect } from "@budibase/bbui"
-import { findHBSBlocks, isJSBinding } from "@budibase/string-templates"
-import { ArrayOperator, FieldType } from "@budibase/types"
+import { Button, Combobox, DatePicker, Drawer, Icon, Input, Multiselect } from "@supertoolmake/bbui"
+import { findHBSBlocks, isJSBinding } from "@supertoolmake/string-templates"
+import { ArrayOperator, FieldType } from "@supertoolmake/types"
 import { createEventDispatcher } from "svelte"
 import * as Constants from "../constants"
 import FilterUsers from "./FilterUsers.svelte"

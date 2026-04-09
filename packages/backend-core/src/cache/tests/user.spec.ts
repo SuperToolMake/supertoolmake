@@ -1,4 +1,4 @@
-import type { User } from "@budibase/types"
+import type { User } from "@supertoolmake/types"
 import _ from "lodash"
 import { generator, structures } from "../../../tests"
 import { DBTestConfiguration } from "../../../tests/extra"

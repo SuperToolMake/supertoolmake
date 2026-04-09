@@ -1,5 +1,5 @@
-import { context, tenancy, utils } from "@budibase/backend-core"
-import type { UserCtx } from "@budibase/types"
+import { context, tenancy, utils } from "@supertoolmake/backend-core"
+import type { UserCtx } from "@supertoolmake/types"
 
 export async function ensureTenantAppOwnershipMiddleware(
   ctx: UserCtx,

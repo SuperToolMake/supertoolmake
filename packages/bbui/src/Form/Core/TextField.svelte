@@ -1,6 +1,6 @@
 <script lang="ts">
 import "@spectrum-css/textfield/dist/index-vars.css"
-import type { UIEvent } from "@budibase/types"
+import type { UIEvent } from "@supertoolmake/types"
 import { createEventDispatcher, onMount, tick } from "svelte"
 import type { FullAutoFill } from "svelte/elements"
 

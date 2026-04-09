@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Input, Label } from "@budibase/bbui"
-import type { AppContext } from "@budibase/types"
+import { Input, Label } from "@supertoolmake/bbui"
+import type { AppContext } from "@supertoolmake/types"
 import { onMount } from "svelte"
 import { previewStore, selectedScreen } from "@/stores/builder"
 

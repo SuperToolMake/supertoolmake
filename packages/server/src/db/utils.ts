@@ -1,14 +1,14 @@
-import { context, db as dbCore, utils } from "@budibase/backend-core"
+import { context, db as dbCore, utils } from "@supertoolmake/backend-core"
 import {
   DocumentType,
   type FieldSchema,
   FieldType,
   type LinkDocument,
   type RelationshipFieldMetadata,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { DocumentListParams } from "nano"
 
-export { DocumentType, VirtualDocumentType } from "@budibase/types"
+export { DocumentType, VirtualDocumentType } from "@supertoolmake/types"
 
 const newid = utils.newid
 

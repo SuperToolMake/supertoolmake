@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Input, Label } from "@budibase/bbui"
+import { Input, Label } from "@supertoolmake/bbui"
 
 export let type
 export let name

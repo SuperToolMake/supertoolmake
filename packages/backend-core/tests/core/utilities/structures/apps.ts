@@ -1,4 +1,4 @@
-import type { Workspace } from "@budibase/types"
+import type { Workspace } from "@supertoolmake/types"
 import { DEFAULT_TENANT_ID, DocumentType } from "../../../../src/constants"
 import { generator } from "."
 

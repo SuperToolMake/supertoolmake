@@ -1,4 +1,4 @@
-import { AutoReason, type Datasource, FieldType, RelationshipType } from "@budibase/types"
+import { AutoReason, type Datasource, FieldType, RelationshipType } from "@supertoolmake/types"
 
 function checkForeignKeysAreAutoColumns(datasource: Datasource) {
   if (!datasource.entities) {

@@ -1,5 +1,5 @@
 <script>
-import { FieldType } from "@budibase/types"
+import { FieldType } from "@supertoolmake/types"
 import { FIELDS } from "@/constants/backend"
 import subjects from "../subjects"
 import { DocumentationLink, InfoWord, Line, Text } from "../typography"

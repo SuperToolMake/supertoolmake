@@ -12,7 +12,7 @@ import {
   Link,
   notifications,
   Toggle,
-} from "@budibase/bbui"
+} from "@supertoolmake/bbui"
 import { cloneDeep, isEqual } from "lodash/fp"
 import { onMount } from "svelte"
 import { API } from "@/api"

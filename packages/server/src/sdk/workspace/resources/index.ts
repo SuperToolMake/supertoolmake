@@ -1,4 +1,4 @@
-import { context, db, HTTPError, logging } from "@budibase/backend-core"
+import { context, db, HTTPError, logging } from "@supertoolmake/backend-core"
 import {
   type AnyDocument,
   DocumentType,
@@ -10,7 +10,7 @@ import {
   type Table,
   type UsedResource,
   type WithDocMetadata,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import chunk from "lodash/chunk"
 import type { DocumentListParams } from "nano"
 import { getRowParams } from "../../../db/utils"

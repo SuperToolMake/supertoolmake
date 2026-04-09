@@ -1,6 +1,6 @@
-import { type Row, RowExportFormat, type TableSchema } from "@budibase/types"
+import { type Row, RowExportFormat, type TableSchema } from "@supertoolmake/types"
 
-export { RowExportFormat as Format } from "@budibase/types"
+export { RowExportFormat as Format } from "@supertoolmake/types"
 
 function getHeaders(headers: string[], customHeaders: { [key: string]: string }) {
   return headers.map((header) => `"${customHeaders[header] || header}"`)

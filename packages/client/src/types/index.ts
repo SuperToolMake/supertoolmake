@@ -1,4 +1,4 @@
-import type { ArrayOperator, BasicOperator, RangeOperator } from "@budibase/types"
+import type { ArrayOperator, BasicOperator, RangeOperator } from "@supertoolmake/types"
 import type { Readable } from "svelte/store"
 
 export * from "./components"

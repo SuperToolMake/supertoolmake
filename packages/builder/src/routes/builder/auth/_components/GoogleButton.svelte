@@ -1,5 +1,5 @@
 <script>
-import { FancyButton } from "@budibase/bbui"
+import { FancyButton } from "@supertoolmake/bbui"
 import GoogleLogo from "assets/google-logo.png"
 import { auth, organisation } from "@/stores/portal"
 

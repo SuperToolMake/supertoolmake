@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Button } from "@budibase/bbui"
+import { Button } from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
 

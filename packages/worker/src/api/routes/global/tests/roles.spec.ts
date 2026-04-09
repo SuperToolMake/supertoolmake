@@ -1,9 +1,9 @@
-import { context, db, roles } from "@budibase/backend-core"
-import { BuiltinPermissionID, type Database } from "@budibase/types"
+import { context, db, roles } from "@supertoolmake/backend-core"
+import { BuiltinPermissionID, type Database } from "@supertoolmake/types"
 import { structures, TestConfiguration } from "../../../../tests"
 
-jest.mock("@budibase/backend-core", () => {
-  const core = jest.requireActual("@budibase/backend-core")
+jest.mock("@supertoolmake/backend-core", () => {
+  const core = jest.requireActual("@supertoolmake/backend-core")
   return {
     ...core,
     db: {

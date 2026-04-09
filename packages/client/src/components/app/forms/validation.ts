@@ -1,10 +1,10 @@
-import { Helpers } from "@budibase/bbui"
+import { Helpers } from "@supertoolmake/bbui"
 import {
   type FieldConstraints,
   FieldType,
   type Table,
   type UIFieldValidationRule,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import dayjs from "dayjs"
 
 /**

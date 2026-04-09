@@ -1,4 +1,4 @@
-import type { SocketSession, Workspace } from "@budibase/types"
+import type { SocketSession, Workspace } from "@supertoolmake/types"
 import { builderSocket } from "../../websockets"
 
 export const enrichApps = async (apps: Workspace[]) => {

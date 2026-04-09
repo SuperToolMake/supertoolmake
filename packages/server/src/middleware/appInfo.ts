@@ -1,4 +1,4 @@
-import type { Ctx } from "@budibase/types"
+import type { Ctx } from "@supertoolmake/types"
 import { isDevWorkspaceID, isProdWorkspaceID } from "../db/utils"
 
 export enum AppType {

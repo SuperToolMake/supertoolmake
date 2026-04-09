@@ -1,5 +1,5 @@
-import { type APIClient, Constants } from "@budibase/frontend-core"
-import type { Row, Table } from "@budibase/types"
+import { type APIClient, Constants } from "@supertoolmake/frontend-core"
+import type { Row, Table } from "@supertoolmake/types"
 import { FieldTypes } from "../constants"
 
 export const patchAPI = (API: APIClient) => {

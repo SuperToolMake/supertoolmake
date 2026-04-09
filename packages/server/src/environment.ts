@@ -1,6 +1,6 @@
 import { join, resolve } from "node:path"
-import { env as coreEnv } from "@budibase/backend-core"
-import { ServiceType } from "@budibase/types"
+import { env as coreEnv } from "@supertoolmake/backend-core"
+import { ServiceType } from "@supertoolmake/types"
 import cloneDeep from "lodash/cloneDeep"
 
 coreEnv._set("SERVICE_TYPE", ServiceType.APPS)

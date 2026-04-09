@@ -16,7 +16,7 @@ jest.mock("../../sdk/workspace/oauth2", () => {
   }
 })
 
-import { generator } from "@budibase/backend-core/tests"
+import { generator } from "@supertoolmake/backend-core/tests"
 import {
   type BasicRestAuthConfig,
   type BearerRestAuthConfig,
@@ -24,7 +24,7 @@ import {
   OAuth2CredentialsMethod,
   OAuth2GrantType,
   RestAuthType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import * as undici from "undici"
 import {
   FormData as UndiciFormData,

@@ -1,4 +1,4 @@
-import type { UIUser } from "@budibase/types"
+import type { UIUser } from "@supertoolmake/types"
 import { derived, get } from "svelte/store"
 import { BudiStore } from "../BudiStore"
 

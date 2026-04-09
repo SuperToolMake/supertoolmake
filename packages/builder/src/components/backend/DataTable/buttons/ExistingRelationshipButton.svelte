@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, notifications } from "@budibase/bbui"
+import { ActionButton, notifications } from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 
 import { datasources, tables as tablesStore } from "@/stores/builder"

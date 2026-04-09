@@ -2,7 +2,7 @@ import type {
   CreateWorkspaceBackupResponse,
   ExportWorkspaceDumpRequest,
   ImportWorkspaceBackupResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { type Expectations, TestAPI } from "./base"
 
 export class BackupAPI extends TestAPI {

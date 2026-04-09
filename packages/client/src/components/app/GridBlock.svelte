@@ -2,9 +2,9 @@
 // NOTE: this is not a block - it's just named as such to avoid confusing users,
 // because it functions similarly to one
 
-import { Grid } from "@budibase/frontend-core"
-import { processStringSync } from "@budibase/string-templates"
-import { EmptyFilterOption, UILogicalOperator } from "@budibase/types"
+import { Grid } from "@supertoolmake/frontend-core"
+import { processStringSync } from "@supertoolmake/string-templates"
+import { EmptyFilterOption, UILogicalOperator } from "@supertoolmake/types"
 import { getContext, onDestroy, onMount } from "svelte"
 import { derived, get, readable } from "svelte/store"
 import { createAutoRefresh } from "@/utils/autoRefresh"

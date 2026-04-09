@@ -12,7 +12,7 @@ import {
   type SearchRowRequest,
   type SearchRowResponse,
   type ValidateRowResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { type Expectations, TestAPI } from "./base"
 
 export class RowAPI extends TestAPI {

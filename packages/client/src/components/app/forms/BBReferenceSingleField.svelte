@@ -1,5 +1,5 @@
 <script>
-import { FieldType } from "@budibase/types"
+import { FieldType } from "@supertoolmake/types"
 import BBReferenceField from "./BBReferenceField.svelte"
 </script>
 

@@ -5,7 +5,7 @@ import type {
   SSOAuthDetails,
   SSOUser,
   User,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { tenant } from "."
 import { uuid } from "./common"
 import { generator } from "./generator"

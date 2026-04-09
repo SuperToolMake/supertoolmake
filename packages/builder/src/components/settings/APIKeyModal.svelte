@@ -1,5 +1,5 @@
 <script>
-import { Body, CopyInput, keepOpen, ModalContent, notifications } from "@budibase/bbui"
+import { Body, CopyInput, keepOpen, ModalContent, notifications } from "@supertoolmake/bbui"
 import { onMount } from "svelte"
 import { auth } from "@/stores/portal"
 

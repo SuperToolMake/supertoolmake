@@ -1,5 +1,5 @@
-import { auth } from "@budibase/backend-core"
-import { ConfigType } from "@budibase/types"
+import { auth } from "@supertoolmake/backend-core"
+import { ConfigType } from "@supertoolmake/types"
 import Joi from "joi"
 import * as controller from "../../controllers/global/configs"
 import { adminRoutes, loggedInRoutes } from "../endpointGroups"

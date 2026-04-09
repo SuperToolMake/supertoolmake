@@ -4,7 +4,7 @@ import {
   LockReason,
   type LockRequest,
   type UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import * as tenantSdk from "../../../sdk/tenants"
 
 export async function destroy(ctx: UserCtx<void, void>) {

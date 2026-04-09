@@ -109,9 +109,12 @@ export default defineConfig(({ mode }) => {
 
       dedupe: ["@roxi/routify", "svelte"],
       alias: {
-        "@budibase/types": path.resolve(__dirname, "../types/src"),
-        "@budibase/shared-core": path.resolve(__dirname, "../shared-core/src"),
-        "@budibase/bbui": path.resolve(__dirname, "../bbui/src"),
+        "@supertoolmake/types": path.resolve(__dirname, "../types/src"),
+        "@supertoolmake/shared-core": path.resolve(
+          __dirname,
+          "../shared-core/src"
+        ),
+        "@supertoolmake/bbui": path.resolve(__dirname, "../bbui/src"),
         "@": path.resolve(__dirname, "src"),
         assets: path.resolve(__dirname, "assets"),
       },

@@ -1,5 +1,5 @@
-import { canBeDisplayColumn, isAllowedDisplayField, SWITCHABLE_TYPES } from "@budibase/shared-core"
-import { type FieldSchema, FieldType, type SaveTableRequest, type Table } from "@budibase/types"
+import { canBeDisplayColumn, isAllowedDisplayField, SWITCHABLE_TYPES } from "@supertoolmake/shared-core"
+import { type FieldSchema, FieldType, type SaveTableRequest, type Table } from "@supertoolmake/types"
 import { cloneDeep } from "lodash/fp"
 import { derived, get, type Writable } from "svelte/store"
 import { API } from "@/api"

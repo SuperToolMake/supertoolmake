@@ -1,4 +1,4 @@
-import type { FieldType, SearchFilter } from "@budibase/types"
+import type { FieldType, SearchFilter } from "@supertoolmake/types"
 
 export interface UICondition {
   column: string

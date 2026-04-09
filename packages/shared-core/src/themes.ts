@@ -1,4 +1,4 @@
-import { Theme } from "@budibase/types"
+import { Theme } from "@supertoolmake/types"
 import { ThemeClassPrefix, ThemeOptions } from "./constants/themes"
 
 // Gets the CSS class names for the specified theme

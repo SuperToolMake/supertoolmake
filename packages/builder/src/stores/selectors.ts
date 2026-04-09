@@ -1,4 +1,4 @@
-import { DatasourceFeature, type Integration } from "@budibase/types"
+import { DatasourceFeature, type Integration } from "@supertoolmake/types"
 import { cloneDeep } from "lodash/fp"
 
 interface Datasource {

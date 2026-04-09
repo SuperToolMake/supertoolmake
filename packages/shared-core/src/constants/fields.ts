@@ -1,4 +1,4 @@
-import { FieldType } from "@budibase/types"
+import { FieldType } from "@supertoolmake/types"
 
 type SwitchableTypes = Partial<{
   [K in FieldType]: [K, ...FieldType[]]

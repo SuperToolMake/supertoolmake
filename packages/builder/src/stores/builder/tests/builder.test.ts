@@ -1,5 +1,5 @@
-import { BuilderSocketEvent } from "@budibase/shared-core"
-import type { Workspace } from "@budibase/types"
+import { BuilderSocketEvent } from "@supertoolmake/shared-core"
+import type { Workspace } from "@supertoolmake/types"
 import { get } from "svelte/store"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { BuilderStore, INITIAL_BUILDER_STATE } from "@/stores/builder/builder"

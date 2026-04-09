@@ -1,5 +1,5 @@
-import { findHBSBlocks } from "@budibase/string-templates"
-import { type DatasourcePlus, SourceName } from "@budibase/types"
+import { findHBSBlocks } from "@supertoolmake/string-templates"
+import { type DatasourcePlus, SourceName } from "@supertoolmake/types"
 import sdk from "../../sdk"
 
 const MYSQL_CONST_CHAR_REGEX = /"[^"]*"|'[^']*'/g

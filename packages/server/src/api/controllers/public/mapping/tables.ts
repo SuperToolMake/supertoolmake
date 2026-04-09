@@ -1,4 +1,4 @@
-import type { RequiredKeys } from "@budibase/types"
+import type { RequiredKeys } from "@supertoolmake/types"
 import type { Table } from "./types"
 
 function table(body: any): RequiredKeys<Table> {

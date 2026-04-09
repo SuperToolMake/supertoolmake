@@ -1,4 +1,4 @@
-import { permissions } from "@budibase/backend-core"
+import { permissions } from "@supertoolmake/backend-core"
 import { authorizedMiddleware as authorized } from "../../middleware/authorized"
 import * as controller from "../controllers/user"
 import { endpointGroupList } from "./endpointGroups"

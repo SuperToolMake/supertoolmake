@@ -1,4 +1,4 @@
-import type { UpdateNavigationRequest } from "@budibase/types"
+import type { UpdateNavigationRequest } from "@supertoolmake/types"
 import { type Expectations, TestAPI } from "./base"
 
 export class NavigationAPI extends TestAPI {

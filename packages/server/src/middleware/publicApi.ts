@@ -1,5 +1,5 @@
-import { constants, utils } from "@budibase/backend-core"
-import type { Ctx } from "@budibase/types"
+import { constants, utils } from "@supertoolmake/backend-core"
+import type { Ctx } from "@supertoolmake/types"
 import type { Next } from "koa"
 
 export function publicApiMiddleware({ requiresAppId }: { requiresAppId?: boolean } = {}) {

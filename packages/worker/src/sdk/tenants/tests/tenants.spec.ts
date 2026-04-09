@@ -1,11 +1,11 @@
-import { configs, tenancy } from "@budibase/backend-core"
-import { ConfigType, LockReason, type SettingsConfig } from "@budibase/types"
+import { configs, tenancy } from "@supertoolmake/backend-core"
+import { ConfigType, LockReason, type SettingsConfig } from "@supertoolmake/types"
 import { structures } from "../../../tests"
 import { lockTenant, setActivation, unlockTenant } from "../tenants"
 
 // Mock the backend-core modules
-jest.mock("@budibase/backend-core", () => {
-  const actual = jest.requireActual("@budibase/backend-core")
+jest.mock("@supertoolmake/backend-core", () => {
+  const actual = jest.requireActual("@supertoolmake/backend-core")
   return {
     ...actual,
     tenancy: {

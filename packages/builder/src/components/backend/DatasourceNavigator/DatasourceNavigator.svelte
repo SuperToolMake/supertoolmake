@@ -1,6 +1,6 @@
 <script>
-import { Layout } from "@budibase/bbui"
-import { DataEnvironmentMode } from "@budibase/types"
+import { Layout } from "@supertoolmake/bbui"
+import { DataEnvironmentMode } from "@supertoolmake/types"
 import { goto, isActive, params } from "@roxi/routify"
 import { onMount } from "svelte"
 import TableNavigator from "@/components/backend/TableNavigator/TableNavigator.svelte"

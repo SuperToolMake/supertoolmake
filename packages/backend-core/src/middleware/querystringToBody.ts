@@ -1,4 +1,4 @@
-import type { Ctx } from "@budibase/types"
+import type { Ctx } from "@supertoolmake/types"
 
 /**
  * Expects a standard "query" query string property which is the JSON body

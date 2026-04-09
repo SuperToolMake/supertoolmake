@@ -8,7 +8,7 @@ const icons = Object.keys(iconData).reduce((acc, cat) => {
 </script>
 
 <script>
-  import { Popover, ActionButton, Button, Input } from "@budibase/bbui"
+  import { Popover, ActionButton, Button, Input } from "@supertoolmake/bbui"
   import { createEventDispatcher, tick } from "svelte"
 
   const dispatch = createEventDispatcher()

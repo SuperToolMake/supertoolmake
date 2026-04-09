@@ -1,4 +1,4 @@
-import type { Row } from "@budibase/types"
+import type { Row } from "@supertoolmake/types"
 
 /**
  * Converts an array of rows to a CSV string.

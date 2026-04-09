@@ -9,7 +9,7 @@ import {
   type User,
   type UserIdentifier,
   UserStatus,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import * as cache from "../cache"
 import { getGlobalDB, getTenantId } from "../context"
 import * as dbUtils from "../db"

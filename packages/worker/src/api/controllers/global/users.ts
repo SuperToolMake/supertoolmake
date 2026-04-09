@@ -8,8 +8,8 @@ import {
   platform,
   tenancy,
   users,
-} from "@budibase/backend-core"
-import { dataFilters, utils } from "@budibase/shared-core"
+} from "@supertoolmake/backend-core"
+import { dataFilters, utils } from "@supertoolmake/shared-core"
 import {
   type AcceptUserInviteRequest,
   type AcceptUserInviteResponse,
@@ -49,7 +49,7 @@ import {
   type User,
   type UserCtx,
   type UserIdentifier,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import emailValidator from "email-validator"
 import env from "../../../environment"
 import * as userSdk from "../../../sdk/users"

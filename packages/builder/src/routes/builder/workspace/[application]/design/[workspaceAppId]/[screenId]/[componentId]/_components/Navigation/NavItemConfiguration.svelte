@@ -1,5 +1,5 @@
 <script>
-import { Constants } from "@budibase/frontend-core"
+import { Constants } from "@supertoolmake/frontend-core"
 import { generate } from "shortid"
 import DraggableList from "@/components/design/settings/controls/DraggableList.svelte"
 import { getSequentialName } from "@/helpers/duplicate"

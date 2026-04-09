@@ -1,5 +1,5 @@
-import { helpers } from "@budibase/shared-core"
-import type { Table, WithoutDocMetadata } from "@budibase/types"
+import { helpers } from "@supertoolmake/shared-core"
+import type { Table, WithoutDocMetadata } from "@supertoolmake/types"
 import { create } from "./create"
 import { getAllInternalTables } from "./getters"
 

@@ -1,4 +1,4 @@
-import type { AppNavigation, WithRequired, WorkspaceApp } from "@budibase/types"
+import type { AppNavigation, WithRequired, WorkspaceApp } from "@supertoolmake/types"
 import * as setup from "./utilities"
 
 describe("/navigation", () => {

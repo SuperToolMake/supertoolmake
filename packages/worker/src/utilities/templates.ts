@@ -1,5 +1,5 @@
-import { configs, tenancy } from "@budibase/backend-core"
-import { EmailTemplatePurpose } from "@budibase/types"
+import { configs, tenancy } from "@supertoolmake/backend-core"
+import { EmailTemplatePurpose } from "@supertoolmake/types"
 import { InternalTemplateBinding, LOGO_URL } from "../constants"
 import { checkSlashesInUrl } from "./index"
 

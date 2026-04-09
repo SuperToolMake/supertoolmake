@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, Button, Input, Label, Select } from "@budibase/bbui"
+import { ActionButton, Button, Input, Label, Select } from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
 

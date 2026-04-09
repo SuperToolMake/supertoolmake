@@ -1,6 +1,6 @@
 // BASE
 
-import { ErrorCode } from "@budibase/types"
+import { ErrorCode } from "@supertoolmake/types"
 
 export abstract class BudibaseError extends Error {
   code: string

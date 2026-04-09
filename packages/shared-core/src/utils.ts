@@ -8,7 +8,7 @@ import {
   type SearchFilters,
   UILogicalOperator,
   type UISearchFilter,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import pick from "lodash/pick"
 import * as Constants from "./constants"
 import { removeKeyNumbering, splitFiltersArray } from "./filters"

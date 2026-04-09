@@ -1,4 +1,4 @@
-import type { InsertWorkspaceAppRequest, RequiredKeys, WorkspaceApp } from "@budibase/types"
+import type { InsertWorkspaceAppRequest, RequiredKeys, WorkspaceApp } from "@supertoolmake/types"
 import { generator } from "./generator"
 
 export function workspaceApp(props?: Partial<WorkspaceApp>): WorkspaceApp {

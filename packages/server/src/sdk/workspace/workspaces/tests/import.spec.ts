@@ -1,4 +1,4 @@
-import { InternalTable, type Table, TableSourceType } from "@budibase/types"
+import { InternalTable, type Table, TableSourceType } from "@supertoolmake/types"
 import { isImportableTable } from "../import"
 
 describe("import", () => {

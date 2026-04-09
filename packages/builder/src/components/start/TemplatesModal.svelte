@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Layout, ModalContent } from "@budibase/bbui"
-import type { TemplateMetadata } from "@budibase/types"
+import { Layout, ModalContent } from "@supertoolmake/bbui"
+import type { TemplateMetadata } from "@supertoolmake/types"
 import TemplateCard from "@/components/common/TemplateCard.svelte"
 import { templates } from "@/stores/portal"
 

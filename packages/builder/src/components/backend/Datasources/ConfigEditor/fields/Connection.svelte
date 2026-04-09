@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Icon, Label } from "@budibase/bbui"
+import { Icon, Label } from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 
 export let name

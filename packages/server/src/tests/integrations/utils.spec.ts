@@ -1,5 +1,5 @@
-import type { DateFieldMetadata } from "@budibase/types"
-import { FieldType } from "@budibase/types"
+import type { DateFieldMetadata } from "@supertoolmake/types"
+import { FieldType } from "@supertoolmake/types"
 
 import { generateColumnDefinition } from "../../integrations/utils/utils"
 

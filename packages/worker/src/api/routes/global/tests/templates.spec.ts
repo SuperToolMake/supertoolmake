@@ -1,5 +1,5 @@
-import { tenancy } from "@budibase/backend-core"
-import { EmailTemplatePurpose, type Template } from "@budibase/types"
+import { tenancy } from "@supertoolmake/backend-core"
+import { EmailTemplatePurpose, type Template } from "@supertoolmake/types"
 import yaml from "yaml"
 import { TemplateMetadata, TemplateType } from "../../../../constants"
 import { addBaseTemplates } from "../../../../constants/templates"

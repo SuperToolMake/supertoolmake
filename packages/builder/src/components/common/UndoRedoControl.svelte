@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, Icon } from "@budibase/bbui"
+import { ActionButton, Icon } from "@supertoolmake/bbui"
 import { onMount } from "svelte"
 import { isBuilderInputFocused } from "@/helpers"
 

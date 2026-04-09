@@ -10,9 +10,9 @@ import {
   Label,
   notifications,
   Select,
-} from "@budibase/bbui"
-import { Utils } from "@budibase/frontend-core"
-import { ValidQueryNameRegex } from "@budibase/shared-core"
+} from "@supertoolmake/bbui"
+import { Utils } from "@supertoolmake/frontend-core"
+import { ValidQueryNameRegex } from "@supertoolmake/shared-core"
 import { goto } from "@roxi/routify"
 import { cloneDeep } from "lodash/fp"
 import CodeMirrorEditor from "@/components/common/CodeMirrorEditor.svelte"

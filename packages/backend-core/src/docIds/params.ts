@@ -1,4 +1,4 @@
-import type { DatabaseQueryOpts } from "@budibase/types"
+import type { DatabaseQueryOpts } from "@supertoolmake/types"
 import type { DocumentListParams } from "nano"
 import { DocumentType, InternalTable, SEPARATOR, UNICODE_MAX, type ViewName } from "../constants"
 import { getProdWorkspaceID } from "./conversions"

@@ -1,5 +1,5 @@
-import { findHBSBlocks } from "@budibase/string-templates"
-import type { Query, QueryVerb } from "@budibase/types"
+import { findHBSBlocks } from "@supertoolmake/string-templates"
+import type { Query, QueryVerb } from "@supertoolmake/types"
 import { IntegrationTypes } from "@/constants/backend"
 
 type QueryVerbSource = Query | string | undefined

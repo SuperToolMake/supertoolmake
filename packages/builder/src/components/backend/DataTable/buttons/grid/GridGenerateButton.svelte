@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ActionButton, ListItem } from "@budibase/bbui"
+import { ActionButton, ListItem } from "@supertoolmake/bbui"
 import { getContext } from "svelte"
 import DetailPopover from "@/components/common/DetailPopover.svelte"
 import { AutoScreenTypes } from "@/constants"

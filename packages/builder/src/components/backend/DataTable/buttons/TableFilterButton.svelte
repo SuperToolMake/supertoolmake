@@ -1,7 +1,7 @@
 <script>
-import { ActionButton, Button } from "@budibase/bbui"
-import { search, Utils } from "@budibase/frontend-core"
-import { makePropSafe } from "@budibase/string-templates"
+import { ActionButton, Button } from "@supertoolmake/bbui"
+import { search, Utils } from "@supertoolmake/frontend-core"
+import { makePropSafe } from "@supertoolmake/string-templates"
 import { createEventDispatcher } from "svelte"
 import DetailPopover from "@/components/common/DetailPopover.svelte"
 import FilterBuilder from "@/components/design/settings/controls/FilterEditor/FilterBuilder.svelte"

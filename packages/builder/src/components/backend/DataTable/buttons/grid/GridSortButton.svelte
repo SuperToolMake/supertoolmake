@@ -1,7 +1,7 @@
 <script>
-import { ActionButton, Select } from "@budibase/bbui"
-import { canBeSortColumn } from "@budibase/frontend-core"
-import { FieldType, isNumeric } from "@budibase/types"
+import { ActionButton, Select } from "@supertoolmake/bbui"
+import { canBeSortColumn } from "@supertoolmake/frontend-core"
+import { FieldType, isNumeric } from "@supertoolmake/types"
 import { getContext } from "svelte"
 import DetailPopover from "@/components/common/DetailPopover.svelte"
 

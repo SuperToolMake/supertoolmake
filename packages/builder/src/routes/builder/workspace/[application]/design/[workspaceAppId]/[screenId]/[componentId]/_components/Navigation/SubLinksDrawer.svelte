@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, Button, Drawer, DrawerContent, Icon, Input, Layout } from "@budibase/bbui"
+import { ActionButton, Button, Drawer, DrawerContent, Icon, Input, Layout } from "@supertoolmake/bbui"
 import { generate } from "shortid"
 import { flip } from "svelte/animate"
 import { dndzone } from "svelte-dnd-action"

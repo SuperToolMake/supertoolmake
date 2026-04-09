@@ -1,4 +1,4 @@
-export { FieldType as FieldTypes } from "@budibase/types"
+export { FieldType as FieldTypes } from "@supertoolmake/types"
 
 export const ActionTypes = {
   ValidateForm: "ValidateForm",

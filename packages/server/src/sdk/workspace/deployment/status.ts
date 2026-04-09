@@ -1,4 +1,4 @@
-import { context } from "@budibase/backend-core"
+import { context } from "@supertoolmake/backend-core"
 import {
   PublishResourceState,
   type PublishStatusResource,
@@ -6,7 +6,7 @@ import {
   type Table,
   type Workspace,
   type WorkspaceApp,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import sdk from "../.."
 
 function getPublishedState(

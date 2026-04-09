@@ -19,7 +19,7 @@ import {
 } from "@aws-sdk/client-s3"
 import { Upload } from "@aws-sdk/lib-storage"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-import { utils } from "@budibase/shared-core"
+import { utils } from "@supertoolmake/shared-core"
 import { NodeHttpHandler } from "@smithy/node-http-handler"
 import type { NodeJsClient } from "@smithy/types"
 import tar from "tar-fs"

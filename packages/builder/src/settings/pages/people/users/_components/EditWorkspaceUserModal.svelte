@@ -1,9 +1,9 @@
 <svelte:options runes={true} />
 
 <script lang="ts">
-import { Input, keepOpen, Layout, ModalContent, notifications, Select } from "@budibase/bbui"
-import { Constants } from "@budibase/frontend-core"
-import type { User } from "@budibase/types"
+import { Input, keepOpen, Layout, ModalContent, notifications, Select } from "@supertoolmake/bbui"
+import { Constants } from "@supertoolmake/frontend-core"
+import type { User } from "@supertoolmake/types"
 import { roles } from "@/stores/builder"
 import { auth, users } from "@/stores/portal"
 import { getRoleFlags } from "../roleUtils"

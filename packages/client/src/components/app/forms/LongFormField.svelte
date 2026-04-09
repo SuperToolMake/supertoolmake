@@ -1,5 +1,5 @@
 <script>
-import { CoreRichTextField, CoreTextArea } from "@budibase/bbui"
+import { CoreRichTextField, CoreTextArea } from "@supertoolmake/bbui"
 import { getContext, setContext } from "svelte"
 import { writable } from "svelte/store"
 import Field from "./Field.svelte"

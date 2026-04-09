@@ -1,4 +1,4 @@
-import type { User } from "@budibase/types"
+import type { User } from "@supertoolmake/types"
 
 export interface UIUser extends User {
   sessionId: string

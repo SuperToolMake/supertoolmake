@@ -1,5 +1,5 @@
-import { context } from "@budibase/backend-core"
-import type { RenameColumn, Table } from "@budibase/types"
+import { context } from "@supertoolmake/backend-core"
+import type { RenameColumn, Table } from "@supertoolmake/types"
 import { cloneDeep } from "lodash"
 import type { DocumentInsertResponse } from "nano"
 import { isExternalTableID } from "../../../integrations/utils"

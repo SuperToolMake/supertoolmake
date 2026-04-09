@@ -1,11 +1,11 @@
-import { generator } from "@budibase/backend-core/tests"
+import { generator } from "@supertoolmake/backend-core/tests"
 import {
   type Datasource,
   FieldType,
   SortOrder,
   StringFieldSubType,
   type Table,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { Knex } from "knex"
 import { DatabaseName, datasourceDescribe, knexClient } from "../integrations/tests/utils"
 

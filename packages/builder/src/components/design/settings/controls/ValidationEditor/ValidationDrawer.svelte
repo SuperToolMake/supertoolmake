@@ -9,7 +9,7 @@ import {
   Body,
   Input,
   DatePicker,
-} from "@budibase/bbui"
+} from "@supertoolmake/bbui"
 import { selectedScreen, selectedComponent } from "@/stores/builder"
 import { findClosestMatchingComponent } from "@/helpers/components"
 import { getSchemaForDatasource, getDatasourceForProvider } from "@/dataBinding"

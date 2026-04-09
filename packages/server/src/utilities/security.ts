@@ -1,5 +1,5 @@
-import { DocumentType, permissions, roles } from "@budibase/backend-core"
-import { getDocumentType } from "@budibase/shared-core"
+import { DocumentType, permissions, roles } from "@supertoolmake/backend-core"
+import { getDocumentType } from "@supertoolmake/shared-core"
 
 export const CURRENTLY_SUPPORTED_LEVELS: string[] = [
   permissions.PermissionLevel.WRITE,

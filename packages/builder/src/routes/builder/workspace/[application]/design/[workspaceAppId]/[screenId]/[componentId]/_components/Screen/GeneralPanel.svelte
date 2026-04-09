@@ -1,5 +1,5 @@
 <script>
-import { Banner, Checkbox, Helpers, Input, notifications, Select } from "@budibase/bbui"
+import { Banner, Checkbox, Helpers, Input, notifications, Select } from "@supertoolmake/bbui"
 import { get } from "svelte/store"
 import { DrawerBindableInput } from "@/components/common/bindings"
 import ButtonActionEditor from "@/components/design/settings/controls/ButtonActionEditor/ButtonActionEditor.svelte"

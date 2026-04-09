@@ -1,5 +1,5 @@
 <script>
-import { notifications } from "@budibase/bbui"
+import { notifications } from "@supertoolmake/bbui"
 import { setContext } from "svelte"
 import { dndStore } from "./dndStore"
 

@@ -1,5 +1,5 @@
 <script>
-import { Button, Modal, Table } from "@budibase/bbui"
+import { Button, Modal, Table } from "@supertoolmake/bbui"
 import { goto } from "@roxi/routify"
 import ViewImportSelection from "@/components/backend/Datasources/TableImportSelection/ViewImportSelection.svelte"
 import CapitaliseRenderer from "@/components/common/renderers/CapitaliseRenderer.svelte"

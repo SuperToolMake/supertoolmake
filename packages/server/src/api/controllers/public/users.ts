@@ -1,5 +1,5 @@
-import { db as dbCore } from "@budibase/backend-core"
-import type { User, UserCtx } from "@budibase/types"
+import { db as dbCore } from "@supertoolmake/backend-core"
+import type { User, UserCtx } from "@supertoolmake/types"
 import type { Next } from "koa"
 import { cloneDeep, isEqual } from "lodash"
 import { publicApiUserFix } from "../../../utilities/users"

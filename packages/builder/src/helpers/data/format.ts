@@ -1,4 +1,4 @@
-import type { Datasource, Table, UITableResource } from "@budibase/types"
+import type { Datasource, Table, UITableResource } from "@supertoolmake/types"
 
 export const datasourceSelect = {
   table: (table: Table, datasources: Omit<Datasource, "entities">[]) => {

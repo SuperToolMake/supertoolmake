@@ -7,7 +7,7 @@ import {
   type UserAdminInfo,
   type UserBuilderInfo,
   type UserRoleInfo,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { getProdAppID } from "./applications"
 
 // checks if a user is specifically a builder, given an app ID

@@ -1,4 +1,4 @@
-import { SortOrder } from "@budibase/types"
+import { SortOrder } from "@supertoolmake/types"
 import { derived, get, type Writable } from "svelte/store"
 import { memo } from "../../../utils"
 import type { Store as StoreContext } from "."

@@ -1,5 +1,5 @@
 <script>
-import { Button, CollapsedButtonGroup } from "@budibase/bbui"
+import { Button, CollapsedButtonGroup } from "@supertoolmake/bbui"
 import { getContext, onMount } from "svelte"
 import GridCell from "../cells/GridCell.svelte"
 import { BlankRowID } from "../lib/constants"

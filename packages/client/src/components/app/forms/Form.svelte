@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Helpers } from "@budibase/bbui"
-import type { DataFetchDatasource, Table, TableSchema } from "@budibase/types"
+import { Helpers } from "@supertoolmake/bbui"
+import type { DataFetchDatasource, Table, TableSchema } from "@supertoolmake/types"
 import { getContext } from "svelte"
 import { writable } from "svelte/store"
 import InnerForm from "./InnerForm.svelte"

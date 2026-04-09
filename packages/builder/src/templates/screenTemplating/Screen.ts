@@ -1,5 +1,5 @@
-import { Helpers } from "@budibase/bbui"
-import { type Screen as ScreenDoc, ScreenVariant } from "@budibase/types"
+import { Helpers } from "@supertoolmake/bbui"
+import { type Screen as ScreenDoc, ScreenVariant } from "@supertoolmake/types"
 import { BaseStructure } from "../BaseStructure"
 
 export class Screen extends BaseStructure<ScreenDoc> {

@@ -10,7 +10,7 @@ import {
   type SSOProfile,
   SSOProviderType,
   type User,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import sample from "lodash/sample"
 import { email, uuid } from "./common"
 import { generator } from "./generator"

@@ -1,4 +1,4 @@
-import { SortOrder, type Table, type TableDatasource } from "@budibase/types"
+import { SortOrder, type Table, type TableDatasource } from "@supertoolmake/types"
 import { get } from "svelte/store"
 import BaseDataFetch from "./DataFetch"
 

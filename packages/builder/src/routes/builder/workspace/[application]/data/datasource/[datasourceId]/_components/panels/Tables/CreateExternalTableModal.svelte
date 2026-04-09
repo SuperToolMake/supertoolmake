@@ -1,6 +1,6 @@
 <script>
-import { Body, Input, ModalContent, notifications } from "@budibase/bbui"
-import { DataEnvironmentMode } from "@budibase/types"
+import { Body, Input, ModalContent, notifications } from "@supertoolmake/bbui"
+import { DataEnvironmentMode } from "@supertoolmake/types"
 import { goto } from "@roxi/routify"
 import { DB_TYPE_EXTERNAL } from "@/constants/backend"
 import { dataEnvironmentStore, datasources, tables } from "@/stores/builder"

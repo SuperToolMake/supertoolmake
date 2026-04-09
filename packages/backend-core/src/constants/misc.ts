@@ -10,7 +10,7 @@ export enum Cookie {
   OIDC_CONFIG = "budibase:oidc:config",
 }
 
-export { Header } from "@budibase/shared-core"
+export { Header } from "@supertoolmake/shared-core"
 
 export enum GlobalRole {
   OWNER = "owner",

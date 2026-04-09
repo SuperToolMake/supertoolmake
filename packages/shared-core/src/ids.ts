@@ -1,4 +1,4 @@
-import { DocumentType, SEPARATOR, VirtualDocumentType } from "@budibase/types"
+import { DocumentType, SEPARATOR, VirtualDocumentType } from "@supertoolmake/types"
 
 // Because DocumentTypes can overlap, we need to make sure that we search
 // longest first to ensure we get the correct type.

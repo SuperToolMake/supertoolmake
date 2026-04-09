@@ -1,4 +1,4 @@
-import { keepOpen, notifications } from "@budibase/bbui"
+import { keepOpen, notifications } from "@supertoolmake/bbui"
 import {
   type Datasource,
   type DatasourceRelationshipConfig,
@@ -7,7 +7,7 @@ import {
   FieldType,
   type Table,
   type TableSchema,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { derived, get, writable } from "svelte/store"
 import { RelationshipType } from "@/constants/backend"
 import { datasources, integrations, tables } from "@/stores/builder"

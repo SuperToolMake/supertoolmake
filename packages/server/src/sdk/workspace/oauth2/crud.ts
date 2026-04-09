@@ -1,4 +1,4 @@
-import { cache, context, docIds, HTTPError, utils } from "@budibase/backend-core"
+import { cache, context, docIds, HTTPError, utils } from "@supertoolmake/backend-core"
 import {
   DocumentType,
   type OAuth2Config,
@@ -6,7 +6,7 @@ import {
   SEPARATOR,
   type WithoutDocMetadata,
   type WithRequired,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 
 type CreatedOAuthConfig = WithRequired<OAuth2Config, "_id" | "_rev">
 

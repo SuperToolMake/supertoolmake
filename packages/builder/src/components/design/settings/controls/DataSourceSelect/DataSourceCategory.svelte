@@ -1,5 +1,5 @@
 <script>
-import { Divider, Heading, Icon } from "@budibase/bbui"
+import { Divider, Heading, Icon } from "@supertoolmake/bbui"
 import QueryVerbBadge from "@/components/common/QueryVerbBadge.svelte"
 import { IntegrationTypes } from "@/constants/backend"
 import { customQueryIconColor, customQueryIconText } from "@/helpers/data/utils"

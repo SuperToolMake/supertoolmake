@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Body, ModalContent, notifications } from "@budibase/bbui"
-import type { APIClient } from "@budibase/frontend-core"
-import { resolveTranslationGroup } from "@budibase/shared-core"
+import { Body, ModalContent, notifications } from "@supertoolmake/bbui"
+import type { APIClient } from "@supertoolmake/frontend-core"
+import { resolveTranslationGroup } from "@supertoolmake/shared-core"
 import { createEventDispatcher } from "svelte"
 import PasswordRepeatInput from "./PasswordRepeatInput.svelte"
 

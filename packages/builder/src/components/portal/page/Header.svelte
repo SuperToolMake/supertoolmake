@@ -1,5 +1,5 @@
 <script>
-import { Heading } from "@budibase/bbui"
+import { Heading } from "@supertoolmake/bbui"
 
 export let title
 export let wrap = true

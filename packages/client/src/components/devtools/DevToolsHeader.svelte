@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, Heading, Select } from "@budibase/bbui"
+import { ActionButton, Heading, Select } from "@supertoolmake/bbui"
 import { getContext, onMount } from "svelte"
 import { API } from "@/api"
 import { devToolsStore } from "@/stores"

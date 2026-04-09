@@ -1,5 +1,5 @@
-import { roles } from "@budibase/backend-core"
-import type { Table, WithoutDocMetadata } from "@budibase/types"
+import { roles } from "@supertoolmake/backend-core"
+import type { Table, WithoutDocMetadata } from "@supertoolmake/types"
 import { setPermissions } from "../permissions"
 import * as external from "./external"
 import { isExternal } from "./utils"

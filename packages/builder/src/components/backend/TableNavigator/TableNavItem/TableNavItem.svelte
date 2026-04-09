@@ -1,6 +1,6 @@
 <script>
-import { Icon, notifications } from "@budibase/bbui"
-import { WorkspaceResource } from "@budibase/types"
+import { Icon, notifications } from "@supertoolmake/bbui"
+import { WorkspaceResource } from "@supertoolmake/types"
 import { isActive } from "@roxi/routify"
 import NavItem from "@/components/common/NavItem.svelte"
 import { TableNames } from "@/constants"

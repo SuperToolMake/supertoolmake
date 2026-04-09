@@ -1,5 +1,5 @@
-import { MAX_SESSIONS_PER_USER } from "@budibase/shared-core"
-import type { CreateSession, ScannedSession, Session, SessionKey } from "@budibase/types"
+import { MAX_SESSIONS_PER_USER } from "@supertoolmake/shared-core"
+import type { CreateSession, ScannedSession, Session, SessionKey } from "@supertoolmake/types"
 import { v4 as uuidv4 } from "uuid"
 import env from "../environment"
 import { logWarn } from "../logging"

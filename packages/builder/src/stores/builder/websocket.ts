@@ -1,7 +1,7 @@
-import { notifications } from "@budibase/bbui"
-import { createWebsocket } from "@budibase/frontend-core"
-import { BuilderSocketEvent, helpers, SocketEvent } from "@budibase/shared-core"
-import type { Datasource, Role, Screen, Table, UIUser, WorkspaceApp } from "@budibase/types"
+import { notifications } from "@supertoolmake/bbui"
+import { createWebsocket } from "@supertoolmake/frontend-core"
+import { BuilderSocketEvent, helpers, SocketEvent } from "@supertoolmake/shared-core"
+import type { Datasource, Role, Screen, Table, UIUser, WorkspaceApp } from "@supertoolmake/types"
 import { get } from "svelte/store"
 import {
   appStore,

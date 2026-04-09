@@ -1,4 +1,4 @@
-import { MAX_SESSIONS_PER_USER } from "@budibase/shared-core"
+import { MAX_SESSIONS_PER_USER } from "@supertoolmake/shared-core"
 
 const SESSIONS_INVALIDATED_KEY = "bb-sessions-invalidated"
 

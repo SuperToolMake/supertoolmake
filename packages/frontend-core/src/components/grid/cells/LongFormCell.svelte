@@ -1,5 +1,5 @@
 <script>
-import { clickOutside } from "@budibase/bbui"
+import { clickOutside } from "@supertoolmake/bbui"
 import { onMount, tick } from "svelte"
 import GridPopover from "../overlays/GridPopover.svelte"
 

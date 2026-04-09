@@ -1,5 +1,5 @@
 <script>
-import { Icon, Toggle } from "@budibase/bbui"
+import { Icon, Toggle } from "@supertoolmake/bbui"
 import { cloneDeep } from "lodash/fp"
 import { createEventDispatcher, setContext } from "svelte"
 import { writable } from "svelte/store"

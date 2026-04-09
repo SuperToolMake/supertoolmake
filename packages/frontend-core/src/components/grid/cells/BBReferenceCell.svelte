@@ -1,6 +1,6 @@
 <script>
-import { helpers } from "@budibase/shared-core"
-import { BBReferenceFieldSubType, FieldType, RelationshipType } from "@budibase/types"
+import { helpers } from "@supertoolmake/shared-core"
+import { BBReferenceFieldSubType, FieldType, RelationshipType } from "@supertoolmake/types"
 import { getContext } from "svelte"
 import RelationshipCell from "./RelationshipCell.svelte"
 

@@ -1,4 +1,4 @@
-import { context, HTTPError } from "@budibase/backend-core"
+import { context, HTTPError } from "@supertoolmake/backend-core"
 import {
   AutoFieldSubType,
   FieldType,
@@ -8,7 +8,7 @@ import {
   type Table,
   type TableRequest,
   type WithoutDocMetadata,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { cloneDeep } from "lodash/fp"
 import { makeTableRequest } from "../../../../api/controllers/table/ExternalRequest"
 import { foreignKeyStructure, hasTypeChanged } from "../../../../api/controllers/table/utils"

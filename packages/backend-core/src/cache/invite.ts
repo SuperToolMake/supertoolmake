@@ -1,4 +1,4 @@
-import { type Invite, type InviteWithCode, LockName, LockType } from "@budibase/types"
+import { type Invite, type InviteWithCode, LockName, LockType } from "@supertoolmake/types"
 import { getTenantId } from "../context"
 import * as redis from "../redis/init"
 import * as locks from "../redis/redlockImpl"

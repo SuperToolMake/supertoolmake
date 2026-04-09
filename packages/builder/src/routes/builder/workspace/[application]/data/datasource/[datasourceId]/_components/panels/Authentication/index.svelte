@@ -1,5 +1,5 @@
 <script>
-import { notifications } from "@budibase/bbui"
+import { notifications } from "@supertoolmake/bbui"
 import { cloneDeep } from "lodash/fp"
 import { integrations } from "@/stores/builder"
 import Panel from "../Panel.svelte"

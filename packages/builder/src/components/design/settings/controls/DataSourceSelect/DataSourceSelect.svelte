@@ -11,8 +11,8 @@ import {
   notifications,
   Popover,
   Select,
-} from "@budibase/bbui"
-import { makePropSafe as safe } from "@budibase/string-templates"
+} from "@supertoolmake/bbui"
+import { makePropSafe as safe } from "@supertoolmake/string-templates"
 import { createEventDispatcher } from "svelte"
 import { API } from "@/api"
 import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"

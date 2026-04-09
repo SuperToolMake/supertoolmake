@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Layout } from "@budibase/bbui"
-import type { Datasource } from "@budibase/types"
+import { Layout } from "@supertoolmake/bbui"
+import type { Datasource } from "@supertoolmake/types"
 import { goto as gotoStore, isActive } from "@roxi/routify"
 import { onMount } from "svelte"
 import DatasourceNavigator from "@/components/backend/DatasourceNavigator/DatasourceNavigator.svelte"

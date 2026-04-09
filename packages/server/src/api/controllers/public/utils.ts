@@ -1,5 +1,5 @@
-import { context } from "@budibase/backend-core"
-import type { Row } from "@budibase/types"
+import { context } from "@supertoolmake/backend-core"
+import type { Row } from "@supertoolmake/types"
 import { DocumentType, WORKSPACE_PREFIX } from "../../../db/utils"
 import { isExternalTableID } from "../../../integrations/utils"
 

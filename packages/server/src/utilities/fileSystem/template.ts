@@ -1,6 +1,6 @@
 import fs from "node:fs"
 import { join } from "node:path"
-import { objectStore } from "@budibase/backend-core"
+import { objectStore } from "@supertoolmake/backend-core"
 import { ObjectStoreBuckets } from "../../constants"
 
 /**

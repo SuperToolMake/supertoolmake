@@ -1,5 +1,5 @@
-import { dataFilters } from "@budibase/shared-core"
-import type { BulkDocsResponse, ContextUser, SearchUsersRequest, User } from "@budibase/types"
+import { dataFilters } from "@supertoolmake/shared-core"
+import type { BulkDocsResponse, ContextUser, SearchUsersRequest, User } from "@supertoolmake/types"
 import type { DocumentListParams } from "nano"
 import * as context from "../context"
 import { getGlobalDB } from "../context"

@@ -1,5 +1,5 @@
 <script>
-import { Button, Drawer, Icon } from "@budibase/bbui"
+import { Button, Drawer, Icon } from "@supertoolmake/bbui"
 import CellDrawer from "./CellDrawer.svelte"
 
 export let column

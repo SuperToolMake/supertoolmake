@@ -1,7 +1,7 @@
 <script lang="ts">
-import { Body, Button, Icon, Input, Label, notifications } from "@budibase/bbui"
-import { createValidationStore } from "@budibase/frontend-core/src/utils/validation/yup"
-import * as workspaceValidation from "@budibase/frontend-core/src/utils/validation/yup/app"
+import { Body, Button, Icon, Input, Label, notifications } from "@supertoolmake/bbui"
+import { createValidationStore } from "@supertoolmake/frontend-core/src/utils/validation/yup"
+import * as workspaceValidation from "@supertoolmake/frontend-core/src/utils/validation/yup/app"
 import { createEventDispatcher } from "svelte"
 import { writable } from "svelte/store"
 import { API } from "@/api"

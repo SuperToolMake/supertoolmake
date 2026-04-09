@@ -11,8 +11,8 @@ import {
   PopoverAlignment,
   type PopoverAPI,
   Select,
-} from "@budibase/bbui"
-import { FilterValueType, OperatorOptions } from "@budibase/frontend-core/src/constants"
+} from "@supertoolmake/bbui"
+import { FilterValueType, OperatorOptions } from "@supertoolmake/frontend-core/src/constants"
 import {
   ArrayOperator,
   BasicOperator,
@@ -21,7 +21,7 @@ import {
   type FilterConfig,
   type SearchFilter,
   type TableSchema,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import { createEventDispatcher, getContext } from "svelte"

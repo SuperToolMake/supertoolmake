@@ -1,4 +1,4 @@
-import type { Component, Query, Screen, Table } from "@budibase/types"
+import type { Component, Query, Screen, Table } from "@supertoolmake/types"
 
 function heading(text: string): Component {
   return {

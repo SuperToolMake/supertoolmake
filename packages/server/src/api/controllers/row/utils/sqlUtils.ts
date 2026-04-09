@@ -1,5 +1,5 @@
-import { sql } from "@budibase/backend-core"
-import { PROTECTED_INTERNAL_COLUMNS } from "@budibase/shared-core"
+import { sql } from "@supertoolmake/backend-core"
+import { PROTECTED_INTERNAL_COLUMNS } from "@supertoolmake/shared-core"
 import {
   type DatasourcePlusQueryResponse,
   DSPlusOperation,
@@ -11,7 +11,7 @@ import {
   type RelationshipsJson,
   type Row,
   type Table,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { generateJunctionTableID } from "../../../../db/utils"
 import { breakExternalTableId } from "../../../../integrations/utils"
 

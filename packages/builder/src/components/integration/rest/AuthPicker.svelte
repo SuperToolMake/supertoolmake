@@ -7,8 +7,8 @@ import {
   List,
   ListItem,
   PopoverAlignment,
-} from "@budibase/bbui"
-import { RestAuthType } from "@budibase/types"
+} from "@supertoolmake/bbui"
+import { RestAuthType } from "@supertoolmake/types"
 import { goto as gotoStore } from "@roxi/routify"
 import { onMount } from "svelte"
 import DetailPopover from "@/components/common/DetailPopover.svelte"

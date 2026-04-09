@@ -1,11 +1,11 @@
-import { Helpers } from "@budibase/bbui"
+import { Helpers } from "@supertoolmake/bbui"
 import {
   FieldType,
   isRelationshipField,
   RelationshipType,
   type Row,
   type UIFieldSchema,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 
 const columnTypeManyTypeOverrides: Partial<Record<FieldType, FieldType>> = {
   [FieldType.DATETIME]: FieldType.STRING,

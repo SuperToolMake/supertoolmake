@@ -1,5 +1,5 @@
 import crypto from "node:crypto"
-import type { Ctx } from "@budibase/types"
+import type { Ctx } from "@supertoolmake/types"
 import type { Middleware, Next } from "koa"
 import environment from "../environment"
 

@@ -1,5 +1,5 @@
-import { context, db as dbCore } from "@budibase/backend-core"
-import type { UserCtx } from "@budibase/types"
+import { context, db as dbCore } from "@supertoolmake/backend-core"
+import type { UserCtx } from "@supertoolmake/types"
 import type { Next } from "koa"
 import type { Application } from "../../../definitions/common"
 import * as deployController from "../deploy"

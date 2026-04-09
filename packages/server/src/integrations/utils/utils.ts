@@ -1,7 +1,7 @@
 import fs from "node:fs"
 import { pipeline } from "node:stream/promises"
-import { context, objectStore, sql } from "@budibase/backend-core"
-import { helpers, utils } from "@budibase/shared-core"
+import { context, objectStore, sql } from "@supertoolmake/backend-core"
+import { helpers, utils } from "@supertoolmake/shared-core"
 import {
   type Datasource,
   type FieldSchema,
@@ -9,7 +9,7 @@ import {
   type SqlQuery,
   StringFieldSubType,
   type Table,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { cloneDeep, merge } from "lodash"
 import tmp from "tmp"
 import { v4 } from "uuid"

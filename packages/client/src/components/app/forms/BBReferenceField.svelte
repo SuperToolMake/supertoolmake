@@ -1,6 +1,6 @@
 <script lang="ts">
-import { sdk } from "@budibase/shared-core"
-import { FieldType, type Row } from "@budibase/types"
+import { sdk } from "@supertoolmake/shared-core"
+import { FieldType, type Row } from "@supertoolmake/types"
 import RelationshipField from "./RelationshipField.svelte"
 
 export let defaultValue: string

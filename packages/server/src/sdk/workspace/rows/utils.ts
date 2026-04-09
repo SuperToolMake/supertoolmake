@@ -1,5 +1,5 @@
-import { BUDIBASE_DATASOURCE_TYPE, sql } from "@budibase/backend-core"
-import { isDatasourceOrDatasourcePlusId } from "@budibase/shared-core"
+import { BUDIBASE_DATASOURCE_TYPE, sql } from "@supertoolmake/backend-core"
+import { isDatasourceOrDatasourcePlusId } from "@supertoolmake/shared-core"
 import {
   ArrayOperator,
   type Datasource,
@@ -13,7 +13,7 @@ import {
   SqlClient,
   type Table,
   type TableSchema,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import dayjs from "dayjs"
 import cloneDeep from "lodash/fp/cloneDeep"
 import { getTableFromSource } from "../../../api/controllers/row/utils"

@@ -1,5 +1,5 @@
-import { auth, context, permissions, roles, users } from "@budibase/backend-core"
-import { PermissionLevel, PermissionType, type UserCtx } from "@budibase/types"
+import { auth, context, permissions, roles, users } from "@supertoolmake/backend-core"
+import { PermissionLevel, PermissionType, type UserCtx } from "@supertoolmake/types"
 import sdk from "../sdk"
 import { builderMiddleware } from "./builder"
 import { paramResource } from "./resourceId"

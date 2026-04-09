@@ -1,5 +1,5 @@
-import { utils } from "@budibase/backend-core"
-import { structures } from "@budibase/backend-core/tests"
+import { utils } from "@supertoolmake/backend-core"
+import { structures } from "@supertoolmake/backend-core/tests"
 import {
   type Datasource,
   type Query,
@@ -7,7 +7,7 @@ import {
   type User,
   type WorkspaceApp,
   WorkspaceResource,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { type DatabaseName, getDatasource } from "../../../integrations/tests/utils"
 import { basicQuery, basicTable } from "../../../tests/utilities/structures"
 import TestConfiguration from "../../../tests/utilities/TestConfiguration"

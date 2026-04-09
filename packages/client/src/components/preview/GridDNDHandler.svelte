@@ -1,6 +1,6 @@
 <script lang="ts">
-import { memo, Utils } from "@budibase/frontend-core"
-import { DropPosition } from "@budibase/types"
+import { memo, Utils } from "@supertoolmake/frontend-core"
+import { DropPosition } from "@supertoolmake/types"
 import { getContext, onDestroy, onMount } from "svelte"
 import { DNDPlaceholderID, GridRowHeight } from "@/constants"
 import {

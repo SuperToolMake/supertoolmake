@@ -1,5 +1,5 @@
 <script>
-import { Input, Label, Layout } from "@budibase/bbui"
+import { Input, Label, Layout } from "@supertoolmake/bbui"
 import { capitalise } from "@/helpers"
 import KeyValueBuilder from "./KeyValueBuilder.svelte"
 import Editor from "./QueryEditor.svelte"

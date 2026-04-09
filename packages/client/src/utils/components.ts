@@ -1,4 +1,4 @@
-import type { Component } from "@budibase/types"
+import type { Component } from "@supertoolmake/types"
 
 /**
  * Finds a component instance by ID

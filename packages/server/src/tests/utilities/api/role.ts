@@ -5,7 +5,7 @@ import type {
   Role,
   SaveRoleRequest,
   SaveRoleResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { type Expectations, TestAPI } from "./base"
 
 export class RoleAPI extends TestAPI {

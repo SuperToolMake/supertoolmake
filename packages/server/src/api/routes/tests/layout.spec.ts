@@ -3,7 +3,7 @@ import { checkBuilderEndpoint } from "./utilities/TestFunctions"
 
 const { basicLayout } = setup.structures
 
-import type { Layout } from "@budibase/types"
+import type { Layout } from "@supertoolmake/types"
 
 describe("/layouts", () => {
   const request = setup.getRequest()

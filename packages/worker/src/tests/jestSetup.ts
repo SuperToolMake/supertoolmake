@@ -1,5 +1,5 @@
-import { env as coreEnv, timers } from "@budibase/backend-core"
-import { mocks, testContainerUtils } from "@budibase/backend-core/tests"
+import { env as coreEnv, timers } from "@supertoolmake/backend-core"
+import { mocks, testContainerUtils } from "@supertoolmake/backend-core/tests"
 import nock from "nock"
 // mock all dates to 2020-01-01T00:00:00.000Z
 // use tk.reset() to use real dates in individual tests

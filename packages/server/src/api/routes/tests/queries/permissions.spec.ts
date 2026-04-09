@@ -1,4 +1,4 @@
-import { type Datasource, type Query, SourceName } from "@budibase/types"
+import { type Datasource, type Query, SourceName } from "@supertoolmake/types"
 import type TestConfiguration from "../../../../tests/utilities/TestConfiguration"
 import * as setup from "../utilities"
 import { checkBuilderEndpoint } from "../utilities/TestFunctions"

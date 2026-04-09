@@ -1,5 +1,5 @@
-import { type RedisClient, redis } from "@budibase/backend-core"
-import type { ContextUser } from "@budibase/types"
+import { type RedisClient, redis } from "@supertoolmake/backend-core"
+import type { ContextUser } from "@supertoolmake/types"
 import type Redis from "ioredis"
 import type { Cluster } from "ioredis"
 import { getGlobalIDFromUserMetadataID } from "../db/utils"

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
-import { BodyType, type Query } from "@budibase/types"
+import { BodyType, type Query } from "@supertoolmake/types"
 import { groupBy, mapValues } from "lodash"
 import { OpenAPI2 } from "../../openapi2"
 

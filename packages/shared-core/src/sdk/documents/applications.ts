@@ -1,4 +1,4 @@
-import { DocumentType, prefixed } from "@budibase/types"
+import { DocumentType, prefixed } from "@supertoolmake/types"
 
 const APP_PREFIX = prefixed(DocumentType.WORKSPACE)
 const APP_DEV_PREFIX = prefixed(DocumentType.WORKSPACE_DEV)

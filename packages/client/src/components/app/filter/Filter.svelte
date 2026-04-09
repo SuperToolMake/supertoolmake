@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Button, Helpers } from "@budibase/bbui"
-import { fetchData, memo, QueryUtils } from "@budibase/frontend-core"
+import { Button, Helpers } from "@supertoolmake/bbui"
+import { fetchData, memo, QueryUtils } from "@supertoolmake/frontend-core"
 import {
   ArrayOperator,
   type Component,
@@ -16,7 +16,7 @@ import {
   type TableSchema,
   UILogicalOperator,
   type UISearchFilter,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { getContext, onDestroy, onMount, setContext } from "svelte"
 import { writable } from "svelte/store"
 import { ActionTypes } from "@/constants"

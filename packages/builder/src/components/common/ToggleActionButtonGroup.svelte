@@ -3,7 +3,7 @@ import { createEventDispatcher } from "svelte"
 
 let dispatch = createEventDispatcher()
 
-import { AbsTooltip, ActionButton, TooltipType } from "@budibase/bbui"
+import { AbsTooltip, ActionButton, TooltipType } from "@supertoolmake/bbui"
 
 export let value
 export let options

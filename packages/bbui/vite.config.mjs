@@ -25,8 +25,11 @@ export default defineConfig(({ mode }) => {
     ],
     resolve: {
       alias: {
-        "@budibase/shared-core": path.resolve(__dirname, "../shared-core/src"),
-        "@budibase/types": path.resolve(__dirname, "../types/src"),
+        "@supertoolmake/shared-core": path.resolve(
+          __dirname,
+          "../shared-core/src"
+        ),
+        "@supertoolmake/types": path.resolve(__dirname, "../types/src"),
       },
     },
   }

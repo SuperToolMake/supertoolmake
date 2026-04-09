@@ -1,5 +1,5 @@
 <script lang="ts" generics="Value extends UIFile|File">
-import type { UIFile } from "@budibase/types"
+import type { UIFile } from "@supertoolmake/types"
 import { createEventDispatcher } from "svelte"
 import CoreDropzone from "./Core/Dropzone.svelte"
 import Field from "./Field.svelte"

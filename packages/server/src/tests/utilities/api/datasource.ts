@@ -1,4 +1,4 @@
-import { sql } from "@budibase/backend-core"
+import { sql } from "@supertoolmake/backend-core"
 import {
   type BuildSchemaFromSourceResponse,
   type CreateDatasourceResponse,
@@ -9,7 +9,7 @@ import {
   type UpdateDatasourceRequest,
   type UpdateDatasourceResponse,
   type VerifyDatasourceRequest,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { type Expectations, TestAPI } from "./base"
 
 export class DatasourceAPI extends TestAPI {

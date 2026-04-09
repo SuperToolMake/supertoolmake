@@ -1,4 +1,4 @@
-import type { PublishedWorkspaceData } from "@budibase/types"
+import type { PublishedWorkspaceData } from "@supertoolmake/types"
 import { API } from "@/api"
 import { BudiStore } from "../BudiStore"
 

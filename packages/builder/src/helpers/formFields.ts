@@ -1,4 +1,4 @@
-import type { Component, Screen } from "@budibase/types"
+import type { Component, Screen } from "@supertoolmake/types"
 import { getDatasourceForProvider, getSchemaForDatasource } from "@/dataBinding"
 import { findClosestMatchingComponent, getComponentContexts } from "@/helpers/components"
 

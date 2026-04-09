@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Body, Input, Layout, ModalContent, Select } from "@budibase/bbui"
+import { Body, Input, Layout, ModalContent, Select } from "@supertoolmake/bbui"
 import { onMount } from "svelte"
 import { BindableCombobox } from "@/components/common/bindings"
 import { getAuthBindings } from "@/dataBinding"

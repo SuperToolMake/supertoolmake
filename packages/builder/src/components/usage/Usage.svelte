@@ -1,5 +1,5 @@
 <script>
-import { Body, Heading, Icon, ProgressBar } from "@budibase/bbui"
+import { Body, Heading, Icon, ProgressBar } from "@supertoolmake/bbui"
 import { onMount } from "svelte"
 
 export let usage

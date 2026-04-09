@@ -5,7 +5,7 @@ import {
   type Row,
   RowExportFormat,
   type Table,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { datasourceDescribe } from "../../../integrations/tests/utils"
 import { tableForDatasource } from "../../../tests/utilities/structures"
 

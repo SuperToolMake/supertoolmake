@@ -4,7 +4,7 @@ import {
   DatasourceFieldType,
   type Integration,
   QueryType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import Redis from "ioredis"
 import { HOST_ADDRESS } from "./utils"
 

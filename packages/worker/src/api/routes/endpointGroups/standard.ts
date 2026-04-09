@@ -1,4 +1,4 @@
-import { auth, EndpointGroupList, middleware } from "@budibase/backend-core"
+import { auth, EndpointGroupList, middleware } from "@supertoolmake/backend-core"
 import cloudRestricted from "../../../middleware/cloudRestricted"
 
 export const endpointGroupList = new EndpointGroupList()

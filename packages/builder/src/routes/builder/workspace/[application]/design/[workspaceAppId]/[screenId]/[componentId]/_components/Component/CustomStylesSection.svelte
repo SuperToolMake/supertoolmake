@@ -8,7 +8,7 @@ import {
   Drawer,
   Icon,
   notifications,
-} from "@budibase/bbui"
+} from "@supertoolmake/bbui"
 import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
 import {
   getBindableProperties,

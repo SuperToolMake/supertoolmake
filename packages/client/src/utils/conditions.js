@@ -1,6 +1,6 @@
-import { QueryUtils } from "@budibase/frontend-core"
-import { processStringSync } from "@budibase/string-templates"
-import { EmptyFilterOption } from "@budibase/types"
+import { QueryUtils } from "@supertoolmake/frontend-core"
+import { processStringSync } from "@supertoolmake/string-templates"
+import { EmptyFilterOption } from "@supertoolmake/types"
 
 export const getActiveConditions = (conditions) => {
   if (!conditions?.length) {

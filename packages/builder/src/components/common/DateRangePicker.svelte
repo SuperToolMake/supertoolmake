@@ -1,6 +1,6 @@
 <script>
-import { DatePicker } from "@budibase/bbui"
-import { memo } from "@budibase/frontend-core"
+import { DatePicker } from "@supertoolmake/bbui"
+import { memo } from "@supertoolmake/frontend-core"
 import dayjs from "dayjs"
 import { createEventDispatcher } from "svelte"
 

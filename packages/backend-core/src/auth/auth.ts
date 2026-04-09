@@ -8,7 +8,7 @@ import {
   type PlatformLogoutOpts,
   type SessionCookie,
   SSOProviderType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import * as userCache from "../cache/user"
 import { invalidateUser } from "../cache/user"
 import * as configs from "../configs"

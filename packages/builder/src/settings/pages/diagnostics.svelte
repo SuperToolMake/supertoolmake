@@ -1,5 +1,5 @@
 <script>
-import { Body, Divider, Helpers, Icon, Layout, notifications, TextArea } from "@budibase/bbui"
+import { Body, Divider, Helpers, Icon, Layout, notifications, TextArea } from "@supertoolmake/bbui"
 import { onMount } from "svelte"
 import { API } from "@/api"
 

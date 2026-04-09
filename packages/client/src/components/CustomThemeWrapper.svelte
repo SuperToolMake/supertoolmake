@@ -1,5 +1,5 @@
 <script>
-import { Context, Helpers } from "@budibase/bbui"
+import { Context, Helpers } from "@supertoolmake/bbui"
 import { setContext } from "svelte"
 import { themeStore } from "@/stores"
 

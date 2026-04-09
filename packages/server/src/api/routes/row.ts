@@ -1,5 +1,5 @@
-import { permissions } from "@budibase/backend-core"
-import { searchRowRequestValidator } from "@budibase/types"
+import { permissions } from "@supertoolmake/backend-core"
+import { searchRowRequestValidator } from "@supertoolmake/types"
 import { authorizedMiddleware as authorized } from "../../middleware/authorized"
 import { paramResource, paramSubResource } from "../../middleware/resourceId"
 import { validateBody } from "../../middleware/zod-validator"

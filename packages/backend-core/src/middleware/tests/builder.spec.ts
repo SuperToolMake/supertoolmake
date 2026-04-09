@@ -1,4 +1,4 @@
-import { ServiceType, type User } from "@budibase/types"
+import { ServiceType, type User } from "@supertoolmake/types"
 import { structures } from "../../../tests"
 import { Header } from "../../constants"
 import env from "../../environment"

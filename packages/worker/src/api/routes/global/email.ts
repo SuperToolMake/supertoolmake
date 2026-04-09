@@ -1,5 +1,5 @@
-import { auth } from "@budibase/backend-core"
-import { EmailTemplatePurpose } from "@budibase/types"
+import { auth } from "@supertoolmake/backend-core"
+import { EmailTemplatePurpose } from "@supertoolmake/types"
 import Joi from "joi"
 import * as controller from "../../controllers/global/email"
 import { adminRoutes } from "../endpointGroups"

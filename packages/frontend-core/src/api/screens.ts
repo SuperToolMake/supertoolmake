@@ -3,7 +3,7 @@ import type {
   SaveScreenRequest,
   SaveScreenResponse,
   UsageInScreensResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface ScreenEndpoints {

@@ -1,4 +1,4 @@
-import type { UserCtx } from "@budibase/types"
+import type { UserCtx } from "@supertoolmake/types"
 import type { Next } from "koa"
 import * as queryController from "../query"
 import { search as stringSearch } from "./utils"

@@ -1,5 +1,5 @@
 <script>
-import { Modal, notifications } from "@budibase/bbui"
+import { Modal, notifications } from "@supertoolmake/bbui"
 import { cloneDeep } from "lodash/fp"
 import { getContext, onMount } from "svelte"
 import CreateEditRow from "../../modals/CreateEditRow.svelte"

@@ -1,5 +1,5 @@
 <script>
-import { Body, Input, ModalContent, notifications } from "@budibase/bbui"
+import { Body, Input, ModalContent, notifications } from "@supertoolmake/bbui"
 import { createEventDispatcher } from "svelte"
 import { users } from "@/stores/portal/users"
 

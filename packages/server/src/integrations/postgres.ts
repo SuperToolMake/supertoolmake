@@ -1,4 +1,4 @@
-import { sql } from "@budibase/backend-core"
+import { sql } from "@supertoolmake/backend-core"
 import {
   type ConnectionInfo,
   DatasourceFeature,
@@ -17,7 +17,7 @@ import {
   type SqlQueryBinding,
   type Table,
   TableSourceType,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { Client, type ClientConfig, types } from "pg"
 import { v4 as uuidv4 } from "uuid"
 import { escapeDangerousCharacters } from "../utilities"

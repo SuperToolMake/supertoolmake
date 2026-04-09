@@ -5,6 +5,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@budibase/client": "0.x"
+    "@supertoolmake/client": "0.x"
   }
 }

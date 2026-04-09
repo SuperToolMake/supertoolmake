@@ -1,5 +1,5 @@
-import { middleware } from "@budibase/backend-core"
-import { OAuth2CredentialsMethod, OAuth2GrantType } from "@budibase/types"
+import { middleware } from "@supertoolmake/backend-core"
+import { OAuth2CredentialsMethod, OAuth2GrantType } from "@supertoolmake/types"
 import Joi from "joi"
 
 import * as controller from "../controllers/oauth2"

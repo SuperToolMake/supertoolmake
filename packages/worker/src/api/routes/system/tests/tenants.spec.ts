@@ -1,5 +1,5 @@
-import { tenancy } from "@budibase/backend-core"
-import { LockReason } from "@budibase/types"
+import { tenancy } from "@supertoolmake/backend-core"
+import { LockReason } from "@supertoolmake/types"
 import * as tenantSdk from "../../../../sdk/tenants"
 import { TestConfiguration } from "../../../../tests"
 

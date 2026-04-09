@@ -1,4 +1,4 @@
-import type { FieldSchema, FieldType, UIFieldValidationRule } from "@budibase/types"
+import type { FieldSchema, FieldType, UIFieldValidationRule } from "@supertoolmake/types"
 import type { Readable } from "svelte/store"
 
 export interface FormContext {

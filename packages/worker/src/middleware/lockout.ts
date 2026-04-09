@@ -1,5 +1,5 @@
-import { cache } from "@budibase/backend-core"
-import type { Ctx } from "@budibase/types"
+import { cache } from "@supertoolmake/backend-core"
+import type { Ctx } from "@supertoolmake/types"
 import type { Next } from "koa"
 import env from "../environment"
 import * as userSdk from "../sdk/users"

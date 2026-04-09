@@ -1,4 +1,4 @@
-import { permissions } from "@budibase/backend-core"
+import { permissions } from "@supertoolmake/backend-core"
 import Router from "@koa/router"
 import { devAppIdPath } from "../../constants/paths"
 import { authorizedMiddleware as authorized } from "../../middleware/authorized"

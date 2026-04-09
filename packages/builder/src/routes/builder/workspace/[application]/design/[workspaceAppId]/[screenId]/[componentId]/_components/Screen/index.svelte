@@ -1,5 +1,5 @@
 <script>
-import { Layout } from "@budibase/bbui"
+import { Layout } from "@supertoolmake/bbui"
 import Panel from "@/components/design/Panel.svelte"
 import { selectedScreen } from "@/stores/builder"
 import GeneralPanel from "./GeneralPanel.svelte"

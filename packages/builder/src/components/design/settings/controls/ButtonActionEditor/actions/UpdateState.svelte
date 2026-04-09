@@ -1,5 +1,5 @@
 <script>
-import { Body, Checkbox, Combobox, Label, Select } from "@budibase/bbui"
+import { Body, Checkbox, Combobox, Label, Select } from "@supertoolmake/bbui"
 import { onMount } from "svelte"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
 import { getAllStateVariables } from "@/dataBinding"

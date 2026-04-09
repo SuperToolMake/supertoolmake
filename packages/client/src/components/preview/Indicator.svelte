@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Icon } from "@budibase/bbui"
+import { Icon } from "@supertoolmake/bbui"
 import { GridDragMode } from "@/utils/grid"
 
 export let top: number

@@ -1,5 +1,5 @@
 <script>
-import { Divider, Layout, StatusLight } from "@budibase/bbui"
+import { Divider, Layout, StatusLight } from "@supertoolmake/bbui"
 import NewPill from "@/components/common/NewPill.svelte"
 import { Breadcrumb, Breadcrumbs } from "@/components/portal/page"
 import { bb } from "@/stores/bb"

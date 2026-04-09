@@ -4,6 +4,6 @@ export default {
     "^.+\\.ts?$": "@swc/jest",
   },
   moduleNameMapper: {
-    "@budibase/types": "<rootDir>/../types/src",
+    "@supertoolmake/types": "<rootDir>/../types/src",
   },
 }

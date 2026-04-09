@@ -1,7 +1,7 @@
 <script lang="ts">
-import { keepOpen, Modal, notifications } from "@budibase/bbui"
-import { sdk } from "@budibase/shared-core"
-import type { BulkUserCreated, InviteUsersResponse } from "@budibase/types"
+import { keepOpen, Modal, notifications } from "@supertoolmake/bbui"
+import { sdk } from "@supertoolmake/shared-core"
+import type { BulkUserCreated, InviteUsersResponse } from "@supertoolmake/types"
 import { onMount } from "svelte"
 import { OnboardingType } from "@/constants"
 import AddUserModal from "@/settings/pages/people/users/_components/AddUserModal.svelte"

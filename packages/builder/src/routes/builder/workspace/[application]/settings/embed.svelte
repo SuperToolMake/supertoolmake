@@ -9,7 +9,7 @@ import {
   Layout,
   notifications,
   Select,
-} from "@budibase/bbui"
+} from "@supertoolmake/bbui"
 import { AppStatus } from "@/constants"
 import { appStore, workspaceAppStore } from "@/stores/builder"
 import { appsStore } from "@/stores/portal"

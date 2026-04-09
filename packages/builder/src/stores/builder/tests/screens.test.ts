@@ -1,5 +1,5 @@
-import { Constants } from "@budibase/frontend-core"
-import type { Screen } from "@budibase/types"
+import { Constants } from "@supertoolmake/frontend-core"
+import type { Screen } from "@supertoolmake/types"
 import { get, writable } from "svelte/store"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { API } from "@/api"

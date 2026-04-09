@@ -1,5 +1,5 @@
-import { testContainerUtils } from "@budibase/backend-core/tests"
-import { type Datasource, SourceName } from "@budibase/types"
+import { testContainerUtils } from "@supertoolmake/backend-core/tests"
+import { type Datasource, SourceName } from "@supertoolmake/types"
 import type { Knex } from "knex"
 import TestConfiguration from "../../../tests/utilities/TestConfiguration"
 import "./images"

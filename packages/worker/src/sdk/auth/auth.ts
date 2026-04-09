@@ -6,8 +6,8 @@ import {
   HTTPError,
   sessions,
   tenancy,
-} from "@budibase/backend-core"
-import { EmailTemplatePurpose, type PlatformLogoutOpts, type User } from "@budibase/types"
+} from "@supertoolmake/backend-core"
+import { EmailTemplatePurpose, type PlatformLogoutOpts, type User } from "@supertoolmake/types"
 import jwt from "jsonwebtoken"
 import * as emails from "../../utilities/email"
 import * as userSdk from "../users"

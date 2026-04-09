@@ -1,5 +1,5 @@
-import { roles, utils } from "@budibase/backend-core"
-import type { UserMetadata } from "@budibase/types"
+import { roles, utils } from "@supertoolmake/backend-core"
+import type { UserMetadata } from "@supertoolmake/types"
 import * as setup from "./utilities"
 import { checkPermissionsEndpoint } from "./utilities/TestFunctions"
 

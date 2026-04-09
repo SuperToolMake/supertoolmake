@@ -6,7 +6,7 @@ import type {
   UpdateOAuth2ConfigResponse,
   ValidateConfigRequest,
   ValidateConfigResponse,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
 export interface OAuth2Endpoints {

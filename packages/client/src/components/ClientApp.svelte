@@ -1,14 +1,14 @@
 <script lang="ts">
-import { Body, Heading, Layout } from "@budibase/bbui"
+import { Body, Heading, Layout } from "@supertoolmake/bbui"
 import {
   Constants,
   CookieUtils,
   invalidationMessage,
   popNumSessionsInvalidated,
-} from "@budibase/frontend-core"
+} from "@supertoolmake/frontend-core"
 //@ts-expect-error TODO(mel): fix?
-import ErrorSVG from "@budibase/frontend-core/assets/error.svg?raw"
-import { getThemeClassNames } from "@budibase/shared-core"
+import ErrorSVG from "@supertoolmake/frontend-core/assets/error.svg?raw"
+import { getThemeClassNames } from "@supertoolmake/shared-core"
 import { onMount, setContext } from "svelte"
 import { get, writable } from "svelte/store"
 import { ActionTypes } from "@/constants"

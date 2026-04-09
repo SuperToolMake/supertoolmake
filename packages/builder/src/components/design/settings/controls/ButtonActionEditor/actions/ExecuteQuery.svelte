@@ -1,5 +1,5 @@
 <script>
-import { Checkbox, Layout, Select } from "@budibase/bbui"
+import { Checkbox, Layout, Select } from "@supertoolmake/bbui"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
 import IntegrationQueryEditor from "@/components/integration/index.svelte"
 import BindingBuilder from "@/components/integration/QueryBindingBuilder.svelte"

@@ -1,6 +1,6 @@
-import { constants, context, utils } from "@budibase/backend-core"
-import { utils as JsonUtils, ValidQueryNameRegex } from "@budibase/shared-core"
-import { findHBSBlocks } from "@budibase/string-templates"
+import { constants, context, utils } from "@supertoolmake/backend-core"
+import { utils as JsonUtils, ValidQueryNameRegex } from "@supertoolmake/shared-core"
+import { findHBSBlocks } from "@supertoolmake/string-templates"
 import {
   type ContextUser,
   type CreateDatasourceRequest,
@@ -28,7 +28,7 @@ import {
   SourceName,
   SSOProviderType,
   type UserCtx,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { cloneDeep, merge } from "lodash"
 import { ObjectId } from "mongodb"
 import fetch from "node-fetch"

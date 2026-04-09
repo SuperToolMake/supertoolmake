@@ -1,5 +1,5 @@
 <script>
-import { Body, Heading, Modal, ModalContent } from "@budibase/bbui"
+import { Body, Heading, Modal, ModalContent } from "@supertoolmake/bbui"
 import { goto as gotoStore, params as paramsStore } from "@roxi/routify"
 import { datasources } from "@/stores/builder"
 

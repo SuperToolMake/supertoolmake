@@ -1,6 +1,6 @@
 <script>
-import { StatusLight } from "@budibase/bbui"
-import { Constants } from "@budibase/frontend-core"
+import { StatusLight } from "@supertoolmake/bbui"
+import { Constants } from "@supertoolmake/frontend-core"
 import { capitalise } from "@/helpers"
 import { roles } from "@/stores/builder"
 

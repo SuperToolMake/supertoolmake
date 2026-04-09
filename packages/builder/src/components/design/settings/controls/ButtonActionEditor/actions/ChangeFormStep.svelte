@@ -1,5 +1,5 @@
 <script>
-import { Label, Select } from "@budibase/bbui"
+import { Label, Select } from "@supertoolmake/bbui"
 import { onMount } from "svelte"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
 import { getActionProviders } from "@/dataBinding"

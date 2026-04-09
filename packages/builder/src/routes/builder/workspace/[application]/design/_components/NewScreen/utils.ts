@@ -1,4 +1,4 @@
-import type { Datasource, Table } from "@budibase/types"
+import type { Datasource, Table } from "@supertoolmake/types"
 import * as format from "@/helpers/data/format"
 
 export type SourceOption = TableOption

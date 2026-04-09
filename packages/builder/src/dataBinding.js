@@ -1,12 +1,12 @@
-import { Constants, JSONUtils, SchemaUtils } from "@budibase/frontend-core"
+import { Constants, JSONUtils, SchemaUtils } from "@supertoolmake/frontend-core"
 import {
   decodeJSBinding,
   encodeJSBinding,
   getJsHelperList,
   isJSBinding,
   makePropSafe,
-} from "@budibase/string-templates"
-import { FieldType } from "@budibase/types"
+} from "@supertoolmake/string-templates"
+import { FieldType } from "@supertoolmake/types"
 import { cloneDeep } from "lodash/fp"
 import { get } from "svelte/store"
 import ActionDefinitions from "@/components/design/settings/controls/ButtonActionEditor/manifest.json"

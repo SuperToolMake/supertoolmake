@@ -1,5 +1,5 @@
 <script>
-import { Body, Button, DrawerContent, Icon, Input, Label, Layout } from "@budibase/bbui"
+import { Body, Button, DrawerContent, Icon, Input, Label, Layout } from "@supertoolmake/bbui"
 import { generate } from "shortid"
 
 export let options = []

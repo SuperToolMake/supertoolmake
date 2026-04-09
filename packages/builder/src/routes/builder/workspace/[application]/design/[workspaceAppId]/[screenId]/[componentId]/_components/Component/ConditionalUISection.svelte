@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, Button, DetailSummary, Drawer, notifications } from "@budibase/bbui"
+import { ActionButton, Button, DetailSummary, Drawer, notifications } from "@supertoolmake/bbui"
 import { builderStore, componentStore } from "@/stores/builder"
 import ComponentSettingsSection from "./ComponentSettingsSection.svelte"
 import ConditionalUIDrawer from "./ConditionalUIDrawer.svelte"

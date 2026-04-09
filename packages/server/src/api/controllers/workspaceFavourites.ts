@@ -1,4 +1,4 @@
-import { db, HTTPError } from "@budibase/backend-core"
+import { db, HTTPError } from "@supertoolmake/backend-core"
 import {
   type AddWorkspaceFavouriteRequest,
   type AddWorkspaceFavouriteResponse,
@@ -12,7 +12,7 @@ import {
   type WorkspaceFavourite,
   type WorkspaceFavouriteResponse,
   WorkspaceResource,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import sdk from "../../sdk"
 
 type WorkspaceResourceDoc = Table | WorkspaceApp | Datasource | Query

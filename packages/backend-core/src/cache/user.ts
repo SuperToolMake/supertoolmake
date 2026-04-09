@@ -1,4 +1,4 @@
-import type { SSOUser, User, UserMetadata } from "@budibase/types"
+import type { SSOUser, User, UserMetadata } from "@supertoolmake/types"
 import * as context from "../context"
 import * as platform from "../platform"
 import * as redis from "../redis/init"

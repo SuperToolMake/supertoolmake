@@ -13,14 +13,14 @@
     "baseUrl": ".",
     "sourceMap": true,
     "paths": {
-      "@budibase/types": ["./packages/types/src"],
-      "@budibase/backend-core": ["./packages/backend-core/src"],
-      "@budibase/backend-core/*": ["./packages/backend-core/*"],
-      "@budibase/shared-core": ["./packages/shared-core/src"],
-      "@budibase/string-templates": ["./packages/string-templates/src"],
-      "@budibase/string-templates/*": ["./packages/string-templates/*"],
-      "@budibase/frontend-core": ["./packages/frontend-core/src"],
-      "@budibase/bbui": ["./packages/bbui/src"]
+      "@supertoolmake/types": ["./packages/types/src"],
+      "@supertoolmake/backend-core": ["./packages/backend-core/src"],
+      "@supertoolmake/backend-core/*": ["./packages/backend-core/*"],
+      "@supertoolmake/shared-core": ["./packages/shared-core/src"],
+      "@supertoolmake/string-templates": ["./packages/string-templates/src"],
+      "@supertoolmake/string-templates/*": ["./packages/string-templates/*"],
+      "@supertoolmake/frontend-core": ["./packages/frontend-core/src"],
+      "@supertoolmake/bbui": ["./packages/bbui/src"]
     }
   },
   "exclude": []

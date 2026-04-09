@@ -1,5 +1,5 @@
 <script>
-import { Input, Modal, ModalContent, notifications } from "@budibase/bbui"
+import { Input, Modal, ModalContent, notifications } from "@supertoolmake/bbui"
 import { get } from "svelte/store"
 import { datasources, integrations } from "@/stores/builder"
 import { integrationForDatasource } from "@/stores/selectors"

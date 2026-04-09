@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, notifications } from "@budibase/bbui"
+import { ActionButton, notifications } from "@supertoolmake/bbui"
 import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
 import { findClosestMatchingComponent } from "@/helpers/components"
 import { componentStore, selectedScreen } from "@/stores/builder"

@@ -1,4 +1,4 @@
-import { db as dbCore, redis } from "@budibase/backend-core"
+import { db as dbCore, redis } from "@supertoolmake/backend-core"
 import * as db from "../db"
 import env from "../environment"
 import * as jsRunner from "../jsRunner"

@@ -1,6 +1,6 @@
 // need to handle table name + field or just field, depending on if relationships used
 
-import { helpers, PROTECTED_EXTERNAL_COLUMNS } from "@budibase/shared-core"
+import { helpers, PROTECTED_EXTERNAL_COLUMNS } from "@supertoolmake/shared-core"
 import {
   EXTERNAL_ROW_REV,
   type FieldSchema,
@@ -8,7 +8,7 @@ import {
   JsonTypes,
   type Row,
   type Table,
-} from "@budibase/types"
+} from "@supertoolmake/types"
 import { generateRowIdField } from "../../../../integrations/utils"
 
 function extractFieldValue({
