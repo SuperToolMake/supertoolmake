@@ -117,10 +117,10 @@ jobs:
       - name: Test
         run: |
           if ${{ env.ONLY_AFFECTED_TASKS }}; then
-            yarn test -- --ignore=@supertoolmake/worker --ignore=@supertoolmake/server --ignore=@supertoolmake/builder --ignore=@supertoolmake/upgrade-tests --ignore=@supertoolmake/client --no-prefix --since=${{ env.NX_BASE_BRANCH }}
+            yarn test -- --ignore=@supertoolmake/worker --ignore=@supertoolmake/server --ignore=@supertoolmake/builder --ignore=@supertoolmake/upgrade-tests --ignore=@supertoolmake/client --ignore=@supertoolmake/frontend-core --ignore=@supertoolmake/backend-core --no-prefix --since=${{ env.NX_BASE_BRANCH }}
             yarn test -- --scope=@supertoolmake/builder --scope=@supertoolmake/client --since=${{ env.NX_BASE_BRANCH }}
           else
-            yarn test -- --ignore=@supertoolmake/worker --ignore=@supertoolmake/server --ignore=@supertoolmake/builder --ignore=@supertoolmake/upgrade-tests --ignore=@supertoolmake/client --no-prefix
+            yarn test -- --ignore=@supertoolmake/worker --ignore=@supertoolmake/server --ignore=@supertoolmake/builder --ignore=@supertoolmake/upgrade-tests --ignore=@supertoolmake/client --ignore=@supertoolmake/frontend-core --ignore=@supertoolmake/backend-core --no-prefix
             yarn test -- --scope=@supertoolmake/builder --scope=@supertoolmake/client --no-prefix
           fi
 
