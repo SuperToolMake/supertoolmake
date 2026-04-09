@@ -1,5 +1,6 @@
 {
   "name": "@budibase/string-templates",
+  "private": true,
   "version": "0.0.0",
   "description": "Handlebars wrapper for templating.",
   "main": "dist/bundle.cjs",

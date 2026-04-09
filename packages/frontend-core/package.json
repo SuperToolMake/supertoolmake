@@ -1,5 +1,6 @@
 {
   "name": "@budibase/frontend-core",
+  "private": true,
   "version": "0.0.0",
   "description": "Budibase frontend core libraries used in builder and client",
   "author": "Budibase",

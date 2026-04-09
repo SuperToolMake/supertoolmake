@@ -1,5 +1,6 @@
 {
   "name": "@budibase/sdk",
+  "private": true,
   "version": "0.0.0",
   "description": "Budibase Public API SDK",
   "author": "Budibase",
