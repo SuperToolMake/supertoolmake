@@ -74,7 +74,18 @@ const saveRowHandler = async (action, context) => {
   const { fields, providerId, tableId, notificationOverride } = action.parameters
   let payload
   if (providerId) {
-    payload = { ...context[providerId] }
+    const providerData = context[providerId]
+    if (providerData) {
+      payload = { ...providerData }
+
+      const datasourceTableId = providerData.tableId
+      if (datasourceTableId && tableId && datasourceTableId !== tableId) {
+        delete payload._id
+        delete payload._rev
+      }
+    } else {
+      payload = {}
+    }
   } else {
     payload = {}
   }
@@ -84,11 +95,7 @@ const saveRowHandler = async (action, context) => {
     }
   }
   if (tableId) {
-    if (tableId.startsWith("view")) {
-      payload._viewId = tableId
-    } else {
-      payload.tableId = tableId
-    }
+    payload.tableId = tableId
   }
   try {
     const row = await API.saveRow(payload)
