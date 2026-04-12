@@ -12,7 +12,7 @@
   "scripts": {
     "prebuild": "rimraf dist/ client/",
     "build": "node ./scripts/build.js",
-    "postbuild": "copyfiles -a -u 3 '../client/dist/**/*.js' client && copyfiles -f ../client/manifest.json client && copyfiles -f ../../yarn.lock ./dist/",
+    "postbuild": "copyfiles -a -u 3 '../client/dist/**/*.js' client && copyfiles -f ../client/manifest.json client && copyfiles -f ../client/package.json client && copyfiles -f ../../yarn.lock ./dist/",
     "check:types": "tsc -p tsconfig.json --noEmit --paths null",
     "build:isolated-vm-lib:snippets": "esbuild --minify --bundle src/jsRunner/bundles/snippets.ts --outfile=src/jsRunner/bundles/snippets.ivm.bundle.js --platform=node --format=iife --global-name=snippets",
     "build:isolated-vm-lib:string-templates": "esbuild --minify --bundle src/jsRunner/bundles/index-helpers.ts --outfile=src/jsRunner/bundles/index-helpers.ivm.bundle.js --platform=node --format=iife --external:handlebars --global-name=helpers",
