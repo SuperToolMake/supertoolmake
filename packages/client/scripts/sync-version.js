@@ -1,8 +1,8 @@
 #!/usr/bin/env node
+import { execSync } from "node:child_process"
 import fs from "node:fs"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
-import { execSync } from "node:child_process"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const rootDir = path.resolve(__dirname, "../../..")
@@ -46,7 +46,7 @@ function hasClientChangesSinceRelease(tag) {
 function updatePackageVersion(pkgPath, version) {
   const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"))
   pkg.version = version
-  fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n")
+  fs.writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`)
   console.log(`Updated ${pkgPath} to version ${version}`)
 }
 
