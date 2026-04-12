@@ -15,7 +15,7 @@ function getLernaVersion() {
 
 function getLastReleaseTag() {
   try {
-    const tags = execSync('git tag --list "v*" --sort=-v:refname --format="%(refname:lstrip=1)"', {
+    const tags = execSync('git tag --list "*" --sort=-v:refname --format="%(refname)"', {
       encoding: "utf-8",
     })
     const tagList = tags
