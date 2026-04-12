@@ -56,6 +56,10 @@ jobs:
           new_version=$(./scripts/getCurrentVersion.sh)
           echo "version=$new_version" >> $GITHUB_OUTPUT
 
+      - name: Sync client version
+        run: |
+          node packages/client/scripts/sync-version.js
+
 
   trigger-release:
     needs: [tag-release]

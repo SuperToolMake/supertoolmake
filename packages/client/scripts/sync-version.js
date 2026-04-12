@@ -50,6 +50,19 @@ function updatePackageVersion(pkgPath, version) {
   console.log(`Updated ${pkgPath} to version ${version}`)
 }
 
+function commitAndPush(version) {
+  try {
+    execSync("git add packages/client/package.json", { encoding: "utf-8" })
+    execSync(`git commit -m "chore: sync client version to v${version}"`, {
+      encoding: "utf-8",
+    })
+    execSync("git push", { encoding: "utf-8" })
+    console.log("Committed and pushed client version change")
+  } catch {
+    console.log("No changes to commit")
+  }
+}
+
 async function main() {
   const lernaVersion = getLernaVersion()
   const lastReleaseTag = getLastReleaseTag()
@@ -60,17 +73,24 @@ async function main() {
   console.log(`Last release tag: ${lastReleaseTag}`)
   console.log(`Current client version: ${currentVersion}`)
 
+  let versionUpdated = false
+
   const changesSinceRelease = await hasClientChangesSinceRelease(lastReleaseTag)
 
   if (changesSinceRelease) {
     if (currentVersion !== lernaVersion) {
       updatePackageVersion(clientPkgPath, lernaVersion)
+      versionUpdated = true
       console.log("Client code changed since last release → version synced to lerna.json")
     } else {
       console.log("Client code changed, but version already matches lerna.json")
     }
   } else {
     console.log("No client code changes since last release → keeping current version")
+  }
+
+  if (versionUpdated) {
+    commitAndPush(lernaVersion)
   }
 }
 
