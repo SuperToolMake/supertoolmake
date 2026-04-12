@@ -8,7 +8,12 @@ export * as csv from "./csv"
 export * as db from "./db"
 export * as docIds from "./docIds"
 export * from "./Endpoint"
-export { default as env, setEnv, withEnv } from "./environment"
+export {
+  default as env,
+  getClientVersion,
+  setEnv,
+  withEnv,
+} from "./environment"
 export * as errors from "./errors"
 export * as installation from "./installation"
 export * as logging from "./logging"

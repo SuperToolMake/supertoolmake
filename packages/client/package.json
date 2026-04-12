@@ -1,7 +1,7 @@
 {
   "name": "@supertoolmake/client",
   "private": true,
-  "version": "1.8.1",
+  "version": "1.8.2",
   "license": "MPL-2.0",
   "module": "dist/budibase-client.js",
   "main": "dist/budibase-client.js",

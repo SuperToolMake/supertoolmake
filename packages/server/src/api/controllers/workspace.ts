@@ -317,7 +317,10 @@ export async function fetchAppPackage(ctx: UserCtx<void, FetchAppPackageResponse
   const clientCacheKey = await objectStore.getClientCacheKey(application.version)
 
   ctx.body = {
-    application: { ...application, upgradableVersion: envCore.VERSION },
+    application: {
+      ...application,
+      upgradableVersion: envCore.getClientVersion(),
+    },
     screens,
     layouts,
     clientLibPath,
@@ -405,7 +408,7 @@ async function performWorkspaceCreate(
       _rev: undefined,
       appId: workspaceId,
       type: "app",
-      version: envCore.VERSION,
+      version: envCore.getClientVersion(),
       componentLibraries: ["@budibase/standard-components"],
       name: workspaceName,
       url: appUrl,
@@ -431,7 +434,7 @@ async function performWorkspaceCreate(
     }
 
     if (!isImport) {
-      newWorkspace.creationVersion = envCore.VERSION
+      newWorkspace.creationVersion = envCore.getClientVersion()
     }
 
     const existing = await sdk.workspaces.metadata.tryGet()
@@ -625,7 +628,7 @@ export async function updateClient(ctx: UserCtx<void, UpdateAppClientResponse>) 
   }
 
   // Update versions in app package
-  const updatedToVersion = envCore.VERSION
+  const updatedToVersion = envCore.getClientVersion()
   const workspacePackageUpdates = {
     version: updatedToVersion,
     revertableVersion: currentVersion,

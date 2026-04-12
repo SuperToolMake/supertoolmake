@@ -64,47 +64,57 @@ function getPackageJsonFields(): {
   VERSION: string
   SERVICE_NAME: string
 } {
-  function getParentFile(file: string) {
-    function findFileInAncestors(fileName: string, currentDir: string): string | null {
-      const filePath = `${currentDir}/${fileName}`
-      if (existsSync(filePath)) {
-        return filePath
-      }
-
-      const parentDir = `${currentDir}/..`
-      if (parentDir === currentDir) {
-        // reached root directory
-        return null
-      }
-
-      return findFileInAncestors(fileName, parentDir)
+  function findFileInAncestors(fileName: string, currentDir: string): string | null {
+    const filePath = `${currentDir}/${fileName}`
+    if (existsSync(filePath)) {
+      return filePath
     }
 
-    const packageJsonFile = findFileInAncestors(file, process.cwd())
-    const content = readFileSync(packageJsonFile!, "utf-8")
-    const parsedContent = JSON.parse(content)
-    return parsedContent
-  }
-
-  let localVersion: string | undefined
-  if (isDev() && !isTest()) {
-    try {
-      const lerna = getParentFile("lerna.json")
-      localVersion = `${lerna.version}+local`
-    } catch {
-      //
+    const parentDir = `${currentDir}/..`
+    if (parentDir === currentDir) {
+      return null
     }
+
+    return findFileInAncestors(fileName, parentDir)
   }
 
   try {
-    const parsedContent = getParentFile("package.json")
-    return {
-      VERSION: localVersion || process.env.BUDIBASE_VERSION || parsedContent.version,
-      SERVICE_NAME: parsedContent.name,
+    const lernaFile = findFileInAncestors("lerna.json", process.cwd())
+    if (lernaFile) {
+      const lernaContent = readFileSync(lernaFile, "utf-8")
+      const lerna = JSON.parse(lernaContent)
+      return {
+        VERSION: process.env.BUDIBASE_VERSION || lerna.version,
+        SERVICE_NAME: lerna.name,
+      }
     }
   } catch {
-    // throwing an error here is confusing/causes backend-core to be hard to import
-    return { VERSION: process.env.BUDIBASE_VERSION || "", SERVICE_NAME: "" }
+    //
+  }
+
+  try {
+    const packageJsonFile = findFileInAncestors("package.json", process.cwd())
+    if (packageJsonFile) {
+      const parsedContent = JSON.parse(readFileSync(packageJsonFile, "utf-8"))
+      return {
+        VERSION: process.env.BUDIBASE_VERSION || parsedContent.version,
+        SERVICE_NAME: parsedContent.name,
+      }
+    }
+  } catch {
+    //
+  }
+
+  return { VERSION: process.env.BUDIBASE_VERSION || "", SERVICE_NAME: "" }
+}
+
+function getClientVersion(): string {
+  try {
+    const pkgJsonPath = require.resolve("@supertoolmake/client/package.json")
+    const content = readFileSync(pkgJsonPath, "utf-8")
+    return JSON.parse(content).version
+  } catch {
+    return ""
   }
 }
 
@@ -233,6 +243,7 @@ const environment = {
   DISABLE_CONTENT_SECURITY_POLICY: process.env.DISABLE_CONTENT_SECURITY_POLICY,
   CSP_ADDITIONAL_DIRECTIVES: process.env.CSP_ADDITIONAL_DIRECTIVES,
   BSON_BUFFER_SIZE: parseIntSafe(process.env.BSON_BUFFER_SIZE),
+  getClientVersion,
 }
 
 export function setEnv(newEnvVars: Partial<typeof environment>): () => void {
@@ -293,3 +304,4 @@ for (const [key, value] of Object.entries(environment)) {
 }
 
 export default environment
+export { getClientVersion }
