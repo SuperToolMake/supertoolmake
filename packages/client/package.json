@@ -1,7 +1,7 @@
 {
   "name": "@supertoolmake/client",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.8.1",
   "license": "MPL-2.0",
   "module": "dist/budibase-client.js",
   "main": "dist/budibase-client.js",
@@ -17,6 +17,7 @@
     "./manifest.json": "./manifest.json"
   },
   "scripts": {
+    "prebuild": "node scripts/sync-version.js",
     "build": "vite build",
     "dev": "vite build --watch --mode=dev",
     "check:types": "yarn svelte-check --incremental",
