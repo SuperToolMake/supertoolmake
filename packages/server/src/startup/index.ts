@@ -2,6 +2,7 @@ import type { Server } from "node:http"
 import type { AddressInfo } from "node:net"
 import {
   cache,
+  db as dbCore,
   env as coreEnv,
   installation,
   logging,
@@ -114,6 +115,17 @@ export async function startup(opts: { app?: Koa; server?: Server; force?: boolea
 
   if (coreEnv.BSON_BUFFER_SIZE) {
     bson.setInternalBufferSize(coreEnv.BSON_BUFFER_SIZE)
+  }
+
+  if (env.SELF_HOSTED && !env.MULTI_TENANCY) {
+    console.log("Updating client library")
+    const tenantId = tenancy.getTenantId()
+    await tenancy.doInTenant(tenantId, async () => {
+      const workspaces = await dbCore.getAllWorkspaces({})
+      for (const workspace of workspaces) {
+        await fileSystem.updateClientLibrary(workspace.appId)
+      }
+    })
   }
 
   console.log("Initialising JS runner")
