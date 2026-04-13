@@ -108,16 +108,6 @@ function getPackageJsonFields(): {
   return { VERSION: process.env.BUDIBASE_VERSION || "", SERVICE_NAME: "" }
 }
 
-function getClientVersion(): string {
-  try {
-    const pkgJsonPath = require.resolve("@supertoolmake/client/package.json")
-    const content = readFileSync(pkgJsonPath, "utf-8")
-    return JSON.parse(content).version
-  } catch {
-    return ""
-  }
-}
-
 function isWorker() {
   return environment.SERVICE_TYPE === ServiceType.WORKER
 }
@@ -243,7 +233,6 @@ const environment = {
   DISABLE_CONTENT_SECURITY_POLICY: process.env.DISABLE_CONTENT_SECURITY_POLICY,
   CSP_ADDITIONAL_DIRECTIVES: process.env.CSP_ADDITIONAL_DIRECTIVES,
   BSON_BUFFER_SIZE: parseIntSafe(process.env.BSON_BUFFER_SIZE),
-  getClientVersion,
 }
 
 export function setEnv(newEnvVars: Partial<typeof environment>): () => void {
@@ -304,4 +293,3 @@ for (const [key, value] of Object.entries(environment)) {
 }
 
 export default environment
-export { getClientVersion }

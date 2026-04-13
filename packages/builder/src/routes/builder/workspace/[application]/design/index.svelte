@@ -19,7 +19,6 @@ import { buildLiveUrl } from "@/helpers/urls"
 import FavouriteResourceButton from "@/routes/builder/_components/FavouriteResourceButton.svelte"
 import WorkspaceAppModal from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/_components/WorkspaceApp/WorkspaceAppModal.svelte"
 import {
-  appStore,
   contextMenuStore,
   workspaceAppStore,
   workspaceFavouriteStore,
@@ -144,10 +143,6 @@ const createApp = () => {
 }
 
 $: favourites = workspaceFavouriteStore.lookup
-$: updateAvailable =
-  $appStore.upgradableVersion &&
-  $appStore.version &&
-  $appStore.upgradableVersion !== $appStore.version
 
 const filters: {
   label: string

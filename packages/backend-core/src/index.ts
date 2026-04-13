@@ -10,7 +10,6 @@ export * as docIds from "./docIds"
 export * from "./Endpoint"
 export {
   default as env,
-  getClientVersion,
   setEnv,
   withEnv,
 } from "./environment"
