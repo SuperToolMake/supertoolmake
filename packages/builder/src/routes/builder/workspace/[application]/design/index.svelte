@@ -7,7 +7,6 @@ import {
   Helpers,
   Icon,
   notifications,
-  StatusLight,
   TooltipPosition,
 } from "@supertoolmake/bbui"
 import { PublishResourceState, type UIWorkspaceApp, WorkspaceResource } from "@supertoolmake/types"
@@ -15,7 +14,6 @@ import { url } from "@roxi/routify"
 import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
 import PublishStatusBadge from "@/components/common/PublishStatusBadge.svelte"
 import TopBar from "@/components/common/TopBar.svelte"
-import VersionModal from "@/components/deploy/VersionModal.svelte"
 import { capitalise, durationFromNow } from "@/helpers"
 import { buildLiveUrl } from "@/helpers/urls"
 import FavouriteResourceButton from "@/routes/builder/_components/FavouriteResourceButton.svelte"
@@ -23,13 +21,10 @@ import WorkspaceAppModal from "@/routes/builder/workspace/[application]/design/[
 import {
   appStore,
   contextMenuStore,
-  isOnlyUser,
   workspaceAppStore,
   workspaceFavouriteStore,
 } from "@/stores/builder"
 import NoResults from "../_components/NoResults.svelte"
-
-type ShowUI = { show: () => void }
 
 let showHighlight = false
 let filter: PublishResourceState | undefined
@@ -37,7 +32,6 @@ let selectedWorkspaceApp: UIWorkspaceApp | undefined
 let workspaceAppModal: WorkspaceAppModal
 let confirmDeleteDialog: ConfirmDialog
 let appChangingStatus: string | undefined
-let versionModal: ShowUI
 
 const deleteWorkspaceApp = async () => {
   if (!selectedWorkspaceApp) {
@@ -207,16 +201,6 @@ $: filteredWorkspaceApps = workspaceApps
 
 <div class="apps-index">
   <TopBar icon="browser" breadcrumbs={[{ text: "Apps" }]} showPublish={false}>
-    {#if updateAvailable && $isOnlyUser}
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div class="update-version" on:click={versionModal.show}>
-        <ActionButton quiet>
-          <StatusLight notice />
-          Update
-        </ActionButton>
-      </div>
-    {/if}
   </TopBar>
   <div class="secondary-bar">
     <div class="filter">
@@ -337,8 +321,6 @@ $: filteredWorkspaceApps = workspaceApps
     Deleting <b>{selectedWorkspaceApp.name}</b> cannot be undone. Are you sure?
   </ConfirmDialog>
 {/if}
-
-<VersionModal hideIcon bind:this={versionModal} />
 
 <style>
   .apps-index {

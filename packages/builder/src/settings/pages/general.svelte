@@ -2,27 +2,19 @@
 import { Body, Button, Divider, Heading, Icon, Layout, Modal } from "@supertoolmake/bbui"
 import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
 import UpdateAppForm from "@/components/common/UpdateAppForm.svelte"
-import RevertModal from "@/components/deploy/RevertModal.svelte"
-import VersionModal from "@/components/deploy/VersionModal.svelte"
 import ExportAppModal from "@/components/start/ExportAppModal.svelte"
 import ImportAppModal from "@/components/start/ImportAppModal.svelte"
-import { appStore, deploymentStore, isOnlyUser } from "@/stores/builder"
-import { admin } from "@/stores/portal/admin"
+import { appStore, deploymentStore } from "@/stores/builder"
 
-let versionModal: VersionModal
 let exportModal: Modal
 let importModal: Modal
 let exportPublishedVersion: boolean = false
 let unpublishModal: ConfirmDialog
-let revertModal: RevertModal
 
 const exportApp = (opts: { published: any }) => {
   exportPublishedVersion = Boolean(opts?.published)
   exportModal.show()
 }
-
-$: updateAvailable = $appStore.upgradableVersion !== $appStore.version
-$: revertAvailable = $appStore.revertableVersion != null
 </script>
 
 <Layout noPadding>
@@ -43,7 +35,6 @@ $: revertAvailable = $appStore.revertableVersion != null
     </div>
     <div class="row">
       <Button warning on:click={unpublishModal?.show}>Unpublish</Button>
-      <Button secondary on:click={revertModal?.show}>Revert changes</Button>
     </div>
   {:else}
     <div class="row">
@@ -68,59 +59,6 @@ $: revertAvailable = $appStore.revertableVersion != null
       </Button>
     </div>
   {/if}
-  <Divider noMargin id="version" />
-  <Layout gap="XS" noPadding>
-    <Heading size="S">Client version</Heading>
-    {#if $admin.isDev}
-      <Body size="S">
-        You're running the latest client version from your file system, as
-        you're in developer mode.
-        <br />
-        Use the flag DEV_USE_CLIENT_FROM_STORAGE to load from minio instead.
-      </Body>
-    {:else if updateAvailable}
-      <Body size="S">
-        The workspace is currently using version
-        <strong>{$appStore.version}</strong>
-        but version <strong>{$appStore.upgradableVersion}</strong> is available.
-        <br />
-        Updates can contain new features, performance improvements and bug fixes.
-      </Body>
-      <div class="buttons">
-        <Button
-          cta
-          on:click={versionModal.show}
-          disabled={!$isOnlyUser}
-          tooltip={$isOnlyUser
-            ? null
-            : "Unavailable - another user is editing this workspace"}
-        >
-          Update version
-        </Button>
-      </div>
-    {:else}
-      <Body size="S">
-        The workspace is currently using version
-        <strong>{$appStore.version}</strong>.
-        <br />
-        You're running the latest!
-      </Body>
-      {#if revertAvailable}
-        <div class="buttons">
-          <Button
-            secondary
-            on:click={versionModal.show}
-            disabled={!$isOnlyUser}
-            tooltip={$isOnlyUser
-              ? null
-              : "Unavailable - another user is editing this workspace"}
-          >
-            Revert version
-          </Button>
-        </div>
-      {/if}
-    {/if}
-  </Layout>
   <Divider noMargin />
   <Layout noPadding gap="XS">
     <Heading size="XS">Export</Heading>
@@ -150,8 +88,6 @@ $: revertAvailable = $appStore.revertableVersion != null
   </div>
 </Layout>
 
-<VersionModal bind:this={versionModal} hideIcon={true} />
-
 <Modal bind:this={exportModal}>
   <ExportAppModal appId={$appStore.appId} published={exportPublishedVersion} />
 </Modal>
@@ -171,8 +107,6 @@ $: revertAvailable = $appStore.revertableVersion != null
 
   <p>This will make all apps and automations in this workspace unavailable</p>
 </ConfirmDialog>
-
-<RevertModal bind:this={revertModal} />
 
 <style>
   .row {
