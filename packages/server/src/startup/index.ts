@@ -2,8 +2,8 @@ import type { Server } from "node:http"
 import type { AddressInfo } from "node:net"
 import {
   cache,
-  db as dbCore,
   env as coreEnv,
+  db as dbCore,
   installation,
   logging,
   tenancy,

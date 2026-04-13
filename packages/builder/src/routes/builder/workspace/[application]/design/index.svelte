@@ -18,11 +18,7 @@ import { capitalise, durationFromNow } from "@/helpers"
 import { buildLiveUrl } from "@/helpers/urls"
 import FavouriteResourceButton from "@/routes/builder/_components/FavouriteResourceButton.svelte"
 import WorkspaceAppModal from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/_components/WorkspaceApp/WorkspaceAppModal.svelte"
-import {
-  contextMenuStore,
-  workspaceAppStore,
-  workspaceFavouriteStore,
-} from "@/stores/builder"
+import { contextMenuStore, workspaceAppStore, workspaceFavouriteStore } from "@/stores/builder"
 import NoResults from "../_components/NoResults.svelte"
 
 let showHighlight = false
