@@ -1,7 +1,6 @@
-import type { Database, Installation, Workspace } from "@supertoolmake/types"
+import type { Database, Installation } from "@supertoolmake/types"
 import { bustCache, CacheKey, TTL, withCache } from "./cache/generic"
-import { doWithDB, getAllWorkspaces, StaticDatabases } from "./db"
-import { DocumentType } from "./db/utils"
+import { doWithDB, StaticDatabases } from "./db"
 import environment from "./environment"
 import { logAlert } from "./logging"
 import { newid } from "./utils"
@@ -80,27 +79,6 @@ export const checkInstallVersion = async (): Promise<void> => {
       logAlert(`Invalid version "${newVersion}" - is it semver?`)
     } else {
       logAlert("Failed to retrieve version", err)
-    }
-  }
-}
-
-export const checkWorkspaceClientVersions = async (): Promise<void> => {
-  const newClientVersion = environment.getClientVersion()
-  const workspaces = await getAllWorkspaces({ dev: true })
-
-  for (const workspace of workspaces) {
-    const currentVersion = workspace.version
-    if (currentVersion && currentVersion !== newClientVersion) {
-      try {
-        await doWithDB(workspace._id!, async (db: any) => {
-          const app = await db.get<Workspace>(DocumentType.WORKSPACE_METADATA)
-          app.version = newClientVersion
-          app.revertableVersion = undefined
-          await db.put(app)
-        })
-      } catch (err) {
-        logAlert(`Failed to update client version for workspace ${workspace._id}`, err)
-      }
     }
   }
 }
