@@ -182,15 +182,20 @@ export function getCookie<T>(ctx: Ctx, name: string) {
  * @param value The value of cookie which will be set.
  * @param opts options like whether to sign.
  */
-export function setCookie(ctx: Ctx, value: any, name = "builder", opts = { sign: true }) {
-  if (value && opts?.sign) {
+export function setCookie(
+  ctx: Ctx,
+  value: any,
+  name = "builder",
+  opts: { sign: boolean; httpOnly?: boolean } = { sign: true }
+) {
+  if (value && opts && opts.sign) {
     value = jwt.sign(value, env.JWT_SECRET as Secret)
   }
 
   const config: SetOption = {
     expires: MAX_VALID_DATE,
     path: "/",
-    httpOnly: false,
+    httpOnly: opts.httpOnly ?? false,
     overwrite: true,
   }
 
