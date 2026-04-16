@@ -52,7 +52,7 @@ const processFiles = async (fileList) => {
   if ($builderStore.inBuilder) {
     return []
   }
-  rawFiles = Array.from(fileList || [])
+  rawFiles = [...rawFiles, ...Array.from(fileList || [])]
   return await new Promise((resolve) => {
     if (!fileList?.length) {
       return []
