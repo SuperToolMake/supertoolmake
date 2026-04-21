@@ -1,11 +1,21 @@
-import { ConfigType, type SettingsConfig } from "@supertoolmake/types"
-import type { Context, Middleware, Next } from "koa"
 import { getConfig } from "../configs"
+import { ConfigType, EndpointMatcher, SettingsConfig } from "@supertoolmake/types"
+import type { Next, Middleware, Context } from "koa"
+import { buildMatcherRegex, matches } from "./matchers"
 
-export function activeTenant(): Middleware {
-  return async (ctx: Context, next: Next) => {
+export function activeTenant(
+  noActivationPatterns: EndpointMatcher[] = []
+): Middleware {
+  const noActivationOptions = buildMatcherRegex(noActivationPatterns)
+
+  return async function (ctx: Context, next: Next) {
+    if (matches(ctx as any, noActivationOptions)) {
+      return next()
+    }
     try {
-      const settingsConfig = await getConfig<SettingsConfig>(ConfigType.SETTINGS)
+      const settingsConfig = await getConfig<SettingsConfig>(
+        ConfigType.SETTINGS
+      )
       if (settingsConfig?.config?.active === false) {
         // Treat inactive tenant as if it doesn't exist - return 404 or unauthorized
         ctx.status = 404
