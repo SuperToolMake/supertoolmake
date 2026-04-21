@@ -188,7 +188,7 @@ export function setCookie(
   name = "builder",
   opts: { sign: boolean; httpOnly?: boolean } = { sign: true }
 ) {
-  if (value && opts && opts.sign) {
+  if (value && opts?.sign) {
     value = jwt.sign(value, env.JWT_SECRET as Secret)
   }
 
