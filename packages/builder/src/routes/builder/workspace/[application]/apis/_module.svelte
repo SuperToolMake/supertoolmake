@@ -10,6 +10,7 @@ import TopBar from "@/components/common/TopBar.svelte"
 import Panel from "@/components/design/Panel.svelte"
 import { IntegrationTypes } from "@/constants/backend"
 import { builderStore, datasources } from "@/stores/builder"
+import { helpers } from "@supertoolmake/shared-core"
 
 let searchValue: string
 let panelWidth = 260
@@ -29,7 +30,7 @@ const sortByDatasourceName = (a: SortableDatasource, b: SortableDatasource) =>
     sensitivity: "base",
   })
 
-const datasourceFilter = (datasource: any) => datasource.source === IntegrationTypes.REST
+const datasourceFilter = (datasource: any) => !helpers.isSQL(datasource)
 
 $: goto = $gotoStore
 
@@ -51,9 +52,14 @@ $: restDatasources = ($datasources.list || []).filter(
 )
 $: hasRestDatasources = restDatasources.length > 0
 
+$: nonSqlDatasources = ($datasources.list || []).filter(
+  (datasource) => !helpers.isSQL(datasource)
+)
+$: hasNonSqlDatasources = nonSqlDatasources.length > 0
+
 const APIS_BASE_ROUTE = "/builder/workspace/[application]/apis"
 
-$: shouldRedirectToNew = !(hasRestDatasources || $isActive("./new")) && $isActive(APIS_BASE_ROUTE)
+$: shouldRedirectToNew = !(hasNonSqlDatasources || hasRestDatasources || $isActive("./new")) && $isActive(APIS_BASE_ROUTE)
 
 $: if (shouldRedirectToNew) {
   goto("./new")

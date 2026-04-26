@@ -1,13 +1,12 @@
 <script lang="ts">
-import { Body } from "@supertoolmake/bbui"
 import { goto as gotoStore, params } from "@roxi/routify"
 import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
 import CreationPage from "@/components/common/CreationPage.svelte"
-import { IntegrationTypes } from "@/constants/backend"
 import { datasources, sortedIntegrations as integrations, tables } from "@/stores/builder"
 import { hasData } from "@/stores/selectors"
 import CreateExternalDatasourceModal from "./_components/CreateExternalDatasourceModal/index.svelte"
 import DatasourceOption from "./_components/DatasourceOption.svelte"
+import { helpers } from "@supertoolmake/shared-core"
 
 $: goto = $gotoStore
 $params
@@ -25,15 +24,12 @@ $: disabled = externalDatasourceLoading
 />
 
 <CreationPage
-  showClose={hasData($datasources.list.filter(ds => ds.source !== "REST"), $tables)}
+  showClose={hasData($datasources.list.filter(ds => helpers.isSQL(ds)), $tables)}
   onClose={() => goto("../")}
-  heading="Add new data source"
+  heading="Connect to your SQL database"
 >
-  <div class="subHeading">
-    <Body>Connect to an external datasource</Body>
-  </div>
   <div class="options">
-    {#each $integrations.filter(integration => integration.name !== IntegrationTypes.REST) as integration}
+    {#each $integrations.filter(integration => helpers.isSQL({ source: integration.name })).reverse() as integration}
       <DatasourceOption
         on:click={() => externalDatasourceModal.show(integration)}
         title={integration.friendlyName}
@@ -51,27 +47,16 @@ $: disabled = externalDatasourceLoading
 </CreationPage>
 
 <style>
-  .subHeading {
-    display: flex;
-    align-items: center;
-    margin-top: 12px;
-    margin-bottom: 24px;
-    gap: 8px;
-  }
-  .subHeading :global(p) {
-    color: var(--spectrum-global-color-gray-600) !important;
-  }
   .options {
     width: 100%;
+    min-width: 100%;
     display: grid;
-    column-gap: 24px;
-    row-gap: 24px;
-    grid-template-columns: repeat(3, 1fr);
-    justify-content: center;
-    margin-bottom: 48px;
-    max-width: 1200px;
-  }
-  .options {
-    grid-column: 1 / -1;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fill, 235px);
+    justify-content: flex-start;
+    margin-bottom: 20px;
+    max-width: calc(4 * 235px + 3 * 16px);
+    margin-left: auto;
+    margin-right: auto;
   }
 </style>

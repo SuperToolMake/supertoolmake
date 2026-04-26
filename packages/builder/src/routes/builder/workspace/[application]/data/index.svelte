@@ -2,8 +2,8 @@
 import { goto } from "@roxi/routify"
 import { onMount } from "svelte"
 import type { Datasource, Table } from "@supertoolmake/types"
-import { IntegrationTypes } from "@/constants/backend"
 import { datasources } from "@/stores/builder"
+import { helpers } from "@supertoolmake/shared-core"
 
 $goto
 
@@ -16,17 +16,17 @@ const getFirstTableId = (datasource: Datasource): string | undefined => {
 }
 
 onMount(() => {
-  const nonRestDatasources = $datasources.list.filter((ds) => ds.source !== IntegrationTypes.REST)
+  const sqlDatasources = $datasources.list.filter((ds) => helpers.isSQL(ds))
   let tableId: string | undefined
-  for (let ds of nonRestDatasources) {
+  for (let ds of sqlDatasources) {
     tableId = getFirstTableId(ds)
     if (tableId) break
   }
-  if (nonRestDatasources.length > 0 && tableId) {
+  if (sqlDatasources.length > 0 && tableId) {
     $goto(`../table/[tableId]`, { tableId })
-  } else if (nonRestDatasources.length > 0) {
+  } else if (sqlDatasources.length > 0) {
     $goto(`../datasource/[datasourceId]`, {
-      datasourceId: nonRestDatasources[0]._id!,
+      datasourceId: sqlDatasources[0]._id!,
     })
   } else {
     $goto("../new")

@@ -1,6 +1,6 @@
 <script lang="ts">
+import { Body } from "@supertoolmake/bbui"
 import { notifications } from "@supertoolmake/bbui"
-import { SourceName } from "@supertoolmake/types"
 import { goto as gotoStore } from "@roxi/routify"
 import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
 import CreationPage from "@/components/common/CreationPage.svelte"
@@ -8,19 +8,20 @@ import { IntegrationTypes } from "@/constants/backend"
 import { datasources, sortedIntegrations as integrations } from "@/stores/builder"
 import CreateExternalDatasourceModal from "../data/_components/CreateExternalDatasourceModal/index.svelte"
 import DatasourceOption from "../data/_components/DatasourceOption.svelte"
+import { helpers } from "@supertoolmake/shared-core"
 
-const openRestModal = () => {
-  if (!restIntegration) {
-    notifications.error("REST API integration is unavailable.")
+const openDatasourceModal = (integration: any) => {
+  if (!integration) {
+    notifications.error("Integration is unavailable.")
     return
   }
-  externalDatasourceModal.show(restIntegration)
+  externalDatasourceModal.show(integration)
 }
 
 const close = () => {
-  if (restDatasources.length) {
+  if (nonSqlDatasources.length) {
     goto(`../datasource/[datasourceId]`, {
-      datasourceId: restDatasources[0]._id!,
+      datasourceId: nonSqlDatasources[0]._id!,
     })
   } else {
     goto("../")
@@ -32,15 +33,18 @@ $: goto = $gotoStore
 let externalDatasourceModal: CreateExternalDatasourceModal
 let externalDatasourceLoading = false
 
-$: restIntegration = ($integrations || []).find(
-  (integration) => integration.name === IntegrationTypes.REST
+$: nonSqlIntegrations = ($integrations || []).filter(
+  (integration) => !helpers.isSQL({ source: integration.name })
 )
 
-$: restDatasources = ($datasources.list || []).filter(
-  (datasource) => datasource.source === SourceName.REST
+$: restIntegration = nonSqlIntegrations.find(i => i.name === IntegrationTypes.REST)
+$: otherNonSqlIntegrations = nonSqlIntegrations.filter(i => i.name !== IntegrationTypes.REST)
+
+$: nonSqlDatasources = ($datasources.list || []).filter(
+  (datasource) => !helpers.isSQL(datasource)
 )
 
-$: hasRestDatasources = restDatasources.length > 0
+$: hasNonSqlDatasources = nonSqlDatasources.length > 0
 $: disabled = externalDatasourceLoading
 </script>
 
@@ -50,31 +54,58 @@ $: disabled = externalDatasourceLoading
 />
 
 <CreationPage
-  showClose={hasRestDatasources}
+  showClose={hasNonSqlDatasources}
   onClose={close}
   heading="Add new API"
 >
   {#if restIntegration}
-    <br />
     <div class="options">
       <DatasourceOption
-        on:click={openRestModal}
-        title="Custom REST API"
-        disabled={disabled}
+        on:click={() => openDatasourceModal(restIntegration)}
+        title={restIntegration.friendlyName}
+        {disabled}
       >
         <IntegrationIcon
           integrationType={restIntegration.name}
           schema={restIntegration}
-          size="20"
+          size="32"
         />
       </DatasourceOption>
     </div>
-  {:else}
-    <p class="empty-state">REST API integration is unavailable.</p>
+  {/if}
+  {#if otherNonSqlIntegrations.length > 0}
+    <div class="subHeading">
+      <Body>Other connectors</Body>
+    </div>
+    <div class="options">
+      {#each otherNonSqlIntegrations as integration}
+        <DatasourceOption
+          on:click={() => openDatasourceModal(integration)}
+          title={integration.friendlyName}
+          {disabled}
+        >
+          <IntegrationIcon
+            integrationType={integration.name}
+            schema={integration}
+            size="32"
+          />
+        </DatasourceOption>
+      {/each}
+    </div>
   {/if}
 </CreationPage>
 
 <style>
+  .subHeading {
+    display: flex;
+    align-items: center;
+    margin-top: 12px;
+    margin-bottom: 24px;
+    gap: 8px;
+  }
+  .subHeading :global(p) {
+    color: var(--spectrum-global-color-gray-600) !important;
+  }
   .options {
     width: 100%;
     min-width: 100%;
