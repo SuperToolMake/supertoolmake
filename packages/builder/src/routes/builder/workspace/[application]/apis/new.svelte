@@ -37,12 +37,10 @@ $: nonSqlIntegrations = ($integrations || []).filter(
   (integration) => !helpers.isSQL({ source: integration.name })
 )
 
-$: restIntegration = nonSqlIntegrations.find(i => i.name === IntegrationTypes.REST)
-$: otherNonSqlIntegrations = nonSqlIntegrations.filter(i => i.name !== IntegrationTypes.REST)
+$: restIntegration = nonSqlIntegrations.find((i) => i.name === IntegrationTypes.REST)
+$: otherNonSqlIntegrations = nonSqlIntegrations.filter((i) => i.name !== IntegrationTypes.REST)
 
-$: nonSqlDatasources = ($datasources.list || []).filter(
-  (datasource) => !helpers.isSQL(datasource)
-)
+$: nonSqlDatasources = ($datasources.list || []).filter((datasource) => !helpers.isSQL(datasource))
 
 $: hasNonSqlDatasources = nonSqlDatasources.length > 0
 $: disabled = externalDatasourceLoading
