@@ -73,10 +73,14 @@ const openContextMenu = (e) => {
 
 $: favourite = query?._id ? $favourites[query?._id] : undefined
 $: isRestDatasource = datasource?.source === IntegrationTypes.REST
-$: isSqlDatasource = [IntegrationTypes.POSTGRES, IntegrationTypes.MYSQL, IntegrationTypes.SQL_SERVER].includes(datasource?.source)
+$: isSqlDatasource = [
+  IntegrationTypes.POSTGRES,
+  IntegrationTypes.MYSQL,
+  IntegrationTypes.SQL_SERVER,
+].includes(datasource?.source)
 $: if (isSqlDatasource) {
   icon = "file-sql"
-} else if(isRestDatasource) {
+} else if (isRestDatasource) {
   icon = "globe-simple"
 } else {
   icon = "file-magnifying-glass"

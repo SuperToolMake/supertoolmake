@@ -38,9 +38,11 @@ const isSqlQuery = (entry) => {
     return false
   }
   const datasource = $datasources.list.find((ds) => ds._id === entry.datasourceId)
-  return datasource?.source === IntegrationTypes.POSTGRES ||
+  return (
+    datasource?.source === IntegrationTypes.POSTGRES ||
     datasource?.source === IntegrationTypes.MYSQL ||
     datasource?.source === IntegrationTypes.SQL_SERVER
+  )
 }
 
 const getDatasourceForEntry = (entry) => {
