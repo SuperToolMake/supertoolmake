@@ -77,6 +77,7 @@ onMount(() => {
   portalTarget={appendTo}
   {anchor}
   {align}
+  widthMode={timeOnly ? "fixed-to-anchor" : "no-anchor"}
   resizable={false}
 >
   {#if isOpen}
