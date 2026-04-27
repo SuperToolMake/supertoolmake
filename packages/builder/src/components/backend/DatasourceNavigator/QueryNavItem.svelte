@@ -25,6 +25,7 @@ const favourites = workspaceFavouriteStore.lookup
 
 let confirmDeleteModal
 let editQueryModal
+let icon
 
 const getContextMenuItems = () => {
   return [
@@ -72,6 +73,14 @@ const openContextMenu = (e) => {
 
 $: favourite = query?._id ? $favourites[query?._id] : undefined
 $: isRestDatasource = datasource?.source === IntegrationTypes.REST
+$: isSqlDatasource = [IntegrationTypes.POSTGRES, IntegrationTypes.MYSQL, IntegrationTypes.SQL_SERVER].includes(datasource?.source)
+$: if (isSqlDatasource) {
+  icon = "file-sql"
+} else if(isRestDatasource) {
+  icon = "globe-simple"
+} else {
+  icon = "file-magnifying-glass"
+}
 $: iconVerb = isRestDatasource ? customQueryIconText(query) : ""
 $: iconColor = isRestDatasource ? customQueryIconColor(query) : undefined
 
@@ -82,7 +91,7 @@ $: goto = $gotoStore
 <NavItem
   on:contextmenu={openContextMenu}
   indentLevel={1}
-  icon="database"
+  {icon}
   iconText={iconVerb}
   {iconColor}
   text={customQueryText(datasource, query)}

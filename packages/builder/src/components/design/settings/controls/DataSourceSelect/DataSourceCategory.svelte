@@ -1,6 +1,7 @@
 <script>
 import { Divider, Heading, Icon } from "@supertoolmake/bbui"
 import QueryVerbBadge from "@/components/common/QueryVerbBadge.svelte"
+import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
 import { IntegrationTypes } from "@/constants/backend"
 import { customQueryIconColor, customQueryIconText } from "@/helpers/data/utils"
 import { datasources } from "@/stores/builder"
@@ -32,6 +33,23 @@ const isRestQuery = (entry) => {
   return datasource?.source === IntegrationTypes.REST
 }
 
+const isSqlQuery = (entry) => {
+  if (entry?.type !== "query") {
+    return false
+  }
+  const datasource = $datasources.list.find((ds) => ds._id === entry.datasourceId)
+  return datasource?.source === IntegrationTypes.POSTGRES ||
+    datasource?.source === IntegrationTypes.MYSQL ||
+    datasource?.source === IntegrationTypes.SQL_SERVER
+}
+
+const getDatasourceForEntry = (entry) => {
+  if (entry?.type !== "query") {
+    return null
+  }
+  return $datasources.list.find((ds) => ds._id === entry.datasourceId)
+}
+
 const shouldInclude = (entry) => {
   if (entry?.type !== "query") {
     return true
@@ -45,6 +63,10 @@ const shouldInclude = (entry) => {
 $: displayDatasourceName = $datasources.list.length > 1
 
 $: filteredDataSet = dataSet?.filter(shouldInclude) ?? []
+
+$: containsRestQuery = filteredDataSet?.some((entry) => isRestQuery(entry)) ?? false
+
+$: iconMinWidth = containsRestQuery ? "64px" : "42px"
 </script>
 
 {#if dividerState}
@@ -56,7 +78,7 @@ $: filteredDataSet = dataSet?.filter(shouldInclude) ?? []
   </div>
 {/if}
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<ul class="spectrum-Menu" role="listbox">
+<ul class="spectrum-Menu" role="listbox" style="--icon-min-width: {iconMinWidth}">
   {#each filteredDataSet as data}
     <li
       class="spectrum-Menu-item"
@@ -74,12 +96,28 @@ $: filteredDataSet = dataSet?.filter(shouldInclude) ?? []
                 verb={customQueryIconText(data)}
                 color={customQueryIconColor(data)}
               />
-            {:else}
+            {:else if isSqlQuery(data)}
               <Icon
-                name="database"
-                size="S"
-                color="var(--spectrum-global-color-gray-600)"
+                name="file-sql"
+                size="L"
+                color="var(--spectrum-global-color-gray-700)"
               />
+            {:else}
+              {@const ds = getDatasourceForEntry(data)}
+              {#if ds}
+                <IntegrationIcon
+                  integrationType={ds.source}
+                  schema={ds.schema}
+                  iconUrl={ds.config?.iconUrl}
+                  size="22"
+                />
+              {:else}
+                <Icon
+                  name="file-magnifying-glass"
+                  size="L"
+                  color="var(--spectrum-global-color-gray-800)"
+                />
+              {/if}
             {/if}
           </span>
         {/if}
@@ -111,11 +149,11 @@ $: filteredDataSet = dataSet?.filter(shouldInclude) ?? []
     align-items: center;
     gap: var(--spacing-s);
   }
-  .query-icon {
+.query-icon {
     display: inline-flex;
     align-items: center;
-    justify-content: flex-start;
-    min-width: 42px;
+    justify-content: center;
+    min-width: var(--icon-min-width, 42px);
   }
   .label-text {
     flex: 1;
