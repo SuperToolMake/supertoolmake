@@ -72,7 +72,7 @@
     "lodash": "4.18.1",
     "marked": "15.0.8",
     "remixicon": "2.5.0",
-    "sanitize-html": "2.13.0",
+    "sanitize-html": "2.17.3",
     "shortid": "2.2.17",
     "svelte-dnd-action": "0.9.64",
     "svelte-loading-spinners": "^0.3.6",
