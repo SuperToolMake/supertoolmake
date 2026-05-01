@@ -7,8 +7,8 @@ import NavHeader from "@/components/common/NavHeader.svelte"
 import { getHorizontalResizeActions } from "@/components/common/resizable"
 import TopBar from "@/components/common/TopBar.svelte"
 import Panel from "@/components/design/Panel.svelte"
-import { IntegrationTypes } from "@/constants/backend"
 import { builderStore } from "@/stores/builder"
+import { helpers } from "@supertoolmake/shared-core"
 
 $goto
 let searchValue
@@ -74,7 +74,7 @@ onDestroy(() => {
 
 <!-- routify:options index=1 -->
 <div class="wrapper" class:resizing-panel={$builderStore.isResizingPanel}>
-  <TopBar breadcrumbs={[{ text: "Data" }]} icon="database"></TopBar>
+  <TopBar breadcrumbs={[{ text: "SQL tables" }]} icon="database"></TopBar>
   <div class="data">
     {#if !$isActive("./new")}
       <div class="panel-container" style="width: {panelWidth}px;" use:resizable>
@@ -90,8 +90,7 @@ onDestroy(() => {
           <Layout paddingX="L" paddingY="none" gap="S">
             <DatasourceNavigator
               searchTerm={searchValue}
-              datasourceFilter={datasource =>
-                datasource.source !== IntegrationTypes.REST}
+              datasourceFilter={helpers.isSQL}
             />
           </Layout>
         </Panel>

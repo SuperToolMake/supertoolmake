@@ -13,6 +13,8 @@ export let error: string | undefined | false = undefined
 export let placeholder = "Choose an option or type"
 export let options: O[] = []
 export let helpText: string | undefined = undefined
+export let popoverAutoWidth = false
+export let wrapText = false
 const extractProperty = (item: O, property: string): string => {
   if (item && typeof item === "object" && property in item) {
     const record = item as Record<string, unknown>
@@ -60,6 +62,8 @@ const onChange = (event: CustomEvent<string | undefined>) => {
     {readonly}
     {getOptionLabel}
     {getOptionValue}
+    {popoverAutoWidth}
+    {wrapText}
     on:change={onChange}
     on:pick
     on:type

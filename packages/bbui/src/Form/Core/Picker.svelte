@@ -53,6 +53,7 @@ type V = any
   export let readonly: boolean = false
   export let quiet: boolean = false
   export let autoWidth: boolean | undefined = false
+  export let popoverAutoWidth: boolean | undefined = false
   export let autocomplete: boolean = false
   export let sort: boolean = false
   export let searchTerm: string | null = null
@@ -91,6 +92,7 @@ type V = any
   let virtualPaddingTop = 0
   let virtualPaddingBottom = 0
 
+  $: effectivePopoverAutoWidth = autoWidth || popoverAutoWidth
   const resolveIcon = (icon: PickerIconInput): ResolvedIcon | null => {
     if (!icon) {
       return null
@@ -284,14 +286,15 @@ $: resolvedFieldIcon = resolveIcon(fieldIcon)
   align={align || PopoverAlignment.Left}
   {open}
   on:close={() => (open = false)}
-  useAnchorWidth={!autoWidth}
-  maxWidth={autoWidth ? 400 : undefined}
+  widthMode={effectivePopoverAutoWidth ? "min-to-anchor" : "fixed-to-anchor"}
+  maxWidth={effectivePopoverAutoWidth ? 400 : undefined}
   customHeight={customPopoverHeight}
   {maxHeight}
+  closeOnScroll
 >
   <div
     class="popover-content"
-    class:auto-width={autoWidth}
+    class:auto-width={effectivePopoverAutoWidth}
     class:wrap-text={wrapText}
     class:size-s={size === "S"}
     class:size-m={size === "M"}

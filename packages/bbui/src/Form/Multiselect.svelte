@@ -16,6 +16,7 @@ export let getOptionLabel: (_: Option) => Option | string = (option: Option) => 
 export let getOptionValue: (_: Option) => Option | string = (option: Option) => option
 export let sort = false
 export let autoWidth = false
+export let popoverAutoWidth: boolean = false
 export let autocomplete = false
 export let searchTerm: string | undefined = undefined
 export let customPopoverHeight: string | undefined = undefined
@@ -45,6 +46,7 @@ const dispatch = createEventDispatcher()
     {getOptionLabel}
     {getOptionValue}
     {autoWidth}
+    {popoverAutoWidth}
     {autocomplete}
     {customPopoverHeight}
     {onOptionMouseenter}

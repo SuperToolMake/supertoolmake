@@ -37,7 +37,7 @@ import {
   workspaceFavouriteStore,
 } from "@/stores/builder"
 import { auth, enrichedApps } from "@/stores/portal"
-import { sdk } from "@supertoolmake/shared-core"
+import { sdk, helpers } from "@supertoolmake/shared-core"
 import type { EnrichedApp } from "@/types"
 import SideNavLink from "./SideNavLink.svelte"
 import SideNavUserSettings from "./SideNavUserSettings.svelte"
@@ -144,15 +144,11 @@ const resourceLink = (favourite: WorkspaceFavourite): ResourceLinkResult | null 
     [WorkspaceResource.DATASOURCE]: (id: string) => {
       const datasourceMap = get(datasourceLookup) || {}
       const datasource = datasourceMap[id]
-      return datasource?.source === IntegrationTypes.REST
-        ? {
-            path: `${appPrefix}apis/datasource/[datasourceId]`,
-            params: { application: currentAppId, datasourceId: id },
-          }
-        : {
-            path: `${appPrefix}data/datasource/[datasourceId]`,
-            params: { application: currentAppId, datasourceId: id },
-          }
+      const basePath = helpers.isSQL(datasource) ? "data" : "apis"
+      return {
+        path: `${appPrefix}${basePath}/datasource/[datasourceId]`,
+        params: { application: currentAppId, datasourceId: id },
+      }
     },
     [WorkspaceResource.TABLE]: (id: string) => ({
       path: `${appPrefix}data/table/[tableId]`,
@@ -182,7 +178,7 @@ const resourceLink = (favourite: WorkspaceFavourite): ResourceLinkResult | null 
       const datasourceMap = get(datasourceLookup) || {}
       const query = queriesStore.list?.find((q) => q._id === id)
       const datasource = query?.datasourceId ? datasourceMap[query.datasourceId] : undefined
-      const basePath = datasource?.source === IntegrationTypes.REST ? "apis" : "data"
+      const basePath = helpers.isSQL(datasource) ? "data" : "apis"
       return {
         path: `${appPrefix}${basePath}/query/[queryId]`,
         params: { application: currentAppId, queryId: id },
@@ -352,7 +348,7 @@ onDestroy(() => {
             />
             <SideNavLink
               icon="database"
-              text="Data"
+              text="SQL tables"
               url={$url("./data", { application: appId })}
               isActive={$isActive("./data", { application: appId })}
               {collapsed}

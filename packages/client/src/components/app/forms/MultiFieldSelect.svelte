@@ -28,6 +28,7 @@ export let autocomplete: boolean = false
 export let onChange: UIFieldOnChange | undefined = undefined
 export let optionsType: "select" | "checkbox" = "select"
 export let direction: "horizontal" | "vertical" = "vertical"
+export let columns: number = 1
 export let span: number | undefined = undefined
 export let helpText: string | undefined = undefined
 export let showSelectAll: boolean = false
@@ -109,6 +110,7 @@ const pickerLabels = loadTranslationsByGroup("picker")
         readonly={fieldState.readonly}
         {options}
         {direction}
+        {columns}
         on:change={handleChange}
         getOptionLabel={flatOptions ? x => x : x => getProp("label", x)}
         getOptionValue={flatOptions ? x => x : x => getProp("value", x)}

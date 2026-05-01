@@ -7,6 +7,7 @@ import DeleteDataConfirmModal from "@/components/backend/modals/DeleteDataConfir
 import NavItem from "@/components/common/NavItem.svelte"
 import { BUDIBASE_INTERNAL_DB_ID } from "@/constants/backend"
 import { contextMenuStore, userSelectedResourceMap } from "@/stores/builder"
+import { helpers } from "@supertoolmake/shared-core"
 
 export let datasource
 
@@ -50,6 +51,8 @@ $params
 let editModal: UpdateDatasourceModal
 let deleteConfirmationModal: DeleteDataConfirmModal
 
+$: isSqlSource = helpers.isSQL(datasource)
+
 let addQueryItem = {
   icon: "plus",
   name: datasource?.source === "REST" ? "Add action" : "Create new query",
@@ -57,7 +60,7 @@ let addQueryItem = {
   visible: true,
   disabled: false,
   callback: () => {
-    const section = datasource?.source === "REST" ? "apis" : "data"
+    const section = isSqlSource ? "data" : "apis"
     goto(`/builder/workspace/[application]/${section}/query/new/[datasourceId]`, {
       application: $params.application,
       datasourceId: datasource._id,
