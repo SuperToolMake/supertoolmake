@@ -23,7 +23,7 @@ export async function uploadUrl(url: string): Promise<Upload | undefined> {
 
     const extension = [...res.url.split(".")].pop()!.split("?")[0]
 
-    const destination = path.resolve(getTmpPath(), `${uuid.v4()}${extension}`)
+    const destination = path.resolve(getTmpPath(), `${uuid()}${extension}`)
     const fileStream = fs.createWriteStream(destination, { flags: "wx" })
 
     await promisify(pipeline)(res.body, fileStream)

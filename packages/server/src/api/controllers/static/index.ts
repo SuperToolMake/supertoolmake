@@ -95,7 +95,7 @@ export const uploadFile = async (ctx: Ctx<void, ProcessAttachmentResponse>) => {
       }
 
       // filenames converted to UUIDs so they are unique
-      const processedFileName = `${uuid.v4()}.${extension}`
+      const processedFileName = `${uuid()}.${extension}`
 
       const s3Key = `${context.getProdWorkspaceId()}/attachments/${processedFileName}`
 
