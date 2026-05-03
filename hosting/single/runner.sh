@@ -123,12 +123,22 @@ fi
 # Wait for backend services to start
 sleep 10
 
-pushd app
-pm2 start --name app "npm run run:docker"
-popd
-pushd worker
-pm2 start --name worker "npm run run:docker"
-popd
+start_node_service() {
+    local name="$1"
+    local dir="$2"
+    local node_args="$3"
+
+    pushd "$dir"
+    if [[ -n "${node_args}" ]]; then
+        pm2 start dist/index.js --name "$name" --interpreter node --node-args "$node_args"
+    else
+        pm2 start dist/index.js --name "$name" --interpreter node
+    fi
+    popd
+}
+
+start_node_service app app "${APP_NODE_ARGS---enable-source-maps}"
+start_node_service worker worker "${WORKER_NODE_ARGS---enable-source-maps}"
 
 echo "end of runner.sh, sleeping ..."
 
