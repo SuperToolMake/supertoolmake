@@ -31,8 +31,8 @@
     "test:watch": "jest --watchAll"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.1017.0",
-    "@aws-sdk/lib-storage": "3.1017.0",
+    "@aws-sdk/client-s3": "3.1041.0",
+    "@aws-sdk/lib-storage": "3.1041.0",
     "@smithy/node-http-handler": "4.1.1",
     "nano": "11.0.3",
     "@budibase/pouchdb-replication-stream": "1.2.11",
