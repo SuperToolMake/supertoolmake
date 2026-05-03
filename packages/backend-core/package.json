@@ -43,7 +43,7 @@
     "aws-sdk": "2.1692.0",
     "bcrypt": "6.0.0",
     "bull": "4.10.1",
-    "correlation-id": "4.0.0",
+    "correlation-id": "5.2.0",
     "csvtojson": "2.0.13",
     "dotenv": "16.0.1",
     "google-auth-library": "8.0.1",
@@ -69,8 +69,7 @@
     "sanitize-s3-objectkey": "0.0.1",
     "semver": "7.5.4",
     "tar-fs": "2.1.4",
-    "undici": "7.24.0",
-    "uuid": "14.0.0"
+    "undici": "7.24.0"
   },
   "devDependencies": {
     "@shopify/jest-koa-mocks": "5.1.1",

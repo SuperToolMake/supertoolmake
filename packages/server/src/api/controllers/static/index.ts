@@ -22,7 +22,7 @@ import {
 import send from "koa-send"
 import sharp from "sharp"
 import { render } from "svelte/server"
-import * as uuid from "uuid"
+import { randomUUID as uuid } from "node:crypto"
 import { ObjectStoreBuckets } from "../../../constants"
 import { getThemeVariables } from "../../../constants/themes"
 import env from "../../../environment"

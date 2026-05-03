@@ -63,7 +63,6 @@
     "passport-local": "1.0.0",
     "pouchdb": "7.3.0",
     "undici": "7.24.0",
-    "uuid": "14.0.0",
     "yaml": "2.8.3"
   },
   "devDependencies": {

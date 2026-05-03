@@ -5,7 +5,7 @@ import { promisify } from "node:util"
 import { context, objectStore } from "@supertoolmake/backend-core"
 import type { Upload } from "@supertoolmake/types"
 import fetch from "node-fetch"
-import * as uuid from "uuid"
+import { randomUUID as uuid } from "node:crypto"
 import { ObjectStoreBuckets } from "../constants"
 
 function getTmpPath() {

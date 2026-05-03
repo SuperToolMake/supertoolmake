@@ -8,7 +8,7 @@ import {
 } from "@supertoolmake/types"
 import type { Writable } from "svelte/store"
 import { get } from "svelte/store"
-import { v4 } from "uuid"
+import { randomUUID as v4 } from "node:crypto"
 import { DB_TYPE_EXTERNAL } from "@/constants/backend"
 import { Component } from "@/templates/Component"
 import { Screen } from "@/templates/screenTemplating/Screen"

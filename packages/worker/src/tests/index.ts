@@ -1,5 +1,4 @@
 export { generator } from "@supertoolmake/backend-core/tests"
-export { v4 as uuid } from "uuid"
 export { default as API } from "./api"
 export { default as mocks } from "./mocks"
 export { default as structures } from "./structures"

@@ -16,7 +16,7 @@ import {
   type SaveGlobalTemplateResponse,
   type UserCtx,
 } from "@supertoolmake/types"
-import { v4 } from "uuid"
+import { randomUUID as v4 } from "node:crypto"
 import yaml from "yaml"
 import { GLOBAL_OWNER, TemplateBindings, TemplateMetadata } from "../../../constants"
 import { addBaseTemplates, getTemplateByID, getTemplates } from "../../../constants/templates"

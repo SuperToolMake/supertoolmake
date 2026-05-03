@@ -108,7 +108,6 @@
     "tar": "7.5.11",
     "tmp": "0.2.3",
     "to-json-schema": "0.2.5",
-    "uuid": "14.0.0",
     "worker-farm": "1.7.0",
     "xml2js": "0.6.2",
     "zod-validation-error": "5.0.0"

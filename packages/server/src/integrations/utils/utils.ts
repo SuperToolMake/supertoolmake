@@ -12,7 +12,7 @@ import {
 } from "@supertoolmake/types"
 import { cloneDeep, merge } from "lodash"
 import tmp from "tmp"
-import { v4 } from "uuid"
+import { randomUUID as v4 } from "node:crypto"
 import { parseStringPromise as xmlParser } from "xml2js"
 import { InvalidColumns } from "../../constants"
 import env from "../../environment"
