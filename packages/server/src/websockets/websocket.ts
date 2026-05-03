@@ -1,3 +1,4 @@
+import { randomUUID as uuid } from "node:crypto"
 import type http from "node:http"
 import { createAdapter } from "@socket.io/redis-adapter"
 import { auth, Header, redis } from "@supertoolmake/backend-core"
@@ -6,7 +7,6 @@ import type { Ctx, SocketSession } from "@supertoolmake/types"
 import type Koa from "koa"
 import { userAgent } from "koa-useragent"
 import { Server, type Socket } from "socket.io"
-import { v4 as uuid } from "uuid"
 import { getSocketPubSubClients } from "../utilities/redis"
 import { createContext, runMiddlewares } from "./middleware"
 

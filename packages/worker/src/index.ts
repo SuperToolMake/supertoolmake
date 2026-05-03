@@ -22,7 +22,7 @@ import env from "./environment"
 
 db.init()
 
-const koaSession = require("koa-session")
+const koaSession = require("koa-session").default
 
 import { userAgent } from "koa-useragent"
 

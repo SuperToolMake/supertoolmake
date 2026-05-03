@@ -1,3 +1,4 @@
+import { randomUUID as uuidv4 } from "node:crypto"
 import { sql } from "@supertoolmake/backend-core"
 import {
   type ConnectionInfo,
@@ -19,7 +20,6 @@ import {
   TableSourceType,
 } from "@supertoolmake/types"
 import { Client, type ClientConfig, types } from "pg"
-import { v4 as uuidv4 } from "uuid"
 import { escapeDangerousCharacters } from "../utilities"
 import { getReadableErrorMessage } from "./base/errorMapping"
 import type { PostgresColumn } from "./base/types"

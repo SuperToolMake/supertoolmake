@@ -1,6 +1,6 @@
-import { v4 as uuid } from "uuid"
+import { randomUUID as v4 } from "node:crypto"
 
-export { v4 as uuid } from "uuid"
+export const uuid = v4
 
 export const email = () => {
   return `${uuid()}@example.com`

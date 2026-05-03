@@ -41,8 +41,8 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@apidevtools/swagger-parser": "12.1.0",
-    "@aws-sdk/client-s3": "3.1017.0",
-    "@aws-sdk/s3-request-presigner": "3.1017.0",
+    "@aws-sdk/client-s3": "3.1041.0",
+    "@aws-sdk/s3-request-presigner": "3.1041.0",
     "@azure/msal-node": "3.8.10",
     "@supertoolmake/backend-core": "*",
     "@supertoolmake/client": "*",
@@ -108,7 +108,6 @@
     "tar": "7.5.11",
     "tmp": "0.2.3",
     "to-json-schema": "0.2.5",
-    "uuid": "8.3.2",
     "worker-farm": "1.7.0",
     "xml2js": "0.6.2",
     "zod-validation-error": "5.0.0"
@@ -136,7 +135,6 @@
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/tar": "6.1.5",
     "@types/tmp": "0.2.6",
-    "@types/uuid": "8.3.4",
     "chance": "^1.1.12",
     "copyfiles": "2.4.1",
     "docker-compose": "1.2.0",
