@@ -3,8 +3,13 @@ import type { EditorView } from "@codemirror/view"
 import { getManifest } from "@supertoolmake/string-templates"
 import type { EditorModesMap, EnrichedBinding, Helper, Snippet } from "@supertoolmake/types"
 import { groupBy } from "lodash"
-import sanitizeHtml from "sanitize-html"
 import type { BindingCompletion, BindingCompletionOption } from "@/types"
+
+const escapeHtml = (str: string) => {
+  const div = document.createElement("div")
+  div.textContent = str
+  return div.innerHTML
+}
 
 export const EditorModes: EditorModesMap = {
   JS: {
@@ -35,10 +40,7 @@ const buildHelperInfoNode = (helper: Helper) => {
   const exampleNodeHtml = helper.example
     ? `<div class="binding__example helper">${helper.example}</div>`
     : ""
-  const descriptionMarkup = sanitizeHtml(helper.description, {
-    allowedTags: [],
-    allowedAttributes: {},
-  })
+  const descriptionMarkup = escapeHtml(helper.description)
   const descriptionNodeHtml = `<div class="binding__description helper">${descriptionMarkup}</div>`
 
   ele.innerHTML = `

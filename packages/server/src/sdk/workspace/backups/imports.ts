@@ -1,3 +1,4 @@
+import { randomUUID as uuid } from "node:crypto"
 import fs from "node:fs"
 import fsp from "node:fs/promises"
 import { join } from "node:path"
@@ -5,7 +6,6 @@ import { db as dbCore, encryption, objectStore } from "@supertoolmake/backend-co
 import { utils } from "@supertoolmake/shared-core"
 import type { Database } from "@supertoolmake/types"
 import * as tar from "tar"
-import { v4 as uuid } from "uuid"
 import { ObjectStoreBuckets } from "../../../constants"
 import { budibaseTempDir } from "../../../utilities/budibaseDir"
 import { downloadTemplate } from "../../../utilities/fileSystem"
