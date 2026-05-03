@@ -63,7 +63,7 @@
     "passport-local": "1.0.0",
     "pouchdb": "7.3.0",
     "undici": "7.24.0",
-    "uuid": "8.3.2",
+    "uuid": "14.0.0",
     "yaml": "2.8.3"
   },
   "devDependencies": {
@@ -75,7 +75,6 @@
     "@types/node-fetch": "2.6.4",
     "@types/nodemailer": "^6.4.17",
     "@types/supertest": "2.0.14",
-    "@types/uuid": "8.3.4",
     "cheerio": "^1.0.0",
     "maildev": "^2.2.1",
     "nock": "^13.5.4",
