@@ -1,8 +1,10 @@
 import { encodeJSBinding, processStringSync } from "@supertoolmake/string-templates"
 import { runJsHelpersTests } from "@supertoolmake/string-templates/test/utils"
 import tk from "timekeeper"
+
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 const isValidUUID = (str: string) => UUID_REGEX.test(str)
+
 import TestConfiguration from "../../tests/utilities/TestConfiguration"
 import { init } from ".."
 

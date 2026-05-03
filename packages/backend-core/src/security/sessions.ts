@@ -1,6 +1,6 @@
+import { randomUUID as uuidv4 } from "node:crypto"
 import { MAX_SESSIONS_PER_USER } from "@supertoolmake/shared-core"
 import type { CreateSession, ScannedSession, Session, SessionKey } from "@supertoolmake/types"
-import { randomUUID as uuidv4 } from "node:crypto"
 import env from "../environment"
 import { logWarn } from "../logging"
 import * as redis from "../redis/init"

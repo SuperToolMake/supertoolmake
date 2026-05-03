@@ -1,3 +1,4 @@
+import { randomUUID as v4 } from "node:crypto"
 import fs from "node:fs"
 import { join } from "node:path"
 import { db as dbCore, objectStore, tenancy } from "@supertoolmake/backend-core"
@@ -16,7 +17,6 @@ import {
   type SaveGlobalTemplateResponse,
   type UserCtx,
 } from "@supertoolmake/types"
-import { randomUUID as v4 } from "node:crypto"
 import yaml from "yaml"
 import { GLOBAL_OWNER, TemplateBindings, TemplateMetadata } from "../../../constants"
 import { addBaseTemplates, getTemplateByID, getTemplates } from "../../../constants/templates"

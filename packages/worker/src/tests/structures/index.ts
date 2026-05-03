@@ -1,5 +1,5 @@
-import { structures } from "@supertoolmake/backend-core/tests"
 import { randomUUID as uuid } from "node:crypto"
+import { structures } from "@supertoolmake/backend-core/tests"
 import * as configs from "./configs"
 
 export const TENANT_ID = "default"

@@ -1,5 +1,6 @@
 const sanitize = require("sanitize-s3-objectkey")
 
+import { randomUUID as v4 } from "node:crypto"
 import fs, { type PathLike, type ReadStream } from "node:fs"
 import fsp from "node:fs/promises"
 import https from "node:https"
@@ -23,7 +24,6 @@ import { NodeHttpHandler } from "@smithy/node-http-handler"
 import type { NodeJsClient } from "@smithy/types"
 import { utils } from "@supertoolmake/shared-core"
 import tar from "tar-fs"
-import { randomUUID as v4 } from "node:crypto"
 import { WORKSPACE_DEV_PREFIX, WORKSPACE_PREFIX } from "../db"
 import env from "../environment"
 import { fetchWithBlacklist } from "../utils/outboundFetch"
