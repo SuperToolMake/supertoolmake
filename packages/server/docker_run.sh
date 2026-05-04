@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-if [ -z $CLUSTER_MODE ]; then
-  yarn run:docker
+if [ -z "$CLUSTER_MODE" ]; then
+  exec node --enable-source-maps dist/index.js
 else
-  yarn run:docker:cluster
+  exec pm2-runtime start pm2.config.js
 fi

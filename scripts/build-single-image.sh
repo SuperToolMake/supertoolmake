@@ -12,7 +12,7 @@ if [[ -n "$platform" ]]; then
 fi
 
 docker buildx build \
-  "${platform_args[@]}" \
+  ${platform_args[*]+"${platform_args[@]}"} \
   -f hosting/single/Dockerfile \
   -t supertoolmake:latest \
   --build-arg SUPER_VERSION=$version \
