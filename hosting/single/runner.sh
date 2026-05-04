@@ -137,8 +137,8 @@ start_node_service() {
     popd
 }
 
-start_node_service app app "${APP_NODE_ARGS---enable-source-maps}"
-start_node_service worker worker "${WORKER_NODE_ARGS---enable-source-maps}"
+start_node_service app app "${APP_NODE_ARGS:-}"
+start_node_service worker worker "${WORKER_NODE_ARGS:-}"
 
 echo "end of runner.sh, sleeping ..."
 
