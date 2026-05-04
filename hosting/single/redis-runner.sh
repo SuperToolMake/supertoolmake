@@ -33,5 +33,10 @@ EOF
 
 chmod +x "$REDIS_LAUNCH_SCRIPT"
 
+if [[ "${LOW_MEMORY_SINGLE_PROCESS}" == "1" ]]; then
+    echo "Starting redis-server directly..."
+    exec "$REDIS_LAUNCH_SCRIPT"
+fi
+
 echo "Starting redis-server with pm2..."
 pm2 start "$REDIS_LAUNCH_SCRIPT" --name redis-server --interpreter bash

@@ -71,6 +71,8 @@ COPY hosting/single/redis.conf /etc/redis/redis.conf
 WORKDIR /
 COPY hosting/single/runner.sh .
 RUN chmod +x ./runner.sh
+COPY hosting/single/single-process.js .
+RUN chmod +x ./single-process.js
 COPY hosting/single/redis-runner.sh .
 RUN chmod +x ./redis-runner.sh
 COPY hosting/single/healthcheck.sh .
@@ -109,6 +111,8 @@ HEALTHCHECK --interval=15s --timeout=15s --start-period=45s CMD "/healthcheck.sh
 
 # Must set this just before running
 ENV NODE_ENV=production
+ENV MALLOC_ARENA_MAX=2
+ENV LOW_MEMORY_SINGLE_PROCESS=1
 # This is required for isolated-vm to work on Node 20+
 ENV NODE_OPTIONS="--no-node-snapshot"
 WORKDIR /
