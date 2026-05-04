@@ -25,6 +25,8 @@ export WORKER_PORT="${WORKER_PORT:-4002}"
 export WORKER_URL="${WORKER_URL:-http://127.0.0.1:4002}"
 export APPS_URL="${APPS_URL:-http://127.0.0.1:4001}"
 export SERVER_TOP_LEVEL_PATH="${SERVER_TOP_LEVEL_PATH:-/app}"
+export WORKER_TOP_LEVEL_PATH="${WORKER_TOP_LEVEL_PATH:-/worker}"
+export LOW_MEMORY_SINGLE_PROCESS="${LOW_MEMORY_SINGLE_PROCESS:-0}"
 
 # Set DATA_DIR and ensure the directory exists
 if [[ ${TARGETBUILD} == "aas" ]]; then
@@ -77,6 +79,9 @@ fi
 
 # Read in the .env file and export the variables
 for LINE in $(cat ${DATA_DIR}/.env); do export $LINE; done
+if [[ "${LOW_MEMORY_SINGLE_PROCESS}" == "1" ]]; then
+    export DISABLE_THREADING="${DISABLE_THREADING:-1}"
+fi
 ln -s ${DATA_DIR}/.env /app/.env
 ln -s ${DATA_DIR}/.env /worker/.env
 
@@ -136,6 +141,21 @@ start_node_service() {
     fi
     popd
 }
+
+start_combined_node_service() {
+    local node_args="${APP_NODE_ARGS:-}"
+
+    echo "Starting app and worker in one low-memory Node process..."
+    if [[ -n "${node_args}" ]]; then
+        exec node ${node_args} /single-process.js
+    else
+        exec node /single-process.js
+    fi
+}
+
+if [[ "${LOW_MEMORY_SINGLE_PROCESS}" == "1" ]]; then
+    start_combined_node_service
+fi
 
 start_node_service app app "${APP_NODE_ARGS:-}"
 start_node_service worker worker "${WORKER_NODE_ARGS:-}"
