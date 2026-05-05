@@ -83,13 +83,9 @@ export async function interpolateSQL(
   }
   // replicate the knex structure
   fields.sql = sql
-  fields.bindings = await sdk.queries.enrichArrayContext(
-    variables,
-    parameters,
-    {
-      escapeNewlines: false,
-    }
-  )
+  fields.bindings = await sdk.queries.enrichArrayContext(variables, parameters, {
+    escapeNewlines: false,
+  })
   if (opts.nullDefaultSupport) {
     for (const index in fields.bindings) {
       if (fields.bindings[index] === "") {
