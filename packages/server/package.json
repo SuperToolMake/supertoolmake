@@ -102,7 +102,7 @@
     "socket.io": "4.8.1",
     "svelte": "5.55.0",
     "tar": "7.5.11",
-    "tmp": "0.2.3",
+    "tmp": "0.2.4",
     "worker-farm": "1.7.0",
     "xml2js": "0.6.2",
     "zod-validation-error": "5.0.0"
