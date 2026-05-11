@@ -19,7 +19,11 @@ import sdk from "../../../sdk"
 import { tableForDatasource } from "../../../tests/utilities/structures"
 import { getCachedVariable } from "../../../threads/utils"
 import * as setup from "./utilities"
-import { allowUndefined, checkBuilderEndpoint } from "./utilities/TestFunctions"
+import {
+  allowUndefined,
+  checkBuilderEndpoint,
+  createRequest,
+} from "./utilities/TestFunctions"
 
 describe("/datasources", () => {
   const config = setup.getConfig()
@@ -155,6 +159,35 @@ describe("/datasources", () => {
         method: "DELETE",
         url: `/api/datasources/${datasource._id}/${datasource._rev}`,
       })
+    })
+
+    it("should apply authorization to update endpoint", async () => {
+      await checkBuilderEndpoint({
+        config,
+        method: "PUT",
+        url: `/api/datasources/${datasource._id}`,
+        body: datasource,
+      })
+    })
+
+    it("should not persist datasource updates from production users without builder access", async () => {
+      const before = await config.api.datasource.get(datasource._id!)
+      const headers = await config.login({
+        userId: "us_fail",
+        builder: false,
+        prodApp: true,
+      })
+      await createRequest(
+        config.request,
+        "PUT",
+        `/api/datasources/${datasource._id}`,
+        { ...before, name: "Unauthorized update attempt" }
+      )
+        .set(headers)
+        .expect(403)
+      const after = await config.api.datasource.get(datasource._id!)
+      expect(after.name).toEqual(before.name)
+      expect(after._rev).toEqual(before._rev)
     })
   })
 })
