@@ -2,3 +2,8 @@
 . "$(dirname "$0")/_/husky.sh"
 
 yarn lint:fix
+
+if [ -n "$(git status --porcelain)" ]; then
+  echo "❌ Linting fixed files. Please commit the fixes before pushing."
+  exit 1
+fi
