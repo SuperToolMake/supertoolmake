@@ -95,7 +95,6 @@ builderOrAdminRoutes
   .get("/api/global/users/:id", controller.find)
   .post("/api/global/users/invite/:code/:role", controller.addWorkspaceIdToInvite)
   .delete("/api/global/users/invite/:code", controller.removeWorkspaceIdFromInvite)
-  .post("/api/global/users/onboard", buildInviteMultipleValidation(), controller.onboardUsers)
   .post("/api/global/users/:userId/permission/:role", controller.addUserToWorkspace)
   .delete("/api/global/users/:userId/permission", controller.removeUserFromWorkspace)
 

@@ -1,4 +1,3 @@
-import crypto from "node:crypto"
 import {
   utils as backendCoreUtils,
   cache,
@@ -53,18 +52,9 @@ import {
 import emailValidator from "email-validator"
 import env from "../../../environment"
 import * as userSdk from "../../../sdk/users"
-import { isEmailConfigured } from "../../../utilities/email"
 import { checkAnyUserExists } from "../../../utilities/users"
 
 const MAX_USERS_UPLOAD_LIMIT = 1000
-
-const generatePassword = (length: number) => {
-  const array = new Uint8Array(length)
-  crypto.getRandomValues(array)
-  return Array.from(array, (byte) => byte.toString(36).padStart(2, "0"))
-    .join("")
-    .slice(0, length)
-}
 
 const stripUsers = (users: (User | StrippedUser)[]): StrippedUser[] => {
   return users.map((user) => ({
@@ -459,39 +449,9 @@ export const tenantUserLookup = async (ctx: UserCtx<void, LookupTenantUserRespon
   }
 }
 
-/* 
-  Encapsulate the app user onboarding flows here.
-*/
-export const onboardUsers = async (ctx: Ctx<InviteUsersRequest, InviteUsersResponse>) => {
-  if (await isEmailConfigured()) {
-    await inviteMultiple(ctx)
-    return
-  }
-
-  const createdPasswords: Record<string, string> = {}
-  const users = ctx.request.body.map<User>((invite) => {
-    const password = generatePassword(12)
-    createdPasswords[invite.email] = password
-
-    return {
-      email: invite.email,
-      password,
-      forceResetPassword: true,
-      roles: invite.userInfo.apps || {},
-      admin: { global: Boolean(invite.userInfo.admin) },
-      builder: invite.userInfo.builder,
-      tenantId: tenancy.getTenantId(),
-    }
-  })
-
-  const resp = await userSdk.db.bulkCreate(users)
-  for (const user of resp.successful) {
-    user.password = createdPasswords[user.email]
-  }
-  ctx.body = { ...resp, created: true }
-}
-
-export const invite = async (ctx: Ctx<InviteUserRequest, InviteUserResponse>) => {
+export const invite = async (
+  ctx: Ctx<InviteUserRequest, InviteUserResponse>
+) => {
   const request = ctx.request.body
 
   const multiRequest = [request]

@@ -4,7 +4,6 @@ import type {
   BulkUserResponse,
   CreateAdminUserRequest,
   InviteUsersRequest,
-  InviteUsersResponse,
   SearchUsersRequest,
   User,
 } from "@supertoolmake/types"
@@ -173,22 +172,6 @@ export class UserAPI extends TestAPI {
       .set(opts?.headers ? opts.headers : this.config.defaultHeaders())
       .expect("Content-Type", /json/)
       .expect(opts?.status ? opts.status : 200)
-  }
-
-  onboardUser = async (req: InviteUsersRequest): Promise<InviteUsersResponse> => {
-    const resp = await this.request
-      .post(`/api/global/users/onboard`)
-      .send(req)
-      .set(this.config.defaultHeaders())
-      .expect("Content-Type", /json/)
-
-    if (resp.status !== 200) {
-      throw new Error(
-        `request failed with status ${resp.status} and body ${JSON.stringify(resp.body)}`
-      )
-    }
-
-    return resp.body as InviteUsersResponse
   }
 
   changeTenantOwnerEmail = (
