@@ -1,7 +1,6 @@
 {
   "name": "@supertoolmake/builder",
   "version": "0.0.0",
-  "license": "GPL-3.0",
   "private": true,
   "scripts": {
     "build": "routify & NODE_OPTIONS=\"--max_old_space_size=4096\" vite build --emptyOutDir",
@@ -79,8 +78,8 @@
     "yup": "1.7.1"
   },
   "devDependencies": {
-    "@babel/plugin-transform-runtime": "7.13.10",
-    "@babel/preset-env": "7.13.12",
+    "@babel/plugin-transform-runtime": "7.29.0",
+    "@babel/preset-env": "7.29.5",
     "@supertoolmake/client": "*",
     "@rollup/plugin-replace": "6.0.3",
     "@roxi/routify": "3.6.4",
@@ -88,7 +87,6 @@
     "@testing-library/jest-dom": "6.4.2",
     "@testing-library/svelte": "5.2.8",
     "@types/shortid": "2.2.0",
-    "babel-jest": "29.6.2",
     "identity-obj-proxy": "3.0.0",
     "resize-observer-polyfill": "1.5.1",
     "svelte-jester": "1.3.2",
