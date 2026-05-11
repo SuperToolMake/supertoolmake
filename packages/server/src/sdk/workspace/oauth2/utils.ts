@@ -92,6 +92,44 @@ export async function getToken(id: string) {
   return token
 }
 
+export async function getTokenFromConfig(
+  cacheKey: string,
+  config: {
+    url: string
+    clientId: string
+    clientSecret: string
+    method: OAuth2CredentialsMethod
+    grantType: OAuth2GrantType
+    scope?: string
+    audience?: string
+  }
+): Promise<string> {
+  return cache.withCacheWithDynamicTTL(
+    cache.CacheKey.OAUTH2_TOKEN(cacheKey),
+    () => fetchAndParseToken(config)
+  )
+}
+
+async function fetchAndParseToken(config: {
+  url: string
+  clientId: string
+  clientSecret: string
+  method: OAuth2CredentialsMethod
+  grantType: OAuth2GrantType
+  scope?: string
+  audience?: string
+}): Promise<{ value: string; ttl: number }> {
+  const resp = await fetchToken(config)
+  const jsonResponse = await resp.json()
+  if (!resp.ok) {
+    const message = jsonResponse.error_description ?? resp.statusText
+    throw new Error(`Error fetching oauth2 token: ${message}`)
+  }
+  const token = `${jsonResponse.token_type} ${jsonResponse.access_token}`
+  const ttl = jsonResponse.expires_in ?? -1
+  return { value: token, ttl }
+}
+
 export async function validateConfig(config: {
   url: string
   clientId: string

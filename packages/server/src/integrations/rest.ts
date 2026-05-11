@@ -1,41 +1,57 @@
-import path from "node:path"
-import { performance } from "node:perf_hooks"
-import qs from "node:querystring"
-import { URLSearchParams } from "node:url"
-import { blacklist } from "@supertoolmake/backend-core"
-import { utils } from "@supertoolmake/shared-core"
 import {
   BodyType,
   DatasourceFieldType,
   HttpMethod,
-  type Integration,
-  type IntegrationBase,
-  type JSONValue,
-  type PaginationConfig,
-  type PaginationValues,
+  Integration,
+  IntegrationBase,
+  JSONValue,
+  OAuth2RestAuthConfig,
+  PaginationConfig,
+  PaginationValues,
   QueryType,
   RestAuthType,
-  type RestConfig,
-  type RestQueryFields as RestQuery,
+  RestConfig,
+  RestQueryFields as RestQuery,
 } from "@supertoolmake/types"
-import { parse } from "content-disposition"
 import get from "lodash/get"
-import {
-  Agent,
-  FormData,
-  fetch,
-  getGlobalDispatcher,
-  Headers,
-  MockAgent,
-  type RequestInit,
-  type Response,
-} from "undici"
-import { Builder as XmlBuilder } from "xml2js"
-import environment from "../environment"
-import sdk from "../sdk"
-import { formatBytes, getProxyDispatcher } from "../utilities"
+import qs from "querystring"
+import { performance } from "perf_hooks"
+import { URLSearchParams } from "url"
+import { utils as coreUtils } from "@supertoolmake/backend-core"
 import { handleFileResponse, handleXml } from "./utils"
+import { parse } from "content-disposition"
+import path from "path"
+import { Builder as XmlBuilder } from "xml2js"
 import { getAttachmentHeaders } from "./utils/restUtils"
+import { helpers } from "@supertoolmake/shared-core"
+import sdk from "../sdk"
+import { getDispatcher } from "../utilities"
+import {
+  fetch,
+  Response,
+  RequestInit,
+  Headers,
+  FormData,
+  getGlobalDispatcher,
+  MockAgent,
+} from "undici"
+import environment from "../environment"
+
+interface AuthConfig {
+  type: string
+  config: {
+    username?: string
+    password?: string
+    token?: string
+    key?: string
+    value?: string
+    location?: string
+  }
+}
+
+type ResolvedAuthConfig =
+  | { type: "auth"; auth: AuthConfig }
+  | { type: "oauth2"; sourceId: string }
 
 const coreFields = {
   path: {
@@ -233,24 +249,29 @@ export class RestIntegration implements IntegrationBase {
     this.config = config
   }
 
-  async parseResponse(response: Response, pagination?: PaginationConfig): Promise<ParsedResponse> {
+  async parseResponse(
+    response: Response,
+    pagination?: PaginationConfig
+  ): Promise<ParsedResponse> {
     let data: JSONValue | undefined,
       raw: string | undefined,
       headers: Record<string, string[] | string> = {},
       filename: string | undefined
 
-    const { contentType, contentDisposition } = getAttachmentHeaders(response.headers, {
-      downloadImages: this.config.downloadImages,
-    })
+    const { contentType, contentDisposition } = getAttachmentHeaders(
+      response.headers,
+      { downloadImages: this.config.downloadImages }
+    )
     let contentLength = response.headers.get("content-length")
-    const isSuccess = response.status >= 200 && response.status < 300
+    let isSuccess = response.status >= 200 && response.status < 300
     if (
       (contentDisposition.includes("filename") ||
         contentDisposition.includes("attachment") ||
         contentDisposition.includes("form-data")) &&
       isSuccess
     ) {
-      filename = path.basename(parse(contentDisposition).parameters?.filename) || ""
+      filename =
+        path.basename(parse(contentDisposition).parameters?.filename) || ""
     }
 
     let triedParsing = false,
@@ -263,7 +284,9 @@ export class RestIntegration implements IntegrationBase {
         if (!contentLength && responseTxt) {
           contentLength = Buffer.byteLength(responseTxt, "utf8").toString()
         }
-        const hasContent = (contentLength && parseInt(contentLength) > 0) || responseTxt.length > 0
+        const hasContent =
+          (contentLength && parseInt(contentLength) > 0) ||
+          responseTxt.length > 0
         if (response.status === 204) {
           data = []
           raw = ""
@@ -276,7 +299,7 @@ export class RestIntegration implements IntegrationBase {
           contentType.includes("application/xml")
         ) {
           triedParsing = true
-          const xmlResponse = await handleXml(responseTxt)
+          let xmlResponse = await handleXml(responseTxt)
           data = xmlResponse.data as JSONValue
           raw = xmlResponse.rawXml
         } else {
@@ -293,7 +316,7 @@ export class RestIntegration implements IntegrationBase {
       }
     }
 
-    const size = formatBytes(contentLength || "0")
+    const size = helpers.formatBytes(contentLength || "0")
     const time = `${Math.round(performance.now() - this.startTimeMs)}ms`
     // converts headers to plain object
     for (const [key, value] of response.headers.entries()) {
@@ -345,7 +368,7 @@ export class RestIntegration implements IntegrationBase {
       }
 
       // Prepend query string with pagination params
-      const paginationString = params.toString()
+      let paginationString = params.toString()
       if (paginationString) {
         queryString = `${paginationString}&${queryString}`
       }
@@ -365,7 +388,7 @@ export class RestIntegration implements IntegrationBase {
 
       // only add query string if there are remaining parameters
       if (Object.keys(filtered).length > 0) {
-        queryString = `?${qs.encode(filtered)}`
+        queryString = "?" + qs.encode(filtered)
       } else {
         queryString = ""
       }
@@ -401,7 +424,12 @@ export class RestIntegration implements IntegrationBase {
     let jsonValue: JSONValue | undefined
 
     if (body != null) {
-      const { bodyString, bodyObject, parseError, jsonValue: parsedJson } = normaliseBody(body)
+      const {
+        bodyString,
+        bodyObject,
+        parseError,
+        jsonValue: parsedJson,
+      } = normaliseBody(body)
       string = bodyString
       object = bodyObject
       error = parseError
@@ -409,7 +437,9 @@ export class RestIntegration implements IntegrationBase {
     }
 
     // Util to add pagination values to a certain body type
-    const addPaginationToBody = (insertFn: (pageParam: string, page?: string | number) => void) => {
+    const addPaginationToBody = (
+      insertFn: (pageParam: string, page?: string | number) => void
+    ) => {
       if (pagination?.location === "body") {
         if (pagination?.pageParam && paginationValues?.page != null) {
           insertFn(pagination.pageParam, paginationValues.page)
@@ -427,14 +457,16 @@ export class RestIntegration implements IntegrationBase {
         break
       case BodyType.ENCODED: {
         const params = new URLSearchParams()
-        for (const [key, value] of Object.entries(object)) {
+        for (let [key, value] of Object.entries(object)) {
           params.append(key, String(value))
         }
-        addPaginationToBody((key: string, value: number | string | undefined) => {
-          if (value != null) {
-            params.append(key, String(value))
+        addPaginationToBody(
+          (key: string, value: number | string | undefined) => {
+            if (value != null) {
+              params.append(key, String(value))
+            }
           }
-        })
+        )
         input.body = params
         break
       }
@@ -463,46 +495,44 @@ export class RestIntegration implements IntegrationBase {
           }
           form.append(key, String(value))
         }
-        for (const [key, value] of Object.entries(object)) {
+        for (let [key, value] of Object.entries(object)) {
           appendFormValue(key, value)
         }
-        addPaginationToBody((key: string, value: number | string | undefined) => {
-          if (value != null) {
-            appendFormValue(key, value)
+        addPaginationToBody(
+          (key: string, value: number | string | undefined) => {
+            if (value != null) {
+              appendFormValue(key, value)
+            }
           }
-        })
+        )
         const ensureHeaderObject = (): Record<string, string> => {
           if (!input.headers) {
-            const headerObject: Record<string, string> = {}
-            return headerObject
+            return {}
           }
           if (Array.isArray(input.headers)) {
-            const headerObject = input.headers.reduce<Record<string, string>>(
+            return input.headers.reduce<Record<string, string>>(
               (acc, [name, value]) => {
                 acc[name] = value
                 return acc
               },
               {}
             )
-            return headerObject
           }
           if (input.headers instanceof Headers) {
-            return Object.fromEntries(input.headers)
+            const result: Record<string, string> = {}
+            input.headers.forEach((value, key) => {
+              result[key] = value
+            })
+            return result
           }
-          const headerObject: Record<string, string> = {}
-          for (const [name, value] of Object.entries(
-            input.headers as Record<string, string | readonly string[]>
-          )) {
-            headerObject[name] = typeof value === "string" ? value : value.join(", ")
-          }
-          return headerObject
+          return input.headers as Record<string, string>
         }
 
         const headers = ensureHeaderObject()
 
         // Delete Content-Type to allow fetch to auto-generate the correct header/boundary.
         const existingContentTypeKey = Object.keys(headers).find(
-          (key) => key.toLowerCase() === "content-type"
+          key => key.toLowerCase() === "content-type"
         )
         if (existingContentTypeKey) {
           delete headers[existingContentTypeKey]
@@ -531,7 +561,7 @@ export class RestIntegration implements IntegrationBase {
         } else if (string) {
           try {
             payload = JSON.parse(string) as JSONValue
-          } catch {
+          } catch (_err) {
             payload = object as JSONValue
           }
         } else {
@@ -543,10 +573,12 @@ export class RestIntegration implements IntegrationBase {
             ...payload,
           }
           if (pagination.pageParam && paginationValues?.page != null) {
-            mutablePayload[pagination.pageParam] = paginationValues.page as JSONValue
+            mutablePayload[pagination.pageParam] =
+              paginationValues.page as JSONValue
           }
           if (pagination.sizeParam && paginationValues?.limit != null) {
-            mutablePayload[pagination.sizeParam] = paginationValues.limit as JSONValue
+            mutablePayload[pagination.sizeParam] =
+              paginationValues.limit as JSONValue
           }
           payload = mutablePayload
         } else if (pagination?.location === "body") {
@@ -562,7 +594,8 @@ export class RestIntegration implements IntegrationBase {
           }
         }
 
-        input.body = typeof payload === "string" ? payload : JSON.stringify(payload)
+        input.body =
+          typeof payload === "string" ? payload : JSON.stringify(payload)
         // @ts-expect-error
         input.headers["Content-Type"] = "application/json"
         break
@@ -571,43 +604,85 @@ export class RestIntegration implements IntegrationBase {
     return input
   }
 
+  buildBasicAuthHeader(username: string, password: string): string {
+    return `Basic ${Buffer.from(`${username}:${password}`).toString("base64")}`
+  }
+
+  buildBearerAuthHeader(token: string): string {
+    return `Bearer ${token}`
+  }
+
+  private buildHeadersFromAuthConfig(auth: AuthConfig): Record<string, string> {
+    const { type, config } = auth
+    switch (type) {
+      case RestAuthType.BASIC:
+        return {
+          Authorization: this.buildBasicAuthHeader(
+            config.username!,
+            config.password!
+          ),
+        }
+      case RestAuthType.BEARER:
+        return { Authorization: this.buildBearerAuthHeader(config.token!) }
+      case RestAuthType.OAUTH2:
+        // Token already includes "Bearer " prefix from OAuth2 response
+        return { Authorization: config.token! }
+      // We dont currently support this but it is available and outlined
+      // in supported openapi specs.
+      case "apiKey":
+        if (config.location === "header") {
+          return { [config.key!]: config.value! }
+        }
+        return {}
+      default:
+        return {}
+    }
+  }
+
+  private async resolveAuthConfig(
+    authConfigId?: string,
+    authConfigType?: RestAuthType
+  ): Promise<ResolvedAuthConfig | null> {
+    if (!authConfigId) return null
+    if (authConfigType === RestAuthType.OAUTH2) {
+      return { type: "oauth2", sourceId: authConfigId }
+    }
+    if (!this.config.authConfigs) return null
+    const authConfig = this.config.authConfigs.find(
+      c => c._id === authConfigId && c.type !== RestAuthType.OAUTH2
+    )
+    if (!authConfig) return null
+    return { type: "auth", auth: authConfig as AuthConfig }
+  }
+
   async getAuthHeaders(
     authConfigId?: string,
     authConfigType?: RestAuthType
   ): Promise<Record<string, string>> {
-    if (!authConfigId) {
-      return {}
-    }
-
-    if (authConfigType === RestAuthType.OAUTH2) {
-      return { Authorization: await sdk.oauth2.getToken(authConfigId) }
-    }
-
-    if (!this.config.authConfigs) {
-      return {}
-    }
-
-    const headers: Record<string, string> = {}
-    const authConfig = this.config.authConfigs.filter((c) => c._id === authConfigId)[0]
-    // check the config still exists before proceeding
-    // if not - do nothing
-    if (authConfig) {
-      const { type, config } = authConfig
-      switch (type) {
-        case RestAuthType.BASIC:
-          headers.Authorization = `Basic ${Buffer.from(
-            `${config.username}:${config.password}`
-          ).toString("base64")}`
-          break
-        case RestAuthType.BEARER:
-          headers.Authorization = `Bearer ${config.token}`
-          break
-        default:
-          throw utils.unreachable(type)
+    if (authConfigId && authConfigType === RestAuthType.OAUTH2) {
+      const inlineOAuth2 = this.config.authConfigs?.find(
+        c => c._id === authConfigId && c.type === RestAuthType.OAUTH2
+      )
+      if (inlineOAuth2) {
+        const token = await sdk.oauth2.getTokenFromConfig(
+          authConfigId,
+          inlineOAuth2 as OAuth2RestAuthConfig
+        )
+        return { Authorization: token }
       }
     }
 
-    return headers
+    const resolved = await this.resolveAuthConfig(authConfigId, authConfigType)
+
+    if (!resolved) {
+      return {}
+    }
+
+    if (resolved.type === "oauth2") {
+      return { Authorization: await sdk.oauth2.getToken(resolved.sourceId) }
+    }
+
+    return this.buildHeadersFromAuthConfig(resolved.auth)
   }
 
   async _req(query: RestQuery, retry401 = true): Promise<ParsedResponse> {
@@ -633,7 +708,7 @@ export class RestIntegration implements IntegrationBase {
     }
 
     if (disabledHeaders) {
-      for (const headerKey of Object.keys(this.headers)) {
+      for (let headerKey of Object.keys(this.headers)) {
         if (disabledHeaders[headerKey]) {
           delete this.headers[headerKey]
         }
@@ -641,7 +716,13 @@ export class RestIntegration implements IntegrationBase {
     }
 
     let input: RequestInit = { method, headers: this.headers }
-    input = this.addBody(bodyType, requestBody, input, pagination, paginationValues)
+    input = this.addBody(
+      bodyType,
+      requestBody,
+      input,
+      pagination,
+      paginationValues
+    )
 
     // Deprecated by rejectUnauthorized
     if (this.config.legacyHttpParser) {
@@ -650,16 +731,25 @@ export class RestIntegration implements IntegrationBase {
       // do with ESM that are above my pay grade.
 
       // https://github.com/nodejs/node/issues/43798
-      // @ts-expect-error
+      // @ts-ignore
       input.extraHttpOptions = { insecureHTTPParser: true }
     }
 
-    this.startTimeMs = performance.now()
-    const url = this.getUrl(path, queryString, pagination, paginationValues)
-    const disableBlacklistForLocalDevelopment = environment.isDev() && !environment.isTest()
-    if (!disableBlacklistForLocalDevelopment && (await blacklist.isBlacklisted(url))) {
-      throw new Error("Cannot connect to URL.")
+    const defaultQueryParameters = this.config.defaultQueryParameters || {}
+    let mergedQueryString = queryString
+    if (Object.keys(defaultQueryParameters).length > 0) {
+      const queryParams = queryString ? qs.decode(queryString) : {}
+      const merged = { ...defaultQueryParameters, ...queryParams }
+      mergedQueryString = qs.encode(merged)
     }
+
+    this.startTimeMs = performance.now()
+    const url = this.getUrl(
+      path,
+      mergedQueryString,
+      pagination,
+      paginationValues
+    )
 
     // Configure dispatcher for proxy and/or TLS settings
     // Use datasource config if set, otherwise fall back to environment variable
@@ -670,40 +760,38 @@ export class RestIntegration implements IntegrationBase {
 
     const globalDispatcher = getGlobalDispatcher()
     const isHttpMockingActive = globalDispatcher instanceof MockAgent
+    let hasDispatcher = false
+    let usedProxyDispatcher = false
 
-    if (!isHttpMockingActive) {
-      const proxyDispatcher = getProxyDispatcher({
+    const setDispatcher = (requestInput: RequestInit, requestUrl: string) => {
+      if (isHttpMockingActive) {
+        return requestInput
+      }
+
+      const dispatcher = getDispatcher({
         rejectUnauthorized,
-      })
-      if (proxyDispatcher) {
-        console.log("[rest integration] Using proxy for request", {
-          url,
-          hasDispatcher: true,
-          isHttpsUrl: url.startsWith("https://"),
-          rejectUnauthorized,
-          configRejectUnauthorized: this.config.rejectUnauthorized,
-          proxyUri:
-            process.env.GLOBAL_AGENT_HTTPS_PROXY ||
-            process.env.GLOBAL_AGENT_HTTP_PROXY ||
-            process.env.HTTPS_PROXY ||
-            process.env.HTTP_PROXY,
-        })
-        // @ts-expect-error - ProxyAgent is compatible with Dispatcher but types don't align perfectly
-        input.dispatcher = proxyDispatcher
-      } else if (!rejectUnauthorized) {
-        // No proxy, but need to disable TLS verification for self-signed certificates
-        const agent = new Agent({
-          connect: {
-            rejectUnauthorized: false,
-          },
-        })
-        input.dispatcher = agent
+        url: requestUrl,
+      }) as unknown as typeof requestInput.dispatcher
+
+      hasDispatcher = true
+      usedProxyDispatcher = dispatcher?.constructor.name === "ProxyAgent"
+
+      return {
+        ...requestInput,
+        dispatcher,
       }
     }
 
     let response: Response
     try {
-      response = await fetch(url, input)
+      response = await coreUtils.fetchWithBlacklist<RequestInit, Response>(
+        url,
+        input,
+        {
+          fetchFn: async (requestUrl: string, requestInput: RequestInit) =>
+            fetch(requestUrl, setDispatcher(requestInput, requestUrl)),
+        }
+      )
     } catch (err) {
       const error = err as Error & {
         cause?: {
@@ -716,7 +804,8 @@ export class RestIntegration implements IntegrationBase {
         error: error.message,
         cause: error.cause?.message,
         code: error.cause?.code,
-        hasDispatcher: Boolean(input.dispatcher),
+        hasDispatcher,
+        usedProxyDispatcher,
         isHttpsUrl: url.startsWith("https://"),
         rejectUnauthorized,
       })
@@ -730,16 +819,18 @@ export class RestIntegration implements IntegrationBase {
         )
       }
 
-      if (error.cause?.code === "ECONNREFUSED" && input.dispatcher) {
+      if (error.cause?.code === "ECONNREFUSED" && usedProxyDispatcher) {
         throw new Error(
           `Connection refused when using proxy. Check proxy configuration and ensure the proxy server is accessible. Original error: ${error.message}`
         )
       }
       throw error
     }
-    if (response.status === 401 && authConfigType === RestAuthType.OAUTH2 && retry401) {
-      await sdk.oauth2.cleanStoredToken(authConfigId!)
-      return await this._req(query, false)
+    if (response.status === 401 && retry401) {
+      if (authConfigType === RestAuthType.OAUTH2 && authConfigId) {
+        await sdk.oauth2.cleanStoredToken(authConfigId)
+        return await this._req(query, false)
+      }
     }
     return await this.parseResponse(response, pagination)
   }
