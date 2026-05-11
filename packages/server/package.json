@@ -1,14 +1,9 @@
 {
   "name": "@supertoolmake/server",
   "private": true,
-  "email": "hi@budibase.com",
   "version": "0.0.0",
   "description": "SuperToolMake Web Server",
   "main": "src/index.ts",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Budibase/budibase.git"
-  },
   "scripts": {
     "prebuild": "rimraf dist/ client/",
     "build": "node ./scripts/build.js",
@@ -37,8 +32,6 @@
   "keywords": [
     "budibase"
   ],
-  "author": "Budibase",
-  "license": "GPL-3.0",
   "dependencies": {
     "@apidevtools/swagger-parser": "12.1.0",
     "@aws-sdk/client-s3": "3.1041.0",
@@ -108,8 +101,8 @@
     "zod-validation-error": "5.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.5",
-    "@babel/preset-env": "7.16.11",
+    "@babel/core": "7.29.0",
+    "@babel/preset-env": "7.29.5",
     "@types/formidable": "^3.4.6",
     "@types/global-agent": "2.1.1",
     "@types/js-yaml": "^4.0.9",
