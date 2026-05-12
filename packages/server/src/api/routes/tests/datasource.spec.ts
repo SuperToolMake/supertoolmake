@@ -19,11 +19,7 @@ import sdk from "../../../sdk"
 import { tableForDatasource } from "../../../tests/utilities/structures"
 import { getCachedVariable } from "../../../threads/utils"
 import * as setup from "./utilities"
-import {
-  allowUndefined,
-  checkBuilderEndpoint,
-  createRequest,
-} from "./utilities/TestFunctions"
+import { allowUndefined, checkBuilderEndpoint, createRequest } from "./utilities/TestFunctions"
 
 describe("/datasources", () => {
   const config = setup.getConfig()
@@ -177,12 +173,10 @@ describe("/datasources", () => {
         builder: false,
         prodApp: true,
       })
-      await createRequest(
-        config.request,
-        "PUT",
-        `/api/datasources/${datasource._id}`,
-        { ...before, name: "Unauthorized update attempt" }
-      )
+      await createRequest(config.request, "PUT", `/api/datasources/${datasource._id}`, {
+        ...before,
+        name: "Unauthorized update attempt",
+      })
         .set(headers)
         .expect(403)
       const after = await config.api.datasource.get(datasource._id!)

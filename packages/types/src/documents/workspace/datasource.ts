@@ -1,7 +1,7 @@
-import { Document } from "../document"
-import { SourceName } from "../../sdk"
-import { Table } from "./table"
-import { OAuth2Config, OAuth2GrantType } from "./oauth2"
+import type { SourceName } from "../../sdk"
+import type { Document } from "../document"
+import { type OAuth2Config, OAuth2GrantType } from "./oauth2"
+import type { Table } from "./table"
 
 export interface Datasource extends Document {
   type: string
@@ -48,8 +48,7 @@ export interface BearerRestAuthConfig {
   config: RestBearerAuthConfig
 }
 
-export interface OAuth2RestAuthConfig
-  extends Omit<OAuth2Config, keyof Document> {
+export interface OAuth2RestAuthConfig extends Omit<OAuth2Config, keyof Document> {
   _id: string
   type: RestAuthType.OAUTH2
 }
@@ -66,10 +65,7 @@ export const REST_AUTH_SECRET_FIELD: Partial<Record<RestAuthType, string>> = {
   [RestAuthType.OAUTH2]: "clientSecret" satisfies keyof OAuth2RestAuthConfig,
 }
 
-export type RestAuthConfig =
-  | BasicRestAuthConfig
-  | BearerRestAuthConfig
-  | OAuth2RestAuthConfig
+export type RestAuthConfig = BasicRestAuthConfig | BearerRestAuthConfig | OAuth2RestAuthConfig
 
 export interface DynamicVariable {
   name: string

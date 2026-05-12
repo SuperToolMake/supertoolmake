@@ -1,26 +1,26 @@
 <script>
-  import "@spectrum-css/textfield/dist/index-vars.css"
-  import "@spectrum-css/actionbutton/dist/index-vars.css"
-  import "@spectrum-css/stepper/dist/index-vars.css"
-  import { createEventDispatcher, onDestroy } from "svelte"
-  import Icon from "../../Icon/Icon.svelte"
+import "@spectrum-css/textfield/dist/index-vars.css"
+import "@spectrum-css/actionbutton/dist/index-vars.css"
+import "@spectrum-css/stepper/dist/index-vars.css"
+import { createEventDispatcher, onDestroy } from "svelte"
+import Icon from "../../Icon/Icon.svelte"
 
-  export let value = null
-  export let placeholder = null
-  export let disabled = false
-  export let id = null
-  export let readonly = false
-  export let updateOnChange = true
-  export let quiet = false
-  export let min
-  export let max
-  export let step
-  export let hideButtons = false
+export let value = null
+export let placeholder = null
+export let disabled = false
+export let id = null
+export let readonly = false
+export let updateOnChange = true
+export let quiet = false
+export let min
+export let max
+export let step
+export let hideButtons = false
 
-  const dispatch = createEventDispatcher()
-  let focus = false
-  let holdTimeout
-  let holdInterval
+const dispatch = createEventDispatcher()
+let focus = false
+let holdTimeout
+let holdInterval
 
 // We need to keep the field value bound to a different variable in order
 // to properly handle erroneous values. If we don't do this then it is
@@ -76,59 +76,59 @@ const updateValueOnEnter = (event) => {
   }
 }
 
-  const stepUp = () => {
-    if (readonly || disabled) {
-      return
-    }
-    if (value == null || isNaN(value)) {
-      updateValue(step)
-    } else {
-      updateValue(value + step)
-    }
+const stepUp = () => {
+  if (readonly || disabled) {
+    return
   }
-
-  const stepDown = () => {
-    if (readonly || disabled) {
-      return
-    }
-    if (value == null || isNaN(value)) {
-      updateValue(step)
-    } else {
-      updateValue(value - step)
-    }
+  if (value == null || Number.isNaN(value)) {
+    updateValue(step)
+  } else {
+    updateValue(value + step)
   }
+}
 
-  const stopHold = () => {
-    if (holdTimeout) {
-      clearTimeout(holdTimeout)
-      holdTimeout = undefined
-    }
-    if (holdInterval) {
-      clearInterval(holdInterval)
-      holdInterval = undefined
-    }
+const stepDown = () => {
+  if (readonly || disabled) {
+    return
   }
-
-  const startHold = stepFn => {
-    if (readonly || disabled) {
-      return
-    }
-    stepFn()
-    holdTimeout = setTimeout(() => {
-      holdInterval = setInterval(stepFn, 75)
-    }, 300)
+  if (value == null || Number.isNaN(value)) {
+    updateValue(step)
+  } else {
+    updateValue(value - step)
   }
+}
 
-  const onStepButtonClick = (event, stepFn) => {
-    if (event.detail !== 0) {
-      return
-    }
-    stepFn()
+const stopHold = () => {
+  if (holdTimeout) {
+    clearTimeout(holdTimeout)
+    holdTimeout = undefined
   }
+  if (holdInterval) {
+    clearInterval(holdInterval)
+    holdInterval = undefined
+  }
+}
 
-  onDestroy(() => {
-    stopHold()
-  })
+const startHold = (stepFn) => {
+  if (readonly || disabled) {
+    return
+  }
+  stepFn()
+  holdTimeout = setTimeout(() => {
+    holdInterval = setInterval(stepFn, 75)
+  }, 300)
+}
+
+const onStepButtonClick = (event, stepFn) => {
+  if (event.detail !== 0) {
+    return
+  }
+  stepFn()
+}
+
+onDestroy(() => {
+  stopHold()
+})
 </script>
 
 <div

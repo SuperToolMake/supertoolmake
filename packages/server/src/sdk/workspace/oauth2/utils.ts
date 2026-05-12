@@ -104,9 +104,8 @@ export async function getTokenFromConfig(
     audience?: string
   }
 ): Promise<string> {
-  return cache.withCacheWithDynamicTTL(
-    cache.CacheKey.OAUTH2_TOKEN(cacheKey),
-    () => fetchAndParseToken(config)
+  return cache.withCacheWithDynamicTTL(cache.CacheKey.OAUTH2_TOKEN(cacheKey), () =>
+    fetchAndParseToken(config)
   )
 }
 

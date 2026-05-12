@@ -1066,9 +1066,7 @@ describe("REST Integration", () => {
         url: "https://example.com",
       })
 
-      await expect(integration.read({})).rejects.toThrow(
-        "Connection refused when using proxy"
-      )
+      await expect(integration.read({})).rejects.toThrow("Connection refused when using proxy")
     })
 
     it("falls back to environment variable when config rejectUnauthorized is undefined", async () => {

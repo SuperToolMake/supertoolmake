@@ -1,4 +1,4 @@
-import { Agent, ProxyAgent, Dispatcher } from "undici"
+import { Agent, type Dispatcher, ProxyAgent } from "undici"
 
 /**
  * Check if a URL matches any pattern in the NO_PROXY list.
@@ -20,7 +20,7 @@ function isUrlMatchingNoProxy(url: string, noProxy: string): boolean {
     return false
   }
 
-  const rules = noProxy.split(/[\s,]+/).filter(r => r.length > 0)
+  const rules = noProxy.split(/[\s,]+/).filter((r) => r.length > 0)
 
   for (const rule of rules) {
     // Handle leading dot (e.g., .foo.com) by converting to wildcard
@@ -43,8 +43,7 @@ function isUrlMatchingNoProxy(url: string, noProxy: string): boolean {
     } else if (ruleHostname.startsWith("*")) {
       // Wildcard pattern like *.foo.com
       const suffix = ruleHostname.slice(1) // .foo.com
-      hostnameMatches =
-        hostname === suffix.slice(1) || hostname.endsWith(suffix)
+      hostnameMatches = hostname === suffix.slice(1) || hostname.endsWith(suffix)
     } else {
       hostnameMatches = hostname === ruleHostname
     }
@@ -67,10 +66,8 @@ function isUrlMatchingNoProxy(url: string, noProxy: string): boolean {
  * @returns true if the request should go direct (no proxy)
  */
 function shouldBypassProxy(url?: string): boolean {
-  const httpProxy =
-    process.env.GLOBAL_AGENT_HTTP_PROXY || process.env.HTTP_PROXY
-  const httpsProxy =
-    process.env.GLOBAL_AGENT_HTTPS_PROXY || process.env.HTTPS_PROXY
+  const httpProxy = process.env.GLOBAL_AGENT_HTTP_PROXY || process.env.HTTP_PROXY
+  const httpsProxy = process.env.GLOBAL_AGENT_HTTPS_PROXY || process.env.HTTPS_PROXY
 
   const proxyUrl = httpsProxy || httpProxy
 
@@ -89,8 +86,7 @@ function shouldBypassProxy(url?: string): boolean {
 
   // Check NO_PROXY patterns
   if (url) {
-    const noProxy =
-      process.env.GLOBAL_AGENT_NO_PROXY || process.env.NO_PROXY || ""
+    const noProxy = process.env.GLOBAL_AGENT_NO_PROXY || process.env.NO_PROXY || ""
     if (noProxy && isUrlMatchingNoProxy(url, noProxy)) {
       console.log("[fetch] URL matches NO_PROXY pattern, bypassing proxy", {
         url,
@@ -118,10 +114,8 @@ function createDirectAgent(rejectUnauthorized: boolean): Agent {
  * Creates a ProxyAgent for proxied requests.
  */
 function createProxyAgent(rejectUnauthorized: boolean): ProxyAgent {
-  const httpProxy =
-    process.env.GLOBAL_AGENT_HTTP_PROXY || process.env.HTTP_PROXY
-  const httpsProxy =
-    process.env.GLOBAL_AGENT_HTTPS_PROXY || process.env.HTTPS_PROXY
+  const httpProxy = process.env.GLOBAL_AGENT_HTTP_PROXY || process.env.HTTP_PROXY
+  const httpsProxy = process.env.GLOBAL_AGENT_HTTPS_PROXY || process.env.HTTPS_PROXY
 
   const proxyUrl = (httpsProxy || httpProxy)!.trim()
 
@@ -158,10 +152,7 @@ function createProxyAgent(rejectUnauthorized: boolean): ProxyAgent {
  * @param options Configuration for the dispatcher
  * @returns A Dispatcher (ProxyAgent for proxied requests, Agent for direct requests)
  */
-function createDispatcher(options?: {
-  rejectUnauthorized?: boolean
-  url?: string
-}): Dispatcher {
+function createDispatcher(options?: { rejectUnauthorized?: boolean; url?: string }): Dispatcher {
   const rejectUnauthorized = options?.rejectUnauthorized ?? true
 
   if (shouldBypassProxy(options?.url)) {
@@ -180,9 +171,6 @@ function createDispatcher(options?: {
  * @param options Configuration for the dispatcher
  * @returns A Dispatcher ready to use with fetch
  */
-export function getDispatcher(options: {
-  rejectUnauthorized?: boolean
-  url: string
-}): Dispatcher {
+export function getDispatcher(options: { rejectUnauthorized?: boolean; url: string }): Dispatcher {
   return createDispatcher(options)
 }

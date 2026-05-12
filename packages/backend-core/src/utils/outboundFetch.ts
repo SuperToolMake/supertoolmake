@@ -67,7 +67,7 @@ function stripSensitiveHeadersForRedirect<TRequest extends FetchRequest>(
     return request
   }
   const headers = new Headers(request.headers as RequestInit["headers"])
-  SENSITIVE_REDIRECT_HEADERS.forEach(header => headers.delete(header))
+  SENSITIVE_REDIRECT_HEADERS.forEach((header) => headers.delete(header))
   return {
     ...request,
     headers,
@@ -94,10 +94,7 @@ interface FetchWithBlacklistOptions<
   TResponse extends FetchResponse,
 > {
   followRedirects?: boolean
-  fetchFn?: (
-    url: string,
-    request: RedirectSafeRequest<TRequest>
-  ) => Promise<TResponse>
+  fetchFn?: (url: string, request: RedirectSafeRequest<TRequest>) => Promise<TResponse>
 }
 
 type RedirectSafeRequest<TRequest extends FetchRequest> = TRequest & {
@@ -152,17 +149,20 @@ export async function fetchWithBlacklist<
       return response
     }
 
+    releaseResponseBody(response)
+
+    if (!followRedirects) {
+      throw new Error("Redirects are not permitted.")
+    }
+
     if (redirects === MAX_REDIRECTS) {
-      releaseResponseBody(response)
       break
     }
 
     const location = response.headers.get("location")
     if (!location) {
-      return response
+      throw new Error("Maximum redirect reached.")
     }
-
-    releaseResponseBody(response)
 
     const redirectUrl = parseUrl(new URL(location, nextUrl).toString()).toString()
     nextRequest = nextRequestForRedirect(nextRequest, response.status)

@@ -1,69 +1,72 @@
 <script>
-  import { CoreStepper, CoreTextField } from "@budibase/bbui"
-  import { onDestroy } from "svelte"
-  import Field from "./Field.svelte"
+import { CoreStepper, CoreTextField } from "@budibase/bbui"
+import { onDestroy } from "svelte"
+import Field from "./Field.svelte"
 
-  export let field
-  export let label
-  export let placeholder
-  export let disabled = false
-  export let readonly = false
-  export let validation
-  export let defaultValue
-  export let min
-  export let max
-  export let step = 1
-  export let enableStepper = false
-  export let onChange
-  export let runOnInput = false
-  export let debounceMs = 500
-  export let span
-  export let helpText = null
+export let field
+export let label
+export let placeholder
+export let disabled = false
+export let readonly = false
+export let validation
+export let defaultValue
+export let min
+export let max
+export let step = 1
+export let enableStepper = false
+export let onChange
+export let runOnInput = false
+export let debounceMs = 500
+export let span
+export let helpText = null
 
-  let fieldState
-  let fieldApi
-  let debounceTimeout
+let fieldState
+let fieldApi
+let debounceTimeout
 
 const parseNumber = (val) => {
   if (val == null) {
     return null
   }
+  return Number.isNaN(val) ? null : parseFloat(val)
+}
 
-  const clampValue = val => {
+const clampValue = (val) => {
+  if (val == null) return val
+  if (min != null && val < min) return min
+  if (max != null && val > max) return max
+  return val
+}
+
+const handleChange = (e) => {
+  const clamped = clampValue(e.detail)
+  const changed = fieldApi.setValue(clamped)
+  if (changed) {
+    scheduleOnChange(clamped)
   }
+}
 
-  const handleChange = e => {
-    const clamped = clampValue(e.detail)
-    const changed = fieldApi.setValue(clamped)
-    if (changed) {
-      scheduleOnChange(clamped)
-    }
+const scheduleOnChange = (value) => {
+  if (debounceTimeout) {
+    clearTimeout(debounceTimeout)
   }
+  debounceTimeout = setTimeout(() => {
+    onChange?.({ value })
+  }, Number(debounceMs) || 0)
+}
 
-  const scheduleOnChange = value => {
-    if (debounceTimeout) {
-      clearTimeout(debounceTimeout)
-    }
-    debounceTimeout = setTimeout(
-      () => {
-        onChange?.({ value })
-      },
-      Number(debounceMs) || 0
-    )
+const handleInput = (e) => {
+  if (!runOnInput) {
+    return
   }
+  scheduleOnChange(e.target.value)
+}
 
-  const handleInput = e => {
-    if (!runOnInput) {
-      return
-    }
-    scheduleOnChange(e.target.value)
+onDestroy(() => {
+  if (debounceTimeout) {
+    clearTimeout(debounceTimeout)
   }
-
-  onDestroy(() => {
-    if (debounceTimeout) {
-      clearTimeout(debounceTimeout)
-    }
-  })
+})
 </script>
 
 <Field
