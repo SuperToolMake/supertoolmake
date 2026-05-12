@@ -9,6 +9,7 @@ import {
   PASSWORD_REPLACEMENT,
   type RestAuthConfig,
   RestAuthType,
+  type BasicRestAuthConfig,
   type RestBasicAuthConfig,
   type RestConfig,
   type Row,
@@ -245,9 +246,9 @@ export function mergeConfigs(update: Datasource, old: Datasource) {
         continue
       }
       const basic = config.config as RestBasicAuthConfig
-      const oldBasic = oldConfigs.find((old) => old.name === config.name)
-        ?.config as RestBasicAuthConfig
-      if (basic.password === PASSWORD_REPLACEMENT) {
+      const oldBasic = oldConfigs.find((old): old is BasicRestAuthConfig => old.name === config.name)
+        ?.config
+      if (basic.password === PASSWORD_REPLACEMENT && oldBasic) {
         basic.password = oldBasic.password
       }
     }

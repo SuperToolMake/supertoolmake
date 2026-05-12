@@ -1,44 +1,47 @@
-<script>
-import { CoreStepper, CoreTextField } from "@budibase/bbui"
+<script lang="ts">
+import { CoreStepper, CoreTextField } from "@supertoolmake/bbui"
+import { type UIFieldOnChange, type UIFieldValidationRule, FieldType, type FieldSchema } from "@supertoolmake/types"
 import { onDestroy } from "svelte"
+import type { FieldApi, FieldState } from "@/types"
 import Field from "./Field.svelte"
 
-export let field
-export let label
-export let placeholder
-export let disabled = false
-export let readonly = false
-export let validation
-export let defaultValue
-export let min
-export let max
-export let step = 1
-export let enableStepper = false
-export let onChange
-export let runOnInput = false
-export let debounceMs = 500
-export let span
-export let helpText = null
+export let field: string
+export let label: string | undefined = undefined
+export let placeholder: string | undefined = undefined
+export let readonly: boolean = false
+export let validation: UIFieldValidationRule[] | undefined = undefined
+export let defaultValue: number | undefined = undefined
+export let min: number | undefined = undefined
+export let max: number | undefined = undefined
+export let step: number = 1
+export let enableStepper: boolean = false
+export let onChange: UIFieldOnChange | undefined = undefined
+export let runOnInput: boolean = false
+export let debounceMs: number = 500
+export let span: number | undefined = undefined
+export let helpText: string | undefined = undefined
 
-let fieldState
-let fieldApi
-let debounceTimeout
+let fieldState: FieldState | undefined
+let fieldApi: FieldApi | undefined
+let fieldSchema: FieldSchema | undefined
+let debounceTimeout: ReturnType<typeof setTimeout> | undefined
 
-const parseNumber = (val) => {
+const parseNumber = (val: number | undefined): number | undefined => {
   if (val == null) {
-    return null
+    return undefined
   }
-  return Number.isNaN(val) ? null : parseFloat(val)
+  return Number.isNaN(val) ? undefined : parseFloat(String(val))
 }
 
-const clampValue = (val) => {
-  if (val == null) return val
+const clampValue = (val: number | undefined): number | undefined => {
+  if (val == null) return undefined
   if (min != null && val < min) return min
   if (max != null && val > max) return max
   return val
 }
 
-const handleChange = (e) => {
+const handleChange = (e: CustomEvent<number>) => {
+  if (!fieldApi) return
   const clamped = clampValue(e.detail)
   const changed = fieldApi.setValue(clamped)
   if (changed) {
@@ -46,7 +49,7 @@ const handleChange = (e) => {
   }
 }
 
-const scheduleOnChange = (value) => {
+const scheduleOnChange = (value: number | undefined) => {
   if (debounceTimeout) {
     clearTimeout(debounceTimeout)
   }
@@ -55,11 +58,12 @@ const scheduleOnChange = (value) => {
   }, Number(debounceMs) || 0)
 }
 
-const handleInput = (e) => {
+const handleInput = (e: Event) => {
   if (!runOnInput) {
     return
   }
-  scheduleOnChange(e.target.value)
+  const target = e.target as HTMLInputElement
+  scheduleOnChange(parseFloat(target.value))
 }
 
 onDestroy(() => {
@@ -74,12 +78,13 @@ onDestroy(() => {
   {field}
   {readonly}
   {validation}
-  defaultValue={parseNumber(defaultValue)}
+  defaultValue={defaultValue != null ? String(defaultValue) : undefined}
   {span}
   {helpText}
-  type="number"
+  type={FieldType.NUMBER}
   bind:fieldState
   bind:fieldApi
+  bind:fieldSchema
 >
   {#if fieldState}
     {#if enableStepper}
@@ -87,7 +92,7 @@ onDestroy(() => {
         updateOnChange={false}
         value={fieldState.value}
         on:change={handleChange}
-        on:input={runOnInput ? handleInput : undefined}
+        on:input={runOnInput ? handleInput : () => {}}
         disabled={fieldState.disabled}
         readonly={fieldState.readonly}
         id={fieldState.fieldId}
@@ -101,7 +106,7 @@ onDestroy(() => {
         updateOnChange={false}
         value={fieldState.value}
         on:change={handleChange}
-        on:input={runOnInput ? handleInput : undefined}
+        on:input={runOnInput ? handleInput : () => {}}
         disabled={fieldState.disabled}
         readonly={fieldState.readonly}
         id={fieldState.fieldId}
