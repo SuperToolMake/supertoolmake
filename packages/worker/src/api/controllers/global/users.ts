@@ -449,9 +449,7 @@ export const tenantUserLookup = async (ctx: UserCtx<void, LookupTenantUserRespon
   }
 }
 
-export const invite = async (
-  ctx: Ctx<InviteUserRequest, InviteUserResponse>
-) => {
+export const invite = async (ctx: Ctx<InviteUserRequest, InviteUserResponse>) => {
   const request = ctx.request.body
 
   const multiRequest = [request]
