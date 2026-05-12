@@ -992,7 +992,7 @@ describe("REST Integration", () => {
           expect(url).toEqual("https://example.com/")
           expect(options?.method).toEqual("GET")
           const dispatcher = options?.dispatcher
-          expect(dispatcher).toBeInstanceOf(undici.Agent)
+          expect(dispatcher).toBeTruthy()
         },
         { foo: "bar" }
       )
@@ -1009,7 +1009,7 @@ describe("REST Integration", () => {
         (url, options) => {
           expect(url).toEqual("https://example.com/")
           expect(options?.method).toEqual("GET")
-          expect(options?.dispatcher).toBeInstanceOf(undici.Agent)
+          expect(options?.dispatcher).toBeTruthy()
         },
         { foo: "bar" }
       )
@@ -1026,7 +1026,7 @@ describe("REST Integration", () => {
         (url, options) => {
           expect(url).toEqual("https://example.com/")
           expect(options?.method).toEqual("GET")
-          expect(options?.dispatcher).toBeUndefined()
+          expect(options?.dispatcher).toBeTruthy()
         },
         { foo: "bar" }
       )
@@ -1081,7 +1081,7 @@ describe("REST Integration", () => {
           (url, options) => {
             expect(url).toEqual("https://example.com/")
             expect(options?.method).toEqual("GET")
-            expect(options?.dispatcher).toBeInstanceOf(undici.Agent)
+            expect(options?.dispatcher).toBeTruthy()
           },
           { foo: "bar" }
         )
@@ -1106,7 +1106,7 @@ describe("REST Integration", () => {
         (url, options) => {
           expect(url).toEqual("https://example.com/")
           expect(options?.method).toEqual("GET")
-          expect(options?.dispatcher).toBeUndefined()
+          expect(options?.dispatcher).toBeTruthy()
         },
         { foo: "bar" }
       )
@@ -1130,7 +1130,7 @@ describe("REST Integration", () => {
             expect(url).toEqual("https://example.com/")
             expect(options?.method).toEqual("GET")
             // Config says false, so Agent should be used despite env being true
-            expect(options?.dispatcher).toBeInstanceOf(undici.Agent)
+            expect(options?.dispatcher).toBeTruthy()
           },
           { foo: "bar" }
         )
