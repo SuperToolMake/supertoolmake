@@ -1,6 +1,11 @@
 <script lang="ts">
 import { CoreStepper, CoreTextField } from "@supertoolmake/bbui"
-import { type UIFieldOnChange, type UIFieldValidationRule, FieldType, type FieldSchema } from "@supertoolmake/types"
+import {
+  type UIFieldOnChange,
+  type UIFieldValidationRule,
+  FieldType,
+  type FieldSchema,
+} from "@supertoolmake/types"
 import { onDestroy } from "svelte"
 import type { FieldApi, FieldState } from "@/types"
 import Field from "./Field.svelte"

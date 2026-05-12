@@ -2,6 +2,7 @@ import { context, db as dbCore } from "@supertoolmake/backend-core"
 import { helpers } from "@supertoolmake/shared-core"
 import { findHBSBlocks, processObjectSync } from "@supertoolmake/string-templates"
 import {
+  type BasicRestAuthConfig,
   type Datasource,
   DatasourceFieldType,
   INTERNAL_TABLE_SOURCE_ID,
@@ -9,7 +10,6 @@ import {
   PASSWORD_REPLACEMENT,
   type RestAuthConfig,
   RestAuthType,
-  type BasicRestAuthConfig,
   type RestBasicAuthConfig,
   type RestConfig,
   type Row,
@@ -246,8 +246,9 @@ export function mergeConfigs(update: Datasource, old: Datasource) {
         continue
       }
       const basic = config.config as RestBasicAuthConfig
-      const oldBasic = oldConfigs.find((old): old is BasicRestAuthConfig => old.name === config.name)
-        ?.config
+      const oldBasic = oldConfigs.find(
+        (old): old is BasicRestAuthConfig => old.name === config.name
+      )?.config
       if (basic.password === PASSWORD_REPLACEMENT && oldBasic) {
         basic.password = oldBasic.password
       }
