@@ -217,8 +217,10 @@ export async function removeSecrets(datasources: Datasource[]) {
       }
       // remove general passwords
       for (const key of Object.keys(datasource.config)) {
+        const fieldType = schema.datasource?.[key]?.type
         if (
-          schema.datasource?.[key]?.type === DatasourceFieldType.PASSWORD &&
+          (fieldType === DatasourceFieldType.PASSWORD ||
+            fieldType === DatasourceFieldType.SENSITIVE_LONGFORM) &&
           !useEnvVars(datasource.config[key])
         ) {
           datasource.config[key] = PASSWORD_REPLACEMENT
