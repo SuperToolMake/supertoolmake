@@ -1,7 +1,8 @@
-import { cache, context, docIds } from "@supertoolmake/backend-core"
+import { cache, context, docIds, 
+  utils as coreUtils } from "@supertoolmake/backend-core"
 import { type Document, OAuth2CredentialsMethod, type OAuth2GrantType } from "@supertoolmake/types"
 import { HttpError } from "koa"
-import fetch, { type RequestInit } from "node-fetch"
+import { type RequestInit } from "node-fetch"
 import { processEnvironmentVariable } from "../../utils"
 import { get } from "."
 
@@ -29,7 +30,6 @@ async function fetchToken(config: {
     body: new URLSearchParams({
       grant_type: "client_credentials",
     }),
-    redirect: "follow",
   }
 
   const bodyParams: Record<string, string> = {
@@ -53,7 +53,7 @@ async function fetchToken(config: {
   }
   fetchConfig.body = new URLSearchParams(bodyParams)
 
-  const resp = await fetch(config.url, fetchConfig)
+  const resp = await coreUtils.fetchWithBlacklist(config.url, fetchConfig)
   return resp
 }
 
