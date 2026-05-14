@@ -1,8 +1,7 @@
-import { cache, context, docIds, 
-  utils as coreUtils } from "@supertoolmake/backend-core"
+import { cache, context, utils as coreUtils, docIds } from "@supertoolmake/backend-core"
 import { type Document, OAuth2CredentialsMethod, type OAuth2GrantType } from "@supertoolmake/types"
 import { HttpError } from "koa"
-import { type RequestInit } from "node-fetch"
+import type { RequestInit } from "node-fetch"
 import { processEnvironmentVariable } from "../../utils"
 import { get } from "."
 

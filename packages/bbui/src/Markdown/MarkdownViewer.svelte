@@ -1,24 +1,21 @@
 <script lang="ts">
-  import { renderMarkdown } from "./renderMarkdown"
+import { renderMarkdown } from "./renderMarkdown"
 
 export let value: string | undefined = undefined
 export let height: string | undefined = undefined
 
 let ref: HTMLDivElement | undefined
 
-  const updateValue = async (
-    ref: HTMLDivElement | undefined,
-    markdown: string | undefined
-  ) => {
-    if (!ref) {
-      return
-    }
-    if (!markdown) {
-      ref.innerHTML = ""
-      return
-    }
-    ref.innerHTML = renderMarkdown(markdown)
+const updateValue = async (ref: HTMLDivElement | undefined, markdown: string | undefined) => {
+  if (!ref) {
+    return
   }
+  if (!markdown) {
+    ref.innerHTML = ""
+    return
+  }
+  ref.innerHTML = renderMarkdown(markdown)
+}
 
 $: updateValue(ref, value)
 </script>

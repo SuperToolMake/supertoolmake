@@ -1,7 +1,7 @@
 import path from "node:path"
+import { blacklist, cache, setEnv as setCoreEnv } from "@supertoolmake/backend-core"
 import { generator, utils as testUtils } from "@supertoolmake/backend-core/tests"
 import { OAuth2CredentialsMethod, OAuth2GrantType } from "@supertoolmake/types"
-import { blacklist, cache, setEnv as setCoreEnv } from "@supertoolmake/backend-core"
 import { GenericContainer, Wait } from "testcontainers"
 import tk from "timekeeper"
 import { startContainer } from "../../../../integrations/tests/utils"

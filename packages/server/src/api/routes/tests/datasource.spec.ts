@@ -520,133 +520,125 @@ if (descriptions.length) {
         })
     })
 
-      describe("auth config secret scrubbing", () => {
-    it("scrubs basic auth password in create response", async () => {
-      const ds = await config.api.datasource.create({
-        type: "datasource",
-        name: "REST scrub basic",
-        source: SourceName.REST,
-        config: {
-          authConfigs: [
-            {
-              _id: generator.guid(),
-              name: "Basic Auth",
-              type: RestAuthType.BASIC,
-              config: {
-                username: "testuser",
-                password: "testpassword",
+    describe("auth config secret scrubbing", () => {
+      it("scrubs basic auth password in create response", async () => {
+        const ds = await config.api.datasource.create({
+          type: "datasource",
+          name: "REST scrub basic",
+          source: SourceName.REST,
+          config: {
+            authConfigs: [
+              {
+                _id: generator.guid(),
+                name: "Basic Auth",
+                type: RestAuthType.BASIC,
+                config: {
+                  username: "testuser",
+                  password: "testpassword",
+                },
               },
-            },
-          ],
-        },
+            ],
+          },
+        })
+
+        expect(ds.config!.authConfigs[0].config.password).toBe(PASSWORD_REPLACEMENT)
+        expect(ds.config!.authConfigs[0].config.username).toBe("testuser")
       })
 
-      expect(ds.config!.authConfigs[0].config.password).toBe(
-        PASSWORD_REPLACEMENT
-      )
-      expect(ds.config!.authConfigs[0].config.username).toBe("testuser")
-    })
-
-    it("scrubs bearer token in create response", async () => {
-      const ds = await config.api.datasource.create({
-        type: "datasource",
-        name: "REST scrub bearer",
-        source: SourceName.REST,
-        config: {
-          authConfigs: [
-            {
-              _id: generator.guid(),
-              name: "Bearer Auth",
-              type: RestAuthType.BEARER,
-              config: {
-                token: "my-secret-token",
+      it("scrubs bearer token in create response", async () => {
+        const ds = await config.api.datasource.create({
+          type: "datasource",
+          name: "REST scrub bearer",
+          source: SourceName.REST,
+          config: {
+            authConfigs: [
+              {
+                _id: generator.guid(),
+                name: "Bearer Auth",
+                type: RestAuthType.BEARER,
+                config: {
+                  token: "my-secret-token",
+                },
               },
-            },
-          ],
-        },
+            ],
+          },
+        })
+
+        expect(ds.config!.authConfigs[0].config.token).toBe(PASSWORD_REPLACEMENT)
       })
 
-      expect(ds.config!.authConfigs[0].config.token).toBe(PASSWORD_REPLACEMENT)
-    })
-
-    it("scrubs basic auth password in get response", async () => {
-      const created = await config.api.datasource.create({
-        type: "datasource",
-        name: "REST scrub get basic",
-        source: SourceName.REST,
-        config: {
-          authConfigs: [
-            {
-              _id: generator.guid(),
-              name: "Basic Auth",
-              type: RestAuthType.BASIC,
-              config: {
-                username: "testuser",
-                password: "testpassword",
+      it("scrubs basic auth password in get response", async () => {
+        const created = await config.api.datasource.create({
+          type: "datasource",
+          name: "REST scrub get basic",
+          source: SourceName.REST,
+          config: {
+            authConfigs: [
+              {
+                _id: generator.guid(),
+                name: "Basic Auth",
+                type: RestAuthType.BASIC,
+                config: {
+                  username: "testuser",
+                  password: "testpassword",
+                },
               },
-            },
-          ],
-        },
+            ],
+          },
+        })
+
+        const fetched = await config.api.datasource.get(created._id!)
+        expect(fetched.config!.authConfigs[0].config.password).toBe(PASSWORD_REPLACEMENT)
       })
 
-      const fetched = await config.api.datasource.get(created._id!)
-      expect(fetched.config!.authConfigs[0].config.password).toBe(
-        PASSWORD_REPLACEMENT
-      )
-    })
-
-    it("preserves env var references instead of scrubbing them", async () => {
-      const ds = await config.api.datasource.create({
-        type: "datasource",
-        name: "REST env vars",
-        source: SourceName.REST,
-        config: {
-          authConfigs: [
-            {
-              _id: generator.guid(),
-              name: "Env Auth",
-              type: RestAuthType.BASIC,
-              config: {
-                username: "{{ env.USERNAME }}",
-                password: "{{ env.PASSWORD }}",
+      it("preserves env var references instead of scrubbing them", async () => {
+        const ds = await config.api.datasource.create({
+          type: "datasource",
+          name: "REST env vars",
+          source: SourceName.REST,
+          config: {
+            authConfigs: [
+              {
+                _id: generator.guid(),
+                name: "Env Auth",
+                type: RestAuthType.BASIC,
+                config: {
+                  username: "{{ env.USERNAME }}",
+                  password: "{{ env.PASSWORD }}",
+                },
               },
-            },
-          ],
-        },
+            ],
+          },
+        })
+
+        expect(ds.config!.authConfigs[0].config.password).toBe("{{ env.PASSWORD }}")
+        expect(ds.config!.authConfigs[0].config.username).toBe("{{ env.USERNAME }}")
       })
 
-      expect(ds.config!.authConfigs[0].config.password).toBe(
-        "{{ env.PASSWORD }}"
-      )
-      expect(ds.config!.authConfigs[0].config.username).toBe(
-        "{{ env.USERNAME }}"
-      )
-    })
+      it("scrubs sensitive longform fields in get response", async () => {
+        const privateKey = [
+          "-----BEGIN PRIVATE KEY-----",
+          "secret-material",
+          "-----END PRIVATE KEY-----",
+        ].join("\n")
+        const created = await config.api.datasource.create({
+          type: "datasource",
+          name: "Snowflake longform secret",
+          config: {
+            account: "test-account",
+            username: "test-user",
+            privateKey,
+            warehouse: "test-warehouse",
+            database: "test-database",
+            schema: "test-schema",
+          },
+        })
 
-    it("scrubs sensitive longform fields in get response", async () => {
-      const privateKey = [
-        "-----BEGIN PRIVATE KEY-----",
-        "secret-material",
-        "-----END PRIVATE KEY-----",
-      ].join("\n")
-      const created = await config.api.datasource.create({
-        type: "datasource",
-        name: "Snowflake longform secret",
-        config: {
-          account: "test-account",
-          username: "test-user",
-          privateKey,
-          warehouse: "test-warehouse",
-          database: "test-database",
-          schema: "test-schema",
-        },
+        const fetched = await config.api.datasource.get(created._id!)
+
+        expect(fetched.config!.privateKey).toBe(PASSWORD_REPLACEMENT)
       })
-
-      const fetched = await config.api.datasource.get(created._id!)
-
-      expect(fetched.config!.privateKey).toBe(PASSWORD_REPLACEMENT)
     })
-  })
 
     describe("verify", () => {
       it("should be able to verify the connection", async () => {
