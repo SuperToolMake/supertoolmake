@@ -3,10 +3,12 @@ import { helpers } from "@supertoolmake/shared-core"
 import { findHBSBlocks, processObjectSync } from "@supertoolmake/string-templates"
 import {
   type BasicRestAuthConfig,
+  type BearerRestAuthConfig,
   type Datasource,
   DatasourceFieldType,
   INTERNAL_TABLE_SOURCE_ID,
   type Integration,
+  REST_AUTH_SECRET_FIELD,
   PASSWORD_REPLACEMENT,
   type RestAuthConfig,
   RestAuthType,
@@ -244,15 +246,19 @@ export function mergeConfigs(update: Datasource, old: Datasource) {
     const configs = update.config.authConfigs as RestAuthConfig[]
     const oldConfigs = (old.config?.authConfigs as RestAuthConfig[]) || []
     for (const config of configs) {
-      if (config.type !== RestAuthType.BASIC) {
-        continue
+      const oldConfig = oldConfigs.find(old => old._id === config._id)
+      const field = REST_AUTH_SECRET_FIELD[config.type]
+      if (!field) continue
+      const isOAuth2 = config.type === RestAuthType.OAUTH2
+      const cfg: any = isOAuth2 ? config : config.config
+      let oldCfg: any
+      if (oldConfig?.type === config.type) {
+        oldCfg = isOAuth2
+          ? oldConfig
+          : (oldConfig as BasicRestAuthConfig | BearerRestAuthConfig).config
       }
-      const basic = config.config as RestBasicAuthConfig
-      const oldBasic = oldConfigs.find(
-        (old): old is BasicRestAuthConfig => old.name === config.name
-      )?.config
-      if (basic.password === PASSWORD_REPLACEMENT && oldBasic) {
-        basic.password = oldBasic.password
+      if (cfg[field] === PASSWORD_REPLACEMENT) {
+        cfg[field] = oldCfg?.[field]
       }
     }
   }
