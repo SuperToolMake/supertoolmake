@@ -8,8 +8,8 @@ import {
   DatasourceFieldType,
   INTERNAL_TABLE_SOURCE_ID,
   type Integration,
-  REST_AUTH_SECRET_FIELD,
   PASSWORD_REPLACEMENT,
+  REST_AUTH_SECRET_FIELD,
   type RestAuthConfig,
   RestAuthType,
   type RestBasicAuthConfig,
@@ -246,7 +246,7 @@ export function mergeConfigs(update: Datasource, old: Datasource) {
     const configs = update.config.authConfigs as RestAuthConfig[]
     const oldConfigs = (old.config?.authConfigs as RestAuthConfig[]) || []
     for (const config of configs) {
-      const oldConfig = oldConfigs.find(old => old._id === config._id)
+      const oldConfig = oldConfigs.find((old) => old._id === config._id)
       const field = REST_AUTH_SECRET_FIELD[config.type]
       if (!field) continue
       const isOAuth2 = config.type === RestAuthType.OAUTH2
