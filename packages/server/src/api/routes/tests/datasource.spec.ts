@@ -624,6 +624,7 @@ if (descriptions.length) {
         const created = await config.api.datasource.create({
           type: "datasource",
           name: "Snowflake longform secret",
+          source: SourceName.FIRESTORE,
           config: {
             account: "test-account",
             username: "test-user",
