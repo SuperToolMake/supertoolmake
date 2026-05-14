@@ -60,7 +60,7 @@ jobs:
           cache: yarn
       - run: yarn --frozen-lockfile
       - name: Run audit-ci
-        run: yarn audit-ci --high
+        run: yarn audit-ci --moderate
 
   build:
     runs-on: ubuntu-24.04
