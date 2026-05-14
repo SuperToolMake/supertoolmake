@@ -6037,11 +6037,6 @@
   dependencies:
     "@types/node" "*"
 
-"@typescript-eslint/types@^8.2.0":
-  version "8.57.2"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/types/-/types-8.57.2.tgz#efe0da4c28b505ed458f113aa960dce2c5c671f4"
-  integrity sha512-/iZM6FnM4tnx9csuTxspMW4BOSegshwX5oBDznJ7S4WggL7Vczz5d2W11ecc4vRrQMQHXRSxzrCsyG5EsPPTbA==
-
 "@typespec/ts-http-runtime@^0.3.0", "@typespec/ts-http-runtime@^0.3.4":
   version "0.3.4"
   resolved "https://registry.yarnpkg.com/@typespec/ts-http-runtime/-/ts-http-runtime-0.3.4.tgz#c5f236ea5924c85ad8ff96d60ecdf0a22585411c"
@@ -8385,10 +8380,10 @@ detect-node@^2.0.4:
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.1.0.tgz#c9c70775a49c3d03bc2c06d9a73be550f978f8b1"
   integrity sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g==
 
-devalue@^5.6.4:
-  version "5.6.4"
-  resolved "https://registry.yarnpkg.com/devalue/-/devalue-5.6.4.tgz#aec6cdba0e4109543b40c94d46e2b87bf8af8de5"
-  integrity sha512-Gp6rDldRsFh/7XuouDbxMH3Mx8GMCcgzIb1pDTvNyn8pZGQ22u+Wa+lGV9dQCltFQ7uVw0MhRyb8XDskNFOReA==
+devalue@^5.8.1:
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/devalue/-/devalue-5.8.1.tgz#f27290d3a324e2eb20c2714369b01b8ec4de4c61"
+  integrity sha512-4CXDYRBGqN+57wVJkuXBYmpAVUSg3L6JAQa/DFqm238G73E1wuyc/JhGQJzN7vUf/CMphYau2zXbfWzDR5aTEw==
 
 dezalgo@^1.0.4:
   version "1.0.4"
@@ -9003,13 +8998,12 @@ esprima@^4.0.0:
   resolved "https://registry.yarnpkg.com/esprima/-/esprima-4.0.1.tgz#13b04cdb3e6c5d19df91ab6987a8695619b0aa71"
   integrity sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A==
 
-esrap@^2.2.2:
-  version "2.2.4"
-  resolved "https://registry.yarnpkg.com/esrap/-/esrap-2.2.4.tgz#3bbcf02a86333b332fac1e00653594048e9dafc5"
-  integrity sha512-suICpxAmZ9A8bzJjEl/+rLJiDKC0X4gYWUxT6URAWBLvlXmtbZd5ySMu/N2ZGEtMCAmflUDPSehrP9BQcsGcSg==
+esrap@^2.2.4:
+  version "2.2.8"
+  resolved "https://registry.yarnpkg.com/esrap/-/esrap-2.2.8.tgz#bdde89ef7aac4c5b934cf9b508403291267d351b"
+  integrity sha512-MPweq2EvEGj8jwOI7Hgycw/QIHzqA1EbAM8lG7p+FBfZbZq/hQ6h3AMsqnu/djzisH1KVWNzbb7LSgIVtMlPSg==
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.4.15"
-    "@typescript-eslint/types" "^8.2.0"
 
 estree-walker@^2.0.2:
   version "2.0.2"
@@ -16499,10 +16493,10 @@ svelte-spa-router@4.0.1:
   dependencies:
     regexparam "2.0.2"
 
-svelte@5.55.0:
-  version "5.55.0"
-  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.55.0.tgz#4072df80d43f92794d52caa7beaaa7b7348ad1fd"
-  integrity sha512-SThllKq6TRMBwPtat7ASnm/9CDXnIhBR0NPGw0ujn2DVYx9rVwsPZxDaDQcYGdUz/3BYVsCzdq7pZarRQoGvtw==
+svelte@5.55.7:
+  version "5.55.7"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.55.7.tgz#04d19e5d4e8e5b6afd7e648c30ab434bb20bfc86"
+  integrity sha512-ymI5ykLPwIHW839E053FQbI1G+jnRFJEw3Kv5Y4njixVWywQBx+NUFpkkKyk5LIb36Fg9DVXSYpqiGekLD0hyw==
   dependencies:
     "@jridgewell/remapping" "^2.3.4"
     "@jridgewell/sourcemap-codec" "^1.5.0"
@@ -16513,9 +16507,9 @@ svelte@5.55.0:
     aria-query "5.3.1"
     axobject-query "^4.1.0"
     clsx "^2.1.1"
-    devalue "^5.6.4"
+    devalue "^5.8.1"
     esm-env "^1.2.1"
-    esrap "^2.2.2"
+    esrap "^2.2.4"
     is-reference "^3.0.3"
     locate-character "^3.0.0"
     magic-string "^0.30.11"
