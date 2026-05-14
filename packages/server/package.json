@@ -93,7 +93,7 @@
     "serialize-error": "7.0.1",
     "sharp": "0.34.5",
     "socket.io": "4.8.1",
-    "svelte": "5.55.0",
+    "svelte": "5.55.7",
     "tar": "7.5.11",
     "tmp": "0.2.4",
     "worker-farm": "1.7.0",
