@@ -13,6 +13,8 @@ import {
   type RestAuthConfig,
   RestAuthType,
   type RestBasicAuthConfig,
+  type RestBearerAuthConfig,
+  type OAuth2RestAuthConfig,
   type RestConfig,
   type Row,
   SourceName,
@@ -208,12 +210,21 @@ export async function removeSecrets(datasources: Datasource[]) {
       if (hasAuthConfigs(datasource)) {
         const configs = datasource.config.authConfigs as RestAuthConfig[]
         for (const config of configs) {
-          if (config.type !== RestAuthType.BASIC) {
-            continue
-          }
-          const basic = config.config as RestBasicAuthConfig
-          if (!useEnvVars(basic.password)) {
-            basic.password = PASSWORD_REPLACEMENT
+          if (config.type === RestAuthType.BASIC) {
+            const basic = config.config as RestBasicAuthConfig
+            if (!useEnvVars(basic.password)) {
+              basic.password = PASSWORD_REPLACEMENT
+            }
+          } else if (config.type === RestAuthType.BEARER) {
+            const bearer = config.config as RestBearerAuthConfig
+            if (!useEnvVars(bearer.token)) {
+              bearer.token = PASSWORD_REPLACEMENT
+            }
+          } else if (config.type === RestAuthType.OAUTH2) {
+            const oauth2 = config as OAuth2RestAuthConfig
+            if (!useEnvVars(oauth2.clientSecret)) {
+              oauth2.clientSecret = PASSWORD_REPLACEMENT
+            }
           }
         }
       }
