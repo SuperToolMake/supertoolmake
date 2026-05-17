@@ -19,7 +19,6 @@
 </h3>
 <img alt="SQL tables" src="docs/sql-tables.png" width="1440" />
 
-<br />
 Visualise your data tables, write SQL queries, and control data access to your end-users.
 
 *PostgreSQL*, *MySQL* and *SQL Server* supported.
@@ -29,7 +28,6 @@ Visualise your data tables, write SQL queries, and control data access to your e
 </h3>
 <img alt="APIs" src="docs/apis.png" width="1440" />
 
-<br />
 Query non-SQL datasources, and make requests to external REST APIs.
 
 <h3>
@@ -37,7 +35,6 @@ Query non-SQL datasources, and make requests to external REST APIs.
 </h3>
 <img alt="Apps" src="docs/apps.png" width="1440" />
 
-<br />
 Quickly build end-user forms, with the flexibility to add more advanced features if needed.
 
 Integrates with any of your SQL tables or APIs, including controlled access with customizable RBAC.  
