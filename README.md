@@ -23,12 +23,16 @@ Visualise your data tables, write SQL queries, and control data access to your e
 
 *PostgreSQL*, *MySQL* and *SQL Server* supported.
 
+---
+
 <h3>
   Connect to APIs
 </h3>
 <img alt="APIs" src="docs/apis.png" width="1440" />
 
 Query non-SQL datasources, and make requests to external REST APIs.
+
+---
 
 <h3>
   App and Form builder
@@ -54,7 +58,7 @@ SuperToolMake considers a lightweight and modular approach, focusing on the core
 
 Currently I am running an app on *Scaleway Stardust*, which costs ~ €2/month: <a href="https://app.gullinfo.org/larus/app" target=_blank>https://app.gullinfo.org/app/larus</a>
 
-I amm also using [Supabase](https://supabase.com/) as my Postgres provider.
+I am also using [Supabase](https://supabase.com/) as my Postgres provider.
 
 ---
 
