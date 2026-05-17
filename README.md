@@ -9,18 +9,57 @@
   A lightweight fork of <a href="https://github.com/Budibase/budibase">Budibase</a>
 </h3>
 <p align="center">
-  SuperToolMake is an open-source low-code platform that saves you time building forms, portals, and approval apps, securely.
+  SuperToolMake is an open source low-code platform for quickly building forms and web apps, with built-in RBAC.
 </p>
-<p>
-  <ul>
-    ✔️ Includes the app builder for client apps
-    <br />✖️ Excludes the pro module
-    <br />✖️ Excludes the internal DB
-    <br />✖️ Excludes automations
-    <br />✖️ Excludes plugins
-    <br />✖️ Excludes user groups
-  </ul>
-</p>
+
+---
+
+<h3>
+  Connect your SQL tables
+</h3>
+<img alt="SQL tables" src="docs/sql-tables.png" width="1440" />
+
+<br />
+Visualise your data tables, write SQL queries, and control data access to your end-users.
+
+*PostgreSQL*, *MySQL* and *SQL Server* supported.
+
+<h3>
+  Connect to APIs
+</h3>
+<img alt="APIs" src="docs/apis.png" width="1440" />
+
+<br />
+Query non-SQL datasources, and make requests to external REST APIs.
+
+<h3>
+  App and Form builder
+</h3>
+<img alt="Apps" src="docs/apps.png" width="1440" />
+
+<br />
+Quickly build end-user forms, with the flexibility to add more advanced features if needed.
+
+Integrates with any of your SQL tables or APIs, including controlled access with customizable RBAC.  
+
+---
+
+<h3>
+  Why SuperToolMake?
+</h3>
+Other low-code platforms such as Appsmith and Tooljet recommend a minimum of 8GB of RAM when self-hosting. 
+
+Budibase is better, but still recommends 4GB. 
+
+SuperToolMake considers a lightweight and modular approach, focusing on the core app builder and data interface experience, with the option to connect to external workflow systems as needed.
+
+**SuperToolMake has a total memory footprint under 0.5GB, and comfortably runs on a 1GB box.**
+
+Currently I am running an app on *Scaleway Stardust*, which costs ~ €2/month: <a href="https://app.gullinfo.org/larus/app" target=_blank>https://app.gullinfo.org/app/larus</a>
+
+I amm also using [Supabase](https://supabase.com/) as my Postgres provider.
+
+---
 
 <h3>
   Running via Docker
