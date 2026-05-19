@@ -24,6 +24,7 @@ import { createEventDispatcher } from "svelte"
 import { flip } from "svelte/animate"
 import { dndzone } from "svelte-dnd-action"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import DrawerBindableSlot from "@/components/common/bindings/DrawerBindableSlot.svelte"
 import { getComponentForSetting } from "@/components/design/settings/componentSettings"
 import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
 import { componentStore } from "@/stores/builder"
@@ -61,7 +62,7 @@ const actionOptions = [
 const valueTypeOptions = [
   {
     value: "string",
-    label: "Binding",
+    label: "Text",
   },
   {
     value: "number",
@@ -135,7 +136,7 @@ const updateConditions = (e: CustomEvent) => {
 
 const getOperatorOptions = (condition: ComponentCondition) => {
   return QueryUtils.getValidOperatorsForType({
-    type: condition.type as FieldType,
+    type: getEffectiveType(condition),
   })
 }
 
@@ -155,12 +156,44 @@ const onOperatorChange = (
   }
 }
 
+const bindingValueTypes = ["string", "Binding"]
+
+const getEffectiveType = (condition: ComponentCondition): FieldType => {
+  return String(condition.valueType) === "Binding"
+    ? FieldType.STRING
+    : condition.type
+}
+
+const getReferenceValue = (
+  condition: ComponentCondition
+): string | undefined => {
+  return condition.referenceValue == null
+    ? undefined
+    : String(condition.referenceValue)
+}
+
+const normaliseBooleanReferenceValue = (
+  condition: ComponentCondition
+): ComponentCondition => {
+  if (condition.valueType === "boolean") {
+    if (condition.referenceValue === "True") {
+      condition.referenceValue = "true"
+    } else if (condition.referenceValue === "False") {
+      condition.referenceValue = "false"
+    }
+  }
+  return condition
+}
+
 const onValueTypeChange = (
   condition: ComponentCondition,
   newValueType: ComponentCondition["valueType"]
 ) => {
   condition.referenceValue = null
   condition.valueType = newValueType
+  if (newValueType === "boolean") {
+    condition.referenceValue = "true"
+  }
 
   condition.type = valueTypeToFieldTypeMap[newValueType]
 
@@ -203,7 +236,11 @@ const openDrawer = () => {
       }
       condition.valueType = typeToValueTypeMap[condition.type] || "string"
     }
-    return condition
+    if (String(condition.valueType) === "Binding") {
+      condition.valueType = "string"
+      condition.type = FieldType.STRING
+    }
+    return normaliseBooleanReferenceValue(condition)
   })
   drawer.show()
 }
@@ -334,28 +371,55 @@ $: settingOptions = settings
                   on:change={e => onValueTypeChange(condition, e.detail)}
                   popoverAutoWidth
                 />
-                {#if ["string", "number"].includes(condition.valueType)}
+                {#if bindingValueTypes.includes(condition.valueType) || condition.valueType === "number"}
                   <DrawerBindableInput
                     disabled={condition.noValue}
                     {bindings}
                     placeholder="Value"
                     value={condition.referenceValue}
+                    inputType={condition.valueType === "number"
+                      ? "number"
+                      : undefined}
                     on:change={e => (condition.referenceValue = e.detail)}
                   />
                 {:else if condition.valueType === "datetime"}
-                  <DatePicker
-                    placeholder="Value"
+                  <DrawerBindableSlot
+                    title="Value"
+                    type="date"
+                    value={getReferenceValue(condition)}
+                    on:change={e => (condition.referenceValue = e.detail)}
+                    {bindings}
+                    updateOnChange={false}
                     disabled={condition.noValue}
-                    bind:value={condition.referenceValue}
-                  />
+                  >
+                    <DatePicker
+                      placeholder="Value"
+                      disabled={condition.noValue}
+                      value={condition.referenceValue}
+                      on:change={e => (condition.referenceValue = e.detail)}
+                    />
+                  </DrawerBindableSlot>
                 {:else if condition.valueType === "boolean"}
-                  <Select
-                    placeholder="Value"
+                  <DrawerBindableSlot
+                    title="Value"
+                    type="boolean"
+                    value={getReferenceValue(condition)}
+                    on:change={e => (condition.referenceValue = e.detail)}
+                    {bindings}
+                    updateOnChange={false}
                     disabled={condition.noValue}
-                    options={["True", "False"]}
-                    bind:value={condition.referenceValue}
-                    popoverAutoWidth
-                  />
+                  >
+                    <Select
+                      placeholder={false}
+                      disabled={condition.noValue}
+                      options={[
+                        { label: "True", value: "true" },
+                        { label: "False", value: "false" },
+                      ]}
+                      bind:value={condition.referenceValue}
+                      popoverAutoWidth
+                    />
+                  </DrawerBindableSlot>
                 {/if}
                 <Icon
                   name="copy"

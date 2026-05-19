@@ -5,6 +5,7 @@ import { generate } from "shortid"
 import { flip } from "svelte/animate"
 import { dndzone } from "svelte-dnd-action"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import DrawerBindableSlot from "@/components/common/bindings/DrawerBindableSlot.svelte"
 import { getComponentForSetting } from "@/components/design/settings/componentSettings"
 import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
 import { componentStore, selectedComponent } from "@/stores/builder"
@@ -33,7 +34,7 @@ const defaultActionOptions = [
 const valueTypeOptions = [
   {
     value: "string",
-    label: "Binding",
+    label: "Text",
   },
   {
     value: "number",
@@ -95,8 +96,26 @@ const updateConditions = (e) => {
   conditions = e.detail.items
 }
 
+const bindingValueTypes = ["string", "Binding"]
+
+const getEffectiveValueType = (condition) => {
+  return condition.valueType === "Binding" ? "string" : condition.valueType
+}
+
+const normaliseBooleanReferenceValue = (condition) => {
+  if (condition.valueType === "boolean") {
+    if (condition.referenceValue === "True") {
+      condition.referenceValue = "true"
+    } else if (condition.referenceValue === "False") {
+      condition.referenceValue = "false"
+    }
+  }
+}
+
 const getOperatorOptions = (condition) => {
-  return QueryUtils.getValidOperatorsForType({ type: condition.valueType })
+  return QueryUtils.getValidOperatorsForType({
+    type: getEffectiveValueType(condition),
+  })
 }
 
 const onOperatorChange = (condition, newOperator) => {
@@ -113,6 +132,9 @@ const onOperatorChange = (condition, newOperator) => {
 
 const onValueTypeChange = (condition, newType) => {
   condition.referenceValue = null
+  if (newType === "boolean") {
+    condition.referenceValue = "true"
+  }
 
   // Ensure a valid operator is set
   const validOperators = QueryUtils.getValidOperatorsForType({
@@ -249,28 +271,55 @@ $: conditions.forEach((link) => {
                 on:change={e => onValueTypeChange(condition, e.detail)}
                 popoverAutoWidth
               />
-              {#if ["string", "number"].includes(condition.valueType)}
+              {#if bindingValueTypes.includes(condition.valueType) || condition.valueType === "number"}
                 <DrawerBindableInput
                   disabled={condition.noValue}
                   {bindings}
                   placeholder="Value"
                   value={condition.referenceValue}
+                  inputType={condition.valueType === "number"
+                    ? "number"
+                    : undefined}
                   on:change={e => (condition.referenceValue = e.detail)}
                 />
               {:else if condition.valueType === "datetime"}
-                <DatePicker
-                  placeholder="Value"
+                <DrawerBindableSlot
+                  title="Value"
+                  type="date"
+                  value={condition.referenceValue}
+                  on:change={e => (condition.referenceValue = e.detail)}
+                  {bindings}
+                  updateOnChange={false}
                   disabled={condition.noValue}
-                  bind:value={condition.referenceValue}
-                />
+                >
+                  <DatePicker
+                    placeholder="Value"
+                    disabled={condition.noValue}
+                    value={condition.referenceValue}
+                    on:change={e => (condition.referenceValue = e.detail)}
+                  />
+                </DrawerBindableSlot>
               {:else if condition.valueType === "boolean"}
-                <Select
-                  placeholder="Value"
+                <DrawerBindableSlot
+                  title="Value"
+                  type="boolean"
+                  value={condition.referenceValue}
+                  on:change={e => (condition.referenceValue = e.detail)}
+                  {bindings}
+                  updateOnChange={false}
                   disabled={condition.noValue}
-                  options={["True", "False"]}
-                  bind:value={condition.referenceValue}
-                  popoverAutoWidth
-                />
+                >
+                  <Select
+                    placeholder={false}
+                    disabled={condition.noValue}
+                    options={[
+                      { label: "True", value: "true" },
+                      { label: "False", value: "false" },
+                    ]}
+                    bind:value={condition.referenceValue}
+                    popoverAutoWidth
+                  />
+                </DrawerBindableSlot>
               {/if}
               <Icon
                 name="copy"

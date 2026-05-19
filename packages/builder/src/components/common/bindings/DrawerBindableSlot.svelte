@@ -76,27 +76,6 @@ const hasValidOptions = (value) => {
   return links.every((link) => schema?.constraints?.inclusion?.includes(link))
 }
 
-const isValidBoolean = (value) => {
-  return value === "false" || value === "true" || value == ""
-}
-
-const isValid = (value) => {
-  const validate = validationMap[type]
-  return validate ? validate(value) : true
-}
-
-const getIconClass = (value, type) => {
-  if (type === "longform" && !isJSBinding(value)) {
-    return "text-area-slot-icon"
-  }
-  if (type === "json" && !isJSBinding(value)) {
-    return "json-slot-icon"
-  }
-  if (!["string", "number", "bigint", "barcodeqr"].includes(type)) {
-    return "slot-icon"
-  }
-  return ""
-}
 
 $: readableValue = runtimeToReadableBinding(bindings, value)
 $: tempValue = readableValue
@@ -118,11 +97,52 @@ const validationMap = {
   options: (value) => !(isJSBinding(value) || findHBSBlocks(value)?.length),
   boolean: isValidBoolean,
 }
+  const isValidBoolean = value => {
+    return (
+      value == null || value === "false" || value === "true" || value === ""
+    )
+  }
+
+  const isValid = value => {
+    const validate = validationMap[type]
+    return validate ? validate(value) : true
+  }
+
+  const getIconClass = (value, type) => {
+    if (type === "longform" && !isJSBinding(value)) {
+      return "text-area-slot-icon"
+    }
+    if (type === "json" && !isJSBinding(value)) {
+      return "json-slot-icon"
+    }
+    if (type === "date" || type === "datetime") {
+      return "date-slot-icon"
+    }
+    if (
+      ![
+        "string",
+        "number",
+        "bigint",
+        "barcodeqr",
+        "attachment",
+        "signature_single",
+        "attachment_single",
+      ].includes(type)
+    ) {
+      return "slot-icon"
+    }
+    return ""
+  }
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="control" class:disabled>
+<div
+  class="control"
+  class:disabled
+  class:date-slot={type === "date" || type === "datetime"}
+  class:boolean-slot={type === "boolean"}
+>
   {#if !isValid(value) && !showComponent}
     <Input
       {label}
@@ -184,11 +204,17 @@ const validationMap = {
     position: relative;
   }
 
-  .slot-icon {
+  .slot-icon,
+  .date-slot-icon {
     right: 34px !important;
     border-right: 1px solid var(--spectrum-alias-border-color);
     border-top-right-radius: 0px !important;
     border-bottom-right-radius: 0px !important;
+  }
+
+  .control.boolean-slot {
+    border: 1px solid var(--spectrum-alias-border-color);
+    border-radius: 4px;
   }
 
   .icon.close {
@@ -236,5 +262,36 @@ const validationMap = {
 
   .control:not(.disabled) :global(.spectrum-Textfield-input) {
     padding-right: 40px;
+  }
+
+  .control.date-slot:not(.disabled)
+    :global(.spectrum-Datepicker .spectrum-Textfield-input) {
+    padding-right: 40px;
+  }
+
+  .control.date-slot :global(.spectrum-Datepicker) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 34px 34px;
+    min-inline-size: 0;
+    min-width: 0;
+  }
+
+  .control.date-slot :global(.spectrum-Datepicker .spectrum-Textfield) {
+    grid-column: 1 / 3;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .control.date-slot :global(.spectrum-Datepicker .spectrum-InputGroup-button) {
+    grid-column: 3;
+    grid-row: 1;
+    inline-size: 34px;
+    width: 34px;
+    min-inline-size: 34px;
+    min-width: 34px;
+  }
+
+  .date-slot-icon {
+    right: 34px !important;
   }
 </style>
