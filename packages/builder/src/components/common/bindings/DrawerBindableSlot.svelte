@@ -116,17 +116,7 @@ const getIconClass = (value, type) => {
   if (type === "date" || type === "datetime") {
     return "date-slot-icon"
   }
-  if (
-    ![
-      "string",
-      "number",
-      "bigint",
-      "barcodeqr",
-      "attachment",
-      "signature_single",
-      "attachment_single",
-    ].includes(type)
-  ) {
+  if (!["string", "number", "bigint"].includes(type)) {
     return "slot-icon"
   }
   return ""
