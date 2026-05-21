@@ -159,22 +159,14 @@ const onOperatorChange = (
 const bindingValueTypes = ["string", "Binding"]
 
 const getEffectiveType = (condition: ComponentCondition): FieldType => {
-  return String(condition.valueType) === "Binding"
-    ? FieldType.STRING
-    : condition.type
+  return String(condition.valueType) === "Binding" ? FieldType.STRING : condition.type
 }
 
-const getReferenceValue = (
-  condition: ComponentCondition
-): string | undefined => {
-  return condition.referenceValue == null
-    ? undefined
-    : String(condition.referenceValue)
+const getReferenceValue = (condition: ComponentCondition): string | undefined => {
+  return condition.referenceValue == null ? undefined : String(condition.referenceValue)
 }
 
-const normaliseBooleanReferenceValue = (
-  condition: ComponentCondition
-): ComponentCondition => {
+const normaliseBooleanReferenceValue = (condition: ComponentCondition): ComponentCondition => {
   if (condition.valueType === "boolean") {
     if (condition.referenceValue === "True") {
       condition.referenceValue = "true"

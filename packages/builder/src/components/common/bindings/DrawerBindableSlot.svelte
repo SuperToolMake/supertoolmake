@@ -76,7 +76,6 @@ const hasValidOptions = (value) => {
   return links.every((link) => schema?.constraints?.inclusion?.includes(link))
 }
 
-
 $: readableValue = runtimeToReadableBinding(bindings, value)
 $: tempValue = readableValue
 $: isJS = isJSBinding(value)
@@ -84,6 +83,10 @@ $: isJS = isJSBinding(value)
 setContext("binding-drawer-actions", {
   save: saveBinding,
 })
+
+const isValidBoolean = (value) => {
+  return value == null || value === "false" || value === "true" || value === ""
+}
 
 const validationMap = {
   date: isValidDate,
@@ -97,42 +100,37 @@ const validationMap = {
   options: (value) => !(isJSBinding(value) || findHBSBlocks(value)?.length),
   boolean: isValidBoolean,
 }
-  const isValidBoolean = value => {
-    return (
-      value == null || value === "false" || value === "true" || value === ""
-    )
-  }
 
-  const isValid = value => {
-    const validate = validationMap[type]
-    return validate ? validate(value) : true
-  }
+const isValid = (value) => {
+  const validate = validationMap[type]
+  return validate ? validate(value) : true
+}
 
-  const getIconClass = (value, type) => {
-    if (type === "longform" && !isJSBinding(value)) {
-      return "text-area-slot-icon"
-    }
-    if (type === "json" && !isJSBinding(value)) {
-      return "json-slot-icon"
-    }
-    if (type === "date" || type === "datetime") {
-      return "date-slot-icon"
-    }
-    if (
-      ![
-        "string",
-        "number",
-        "bigint",
-        "barcodeqr",
-        "attachment",
-        "signature_single",
-        "attachment_single",
-      ].includes(type)
-    ) {
-      return "slot-icon"
-    }
-    return ""
+const getIconClass = (value, type) => {
+  if (type === "longform" && !isJSBinding(value)) {
+    return "text-area-slot-icon"
   }
+  if (type === "json" && !isJSBinding(value)) {
+    return "json-slot-icon"
+  }
+  if (type === "date" || type === "datetime") {
+    return "date-slot-icon"
+  }
+  if (
+    ![
+      "string",
+      "number",
+      "bigint",
+      "barcodeqr",
+      "attachment",
+      "signature_single",
+      "attachment_single",
+    ].includes(type)
+  ) {
+    return "slot-icon"
+  }
+  return ""
+}
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
