@@ -63,7 +63,6 @@
     "pino": "8.11.0",
     "pino-http": "8.3.3",
     "pouchdb": "9.0.0",
-    "pouchdb-find": "9.0.0",
     "redlock": "4.2.0",
     "rotating-file-stream": "3.1.0",
     "sanitize-s3-objectkey": "0.0.1",
@@ -87,7 +86,7 @@
     "ioredis-mock": "8.9.0",
     "nock": "^13.5.6",
     "pino-pretty": "10.0.0",
-    "pouchdb-adapter-memory": "7.2.2",
+    "pouchdb-adapter-memory": "9.0.0",
     "timekeeper": "2.2.0"
   },
   "nx": {
