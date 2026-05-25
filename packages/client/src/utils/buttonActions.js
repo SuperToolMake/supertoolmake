@@ -243,6 +243,11 @@ const navigationHandler = (action) => {
     url = `/${url}`
   }
 
+  // Normalise string booleans from the bindable field
+  if (typeof peek === "string") {
+    peek = peek === "true"
+  }
+
   routeStore.actions.navigate(url, peek, externalNewTab)
   closeSidePanelHandler()
 }

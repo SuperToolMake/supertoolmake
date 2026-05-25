@@ -1,8 +1,9 @@
 <script>
-import { Checkbox, Label, Select } from "@supertoolmake/bbui"
+import { Label, Select } from "@supertoolmake/bbui"
 import { onMount } from "svelte"
 import DrawerBindableCombobox from "@/components/common/bindings/DrawerBindableCombobox.svelte"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import DrawerBindableSlot from "@/components/common/bindings/DrawerBindableSlot.svelte"
 import { screenStore } from "@/stores/builder"
 
 export let parameters
@@ -21,9 +22,17 @@ const typeOptions = [
   },
 ]
 
+const booleanOptions = [
+  { label: "True", value: "true" },
+  { label: "False", value: "false" },
+]
+
 onMount(() => {
   if (!parameters.type) {
     parameters.type = "screen"
+  }
+  if (parameters.peek == null) {
+    parameters.peek = "false"
   }
 })
 </script>
@@ -49,7 +58,21 @@ onMount(() => {
       appendBindingsAsOptions={false}
     />
     <div></div>
-    <Checkbox text="Open screen in modal" bind:value={parameters.peek} />
+    <Label small>Open screen in modal</Label>
+    <DrawerBindableSlot
+      title="Open in modal"
+      type="boolean"
+      value={parameters.peek}
+      on:change={e => (parameters.peek = e.detail)}
+      {bindings}
+    >
+      <Select
+        placeholder={false}
+        options={booleanOptions}
+        bind:value={parameters.peek}
+        popoverAutoWidth
+      />
+    </DrawerBindableSlot>
   {:else}
     <DrawerBindableInput
       title="Destination"
