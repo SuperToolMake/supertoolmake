@@ -36,7 +36,7 @@
     "@apidevtools/swagger-parser": "12.1.0",
     "@aws-sdk/client-s3": "3.1041.0",
     "@aws-sdk/s3-request-presigner": "3.1041.0",
-    "@azure/msal-node": "3.8.10",
+    "@azure/msal-node": "5.2.2",
     "@supertoolmake/backend-core": "*",
     "@supertoolmake/client": "*",
     "@supertoolmake/frontend-core": "*",

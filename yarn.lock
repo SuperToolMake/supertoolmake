@@ -853,19 +853,18 @@
   resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-14.16.1.tgz#d23ecce40823a4d03ad74160dc819d62e0c0a787"
   integrity sha512-nyxsA6NA4SVKh5YyRpbSXiMr7oQbwark7JU9LMeg6tJYTSPyAGkdx61wPT4gyxZfxlSxMMEyAsWaubBlNyIa1w==
 
-"@azure/msal-common@15.17.0":
-  version "15.17.0"
-  resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-15.17.0.tgz#ae3c03378c852642b1c9a303380e945c2b897f02"
-  integrity sha512-VQ5/gTLFADkwue+FohVuCqlzFPUq4xSrX8jeZe+iwZuY6moliNC8xt86qPVNYdtbQfELDf2Nu6LI+demFPHGgw==
+"@azure/msal-common@16.6.2":
+  version "16.6.2"
+  resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-16.6.2.tgz#4aa791db2c4f37f503bfe10f5aec76fd552daf8e"
+  integrity sha512-hQjjsekAjB00cM1EmatWJlzhEoK2Qhz7Rj5gvM6tYf8iL7RM3tkxlpU9fG0+ofkulzg9AEEA6dIEnSmDr5ZqUA==
 
-"@azure/msal-node@3.8.10":
-  version "3.8.10"
-  resolved "https://registry.yarnpkg.com/@azure/msal-node/-/msal-node-3.8.10.tgz#44c900905b023e63146cead2999720f0906c74ca"
-  integrity sha512-0Hz7Kx4hs70KZWep/Rd7aw/qOLUF92wUOhn7ZsOuB5xNR/06NL1E2RAI9+UKH1FtvN8nD6mFjH7UKSjv6vOWvQ==
+"@azure/msal-node@5.2.2":
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/@azure/msal-node/-/msal-node-5.2.2.tgz#0fc8e82027d5f79538d7b3f1b854ec0efff1cea2"
+  integrity sha512-toS+2AePxqyzb0YOKttDOOiSl3jrkK9aiqIvpurpis0O34QcIS5gToqrgT39p04Dpxw3YoUU0lxJKTpSFFfA6Q==
   dependencies:
-    "@azure/msal-common" "15.17.0"
+    "@azure/msal-common" "16.6.2"
     jsonwebtoken "^9.0.0"
-    uuid "^8.3.0"
 
 "@azure/msal-node@^2.9.2":
   version "2.16.3"
@@ -1865,10 +1864,10 @@
   resolved "https://registry.yarnpkg.com/@biomejs/cli-win32-x64/-/cli-win32-x64-2.4.7.tgz#952a06ac73f36e7c16d984bf2c0de0b619aa67b5"
   integrity sha512-qEpGjSkPC3qX4ycbMUthXvi9CkRq7kZpkqMY1OyhmYlYLnANnooDQ7hDerM8+0NJ+DZKVnsIc07h30XOpt7LtQ==
 
-"@budibase/handlebars-helpers@0.14.2":
-  version "0.14.2"
-  resolved "https://registry.yarnpkg.com/@budibase/handlebars-helpers/-/handlebars-helpers-0.14.2.tgz#3eb440cb2655671021cff6270f186b2acd63fe11"
-  integrity sha512-b+1ofp2sUx+iW+Tz2FIyMbjtUr5OZfHbGHALoz6cz9cD3tgfcVjo9cwdOsw/TwOtG/+xbWc4IAcL9mDji2otdw==
+"@budibase/handlebars-helpers@0.14.3":
+  version "0.14.3"
+  resolved "https://registry.yarnpkg.com/@budibase/handlebars-helpers/-/handlebars-helpers-0.14.3.tgz#2ad64079ed2a900cf1869d7960cc3f329c8b4530"
+  integrity sha512-4q0zSlDh3eQC/mB4UtKXhlreBjUVx+IH9ktR7zyogDE0+y3ePJAkpkFKcwE1vRDwrfkilxzwMJG0JZBFBArFmA==
   dependencies:
     get-object "^0.2.0"
     get-value "^3.0.1"
@@ -1882,7 +1881,7 @@
     striptags "^3.1.1"
     to-gfm-code-block "^0.1.1"
     typeof-article "^0.1.1"
-    uuid "^9.0.1"
+    uuid "^11.1.1"
 
 "@budibase/pouchdb-replication-stream@1.2.11":
   version "1.2.11"
@@ -17432,10 +17431,10 @@ uuid@^10.0.0:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-10.0.0.tgz#5a95aa454e6e002725c79055fd42aaba30ca6294"
   integrity sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ==
 
-uuid@^9.0.1:
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.1.tgz#e188d4c8853cc722220392c424cd637f32293f30"
-  integrity sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==
+uuid@^11.1.1:
+  version "11.1.1"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-11.1.1.tgz#f6d81d2e1c65d00762e5e29b16c5d2d995e208ad"
+  integrity sha512-vIYxrBCC/N/K+Js3qSN88go7kIfNPssr/hHCesKCQNAjmgvYS2oqr69kIufEG+O4+PfezOH4EbIeHCfFov8ZgQ==
 
 v8-compile-cache-lib@^3.0.1:
   version "3.0.1"
