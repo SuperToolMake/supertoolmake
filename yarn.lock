@@ -5566,6 +5566,15 @@
   resolved "https://registry.yarnpkg.com/@types/ms/-/ms-2.1.0.tgz#052aa67a48eccc4309d7f0191b7e41434b90bb78"
   integrity sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==
 
+"@types/mssql@12.3.0":
+  version "12.3.0"
+  resolved "https://registry.yarnpkg.com/@types/mssql/-/mssql-12.3.0.tgz#77ae34e7a258f3b40208d4e0e1b46737d0f6a3c8"
+  integrity sha512-+jy+AJtfuTDI5+nhh0hDNcir1p8P+pf+qsHXpUpYvg7EikxUUePBe+a+Kr6j/Xs89o4EbHlVzrh0HOxbqWM31Q==
+  dependencies:
+    "@types/node" "*"
+    tarn "^3.0.1"
+    tedious "*"
+
 "@types/node-fetch@2.6.4":
   version "2.6.4"
   resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.6.4.tgz#1bc3a26de814f6bf466b25aeb1473fa1afe6a660"
@@ -16569,12 +16578,12 @@ tar@7.5.11, tar@^7.4.3, tar@^7.5.4:
     minizlib "^3.1.0"
     yallist "^5.0.0"
 
-tarn@^3.0.2:
+tarn@^3.0.1, tarn@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/tarn/-/tarn-3.0.2.tgz#73b6140fbb881b71559c4f8bfde3d9a4b3d27693"
   integrity sha512-51LAVKUSZSVfI05vjPESNc5vwqqZpbXCsU+/+wxlOrUjk2SnFTt97v9ZgQrD4YmxYW1Px6w2KjaDitCfkvgxMQ==
 
-tedious@^19.0.0:
+tedious@*, tedious@^19.0.0:
   version "19.2.1"
   resolved "https://registry.yarnpkg.com/tedious/-/tedious-19.2.1.tgz#58edc3838ebacc34ff3856177905137bc8ba3b1f"
   integrity sha512-pk1Q16Yl62iocuQB+RWbg6rFUFkIyzqOFQ6NfysCltRvQqKwfurgj8v/f2X+CKvDhSL4IJ0cCOfCHDg9PWEEYA==
