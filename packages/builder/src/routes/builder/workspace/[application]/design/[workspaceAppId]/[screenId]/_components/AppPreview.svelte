@@ -143,6 +143,8 @@ const handleBudibaseEvent = async (event) => {
       }
     }
     previewStore.setSelectedComponentContext(context)
+  } else if (type === "set-preview-device") {
+    previewStore.setDevice(data.device)
   } else {
     console.warn(`Client sent unknown event type: ${type}`)
   }

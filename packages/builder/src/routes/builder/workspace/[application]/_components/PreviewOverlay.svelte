@@ -29,6 +29,8 @@ $: window.previewFullscreenUrl = src
 >
   <div
     class="container spectrum {$themeStore.theme}"
+    class:mobile={$previewStore.previewDevice === "mobile"}
+    class:tablet={$previewStore.previewDevice === "tablet"}
     transition:fly={{ duration: 260, y: 130 }}
   >
     <div class="header placeholder"></div>
@@ -49,11 +51,14 @@ $: window.previewFullscreenUrl = src
     position: absolute;
     background: rgba(255, 255, 255, 0.1);
     display: flex;
-    align-items: stretch;
+    align-items: center;
+    justify-content: center;
     padding: 48px;
   }
   .container {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
+    width: 100%;
+    height: 100%;
     background: var(--spectrum-global-color-gray-75);
     border-radius: 4px;
     display: flex;
@@ -61,6 +66,14 @@ $: window.previewFullscreenUrl = src
     overflow: hidden;
     position: relative;
     box-shadow: 0 0 80px 0 rgba(0, 0, 0, 0.5);
+  }
+  .container.mobile {
+    max-width: 390px;
+    max-height: 844px;
+  }
+  .container.tablet {
+    max-width: 1024px;
+    max-height: 768px;
   }
   iframe {
     position: absolute;

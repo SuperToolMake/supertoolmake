@@ -2,7 +2,7 @@
 import { ActionButton, Heading, Select } from "@supertoolmake/bbui"
 import { getContext, onMount } from "svelte"
 import { API } from "@/api"
-import { devToolsStore } from "@/stores"
+import { builderStore, devToolsStore, eventStore } from "@/stores"
 
 const context = getContext("context")
 const SELF_ROLE = "self"
@@ -34,6 +34,22 @@ onMount(async () => {
   await devToolsStore.actions.changeRole(SELF_ROLE)
   roles = await API.getRoles()
 })
+
+const togglePreviewDevice = () => {
+  const nextDevice = displayDevice === "mobile" ? "desktop" : "mobile"
+  builderStore.update(state => ({
+    ...state,
+    previewDevice: nextDevice,
+  }))
+  eventStore.actions.dispatchEvent("set-preview-device", {
+    device: nextDevice,
+  })
+}
+
+$: contextDevice = $context?.device?.mobile === true ? "mobile" : "desktop"
+$: displayDevice = $builderStore.previewDevice || contextDevice
+$: previewIcon =
+  displayDevice === "mobile" ? "device-mobile-camera" : "monitor"
 </script>
 
 <div class="dev-preview-header" class:mobile={$context.device.mobile}>
@@ -47,6 +63,12 @@ onMount(async () => {
     on:change={e => devToolsStore.actions.changeRole(e.detail)}
   />
   {#if window.parent.isBuilder}
+    <ActionButton
+      quiet
+      icon={previewIcon}
+      aria-label="Toggle preview device"
+      on:click={togglePreviewDevice}
+    />
     <ActionButton
       quiet
       icon="arrow-square-out"
