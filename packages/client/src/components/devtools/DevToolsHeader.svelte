@@ -37,7 +37,7 @@ onMount(async () => {
 
 const togglePreviewDevice = () => {
   const nextDevice = displayDevice === "mobile" ? "desktop" : "mobile"
-  builderStore.update(state => ({
+  builderStore.update((state) => ({
     ...state,
     previewDevice: nextDevice,
   }))
@@ -48,8 +48,7 @@ const togglePreviewDevice = () => {
 
 $: contextDevice = $context?.device?.mobile === true ? "mobile" : "desktop"
 $: displayDevice = $builderStore.previewDevice || contextDevice
-$: previewIcon =
-  displayDevice === "mobile" ? "device-mobile-camera" : "monitor"
+$: previewIcon = displayDevice === "mobile" ? "device-mobile-camera" : "monitor"
 </script>
 
 <div class="dev-preview-header" class:mobile={$context.device.mobile}>
