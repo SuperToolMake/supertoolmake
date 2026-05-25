@@ -87,7 +87,6 @@
     "openapi-types": "9.3.1",
     "pg": "8.10.0",
     "pouchdb": "9.0.0",
-    "pouchdb-find": "9.0.0",
     "redis": "4",
     "semver": "7.5.4",
     "serialize-error": "7.0.1",

@@ -45,11 +45,6 @@ export const getPouch = (opts: PouchOptions = {}) => {
     PouchDB.adapter("writableStream", replicationStream.adapters.writableStream)
   }
 
-  if (opts.find) {
-    const find = require("pouchdb-find")
-    PouchDB.plugin(find)
-  }
-
   return PouchDB.defaults(POUCH_DB_DEFAULTS)
 }
 
