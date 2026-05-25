@@ -86,6 +86,28 @@ docker run -d -t \
 
 </p>
 
+### Running via Docker Swarm
+
+For production deployments requiring high availability and zero-downtime updates. This setup utilizes Swarm's built-in Routing Mesh to manage traffic and rolling updates automatically.
+
+#### Prerequisites
+Ensure Docker Engine is installed and Swarm mode is initialized on your host. You can initialize a single-node swarm (which you can expand later) by running `docker swarm init`.
+
+#### Creating the service
+Instead of docker run, use docker service create. Note that named volumes are used here for persistent data; ensure the volume my-vol exists or let Docker create it automatically. The following command sets up the service with the necessary port mapping and volume mounts:
+
+```
+docker service create --name supertoolmake --replicas 1 --publish 10000:80 --mount type=volume,source=my-vol,target=/data --mount type=volume,source=my-vol,target=/opt/couchdb/data --update-parallelism 1 --update-delay 10s ghcr.io/supertoolmake/supertoolmake:latest
+```
+
+#### Performing rolling updates
+To update to a new version without downtime, simply run `docker service update --image ghcr.io/supertoolmake/supertoolmake:latest supertoolmake`. Swarm will automatically start the new container, verify it is healthy, and then stop the old one.
+
+#### Managing environment variables
+To pass environment variables, use the --env flag during creation (e.g., --env MY_VAR=value). To update environment variables later, you must re-run `docker service update --env ...`, which triggers a rolling restart of the service.
+
+---
+
 <h3>
   Local development
 </h3>
