@@ -541,7 +541,7 @@ const handlerMap = {
   "Update State": updateStateHandler,
   "Upload File to Bucket": s3UploadHandler,
   "Export Data": exportDataHandler,
-  "IF": ifHandler,
+  IF: ifHandler,
   "Continue if / Stop if": continueIfHandler,
   "Show Notification": showNotificationHandler,
   "Prompt User": promptUserHandler,

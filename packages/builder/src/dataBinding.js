@@ -823,7 +823,7 @@ export const getActionBindings = (actions, actionId) => {
   // Generate bindings for any steps which provide context
   prevActions.forEach((action, idx) => {
     const def = ActionDefinitions.actions.find((x) => x.name === action["##eventHandlerType"])
-    if (def && def.context) {
+    if (def?.context) {
       def.context.forEach((contextValue) => {
         bindings.push({
           readableBinding: `Action ${idx + 1}.${contextValue.label}`,
