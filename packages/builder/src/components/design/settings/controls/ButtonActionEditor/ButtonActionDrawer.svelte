@@ -15,6 +15,7 @@ import { getAvailableActions } from "./index"
 
 const flipDurationMs = 150
 const EVENT_TYPE_KEY = "##eventHandlerType"
+const IF_TYPE = "IF"
 const actionTypes = getAvailableActions()
 const zoneType = generate()
 
@@ -28,6 +29,10 @@ let actionQuery
 let selectedAction = actions?.length ? actions[0] : null
 let originalActionIndex
 let draggingActionId
+
+const isIFBlock = (action) => {
+  return action?.[EVENT_TYPE_KEY] === IF_TYPE
+}
 
 const setUpdateActions = (actions) => {
   return actions
@@ -72,6 +77,11 @@ const deleteAction = (index) => {
   })
 }
 
+const getBranchActionCount = (action) => {
+  if (!isIFBlock(action)) return 0
+  return (action.parameters?.actions?.length || 0) + (action.parameters?.elseActions?.length || 0)
+}
+
 const toggleActionList = () => {
   actionQuery = null
   showAvailableActions = !showAvailableActions
@@ -82,6 +92,10 @@ const addAction = (actionType) => {
     parameters: {},
     [EVENT_TYPE_KEY]: actionType.name,
     id: generate(),
+  }
+  if (isIFBlock(newAction)) {
+    newAction.parameters.actions = []
+    newAction.parameters.elseActions = []
   }
   if (!actions) {
     actions = []
@@ -149,10 +163,19 @@ const getAllBindings = (actionBindings, eventContextBindings, actions) => {
     return []
   }
 
+  // Flatten all actions from IF blocks for binding generation
+  const flattenedActions = []
+  ;(actions || []).forEach((action) => {
+    flattenedActions.push(action)
+    if (isIFBlock(action)) {
+      ;(action.parameters?.actions || []).forEach((child) => flattenedActions.push(child))
+      ;(action.parameters?.elseActions || []).forEach((child) => flattenedActions.push(child))
+    }
+  })
+
   // Ensure bindings are generated for all "update state" action keys
-  actions
+  flattenedActions
     .filter((action) => {
-      // Find all "Update State" actions which set values
       return (
         action[EVENT_TYPE_KEY] === "Update State" &&
         action.parameters?.type === "set" &&
@@ -160,7 +183,6 @@ const getAllBindings = (actionBindings, eventContextBindings, actions) => {
       )
     })
     .forEach((action) => {
-      // Check we have a binding for this action, and generate one if not
       const stateBinding = makeStateBinding(action.parameters.key)
       const hasKey = actionBindings.some((binding) => {
         return binding.runtimeBinding === stateBinding.runtimeBinding
@@ -177,7 +199,7 @@ const getAllBindings = (actionBindings, eventContextBindings, actions) => {
       }
     })
   // Get which indexes are asynchronous automations as we want to filter them out from the bindings
-  const asynchronousAutomationIndexes = actions
+  const asynchronousAutomationIndexes = flattenedActions
     .map((action, index) => {
       if (action[EVENT_TYPE_KEY] === "Trigger Automation" && !action.parameters?.synchronous) {
         return index
@@ -305,28 +327,63 @@ $: {
         on:finalize={handleDndFinalize}
       >
         {#each actions as action, index (action.id)}
-          <div
-            class="action-container"
-            animate:flip={{ duration: flipDurationMs }}
-            class:selected={action === selectedAction}
-            on:click={selectAction(action)}
-          >
-            <Icon
-              name="dots-six-vertical"
-              size="L"
-              color="var(--spectrum-global-color-gray-600)"
-              hoverable="true"
-              hovercolor="var(--spectrum-global-color-gray-800)"
-            />
-            <div class="action-header">
-              {index + 1}.&nbsp;{toDisplay(action[EVENT_TYPE_KEY])}
-            </div>
-            <Icon
-              name="x"
-              hoverable
-              size="S"
-              on:click={() => deleteAction(index)}
-            />
+          <div animate:flip={{ duration: flipDurationMs }}>
+            {#if isIFBlock(action)}
+              <div
+                class="if-block-container"
+                class:selected={action === selectedAction}
+                on:click={selectAction(action)}
+                role="button"
+                tabindex="0"
+                on:keydown={(e) => e.key === "Enter" && selectAction(action)()}
+              >
+                <div class="if-block-header">
+                  <Icon
+                    name="dots-six-vertical"
+                    size="L"
+                    color="var(--spectrum-global-color-gray-600)"
+                    hoverable="true"
+                    hovercolor="var(--spectrum-global-color-gray-800)"
+                  />
+                  <div class="action-header">
+                    {index + 1}. IF / ELSE
+                  </div>
+                  <div class="branch-count">
+                    {getBranchActionCount(action)} action{getBranchActionCount(action) !== 1 ? "s" : ""}
+                  </div>
+                  <!-- svelte-ignore a11y-click-events-have-key-events -->
+                  <!-- svelte-ignore a11y-no-static-element-interactions -->
+                  <div class="delete-btn" on:click={() => deleteAction(index)}>
+                    <Icon name="x" hoverable size="S" />
+                  </div>
+                </div>
+              </div>
+            {:else}
+              <div
+                class="action-container"
+                class:selected={action === selectedAction}
+                on:click={selectAction(action)}
+                role="button"
+                tabindex="0"
+                on:keydown={(e) => e.key === "Enter" && selectAction(action)()}
+              >
+                <Icon
+                  name="dots-six-vertical"
+                  size="L"
+                  color="var(--spectrum-global-color-gray-600)"
+                  hoverable="true"
+                  hovercolor="var(--spectrum-global-color-gray-800)"
+                />
+                <div class="action-header">
+                  {index + 1}.&nbsp;{toDisplay(action[EVENT_TYPE_KEY])}
+                </div>
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-static-element-interactions -->
+                <div class="delete-btn" on:click={() => deleteAction(index)}>
+                  <Icon name="x" hoverable size="S" />
+                </div>
+              </div>
+            {/if}
           </div>
         {/each}
       </div>
@@ -341,6 +398,7 @@ $: {
             bind:parameters={selectedAction.parameters}
             bindings={allBindings}
             {nested}
+            {componentInstance}
           />
         </div>
       {/key}
@@ -384,6 +442,43 @@ $: {
   .action-container:hover .action-header,
   .action-container.selected .action-header {
     color: var(--spectrum-global-color-gray-900);
+  }
+
+  .if-block-container {
+    background-color: var(--spectrum-global-color-gray-75);
+    border-radius: 4px;
+    border: 1px solid var(--spectrum-global-color-gray-300);
+    transition:
+      background-color 130ms ease-in-out,
+      border-color 130ms ease-in-out;
+    overflow: hidden;
+  }
+  .if-block-container:hover,
+  .if-block-container.selected {
+    border-color: var(--spectrum-global-color-gray-500);
+    cursor: pointer;
+  }
+  .if-block-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-m);
+    padding: var(--spacing-s) var(--spacing-m);
+    background-color: var(--background);
+    border-bottom: 1px solid var(--spectrum-global-color-gray-200);
+  }
+  .if-block-container:hover .if-block-header .action-header,
+  .if-block-container.selected .if-block-header .action-header {
+    color: var(--spectrum-global-color-gray-900);
+  }
+  .branch-count {
+    font-size: var(--font-size-xs);
+    color: var(--spectrum-global-color-gray-500);
+    white-space: nowrap;
+  }
+  .delete-btn {
+    display: flex;
+    align-items: center;
   }
 
   .actions-list > * {

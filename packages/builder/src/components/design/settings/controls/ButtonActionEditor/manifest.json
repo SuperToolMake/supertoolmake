@@ -129,6 +129,12 @@
       "component": "ExportData"
     },
     {
+      "name": "IF",
+      "type": "logic",
+      "component": "IFBlock",
+      "dependsOnFeature": "continueIfAction"
+    },
+    {
       "name": "Continue if / Stop if",
       "type": "logic",
       "component": "ContinueIf",
