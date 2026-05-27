@@ -1,27 +1,11 @@
 import { generator, type testContainerUtils } from "@supertoolmake/backend-core/tests"
 import { type Datasource, SourceName } from "@supertoolmake/types"
 import { GenericContainer, Wait } from "testcontainers"
-import { AbstractWaitStrategy } from "testcontainers/build/wait-strategies/wait-strategy"
 import { startContainer } from "."
 import { MARIADB_IMAGE } from "./images"
 import { knexClient } from "./mysql"
 
 let ports: Promise<testContainerUtils.Port[]>
-
-class MariaDBWaitStrategy extends AbstractWaitStrategy {
-  async waitUntilReady(container: any, boundPorts: any, startTime?: Date) {
-    // Because MariaDB first starts itself up, runs an init script, then restarts,
-    // it's possible for the mysqladmin ping to succeed early and then tests to
-    // run against a MariaDB that's mid-restart and fail. To get around this, we
-    // wait for logs and then do a ping check.
-
-    const logs = Wait.forLogMessage("mariadbd: ready for connections", 2)
-    await logs.waitUntilReady(container, boundPorts, startTime)
-
-    const command = Wait.forSuccessfulCommand(`/usr/local/bin/healthcheck.sh --innodb_initialized`)
-    await command.waitUntilReady(container)
-  }
-}
 
 export async function getDatasource(): Promise<Datasource> {
   if (!ports) {
@@ -29,7 +13,12 @@ export async function getDatasource(): Promise<Datasource> {
       new GenericContainer(MARIADB_IMAGE)
         .withExposedPorts(3306)
         .withEnvironment({ MARIADB_ROOT_PASSWORD: "password" })
-        .withWaitStrategy(new MariaDBWaitStrategy().withStartupTimeout(20000))
+        .withWaitStrategy(
+          Wait.forAll([
+            Wait.forLogMessage("mariadbd: ready for connections", 2),
+            Wait.forSuccessfulCommand(`/usr/local/bin/healthcheck.sh --innodb_initialized`),
+          ]).withStartupTimeout(20000)
+        )
     )
   }
 
