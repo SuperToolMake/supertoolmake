@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
 import {
   ActionButton,
   Body,
   Button,
+  Checkbox,
   Divider,
   Heading,
   Icon,
@@ -25,6 +26,16 @@ import AccessLevelSelect from "./AccessLevelSelect.svelte"
 import ConnectedQueryScreens from "./ConnectedQueryScreens.svelte"
 import ExtraQueryConfig from "./ExtraQueryConfig.svelte"
 import QueryViewerSidePanel from "./QueryViewerSidePanel/index.svelte"
+import type {
+  Datasource,
+  Integration,
+  PreviewQueryResponse,
+  Query,
+  QueryFields,
+  QuerySchema,
+  PaginationConfig,
+  UIInternalDatasource,
+} from "@supertoolmake/types"
 
 $goto
 
@@ -48,10 +59,11 @@ let nestedSchemaFields = {}
 let rows = []
 let keys = {}
 
-const parseQuery = (query) => {
-  modified = false
+let pagination: PaginationConfig | undefined
 
-  datasource = $datasources.list.find((ds) => ds._id === query.datasourceId)
+const parseQuery = (query: Query) => {
+  modified = false
+  datasource = $datasources.list.find((ds: Datasource) => ds._id === query.datasourceId)
   integration = $integrations[datasource.source]
   schemaType = integration.query[query.queryVerb].type
 
@@ -61,6 +73,20 @@ const parseQuery = (query) => {
   // Set the location where the query code will be written to an empty string so that it doesn't
   // get changed from undefined -> "" by the input, breaking our unsaved changes checks
   newQuery.fields[schemaType] ??= ""
+
+  // Initialize pagination for SQL Read queries
+  if (newQuery.queryVerb === "read" && schemaType === "sql") {
+    if (!newQuery.fields.pagination) {
+      newQuery.fields.pagination = {
+        enabled: false,
+        offsetBinding: "offset",
+        limitBinding: "limit",
+      }
+    }
+    pagination = newQuery.fields.pagination
+  } else {
+    pagination = undefined
+  }
 
   queryHash = JSON.stringify(newQuery)
 }
@@ -88,6 +114,20 @@ async function runQuery({ suppressErrors = true }) {
 
     schema = response.schema
     rows = response.rows
+
+    // Initialize pagination for SQL Read queries
+    if (newQuery.queryVerb === "read" && schemaType === "sql") {
+      if (!newQuery.fields.pagination) {
+        newQuery.fields.pagination = {
+          enabled: false,
+          offsetBinding: "offset",
+          limitBinding: "limit",
+        }
+      }
+      pagination = newQuery.fields.pagination
+    } else {
+      pagination = undefined
+    }
 
     notifications.success("Query executed successfully")
   } catch (error) {
@@ -126,6 +166,26 @@ function resetDependentFields() {
   }
 }
 
+const setPaginationField = (field: string, value: unknown) => {
+  if (!newQuery.fields.pagination) {
+    newQuery.fields.pagination = {
+      enabled: false,
+      offsetBinding: "offset",
+      limitBinding: "limit",
+    }
+  }
+  const newPagination = {
+    ...newQuery.fields.pagination,
+    [field]: value,
+  }
+  // Reassign the parent fields object to trigger Svelte reactivity
+  newQuery.fields = {
+    ...newQuery.fields,
+    pagination: newPagination,
+  }
+  pagination = newQuery.fields.pagination
+}
+
 function populateExtraQuery(extraQueryFields) {
   newQuery.fields.extra = extraQueryFields
 }
@@ -134,9 +194,8 @@ const handleScroll = (e) => {
   scrolling = e.target.scrollTop !== 0
 }
 
-async function handleKeyDown(evt) {
-  keys[evt.key] = true
-  if ((keys.Meta || keys.Control) && keys.Enter) {
+async function handleKeyDown(evt: KeyboardEvent) {
+  if (evt.key === "Enter" && (evt.metaKey || evt.ctrlKey)) {
     await runQuery({ suppressErrors: false })
   }
 }
@@ -289,6 +348,44 @@ $: debouncedCheckIsModified(newQuery)
             }}
           />
         {/key}
+
+        {#if pagination && newQuery.queryVerb === "read"}
+          <Divider />
+          <div class="heading">
+            <Heading weight="heavy" size="XS">Pagination</Heading>
+          </div>
+          <div class="copy">
+            <Body size="S">
+              Enable pagination to support limit and offset parameters in this
+              query.
+            </Body>
+          </div>
+          <div class="pagination">
+            {#key pagination.enabled}
+              <Checkbox
+                text="Enable pagination"
+                bind:value={pagination.enabled}
+                on:change={e => setPaginationField("enabled", e.detail)}
+              />
+            {/key}
+            {#if pagination.enabled}
+              <div class="pagination-inputs">
+                <Input
+                  label="Offset binding name"
+                  placeholder="e.g., offset"
+                  value={pagination.offsetBinding}
+                  on:change={e => setPaginationField("offsetBinding", e.detail)}
+                />
+                <Input
+                  label="Limit binding name"
+                  placeholder="e.g., limit"
+                  value={pagination.limitBinding}
+                  on:change={e => setPaginationField("limitBinding", e.detail)}
+                />
+              </div>
+            {/if}
+          </div>
+        {/if}
 
         <Divider />
         <div class="heading">
@@ -457,5 +554,17 @@ $: debouncedCheckIsModified(newQuery)
 
   .showSidePanel {
     width: 450px;
+  }
+
+  .pagination {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-m);
+  }
+
+  .pagination-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-m);
   }
 </style>
