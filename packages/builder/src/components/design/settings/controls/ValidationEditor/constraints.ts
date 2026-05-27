@@ -1,3 +1,5 @@
+export { defaultErrorForConstraint } from "@supertoolmake/types"
+
 export interface ValidationConstraintOption {
   label: string
   value: string
@@ -58,9 +60,7 @@ const Constraints = {
   },
 }
 
-type FieldType = "string" | "number" | "boolean" | "datetime" | "link" | "array"
-
-const ConstraintMap: Record<FieldType, ValidationConstraintOption[]> = {
+const ConstraintMap: Record<string, ValidationConstraintOption[]> = {
   string: [
     Constraints.Required,
     Constraints.MinLength,
@@ -101,6 +101,6 @@ const ConstraintMap: Record<FieldType, ValidationConstraintOption[]> = {
   ],
 }
 
-export const getConstraintsForType = (type: FieldType): ValidationConstraintOption[] => {
+export const getConstraintsForType = (type: string): ValidationConstraintOption[] => {
   return ConstraintMap[type] || []
 }
