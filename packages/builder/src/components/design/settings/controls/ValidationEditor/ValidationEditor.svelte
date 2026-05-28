@@ -34,16 +34,6 @@ let drawer: DrawerHandle
 let drawerContentKey: number = 0
 let workingValue: ValidationEditorRule[] = []
 
-$: text = getText(value)
-
-$: active = getActive(value)
-
-$: fieldType = type?.split("/")[1]
-
-$: fieldDefinition = getFieldDefinition(fieldType)
-
-$: fieldTypeLabel = fieldDefinition?.name || fieldType
-
 const sanitiseRules = (rules: ValidationEditorRule[]): ValidationEditorRule[] => {
   return (rules || []).map((rule) => {
     const sanitisedRule = { ...rule }
@@ -90,6 +80,16 @@ const getText = (rules: ValidationEditorRule[]): string => {
     return `${rules.length} rule${rules.length === 1 ? "" : "s"} set`
   }
 }
+
+$: text = getText(value)
+
+$: active = getActive(value)
+
+$: fieldType = type?.split("/")[1]
+
+$: fieldDefinition = getFieldDefinition(fieldType)
+
+$: fieldTypeLabel = fieldDefinition?.name || fieldType
 </script>
 
 <div class="validation-editor">
