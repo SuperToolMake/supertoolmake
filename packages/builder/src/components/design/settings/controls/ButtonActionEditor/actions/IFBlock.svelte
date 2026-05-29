@@ -12,24 +12,12 @@ const operatorOptions = [
 ]
 
 onMount(() => {
-  if (!parameters.operator) parameters.operator = "equal"
-  if (!parameters.value) parameters.value = ""
-  if (!parameters.referenceValue) parameters.referenceValue = ""
-  if (!parameters.actions) parameters.actions = []
-  if (!parameters.elseActions) parameters.elseActions = []
+  parameters.operator ??= "equal"
+  parameters.value ??= ""
+  parameters.referenceValue ??= ""
+  parameters.actions ??= []
+  parameters.elseActions ??= []
 })
-
-function handleValueChange(e) {
-  parameters.value = e.detail
-}
-
-function handleOperatorChange(e) {
-  parameters.operator = e.detail
-}
-
-function handleReferenceValueChange(e) {
-  parameters.referenceValue = e.detail
-}
 </script>
 
 <div class="root">
@@ -42,19 +30,18 @@ function handleReferenceValueChange(e) {
     <DrawerBindableInput
       placeholder="Value"
       value={parameters.value}
-      on:change={handleValueChange}
+      on:change={e => (parameters.value = e.detail)}
       {bindings}
     />
     <Select
-      value={parameters.operator}
-      on:change={handleOperatorChange}
+      bind:value={parameters.operator}
       options={operatorOptions}
       placeholder={null}
     />
     <DrawerBindableInput
       placeholder="Reference value"
       value={parameters.referenceValue}
-      on:change={handleReferenceValueChange}
+      on:change={e => (parameters.referenceValue = e.detail)}
       {bindings}
     />
   </div>
