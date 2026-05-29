@@ -37,6 +37,7 @@ let branchDrawerMode = null // "picker" | "editor"
 let branchDrawerAction = null
 let branchDrawerKey = null // "actions" | "elseActions"
 let branchDrawerDraft = null
+let branchDrawerIsNew = false
 
 const openBranchAddDrawer = (branchKey) => {
   branchDrawerKey = branchKey
@@ -51,20 +52,41 @@ const openBranchActionDrawer = (action, branchKey) => {
   branchDrawerMode = "editor"
   branchDrawerAction = action
   branchDrawerDraft = cloneDeep(action.parameters || {})
+  branchDrawerIsNew = false
   branchDrawer.show()
 }
 
 const onBranchPickerSelect = (actionType) => {
-  const prevSelected = selectedAction
-  addBranchAction(activeIfAction, branchDrawerKey, actionType)
-  selectedAction = prevSelected
-  branchDrawer.hide()
+  const newAction = {
+    parameters: {},
+    [EVENT_TYPE_KEY]: actionType.name,
+    id: generate(),
+  }
+  if (isIFBlock(newAction)) {
+    newAction.parameters.actions = []
+    newAction.parameters.elseActions = []
+  }
+  branchDrawerMode = "editor"
+  branchDrawerAction = newAction
+  branchDrawerDraft = cloneDeep(newAction.parameters)
+  branchDrawerIsNew = true
 }
 
 const saveBranchAction = () => {
-  if (branchDrawerMode === "editor" && branchDrawerAction && branchDrawerDraft) {
-    branchDrawerAction.parameters = branchDrawerDraft
-    actions = [...actions]
+  if (branchDrawerMode === "editor" && branchDrawerAction) {
+    if (branchDrawerIsNew) {
+      const ifAction = activeIfAction
+      const branchKey = branchDrawerKey
+      if (!ifAction.parameters) ifAction.parameters = {}
+      if (!ifAction.parameters[branchKey]) ifAction.parameters[branchKey] = []
+      branchDrawerAction.parameters = branchDrawerDraft
+      ifAction.parameters[branchKey] = [...ifAction.parameters[branchKey], branchDrawerAction]
+      actions = [...actions]
+      selectedAction = branchDrawerAction
+    } else {
+      branchDrawerAction.parameters = branchDrawerDraft
+      actions = [...actions]
+    }
   }
   branchDrawer.hide()
 }
@@ -660,7 +682,23 @@ $: activeIfAction = isIFBlock(selectedAction)
           </div>
         </div>
 
-        <Drawer bind:this={branchDrawer} title={branchDrawerTitle} on:drawerHide>
+        <Drawer
+          bind:this={branchDrawer}
+          title={branchDrawerTitle}
+          cancelText={branchDrawerMode === "editor" ? "Back" : "Cancel"}
+          onCancel={() => {
+            if (branchDrawerMode === "editor") {
+              branchDrawerMode = "picker"
+              branchDrawerAction = null
+              branchDrawerDraft = null
+              branchDrawerIsNew = false
+              branchAddQuery = ""
+            } else {
+              branchDrawer.hide()
+            }
+          }}
+          on:drawerHide
+        >
           <Button slot="buttons" on:click={saveBranchAction}>Save</Button>
           <div class="branch-drawer-body" slot="body">
             {#if branchDrawerMode === "picker"}

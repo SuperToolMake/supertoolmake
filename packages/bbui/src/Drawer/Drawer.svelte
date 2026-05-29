@@ -66,12 +66,22 @@ const unobserve = () => {
 
   export let title = ""
   export let forceModal = false
+  export let cancelText = "Cancel"
+  export let onCancel = null
 
   const dispatch = createEventDispatcher()
   const spacing = 11
 
   let visible = false
   let drawerId = generate()
+
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel()
+    } else {
+      hide()
+    }
+  }
 
   const getStyle = (depth, left, width, modal) => {
     let style = `
@@ -207,7 +217,7 @@ $: depth = $openDrawers.length - $openDrawers.indexOf(drawerId) - 1
             <div class="text">{title || "Bindings"}</div>
           {/if}
           <div class="buttons">
-            <Button secondary quiet on:click={hide}>Cancel</Button>
+            <Button secondary quiet on:click={handleCancel}>{cancelText}</Button>
             <slot name="buttons" />
             {#if $resizable}
               <ActionButton
