@@ -1,5 +1,5 @@
 <script>
-import { ActionButton, Button, DrawerContent, Icon, Layout, Search } from "@supertoolmake/bbui"
+import { ActionButton, Button, Drawer, DrawerContent, Icon, Layout, Search } from "@supertoolmake/bbui"
 import { cloneDeep } from "lodash/fp"
 import { generate } from "shortid"
 import { getActionBindings, getEventContextBindings, makeStateBinding, updateReferencesInObject } from "@/dataBinding"
@@ -17,8 +17,44 @@ export let componentInstance
 
 let actionQuery
 let selectedAction = actions?.length ? actions[0] : null
-let branchAddPicker = null // { ifActionId: string, branchKey: string }
 let branchAddQuery = ""
+
+let branchDrawer
+let branchDrawerMode = null // "picker" | "editor"
+let branchDrawerAction = null
+let branchDrawerKey = null // "actions" | "elseActions"
+
+$: branchDrawerComponent = branchDrawerMode === "editor" && branchDrawerAction
+  ? actionTypes.find((t) => t.name === branchDrawerAction[EVENT_TYPE_KEY])?.component
+  : null
+
+$: branchDrawerTitle = branchDrawerMode === "picker"
+  ? "Add Action"
+  : branchDrawerMode === "editor" && branchDrawerAction
+    ? `Edit: ${toDisplay(branchDrawerAction[EVENT_TYPE_KEY])}`
+    : "Actions"
+
+const openBranchAddDrawer = (branchKey) => {
+  branchDrawerKey = branchKey
+  branchDrawerMode = "picker"
+  branchDrawerAction = null
+  branchAddQuery = ""
+  branchDrawer.show()
+}
+
+const openBranchActionDrawer = (action, branchKey) => {
+  branchDrawerKey = branchKey
+  branchDrawerMode = "editor"
+  branchDrawerAction = action
+  branchDrawer.show()
+}
+
+const onBranchPickerSelect = (actionType) => {
+  const prevSelected = selectedAction
+  addBranchAction(activeIfAction, branchDrawerKey, actionType)
+  selectedAction = prevSelected
+  branchDrawer.hide()
+}
 
 const isIFBlock = (action) => {
   return action?.[EVENT_TYPE_KEY] === IF_TYPE
@@ -228,7 +264,6 @@ const addBranchAction = (ifAction, branchKey, actionType) => {
   if (!ifAction.parameters[branchKey]) ifAction.parameters[branchKey] = []
   ifAction.parameters[branchKey] = [...ifAction.parameters[branchKey], newAction]
   actions = [...actions]
-  branchAddPicker = null
   branchAddQuery = ""
   selectedAction = newAction
 }
@@ -297,6 +332,15 @@ $: mappedActionTypes = actionTypes.reduce((acc, action) => {
   return acc
 }, {})
 
+$: branchParsedQuery = typeof branchAddQuery === "string" ? branchAddQuery.toLowerCase().trim() : ""
+$: branchMappedActionTypes = actionTypes.reduce((acc, action) => {
+  let pn = action.name.toLowerCase().trim()
+  if (branchParsedQuery.length && pn.indexOf(branchParsedQuery) < 0) return acc
+  acc[action.type] = acc[action.type] || []
+  acc[action.type].push(action)
+  return acc
+}, {})
+
 $: eventContextBindings = getEventContextBindings({ componentInstance, settingKey: key })
 $: actionContextBindings = getActionBindings(actions, selectedAction?.id)
 
@@ -330,6 +374,21 @@ const findBranchActionById = (actions, id) => {
   }
   return null
 }
+
+const findParentIfAction = (actions, childId) => {
+  if (!actions || !childId) return null
+  for (const action of actions) {
+    if (!isIFBlock(action)) continue
+    for (const key of ["actions", "elseActions"]) {
+      if ((action.parameters?.[key] || []).some((a) => a.id === childId)) {
+        return action
+      }
+    }
+  }
+  return null
+}
+
+$: activeIfAction = isIFBlock(selectedAction) ? selectedAction : findParentIfAction(actions, selectedAction?.id)
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -353,7 +412,7 @@ const findBranchActionById = (actions, id) => {
           <div class="heading" class:top-entry={idx === 0}>{categoryId}</div>
           <ul>
             {#each category as actionType}
-              <li on:click={onAddAction(actionType)}>
+              <li on:click={() => addAction(actionType)}>
                 <span class="action-name">{actionType.displayName || actionType.name}</span>
               </li>
             {/each}
@@ -405,128 +464,6 @@ const findBranchActionById = (actions, id) => {
                   <!-- svelte-ignore a11y-no-static-element-interactions -->
                   <div class="delete-btn" on:click|stopPropagation={() => deleteAction(index)}>
                     <Icon name="x" hoverable size="S" />
-                  </div>
-                </div>
-
-                <div class="if-branches">
-                  <div class="branch-section" on:dragover|preventDefault={(e) => handleBranchDragOver(e, action.id, "actions")} on:drop={(e) => handleBranchDrop(e, action.id, "actions")} on:dragleave={handleBranchDragLeave}>
-                    <div class="branch-label">
-                      <span>IF TRUE</span>
-                      <!-- svelte-ignore a11y-click-events-have-key-events -->
-                      <!-- svelte-ignore a11y-no-static-element-interactions -->
-                      <span
-                        class="branch-add-btn"
-                        on:click|stopPropagation={() => { branchAddPicker = { ifActionId: action.id, branchKey: "actions" }; branchAddQuery = "" }}
-                      >+</span>
-                    </div>
-                    {#if branchAddPicker?.ifActionId === action.id && branchAddPicker?.branchKey === "actions"}
-                      <div class="branch-add-picker" on:dragstart|preventDefault on:dragover|preventDefault on:drop|preventDefault>
-                        <input class="branch-add-search" type="text" placeholder="Search..." bind:value={branchAddQuery} />
-                        <div class="branch-add-items">
-                          {#each actionTypes.filter((t) => t.name !== "IF").filter((t) => !branchAddQuery || t.name.toLowerCase().trim().includes(branchAddQuery.toLowerCase().trim())) as actionType}
-                            <!-- svelte-ignore a11y-click-events-have-key-events -->
-                            <!-- svelte-ignore a11y-no-static-element-interactions -->
-                            <div class="branch-add-item" on:click={() => addBranchAction(action, "actions", actionType)}>
-                              {actionType.displayName || actionType.name}
-                            </div>
-                          {/each}
-                        </div>
-                      </div>
-                    {/if}
-                    {#each action.parameters?.actions || [] as childAction, childIndex (childAction.id)}
-                      {#if matchesDrop("branch", action.id, "actions", childIndex)}
-                        <div class="drop-indicator"></div>
-                      {/if}
-                      <div
-                        class="action-container branch-action"
-                        class:selected={childAction === selectedAction}
-                        data-dnd-item={childAction.id}
-                        draggable="true"
-                        on:dragstart={(e) => startDrag(e, childAction, { type: "branch", parentActionId: action.id, branchKey: "actions" })}
-                        on:dragend={clearDrag}
-                        on:click|stopPropagation={() => selectAction(childAction)}
-                        role="button"
-                        tabindex="0"
-                        on:keydown={(e) => e.key === "Enter" && selectAction(childAction)}
-                      >
-                        <Icon
-                          name="dots-six-vertical"
-                          size="L"
-                          color="var(--spectrum-global-color-gray-600)"
-                          hoverable="true"
-                          hovercolor="var(--spectrum-global-color-gray-800)"
-                        />
-                        <div class="action-header">{toDisplay(childAction[EVENT_TYPE_KEY])}</div>
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <!-- svelte-ignore a11y-no-static-element-interactions -->
-                        <div class="delete-btn" on:click|stopPropagation={() => deleteBranchAction(action, "actions", childAction.id)}>
-                          <Icon name="x" hoverable size="S" />
-                        </div>
-                      </div>
-                    {/each}
-                    {#if matchesDrop("branch", action.id, "actions", (action.parameters?.actions || []).length)}
-                      <div class="drop-indicator"></div>
-                    {/if}
-                  </div>
-
-                  <div class="branch-section" on:dragover|preventDefault={(e) => handleBranchDragOver(e, action.id, "elseActions")} on:drop={(e) => handleBranchDrop(e, action.id, "elseActions")} on:dragleave={handleBranchDragLeave}>
-                    <div class="branch-label">
-                      <span>ELSE</span>
-                      <!-- svelte-ignore a11y-click-events-have-key-events -->
-                      <!-- svelte-ignore a11y-no-static-element-interactions -->
-                      <span
-                        class="branch-add-btn"
-                        on:click|stopPropagation={() => { branchAddPicker = { ifActionId: action.id, branchKey: "elseActions" }; branchAddQuery = "" }}
-                      >+</span>
-                    </div>
-                    {#if branchAddPicker?.ifActionId === action.id && branchAddPicker?.branchKey === "elseActions"}
-                      <div class="branch-add-picker" on:dragstart|preventDefault on:dragover|preventDefault on:drop|preventDefault>
-                        <input class="branch-add-search" type="text" placeholder="Search..." bind:value={branchAddQuery} />
-                        <div class="branch-add-items">
-                          {#each actionTypes.filter((t) => t.name !== "IF").filter((t) => !branchAddQuery || t.name.toLowerCase().trim().includes(branchAddQuery.toLowerCase().trim())) as actionType}
-                            <!-- svelte-ignore a11y-click-events-have-key-events -->
-                            <!-- svelte-ignore a11y-no-static-element-interactions -->
-                            <div class="branch-add-item" on:click={() => addBranchAction(action, "elseActions", actionType)}>
-                              {actionType.displayName || actionType.name}
-                            </div>
-                          {/each}
-                        </div>
-                      </div>
-                    {/if}
-                    {#each action.parameters?.elseActions || [] as childAction, childIndex (childAction.id)}
-                      {#if matchesDrop("branch", action.id, "elseActions", childIndex)}
-                        <div class="drop-indicator"></div>
-                      {/if}
-                      <div
-                        class="action-container branch-action"
-                        class:selected={childAction === selectedAction}
-                        data-dnd-item={childAction.id}
-                        draggable="true"
-                        on:dragstart={(e) => startDrag(e, childAction, { type: "branch", parentActionId: action.id, branchKey: "elseActions" })}
-                        on:dragend={clearDrag}
-                        on:click|stopPropagation={() => selectAction(childAction)}
-                        role="button"
-                        tabindex="0"
-                        on:keydown={(e) => e.key === "Enter" && selectAction(childAction)}
-                      >
-                        <Icon
-                          name="dots-six-vertical"
-                          size="L"
-                          color="var(--spectrum-global-color-gray-600)"
-                          hoverable="true"
-                          hovercolor="var(--spectrum-global-color-gray-800)"
-                        />
-                        <div class="action-header">{toDisplay(childAction[EVENT_TYPE_KEY])}</div>
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <!-- svelte-ignore a11y-no-static-element-interactions -->
-                        <div class="delete-btn" on:click|stopPropagation={() => deleteBranchAction(action, "elseActions", childAction.id)}>
-                          <Icon name="x" hoverable size="S" />
-                        </div>
-                      </div>
-                    {/each}
-                    {#if matchesDrop("branch", action.id, "elseActions", (action.parameters?.elseActions || []).length)}
-                      <div class="drop-indicator"></div>
-                    {/if}
                   </div>
                 </div>
               </div>
@@ -581,6 +518,131 @@ const findBranchActionById = (actions, id) => {
           />
         </div>
       {/key}
+      {#if activeIfAction}
+        <div class="if-branches">
+          <div class="branch-section" on:dragover|preventDefault={(e) => handleBranchDragOver(e, activeIfAction.id, "actions")} on:drop={(e) => handleBranchDrop(e, activeIfAction.id, "actions")} on:dragleave={handleBranchDragLeave}>
+            <div class="branch-label">
+              <span>THEN</span>
+              <span class="branch-count">{(activeIfAction.parameters?.actions || []).length} action{((activeIfAction.parameters?.actions || []).length) !== 1 ? "s" : ""}</span>
+            </div>
+            {#if matchesDrop("branch", activeIfAction.id, "actions", 0)}
+              <div class="drop-indicator"></div>
+            {/if}
+            {#each activeIfAction.parameters?.actions || [] as childAction, childIndex (childAction.id)}
+              <div
+                class="action-container"
+                class:selected={childAction === selectedAction}
+                data-dnd-item={childAction.id}
+                draggable="true"
+                on:dragstart={(e) => startDrag(e, childAction, { type: "branch", parentActionId: activeIfAction.id, branchKey: "actions" })}
+                on:dragend={clearDrag}
+                on:click|stopPropagation={() => openBranchActionDrawer(childAction, "actions")}
+                role="button"
+                tabindex="0"
+                on:keydown={(e) => e.key === "Enter" && openBranchActionDrawer(childAction, "actions")}
+              >
+                <Icon
+                  name="dots-six-vertical"
+                  size="L"
+                  color="var(--spectrum-global-color-gray-600)"
+                  hoverable="true"
+                  hovercolor="var(--spectrum-global-color-gray-800)"
+                />
+                <div class="action-header">{childIndex + 1}. {toDisplay(childAction[EVENT_TYPE_KEY])}</div>
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-static-element-interactions -->
+                <div class="delete-btn" on:click|stopPropagation={() => deleteBranchAction(activeIfAction, "actions", childAction.id)}>
+                  <Icon name="x" hoverable size="S" />
+                </div>
+              </div>
+              {#if matchesDrop("branch", activeIfAction.id, "actions", childIndex + 1)}
+                <div class="drop-indicator"></div>
+              {/if}
+            {/each}
+            <div class="add-action-wrap">
+              <Button secondary on:click={(e) => { e.stopPropagation(); openBranchAddDrawer("actions") }}>Add Action</Button>
+            </div>
+          </div>
+
+          <div class="branch-section" on:dragover|preventDefault={(e) => handleBranchDragOver(e, activeIfAction.id, "elseActions")} on:drop={(e) => handleBranchDrop(e, activeIfAction.id, "elseActions")} on:dragleave={handleBranchDragLeave}>
+            <div class="branch-label">
+              <span>ELSE</span>
+              <span class="branch-count">{(activeIfAction.parameters?.elseActions || []).length} action{((activeIfAction.parameters?.elseActions || []).length) !== 1 ? "s" : ""}</span>
+            </div>
+            {#if matchesDrop("branch", activeIfAction.id, "elseActions", 0)}
+              <div class="drop-indicator"></div>
+            {/if}
+            {#each activeIfAction.parameters?.elseActions || [] as childAction, childIndex (childAction.id)}
+              <div
+                class="action-container"
+                class:selected={childAction === selectedAction}
+                data-dnd-item={childAction.id}
+                draggable="true"
+                on:dragstart={(e) => startDrag(e, childAction, { type: "branch", parentActionId: activeIfAction.id, branchKey: "elseActions" })}
+                on:dragend={clearDrag}
+                on:click|stopPropagation={() => openBranchActionDrawer(childAction, "elseActions")}
+                role="button"
+                tabindex="0"
+                on:keydown={(e) => e.key === "Enter" && openBranchActionDrawer(childAction, "elseActions")}
+              >
+                <Icon
+                  name="dots-six-vertical"
+                  size="L"
+                  color="var(--spectrum-global-color-gray-600)"
+                  hoverable="true"
+                  hovercolor="var(--spectrum-global-color-gray-800)"
+                />
+                <div class="action-header">{childIndex + 1}. {toDisplay(childAction[EVENT_TYPE_KEY])}</div>
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-static-element-interactions -->
+                <div class="delete-btn" on:click|stopPropagation={() => deleteBranchAction(activeIfAction, "elseActions", childAction.id)}>
+                  <Icon name="x" hoverable size="S" />
+                </div>
+              </div>
+              {#if matchesDrop("branch", activeIfAction.id, "elseActions", childIndex + 1)}
+                <div class="drop-indicator"></div>
+              {/if}
+            {/each}
+            <div class="add-action-wrap">
+              <Button secondary on:click={(e) => { e.stopPropagation(); openBranchAddDrawer("elseActions") }}>Add Action</Button>
+            </div>
+          </div>
+        </div>
+
+        <Drawer bind:this={branchDrawer} title={branchDrawerTitle} on:drawerHide>
+          <div class="branch-drawer-body" slot="body">
+            {#if branchDrawerMode === "picker"}
+              <div class="actions-list">
+                <div class="search-wrap">
+                  <Search placeholder="Search" bind:value={branchAddQuery} />
+                </div>
+                {#each Object.entries(branchMappedActionTypes) as [categoryId, category], idx}
+                  <div class="heading" class:top-entry={idx === 0}>{categoryId}</div>
+                  <ul>
+                    {#each category as actionType}
+                      <li on:click={() => onBranchPickerSelect(actionType)}>
+                        <span class="action-name">{actionType.displayName || actionType.name}</span>
+                      </li>
+                    {/each}
+                  </ul>
+                {/each}
+              </div>
+            {:else if branchDrawerMode === "editor" && branchDrawerComponent && branchDrawerAction}
+              {#key (branchDrawerAction.id)}
+                <div class="selected-action-container">
+                  <svelte:component
+                    this={branchDrawerComponent}
+                    bind:parameters={branchDrawerAction.parameters}
+                    bindings={allBindings}
+                    {nested}
+                    {componentInstance}
+                  />
+                </div>
+              {/key}
+            {/if}
+          </div>
+        </Drawer>
+      {/if}
     {/if}
   </Layout>
 </DrawerContent>
@@ -672,6 +734,10 @@ const findBranchActionById = (actions, id) => {
     transition: background-color 130ms ease-in-out;
   }
   .branch-label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-s);
     font-size: var(--font-size-xs);
     font-weight: 600;
     color: var(--spectrum-global-color-gray-500);
@@ -680,74 +746,17 @@ const findBranchActionById = (actions, id) => {
     padding: var(--spacing-xs) var(--spacing-s);
     user-select: none;
   }
-  .branch-action {
-    margin-left: var(--spacing-l);
-    padding: var(--spacing-xs) var(--spacing-m);
-  }
-  .branch-action:hover {
-    cursor: grab;
-  }
-  .branch-action:active {
-    cursor: grabbing;
-  }
-  .branch-add-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background-color: var(--spectrum-global-color-gray-300);
-    color: var(--spectrum-global-color-gray-700);
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 1;
-    cursor: pointer;
-    margin-left: var(--spacing-s);
-    user-select: none;
-    transition: background-color 130ms ease-in-out;
-  }
-  .branch-add-btn:hover {
-    background-color: var(--spectrum-global-color-gray-400);
-  }
-  .branch-add-picker {
-    margin-left: var(--spacing-l);
-    background-color: var(--background);
-    border: 1px solid var(--spectrum-global-color-gray-300);
-    border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-    overflow: hidden;
-    z-index: 10;
-  }
-  .branch-add-search {
-    width: 100%;
-    box-sizing: border-box;
+  .add-action-wrap {
     padding: var(--spacing-xs) var(--spacing-s);
-    border: none;
-    border-bottom: 1px solid var(--spectrum-global-color-gray-200);
-    font-size: var(--font-size-s);
-    outline: none;
-  }
-  .branch-add-search:focus {
-    background-color: var(--spectrum-global-color-gray-50);
-  }
-  .branch-add-items {
-    max-height: 180px;
-    overflow-y: auto;
-  }
-  .branch-add-item {
-    padding: var(--spacing-xs) var(--spacing-s);
-    font-size: var(--font-size-xs);
-    cursor: pointer;
-    transition: background-color 130ms ease-in-out;
-  }
-  .branch-add-item:hover {
-    background-color: var(--spectrum-global-color-gray-50);
   }
   .branch-count {
     font-size: var(--font-size-xs);
     color: var(--spectrum-global-color-gray-500);
     white-space: nowrap;
+  }
+  .branch-drawer-body {
+    padding: var(--spacing-m);
+    overflow-y: auto;
   }
   .delete-btn {
     display: flex;
