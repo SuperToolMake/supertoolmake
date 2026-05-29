@@ -685,9 +685,9 @@ $: activeIfAction = isIFBlock(selectedAction)
         <Drawer
           bind:this={branchDrawer}
           title={branchDrawerTitle}
-          cancelText={branchDrawerMode === "editor" ? "Back" : "Cancel"}
+          cancelText={branchDrawerMode === "editor" && branchDrawerIsNew ? "Back" : "Cancel"}
           onCancel={() => {
-            if (branchDrawerMode === "editor") {
+            if (branchDrawerMode === "editor" && branchDrawerIsNew) {
               branchDrawerMode = "picker"
               branchDrawerAction = null
               branchDrawerDraft = null
