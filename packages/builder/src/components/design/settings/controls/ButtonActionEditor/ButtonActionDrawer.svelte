@@ -770,7 +770,7 @@ $: activeIfAction = isIFBlock(selectedAction)
     padding: var(--spacing-s);
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-s);
+    gap: var(--spacing-xl);
   }
   .branch-section {
     display: flex;
@@ -786,9 +786,6 @@ $: activeIfAction = isIFBlock(selectedAction)
     flex-direction: row;
     align-items: center;
     gap: var(--spacing-s);
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    color: var(--spectrum-global-color-gray-500);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     padding: var(--spacing-xs) var(--spacing-s);

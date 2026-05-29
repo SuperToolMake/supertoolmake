@@ -22,8 +22,7 @@ onMount(() => {
 
 <div class="root">
   <Body size="S">
-    Configure a condition for the IF block. If the condition is met, the IF
-    actions are executed. Otherwise, the ELSE actions are executed.
+    IF
   </Body>
 
   <div class="condition-editor">
@@ -49,6 +48,8 @@ onMount(() => {
 
 <style>
   .root {
+    padding-left: var(--spacing-l);
+    padding-right: var(--spacing-l);
     display: flex;
     flex-direction: column;
     gap: var(--spacing-l);
