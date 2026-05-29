@@ -1,5 +1,6 @@
 import { Helpers } from "@supertoolmake/bbui"
 import {
+  defaultErrorForConstraint,
   type FieldConstraints,
   FieldType,
   type Table,
@@ -137,7 +138,9 @@ const evaluateRule = (rule: UIFieldValidationRule, value: any) => {
 
   // Evaluate the rule
   const pass = handler(value, rule)
-  return pass ? null : rule.error || "Error"
+  return pass
+    ? null
+    : rule.error || defaultErrorForConstraint(rule.constraint, rule.value, rule.type)
 }
 
 /**
