@@ -170,6 +170,7 @@ function handleTopLevelDrop(e) {
 function handleBranchDrop(e, parentActionId, branchKey) {
   e.preventDefault()
   if (!dragInfo) return
+  if (isIFBlock(dragInfo.action)) return
   const targetEl = e.currentTarget
   const insertAt = getInsertIndex(targetEl, e.clientY)
 
@@ -394,6 +395,7 @@ $: mappedActionTypes = actionTypes.reduce((acc, action) => {
 
 $: branchParsedQuery = typeof branchAddQuery === "string" ? branchAddQuery.toLowerCase().trim() : ""
 $: branchMappedActionTypes = actionTypes.reduce((acc, action) => {
+  if (action.name === IF_TYPE) return acc
   let pn = action.name.toLowerCase().trim()
   if (branchParsedQuery.length && pn.indexOf(branchParsedQuery) < 0) return acc
   acc[action.type] = acc[action.type] || []
