@@ -129,7 +129,7 @@
       "component": "ExportData"
     },
     {
-      "name": "IF",
+      "name": "IF / ELSE",
       "type": "logic",
       "component": "IFBlock",
       "dependsOnFeature": "continueIfAction"

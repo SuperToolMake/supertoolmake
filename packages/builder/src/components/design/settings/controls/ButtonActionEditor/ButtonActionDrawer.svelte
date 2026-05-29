@@ -19,7 +19,7 @@ import {
 import { getAvailableActions } from "./index"
 
 const EVENT_TYPE_KEY = "##eventHandlerType"
-const IF_TYPE = "IF"
+const IF_TYPE = "IF / ELSE"
 const actionTypes = getAvailableActions()
 
 export let key
@@ -588,6 +588,9 @@ $: activeIfAction = isIFBlock(selectedAction)
                 </div>
               </div>
             {/each}
+            {#if !(activeIfAction.parameters?.actions || []).length}
+              <div class="branch-placeholder">Drop actions here</div>
+            {/if}
             <div class="add-action-wrap">
               <Button secondary on:click={(e) => { e.stopPropagation(); openBranchAddDrawer("actions") }}>Add Action</Button>
             </div>
@@ -626,6 +629,9 @@ $: activeIfAction = isIFBlock(selectedAction)
                 </div>
               </div>
             {/each}
+            {#if !(activeIfAction.parameters?.elseActions || []).length}
+              <div class="branch-placeholder">Drop actions here</div>
+            {/if}
             <div class="add-action-wrap">
               <Button secondary on:click={(e) => { e.stopPropagation(); openBranchAddDrawer("elseActions") }}>Add Action</Button>
             </div>
@@ -788,6 +794,15 @@ $: activeIfAction = isIFBlock(selectedAction)
   }
   .add-action-wrap {
     padding: var(--spacing-xs) var(--spacing-s);
+  }
+  .branch-placeholder {
+    border: 2px dashed var(--spectrum-global-color-gray-300);
+    border-radius: 4px;
+    padding: var(--spacing-l);
+    text-align: center;
+    color: var(--spectrum-global-color-gray-400);
+    font-size: var(--font-size-s);
+    margin: 0 var(--spacing-xs);
   }
   .branch-count {
     font-size: var(--font-size-xs);
