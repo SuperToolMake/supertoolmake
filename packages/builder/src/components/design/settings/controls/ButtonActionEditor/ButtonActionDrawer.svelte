@@ -112,17 +112,6 @@ const setUpdateActions = (actions) => {
 let updateStateActions = setUpdateActions(actions)
 
 let dragInfo = null
-let dropIndicator = null
-
-function matchesDrop(zoneType, parentActionId, branchKey, index) {
-  if (!dropIndicator) return false
-  if (dropIndicator.zoneType !== zoneType) return false
-  if (zoneType === "branch") {
-    if (dropIndicator.parentActionId !== parentActionId || dropIndicator.branchKey !== branchKey)
-      return false
-  }
-  return dropIndicator.index === index
-}
 
 function startDrag(e, action, source) {
   dragInfo = { action, source }
@@ -132,12 +121,6 @@ function startDrag(e, action, source) {
 
 function clearDrag() {
   dragInfo = null
-  dropIndicator = null
-}
-
-function updateDropIndicator(zoneType, containerEl, clientY, parentActionId, branchKey) {
-  const index = getInsertIndex(containerEl, clientY)
-  dropIndicator = { zoneType, index, parentActionId, branchKey }
 }
 
 function getInsertIndex(containerEl, clientY) {
@@ -153,11 +136,6 @@ function getInsertIndex(containerEl, clientY) {
 function handleTopLevelDragOver(e) {
   e.preventDefault()
   e.dataTransfer.dropEffect = "move"
-  updateDropIndicator("top-level", e.currentTarget, e.clientY)
-}
-
-function handleTopLevelDragLeave() {
-  if (dropIndicator?.zoneType === "top-level") dropIndicator = null
 }
 
 function handleTopLevelDrop(e) {
@@ -187,16 +165,6 @@ function handleTopLevelDrop(e) {
     }
   }
   clearDrag()
-}
-
-function handleBranchDragOver(e, parentActionId, branchKey) {
-  e.preventDefault()
-  e.dataTransfer.dropEffect = "move"
-  updateDropIndicator("branch", e.currentTarget, e.clientY, parentActionId, branchKey)
-}
-
-function handleBranchDragLeave() {
-  if (dropIndicator?.zoneType === "branch") dropIndicator = null
 }
 
 function handleBranchDrop(e, parentActionId, branchKey) {
@@ -499,11 +467,8 @@ $: activeIfAction = isIFBlock(selectedAction)
         <Button secondary on:click={toggleActionList}>Add Action</Button>
       </div>
 
-      <div class="actions" on:dragover|preventDefault={handleTopLevelDragOver} on:drop={handleTopLevelDrop} on:dragleave={handleTopLevelDragLeave}>
+      <div class="actions" on:dragover|preventDefault={handleTopLevelDragOver} on:drop={handleTopLevelDrop}>
         {#each actions as action, index (action.id)}
-          {#if matchesDrop("top-level", null, null, index)}
-            <div class="drop-indicator"></div>
-          {/if}
           {#if isIFBlock(action)}
             <div class="if-block-wrapper" data-dnd-item={action.id}>
               <div
@@ -572,9 +537,6 @@ $: activeIfAction = isIFBlock(selectedAction)
             </div>
           {/if}
         {/each}
-        {#if matchesDrop("top-level", null, null, (actions || []).length)}
-          <div class="drop-indicator"></div>
-        {/if}
       </div>
     {/if}
   </Layout>
@@ -593,14 +555,11 @@ $: activeIfAction = isIFBlock(selectedAction)
       {/key}
       {#if activeIfAction}
         <div class="if-branches">
-          <div class="branch-section" on:dragover|preventDefault={(e) => handleBranchDragOver(e, activeIfAction.id, "actions")} on:drop={(e) => handleBranchDrop(e, activeIfAction.id, "actions")} on:dragleave={handleBranchDragLeave}>
+          <div class="branch-section" on:dragover|preventDefault={(e) => { e.dataTransfer.dropEffect = "move" }} on:drop={(e) => handleBranchDrop(e, activeIfAction.id, "actions")}>
             <div class="branch-label">
               <span>THEN</span>
               <span class="branch-count">{(activeIfAction.parameters?.actions || []).length} action{((activeIfAction.parameters?.actions || []).length) !== 1 ? "s" : ""}</span>
             </div>
-            {#if matchesDrop("branch", activeIfAction.id, "actions", 0)}
-              <div class="drop-indicator"></div>
-            {/if}
             {#each activeIfAction.parameters?.actions || [] as childAction, childIndex (childAction.id)}
               <div
                 class="action-container"
@@ -628,23 +587,17 @@ $: activeIfAction = isIFBlock(selectedAction)
                   <Icon name="x" hoverable size="S" />
                 </div>
               </div>
-              {#if matchesDrop("branch", activeIfAction.id, "actions", childIndex + 1)}
-                <div class="drop-indicator"></div>
-              {/if}
             {/each}
             <div class="add-action-wrap">
               <Button secondary on:click={(e) => { e.stopPropagation(); openBranchAddDrawer("actions") }}>Add Action</Button>
             </div>
           </div>
 
-          <div class="branch-section" on:dragover|preventDefault={(e) => handleBranchDragOver(e, activeIfAction.id, "elseActions")} on:drop={(e) => handleBranchDrop(e, activeIfAction.id, "elseActions")} on:dragleave={handleBranchDragLeave}>
+          <div class="branch-section" on:dragover|preventDefault={(e) => { e.dataTransfer.dropEffect = "move" }} on:drop={(e) => handleBranchDrop(e, activeIfAction.id, "elseActions")}>
             <div class="branch-label">
               <span>ELSE</span>
               <span class="branch-count">{(activeIfAction.parameters?.elseActions || []).length} action{((activeIfAction.parameters?.elseActions || []).length) !== 1 ? "s" : ""}</span>
             </div>
-            {#if matchesDrop("branch", activeIfAction.id, "elseActions", 0)}
-              <div class="drop-indicator"></div>
-            {/if}
             {#each activeIfAction.parameters?.elseActions || [] as childAction, childIndex (childAction.id)}
               <div
                 class="action-container"
@@ -672,9 +625,6 @@ $: activeIfAction = isIFBlock(selectedAction)
                   <Icon name="x" hoverable size="S" />
                 </div>
               </div>
-              {#if matchesDrop("branch", activeIfAction.id, "elseActions", childIndex + 1)}
-                <div class="drop-indicator"></div>
-              {/if}
             {/each}
             <div class="add-action-wrap">
               <Button secondary on:click={(e) => { e.stopPropagation(); openBranchAddDrawer("elseActions") }}>Add Action</Button>
@@ -859,15 +809,6 @@ $: activeIfAction = isIFBlock(selectedAction)
     opacity: 1;
   }
 
-  .drop-indicator {
-    height: 3px;
-    background-color: var(--spectrum-global-color-blue-500);
-    border-radius: 2px;
-    margin: -1px 0;
-    flex-shrink: 0;
-    pointer-events: none;
-    transition: opacity 100ms ease;
-  }
   .actions-list > * { padding-bottom: var(--spectrum-global-dimension-static-size-200); }
   .actions-list .heading { padding-bottom: var(--spectrum-global-dimension-static-size-100); padding-top: var(--spectrum-global-dimension-static-size-50); }
   .actions-list .heading.top-entry { padding-top: 0px; }
