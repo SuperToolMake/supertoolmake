@@ -1,8 +1,21 @@
 <script>
-import { ActionButton, Button, Drawer, DrawerContent, Icon, Layout, Search } from "@supertoolmake/bbui"
+import {
+  ActionButton,
+  Button,
+  Drawer,
+  DrawerContent,
+  Icon,
+  Layout,
+  Search,
+} from "@supertoolmake/bbui"
 import { cloneDeep } from "lodash/fp"
 import { generate } from "shortid"
-import { getActionBindings, getEventContextBindings, makeStateBinding, updateReferencesInObject } from "@/dataBinding"
+import {
+  getActionBindings,
+  getEventContextBindings,
+  makeStateBinding,
+  updateReferencesInObject,
+} from "@/dataBinding"
 import { getAvailableActions } from "./index"
 
 const EVENT_TYPE_KEY = "##eventHandlerType"
@@ -23,16 +36,6 @@ let branchDrawer
 let branchDrawerMode = null // "picker" | "editor"
 let branchDrawerAction = null
 let branchDrawerKey = null // "actions" | "elseActions"
-
-$: branchDrawerComponent = branchDrawerMode === "editor" && branchDrawerAction
-  ? actionTypes.find((t) => t.name === branchDrawerAction[EVENT_TYPE_KEY])?.component
-  : null
-
-$: branchDrawerTitle = branchDrawerMode === "picker"
-  ? "Add Action"
-  : branchDrawerMode === "editor" && branchDrawerAction
-    ? `Edit: ${toDisplay(branchDrawerAction[EVENT_TYPE_KEY])}`
-    : "Actions"
 
 const openBranchAddDrawer = (branchKey) => {
   branchDrawerKey = branchKey
@@ -63,8 +66,14 @@ const isIFBlock = (action) => {
 const setUpdateActions = (actions) => {
   return actions
     ? cloneDeep(actions)
-        .filter((a) => a[EVENT_TYPE_KEY] === "Update State" && a.parameters?.type === "set" && a.parameters.key)
-        .reduce((acc, a) => { acc[a.id] = a; return acc }, {})
+        .filter(
+          (a) =>
+            a[EVENT_TYPE_KEY] === "Update State" && a.parameters?.type === "set" && a.parameters.key
+        )
+        .reduce((acc, a) => {
+          acc[a.id] = a
+          return acc
+        }, {})
     : []
 }
 
@@ -77,7 +86,8 @@ function matchesDrop(zoneType, parentActionId, branchKey, index) {
   if (!dropIndicator) return false
   if (dropIndicator.zoneType !== zoneType) return false
   if (zoneType === "branch") {
-    if (dropIndicator.parentActionId !== parentActionId || dropIndicator.branchKey !== branchKey) return false
+    if (dropIndicator.parentActionId !== parentActionId || dropIndicator.branchKey !== branchKey)
+      return false
   }
   return dropIndicator.index === index
 }
@@ -214,7 +224,12 @@ const deleteAction = (index) => {
   actions.splice(index, 1)
   actions = [...actions]
   if (isSelected) selectedAction = actions?.length ? actions[0] : null
-  updateReferencesInObject({ obj: actions, modifiedIndex: index, action: "delete", label: "actions" })
+  updateReferencesInObject({
+    obj: actions,
+    modifiedIndex: index,
+    action: "delete",
+    label: "actions",
+  })
 }
 
 const deleteBranchAction = (ifAction, branchKey, actionId) => {
@@ -288,7 +303,10 @@ const getAllBindings = (actionBindings, eventContextBindings, actions) => {
   })
 
   flattenedActions
-    .filter((a) => a[EVENT_TYPE_KEY] === "Update State" && a.parameters?.type === "set" && a.parameters.key)
+    .filter(
+      (a) =>
+        a[EVENT_TYPE_KEY] === "Update State" && a.parameters?.type === "set" && a.parameters.key
+    )
     .forEach((action) => {
       const stateBinding = makeStateBinding(action.parameters.key)
       const hasKey = actionBindings.some((b) => b.runtimeBinding === stateBinding.runtimeBinding)
@@ -296,14 +314,18 @@ const getAllBindings = (actionBindings, eventContextBindings, actions) => {
         let existing = updateStateActions[action.id]
         if (existing) {
           const existingBinding = makeStateBinding(existing.parameters.key)
-          cloneActionBindings = cloneActionBindings.filter((b) => b.runtimeBinding !== existingBinding.runtimeBinding)
+          cloneActionBindings = cloneActionBindings.filter(
+            (b) => b.runtimeBinding !== existingBinding.runtimeBinding
+          )
         }
         allBindings.push(stateBinding)
       }
     })
 
   const asyncAutoIndexes = flattenedActions
-    .map((a, i) => a[EVENT_TYPE_KEY] === "Trigger Automation" && !a.parameters?.synchronous ? i : undefined)
+    .map((a, i) =>
+      a[EVENT_TYPE_KEY] === "Trigger Automation" && !a.parameters?.synchronous ? i : undefined
+    )
     .filter((i) => i !== undefined)
 
   let contextBindings = asyncAutoIndexes.length
@@ -317,49 +339,6 @@ const getAllBindings = (actionBindings, eventContextBindings, actions) => {
 const toDisplay = (eventKey) => {
   const type = actionTypes.find((a) => a.name == eventKey)
   return type?.displayName || type?.name
-}
-
-$: {
-  if (selectedAction && !selectedAction.parameters) selectedAction.parameters = {}
-}
-$: parsedQuery = typeof actionQuery === "string" ? actionQuery.toLowerCase().trim() : ""
-$: showAvailableActions = !actions?.length
-$: mappedActionTypes = actionTypes.reduce((acc, action) => {
-  let pn = action.name.toLowerCase().trim()
-  if (parsedQuery.length && pn.indexOf(parsedQuery) < 0) return acc
-  acc[action.type] = acc[action.type] || []
-  acc[action.type].push(action)
-  return acc
-}, {})
-
-$: branchParsedQuery = typeof branchAddQuery === "string" ? branchAddQuery.toLowerCase().trim() : ""
-$: branchMappedActionTypes = actionTypes.reduce((acc, action) => {
-  let pn = action.name.toLowerCase().trim()
-  if (branchParsedQuery.length && pn.indexOf(branchParsedQuery) < 0) return acc
-  acc[action.type] = acc[action.type] || []
-  acc[action.type].push(action)
-  return acc
-}, {})
-
-$: eventContextBindings = getEventContextBindings({ componentInstance, settingKey: key })
-$: actionContextBindings = getActionBindings(actions, selectedAction?.id)
-
-$: allBindings = getAllBindings(bindings, [...eventContextBindings, ...actionContextBindings], actions)
-
-$: {
-  if (actions) {
-    actions.forEach((action) => {
-      if (!action.id) action.id = generate()
-    })
-  }
-}
-$: selectedActionComponent = selectedAction && actionTypes.find((t) => t.name === selectedAction[EVENT_TYPE_KEY])?.component
-
-$: {
-  if (selectedAction && actions && !actions.includes(selectedAction)) {
-    const found = findBranchActionById(actions, selectedAction.id)
-    if (!found) selectedAction = actions?.[0]
-  }
 }
 
 const findBranchActionById = (actions, id) => {
@@ -388,7 +367,69 @@ const findParentIfAction = (actions, childId) => {
   return null
 }
 
-$: activeIfAction = isIFBlock(selectedAction) ? selectedAction : findParentIfAction(actions, selectedAction?.id)
+$: branchDrawerComponent =
+  branchDrawerMode === "editor" && branchDrawerAction
+    ? actionTypes.find((t) => t.name === branchDrawerAction[EVENT_TYPE_KEY])?.component
+    : null
+
+$: branchDrawerTitle =
+  branchDrawerMode === "picker"
+    ? "Add Action"
+    : branchDrawerMode === "editor" && branchDrawerAction
+      ? `Edit: ${toDisplay(branchDrawerAction[EVENT_TYPE_KEY])}`
+      : "Actions"
+
+$: {
+  if (selectedAction && !selectedAction.parameters) selectedAction.parameters = {}
+}
+$: parsedQuery = typeof actionQuery === "string" ? actionQuery.toLowerCase().trim() : ""
+$: showAvailableActions = !actions?.length
+$: mappedActionTypes = actionTypes.reduce((acc, action) => {
+  let pn = action.name.toLowerCase().trim()
+  if (parsedQuery.length && pn.indexOf(parsedQuery) < 0) return acc
+  acc[action.type] = acc[action.type] || []
+  acc[action.type].push(action)
+  return acc
+}, {})
+
+$: branchParsedQuery = typeof branchAddQuery === "string" ? branchAddQuery.toLowerCase().trim() : ""
+$: branchMappedActionTypes = actionTypes.reduce((acc, action) => {
+  let pn = action.name.toLowerCase().trim()
+  if (branchParsedQuery.length && pn.indexOf(branchParsedQuery) < 0) return acc
+  acc[action.type] = acc[action.type] || []
+  acc[action.type].push(action)
+  return acc
+}, {})
+
+$: eventContextBindings = getEventContextBindings({ componentInstance, settingKey: key })
+$: actionContextBindings = getActionBindings(actions, selectedAction?.id)
+
+$: allBindings = getAllBindings(
+  bindings,
+  [...eventContextBindings, ...actionContextBindings],
+  actions
+)
+
+$: {
+  if (actions) {
+    actions.forEach((action) => {
+      if (!action.id) action.id = generate()
+    })
+  }
+}
+$: selectedActionComponent =
+  selectedAction && actionTypes.find((t) => t.name === selectedAction[EVENT_TYPE_KEY])?.component
+
+$: {
+  if (selectedAction && actions && !actions.includes(selectedAction)) {
+    const found = findBranchActionById(actions, selectedAction.id)
+    if (!found) selectedAction = actions?.[0]
+  }
+}
+
+$: activeIfAction = isIFBlock(selectedAction)
+  ? selectedAction
+  : findParentIfAction(actions, selectedAction?.id)
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
