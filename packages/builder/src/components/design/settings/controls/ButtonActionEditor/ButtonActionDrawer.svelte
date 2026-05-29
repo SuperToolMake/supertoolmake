@@ -36,6 +36,7 @@ let branchDrawer
 let branchDrawerMode = null // "picker" | "editor"
 let branchDrawerAction = null
 let branchDrawerKey = null // "actions" | "elseActions"
+let branchDrawerDraft = null
 
 const openBranchAddDrawer = (branchKey) => {
   branchDrawerKey = branchKey
@@ -49,6 +50,7 @@ const openBranchActionDrawer = (action, branchKey) => {
   branchDrawerKey = branchKey
   branchDrawerMode = "editor"
   branchDrawerAction = action
+  branchDrawerDraft = cloneDeep(action.parameters || {})
   branchDrawer.show()
 }
 
@@ -56,6 +58,14 @@ const onBranchPickerSelect = (actionType) => {
   const prevSelected = selectedAction
   addBranchAction(activeIfAction, branchDrawerKey, actionType)
   selectedAction = prevSelected
+  branchDrawer.hide()
+}
+
+const saveBranchAction = () => {
+  if (branchDrawerMode === "editor" && branchDrawerAction && branchDrawerDraft) {
+    branchDrawerAction.parameters = branchDrawerDraft
+    actions = [...actions]
+  }
   branchDrawer.hide()
 }
 
@@ -651,6 +661,7 @@ $: activeIfAction = isIFBlock(selectedAction)
         </div>
 
         <Drawer bind:this={branchDrawer} title={branchDrawerTitle} on:drawerHide>
+          <Button slot="buttons" on:click={saveBranchAction}>Save</Button>
           <div class="branch-drawer-body" slot="body">
             {#if branchDrawerMode === "picker"}
               <div class="actions-list">
@@ -673,7 +684,7 @@ $: activeIfAction = isIFBlock(selectedAction)
                 <div class="selected-action-container">
                   <svelte:component
                     this={branchDrawerComponent}
-                    bind:parameters={branchDrawerAction.parameters}
+                    bind:parameters={branchDrawerDraft}
                     bindings={allBindings}
                     {nested}
                     {componentInstance}
