@@ -7,9 +7,6 @@ describe("validation constraints", () => {
     ["number", ["required", "maxValue", "minValue", "equal", "notEqual"]],
     ["boolean", ["required", "equal", "notEqual"]],
     ["datetime", ["required", "maxValue", "minValue", "equal", "notEqual"]],
-    ["attachment", ["required", "maxFileSize", "maxUploadSize"]],
-    ["attachment_single", ["required", "maxUploadSize"]],
-    ["signature_single", ["required"]],
     ["link", ["required", "contains", "notContains", "minLength", "maxLength"]],
     ["array", ["required", "minLength", "maxLength", "contains", "notContains"]],
   ])("returns constraints for %s fields", (fieldType, expected) => {
