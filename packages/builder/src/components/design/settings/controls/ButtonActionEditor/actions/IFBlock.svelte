@@ -55,7 +55,6 @@ onMount(() => {
     gap: var(--spacing-l);
     justify-content: flex-start;
     align-items: stretch;
-    max-width: 500px;
     margin: 0 auto;
   }
   .condition-editor {
