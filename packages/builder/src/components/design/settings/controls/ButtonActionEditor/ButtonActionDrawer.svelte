@@ -40,6 +40,9 @@ let draggingIFBlock = false
 let topLevelDragSnapshot
 let topLevelDraggedAction
 let branchDragSource
+let branchCountSnapshot = {}
+let freezeBranchCounts = false
+let dragStateResetTimeout
 let branchAddQuery = ""
 
 let branchDrawer
@@ -124,6 +127,7 @@ let updateStateActions = setUpdateActions(actions)
 const recordOriginalActionIndex = (id) => {
   if (!(actions && id)) return
   if (draggingActionId !== id) {
+    clearTimeout(dragStateResetTimeout)
     draggingActionId = id
     originalActionIndex = -1
     topLevelDragSnapshot = actions
@@ -140,6 +144,13 @@ const resetDragState = () => {
   topLevelDragSnapshot = undefined
   topLevelDraggedAction = undefined
   branchDragSource = undefined
+  branchCountSnapshot = {}
+  freezeBranchCounts = false
+}
+
+const scheduleDragStateReset = () => {
+  clearTimeout(dragStateResetTimeout)
+  dragStateResetTimeout = setTimeout(resetDragState, 0)
 }
 
 const isDraggingIFAction = (id) => {
@@ -154,6 +165,19 @@ const restoreTopLevelDragSnapshot = () => {
   if (topLevelDragSnapshot) {
     actions = topLevelDragSnapshot
   }
+}
+
+const getBranchCountSnapshot = () => {
+  return (actions || []).reduce((acc, action) => {
+    if (isIFBlock(action)) {
+      acc[action.id] = {
+        total: getBranchActionCount(action),
+        actions: getIfBranchActionCount(action, "actions"),
+        elseActions: getIfBranchActionCount(action, "elseActions"),
+      }
+    }
+    return acc
+  }, {})
 }
 
 function handleDndConsider(e) {
@@ -204,8 +228,10 @@ function handleBranchConsider(e, ifActionId, branchKey) {
     restoreTopLevelDragSnapshot()
     return
   }
-  if (!branchDragSource && draggedItem) {
+  if (!branchDragSource) {
     branchDragSource = { ifActionId, branchKey }
+    branchCountSnapshot = getBranchCountSnapshot()
+    freezeBranchCounts = true
   }
   const ifAction = actions.find((a) => a.id === ifActionId)
   if (ifAction?.parameters) {
@@ -220,13 +246,17 @@ function handleBranchFinalize(e, ifActionId, branchKey) {
     restoreTopLevelDragSnapshot()
     return
   }
-  if (!branchDragSource && draggedItem) {
+  if (!branchDragSource) {
     branchDragSource = { ifActionId, branchKey }
+    branchCountSnapshot = getBranchCountSnapshot()
+    freezeBranchCounts = true
   }
   const ifAction = actions.find((a) => a.id === ifActionId)
   if (ifAction?.parameters) {
     ifAction.parameters[branchKey] = e.detail.items
     actions = [...actions]
+    freezeBranchCounts = false
+    scheduleDragStateReset()
   }
 }
 
@@ -258,6 +288,22 @@ const deleteBranchAction = (ifAction, branchKey, actionId) => {
 const getBranchActionCount = (action) => {
   if (!isIFBlock(action)) return 0
   return (action.parameters?.actions?.length || 0) + (action.parameters?.elseActions?.length || 0)
+}
+
+const getDisplayedBranchActionCount = (action) => {
+  return freezeBranchCounts
+    ? (branchCountSnapshot?.[action.id]?.total ?? getBranchActionCount(action))
+    : getBranchActionCount(action)
+}
+
+const getIfBranchActionCount = (action, branchKey) => {
+  return action?.parameters?.[branchKey]?.length || 0
+}
+
+const getDisplayedIfBranchActionCount = (action, branchKey) => {
+  return freezeBranchCounts
+    ? (branchCountSnapshot?.[action.id]?.[branchKey] ?? getIfBranchActionCount(action, branchKey))
+    : getIfBranchActionCount(action, branchKey)
 }
 
 const toggleActionList = () => {
@@ -519,7 +565,7 @@ $: activeIfAction = isIFBlock(selectedAction)
                     {index + 1}. IF / ELSE
                   </div>
                   <div class="branch-count">
-                    {getBranchActionCount(action)} action{getBranchActionCount(action) !== 1 ? "s" : ""}
+                    {getDisplayedBranchActionCount(action)} action{getDisplayedBranchActionCount(action) !== 1 ? "s" : ""}
                   </div>
                   <!-- svelte-ignore a11y-click-events-have-key-events -->
                   <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -579,7 +625,7 @@ $: activeIfAction = isIFBlock(selectedAction)
           <div class="branch-section">
             <div class="branch-label">
               <span>THEN</span>
-              <span class="branch-count">{(activeIfAction.parameters?.actions || []).length} action{((activeIfAction.parameters?.actions || []).length) !== 1 ? "s" : ""}</span>
+              <span class="branch-count">{getDisplayedIfBranchActionCount(activeIfAction, "actions")} action{getDisplayedIfBranchActionCount(activeIfAction, "actions") !== 1 ? "s" : ""}</span>
             </div>
             <div
               class="branch-actions"
@@ -629,7 +675,7 @@ $: activeIfAction = isIFBlock(selectedAction)
           <div class="branch-section">
             <div class="branch-label">
               <span>ELSE</span>
-              <span class="branch-count">{(activeIfAction.parameters?.elseActions || []).length} action{((activeIfAction.parameters?.elseActions || []).length) !== 1 ? "s" : ""}</span>
+              <span class="branch-count">{getDisplayedIfBranchActionCount(activeIfAction, "elseActions")} action{getDisplayedIfBranchActionCount(activeIfAction, "elseActions") !== 1 ? "s" : ""}</span>
             </div>
             <div
               class="branch-actions"
@@ -747,6 +793,7 @@ $: activeIfAction = isIFBlock(selectedAction)
     align-items: stretch;
     gap: var(--spacing-s);
     flex: 1 1 auto;
+    margin-top: var(--spacing-s);
     min-height: 160px;
   }
   .action-header {
