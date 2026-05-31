@@ -39,6 +39,7 @@ let draggingActionId
 let draggingIFBlock = false
 let topLevelDragSnapshot
 let topLevelDraggedAction
+let branchDragSource
 let branchAddQuery = ""
 
 let branchDrawer
@@ -138,6 +139,7 @@ const resetDragState = () => {
   draggingActionId = undefined
   topLevelDragSnapshot = undefined
   topLevelDraggedAction = undefined
+  branchDragSource = undefined
 }
 
 const isDraggingIFAction = (id) => {
@@ -171,6 +173,13 @@ function handleDndFinalize(e) {
   const wasIFBlock = draggingIFBlock
   draggingIFBlock = false
 
+  if (branchDragSource && e.detail.info.trigger === "droppedIntoZone") {
+    actions = e.detail.items
+    selectedAction = actions.find((action) => action.id === e.detail.info.id) || selectedAction
+    resetDragState()
+    return
+  }
+
   if (wasIFBlock && e.detail.info.trigger === "droppedIntoAnother") {
     restoreTopLevelDragSnapshot()
     resetDragState()
@@ -195,6 +204,9 @@ function handleBranchConsider(e, ifActionId, branchKey) {
     restoreTopLevelDragSnapshot()
     return
   }
+  if (!branchDragSource && draggedItem) {
+    branchDragSource = { ifActionId, branchKey }
+  }
   const ifAction = actions.find((a) => a.id === ifActionId)
   if (ifAction?.parameters) {
     ifAction.parameters[branchKey] = e.detail.items
@@ -207,6 +219,9 @@ function handleBranchFinalize(e, ifActionId, branchKey) {
   if (isDraggingIFAction(e.detail.info.id) || isIFBlock(draggedItem)) {
     restoreTopLevelDragSnapshot()
     return
+  }
+  if (!branchDragSource && draggedItem) {
+    branchDragSource = { ifActionId, branchKey }
   }
   const ifAction = actions.find((a) => a.id === ifActionId)
   if (ifAction?.parameters) {
@@ -463,6 +478,7 @@ $: activeIfAction = isIFBlock(selectedAction)
     {/if}
 
     {#if actions && actions.length > 0 && !showAvailableActions}
+      <div class="sidebar-actions-panel">
       <div>
         <Button secondary on:click={toggleActionList}>Add Action</Button>
       </div>
@@ -541,6 +557,7 @@ $: activeIfAction = isIFBlock(selectedAction)
             </div>
           {/if}
         {/each}
+      </div>
       </div>
     {/if}
   </Layout>
@@ -716,13 +733,21 @@ $: activeIfAction = isIFBlock(selectedAction)
 </DrawerContent>
 
 <style>
+  .sidebar-actions-panel {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    height: 100%;
+    min-height: 0;
+  }
   .actions {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
     gap: var(--spacing-s);
-    min-height: 4px;
+    flex: 1 1 auto;
+    min-height: 160px;
   }
   .action-header {
     color: var(--spectrum-global-color-gray-700);
