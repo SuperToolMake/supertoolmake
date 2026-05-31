@@ -61,5 +61,6 @@ onMount(() => {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-l);
+    max-width: 320px;
   }
 </style>
