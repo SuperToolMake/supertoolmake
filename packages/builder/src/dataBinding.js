@@ -805,7 +805,7 @@ export const getActionBindings = (actions, actionId) => {
   if (index == null || index === -1) {
     for (let i = 0; i < (actions || []).length; i++) {
       const action = actions[i]
-      if (action["##eventHandlerType"] !== "IF") continue
+      if (action["##eventHandlerType"] !== "IF / ELSE") continue
       const ifActions = action.parameters?.actions || []
       const elseActions = action.parameters?.elseActions || []
       if (ifActions.some((a) => a.id === actionId) || elseActions.some((a) => a.id === actionId)) {
