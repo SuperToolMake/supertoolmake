@@ -104,7 +104,7 @@ docker service create --name supertoolmake --replicas 1 --publish 10000:80 --mou
 To update to a new version without downtime, simply run:
 
 ```
-docker service update  --update-delay 45s --image ghcr.io/supertoolmake/supertoolmake:latest supertoolmake
+docker service update --update-delay 45s --force --image ghcr.io/supertoolmake/supertoolmake:latest supertoolmake
 ```
 
 Swarm will automatically start the new container, verify it is healthy, and then stop the old one.
