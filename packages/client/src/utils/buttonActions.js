@@ -390,6 +390,31 @@ const exportDataHandler = async (action) => {
   }
 }
 
+const ifHandler = async (action, context) => {
+  const { value, operator, referenceValue } = action.parameters
+  if (!operator) {
+    const enrich = enrichButtonActions(action.parameters.actions, context)
+    if (enrich) {
+      await enrich(context.eventContext)
+    }
+    return
+  }
+  let match = false
+  if (value == null && referenceValue == null) {
+    match = true
+  } else if (value === referenceValue) {
+    match = true
+  } else {
+    match = JSON.stringify(value) === JSON.stringify(referenceValue)
+  }
+  match = operator === "equal" ? match : !match
+  const branchActions = match ? action.parameters.actions : action.parameters.elseActions
+  const enrich = enrichButtonActions(branchActions, context)
+  if (enrich) {
+    await enrich(context.eventContext)
+  }
+}
+
 const continueIfHandler = (action) => {
   const { type, value, operator, referenceValue } = action.parameters
   if (!(type && operator)) {
@@ -516,6 +541,7 @@ const handlerMap = {
   "Update State": updateStateHandler,
   "Upload File to Bucket": s3UploadHandler,
   "Export Data": exportDataHandler,
+  IF: ifHandler,
   "Continue if / Stop if": continueIfHandler,
   "Show Notification": showNotificationHandler,
   "Prompt User": promptUserHandler,

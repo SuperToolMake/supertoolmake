@@ -26,7 +26,7 @@
     "svelte": "5.55.7",
     "svelte-check": "4.4.6",
     "svelte-preprocess": "6.0.3",
-    "testcontainers": "11.13.0",
+    "testcontainers": "12.0.1",
     "typescript": "5.9.2",
     "update-dotenv": "1.1.1",
     "yargs": "17.7.2"
@@ -98,7 +98,7 @@
     "semver": "7.5.3",
     "http-cache-semantics": "4.1.1",
     "msgpackr": "1.10.1",
-    "axios": "1.15.2",
+    "axios": "1.16.0",
     "xml2js": "0.6.2",
     "passport": "0.6.0",
     "nodemailer": "8.0.5",
@@ -114,9 +114,10 @@
     "@smithy/node-http-handler": "4.4.16",
     "**/lodash": "4.18.1",
     "protobufjs": "8.2.0",
-    "uuid": "11.1.1"
+    "uuid": "11.1.1",
+    "tmp": "0.2.6"
   },
   "engines": {
-    "node": ">=22.0.0 <23.0.0"
+    "node": ">=22.22.0 <23.0.0"
   }
 }

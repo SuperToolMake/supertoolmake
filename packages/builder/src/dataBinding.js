@@ -796,8 +796,25 @@ export const getEventContextBindings = ({
  */
 export const getActionBindings = (actions, actionId) => {
   const bindings = []
+  if (!actions || !actionId) return bindings
+
   // Get the steps leading up to this value
-  const index = actions?.findIndex((action) => action.id === actionId)
+  let index = actions?.findIndex((action) => action.id === actionId)
+
+  // If action not found at top level, check inside IF blocks
+  if (index == null || index === -1) {
+    for (let i = 0; i < (actions || []).length; i++) {
+      const action = actions[i]
+      if (action["##eventHandlerType"] !== "IF") continue
+      const ifActions = action.parameters?.actions || []
+      const elseActions = action.parameters?.elseActions || []
+      if (ifActions.some((a) => a.id === actionId) || elseActions.some((a) => a.id === actionId)) {
+        index = i
+        break
+      }
+    }
+  }
+
   if (index == null || index === -1) {
     return bindings
   }
@@ -806,7 +823,7 @@ export const getActionBindings = (actions, actionId) => {
   // Generate bindings for any steps which provide context
   prevActions.forEach((action, idx) => {
     const def = ActionDefinitions.actions.find((x) => x.name === action["##eventHandlerType"])
-    if (def.context) {
+    if (def?.context) {
       def.context.forEach((contextValue) => {
         bindings.push({
           readableBinding: `Action ${idx + 1}.${contextValue.label}`,

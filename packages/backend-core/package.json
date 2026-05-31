@@ -83,7 +83,7 @@
     "@types/semver": "7.3.7",
     "@types/tar-fs": "2.0.4",
     "chance": "1.1.8",
-    "ioredis-mock": "8.9.0",
+    "ioredis-mock": "8.13.1",
     "nock": "^13.5.6",
     "pino-pretty": "10.0.0",
     "pouchdb-adapter-memory": "9.0.0",
