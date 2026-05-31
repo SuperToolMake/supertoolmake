@@ -37,6 +37,8 @@ let selectedAction = actions?.length ? actions[0] : null
 let originalActionIndex
 let draggingActionId
 let draggingIFBlock = false
+let topLevelDragSnapshot
+let topLevelDraggedAction
 let branchAddQuery = ""
 
 let branchDrawer
@@ -123,16 +125,44 @@ const recordOriginalActionIndex = (id) => {
   if (draggingActionId !== id) {
     draggingActionId = id
     originalActionIndex = -1
+    topLevelDragSnapshot = actions
+    topLevelDraggedAction = actions.find((action) => action.id === id)
   }
   if (originalActionIndex >= 0) return
   const index = actions.findIndex((action) => action.id === id)
   if (index !== -1) originalActionIndex = index
 }
 
+const resetDragState = () => {
+  originalActionIndex = -1
+  draggingActionId = undefined
+  topLevelDragSnapshot = undefined
+  topLevelDraggedAction = undefined
+}
+
+const isDraggingIFAction = (id) => {
+  return (
+    draggingIFBlock ||
+    isIFBlock(topLevelDraggedAction) ||
+    actions?.some((action) => action.id === id && isIFBlock(action))
+  )
+}
+
+const restoreTopLevelDragSnapshot = () => {
+  if (topLevelDragSnapshot) {
+    actions = topLevelDragSnapshot
+  }
+}
+
 function handleDndConsider(e) {
   recordOriginalActionIndex(e.detail.info.id)
-  if (!draggingIFBlock && actions?.some((a) => a.id === e.detail.info.id && isIFBlock(a))) {
+  const wasIFBlock = isDraggingIFAction(e.detail.info.id)
+  if (!draggingIFBlock && wasIFBlock) {
     draggingIFBlock = true
+  }
+  if (wasIFBlock && e.detail.info.trigger === "draggedEnteredAnother") {
+    restoreTopLevelDragSnapshot()
+    return
   }
   actions = e.detail.items
 }
@@ -141,13 +171,13 @@ function handleDndFinalize(e) {
   const wasIFBlock = draggingIFBlock
   draggingIFBlock = false
 
-  if (e.detail.trigger === "droppedIntoAnother" && wasIFBlock) {
-    originalActionIndex = -1
-    draggingActionId = undefined
+  if (wasIFBlock && e.detail.info.trigger === "droppedIntoAnother") {
+    restoreTopLevelDragSnapshot()
+    resetDragState()
     return
   }
   actions = e.detail.items
-  if (e.detail.trigger !== "droppedIntoAnother") {
+  if (e.detail.info.trigger !== "droppedIntoAnother") {
     updateReferencesInObject({
       obj: actions,
       modifiedIndex: actions.findIndex((action) => action.id === e.detail.info.id),
@@ -156,12 +186,15 @@ function handleDndFinalize(e) {
       originalIndex: originalActionIndex,
     })
   }
-  originalActionIndex = -1
-  draggingActionId = undefined
+  resetDragState()
 }
 
 function handleBranchConsider(e, ifActionId, branchKey) {
-  if (draggingIFBlock) return
+  const draggedItem = e.detail.items.find((item) => item.id === e.detail.info.id)
+  if (isDraggingIFAction(e.detail.info.id) || isIFBlock(draggedItem)) {
+    restoreTopLevelDragSnapshot()
+    return
+  }
   const ifAction = actions.find((a) => a.id === ifActionId)
   if (ifAction?.parameters) {
     ifAction.parameters[branchKey] = e.detail.items
@@ -171,10 +204,8 @@ function handleBranchConsider(e, ifActionId, branchKey) {
 
 function handleBranchFinalize(e, ifActionId, branchKey) {
   const draggedItem = e.detail.items.find((item) => item.id === e.detail.info.id)
-  if (draggedItem && isIFBlock(draggedItem)) {
-    if (!actions.some((a) => a.id === draggedItem.id)) {
-      actions = [...actions, draggedItem]
-    }
+  if (isDraggingIFAction(e.detail.info.id) || isIFBlock(draggedItem)) {
+    restoreTopLevelDragSnapshot()
     return
   }
   const ifAction = actions.find((a) => a.id === ifActionId)
@@ -540,7 +571,7 @@ $: activeIfAction = isIFBlock(selectedAction)
                 type: zoneType,
                 flipDurationMs,
                 dropTargetStyle: { outline: "none" },
-                dropFromOthersDisabled: false,
+                dropFromOthersDisabled: draggingIFBlock,
               }}
               on:consider={(e) => handleBranchConsider(e, activeIfAction.id, "actions")}
               on:finalize={(e) => handleBranchFinalize(e, activeIfAction.id, "actions")}
@@ -590,7 +621,7 @@ $: activeIfAction = isIFBlock(selectedAction)
                 type: zoneType,
                 flipDurationMs,
                 dropTargetStyle: { outline: "none" },
-                dropFromOthersDisabled: false,
+                dropFromOthersDisabled: draggingIFBlock,
               }}
               on:consider={(e) => handleBranchConsider(e, activeIfAction.id, "elseActions")}
               on:finalize={(e) => handleBranchFinalize(e, activeIfAction.id, "elseActions")}
