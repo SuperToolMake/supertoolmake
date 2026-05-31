@@ -26,6 +26,24 @@ const actionTypes = getAvailableActions()
 const flipDurationMs = 150
 const zoneType = generate()
 
+const branchConfigs = [
+  { key: "actions", label: "THEN" },
+  { key: "elseActions", label: "ELSE" },
+]
+
+const createAction = (actionType) => {
+  const newAction = {
+    parameters: {},
+    [EVENT_TYPE_KEY]: actionType.name,
+    id: generate(),
+  }
+  if (isIFBlock(newAction)) {
+    newAction.parameters.actions = []
+    newAction.parameters.elseActions = []
+  }
+  return newAction
+}
+
 export let key
 export let actions
 export let bindings = []
@@ -70,15 +88,7 @@ const openBranchActionDrawer = (action, branchKey) => {
 }
 
 const onBranchPickerSelect = (actionType) => {
-  const newAction = {
-    parameters: {},
-    [EVENT_TYPE_KEY]: actionType.name,
-    id: generate(),
-  }
-  if (isIFBlock(newAction)) {
-    newAction.parameters.actions = []
-    newAction.parameters.elseActions = []
-  }
+  const newAction = createAction(actionType)
   branchDrawerMode = "editor"
   branchDrawerAction = newAction
   branchDrawerDraft = cloneDeep(newAction.parameters)
@@ -222,7 +232,7 @@ function handleDndFinalize(e) {
   resetDragState()
 }
 
-function handleBranchConsider(e, ifActionId, branchKey) {
+function handleBranchDrag(e, ifActionId, branchKey, isFinalize) {
   const draggedItem = e.detail.items.find((item) => item.id === e.detail.info.id)
   if (isDraggingIFAction(e.detail.info.id) || isIFBlock(draggedItem)) {
     restoreTopLevelDragSnapshot()
@@ -237,26 +247,10 @@ function handleBranchConsider(e, ifActionId, branchKey) {
   if (ifAction?.parameters) {
     ifAction.parameters[branchKey] = e.detail.items
     actions = [...actions]
-  }
-}
-
-function handleBranchFinalize(e, ifActionId, branchKey) {
-  const draggedItem = e.detail.items.find((item) => item.id === e.detail.info.id)
-  if (isDraggingIFAction(e.detail.info.id) || isIFBlock(draggedItem)) {
-    restoreTopLevelDragSnapshot()
-    return
-  }
-  if (!branchDragSource) {
-    branchDragSource = { ifActionId, branchKey }
-    branchCountSnapshot = getBranchCountSnapshot()
-    freezeBranchCounts = true
-  }
-  const ifAction = actions.find((a) => a.id === ifActionId)
-  if (ifAction?.parameters) {
-    ifAction.parameters[branchKey] = e.detail.items
-    actions = [...actions]
-    freezeBranchCounts = false
-    scheduleDragStateReset()
+    if (isFinalize) {
+      freezeBranchCounts = false
+      scheduleDragStateReset()
+    }
   }
 }
 
@@ -312,15 +306,7 @@ const toggleActionList = () => {
 }
 
 const addAction = (actionType) => {
-  const newAction = {
-    parameters: {},
-    [EVENT_TYPE_KEY]: actionType.name,
-    id: generate(),
-  }
-  if (isIFBlock(newAction)) {
-    newAction.parameters.actions = []
-    newAction.parameters.elseActions = []
-  }
+  const newAction = createAction(actionType)
   if (!actions) actions = []
   actions = [...actions, newAction]
   selectedAction = newAction
@@ -328,11 +314,7 @@ const addAction = (actionType) => {
 }
 
 const addBranchAction = (ifAction, branchKey, actionType) => {
-  const newAction = {
-    parameters: {},
-    [EVENT_TYPE_KEY]: actionType.name,
-    id: generate(),
-  }
+  const newAction = createAction(actionType)
   if (!ifAction.parameters) ifAction.parameters = {}
   if (!ifAction.parameters[branchKey]) ifAction.parameters[branchKey] = []
   ifAction.parameters[branchKey] = [...ifAction.parameters[branchKey], newAction]
@@ -444,23 +426,21 @@ $: {
 }
 $: parsedQuery = typeof actionQuery === "string" ? actionQuery.toLowerCase().trim() : ""
 $: showAvailableActions = !actions?.length
-$: mappedActionTypes = actionTypes.reduce((acc, action) => {
-  let pn = action.name.toLowerCase().trim()
-  if (parsedQuery.length && pn.indexOf(parsedQuery) < 0) return acc
-  acc[action.type] = acc[action.type] || []
-  acc[action.type].push(action)
-  return acc
-}, {})
+const mapActionTypes = (query, excludeIF = false) => {
+  return actionTypes.reduce((acc, action) => {
+    if (excludeIF && action.name === IF_TYPE) return acc
+    let pn = action.name.toLowerCase().trim()
+    if (query.length && pn.indexOf(query) < 0) return acc
+    acc[action.type] = acc[action.type] || []
+    acc[action.type].push(action)
+    return acc
+  }, {})
+}
+
+$: mappedActionTypes = mapActionTypes(parsedQuery)
 
 $: branchParsedQuery = typeof branchAddQuery === "string" ? branchAddQuery.toLowerCase().trim() : ""
-$: branchMappedActionTypes = actionTypes.reduce((acc, action) => {
-  if (action.name === IF_TYPE) return acc
-  let pn = action.name.toLowerCase().trim()
-  if (branchParsedQuery.length && pn.indexOf(branchParsedQuery) < 0) return acc
-  acc[action.type] = acc[action.type] || []
-  acc[action.type].push(action)
-  return acc
-}, {})
+$: branchMappedActionTypes = mapActionTypes(branchParsedQuery, true)
 
 $: eventContextBindings = getEventContextBindings({ componentInstance, settingKey: key })
 $: actionContextBindings = getActionBindings(actions, selectedAction?.id)
@@ -622,105 +602,57 @@ $: activeIfAction = isIFBlock(selectedAction)
       {/key}
       {#if activeIfAction}
         <div class="if-branches">
-          <div class="branch-section">
-            <div class="branch-label">
-              <span>THEN</span>
-              <span class="branch-count">{getDisplayedIfBranchActionCount(activeIfAction, "actions")} action{getDisplayedIfBranchActionCount(activeIfAction, "actions") !== 1 ? "s" : ""}</span>
-            </div>
-            <div
-              class="branch-actions"
-              use:dndzone={{
-                items: activeIfAction?.parameters?.actions || [],
-                type: zoneType,
-                flipDurationMs,
-                dropTargetStyle: { outline: "none" },
-                dropFromOthersDisabled: draggingIFBlock,
-              }}
-              on:consider={(e) => handleBranchConsider(e, activeIfAction.id, "actions")}
-              on:finalize={(e) => handleBranchFinalize(e, activeIfAction.id, "actions")}
-            >
-              {#each activeIfAction.parameters?.actions || [] as childAction, childIndex (childAction.id)}
-                <div
-                  class="action-container"
-                  class:selected={childAction === selectedAction}
-                  on:click|stopPropagation={() => openBranchActionDrawer(childAction, "actions")}
-                  role="button"
-                  tabindex="0"
-                  on:keydown={(e) => e.key === "Enter" && openBranchActionDrawer(childAction, "actions")}
-                >
-                  <Icon
-                    name="dots-six-vertical"
-                    size="L"
-                    color="var(--spectrum-global-color-gray-600)"
-                    hoverable="true"
-                    hovercolor="var(--spectrum-global-color-gray-800)"
-                  />
-                  <div class="action-header">{childIndex + 1}. {toDisplay(childAction[EVENT_TYPE_KEY])}</div>
-                  <!-- svelte-ignore a11y-click-events-have-key-events -->
-                  <!-- svelte-ignore a11y-no-static-element-interactions -->
-                  <div class="delete-btn" on:click|stopPropagation={() => deleteBranchAction(activeIfAction, "actions", childAction.id)}>
-                    <Icon name="x" hoverable size="S" />
+          {#each branchConfigs as branch}
+            <div class="branch-section">
+              <div class="branch-label">
+                <span>{branch.label}</span>
+                <span class="branch-count">{getDisplayedIfBranchActionCount(activeIfAction, branch.key)} action{getDisplayedIfBranchActionCount(activeIfAction, branch.key) !== 1 ? "s" : ""}</span>
+              </div>
+              <div
+                class="branch-actions"
+                use:dndzone={{
+                  items: activeIfAction?.parameters?.[branch.key] || [],
+                  type: zoneType,
+                  flipDurationMs,
+                  dropTargetStyle: { outline: "none" },
+                  dropFromOthersDisabled: draggingIFBlock,
+                }}
+                on:consider={(e) => handleBranchDrag(e, activeIfAction.id, branch.key, false)}
+                on:finalize={(e) => handleBranchDrag(e, activeIfAction.id, branch.key, true)}
+              >
+                {#each activeIfAction.parameters?.[branch.key] || [] as childAction, childIndex (childAction.id)}
+                  <div
+                    class="action-container"
+                    class:selected={childAction === selectedAction}
+                    on:click|stopPropagation={() => openBranchActionDrawer(childAction, branch.key)}
+                    role="button"
+                    tabindex="0"
+                    on:keydown={(e) => e.key === "Enter" && openBranchActionDrawer(childAction, branch.key)}
+                  >
+                    <Icon
+                      name="dots-six-vertical"
+                      size="L"
+                      color="var(--spectrum-global-color-gray-600)"
+                      hoverable="true"
+                      hovercolor="var(--spectrum-global-color-gray-800)"
+                    />
+                    <div class="action-header">{childIndex + 1}. {toDisplay(childAction[EVENT_TYPE_KEY])}</div>
+                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                    <!-- svelte-ignore a11y-no-static-element-interactions -->
+                    <div class="delete-btn" on:click|stopPropagation={() => deleteBranchAction(activeIfAction, branch.key, childAction.id)}>
+                      <Icon name="x" hoverable size="S" />
+                    </div>
                   </div>
-                </div>
-              {/each}
-              {#if !(activeIfAction.parameters?.actions || []).length}
-                <div class="branch-placeholder">Drop actions here</div>
-              {/if}
+                {/each}
+                {#if !(activeIfAction.parameters?.[branch.key] || []).length}
+                  <div class="branch-placeholder">Drop actions here</div>
+                {/if}
+              </div>
+              <div class="add-action-wrap">
+                <Button secondary on:click={(e) => { e.stopPropagation(); openBranchAddDrawer(branch.key) }}>Add Action</Button>
+              </div>
             </div>
-            <div class="add-action-wrap">
-              <Button secondary on:click={(e) => { e.stopPropagation(); openBranchAddDrawer("actions") }}>Add Action</Button>
-            </div>
-          </div>
-
-          <div class="branch-section">
-            <div class="branch-label">
-              <span>ELSE</span>
-              <span class="branch-count">{getDisplayedIfBranchActionCount(activeIfAction, "elseActions")} action{getDisplayedIfBranchActionCount(activeIfAction, "elseActions") !== 1 ? "s" : ""}</span>
-            </div>
-            <div
-              class="branch-actions"
-              use:dndzone={{
-                items: activeIfAction?.parameters?.elseActions || [],
-                type: zoneType,
-                flipDurationMs,
-                dropTargetStyle: { outline: "none" },
-                dropFromOthersDisabled: draggingIFBlock,
-              }}
-              on:consider={(e) => handleBranchConsider(e, activeIfAction.id, "elseActions")}
-              on:finalize={(e) => handleBranchFinalize(e, activeIfAction.id, "elseActions")}
-            >
-              {#each activeIfAction.parameters?.elseActions || [] as childAction, childIndex (childAction.id)}
-                <div
-                  class="action-container"
-                  class:selected={childAction === selectedAction}
-                  on:click|stopPropagation={() => openBranchActionDrawer(childAction, "elseActions")}
-                  role="button"
-                  tabindex="0"
-                  on:keydown={(e) => e.key === "Enter" && openBranchActionDrawer(childAction, "elseActions")}
-                >
-                  <Icon
-                    name="dots-six-vertical"
-                    size="L"
-                    color="var(--spectrum-global-color-gray-600)"
-                    hoverable="true"
-                    hovercolor="var(--spectrum-global-color-gray-800)"
-                  />
-                  <div class="action-header">{childIndex + 1}. {toDisplay(childAction[EVENT_TYPE_KEY])}</div>
-                  <!-- svelte-ignore a11y-click-events-have-key-events -->
-                  <!-- svelte-ignore a11y-no-static-element-interactions -->
-                  <div class="delete-btn" on:click|stopPropagation={() => deleteBranchAction(activeIfAction, "elseActions", childAction.id)}>
-                    <Icon name="x" hoverable size="S" />
-                  </div>
-                </div>
-              {/each}
-              {#if !(activeIfAction.parameters?.elseActions || []).length}
-                <div class="branch-placeholder">Drop actions here</div>
-              {/if}
-            </div>
-            <div class="add-action-wrap">
-              <Button secondary on:click={(e) => { e.stopPropagation(); openBranchAddDrawer("elseActions") }}>Add Action</Button>
-            </div>
-          </div>
+          {/each}
         </div>
 
         <Drawer
@@ -782,9 +714,9 @@ $: activeIfAction = isIFBlock(selectedAction)
   .sidebar-actions-panel {
     display: flex;
     flex-direction: column;
-    flex: 1 1 auto;
-    height: 100%;
+    flex: 1;
     min-height: 0;
+    overflow: hidden;
   }
   .actions {
     display: flex;
@@ -792,9 +724,10 @@ $: activeIfAction = isIFBlock(selectedAction)
     justify-content: flex-start;
     align-items: stretch;
     gap: var(--spacing-s);
-    flex: 1 1 auto;
+    flex: 1;
     margin-top: var(--spacing-s);
     min-height: 160px;
+    overflow-y: auto;
   }
   .action-header {
     color: var(--spectrum-global-color-gray-700);
