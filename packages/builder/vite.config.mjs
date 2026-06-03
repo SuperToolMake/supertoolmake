@@ -54,6 +54,16 @@ export default defineConfig(({ mode }) => {
       setupFiles: ["./vitest.setup.js"],
       globals: true,
       environment: "jsdom",
+      deps: {
+        web: {
+          transformCss: true,
+        },
+      },
+      server: {
+        deps: {
+          inline: [/@budibase\/bbui/, /@spectrum-css/, /easymde/],
+        },
+      },
     },
     server: {
       fs: {
