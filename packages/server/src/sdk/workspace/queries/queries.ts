@@ -153,7 +153,7 @@ export async function enrichContext(
     try {
       const json = enrichedQuery.json || enrichedQuery.customData || enrichedQuery.requestBody
       enrichedQuery.json = typeof json === "string" ? JSON.parse(json) : json
-    } catch (err) {
+    } catch (_err) {
       // no json found, ignore
     }
     delete enrichedQuery.customData
