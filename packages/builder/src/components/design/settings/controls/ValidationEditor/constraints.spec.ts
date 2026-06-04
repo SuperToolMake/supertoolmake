@@ -5,16 +5,7 @@ describe("validation constraints", () => {
   it.each([
     [
       "string",
-      [
-        "required",
-        "minLength",
-        "maxLength",
-        "equal",
-        "notEqual",
-        "regex",
-        "notRegex",
-        "url",
-      ],
+      ["required", "minLength", "maxLength", "equal", "notEqual", "regex", "notRegex", "url"],
     ],
     ["number", ["required", "maxValue", "minValue", "equal", "notEqual"]],
     ["boolean", ["required", "equal", "notEqual"]],
@@ -36,10 +27,8 @@ describe("validation constraints", () => {
     const stringConstraints = getConstraintsForType("string")
     const urlConstraints = getConstraintsForType("url")
 
-    expect(stringConstraints.map(constraint => constraint.value)).toContain(
-      "url"
-    )
-    expect(urlConstraints.map(constraint => constraint.value)).toContain("url")
+    expect(stringConstraints.map((constraint) => constraint.value)).toContain("url")
+    expect(urlConstraints.map((constraint) => constraint.value)).toContain("url")
   })
 })
 

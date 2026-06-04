@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
-import { describe, expect, it } from "vitest"
+
 import { FieldType, type UIFieldValidationRule } from "@supertoolmake/types"
+import { describe, expect, it } from "vitest"
 import { createValidatorFromConstraints } from "./validation"
 
 describe("form validation", () => {
@@ -38,9 +39,7 @@ describe("form validation", () => {
     expect(validator("https://www.g?&^%&^%&^%.com")).toBe("Invalid URL")
     expect(validator("https://example.com\\path")).toBe("Invalid URL")
     expect(
-      validator(
-        "//////\\\\\\\\\\\\\\\\///////////////\\\\\\\\\\\\\\\\///www.google.com"
-      )
+      validator("//////\\\\\\\\\\\\\\\\///////////////\\\\\\\\\\\\\\\\///www.google.com")
     ).toBe("Invalid URL")
     expect(validator("not a url")).toBe("Invalid URL")
     expect(validator("")).toBeNull()
@@ -63,9 +62,7 @@ describe("form validation", () => {
     expect(ftpValidator("https://example.com")).toBe("Invalid URL")
 
     expect(mailtoValidator("mailto:test@example.com")).toBeNull()
-    expect(
-      mailtoValidator("mailto:test@example.com?subject=Hello&body=World")
-    ).toBeNull()
+    expect(mailtoValidator("mailto:test@example.com?subject=Hello&body=World")).toBeNull()
     expect(mailtoValidator("test@example.com")).toBe("Invalid URL")
     expect(mailtoValidator("https://example.com")).toBe("Invalid URL")
   })

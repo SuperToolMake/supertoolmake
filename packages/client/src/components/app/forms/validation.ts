@@ -1,7 +1,7 @@
 import { Helpers } from "@supertoolmake/bbui"
 import {
-  defaultErrorForConstraint,
   DEFAULT_URL_VALIDATION_PROTOCOLS,
+  defaultErrorForConstraint,
   type FieldConstraints,
   FieldType,
   type Table,
@@ -306,16 +306,12 @@ const notRegexHandler = (value: any, rule: UIFieldValidationRule) => {
   return !regexHandler(value, rule)
 }
 
-const isUrlValidationProtocol = (
-  protocol: unknown
-): protocol is UrlValidationProtocol => {
+const isUrlValidationProtocol = (protocol: unknown): protocol is UrlValidationProtocol => {
   const protocols: readonly string[] = URL_VALIDATION_PROTOCOLS
   return typeof protocol === "string" && protocols.includes(protocol)
 }
 
-const getAllowedUrlProtocols = (
-  rule: UIFieldValidationRule
-): UrlValidationProtocol[] => {
+const getAllowedUrlProtocols = (rule: UIFieldValidationRule): UrlValidationProtocol[] => {
   if (!Array.isArray(rule.value) || !rule.value.length) {
     return DEFAULT_URL_VALIDATION_PROTOCOLS
   }
@@ -331,7 +327,7 @@ const isValidIpv4Hostname = (hostname: string): boolean => {
   const parts = hostname.split(".")
   return (
     parts.length === 4 &&
-    parts.every(part => {
+    parts.every((part) => {
       if (!/^\d{1,3}$/.test(part)) {
         return false
       }
@@ -353,7 +349,7 @@ const isValidDomainHostname = (hostname: string): boolean => {
     return false
   }
 
-  return labels.every(label => {
+  return labels.every((label) => {
     return /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i.test(label)
   })
 }
@@ -377,9 +373,7 @@ const isValidUrlHostname = (hostname: string): boolean => {
 }
 
 const isValidMailtoUrl = (url: URL): boolean => {
-  return (
-    !url.host && !url.hash && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(url.pathname)
-  )
+  return !url.host && !url.hash && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(url.pathname)
 }
 
 const urlHandler = (value: unknown, rule: UIFieldValidationRule) => {

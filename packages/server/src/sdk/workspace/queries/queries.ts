@@ -1,8 +1,5 @@
 import { context } from "@supertoolmake/backend-core"
-import {
-  processJsonStringSync,
-  processStringSync,
-} from "@supertoolmake/string-templates"
+import { processJsonStringSync, processStringSync } from "@supertoolmake/string-templates"
 import type { JSONValue, Query, QuerySchema } from "@supertoolmake/types"
 import { BaseQueryVerbs } from "../../../constants"
 import { getQueryParams, isProdWorkspaceID } from "../../../db/utils"
@@ -154,10 +151,7 @@ export async function enrichContext(
   }
   if (enrichedQuery.json || enrichedQuery.customData || enrichedQuery.requestBody) {
     try {
-      const json =
-        enrichedQuery.json ||
-        enrichedQuery.customData ||
-        enrichedQuery.requestBody
+      const json = enrichedQuery.json || enrichedQuery.customData || enrichedQuery.requestBody
       enrichedQuery.json = typeof json === "string" ? JSON.parse(json) : json
     } catch (err) {
       // no json found, ignore

@@ -274,11 +274,7 @@ interface RawJsonBinding {
   block: string
 }
 
-const processJsonTemplateString = (
-  value: string,
-  context?: object,
-  opts?: ProcessOptions
-) => {
+const processJsonTemplateString = (value: string, context?: object, opts?: ProcessOptions) => {
   return processStringSync(value, context, opts)
 }
 
@@ -342,7 +338,7 @@ const processJsonTemplateValue = (
   opts?: ProcessOptions
 ): JsonTemplateValue => {
   if (typeof value === "string") {
-    const binding = bindings.find(binding => binding.token === value)
+    const binding = bindings.find((binding) => binding.token === value)
     if (binding) {
       const processed = processJsonTemplateString(binding.block, context, opts)
       return parseRawJsonBinding(processed)
@@ -351,9 +347,7 @@ const processJsonTemplateValue = (
   }
 
   if (Array.isArray(value)) {
-    return value.map(item =>
-      processJsonTemplateValue(item, bindings, context, opts)
-    )
+    return value.map((item) => processJsonTemplateValue(item, bindings, context, opts))
   }
 
   if (value && typeof value === "object") {
