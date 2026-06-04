@@ -1,254 +1,350 @@
 <script lang="ts">
-import {
-  Button,
-  Icon,
-  DrawerContent,
-  Layout,
-  Select,
-  Heading,
-  Body,
-  Input,
-  DatePicker,
-  Label,
-} from "@supertoolmake/bbui"
-import type { Component, EnrichedBinding } from "@supertoolmake/types"
-import { isJSBinding } from "@supertoolmake/string-templates"
-import { generate } from "shortid"
-import { SvelteSet } from "svelte/reactivity"
-import { selectedScreen, selectedComponent } from "@/stores/builder"
-import { findClosestMatchingComponent } from "@/helpers/components"
-import { getSchemaForDatasource, getDatasourceForProvider } from "@/dataBinding"
-import { defaultErrorForConstraint, getConstraintsForType } from "./constraints"
-import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
-import SchemaRulesSummary from "./SchemaRulesSummary.svelte"
-import ValidationRuleCard from "./ValidationRuleCard.svelte"
-import type { SchemaValidationRule, ValidationEditorRule, ValidationValue } from "./types"
+  import {
+    Button,
+    Icon,
+    DrawerContent,
+    Layout,
+    Select,
+    Heading,
+    Body,
+    Input,
+    DatePicker,
+    Label,
+    Multiselect,
+  } from "@supertoolmake/bbui"
+  import {
+    DEFAULT_URL_VALIDATION_PROTOCOLS,
+    URL_VALIDATION_PROTOCOLS,
+  } from "@supertoolmake/types"
+  import type {
+    Component,
+    EnrichedBinding,
+    UrlValidationProtocol,
+  } from "@supertoolmake/types"
+  import { isJSBinding } from "@supertoolmake/string-templates"
+  import { generate } from "shortid"
+  import { SvelteSet } from "svelte/reactivity"
+  import { selectedScreen, selectedComponent } from "@/stores/builder"
+  import { findClosestMatchingComponent } from "@/helpers/components"
+  import {
+    getSchemaForDatasource,
+    getDatasourceForProvider,
+  } from "@/dataBinding"
+  import {
+    defaultErrorForConstraint,
+    getConstraintsForType,
+  } from "./constraints"
+  import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+  import SchemaRulesSummary from "./SchemaRulesSummary.svelte"
+  import ValidationRuleCard from "./ValidationRuleCard.svelte"
+  import type {
+    SchemaValidationRule,
+    ValidationEditorRule,
+    ValidationValue,
+  } from "./types"
 
-type InputValue = string | number | null | undefined
+  type InputValue = string | number | null | undefined
 
-interface ScreenAsset {
-  props: Component
-}
-
-interface DatasourceSchema {
-  schema?: Record<string, { constraints?: SchemaConstraints }>
-  table?: { primaryDisplay?: string }
-}
-
-interface SchemaConstraints {
-  presence?: boolean | { allowEmpty?: boolean }
-  length?: { minimum?: ValidationValue; maximum?: ValidationValue }
-  numericality?: {
-    greaterThanOrEqualTo?: number
-    lessThanOrEqualTo?: number
-  }
-  inclusion?: string[]
-}
-
-const stringConstraints: string[] = [
-  "maxUploadSize",
-  "maxFileSize",
-  "maxLength",
-  "minLength",
-  "regex",
-  "notRegex",
-  "contains",
-  "notContains",
-]
-
-export let fieldName: string | null = null
-export let rules: ValidationEditorRule[] = []
-export let bindings: EnrichedBinding[] = []
-export let type: string | undefined = undefined
-
-const getInitialExpandedRules = (rules: ValidationEditorRule[]): SvelteSet<string> => {
-  const expanded = new SvelteSet<string>()
-  if (rules?.length <= 2) {
-    rules.forEach((rule) => {
-      if (rule?.id) {
-        expanded.add(rule.id)
-      }
-    })
-  }
-  return expanded
-}
-
-let expandedRules = getInitialExpandedRules(rules)
-
-const resolveDatasource = (
-  selectedScreen: ScreenAsset,
-  componentInstance: Component,
-  parent: Component | null
-): unknown => {
-  return getDatasourceForProvider(selectedScreen, parent || componentInstance) || {}
-}
-
-const getDataSourceSchema = (
-  asset: ScreenAsset | null | undefined,
-  component: Component | null | undefined
-): DatasourceSchema | null => {
-  if (!asset || !component) {
-    return null
-  }
-  const formParent = findClosestMatchingComponent(
-    asset.props,
-    component._id,
-    (component: Component) =>
-      component._component.endsWith("/form") ||
-      component._component.endsWith("/formblock") ||
-      component._component.endsWith("/tableblock")
-  )
-  const dataSource = resolveDatasource(asset, component, formParent)
-  return getSchemaForDatasource(asset, dataSource, {}) as DatasourceSchema
-}
-
-const parseRulesFromSchema = (
-  field: string | null | undefined,
-  dataSourceSchema: DatasourceSchema
-): SchemaValidationRule[] => {
-  if (!field || !dataSourceSchema) {
-    return []
-  }
-  const fieldSchema = dataSourceSchema.schema?.[field]
-  const constraints = fieldSchema?.constraints
-  if (!constraints) {
-    return []
-  }
-  let rules: SchemaValidationRule[] = []
-
-  const presence = constraints.presence
-
-  // Required constraint
-  if (
-    field === dataSourceSchema?.table?.primaryDisplay ||
-    (typeof presence === "object" && presence?.allowEmpty === false) ||
-    presence === true
-  ) {
-    rules.push({
-      constraint: "required",
-      error: defaultErrorForConstraint("required", null),
-    })
+  interface UrlProtocolOption {
+    label: string
+    value: UrlValidationProtocol
   }
 
-  // String length constraint
-  if (exists(constraints.length?.minimum)) {
-    const length = constraints.length?.minimum
-    rules.push({
-      constraint: "minLength",
-      value: length,
-      error: defaultErrorForConstraint("minLength", length),
-    })
-  }
-  if (exists(constraints.length?.maximum)) {
-    const length = constraints.length?.maximum
-    rules.push({
-      constraint: "maxLength",
-      value: length,
-      error: defaultErrorForConstraint("maxLength", length),
-    })
+  interface ScreenAsset {
+    props: Component
   }
 
-  // Min / max number constraint
-  if (exists(constraints.numericality?.greaterThanOrEqualTo)) {
-    const min = constraints.numericality?.greaterThanOrEqualTo
-    rules.push({
-      constraint: "minValue",
-      value: min,
-      error: defaultErrorForConstraint("minValue", min),
-    })
-  }
-  if (exists(constraints.numericality?.lessThanOrEqualTo)) {
-    const max = constraints.numericality?.lessThanOrEqualTo
-    rules.push({
-      constraint: "maxValue",
-      value: max,
-      error: defaultErrorForConstraint("maxValue", max),
-    })
+  interface DatasourceSchema {
+    schema?: Record<string, { constraints?: SchemaConstraints }>
+    table?: { primaryDisplay?: string }
   }
 
-  return rules
-}
-
-const inputValue = (value: ValidationValue | undefined): InputValue => {
-  if (Array.isArray(value)) {
-    return value.join(", ")
+  interface SchemaConstraints {
+    presence?: boolean | { allowEmpty?: boolean }
+    length?: { minimum?: ValidationValue; maximum?: ValidationValue }
+    numericality?: {
+      greaterThanOrEqualTo?: number
+      lessThanOrEqualTo?: number
+    }
+    inclusion?: string[]
   }
-  return value
-}
 
-const updateRuleValue = (rule: ValidationEditorRule, event: CustomEvent<InputValue>): void => {
-  rule.value = event.detail
-}
-
-const exists = (value: unknown): boolean => {
-  return value != null && value !== ""
-}
-
-const addRule = (): void => {
-  const id = generate()
-  rules = [
-    ...(rules || []),
-    {
-      valueType: "Binding",
-      type: fieldType,
-      id,
-      value: fieldType == "array" ? [] : null,
-    },
+  const stringConstraints: string[] = [
+    "maxUploadSize",
+    "maxFileSize",
+    "maxLength",
+    "minLength",
+    "regex",
+    "notRegex",
+    "contains",
+    "notContains",
   ]
-  expandedRules.add(id)
-}
 
-const removeRule = (id: string): void => {
-  rules = rules.filter((link) => link.id !== id)
-  expandedRules.delete(id)
-}
+  export let fieldName: string | null = null
+  export let rules: ValidationEditorRule[] = []
+  export let bindings: EnrichedBinding[] = []
+  export let type: string | undefined = undefined
 
-const duplicateRule = (id: string): void => {
-  const existingRule = rules.find((rule) => rule.id === id)
-  if (!existingRule) {
-    return
+  const getInitialExpandedRules = (
+    rules: ValidationEditorRule[]
+  ): SvelteSet<string> => {
+    const expanded = new SvelteSet<string>()
+    if (rules?.length <= 2) {
+      rules.forEach(rule => {
+        if (rule?.id) {
+          expanded.add(rule.id)
+        }
+      })
+    }
+    return expanded
   }
-  const newRule = { ...existingRule, id: generate() }
-  rules = [...rules, newRule]
-  expandedRules.add(newRule.id)
-}
 
-const toggleRule = (id: string): void => {
-  const nextExpandedRules = new SvelteSet(expandedRules)
-  if (nextExpandedRules.has(id)) {
-    nextExpandedRules.delete(id)
-  } else {
-    nextExpandedRules.add(id)
-  }
-  expandedRules = nextExpandedRules
-}
+  let expandedRules = getInitialExpandedRules(rules)
 
-const constraintLabel = (constraint?: string): string => {
-  const option = constraintOptions.find((option) => option.value === constraint)
-  return option?.label || "Choose a constraint"
-}
+  const urlProtocolOptions: UrlProtocolOption[] = URL_VALIDATION_PROTOCOLS.map(
+    protocol => ({
+      label: protocol === "mailto" ? "Mailto" : protocol.toUpperCase(),
+      value: protocol,
+    })
+  )
 
-const valueSummary = (rule: ValidationEditorRule): string => {
-  if (rule.constraint === "required") {
-    return ""
+  const resolveDatasource = (
+    selectedScreen: ScreenAsset,
+    componentInstance: Component,
+    parent: Component | null
+  ): unknown => {
+    return (
+      getDatasourceForProvider(selectedScreen, parent || componentInstance) || {}
+    )
   }
-  if (rule.value == null || rule.value === "") {
-    return ""
-  }
-  if (Array.isArray(rule.value)) {
-    return rule.value.length ? rule.value.join(", ") : ""
-  }
-  if (isJSBinding(rule.value)) {
-    return "(JavaScript function)"
-  }
-  return String(rule.value)
-}
 
-$: dataSourceSchema = getDataSourceSchema($selectedScreen, $selectedComponent)
-$: field = fieldName || $selectedComponent?.field
-$: schemaRules = parseRulesFromSchema(field, dataSourceSchema || {})
-$: fieldType = type?.split("/")[1] || "string"
-$: constraintOptions = getConstraintsForType(fieldType)
+  const getDataSourceSchema = (
+    asset: ScreenAsset | null | undefined,
+    component: Component | null | undefined
+  ): DatasourceSchema | null => {
+    if (!asset || !component) {
+      return null
+    }
+    const formParent = findClosestMatchingComponent(
+      asset.props,
+      component._id,
+      (component: Component) =>
+        component._component.endsWith("/form") ||
+        component._component.endsWith("/formblock") ||
+        component._component.endsWith("/tableblock")
+    )
+    const dataSource = resolveDatasource(asset, component, formParent)
+    return getSchemaForDatasource(asset, dataSource, {}) as DatasourceSchema
+  }
+
+  const parseRulesFromSchema = (
+    field: string | null | undefined,
+    dataSourceSchema: DatasourceSchema
+  ): SchemaValidationRule[] => {
+    if (!field || !dataSourceSchema) {
+      return []
+    }
+    const fieldSchema = dataSourceSchema.schema?.[field]
+    const constraints = fieldSchema?.constraints
+    if (!constraints) {
+      return []
+    }
+    let rules: SchemaValidationRule[] = []
+
+    const presence = constraints.presence
+
+    if (
+      field === dataSourceSchema?.table?.primaryDisplay ||
+      (typeof presence === "object" && presence?.allowEmpty === false) ||
+      presence === true
+    ) {
+      rules.push({
+        constraint: "required",
+        error: defaultErrorForConstraint("required", null),
+      })
+    }
+
+    if (exists(constraints.length?.minimum)) {
+      const length = constraints.length?.minimum
+      rules.push({
+        constraint: "minLength",
+        value: length,
+        error: defaultErrorForConstraint("minLength", length),
+      })
+    }
+    if (exists(constraints.length?.maximum)) {
+      const length = constraints.length?.maximum
+      rules.push({
+        constraint: "maxLength",
+        value: length,
+        error: defaultErrorForConstraint("maxLength", length),
+      })
+    }
+
+    if (exists(constraints.numericality?.greaterThanOrEqualTo)) {
+      const min = constraints.numericality?.greaterThanOrEqualTo
+      rules.push({
+        constraint: "minValue",
+        value: min,
+        error: defaultErrorForConstraint("minValue", min),
+      })
+    }
+    if (exists(constraints.numericality?.lessThanOrEqualTo)) {
+      const max = constraints.numericality?.lessThanOrEqualTo
+      rules.push({
+        constraint: "maxValue",
+        value: max,
+        error: defaultErrorForConstraint("maxValue", max),
+      })
+    }
+
+    return rules
+  }
+
+  const isUrlProtocol = (
+    protocol: unknown
+  ): protocol is UrlValidationProtocol => {
+    const protocols: readonly string[] = URL_VALIDATION_PROTOCOLS
+    return typeof protocol === "string" && protocols.includes(protocol)
+  }
+
+  const getUrlProtocolValue = (
+    value: ValidationValue | undefined
+  ): UrlValidationProtocol[] => {
+    if (!Array.isArray(value)) {
+      return [...DEFAULT_URL_VALIDATION_PROTOCOLS]
+    }
+
+    const protocols = value.filter(isUrlProtocol)
+    return protocols.length ? protocols : [...DEFAULT_URL_VALIDATION_PROTOCOLS]
+  }
+
+  const updateRuleUrlProtocols = (
+    rule: ValidationEditorRule,
+    event: CustomEvent<UrlValidationProtocol[]>
+  ): void => {
+    rule.value = getUrlProtocolValue(event.detail)
+  }
+
+  const updateRuleConstraint = (rule: ValidationEditorRule): void => {
+    if (rule.constraint === "url") {
+      rule.value = getUrlProtocolValue(rule.value)
+      delete rule.valueType
+      return
+    }
+
+    if (rule.constraint === "required") {
+      delete rule.value
+      delete rule.valueType
+      return
+    }
+
+    if (Array.isArray(rule.value)) {
+      rule.value = null
+    }
+    rule.valueType ||= "Binding"
+  }
+
+  $: dataSourceSchema = getDataSourceSchema($selectedScreen, $selectedComponent)
+  $: field = fieldName || $selectedComponent?.field
+  $: schemaRules = parseRulesFromSchema(field, dataSourceSchema || {})
+  $: validationType = type?.split("/")[1] || "string"
+  $: fieldType = validationType === "url" ? "string" : validationType
+  $: constraintOptions = getConstraintsForType(validationType)
+
+  const inputValue = (value: ValidationValue | undefined): InputValue => {
+    if (Array.isArray(value)) {
+      return value.join(", ")
+    }
+    return value
+  }
+
+  const updateRuleValue = (
+    rule: ValidationEditorRule,
+    event: CustomEvent<InputValue>
+  ): void => {
+    rule.value = event.detail
+  }
+
+  const exists = (value: unknown): boolean => {
+    return value != null && value !== ""
+  }
+
+  const addRule = (): void => {
+    const id = generate()
+    rules = [
+      ...(rules || []),
+      {
+        valueType: "Binding",
+        type: fieldType,
+        id,
+        value: fieldType == "array" ? [] : null,
+      },
+    ]
+    expandedRules.add(id)
+  }
+
+  const removeRule = (id: string): void => {
+    rules = rules.filter(link => link.id !== id)
+    expandedRules.delete(id)
+  }
+
+  const duplicateRule = (id: string): void => {
+    const existingRule = rules.find(rule => rule.id === id)
+    if (!existingRule) {
+      return
+    }
+    const newRule = { ...existingRule, id: generate() }
+    rules = [...rules, newRule]
+    expandedRules.add(newRule.id)
+  }
+
+  const supportsConstraintValue = (constraint?: string): boolean => {
+    return constraint !== "required"
+  }
+
+  const toggleRule = (id: string): void => {
+    const nextExpandedRules = new SvelteSet(expandedRules)
+    if (nextExpandedRules.has(id)) {
+      nextExpandedRules.delete(id)
+    } else {
+      nextExpandedRules.add(id)
+    }
+    expandedRules = nextExpandedRules
+  }
+
+  const constraintLabel = (constraint?: string): string => {
+    const option = constraintOptions.find(
+      option => option.value === constraint
+    )
+    return option?.label || "Choose a constraint"
+  }
+
+  const valueSummary = (rule: ValidationEditorRule): string => {
+    if (rule.constraint === "url") {
+      const protocols = getUrlProtocolValue(rule.value)
+      return protocols
+        .map(
+          protocol =>
+            urlProtocolOptions.find(option => option.value === protocol)?.label
+        )
+        .filter(Boolean)
+        .join(", ")
+    }
+    if (!supportsConstraintValue(rule.constraint)) {
+      return ""
+    }
+    if (rule.value == null || rule.value === "") {
+      return ""
+    }
+    if (Array.isArray(rule.value)) {
+      return rule.value.length ? rule.value.join(", ") : ""
+    }
+    if (isJSBinding(rule.value)) {
+      return "(JavaScript function)"
+    }
+    return String(rule.value)
+  }
 </script>
 
 <DrawerContent>
@@ -272,7 +368,8 @@ $: constraintOptions = getConstraintsForType(fieldType)
         {#if rules?.length}
           <div class="rules">
             {#each rules as rule (rule.id)}
-              {@const valueDisabled = rule.constraint === "required"}
+              {@const valueDisabled = !supportsConstraintValue(rule.constraint)}
+              {@const isUrlValue = rule.constraint === "url"}
               {@const isExpanded = expandedRules.has(rule.id)}
               <ValidationRuleCard
                 title={constraintLabel(rule.constraint)}
@@ -300,78 +397,94 @@ $: constraintOptions = getConstraintsForType(fieldType)
                   </button>
                 {/snippet}
 
-                <div class="rule-row" class:rule-row--no-value={valueDisabled}>
+                <div
+                  class="rule-row"
+                  class:rule-row--no-value={valueDisabled}
+                  class:rule-row--url-value={isUrlValue}
+                >
                   <Select
                     label="Constraint"
                     bind:value={rule.constraint}
                     options={constraintOptions}
                     placeholder="Constraint"
+                    on:change={() => updateRuleConstraint(rule)}
                   />
                   {#if !valueDisabled}
-                    <Select
-                      label="Value type"
-                      placeholder={false}
-                      bind:value={rule.valueType}
-                      options={["Binding", "Value"]}
-                    />
+                    {#if isUrlValue}
+                      <Multiselect
+                        label="Allowed protocols"
+                        options={urlProtocolOptions}
+                        getOptionLabel={option => option.label}
+                        getOptionValue={option => option.value}
+                        value={getUrlProtocolValue(rule.value)}
+                        on:change={e => updateRuleUrlProtocols(rule, e)}
+                      />
+                    {:else}
+                      <Select
+                        label="Value type"
+                        placeholder={false}
+                        bind:value={rule.valueType}
+                        options={["Binding", "Value"]}
+                      />
 
-                    {#if rule.valueType === "Binding"}
-                      <DrawerBindableInput
-                        label="Value"
-                        title="Value"
-                        placeholder="Constraint value"
-                        value={rule.value}
-                        {bindings}
-                        on:change={e => (rule.value = e.detail)}
-                      />
-                    {:else if rule.type !== "array" && rule.constraint && stringConstraints.includes(rule.constraint)}
-                      <Input
-                        label="Value"
-                        value={inputValue(rule.value)}
-                        on:change={e => updateRuleValue(rule, e)}
-                        placeholder="Constraint value"
-                      />
-                    {:else if rule.type && ["string", "number", "options", "longform"].includes(rule.type)}
-                      <Input
-                        label="Value"
-                        value={inputValue(rule.value)}
-                        on:change={e => updateRuleValue(rule, e)}
-                        placeholder="Constraint value"
-                      />
-                    {:else if rule.type === "array"}
-                      <Select
-                        label="Value"
-                        options={dataSourceSchema?.schema?.[field]?.constraints
-                          ?.inclusion || []}
-                        getOptionLabel={x => x}
-                        getOptionValue={x => x}
-                        value={rule.value}
-                        on:change={e => {
-                          rule.value = e.detail
-                        }}
-                      />
-                    {:else if rule.type === "boolean"}
-                      <Select
-                        label="Value"
-                        options={[
-                          { label: "True", value: "true" },
-                          { label: "False", value: "false" },
-                        ]}
-                        bind:value={rule.value}
-                      />
-                    {:else if rule.type === "datetime"}
-                      <Layout noPadding gap="XS">
-                        <Label>Value</Label>
-                        <DatePicker
-                          enableTime={false}
+                      {#if rule.valueType === "Binding"}
+                        <DrawerBindableInput
+                          label="Value"
+                          title="Value"
+                          placeholder="Constraint value"
+                          value={rule.value}
+                          {bindings}
+                          on:change={e => (rule.value = e.detail)}
+                        />
+                      {:else if rule.type !== "array" && rule.constraint && stringConstraints.includes(rule.constraint)}
+                        <Input
+                          label="Value"
+                          value={inputValue(rule.value)}
+                          on:change={e => updateRuleValue(rule, e)}
+                          placeholder="Constraint value"
+                        />
+                      {:else if rule.type && ["string", "number", "options", "longform"].includes(rule.type)}
+                        <Input
+                          label="Value"
+                          value={inputValue(rule.value)}
+                          on:change={e => updateRuleValue(rule, e)}
+                          placeholder="Constraint value"
+                        />
+                      {:else if rule.type === "array"}
+                        <Select
+                          label="Value"
+                          options={dataSourceSchema?.schema?.[field]
+                            ?.constraints?.inclusion || []}
+                          getOptionLabel={x => x}
+                          getOptionValue={x => x}
+                          value={rule.value}
+                          on:change={e => {
+                            rule.value = e.detail
+                          }}
+                        />
+                      {:else if rule.type === "boolean"}
+                        <Select
+                          label="Value"
+                          options={[
+                            { label: "True", value: "true" },
+                            { label: "False", value: "false" },
+                          ]}
                           bind:value={rule.value}
                         />
-                      </Layout>
-                    {:else}
-                      <Layout noPadding gap="XS">
-                        <Label>Value</Label>
-                        <DrawerBindableInput disabled />
-                      </Layout>
+                      {:else if rule.type === "datetime"}
+                        <Layout noPadding gap="XS">
+                          <Label>Value</Label>
+                          <DatePicker
+                            enableTime={false}
+                            bind:value={rule.value}
+                          />
+                        </Layout>
+                      {:else}
+                        <Layout noPadding gap="XS">
+                          <Label>Value</Label>
+                          <DrawerBindableInput disabled />
+                        </Layout>
+                      {/if}
                     {/if}
                   {/if}
                   <DrawerBindableInput
@@ -425,6 +538,12 @@ $: constraintOptions = getConstraintsForType(fieldType)
   }
   .rule-row--no-value {
     grid-template-columns: minmax(170px, 210px) minmax(220px, 1.3fr);
+  }
+  .rule-row--url-value {
+    grid-template-columns: minmax(170px, 210px) minmax(180px, 1fr) minmax(
+        220px,
+        1.3fr
+      );
   }
   .icon-button {
     display: flex;

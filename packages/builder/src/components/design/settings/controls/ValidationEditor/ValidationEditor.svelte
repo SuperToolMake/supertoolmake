@@ -1,95 +1,107 @@
 <script lang="ts">
-import { Button, ActionButton, Drawer, Heading, Icon } from "@supertoolmake/bbui"
-import { createEventDispatcher } from "svelte"
-import { cloneDeep } from "lodash/fp"
-import type { Component, EnrichedBinding } from "@supertoolmake/types"
-import { FIELDS } from "@/constants/backend"
-import ValidationDrawer from "./ValidationDrawer.svelte"
-import type { ValidationEditorRule } from "./types"
+  import { Button, ActionButton, Drawer, Heading, Icon } from "@supertoolmake/bbui"
+  import { createEventDispatcher } from "svelte"
+  import { cloneDeep } from "lodash/fp"
+  import { DEFAULT_URL_VALIDATION_PROTOCOLS } from "@supertoolmake/types"
+  import type { Component, EnrichedBinding } from "@supertoolmake/types"
+  import { FIELDS } from "@/constants/backend"
+  import ValidationDrawer from "./ValidationDrawer.svelte"
+  import type { ValidationEditorRule } from "./types"
 
-interface FieldComponent extends Component {
-  field?: string
-}
-
-interface DrawerHandle {
-  show: () => void
-  hide: () => void
-}
-
-interface FieldDefinition {
-  name?: string
-  type: string
-  icon?: string
-}
-
-export let value: ValidationEditorRule[] = []
-export let bindings: EnrichedBinding[] = []
-export let componentInstance: FieldComponent | undefined = undefined
-export let type: string | undefined = undefined
-const dispatch = createEventDispatcher<{
-  change: ValidationEditorRule[]
-  drawerShow: unknown
-}>()
-let drawer: DrawerHandle
-let drawerContentKey: number = 0
-let workingValue: ValidationEditorRule[] = []
-
-const sanitiseRules = (rules: ValidationEditorRule[]): ValidationEditorRule[] => {
-  return (rules || []).map((rule) => {
-    const sanitisedRule = { ...rule }
-    if (sanitisedRule.constraint === "required") {
-      delete sanitisedRule.value
-      delete sanitisedRule.valueType
-    }
-    if (!sanitisedRule.error) {
-      delete sanitisedRule.error
-    }
-    return sanitisedRule
-  })
-}
-
-const handleShow = (event: CustomEvent<unknown>): void => {
-  workingValue = cloneDeep(value || [])
-  drawerContentKey += 1
-  dispatch("drawerShow", event.detail)
-}
-
-const getFieldDefinition = (fieldType: string | undefined): FieldDefinition | undefined => {
-  return Object.values(FIELDS as Record<string, FieldDefinition>).find(
-    (field) => field.type === fieldType
-  )
-}
-
-const save = (): void => {
-  dispatch("change", sanitiseRules(workingValue))
-  drawer.hide()
-}
-
-const getActive = (rules: ValidationEditorRule[]): boolean => {
-  if (!rules?.length) {
-    return false
-  } else {
-    return true
+  interface FieldComponent extends Component {
+    field?: string
   }
-}
 
-const getText = (rules: ValidationEditorRule[]): string => {
-  if (!rules?.length) {
-    return "No rules set"
-  } else {
-    return `${rules.length} rule${rules.length === 1 ? "" : "s"} set`
+  interface DrawerHandle {
+    show: () => void
+    hide: () => void
   }
-}
 
-$: text = getText(value)
+  interface FieldDefinition {
+    name?: string
+    type: string
+    icon?: string
+  }
 
-$: active = getActive(value)
+  export let value: ValidationEditorRule[] = []
+  export let bindings: EnrichedBinding[] = []
+  export let componentInstance: FieldComponent | undefined = undefined
+  export let type: string | undefined = undefined
+  const dispatch = createEventDispatcher<{
+    change: ValidationEditorRule[]
+    drawerShow: unknown
+  }>()
+  let drawer: DrawerHandle
+  let drawerContentKey: number = 0
+  let workingValue: ValidationEditorRule[] = []
 
-$: fieldType = type?.split("/")[1]
+  $: active = getActive(value)
 
-$: fieldDefinition = getFieldDefinition(fieldType)
+  $: text = getText(value)
 
-$: fieldTypeLabel = fieldDefinition?.name || fieldType
+  $: fieldType = type?.split("/")[1]
+
+  $: fieldDefinition = getFieldDefinition(fieldType)
+
+  $: fieldTypeLabel = fieldDefinition?.name || fieldType
+
+  const sanitiseRules = (
+    rules: ValidationEditorRule[]
+  ): ValidationEditorRule[] => {
+    return (rules || []).map(rule => {
+      const sanitisedRule = { ...rule }
+      if (sanitisedRule.constraint === "required") {
+        delete sanitisedRule.value
+        delete sanitisedRule.valueType
+      }
+      if (sanitisedRule.constraint === "url") {
+        sanitisedRule.value =
+          Array.isArray(sanitisedRule.value) && sanitisedRule.value.length
+            ? sanitisedRule.value
+            : [...DEFAULT_URL_VALIDATION_PROTOCOLS]
+        delete sanitisedRule.valueType
+      }
+      if (!sanitisedRule.error) {
+        delete sanitisedRule.error
+      }
+      return sanitisedRule
+    })
+  }
+
+  const handleShow = (event: CustomEvent<unknown>): void => {
+    workingValue = cloneDeep(value || [])
+    drawerContentKey += 1
+    dispatch("drawerShow", event.detail)
+  }
+
+  const getFieldDefinition = (
+    fieldType: string | undefined
+  ): FieldDefinition | undefined => {
+    return Object.values(FIELDS as Record<string, FieldDefinition>).find(
+      field => field.type === fieldType
+    )
+  }
+
+  const save = (): void => {
+    dispatch("change", sanitiseRules(workingValue))
+    drawer.hide()
+  }
+
+  const getActive = (rules: ValidationEditorRule[]): boolean => {
+    if (!rules?.length) {
+      return false
+    } else {
+      return true
+    }
+  }
+
+  const getText = (rules: ValidationEditorRule[]): string => {
+    if (!rules?.length) {
+      return "No rules set"
+    } else {
+      return `${rules.length} rule${rules.length === 1 ? "" : "s"} set`
+    }
+  }
 </script>
 
 <div class="validation-editor">
