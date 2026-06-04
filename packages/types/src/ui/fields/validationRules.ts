@@ -27,6 +27,7 @@ export type FieldValidationRuleType =
   | "regex"
   | "notRegex"
   | "url"
+  | "email"
   | "contains"
   | "notContains"
   | "json"
@@ -51,6 +52,8 @@ export const defaultErrorForConstraint = (
       return "Required"
     case "url":
       return "Must be a valid URL"
+    case "email":
+      return "Must be a valid email address"
     case "minLength":
       return hasValidationValue(value) ? `Must be at least ${value} characters` : "Too short"
     case "maxLength":

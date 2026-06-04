@@ -61,6 +61,7 @@ export function getComponentStructure({ chatbox } = { chatbox: false }) {
         "fieldgroup",
         "stringfield",
         "urlfield",
+        "emailfield",
         "numberfield",
         "bigintfield",
         "passwordfield",
