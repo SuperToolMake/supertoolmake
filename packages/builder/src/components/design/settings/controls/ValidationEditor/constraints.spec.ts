@@ -18,7 +18,7 @@ describe("validation constraints", () => {
       ],
     ],
     ["number", ["required", "maxValue", "minValue", "equal", "notEqual"]],
-    ["boolean", ["required", "equal", "notEqual"]],
+    ["boolean", ["equal", "notEqual"]],
     ["datetime", ["required", "maxValue", "minValue", "equal", "notEqual"]],
     ["link", ["required", "contains", "notContains", "minLength", "maxLength"]],
     [
