@@ -1,22 +1,11 @@
 <script>
 import { Body, Divider, Heading, Label, Layout, Link, notifications } from "@supertoolmake/bbui"
 import { onMount } from "svelte"
-import { API } from "@/api"
 
-let version
 let loaded = false
 let githubVersion
 let githubPublishedDate
 let githubPublishedTime
-
-async function getVersion() {
-  try {
-    version = await API.getInstallVersion()
-  } catch {
-    notifications.error("Error getting version")
-    version = null
-  }
-}
 
 async function getLatestVersion() {
   try {
@@ -39,7 +28,6 @@ async function getLatestVersion() {
 }
 
 onMount(async () => {
-  await getVersion()
   await getLatestVersion()
   loaded = true
 })
@@ -49,11 +37,6 @@ onMount(async () => {
   {#if loaded}
     <Layout noPadding gap="S">
       <Label size="L">Current version</Label>
-      <Heading size="XS">
-        {version || "-"}
-      </Heading>
-      <Divider noMargin />
-      <Label size="L">Latest version</Label>
       <Heading size="XS">
         {githubVersion}
       </Heading>
@@ -67,7 +50,7 @@ onMount(async () => {
       <Body size="S"
         >To update your self-host installation, follow the docs found <Link
           size="L"
-          href="https://docs.budibase.com/docs/updating-budibase">here.</Link
+          href="https://github.com/SuperToolMake/supertoolmake#--running-via-docker" target=_blank>here.</Link
         ></Body
       >
     </Layout>
