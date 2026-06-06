@@ -7064,6 +7064,7 @@
   },
   "galleryblock": {
     "block": true,
+    "ejectable": false,
     "name": "Gallery",
     "icon": "images",
     "styles": [
@@ -7178,6 +7179,7 @@
             "type": "field",
             "key": "captionColumn",
             "label": "Caption column",
+            "placeholder": "None",
             "nested": true,
             "resetOn": "dataSource",
             "dependsOn": {
@@ -7189,12 +7191,18 @@
           {
             "type": "number",
             "label": "Tile width",
-            "key": "tileWidth"
+            "key": "tileWidth",
+            "defaultValue": 200,
+            "min": 32,
+            "max": 1024
           },
           {
             "type": "number",
             "label": "Tile height",
-            "key": "tileHeight"
+            "key": "tileHeight",
+            "defaultValue": 150,
+            "min": 32,
+            "max": 1024
           }
         ]
       }
