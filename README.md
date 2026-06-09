@@ -50,7 +50,7 @@ Integrates with any of your SQL tables or APIs, including controlled access with
 </h3>
 Other low-code platforms such as Appsmith and Tooljet recommend a minimum of 8GB of RAM when self-hosting. 
 
-Budibase is better, but still recommends 4GB. 
+Budibase is a little better, but still recommends 6GB. 
 
 SuperToolMake considers a lightweight and modular approach, focusing on the core app builder and data interface experience, with the option to connect to external workflow systems as needed.
 
