@@ -10,9 +10,10 @@ import {
   Layout,
   Multiselect,
   Select,
+  Toggle,
 } from "@supertoolmake/bbui"
 import { Constants, FilterUsers, QueryUtils } from "@supertoolmake/frontend-core"
-import { FieldType } from "@supertoolmake/types"
+import { FieldType, FormulaType } from "@supertoolmake/types"
 import { cloneDeep } from "lodash"
 import { generate } from "shortid"
 import { createEventDispatcher } from "svelte"
@@ -78,16 +79,17 @@ const save = async () => {
   drawer.hide()
 }
 
-const addCondition = () => {
-  const condition = {
-    id: generate(),
-    target: targetOptions[0].value,
-    metadataKey: conditionOptions[0].value,
-    operator: operatorOptions[0]?.value,
-    valueType: FieldType.STRING,
+  const addCondition = () => {
+    const condition = {
+      id: generate(),
+      target: targetOptions[0].value,
+      metadataKey: conditionOptions[0].value,
+      operator: operatorOptions[0]?.value,
+      valueType: FieldType.STRING,
+      disabled: false,
+    }
+    tempValue = [...tempValue, condition]
   }
-  tempValue = [...tempValue, condition]
-}
 
 const duplicateCondition = (condition) => {
   const dupe = { ...condition, id: generate() }
@@ -130,6 +132,7 @@ $: valueTypeOptions = getValueTypeOptions(type)
 $: hasValueOption = type !== FieldType.STRING
 $: operatorOptions = QueryUtils.getValidOperatorsForType({
   type,
+  formulaType: FormulaType.STATIC,
 })
 </script>
 
@@ -267,18 +270,28 @@ $: operatorOptions = QueryUtils.getValidOperatorsForType({
                     on:change={e => (condition.referenceValue = e.detail)}
                   />
                 {/if}
-                <Icon
-                  name="copy"
-                  hoverable
-                  size="S"
-                  on:click={() => duplicateCondition(condition)}
-                />
-                <Icon
-                  name="x"
-                  hoverable
-                  size="S"
-                  on:click={() => removeCondition(condition)}
-                />
+                <div class="condition-actions">
+                  <Toggle
+                    noMargin
+                    text=""
+                    value={!condition.disabled}
+                    on:change={e => {
+                      condition.disabled = !e.detail
+                    }}
+                  />
+                  <Icon
+                    name="copy"
+                    hoverable
+                    size="S"
+                    on:click={() => duplicateCondition(condition)}
+                  />
+                  <Icon
+                    name="x"
+                    hoverable
+                    size="S"
+                    on:click={() => removeCondition(condition)}
+                  />
+                </div>
               </div>
             {/each}
           </div>
@@ -306,11 +319,16 @@ $: operatorOptions = QueryUtils.getValidOperatorsForType({
   }
   .condition {
     display: grid;
-    grid-template-columns: auto auto 1fr 1fr auto auto auto 1fr 1fr auto auto;
+    grid-template-columns: auto auto 1fr 1fr auto auto auto 1fr 1fr auto;
     align-items: center;
     grid-column-gap: var(--spacing-l);
   }
   .condition.with-value-option {
-    grid-template-columns: auto auto 1fr 1fr auto auto auto 1fr 1fr 1fr auto auto;
+    grid-template-columns: auto auto 1fr 1fr auto auto auto 1fr 1fr 1fr auto;
+  }
+  .condition-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-l);
   }
 </style>

@@ -2,12 +2,19 @@ import { QueryUtils } from "@supertoolmake/frontend-core"
 import { processStringSync } from "@supertoolmake/string-templates"
 import { EmptyFilterOption } from "@supertoolmake/types"
 
-export const getActiveConditions = (conditions) => {
+export const getEnabledConditions = conditions => {
+  if (!conditions?.length) {
+    return []
+  }
+  return conditions.filter(condition => !condition.disabled)
+}
+
+export const getActiveConditions = conditions => {
   if (!conditions?.length) {
     return []
   }
 
-  return conditions.filter((condition) => {
+  return getEnabledConditions(conditions).filter(condition => {
     // Parse values into correct types
     if (condition.valueType === "number") {
       condition.referenceValue = parseFloat(condition.referenceValue)

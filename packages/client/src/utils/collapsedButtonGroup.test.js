@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 const mockGetComponentDefinition = vi.fn()
 const mockGetSettingsDefinition = vi.fn()
 const mockEnrichProps = vi.fn()
+const mockGetEnabledConditions = vi.fn()
 const mockGetActiveConditions = vi.fn()
 const mockReduceConditionActions = vi.fn()
 
@@ -23,6 +24,7 @@ vi.mock("@/utils/componentProps", () => ({
 }))
 
 vi.mock("@/utils/conditions", () => ({
+  getEnabledConditions: (...args) => mockGetEnabledConditions(...args),
   getActiveConditions: (...args) => mockGetActiveConditions(...args),
   reduceConditionActions: (...args) => mockReduceConditionActions(...args),
 }))
@@ -37,7 +39,12 @@ describe("resolveCollapsedButtons", () => {
     vi.resetModules()
     vi.clearAllMocks()
     mockGetComponentDefinition.mockReturnValue({ name: "Button" })
-    mockGetSettingsDefinition.mockReturnValue([{ key: "onClick", type: "event" }])
+    mockGetSettingsDefinition.mockReturnValue([
+      { key: "onClick", type: "event" },
+    ])
+    mockGetEnabledConditions.mockImplementation(conditions =>
+      conditions.filter(condition => !condition.disabled)
+    )
   })
 
   it("returns an empty array when buttons are missing", async () => {
@@ -97,6 +104,22 @@ describe("resolveCollapsedButtons", () => {
     const result = resolveCollapsedButtons([{ text: "Action" }], {}, vi.fn())
     await result[0].onClick()
     expect(enrichedHandler).toHaveBeenCalledTimes(1)
+  })
+
+  it("ignores disabled show conditions when computing default visibility", async () => {
+    const resolveCollapsedButtons = await setupResolver()
+    mockEnrichProps.mockImplementation(props => ({
+      ...props,
+      _conditions: [{ action: "show", disabled: true }],
+    }))
+    mockGetActiveConditions.mockReturnValue([])
+    mockReduceConditionActions.mockReturnValue({
+      settingUpdates: {},
+      visible: null,
+    })
+
+    const result = resolveCollapsedButtons([{ text: "Visible" }], {}, vi.fn())
+    expect(result).toHaveLength(1)
   })
 
   it("falls back to enrichButtonActions when no enriched handler exists", async () => {

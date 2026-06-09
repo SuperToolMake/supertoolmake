@@ -9,6 +9,7 @@ import {
   Icon,
   Layout,
   Select,
+  Toggle,
 } from "@supertoolmake/bbui"
 import { Constants, QueryUtils } from "@supertoolmake/frontend-core"
 import type {
@@ -212,6 +213,12 @@ const onSettingValueChange = (val: unknown, condition: ComponentCondition) => {
   condition.settingValue = val
 }
 
+const toggleCondition = (id: string, enabled: boolean) => {
+  conditions = conditions.map(condition =>
+    condition.id === id ? { ...condition, disabled: !enabled } : condition
+  )
+}
+
 const propertyControlChangeHandler = (condition: ComponentCondition) => {
   return (val: unknown) => onSettingValueChange(val, condition)
 }
@@ -413,6 +420,12 @@ $: settingOptions = settings
                     />
                   </DrawerBindableSlot>
                 {/if}
+                <Toggle
+                  text=""
+                  noMargin={true}
+                  value={!condition.disabled}
+                  on:change={e => toggleCondition(condition.id, e.detail)}
+                />
                 <Icon
                   name="copy"
                   hoverable
@@ -460,14 +473,14 @@ $: settingOptions = settings
     align-items: center;
     grid-template-columns:
       auto 150px auto minmax(140px, 1fr) 120px 100px minmax(140px, 1fr)
-      auto auto;
+      auto auto auto;
     border-radius: var(--border-radius-s);
     transition: background-color ease-in-out 130ms;
   }
   .condition.update {
     grid-template-columns:
       auto 150px minmax(140px, 1fr) auto minmax(140px, 1fr) auto
-      minmax(140px, 1fr) 120px 100px minmax(140px, 1fr) auto auto;
+      minmax(140px, 1fr) 120px 100px minmax(140px, 1fr) auto auto auto;
   }
   .condition:hover {
     background-color: var(--spectrum-global-color-gray-100);

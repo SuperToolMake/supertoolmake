@@ -7,6 +7,7 @@ export let id: string | null = null
 export let text: string | null = null
 export let disabled: boolean = false
 export let noPadding: boolean = false
+export let noMargin: boolean = false
 
 const dispatch = createEventDispatcher()
 const onChange = (event: Event) => {
@@ -15,7 +16,11 @@ const onChange = (event: Event) => {
 }
 </script>
 
-<div class="spectrum-Switch spectrum-Switch--emphasized" class:noPadding>
+<div
+  class="spectrum-Switch spectrum-Switch--emphasized"
+  class:noPadding
+  class:noMargin
+>
   <input
     checked={value}
     {disabled}
@@ -39,5 +44,8 @@ const onChange = (event: Event) => {
   .noPadding {
     padding: 0;
     margin: 0;
+  }
+  .spectrum-Switch.noMargin {
+    --spectrum-switch-cursor-hit-x: 0;
   }
 </style>
