@@ -30,7 +30,7 @@ export const getEnabledConditions = (conditions: UICondition[] | undefined) => {
   if (!conditions?.length) {
     return []
   }
-  return conditions.filter(condition => !condition.disabled)
+  return conditions.filter((condition) => !condition.disabled)
 }
 
 export const deriveStores = (context: StoreContext): ConditionDerivedStore => {
@@ -81,7 +81,7 @@ export const initialise = (context: StoreContext) => {
   const { metadata, conditions, rows } = context
 
   const recomputeAllMetadata = () => {
-    let newMetadata: Record<string, any> = {}
+    const newMetadata: Record<string, any> = {}
     const $conditions = get(conditions)
     if ($conditions?.length) {
       for (const row of get(rows)) {

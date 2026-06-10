@@ -2,8 +2,8 @@ import { getSettingsDefinition } from "@supertoolmake/frontend-core"
 import { componentStore } from "@/stores/components"
 import { enrichProps } from "@/utils/componentProps"
 import {
-  getEnabledConditions,
   getActiveConditions,
+  getEnabledConditions,
   reduceConditionActions,
 } from "@/utils/conditions"
 
@@ -41,9 +41,7 @@ const evaluateButtonConditions = (conditions) => {
   const enabledConditions = getEnabledConditions(conditions)
 
   // Keep in line with Component.svelte's condition evaluation behavior.
-  let visible = !enabledConditions.find(
-    condition => condition.action === "show"
-  )
+  let visible = !enabledConditions.find((condition) => condition.action === "show")
   const activeConditions = getActiveConditions(enabledConditions)
   const result = reduceConditionActions(activeConditions)
   if (result.visible != null) {

@@ -42,12 +42,9 @@ $: componentName = getComponentName(componentInstance)
 $: highlightedSetting = $builderStore.highlightedSetting
 $: conditionCount = componentInstance?._conditions?.length || 0
 $: disabledConditionCount =
-  componentInstance?._conditions?.filter(condition => condition.disabled)
-    .length || 0
-$: allConditionsDisabled =
-  conditionCount > 0 && disabledConditionCount === conditionCount
-$: someConditionsDisabled =
-  disabledConditionCount > 0 && disabledConditionCount < conditionCount
+  componentInstance?._conditions?.filter((condition) => condition.disabled).length || 0
+$: allConditionsDisabled = conditionCount > 0 && disabledConditionCount === conditionCount
+$: someConditionsDisabled = disabledConditionCount > 0 && disabledConditionCount < conditionCount
 $: conditionsStatusColor = allConditionsDisabled
   ? "var(--spectrum-semantic-negative-color-icon)"
   : someConditionsDisabled

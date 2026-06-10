@@ -79,17 +79,17 @@ const save = async () => {
   drawer.hide()
 }
 
-  const addCondition = () => {
-    const condition = {
-      id: generate(),
-      target: targetOptions[0].value,
-      metadataKey: conditionOptions[0].value,
-      operator: operatorOptions[0]?.value,
-      valueType: FieldType.STRING,
-      disabled: false,
-    }
-    tempValue = [...tempValue, condition]
+const addCondition = () => {
+  const condition = {
+    id: generate(),
+    target: targetOptions[0].value,
+    metadataKey: conditionOptions[0].value,
+    operator: operatorOptions[0]?.value,
+    valueType: FieldType.STRING,
+    disabled: false,
   }
+  tempValue = [...tempValue, condition]
+}
 
 const duplicateCondition = (condition) => {
   const dupe = { ...condition, id: generate() }

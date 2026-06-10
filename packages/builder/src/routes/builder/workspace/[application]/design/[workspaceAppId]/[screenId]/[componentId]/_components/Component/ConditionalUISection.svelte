@@ -36,15 +36,12 @@ $: highlighted = $builderStore.highlightedSetting?.key === "_conditions"
 
 $: conditionCount = componentInstance?._conditions?.length
 $: disabledConditionCount =
-  componentInstance?._conditions?.filter(condition => condition.disabled)
-    .length || 0
-$: baseConditionText = `${conditionCount || "No"} condition${
-  conditionCount !== 1 ? "s" : ""
-} set`
+  componentInstance?._conditions?.filter((condition) => condition.disabled).length || 0
+$: baseConditionText = `${conditionCount || "No"} condition${conditionCount !== 1 ? "s" : ""} set`
 $: conditionText =
   disabledConditionCount > 0
     ? `${baseConditionText}, ${disabledConditionCount} disabled`
-    : baseConditionText:packages/builder/src/pages/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/ConditionalUISection.svelte
+    : baseConditionText
 </script>
 
 <!--

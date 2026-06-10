@@ -39,11 +39,9 @@ describe("resolveCollapsedButtons", () => {
     vi.resetModules()
     vi.clearAllMocks()
     mockGetComponentDefinition.mockReturnValue({ name: "Button" })
-    mockGetSettingsDefinition.mockReturnValue([
-      { key: "onClick", type: "event" },
-    ])
-    mockGetEnabledConditions.mockImplementation(conditions =>
-      conditions.filter(condition => !condition.disabled)
+    mockGetSettingsDefinition.mockReturnValue([{ key: "onClick", type: "event" }])
+    mockGetEnabledConditions.mockImplementation((conditions) =>
+      conditions.filter((condition) => !condition.disabled)
     )
   })
 
@@ -108,7 +106,7 @@ describe("resolveCollapsedButtons", () => {
 
   it("ignores disabled show conditions when computing default visibility", async () => {
     const resolveCollapsedButtons = await setupResolver()
-    mockEnrichProps.mockImplementation(props => ({
+    mockEnrichProps.mockImplementation((props) => ({
       ...props,
       _conditions: [{ action: "show", disabled: true }],
     }))

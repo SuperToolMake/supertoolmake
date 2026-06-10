@@ -214,7 +214,7 @@ const onSettingValueChange = (val: unknown, condition: ComponentCondition) => {
 }
 
 const toggleCondition = (id: string, enabled: boolean) => {
-  conditions = conditions.map(condition =>
+  conditions = conditions.map((condition) =>
     condition.id === id ? { ...condition, disabled: !enabled } : condition
   )
 }

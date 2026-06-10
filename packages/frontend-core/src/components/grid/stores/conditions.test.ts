@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from "vitest"
 import type { UICondition } from "@budibase/types"
+import { describe, expect, it, vi } from "vitest"
 
 vi.mock("../../../utils", () => ({
   derivedMemo: (value: unknown) => value,

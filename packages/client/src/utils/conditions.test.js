@@ -1,10 +1,6 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from "vitest"
-import {
-  enrichGridConditions,
-  getEnabledConditions,
-  getActiveConditions,
-} from "./conditions"
+import { enrichGridConditions, getActiveConditions, getEnabledConditions } from "./conditions"
 
 describe("enrichGridConditions", () => {
   it("enriches row and current user bindings in conditions", () => {

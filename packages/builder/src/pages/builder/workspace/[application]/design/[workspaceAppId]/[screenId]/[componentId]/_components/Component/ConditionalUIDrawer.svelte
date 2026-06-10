@@ -1,178 +1,167 @@
 <script>
-  import {
-    Button,
-    Body,
-    Icon,
-    Toggle,
-    DrawerContent,
-    Layout,
-    Select,
-  } from "@supertoolmake/bbui"
-  import { flip } from "svelte/animate"
-  import { dndzone } from "svelte-dnd-action"
-  import { generate } from "shortid"
-  import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
-  import ConditionValueControl from "@/components/common/ConditionValueControl.svelte"
-  import { QueryUtils, Constants } from "@supertoolmake/frontend-core"
-  import { selectedComponent, componentStore } from "@/stores/builder"
-  import { getComponentForSetting } from "@/components/design/settings/componentSettingsRegistry"
-  import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
+import { Button, Body, Icon, Toggle, DrawerContent, Layout, Select } from "@supertoolmake/bbui"
+import { flip } from "svelte/animate"
+import { dndzone } from "svelte-dnd-action"
+import { generate } from "shortid"
+import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import ConditionValueControl from "@/components/common/ConditionValueControl.svelte"
+import { QueryUtils, Constants } from "@supertoolmake/frontend-core"
+import { selectedComponent, componentStore } from "@/stores/builder"
+import { getComponentForSetting } from "@/components/design/settings/componentSettingsRegistry"
+import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
 
-  export let conditions = []
-  export let bindings = []
-  export let componentBindings = []
-  export let actionOptions = null
+export let conditions = []
+export let bindings = []
+export let componentBindings = []
+export let actionOptions = null
 
-  const flipDurationMs = 150
-  const zoneType = generate()
-  const defaultActionOptions = [
+const flipDurationMs = 150
+const zoneType = generate()
+const defaultActionOptions = [
+  {
+    label: "Hide component",
+    value: "hide",
+  },
+  {
+    label: "Show component",
+    value: "show",
+  },
+  {
+    label: "Update setting",
+    value: "update",
+  },
+]
+let dragDisabled = true
+
+$: finalActionOptions = actionOptions ?? defaultActionOptions
+
+$: settings = componentStore.getComponentSettings($selectedComponent?._component)?.concat({
+  label: "Custom CSS",
+  key: "_css",
+  type: "text",
+})
+$: settingOptions = settings
+  .filter((setting) => setting.supportsConditions !== false)
+  .map((setting) => ({
+    label: makeLabel(setting),
+    value: setting.key,
+  }))
+$: conditions.forEach((link) => {
+  if (!link.id) {
+    link.id = generate()
+  }
+  if (link.valueType === "Binding") {
+    link.valueType = "string"
+  }
+  normaliseBooleanReferenceValue(link)
+})
+
+const normaliseBooleanReferenceValue = (condition) => {
+  if (condition.valueType === "boolean") {
+    if (condition.referenceValue === "True") {
+      condition.referenceValue = "true"
+    } else if (condition.referenceValue === "False") {
+      condition.referenceValue = "false"
+    }
+  }
+}
+
+const makeLabel = (setting) => {
+  const { section, label } = setting
+  if (section) {
+    return label ? `${section} - ${label}` : section
+  } else {
+    return label
+  }
+}
+
+const getSettingDefinition = (key) => {
+  return settings.find((setting) => setting.key === key)
+}
+
+const addCondition = () => {
+  conditions = [
+    ...conditions,
     {
-      label: "Hide component",
-      value: "hide",
-    },
-    {
-      label: "Show component",
-      value: "show",
-    },
-    {
-      label: "Update setting",
-      value: "update",
+      valueType: "string",
+      id: generate(),
+      action: "hide",
+      operator: Constants.OperatorOptions.Equals.value,
     },
   ]
-  let dragDisabled = true
+}
 
-  $: finalActionOptions = actionOptions ?? defaultActionOptions
+const removeCondition = (id) => {
+  conditions = conditions.filter((link) => link.id !== id)
+}
 
-  $: settings = componentStore
-    .getComponentSettings($selectedComponent?._component)
-    ?.concat({
-      label: "Custom CSS",
-      key: "_css",
-      type: "text",
-    })
-  $: settingOptions = settings
-    .filter(setting => setting.supportsConditions !== false)
-    .map(setting => ({
-      label: makeLabel(setting),
-      value: setting.key,
-    }))
-  $: conditions.forEach(link => {
-    if (!link.id) {
-      link.id = generate()
-    }
-    if (link.valueType === "Binding") {
-      link.valueType = "string"
-    }
-    normaliseBooleanReferenceValue(link)
+const duplicateCondition = (id) => {
+  const condition = conditions.find((link) => link.id === id)
+  const duplicate = { ...condition, id: generate() }
+  conditions = [...conditions, duplicate]
+}
+
+const toggleCondition = (id, enabled) => {
+  conditions = conditions.map((condition) =>
+    condition.id === id ? { ...condition, disabled: !enabled } : condition
+  )
+}
+
+const handleFinalize = (e) => {
+  updateConditions(e)
+  dragDisabled = true
+}
+
+const updateConditions = (e) => {
+  conditions = e.detail.items
+}
+
+const getOperatorOptions = (condition) => {
+  return QueryUtils.getValidOperatorsForType({
+    type: getEffectiveValueType(condition),
   })
+}
 
-  const normaliseBooleanReferenceValue = condition => {
-    if (condition.valueType === "boolean") {
-      if (condition.referenceValue === "True") {
-        condition.referenceValue = "true"
-      } else if (condition.referenceValue === "False") {
-        condition.referenceValue = "false"
-      }
-    }
-  }
+const getEffectiveValueType = (condition) => {
+  return condition.valueType === "Binding" ? "string" : condition.valueType
+}
 
-  const makeLabel = setting => {
-    const { section, label } = setting
-    if (section) {
-      return label ? `${section} - ${label}` : section
-    } else {
-      return label
-    }
-  }
-
-  const getSettingDefinition = key => {
-    return settings.find(setting => setting.key === key)
-  }
-
-  const addCondition = () => {
-    conditions = [
-      ...conditions,
-      {
-        valueType: "string",
-        id: generate(),
-        action: "hide",
-        operator: Constants.OperatorOptions.Equals.value,
-      },
-    ]
-  }
-
-  const removeCondition = id => {
-    conditions = conditions.filter(link => link.id !== id)
-  }
-
-  const duplicateCondition = id => {
-    const condition = conditions.find(link => link.id === id)
-    const duplicate = { ...condition, id: generate() }
-    conditions = [...conditions, duplicate]
-  }
-
-  const toggleCondition = (id, enabled) => {
-    conditions = conditions.map(condition =>
-      condition.id === id ? { ...condition, disabled: !enabled } : condition
-    )
-  }
-
-  const handleFinalize = e => {
-    updateConditions(e)
-    dragDisabled = true
-  }
-
-  const updateConditions = e => {
-    conditions = e.detail.items
-  }
-
-  const getOperatorOptions = condition => {
-    return QueryUtils.getValidOperatorsForType({
-      type: getEffectiveValueType(condition),
-    })
-  }
-
-  const getEffectiveValueType = condition => {
-    return condition.valueType === "Binding" ? "string" : condition.valueType
-  }
-
-  const onOperatorChange = (condition, newOperator) => {
-    const noValueOptions = [
-      Constants.OperatorOptions.Empty.value,
-      Constants.OperatorOptions.NotEmpty.value,
-    ]
-    condition.noValue = noValueOptions.includes(newOperator)
-    if (condition.noValue || newOperator === "oneOf") {
-      condition.referenceValue = null
-      condition.valueType = "string"
-    }
-  }
-
-  const onValueTypeChange = (condition, newType) => {
+const onOperatorChange = (condition, newOperator) => {
+  const noValueOptions = [
+    Constants.OperatorOptions.Empty.value,
+    Constants.OperatorOptions.NotEmpty.value,
+  ]
+  condition.noValue = noValueOptions.includes(newOperator)
+  if (condition.noValue || newOperator === "oneOf") {
     condition.referenceValue = null
-    if (newType === "boolean") {
-      condition.referenceValue = "true"
-    }
+    condition.valueType = "string"
+  }
+}
 
-    // Ensure a valid operator is set
-    const validOperators = QueryUtils.getValidOperatorsForType({
-      type: newType,
-    }).map(x => x.value)
-    if (!validOperators.includes(condition.operator)) {
-      condition.operator =
-        validOperators[0] ?? Constants.OperatorOptions.Equals.value
-      onOperatorChange(condition, condition.operator)
-    }
+const onValueTypeChange = (condition, newType) => {
+  condition.referenceValue = null
+  if (newType === "boolean") {
+    condition.referenceValue = "true"
   }
 
-  const onSettingChange = (e, condition) => {
-    const setting = settings.find(x => x.key === e.detail)
-    if (setting?.defaultValue != null) {
-      condition.settingValue = setting.defaultValue
-    } else {
-      delete condition.settingValue
-    }
+  // Ensure a valid operator is set
+  const validOperators = QueryUtils.getValidOperatorsForType({
+    type: newType,
+  }).map((x) => x.value)
+  if (!validOperators.includes(condition.operator)) {
+    condition.operator = validOperators[0] ?? Constants.OperatorOptions.Equals.value
+    onOperatorChange(condition, condition.operator)
   }
+}
+
+const onSettingChange = (e, condition) => {
+  const setting = settings.find((x) => x.key === e.detail)
+  if (setting?.defaultValue != null) {
+    condition.settingValue = setting.defaultValue
+  } else {
+    delete condition.settingValue
+  }
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
