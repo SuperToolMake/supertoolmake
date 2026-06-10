@@ -1,214 +1,380 @@
 <script>
-import { clickOutside, Heading, Icon } from "@supertoolmake/bbui"
-import { Constants } from "@supertoolmake/frontend-core"
-import { getContext, setContext } from "svelte"
-import { writable } from "svelte/store"
-import { getActiveConditions, reduceConditionActions } from "@/utils/conditions"
-import Logo from "./Logo.svelte"
-import NavItem from "./NavItem.svelte"
-import UserMenu from "./UserMenu.svelte"
+  import { getContext, setContext } from "svelte"
+  import { writable } from "svelte/store"
+  import { Heading, Icon, Button, clickOutside } from "@supertoolmake/bbui"
+  import { Constants } from "@supertoolmake/frontend-core"
+  import NavItem from "./NavItem.svelte"
+  import UserMenu from "./UserMenu.svelte"
+  import Logo from "./Logo.svelte"
+  import {
+    getEnabledConditions,
+    getActiveConditions,
+    reduceConditionActions,
+  } from "@/utils/conditions"
+  import { authStore } from "@/stores/auth"
+  import { currentRole } from "@/stores/derived/currentRole.js"
 
-const sdk = getContext("sdk")
-const { routeStore, roleStore, linkable, builderStore, sidePanelStore, modalStore } = sdk
-const context = getContext("context")
-const navStateStore = writable({})
+  const sdk = getContext("sdk")
+  const {
+    routeStore,
+    roleStore,
+    linkable,
+    builderStore,
+    sidePanelStore,
+    modalStore,
+  } = sdk
+  const context = getContext("context")
+  const navStateStore = writable({})
+  let navStateBeforeCollapse = {}
 
-// Legacy props which must remain unchanged for backwards compatibility
-export let title
-export let hideTitle = false
-export let logoUrl
-export let hideLogo = false
-export let navigation = "Top"
-export let sticky = false
-export let links
-export let width = "Large"
+  // Legacy props which must remain unchanged for backwards compatibility
+  export let title
+  export let hideTitle = false
+  export let logoUrl
+  export let hideLogo = false
+  export let navigation = "Top"
+  export let sticky = false
+  export let links
+  export let width = "Large"
 
-// New props from new design UI
-export let navBackground
-export let navTextColor
-export let navWidth
-export let pageWidth
-export let logoLinkUrl
-export let logoHeight
-export let openLogoLinkInNewTab
-export let textAlign
-export let embedded = false
+  // New props from new design UI
+  export let navBackground
+  export let navTextColor
+  export let navLinkHoverTextColor
+  export let navLinkHoverIconColor
+  export let navLinkHoverBackground
+  export let navLinkActiveTextColor
+  export let navLinkActiveIconColor
+  export let navLinkActiveBackground
+  export let navWidth
+  export let pageWidth
+  export let logoLinkUrl
+  export let logoHeight
+  export let openLogoLinkInNewTab
+  export let textAlign
+  export let embedded = false
+  export let banner
+  export let showLoginButton = true
 
-export let collapsible = false
+  export let collapsible = false
 
-const NavigationClasses = {
-  Top: "top",
-  Left: "left",
-  None: "none",
-}
-const WidthClasses = {
-  Max: "max",
-  Large: "l",
-  Medium: "m",
-  Small: "s",
-  "Extra small": "xs",
-}
+  export let screenBackground
+  export let screenGradient
+  export let screenCustomCss
 
-export let logoPosition = "top" // "top" or "bottom"
-export let titleSize = "S"
-export let titleColor // CSS color string, only affects title
-
-let mobileOpen = false
-let navCollapsed = false
-
-// Set some layout context. This isn't used in bindings but can be used
-// determine things about the current app layout.
-const enrichNavItem = (navItem) => {
-  const internalLink = isInternal(navItem.url)
-  return {
-    ...navItem,
-    internalLink,
-    url: internalLink ? navItem.url : ensureExternal(navItem.url),
+  const NavigationClasses = {
+    Top: "top",
+    Left: "left",
+    None: "none",
   }
-}
-
-const enrichNavItems = (navItems, userRoleHierarchy) => {
-  if (!navItems?.length) {
-    return []
+  const WidthClasses = {
+    Max: "max",
+    Large: "l",
+    Medium: "m",
+    Small: "s",
+    "Extra small": "xs",
   }
-  return navItems
-    .filter((navItem) => {
-      // Strip nav items without text
-      if (!navItem.text) {
-        return false
-      }
 
-      // Strip out links without URLs
-      if (navItem.type !== "sublinks" && !navItem.url) {
-        return false
-      }
+  export let logoPosition = "top" // "top" or "bottom"
+  export let titleSize = "S"
+  export let titleColor // CSS color string, only affects title
 
-      // Filter to only links allowed by the current role
-      const role = navItem.roleId || Constants.Roles.BASIC
-      return userRoleHierarchy?.find((roleId) => roleId === role)
-    })
-    .map((navItem) => {
-      const enrichedNavItem = enrichNavItem(navItem)
-      if (navItem.type === "sublinks" && navItem.subLinks?.length) {
-        enrichedNavItem.subLinks = navItem.subLinks
-          .filter((subLink) => subLink.text && subLink.url)
-          .map(enrichNavItem)
-      }
-      return enrichedNavItem
-    })
-}
+  let mobileOpen = false
+  let navCollapsed = false
 
-function evaluateNavItemConditions(conditions = []) {
-  if (!conditions?.length) return true
+  // When a developer uses devtools to "view as public", hide the user menu and
+  // show the login button instead so it accurately previews the public UX.
+  $: isPublicPreview =
+    $authStore != null && $currentRole === Constants.Roles.PUBLIC
 
-  // Get only the active (matching) conditions
-  const activeConditions = getActiveConditions(conditions)
-  const { visible } = reduceConditionActions(activeConditions)
+  // Set some layout context. This isn't used in bindings but can be used
+  // determine things about the current app layout.
+  $: mobile = $context.device.mobile
+  const store = writable({ headerHeight: 0 })
+  $: store.set({
+    screenXOffset: getScreenXOffset(navigation, mobile),
+    screenYOffset: getScreenYOffset(navigation, mobile),
+  })
+  setContext("layout", store)
 
-  if (visible == null) {
-    // If any show condition exists, default to hidden unless one matches
-    const hasShow = conditions.some((cond) => cond.action === "show")
-    return !hasShow
+  $: enrichedNavItems = enrichNavItems(links, $roleStore, $routeStore.routes)
+  $: typeClass = NavigationClasses[navigation] || NavigationClasses.None
+  $: navWidthClass = WidthClasses[navWidth || width] || WidthClasses.Large
+  $: pageWidthClass = WidthClasses[pageWidth || width] || WidthClasses.Large
+  $: navStyle = getNavStyle(
+    navBackground,
+    navTextColor,
+    navLinkHoverTextColor,
+    navLinkHoverIconColor,
+    navLinkHoverBackground,
+    navLinkActiveTextColor,
+    navLinkActiveIconColor,
+    navLinkActiveBackground,
+    logoHeight,
+    $context.device.width,
+    $context.device.height
+  )
+  $: bannerStyle = getBannerStyle(
+    banner?.background,
+    banner?.textColor,
+    banner?.textSize
+  )
+  $: showBanner = !!banner?.text?.trim?.() && typeClass !== "none"
+  $: autoCloseSidePanel =
+    !$builderStore.inBuilder &&
+    $sidePanelStore.open &&
+    !$sidePanelStore.ignoreClicksOutside
+  $: sidePanelPosition = $sidePanelStore.position || "right"
+
+  // When the position anchor (left/right) changes, suppress the CSS
+  // transition so the panel snaps to the new off-screen position instantly.
+  // Without this the browser sees a transform change (e.g. translateX(100%)
+  // → translateX(-100%)) and animates through the center of the screen.
+  //
+  // This block runs inside Svelte's update cycle BEFORE the DOM is patched,
+  // so we must toggle the position classes directly on the element first,
+  // force a reflow to commit the snapped position, then re-enable the
+  // transition. Svelte's subsequent DOM patch will see the same classes and
+  // treat them as a no-op, while adding the "open" class triggers the
+  // correct slide-in animation.
+  let sidePanelContainer
+  let prevSidePanelPosition = null
+  $: if (sidePanelContainer && sidePanelPosition !== prevSidePanelPosition) {
+    if (prevSidePanelPosition != null) {
+      sidePanelContainer.style.transition = "none"
+      sidePanelContainer.classList.toggle(
+        "position--left",
+        sidePanelPosition === "left"
+      )
+      sidePanelContainer.classList.toggle(
+        "position--right",
+        sidePanelPosition !== "left"
+      )
+      // Force a synchronous reflow so the browser commits the snapped
+      // position before we re-enable the transition on the next line.
+      const _reflow = sidePanelContainer.offsetHeight
+      sidePanelContainer.style.transition = ""
+    }
+    prevSidePanelPosition = sidePanelPosition
   }
-  return visible
-}
 
-const isInternal = (url) => {
-  return url?.startsWith("/")
-}
+  $: screenId = $builderStore.inBuilder
+    ? `${$builderStore.screen?._id}-screen`
+    : "screen"
+  $: navigationId = $builderStore.inBuilder
+    ? `${$builderStore.screen?._id}-navigation`
+    : "navigation"
 
-const ensureExternal = (url) => {
-  if (!url?.length) {
-    return url
-  }
-  return !url.startsWith("http") ? `http://${url}` : url
-}
-
-const getScreenXOffset = (navigation, mobile) => {
-  if (navigation !== "Left") {
-    return 0
-  }
-  return mobile ? "0px" : "250px"
-}
-
-const getScreenYOffset = (navigation, mobile) => {
-  if (mobile) {
-    return !navigation || navigation === "None" ? 0 : "61px"
-  } else {
-    return navigation === "Top" ? "137px" : "0px"
-  }
-}
-
-const getNavStyle = (backgroundColor, textColor, logoHeight, width, height) => {
-  let style = `--width:${width}px; --height:${height}px;`
-  if (backgroundColor) {
-    style += `--navBackground:${backgroundColor};`
-  }
-  if (textColor) {
-    style += `--navTextColor:${textColor};`
-  }
-  style += `--logoHeight:${logoHeight || 24}px;`
-  return style
-}
-
-const getSanitizedUrl = (url, openInNewTab) => {
-  if (!isInternal(url)) {
-    return ensureExternal(url)
-  }
-  if (openInNewTab) {
-    return `#${url}`
-  }
-  return url
-}
-
-const handleClickLink = () => {
-  mobileOpen = false
-  sidePanelStore.actions.close()
-  modalStore.actions.close()
-}
-
-$: mobile = $context.device.mobile
-const store = writable({ headerHeight: 0 })
-$: store.set({
-  screenXOffset: getScreenXOffset(navigation, mobile),
-  screenYOffset: getScreenYOffset(navigation, mobile),
-})
-setContext("layout", store)
-
-$: enrichedNavItems = enrichNavItems(links, $roleStore)
-$: typeClass = NavigationClasses[navigation] || NavigationClasses.None
-$: navWidthClass = WidthClasses[navWidth || width] || WidthClasses.Large
-$: pageWidthClass = WidthClasses[pageWidth || width] || WidthClasses.Large
-$: navStyle = getNavStyle(
-  navBackground,
-  navTextColor,
-  logoHeight,
-  $context.device.width,
-  $context.device.height
-)
-$: autoCloseSidePanel =
-  !$builderStore.inBuilder && $sidePanelStore.open && !$sidePanelStore.ignoreClicksOutside
-
-$: screenId = $builderStore.inBuilder ? `${$builderStore.screen?._id}-screen` : "screen"
-$: navigationId = $builderStore.inBuilder ? `${$builderStore.screen?._id}-navigation` : "navigation"
-
-// Scroll navigation into view if selected.
-// Memoize into a primitive to avoid spamming this whenever builder store
-// changes.
-$: selected = $builderStore.inBuilder && $builderStore.selectedComponentId?.endsWith("-navigation")
-$: {
-  if (selected) {
-    const node = document.getElementsByClassName("nav-wrapper")?.[0]
-    if (node) {
-      node.style.scrollMargin = "100px"
-      node.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "start",
-      })
+  const enrichNavItem = navItem => {
+    const internalLink = isInternal(navItem.url)
+    return {
+      ...navItem,
+      internalLink,
+      url: internalLink ? navItem.url : ensureExternal(navItem.url),
     }
   }
-}
+
+  const getRouteWithoutQueryParams = route => {
+    if (!route) {
+      return route
+    }
+    try {
+      return new URL(route, "http://localhost").pathname
+    } catch (error) {
+      return route
+    }
+  }
+
+  const canAccessSubLink = (subLink, accessibleRoutes) => {
+    const url = subLink?.url
+    if (!url) {
+      return false
+    }
+
+    // We can only reliably validate static internal routes here.
+    if (!isInternal(url) || url.includes("{{")) {
+      return true
+    }
+
+    return accessibleRoutes.has(getRouteWithoutQueryParams(url))
+  }
+
+  const enrichNavItems = (navItems, userRoleHierarchy, routeEntries = []) => {
+    if (!navItems?.length) {
+      return []
+    }
+    const accessibleRoutes = new Set(routeEntries.map(route => route.path))
+
+    return navItems
+      .filter(navItem => {
+        // Strip nav items without text
+        if (!navItem.text) {
+          return false
+        }
+
+        // Strip out links without URLs
+        if (navItem.type !== "sublinks" && !navItem.url) {
+          return false
+        }
+
+        // Filter to only links allowed by the current role
+        const role = navItem.roleId || Constants.Roles.BASIC
+        return userRoleHierarchy?.find(roleId => roleId === role)
+      })
+      .map(navItem => {
+        const enrichedNavItem = enrichNavItem(navItem)
+        if (navItem.type === "sublinks" && navItem.subLinks?.length) {
+          enrichedNavItem.subLinks = navItem.subLinks
+            .filter(
+              subLink =>
+                subLink.text && canAccessSubLink(subLink, accessibleRoutes)
+            )
+            .map(enrichNavItem)
+        }
+        return enrichedNavItem
+      })
+      .filter(
+        navItem => navItem.type !== "sublinks" || navItem.subLinks?.length > 0
+      )
+  }
+
+  function evaluateNavItemConditions(conditions = []) {
+    if (!conditions?.length) return true
+    const enabledConditions = getEnabledConditions(conditions)
+
+    // Get only the active (matching) conditions
+    const activeConditions = getActiveConditions(enabledConditions)
+    const { visible } = reduceConditionActions(activeConditions)
+
+    if (visible == null) {
+      // If any show condition exists, default to hidden unless one matches
+      const hasShow = enabledConditions.some(cond => cond.action === "show")
+      return hasShow ? false : true
+    }
+    return visible
+  }
+
+  const isInternal = url => {
+    return url?.startsWith("/")
+  }
+
+  const ensureExternal = url => {
+    if (!url?.length) {
+      return url
+    }
+    return !url.startsWith("http") ? `http://${url}` : url
+  }
+
+  const getScreenXOffset = (navigation, mobile) => {
+    if (navigation !== "Left") {
+      return 0
+    }
+    return mobile ? "0px" : "250px"
+  }
+  const getScreenYOffset = (navigation, mobile) => {
+    if (mobile) {
+      return !navigation || navigation === "None" ? 0 : "61px"
+    } else {
+      return navigation === "Top" ? "137px" : "0px"
+    }
+  }
+
+  const getNavStyle = (
+    backgroundColor,
+    textColor,
+    linkHoverTextColor,
+    linkHoverIconColor,
+    linkHoverBackground,
+    linkActiveTextColor,
+    linkActiveIconColor,
+    linkActiveBackground,
+    logoHeight,
+    width,
+    height
+  ) => {
+    let style = `--width:${width}px; --height:${height}px;`
+    if (backgroundColor) {
+      style += `--navBackground:${backgroundColor};`
+    }
+    if (textColor) {
+      style += `--navTextColor:${textColor};`
+    }
+    if (linkHoverTextColor) {
+      style += `--navLinkHoverTextColor:${linkHoverTextColor};`
+    }
+    if (linkHoverIconColor) {
+      style += `--navLinkHoverIconColor:${linkHoverIconColor};`
+    }
+    if (linkHoverBackground) {
+      style += `--navLinkHoverBackground:${linkHoverBackground};`
+    }
+    if (linkActiveTextColor) {
+      style += `--navLinkActiveTextColor:${linkActiveTextColor};`
+    }
+    if (linkActiveIconColor) {
+      style += `--navLinkActiveIconColor:${linkActiveIconColor};`
+    }
+    if (linkActiveBackground) {
+      style += `--navLinkActiveBackground:${linkActiveBackground};`
+    }
+    style += `--logoHeight:${logoHeight || 24}px;`
+    return style
+  }
+
+  const getBannerStyle = (backgroundColor, textColor, textSize) => {
+    let style = ""
+    if (backgroundColor) {
+      style += `--bannerBackground:${backgroundColor};`
+    }
+    if (textColor) {
+      style += `--bannerTextColor:${textColor};`
+    }
+    if (textSize) {
+      style += `--bannerTextSize:${textSize}px;`
+    }
+    return style
+  }
+
+  const getScreenStyle = (background, gradient, customCss) => {
+    let style = ""
+    if (gradient) {
+      style += `background: ${gradient};`
+    } else if (background) {
+      style += `background-color: ${background};`
+    }
+    if (customCss) {
+      style += customCss
+    }
+    return style || undefined
+  }
+
+  $: screenStyle = getScreenStyle(
+    screenBackground,
+    screenGradient,
+    screenCustomCss
+  )
+
+  const getSanitizedUrl = (url, openInNewTab) => {
+    if (!isInternal(url)) {
+      return ensureExternal(url)
+    }
+    if (openInNewTab) {
+      return `#${url}`
+    }
+    return url
+  }
+
+  const handleClickLink = () => {
+    mobileOpen = false
+    sidePanelStore.actions.close()
+    modalStore.actions.close()
+  }
+
+  const handleBannerActionClick = () => {
+    if (typeof banner?.action?.onClick === "function") {
+      banner.action.onClick()
+    }
+  }
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -222,66 +388,87 @@ $: {
   data-icon="browser"
 >
   <div class="screen-wrapper layout-body">
-    {#if typeClass !== "none"}
-      <div
-        class="interactive component {navigationId}"
-        data-id={navigationId}
-        data-name="Navigation"
-        data-icon="eye"
-      >
+    {#if showBanner && (typeClass !== "left" || mobile)}
+      <div class="banner" style={bannerStyle}>
+        <div class="banner-content">
+          {banner?.text}
+          {#if banner?.action}
+            <Button cta on:click={handleBannerActionClick}>
+              {banner.action.label}
+            </Button>
+          {/if}
+        </div>
+      </div>
+    {/if}
+    <div class="layout-content">
+      {#if typeClass !== "none"}
         <div
-          class="nav-wrapper {navigationId}-dom"
-          class:sticky
-          class:hidden={$routeStore.queryParams?.peek}
-          class:clickable={$builderStore.inBuilder}
-          on:click={$builderStore.inBuilder
-            ? builderStore.actions.selectComponent(navigationId)
-            : null}
-          style={navStyle}
+          class="interactive component {navigationId}"
+          data-id={navigationId}
+          data-name="Navigation"
+          data-icon="eye"
         >
           <div
-            class="nav nav--{typeClass} size--{navWidthClass}"
-            class:collapsed={navCollapsed}
-            on:click={() => {
-              if (navCollapsed) {
-                navCollapsed = false
-              }
-            }}
+            class="nav-wrapper {navigationId}-dom"
+            class:sticky
+            class:hidden={$routeStore.queryParams?.peek}
+            class:clickable={$builderStore.inBuilder}
+            on:click={$builderStore.inBuilder
+              ? builderStore.actions.selectComponent(navigationId)
+              : null}
+            style={navStyle}
           >
-            <div class="nav-header">
-              {#if enrichedNavItems.length}
-                <div class="burger">
-                  <Icon
-                    hoverable
-                    name="list"
-                    color="var(--navTextColor)"
-                    on:click={() => (mobileOpen = !mobileOpen)}
-                  />
+            <div
+              class="nav nav--{typeClass} size--{navWidthClass}"
+              class:collapsed={navCollapsed}
+              on:click={() => {
+                if (navCollapsed) {
+                  // Restore dropdown state when expanding
+                  navStateStore.set(navStateBeforeCollapse)
+                  navStateBeforeCollapse = {}
+                  navCollapsed = false
+                }
+              }}
+            >
+              <div class="nav-header">
+                {#if enrichedNavItems.length}
+                  <div class="burger">
+                    <Icon
+                      hoverable
+                      name="list"
+                      color="var(--navTextColor)"
+                      on:click={() => (mobileOpen = !mobileOpen)}
+                    />
+                  </div>
+                {/if}
+                <div class="logo" class:collapsed-logo={navCollapsed}>
+                  {#if logoPosition === "top"}
+                    <Logo
+                      {logoUrl}
+                      {logoLinkUrl}
+                      {openLogoLinkInNewTab}
+                      hideLogo={hideLogo && !navCollapsed}
+                      {title}
+                      {linkable}
+                      {isInternal}
+                      {getSanitizedUrl}
+                    />
+                  {/if}
+                  {#if !hideTitle && title && !navCollapsed}
+                    <Heading size={titleSize} {textAlign} color={titleColor}>
+                      {title}
+                    </Heading>
+                  {/if}
                 </div>
-              {/if}
-              <div class="logo" class:collapsed-logo={navCollapsed}>
-                {#if logoPosition === "top"}
-                  <Logo
-                    {logoUrl}
-                    {logoLinkUrl}
-                    {openLogoLinkInNewTab}
-                    hideLogo={hideLogo && !navCollapsed}
-                    {title}
-                    {linkable}
-                    {isInternal}
-                    {getSanitizedUrl}
-                  />
-                {/if}
-                {#if !hideTitle && title && !navCollapsed}
-                  <Heading size={titleSize} {textAlign} color={titleColor}>
-                    {title}
-                  </Heading>
-                {/if}
-                {#if navigation === "Left" && collapsible && !navCollapsed && !mobile}
+                {#if navigation === "Left" && collapsible && !mobile && !navCollapsed}
                   <div
                     class="nav-toggle"
-                    on:click|stopPropagation={() =>
-                      (navCollapsed = !navCollapsed)}
+                    on:click|stopPropagation={() => {
+                      // Save current dropdown state before collapsing
+                      navStateBeforeCollapse = $navStateStore
+                      navStateStore.set({})
+                      navCollapsed = !navCollapsed
+                    }}
                   >
                     <i
                       class="ph ph-sidebar-simple"
@@ -289,91 +476,121 @@ $: {
                     ></i>
                   </div>
                 {/if}
-              </div>
-              {#if !embedded}
-                <div class="user top">
-                  <UserMenu compact />
-                </div>
-              {/if}
-            </div>
-            <div
-              class="mobile-click-handler"
-              class:visible={mobileOpen}
-              on:click={() => (mobileOpen = false)}
-            ></div>
-
-            <div class="links" class:visible={mobileOpen}>
-              {#if enrichedNavItems.length}
-                {#each enrichedNavItems as navItem}
-                  {#if evaluateNavItemConditions(navItem._conditions)}
-                    <NavItem
-                      type={navItem.type}
-                      text={navItem.text}
-                      url={navItem.url}
-                      subLinks={navItem.subLinks}
-                      icon={navItem.icon}
-                      internalLink={navItem.internalLink}
-                      customStyles={navItem._styles?.custom}
-                      on:clickLink={handleClickLink}
-                      leftNav={navigation === "Left"}
-                      {mobile}
-                      {navStateStore}
-                      collapsed={navCollapsed}
-                    />
-                  {/if}
-                {/each}
-              {/if}
-            </div>
-
-            {#if !embedded}
-              <div class="user left" class:collapsed={navCollapsed}>
-                <UserMenu collapsed={navCollapsed} />
-                {#if logoPosition === "bottom"}
-                  <div>
-                    <Logo
-                      {logoUrl}
-                      {logoLinkUrl}
-                      {openLogoLinkInNewTab}
-                      {hideLogo}
-                      {title}
-                      {linkable}
-                      {isInternal}
-                      {getSanitizedUrl}
-                    />
+                {#if !embedded}
+                  <div class="user top">
+                    <UserMenu compact {showLoginButton} {isPublicPreview} />
                   </div>
                 {/if}
               </div>
-            {/if}
+              <div
+                class="mobile-click-handler"
+                class:visible={mobileOpen}
+                on:click={() => (mobileOpen = false)}
+              ></div>
+
+              <div class="links" class:visible={mobileOpen}>
+                {#if enrichedNavItems.length}
+                  {#each enrichedNavItems as navItem}
+                    {#if evaluateNavItemConditions(navItem._conditions)}
+                      <NavItem
+                        type={navItem.type}
+                        text={navItem.text}
+                        url={navItem.url}
+                        subLinks={navItem.subLinks}
+                        icon={navItem.icon}
+                        internalLink={navItem.internalLink}
+                        customStyles={navItem._styles?.custom}
+                        on:clickLink={handleClickLink}
+                        leftNav={navigation === "Left"}
+                        {mobile}
+                        {navStateStore}
+                        collapsed={navCollapsed}
+                      />
+                    {/if}
+                  {/each}
+                {/if}
+              </div>
+
+              {#if !embedded}
+                <div class="user left" class:collapsed={navCollapsed}>
+                  <UserMenu
+                    collapsed={navCollapsed}
+                    {showLoginButton}
+                    {isPublicPreview}
+                  />
+                  {#if logoPosition === "bottom"}
+                    <div>
+                      <Logo
+                        {logoUrl}
+                        {logoLinkUrl}
+                        {openLogoLinkInNewTab}
+                        {hideLogo}
+                        {title}
+                        {linkable}
+                        {isInternal}
+                        {getSanitizedUrl}
+                      />
+                    </div>
+                  {/if}
+                </div>
+              {/if}
+            </div>
           </div>
         </div>
-      </div>
-    {/if}
-    <div
-      class="main-wrapper"
-      on:click={() => {
-        if ($builderStore.inBuilder) {
-          builderStore.actions.selectComponent(screenId)
-        }
-      }}
-    >
-      <div class="main size--{pageWidthClass}">
-        <slot />
+      {/if}
+      <div
+        class="main-wrapper"
+        style={screenStyle}
+        on:click={() => {
+          if ($builderStore.inBuilder) {
+            builderStore.actions.selectComponent(screenId)
+          }
+        }}
+      >
+        <div class="main-content-area">
+          {#if showBanner && typeClass === "left" && !mobile}
+            <div class="banner" style={bannerStyle}>
+              <div class="banner-content">
+                {banner?.text}
+                {#if banner?.action}
+                  <Button cta on:click={handleBannerActionClick}>
+                    {banner.action.label}
+                  </Button>
+                {/if}
+              </div>
+            </div>
+          {/if}
+          <div class="main size--{pageWidthClass}">
+            <slot />
+          </div>
+        </div>
       </div>
     </div>
   </div>
   <div
     id="side-panel-container"
+    bind:this={sidePanelContainer}
     class:open={$sidePanelStore.open}
     use:clickOutside={autoCloseSidePanel ? sidePanelStore.actions.close : null}
     class:builder={$builderStore.inBuilder}
+    class={"size--" + ($sidePanelStore.size || "small")}
+    class:position--left={sidePanelPosition === "left"}
+    class:position--right={sidePanelPosition !== "left"}
   >
-    <div class="side-panel-header">
-      <Icon
-        color="var(--spectrum-global-color-gray-600)"
-        name="caret-line-right"
-        hoverable
+    <div class="side-panel-header" class:left={sidePanelPosition === "left"}>
+      <button
+        type="button"
+        class="side-panel-close-button"
+        aria-label="Close side panel"
         on:click={sidePanelStore.actions.close}
-      />
+      >
+        <Icon
+          color="currentColor"
+          name={sidePanelPosition === "left"
+            ? "caret-line-left"
+            : "caret-line-right"}
+        />
+      </button>
     </div>
   </div>
   <div class="modal-container"></div>
@@ -408,6 +625,37 @@ $: {
     overflow-x: hidden;
     position: relative;
     background: var(--spectrum-alias-background-color-secondary);
+  }
+  .layout-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .banner {
+    width: 100%;
+    background: var(--bannerBackground, var(--spectrum-global-color-gray-100));
+    color: var(--bannerTextColor, var(--spectrum-global-color-gray-800));
+    text-align: center;
+    padding: 8px 16px;
+    font-size: var(--bannerTextSize, 12px);
+    line-height: 1.4;
+    z-index: 3;
+  }
+  .banner-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    word-break: break-word;
+    display: flex;
+    align-items: center;
+    gap: 1em;
+  }
+
+  .banner-content :global(.spectrum-Button) {
+    margin-left: 1em;
   }
 
   .nav-wrapper {
@@ -474,10 +722,33 @@ $: {
     overflow-x: hidden;
     transition: transform 130ms ease-out;
     position: absolute;
-    width: 400px;
-    right: 0;
-    transform: translateX(100%);
+    /* default width matches modal medium */
+    width: 600px;
     height: 100%;
+  }
+  #side-panel-container.position--right {
+    right: 0;
+    left: auto;
+    transform: translateX(100%);
+  }
+  #side-panel-container.position--left {
+    left: 0;
+    right: auto;
+    transform: translateX(-100%);
+  }
+  /* Side panel size variants */
+  #side-panel-container.size--small {
+    width: 400px;
+  }
+  #side-panel-container.size--medium {
+    width: 500px;
+  }
+  #side-panel-container.size--large {
+    width: 625px;
+  }
+  #side-panel-container.size--fullscreen {
+    width: calc(100vw - 40px);
+    max-width: calc(100vw - 40px);
   }
   #side-panel-container.builder {
     transform: translateX(0);
@@ -497,6 +768,29 @@ $: {
     flex-direction: row;
     justify-content: flex-end;
   }
+  .side-panel-header.left {
+    justify-content: flex-start;
+  }
+  .side-panel-close-button {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 999px;
+    border: 1px solid var(--spectrum-alias-border-color);
+    background: var(--spectrum-alias-background-color-default);
+    color: var(--spectrum-alias-text-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.16);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+  .side-panel-close-button:hover {
+    background: var(--spectrum-alias-background-color-secondary);
+  }
+  .side-panel-close-button:focus-visible {
+    outline: 2px solid var(--spectrum-alias-border-color-focus);
+    outline-offset: 2px;
+  }
 
   .main-wrapper {
     display: flex;
@@ -506,6 +800,12 @@ $: {
     flex: 1 1 auto;
     z-index: 1;
   }
+  .main-content-area {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+  }
   .main {
     display: flex;
     flex-direction: column;
@@ -514,6 +814,11 @@ $: {
     max-width: 100%;
     position: relative;
     padding: 32px;
+    align-self: center;
+    flex: 1;
+  }
+  .main.size--max {
+    padding: 0;
   }
   .main:not(.size--max):has(.screenslot-dom > .component > .grid) {
     padding: calc(32px - var(--grid-spacing) * 2px);
@@ -537,11 +842,7 @@ $: {
   .size--max {
     width: 100%;
   }
-  .main.size--max {
-    padding: 0;
-  }
-
-  /*  Nav components */
+  /* Note: size variants are defined earlier; keep those as the source of width values. */
   .nav-toggle {
     display: flex;
     align-items: center;
@@ -550,12 +851,25 @@ $: {
     padding: var(--spacing-s);
     border-radius: 4px;
     transition: background-color 0.2s ease;
+    flex-shrink: 0;
+    align-self: flex-start;
   }
   .nav-toggle:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.25);
   }
   .collapsed-logo {
     cursor: pointer;
+  }
+  .logo.collapsed-logo {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 4px;
+  }
+  .logo.collapsed-logo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
   .burger {
     display: none;
@@ -564,9 +878,14 @@ $: {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--spacing-m);
     flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .logo :global(img) {
+    flex-shrink: 0;
   }
   .logo :global(h1) {
     font-weight: 600;
@@ -596,6 +915,9 @@ $: {
 
   /* Desktop nav overrides */
   .desktop.layout--left .layout-body {
+    overflow: hidden;
+  }
+  .desktop.layout--left .layout-content {
     flex-direction: row;
     overflow: hidden;
   }
@@ -621,6 +943,10 @@ $: {
     padding: var(--spacing-xs);
     justify-content: center;
     width: 100%;
+  }
+  .desktop .nav--left.collapsed .links :global(.link:hover),
+  .desktop .nav--left.collapsed .links :global(.dropdown .text:hover) {
+    background-color: rgba(255, 255, 255, 0.25);
   }
   .desktop .nav--left .links {
     margin-top: var(--spacing-m);
@@ -673,6 +999,10 @@ $: {
   /* Reduce padding */
   .mobile:not(.layout--none) .main {
     padding: 16px;
+  }
+  .mobile:not(.layout--none)
+    .main:not(.size--max):has(:global(.screenslot-dom > .component > .grid)) {
+    padding: 6px;
   }
   .mobile .main.size--max {
     padding: 0;
