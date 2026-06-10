@@ -13,7 +13,7 @@ import {
   Toggle,
 } from "@supertoolmake/bbui"
 import { Constants, FilterUsers, QueryUtils } from "@supertoolmake/frontend-core"
-import { FieldType, FormulaType } from "@supertoolmake/types"
+import { FieldType } from "@supertoolmake/types"
 import { cloneDeep } from "lodash"
 import { generate } from "shortid"
 import { createEventDispatcher } from "svelte"
@@ -132,7 +132,6 @@ $: valueTypeOptions = getValueTypeOptions(type)
 $: hasValueOption = type !== FieldType.STRING
 $: operatorOptions = QueryUtils.getValidOperatorsForType({
   type,
-  formulaType: FormulaType.STATIC,
 })
 </script>
 

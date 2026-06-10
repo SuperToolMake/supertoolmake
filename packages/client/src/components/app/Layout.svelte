@@ -163,6 +163,19 @@ const isInternal = (url) => {
   return url?.startsWith("/")
 }
 
+const getScreenStyle = (background, gradient, customCss) => {
+  let style = ""
+  if (gradient) {
+    style += `background: ${gradient};`
+  } else if (background) {
+    style += `background-color: ${background};`
+  }
+  if (customCss) {
+    style += customCss
+  }
+  return style || undefined
+}
+
 $: screenStyle = getScreenStyle(screenBackground, screenGradient, screenCustomCss)
 
 const getSanitizedUrl = (url, openInNewTab) => {

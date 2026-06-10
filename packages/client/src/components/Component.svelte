@@ -653,55 +653,6 @@ $: initialise(instance)
     darkMode,
   })
 
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  const evaluateConditions = conditions => {
-    if (!conditions?.length) {
-      conditionalSettings = {}
-      visible = true
-      return
-    }
-    const enabledConditions = getEnabledConditions(conditions)
-
-    // Default visible to false if there is a show condition
-    let nextVisible = !enabledConditions.find(
-      condition => condition.action === "show"
-    )
-
-    // Execute conditions and determine settings and visibility changes
-    const activeConditions = getActiveConditions(enabledConditions)
-    const result = reduceConditionActions(activeConditions)
-    if (result.visible != null) {
-      nextVisible = result.visible
-    }
-
-    // Update state from condition results
-    conditionalSettings = result.settingUpdates
-    visible = nextVisible
-  }
-
   onMount(() => {
     // Register this component instance for external access
     if ($appStore.isDevApp) {
