@@ -35,20 +35,8 @@ let drawer: DrawerHandle
 let drawerContentKey: number = 0
 let workingValue: ValidationEditorRule[] = []
 
-$: active = getActive(value)
-
-$: text = getText(value)
-
-$: fieldType = type?.split("/")[1]
-
-$: fieldDefinition = getFieldDefinition(fieldType)
-
-$: fieldTypeLabel = fieldDefinition?.name || fieldType
-
-const sanitiseRules = (
-  rules: ValidationEditorRule[]
-): ValidationEditorRule[] => {
-  return (rules || []).map(rule => {
+const sanitiseRules = (rules: ValidationEditorRule[]): ValidationEditorRule[] => {
+  return (rules || []).map((rule) => {
     const sanitisedRule = { ...rule }
     if (["required", "email"].includes(sanitisedRule.constraint || "")) {
       delete sanitisedRule.value
@@ -74,11 +62,9 @@ const handleShow = (event: CustomEvent<unknown>): void => {
   dispatch("drawerShow", event.detail)
 }
 
-const getFieldDefinition = (
-  fieldType: string | undefined
-): FieldDefinition | undefined => {
+const getFieldDefinition = (fieldType: string | undefined): FieldDefinition | undefined => {
   return Object.values(FIELDS as Record<string, FieldDefinition>).find(
-    field => field.type === fieldType
+    (field) => field.type === fieldType
   )
 }
 
@@ -102,6 +88,16 @@ const getText = (rules: ValidationEditorRule[]): string => {
     return `${rules.length} rule${rules.length === 1 ? "" : "s"} set`
   }
 }
+
+$: active = getActive(value)
+
+$: text = getText(value)
+
+$: fieldType = type?.split("/")[1]
+
+$: fieldDefinition = getFieldDefinition(fieldType)
+
+$: fieldTypeLabel = fieldDefinition?.name || fieldType
 </script>
 
 <div class="validation-editor">

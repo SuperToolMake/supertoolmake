@@ -108,7 +108,7 @@ export const createValidatorFromConstraints = (
 
   // Evaluate each constraint
   return (value: unknown) => {
-    for (let rule of rules) {
+    for (const rule of rules) {
       const error = evaluateRule(rule, value)
       if (error) {
         return error
@@ -172,7 +172,7 @@ const parseType = (value: unknown, type: `${FieldType}`) => {
 
   // Parse as number
   if (type === FieldType.NUMBER) {
-    if (isNaN(value as number)) {
+    if (Number.isNaN(value as number)) {
       return null
     }
     return parseFloat(value as string)
@@ -183,10 +183,10 @@ const parseType = (value: unknown, type: `${FieldType}`) => {
     if (value instanceof Date) {
       return value.getTime()
     }
-    const time = isNaN(value as number)
+    const time = Number.isNaN(value as number)
       ? Date.parse(value as string)
       : new Date(value as string | number | Date).getTime()
-    return isNaN(time) ? null : time
+    return Number.isNaN(time) ? null : time
   }
 
   // Parse as boolean
@@ -206,10 +206,7 @@ const parseType = (value: unknown, type: `${FieldType}`) => {
   }
 
   // Parse attachment/signature single, treating no key as null
-  if (
-    type === FieldType.ATTACHMENT_SINGLE ||
-    type === FieldType.SIGNATURE_SINGLE
-  ) {
+  if (type === FieldType.ATTACHMENT_SINGLE || type === FieldType.SIGNATURE_SINGLE) {
     if (!(value as { key?: unknown } | null | undefined)?.key) {
       return null
     }
@@ -261,17 +258,13 @@ const maxLengthHandler = (value: unknown, rule: UIFieldValidationRule) => {
 // Evaluates a max file size (MB) constraint
 const maxFileSizeHandler = (value: unknown, rule: UIFieldValidationRule) => {
   const limit = parseType(rule.value, "number") as number
-  const check = (attachment: { size: number }) =>
-    attachment.size / 1000000 > limit
+  const check = (attachment: { size: number }) => attachment.size / 1000000 > limit
   const attachments = value as {
     key?: unknown
     size: number
     some: (predicate: (attachment: { size: number }) => boolean) => boolean
   }
-  return (
-    value == null ||
-    !(attachments?.key ? check(attachments) : attachments.some(check))
-  )
+  return value == null || !(attachments?.key ? check(attachments) : attachments.some(check))
 }
 
 // Evaluates a max total upload size (MB) constraint
@@ -290,8 +283,7 @@ const maxUploadSizeHandler = (value: unknown, rule: UIFieldValidationRule) => {
     (attachments?.key
       ? attachments.size / 1000000 <= limit
       : attachments.reduce(
-          (acc: number, currentItem: { size: number }) =>
-            acc + currentItem.size,
+          (acc: number, currentItem: { size: number }) => acc + currentItem.size,
           0
         ) /
           1000000 <=
@@ -426,7 +418,7 @@ const isValidEmailLocalPart = (localPart: string): boolean => {
   if (!localPart) {
     return false
   }
-  return localPart.split(".").every(atom => EMAIL_LOCAL_PART_ATOM.test(atom))
+  return localPart.split(".").every((atom) => EMAIL_LOCAL_PART_ATOM.test(atom))
 }
 
 const isValidEmailAddress = (value: string): boolean => {

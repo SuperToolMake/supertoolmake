@@ -81,11 +81,11 @@ const stringConstraints = [
 ]
 
 const urlConstraints = stringConstraints.filter(
-  constraint => constraint.value !== Constraints.Email.value
+  (constraint) => constraint.value !== Constraints.Email.value
 )
 
 const emailConstraints = stringConstraints.filter(
-  constraint => constraint.value !== Constraints.Url.value
+  (constraint) => constraint.value !== Constraints.Url.value
 )
 
 const ConstraintMap: Record<string, ValidationConstraintOption[]> = {
@@ -99,8 +99,8 @@ const ConstraintMap: Record<string, ValidationConstraintOption[]> = {
     Constraints.Equal,
     Constraints.NotEqual,
   ],
-  ["boolean"]: [Constraints.Equal, Constraints.NotEqual],
-  ["datetime"]: [
+  boolean: [Constraints.Equal, Constraints.NotEqual],
+  datetime: [
     Constraints.Required,
     Constraints.MaxValue,
     Constraints.MinValue,

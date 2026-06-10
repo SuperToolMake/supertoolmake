@@ -23,34 +23,13 @@ describe("validation constraints", () => {
     ["link", ["required", "contains", "notContains", "minLength", "maxLength"]],
     [
       "url",
-      [
-        "required",
-        "minLength",
-        "maxLength",
-        "equal",
-        "notEqual",
-        "regex",
-        "notRegex",
-        "url",
-      ],
+      ["required", "minLength", "maxLength", "equal", "notEqual", "regex", "notRegex", "url"],
     ],
     [
       "email",
-      [
-        "required",
-        "minLength",
-        "maxLength",
-        "equal",
-        "notEqual",
-        "regex",
-        "notRegex",
-        "email",
-      ],
+      ["required", "minLength", "maxLength", "equal", "notEqual", "regex", "notRegex", "email"],
     ],
-    [
-      "array",
-      ["required", "minLength", "maxLength", "contains", "notContains"],
-    ],
+    ["array", ["required", "minLength", "maxLength", "contains", "notContains"]],
   ])("returns constraints for %s fields", (fieldType, expected) => {
     const constraints = getConstraintsForType(fieldType)
     const values = constraints.map((constraint) => constraint.value)
@@ -73,29 +52,21 @@ describe("validation constraints", () => {
   it("does not include an email rule for URL fields", () => {
     const urlConstraints = getConstraintsForType("url")
 
-    expect(urlConstraints.map(constraint => constraint.value)).not.toContain(
-      "email"
-    )
+    expect(urlConstraints.map((constraint) => constraint.value)).not.toContain("email")
   })
 
   it("includes an email rule for text and email fields", () => {
     const stringConstraints = getConstraintsForType("string")
     const emailConstraints = getConstraintsForType("email")
 
-    expect(stringConstraints.map(constraint => constraint.value)).toContain(
-      "email"
-    )
-    expect(emailConstraints.map(constraint => constraint.value)).toContain(
-      "email"
-    )
+    expect(stringConstraints.map((constraint) => constraint.value)).toContain("email")
+    expect(emailConstraints.map((constraint) => constraint.value)).toContain("email")
   })
 
   it("does not include a URL rule for email fields", () => {
     const emailConstraints = getConstraintsForType("email")
 
-    expect(emailConstraints.map(constraint => constraint.value)).not.toContain(
-      "url"
-    )
+    expect(emailConstraints.map((constraint) => constraint.value)).not.toContain("url")
   })
 })
 

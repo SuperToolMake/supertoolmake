@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it } from "vitest"
+
 import { FieldType, type UIFieldValidationRule } from "@supertoolmake/types"
+import { beforeEach, describe, expect, it } from "vitest"
 import { createValidatorFromConstraints } from "./validation"
 
 const URL_ERROR = "Invalid URL"
@@ -49,7 +50,7 @@ describe("form validation", () => {
       "http://192.168.0.1/path",
       "http://[2001:db8::1]/path",
       "https://example.com/path%5Csegment",
-    ])("accepts valid URL %s", input => {
+    ])("accepts valid URL %s", (input) => {
       expect(validator(input)).toBeNull()
     })
 
@@ -61,16 +62,13 @@ describe("form validation", () => {
       "https://example.com\\path",
       "//////\\\\\\\\\\\\\\\\///////////////\\\\\\\\\\\\\\\\///www.google.com",
       "not a url",
-    ])("rejects invalid URL %s", input => {
+    ])("rejects invalid URL %s", (input) => {
       expect(validator(input)).toBe(URL_ERROR)
     })
 
-    it.each(["", null] as const)(
-      "leaves empty value to other rules: %s",
-      input => {
-        expect(validator(input)).toBeNull()
-      }
-    )
+    it.each(["", null] as const)("leaves empty value to other rules: %s", (input) => {
+      expect(validator(input)).toBeNull()
+    })
 
     it.each([
       [["https"], "https://budibase.com", null],
@@ -100,7 +98,7 @@ describe("form validation", () => {
       "user@example.com",
       "user.name+tag@example.co.uk",
       "user@sub.example.com",
-    ])("accepts valid email %s", input => {
+    ])("accepts valid email %s", (input) => {
       expect(validator(input)).toBeNull()
     })
 
@@ -126,16 +124,13 @@ describe("form validation", () => {
       ".user@example.com",
       "user.@example.com",
       "user..name@example.com",
-    ])("rejects invalid email %s", input => {
+    ])("rejects invalid email %s", (input) => {
       expect(validator(input)).toBe(EMAIL_ERROR)
     })
 
-    it.each(["", null] as const)(
-      "leaves empty value to other rules: %s",
-      input => {
-        expect(validator(input)).toBeNull()
-      }
-    )
+    it.each(["", null] as const)("leaves empty value to other rules: %s", (input) => {
+      expect(validator(input)).toBeNull()
+    })
   })
 
   describe("contains validation", () => {
@@ -143,8 +138,7 @@ describe("form validation", () => {
       type: FieldType,
       constraint: "contains" | "notContains" = "contains"
     ) => {
-      const error =
-        constraint === "contains" ? CONTAINS_ERROR : NOT_CONTAINS_ERROR
+      const error = constraint === "contains" ? CONTAINS_ERROR : NOT_CONTAINS_ERROR
       const rules: UIFieldValidationRule[] = [
         {
           type,
@@ -172,7 +166,7 @@ describe("form validation", () => {
         expect(validator(input)).toBe(expected)
       })
 
-      it.each(["", null] as const)("empty value %s fails contains", input => {
+      it.each(["", null] as const)("empty value %s fails contains", (input) => {
         expect(validator(input)).toBe(CONTAINS_ERROR)
       })
     })
@@ -191,7 +185,7 @@ describe("form validation", () => {
         expect(validator(input)).toBe(expected)
       })
 
-      it.each([null, []] as const)("empty value %j fails contains", input => {
+      it.each([null, []] as const)("empty value %j fails contains", (input) => {
         expect(validator(input)).toBe(CONTAINS_ERROR)
       })
     })
