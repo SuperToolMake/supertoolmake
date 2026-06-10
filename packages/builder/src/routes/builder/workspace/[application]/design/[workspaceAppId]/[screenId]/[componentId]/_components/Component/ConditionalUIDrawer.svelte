@@ -1,5 +1,14 @@
 <script>
-import { Body, Button, DatePicker, DrawerContent, Icon, Layout, Select, Toggle } from "@supertoolmake/bbui"
+import {
+  Body,
+  Button,
+  DatePicker,
+  DrawerContent,
+  Icon,
+  Layout,
+  Select,
+  Toggle,
+} from "@supertoolmake/bbui"
 import { Constants, QueryUtils } from "@supertoolmake/frontend-core"
 import { generate } from "shortid"
 import { flip } from "svelte/animate"
@@ -88,7 +97,7 @@ const duplicateCondition = (id) => {
 }
 
 const toggleCondition = (id, enabled) => {
-  conditions = conditions.map(condition =>
+  conditions = conditions.map((condition) =>
     condition.id === id ? { ...condition, disabled: !enabled } : condition
   )
 }
