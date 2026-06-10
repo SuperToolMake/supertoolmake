@@ -1,8 +1,8 @@
 import { auth } from "@supertoolmake/backend-core"
 import Joi from "joi"
-import { lockout } from "../../../middleware"
 import * as authController from "../../controllers/global/auth"
 import { loggedInRoutes } from "../endpointGroups"
+import { emailLockout, ipLockout } from "../../../middleware"
 
 function buildAuthValidation() {
   // prettier-ignore
@@ -41,7 +41,13 @@ function buildResetUpdateValidation() {
 
 loggedInRoutes
   // PASSWORD
-  .post("/api/global/auth/:tenantId/login", buildAuthValidation(), lockout, authController.login)
+  .post(
+    "/api/global/auth/:tenantId/login",
+    buildAuthValidation(),
+    ipLockout,
+    emailLockout,
+    authController.login
+  )
   .post("/api/global/auth/logout", authController.logout)
   .post("/api/global/auth/:tenantId/reset", buildResetValidation(), authController.reset)
   .post(
