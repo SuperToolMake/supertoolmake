@@ -163,6 +163,84 @@ const isInternal = (url) => {
   return url?.startsWith("/")
 }
 
+const ensureExternal = (url) => {
+  if (!url?.length) {
+    return url
+  }
+  return !url.startsWith("http") ? `http://${url}` : url
+}
+
+const getScreenXOffset = (navigation, mobile) => {
+  if (navigation !== "Left") {
+    return 0
+  }
+  return mobile ? "0px" : "250px"
+}
+
+const getScreenYOffset = (navigation, mobile) => {
+  if (mobile) {
+    return !navigation || navigation === "None" ? 0 : "61px"
+  } else {
+    return navigation === "Top" ? "137px" : "0px"
+  }
+}
+
+const getNavStyle = (
+  backgroundColor,
+  textColor,
+  linkHoverTextColor,
+  linkHoverIconColor,
+  linkHoverBackground,
+  linkActiveTextColor,
+  linkActiveIconColor,
+  linkActiveBackground,
+  logoHeight,
+  width,
+  height
+) => {
+  let style = `--width:${width}px; --height:${height}px;`
+  if (backgroundColor) {
+    style += `--navBackground:${backgroundColor};`
+  }
+  if (textColor) {
+    style += `--navTextColor:${textColor};`
+  }
+  if (linkHoverTextColor) {
+    style += `--navLinkHoverTextColor:${linkHoverTextColor};`
+  }
+  if (linkHoverIconColor) {
+    style += `--navLinkHoverIconColor:${linkHoverIconColor};`
+  }
+  if (linkHoverBackground) {
+    style += `--navLinkHoverBackground:${linkHoverBackground};`
+  }
+  if (linkActiveTextColor) {
+    style += `--navLinkActiveTextColor:${linkActiveTextColor};`
+  }
+  if (linkActiveIconColor) {
+    style += `--navLinkActiveIconColor:${linkActiveIconColor};`
+  }
+  if (linkActiveBackground) {
+    style += `--navLinkActiveBackground:${linkActiveBackground};`
+  }
+  style += `--logoHeight:${logoHeight || 24}px;`
+  return style
+}
+
+const getBannerStyle = (backgroundColor, textColor, textSize) => {
+  let style = ""
+  if (backgroundColor) {
+    style += `--bannerBackground:${backgroundColor};`
+  }
+  if (textColor) {
+    style += `--bannerTextColor:${textColor};`
+  }
+  if (textSize) {
+    style += `--bannerTextSize:${textSize}px;`
+  }
+  return style
+}
+
 const getScreenStyle = (background, gradient, customCss) => {
   let style = ""
   if (gradient) {
