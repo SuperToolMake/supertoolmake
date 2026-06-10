@@ -1,5 +1,5 @@
 <script>
-import { Body, Button, DatePicker, DrawerContent, Icon, Layout, Select } from "@supertoolmake/bbui"
+import { Body, Button, DatePicker, DrawerContent, Icon, Layout, Select, Toggle } from "@supertoolmake/bbui"
 import { Constants, QueryUtils } from "@supertoolmake/frontend-core"
 import { generate } from "shortid"
 import { flip } from "svelte/animate"
@@ -85,6 +85,12 @@ const duplicateCondition = (id) => {
   const condition = conditions.find((link) => link.id === id)
   const duplicate = { ...condition, id: generate() }
   conditions = [...conditions, duplicate]
+}
+
+const toggleCondition = (id, enabled) => {
+  conditions = conditions.map(condition =>
+    condition.id === id ? { ...condition, disabled: !enabled } : condition
+  )
 }
 
 const handleFinalize = (e) => {
@@ -321,6 +327,12 @@ $: conditions.forEach((link) => {
                   />
                 </DrawerBindableSlot>
               {/if}
+              <Toggle
+                text=""
+                noMargin
+                value={!condition.disabled}
+                on:change={e => toggleCondition(condition.id, e.detail)}
+              />
               <Icon
                 name="copy"
                 hoverable
@@ -367,14 +379,14 @@ $: conditions.forEach((link) => {
     align-items: center;
     grid-template-columns:
       auto 150px auto minmax(140px, 1fr) 120px 100px minmax(140px, 1fr)
-      auto auto;
+      auto auto auto;
     border-radius: var(--border-radius-s);
     transition: background-color ease-in-out 130ms;
   }
   .condition.update {
     grid-template-columns:
       auto 150px minmax(140px, 1fr) auto minmax(140px, 1fr) auto
-      minmax(140px, 1fr) 120px 100px minmax(140px, 1fr) auto auto;
+      minmax(140px, 1fr) 120px 100px minmax(140px, 1fr) auto auto auto;
   }
   .condition:hover {
     background-color: var(--spectrum-global-color-gray-100);
