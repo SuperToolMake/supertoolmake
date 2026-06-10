@@ -125,10 +125,7 @@ const createScreenStore = () => {
       // from the screen navigation settings
       if (!activeLayout) {
         let layoutSettings: Partial<Layout> &
-          Pick<
-            Screen,
-            "screenBackground" | "screenGradient" | "screenCustomCss"
-          > = {
+          Pick<Screen, "screenBackground" | "screenGradient" | "screenCustomCss"> = {
           navigation: "None",
           pageWidth: activeScreen?.width || "Large",
           embedded: $appStore.embedded,

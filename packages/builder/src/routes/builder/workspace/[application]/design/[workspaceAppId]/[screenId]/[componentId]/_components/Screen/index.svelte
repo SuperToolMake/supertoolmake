@@ -1,19 +1,19 @@
 <script>
-  import GeneralPanel from "./GeneralPanel.svelte"
-  import StylingPanel from "./StylingPanel.svelte"
-  import { selectedScreen } from "@/stores/builder"
-  import Panel from "@/components/design/Panel.svelte"
-  import { Layout, ActionButton } from "@supertoolmake/bbui"
-  import { capitalise } from "@/helpers"
+import GeneralPanel from "./GeneralPanel.svelte"
+import StylingPanel from "./StylingPanel.svelte"
+import { selectedScreen } from "@/stores/builder"
+import Panel from "@/components/design/Panel.svelte"
+import { Layout, ActionButton } from "@supertoolmake/bbui"
+import { capitalise } from "@/helpers"
 
-  const tabs = ["settings", "styles"]
-  let section = "settings"
+const tabs = ["settings", "styles"]
+let section = "settings"
 
-  let currentScreenId = $selectedScreen?._id
-  $: if ($selectedScreen?._id !== currentScreenId) {
-    currentScreenId = $selectedScreen?._id
-    section = "settings"
-  }
+let currentScreenId = $selectedScreen?._id
+$: if ($selectedScreen?._id !== currentScreenId) {
+  currentScreenId = $selectedScreen?._id
+  section = "settings"
+}
 </script>
 
 {#if $selectedScreen}

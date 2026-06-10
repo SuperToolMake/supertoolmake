@@ -1,380 +1,347 @@
 <script>
-  import { getContext, setContext } from "svelte"
-  import { writable } from "svelte/store"
-  import { Heading, Icon, Button, clickOutside } from "@supertoolmake/bbui"
-  import { Constants } from "@supertoolmake/frontend-core"
-  import NavItem from "./NavItem.svelte"
-  import UserMenu from "./UserMenu.svelte"
-  import Logo from "./Logo.svelte"
-  import {
-    getEnabledConditions,
-    getActiveConditions,
-    reduceConditionActions,
-  } from "@/utils/conditions"
-  import { authStore } from "@/stores/auth"
-  import { currentRole } from "@/stores/derived/currentRole.js"
+import { getContext, setContext } from "svelte"
+import { writable } from "svelte/store"
+import { Heading, Icon, Button, clickOutside } from "@supertoolmake/bbui"
+import { Constants } from "@supertoolmake/frontend-core"
+import NavItem from "./NavItem.svelte"
+import UserMenu from "./UserMenu.svelte"
+import Logo from "./Logo.svelte"
+import {
+  getEnabledConditions,
+  getActiveConditions,
+  reduceConditionActions,
+} from "@/utils/conditions"
+import { authStore } from "@/stores/auth"
+import { currentRole } from "@/stores/derived/currentRole.js"
 
-  const sdk = getContext("sdk")
-  const {
-    routeStore,
-    roleStore,
-    linkable,
-    builderStore,
-    sidePanelStore,
-    modalStore,
-  } = sdk
-  const context = getContext("context")
-  const navStateStore = writable({})
-  let navStateBeforeCollapse = {}
+const sdk = getContext("sdk")
+const { routeStore, roleStore, linkable, builderStore, sidePanelStore, modalStore } = sdk
+const context = getContext("context")
+const navStateStore = writable({})
+let navStateBeforeCollapse = {}
 
-  // Legacy props which must remain unchanged for backwards compatibility
-  export let title
-  export let hideTitle = false
-  export let logoUrl
-  export let hideLogo = false
-  export let navigation = "Top"
-  export let sticky = false
-  export let links
-  export let width = "Large"
+// Legacy props which must remain unchanged for backwards compatibility
+export let title
+export let hideTitle = false
+export let logoUrl
+export let hideLogo = false
+export let navigation = "Top"
+export let sticky = false
+export let links
+export let width = "Large"
 
-  // New props from new design UI
-  export let navBackground
-  export let navTextColor
-  export let navLinkHoverTextColor
-  export let navLinkHoverIconColor
-  export let navLinkHoverBackground
-  export let navLinkActiveTextColor
-  export let navLinkActiveIconColor
-  export let navLinkActiveBackground
-  export let navWidth
-  export let pageWidth
-  export let logoLinkUrl
-  export let logoHeight
-  export let openLogoLinkInNewTab
-  export let textAlign
-  export let embedded = false
-  export let banner
-  export let showLoginButton = true
+// New props from new design UI
+export let navBackground
+export let navTextColor
+export let navLinkHoverTextColor
+export let navLinkHoverIconColor
+export let navLinkHoverBackground
+export let navLinkActiveTextColor
+export let navLinkActiveIconColor
+export let navLinkActiveBackground
+export let navWidth
+export let pageWidth
+export let logoLinkUrl
+export let logoHeight
+export let openLogoLinkInNewTab
+export let textAlign
+export let embedded = false
+export let banner
+export let showLoginButton = true
 
-  export let collapsible = false
+export let collapsible = false
 
-  export let screenBackground
-  export let screenGradient
-  export let screenCustomCss
+export let screenBackground
+export let screenGradient
+export let screenCustomCss
 
-  const NavigationClasses = {
-    Top: "top",
-    Left: "left",
-    None: "none",
+const NavigationClasses = {
+  Top: "top",
+  Left: "left",
+  None: "none",
+}
+const WidthClasses = {
+  Max: "max",
+  Large: "l",
+  Medium: "m",
+  Small: "s",
+  "Extra small": "xs",
+}
+
+export let logoPosition = "top" // "top" or "bottom"
+export let titleSize = "S"
+export let titleColor // CSS color string, only affects title
+
+let mobileOpen = false
+let navCollapsed = false
+
+const enrichNavItem = (navItem) => {
+  const internalLink = isInternal(navItem.url)
+  return {
+    ...navItem,
+    internalLink,
+    url: internalLink ? navItem.url : ensureExternal(navItem.url),
   }
-  const WidthClasses = {
-    Max: "max",
-    Large: "l",
-    Medium: "m",
-    Small: "s",
-    "Extra small": "xs",
+}
+
+const getRouteWithoutQueryParams = (route) => {
+  if (!route) {
+    return route
   }
+  try {
+    return new URL(route, "http://localhost").pathname
+  } catch (error) {
+    return route
+  }
+}
 
-  export let logoPosition = "top" // "top" or "bottom"
-  export let titleSize = "S"
-  export let titleColor // CSS color string, only affects title
-
-  let mobileOpen = false
-  let navCollapsed = false
-
-  // When a developer uses devtools to "view as public", hide the user menu and
-  // show the login button instead so it accurately previews the public UX.
-  $: isPublicPreview =
-    $authStore != null && $currentRole === Constants.Roles.PUBLIC
-
-  // Set some layout context. This isn't used in bindings but can be used
-  // determine things about the current app layout.
-  $: mobile = $context.device.mobile
-  const store = writable({ headerHeight: 0 })
-  $: store.set({
-    screenXOffset: getScreenXOffset(navigation, mobile),
-    screenYOffset: getScreenYOffset(navigation, mobile),
-  })
-  setContext("layout", store)
-
-  $: enrichedNavItems = enrichNavItems(links, $roleStore, $routeStore.routes)
-  $: typeClass = NavigationClasses[navigation] || NavigationClasses.None
-  $: navWidthClass = WidthClasses[navWidth || width] || WidthClasses.Large
-  $: pageWidthClass = WidthClasses[pageWidth || width] || WidthClasses.Large
-  $: navStyle = getNavStyle(
-    navBackground,
-    navTextColor,
-    navLinkHoverTextColor,
-    navLinkHoverIconColor,
-    navLinkHoverBackground,
-    navLinkActiveTextColor,
-    navLinkActiveIconColor,
-    navLinkActiveBackground,
-    logoHeight,
-    $context.device.width,
-    $context.device.height
-  )
-  $: bannerStyle = getBannerStyle(
-    banner?.background,
-    banner?.textColor,
-    banner?.textSize
-  )
-  $: showBanner = !!banner?.text?.trim?.() && typeClass !== "none"
-  $: autoCloseSidePanel =
-    !$builderStore.inBuilder &&
-    $sidePanelStore.open &&
-    !$sidePanelStore.ignoreClicksOutside
-  $: sidePanelPosition = $sidePanelStore.position || "right"
-
-  // When the position anchor (left/right) changes, suppress the CSS
-  // transition so the panel snaps to the new off-screen position instantly.
-  // Without this the browser sees a transform change (e.g. translateX(100%)
-  // → translateX(-100%)) and animates through the center of the screen.
-  //
-  // This block runs inside Svelte's update cycle BEFORE the DOM is patched,
-  // so we must toggle the position classes directly on the element first,
-  // force a reflow to commit the snapped position, then re-enable the
-  // transition. Svelte's subsequent DOM patch will see the same classes and
-  // treat them as a no-op, while adding the "open" class triggers the
-  // correct slide-in animation.
-  let sidePanelContainer
-  let prevSidePanelPosition = null
-  $: if (sidePanelContainer && sidePanelPosition !== prevSidePanelPosition) {
-    if (prevSidePanelPosition != null) {
-      sidePanelContainer.style.transition = "none"
-      sidePanelContainer.classList.toggle(
-        "position--left",
-        sidePanelPosition === "left"
-      )
-      sidePanelContainer.classList.toggle(
-        "position--right",
-        sidePanelPosition !== "left"
-      )
-      // Force a synchronous reflow so the browser commits the snapped
-      // position before we re-enable the transition on the next line.
-      const _reflow = sidePanelContainer.offsetHeight
-      sidePanelContainer.style.transition = ""
-    }
-    prevSidePanelPosition = sidePanelPosition
+const canAccessSubLink = (subLink, accessibleRoutes) => {
+  const url = subLink?.url
+  if (!url) {
+    return false
   }
 
-  $: screenId = $builderStore.inBuilder
-    ? `${$builderStore.screen?._id}-screen`
-    : "screen"
-  $: navigationId = $builderStore.inBuilder
-    ? `${$builderStore.screen?._id}-navigation`
-    : "navigation"
-
-  const enrichNavItem = navItem => {
-    const internalLink = isInternal(navItem.url)
-    return {
-      ...navItem,
-      internalLink,
-      url: internalLink ? navItem.url : ensureExternal(navItem.url),
-    }
+  // We can only reliably validate static internal routes here.
+  if (!isInternal(url) || url.includes("{{")) {
+    return true
   }
 
-  const getRouteWithoutQueryParams = route => {
-    if (!route) {
-      return route
-    }
-    try {
-      return new URL(route, "http://localhost").pathname
-    } catch (error) {
-      return route
-    }
+  return accessibleRoutes.has(getRouteWithoutQueryParams(url))
+}
+
+const enrichNavItems = (navItems, userRoleHierarchy, routeEntries = []) => {
+  if (!navItems?.length) {
+    return []
   }
+  const accessibleRoutes = new Set(routeEntries.map((route) => route.path))
 
-  const canAccessSubLink = (subLink, accessibleRoutes) => {
-    const url = subLink?.url
-    if (!url) {
-      return false
-    }
+  return navItems
+    .filter((navItem) => {
+      // Strip nav items without text
+      if (!navItem.text) {
+        return false
+      }
 
-    // We can only reliably validate static internal routes here.
-    if (!isInternal(url) || url.includes("{{")) {
-      return true
-    }
+      // Strip out links without URLs
+      if (navItem.type !== "sublinks" && !navItem.url) {
+        return false
+      }
 
-    return accessibleRoutes.has(getRouteWithoutQueryParams(url))
+      // Filter to only links allowed by the current role
+      const role = navItem.roleId || Constants.Roles.BASIC
+      return userRoleHierarchy?.find((roleId) => roleId === role)
+    })
+    .map((navItem) => {
+      const enrichedNavItem = enrichNavItem(navItem)
+      if (navItem.type === "sublinks" && navItem.subLinks?.length) {
+        enrichedNavItem.subLinks = navItem.subLinks
+          .filter((subLink) => subLink.text && canAccessSubLink(subLink, accessibleRoutes))
+          .map(enrichNavItem)
+      }
+      return enrichedNavItem
+    })
+    .filter((navItem) => navItem.type !== "sublinks" || navItem.subLinks?.length > 0)
+}
+
+function evaluateNavItemConditions(conditions = []) {
+  if (!conditions?.length) return true
+  const enabledConditions = getEnabledConditions(conditions)
+
+  // Get only the active (matching) conditions
+  const activeConditions = getActiveConditions(enabledConditions)
+  const { visible } = reduceConditionActions(activeConditions)
+
+  if (visible == null) {
+    // If any show condition exists, default to hidden unless one matches
+    const hasShow = enabledConditions.some((cond) => cond.action === "show")
+    return !hasShow
   }
+  return visible
+}
 
-  const enrichNavItems = (navItems, userRoleHierarchy, routeEntries = []) => {
-    if (!navItems?.length) {
-      return []
-    }
-    const accessibleRoutes = new Set(routeEntries.map(route => route.path))
+const isInternal = (url) => {
+  return url?.startsWith("/")
+}
 
-    return navItems
-      .filter(navItem => {
-        // Strip nav items without text
-        if (!navItem.text) {
-          return false
-        }
-
-        // Strip out links without URLs
-        if (navItem.type !== "sublinks" && !navItem.url) {
-          return false
-        }
-
-        // Filter to only links allowed by the current role
-        const role = navItem.roleId || Constants.Roles.BASIC
-        return userRoleHierarchy?.find(roleId => roleId === role)
-      })
-      .map(navItem => {
-        const enrichedNavItem = enrichNavItem(navItem)
-        if (navItem.type === "sublinks" && navItem.subLinks?.length) {
-          enrichedNavItem.subLinks = navItem.subLinks
-            .filter(
-              subLink =>
-                subLink.text && canAccessSubLink(subLink, accessibleRoutes)
-            )
-            .map(enrichNavItem)
-        }
-        return enrichedNavItem
-      })
-      .filter(
-        navItem => navItem.type !== "sublinks" || navItem.subLinks?.length > 0
-      )
-  }
-
-  function evaluateNavItemConditions(conditions = []) {
-    if (!conditions?.length) return true
-    const enabledConditions = getEnabledConditions(conditions)
-
-    // Get only the active (matching) conditions
-    const activeConditions = getActiveConditions(enabledConditions)
-    const { visible } = reduceConditionActions(activeConditions)
-
-    if (visible == null) {
-      // If any show condition exists, default to hidden unless one matches
-      const hasShow = enabledConditions.some(cond => cond.action === "show")
-      return hasShow ? false : true
-    }
-    return visible
-  }
-
-  const isInternal = url => {
-    return url?.startsWith("/")
-  }
-
-  const ensureExternal = url => {
-    if (!url?.length) {
-      return url
-    }
-    return !url.startsWith("http") ? `http://${url}` : url
-  }
-
-  const getScreenXOffset = (navigation, mobile) => {
-    if (navigation !== "Left") {
-      return 0
-    }
-    return mobile ? "0px" : "250px"
-  }
-  const getScreenYOffset = (navigation, mobile) => {
-    if (mobile) {
-      return !navigation || navigation === "None" ? 0 : "61px"
-    } else {
-      return navigation === "Top" ? "137px" : "0px"
-    }
-  }
-
-  const getNavStyle = (
-    backgroundColor,
-    textColor,
-    linkHoverTextColor,
-    linkHoverIconColor,
-    linkHoverBackground,
-    linkActiveTextColor,
-    linkActiveIconColor,
-    linkActiveBackground,
-    logoHeight,
-    width,
-    height
-  ) => {
-    let style = `--width:${width}px; --height:${height}px;`
-    if (backgroundColor) {
-      style += `--navBackground:${backgroundColor};`
-    }
-    if (textColor) {
-      style += `--navTextColor:${textColor};`
-    }
-    if (linkHoverTextColor) {
-      style += `--navLinkHoverTextColor:${linkHoverTextColor};`
-    }
-    if (linkHoverIconColor) {
-      style += `--navLinkHoverIconColor:${linkHoverIconColor};`
-    }
-    if (linkHoverBackground) {
-      style += `--navLinkHoverBackground:${linkHoverBackground};`
-    }
-    if (linkActiveTextColor) {
-      style += `--navLinkActiveTextColor:${linkActiveTextColor};`
-    }
-    if (linkActiveIconColor) {
-      style += `--navLinkActiveIconColor:${linkActiveIconColor};`
-    }
-    if (linkActiveBackground) {
-      style += `--navLinkActiveBackground:${linkActiveBackground};`
-    }
-    style += `--logoHeight:${logoHeight || 24}px;`
-    return style
-  }
-
-  const getBannerStyle = (backgroundColor, textColor, textSize) => {
-    let style = ""
-    if (backgroundColor) {
-      style += `--bannerBackground:${backgroundColor};`
-    }
-    if (textColor) {
-      style += `--bannerTextColor:${textColor};`
-    }
-    if (textSize) {
-      style += `--bannerTextSize:${textSize}px;`
-    }
-    return style
-  }
-
-  const getScreenStyle = (background, gradient, customCss) => {
-    let style = ""
-    if (gradient) {
-      style += `background: ${gradient};`
-    } else if (background) {
-      style += `background-color: ${background};`
-    }
-    if (customCss) {
-      style += customCss
-    }
-    return style || undefined
-  }
-
-  $: screenStyle = getScreenStyle(
-    screenBackground,
-    screenGradient,
-    screenCustomCss
-  )
-
-  const getSanitizedUrl = (url, openInNewTab) => {
-    if (!isInternal(url)) {
-      return ensureExternal(url)
-    }
-    if (openInNewTab) {
-      return `#${url}`
-    }
+const ensureExternal = (url) => {
+  if (!url?.length) {
     return url
   }
+  return !url.startsWith("http") ? `http://${url}` : url
+}
 
-  const handleClickLink = () => {
-    mobileOpen = false
-    sidePanelStore.actions.close()
-    modalStore.actions.close()
+const getScreenXOffset = (navigation, mobile) => {
+  if (navigation !== "Left") {
+    return 0
   }
+  return mobile ? "0px" : "250px"
+}
+const getScreenYOffset = (navigation, mobile) => {
+  if (mobile) {
+    return !navigation || navigation === "None" ? 0 : "61px"
+  } else {
+    return navigation === "Top" ? "137px" : "0px"
+  }
+}
 
-  const handleBannerActionClick = () => {
-    if (typeof banner?.action?.onClick === "function") {
-      banner.action.onClick()
-    }
+const getNavStyle = (
+  backgroundColor,
+  textColor,
+  linkHoverTextColor,
+  linkHoverIconColor,
+  linkHoverBackground,
+  linkActiveTextColor,
+  linkActiveIconColor,
+  linkActiveBackground,
+  logoHeight,
+  width,
+  height
+) => {
+  let style = `--width:${width}px; --height:${height}px;`
+  if (backgroundColor) {
+    style += `--navBackground:${backgroundColor};`
   }
+  if (textColor) {
+    style += `--navTextColor:${textColor};`
+  }
+  if (linkHoverTextColor) {
+    style += `--navLinkHoverTextColor:${linkHoverTextColor};`
+  }
+  if (linkHoverIconColor) {
+    style += `--navLinkHoverIconColor:${linkHoverIconColor};`
+  }
+  if (linkHoverBackground) {
+    style += `--navLinkHoverBackground:${linkHoverBackground};`
+  }
+  if (linkActiveTextColor) {
+    style += `--navLinkActiveTextColor:${linkActiveTextColor};`
+  }
+  if (linkActiveIconColor) {
+    style += `--navLinkActiveIconColor:${linkActiveIconColor};`
+  }
+  if (linkActiveBackground) {
+    style += `--navLinkActiveBackground:${linkActiveBackground};`
+  }
+  style += `--logoHeight:${logoHeight || 24}px;`
+  return style
+}
+
+const getBannerStyle = (backgroundColor, textColor, textSize) => {
+  let style = ""
+  if (backgroundColor) {
+    style += `--bannerBackground:${backgroundColor};`
+  }
+  if (textColor) {
+    style += `--bannerTextColor:${textColor};`
+  }
+  if (textSize) {
+    style += `--bannerTextSize:${textSize}px;`
+  }
+  return style
+}
+
+const getScreenStyle = (background, gradient, customCss) => {
+  let style = ""
+  if (gradient) {
+    style += `background: ${gradient};`
+  } else if (background) {
+    style += `background-color: ${background};`
+  }
+  if (customCss) {
+    style += customCss
+  }
+  return style || undefined
+}
+
+$: screenStyle = getScreenStyle(screenBackground, screenGradient, screenCustomCss)
+
+const getSanitizedUrl = (url, openInNewTab) => {
+  if (!isInternal(url)) {
+    return ensureExternal(url)
+  }
+  if (openInNewTab) {
+    return `#${url}`
+  }
+  return url
+}
+
+// When a developer uses devtools to "view as public", hide the user menu and
+// show the login button instead so it accurately previews the public UX.
+$: isPublicPreview = $authStore != null && $currentRole === Constants.Roles.PUBLIC
+
+// Set some layout context. This isn't used in bindings but can be used
+// determine things about the current app layout.
+$: mobile = $context.device.mobile
+const store = writable({ headerHeight: 0 })
+$: store.set({
+  screenXOffset: getScreenXOffset(navigation, mobile),
+  screenYOffset: getScreenYOffset(navigation, mobile),
+})
+setContext("layout", store)
+
+$: enrichedNavItems = enrichNavItems(links, $roleStore, $routeStore.routes)
+$: typeClass = NavigationClasses[navigation] || NavigationClasses.None
+$: navWidthClass = WidthClasses[navWidth || width] || WidthClasses.Large
+$: pageWidthClass = WidthClasses[pageWidth || width] || WidthClasses.Large
+$: navStyle = getNavStyle(
+  navBackground,
+  navTextColor,
+  navLinkHoverTextColor,
+  navLinkHoverIconColor,
+  navLinkHoverBackground,
+  navLinkActiveTextColor,
+  navLinkActiveIconColor,
+  navLinkActiveBackground,
+  logoHeight,
+  $context.device.width,
+  $context.device.height
+)
+$: bannerStyle = getBannerStyle(banner?.background, banner?.textColor, banner?.textSize)
+$: showBanner = !!banner?.text?.trim?.() && typeClass !== "none"
+$: autoCloseSidePanel =
+  !$builderStore.inBuilder && $sidePanelStore.open && !$sidePanelStore.ignoreClicksOutside
+$: sidePanelPosition = $sidePanelStore.position || "right"
+
+// When the position anchor (left/right) changes, suppress the CSS
+// transition so the panel snaps to the new off-screen position instantly.
+// Without this the browser sees a transform change (e.g. translateX(100%)
+// → translateX(-100%)) and animates through the center of the screen.
+//
+// This block runs inside Svelte's update cycle BEFORE the DOM is patched,
+// so we must toggle the position classes directly on the element first,
+// force a reflow to commit the snapped position, then re-enable the
+// transition. Svelte's subsequent DOM patch will see the same classes and
+// treat them as a no-op, while adding the "open" class triggers the
+// correct slide-in animation.
+let sidePanelContainer
+let prevSidePanelPosition = null
+$: if (sidePanelContainer && sidePanelPosition !== prevSidePanelPosition) {
+  if (prevSidePanelPosition != null) {
+    sidePanelContainer.style.transition = "none"
+    sidePanelContainer.classList.toggle("position--left", sidePanelPosition === "left")
+    sidePanelContainer.classList.toggle("position--right", sidePanelPosition !== "left")
+    // Force a synchronous reflow so the browser commits the snapped
+    // position before we re-enable the transition on the next line.
+    const _reflow = sidePanelContainer.offsetHeight
+    sidePanelContainer.style.transition = ""
+  }
+  prevSidePanelPosition = sidePanelPosition
+}
+
+$: screenId = $builderStore.inBuilder ? `${$builderStore.screen?._id}-screen` : "screen"
+$: navigationId = $builderStore.inBuilder ? `${$builderStore.screen?._id}-navigation` : "navigation"
+
+const handleClickLink = () => {
+  mobileOpen = false
+  sidePanelStore.actions.close()
+  modalStore.actions.close()
+}
+
+const handleBannerActionClick = () => {
+  if (typeof banner?.action?.onClick === "function") {
+    banner.action.onClick()
+  }
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

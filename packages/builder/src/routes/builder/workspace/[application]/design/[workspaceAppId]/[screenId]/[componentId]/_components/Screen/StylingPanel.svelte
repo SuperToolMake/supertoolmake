@@ -1,52 +1,47 @@
 <script>
-  import { get } from "svelte/store"
-  import {
-    DetailSummary,
-    ActionButton,
-    Drawer,
-    Button,
-    Select,
-    notifications,
-  } from "@supertoolmake/bbui"
-  import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
-  import ColorPicker from "@/components/design/settings/controls/ColorPicker.svelte"
-  import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
-  import { getBindableProperties } from "@/dataBinding"
-  import { selectedScreen, screenStore, themeStore } from "@/stores/builder"
-  import { background } from "../Component/componentStyles"
+import { get } from "svelte/store"
+import {
+  DetailSummary,
+  ActionButton,
+  Drawer,
+  Button,
+  Select,
+  notifications,
+} from "@supertoolmake/bbui"
+import PropertyControl from "@/components/design/settings/controls/PropertyControl.svelte"
+import ColorPicker from "@/components/design/settings/controls/ColorPicker.svelte"
+import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
+import { getBindableProperties } from "@/dataBinding"
+import { selectedScreen, screenStore, themeStore } from "@/stores/builder"
+import { background } from "../Component/componentStyles"
 
-  let customCssDrawer
-  let tempCustomCss = ""
+let customCssDrawer
+let tempCustomCss = ""
 
-  $: bindings = getBindableProperties($selectedScreen, null)
-  $: backgroundChanged =
-    !!$selectedScreen?.screenBackground || !!$selectedScreen?.screenGradient
+$: bindings = getBindableProperties($selectedScreen, null)
+$: backgroundChanged = !!$selectedScreen?.screenBackground || !!$selectedScreen?.screenGradient
 
-  const updateSetting = async (key, value) => {
-    try {
-      await screenStore.updateSetting(get(selectedScreen), key, value)
-    } catch (error) {
-      notifications.error("Error updating style")
-    }
+const updateSetting = async (key, value) => {
+  try {
+    await screenStore.updateSetting(get(selectedScreen), key, value)
+  } catch (error) {
+    notifications.error("Error updating style")
   }
+}
 
-  const openCustomCssDrawer = () => {
-    tempCustomCss = $selectedScreen?.screenCustomCss || ""
-    customCssDrawer.show()
-  }
+const openCustomCssDrawer = () => {
+  tempCustomCss = $selectedScreen?.screenCustomCss || ""
+  customCssDrawer.show()
+}
 
-  const saveCustomCss = async () => {
-    try {
-      await screenStore.updateSetting(
-        get(selectedScreen),
-        "screenCustomCss",
-        tempCustomCss
-      )
-      customCssDrawer.hide()
-    } catch (error) {
-      notifications.error("Error updating custom style")
-    }
+const saveCustomCss = async () => {
+  try {
+    await screenStore.updateSetting(get(selectedScreen), "screenCustomCss", tempCustomCss)
+    customCssDrawer.hide()
+  } catch (error) {
+    notifications.error("Error updating custom style")
   }
+}
 </script>
 
 <DetailSummary
