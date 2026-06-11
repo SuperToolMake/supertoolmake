@@ -1,7 +1,7 @@
 import { cache } from "@supertoolmake/backend-core"
-import emailLockout from "../emailLockout"
 import env from "../../environment"
 import * as userSdk from "../../sdk/users"
+import emailLockout from "../emailLockout"
 
 jest.mock("@supertoolmake/backend-core", () => ({
   cache: {

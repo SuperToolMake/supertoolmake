@@ -1,8 +1,8 @@
 import { auth } from "@supertoolmake/backend-core"
 import Joi from "joi"
+import { emailLockout, ipLockout } from "../../../middleware"
 import * as authController from "../../controllers/global/auth"
 import { loggedInRoutes } from "../endpointGroups"
-import { emailLockout, ipLockout } from "../../../middleware"
 
 function buildAuthValidation() {
   // prettier-ignore

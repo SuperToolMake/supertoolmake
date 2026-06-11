@@ -174,21 +174,13 @@ describe("/api/global/auth", () => {
           const email = config.user!.email!
           const password = config.userPassword
 
-          await withEnv(
-            { LOGIN_IP_LOCKOUT_LIMIT: 2, LOGIN_LOCKOUT_SECONDS: 900 },
-            async () => {
-              await config.api.auth.login(tenantId, email, password)
-              await config.api.auth.login(tenantId, email, password)
+          await withEnv({ LOGIN_IP_LOCKOUT_LIMIT: 2, LOGIN_LOCKOUT_SECONDS: 900 }, async () => {
+            await config.api.auth.login(tenantId, email, password)
+            await config.api.auth.login(tenantId, email, password)
 
-              const res = await config.api.auth.login(
-                tenantId,
-                email,
-                password,
-                { status: 429 }
-              )
-              expect(res.headers["retry-after"]).toBe("900")
-            }
-          )
+            const res = await config.api.auth.login(tenantId, email, password, { status: 429 })
+            expect(res.headers["retry-after"]).toBe("900")
+          })
         })
       })
     })

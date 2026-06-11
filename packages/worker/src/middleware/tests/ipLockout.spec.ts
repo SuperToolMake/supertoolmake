@@ -1,6 +1,6 @@
-import ipLockout from "../ipLockout"
 import { cache } from "@budibase/backend-core"
 import env from "../../environment"
+import ipLockout from "../ipLockout"
 
 jest.mock("@budibase/backend-core", () => ({
   cache: {
@@ -36,10 +36,7 @@ describe("ipLockout middleware", () => {
 
     await ipLockout(ctx, next)
 
-    expect(cache.increment).toHaveBeenCalledWith(
-      "auth:login:ip:1.2.3.4",
-      env.LOGIN_LOCKOUT_SECONDS
-    )
+    expect(cache.increment).toHaveBeenCalledWith("auth:login:ip:1.2.3.4", env.LOGIN_LOCKOUT_SECONDS)
     expect(next).toHaveBeenCalled()
     expect(ctx.throw).not.toHaveBeenCalled()
   })
@@ -54,9 +51,7 @@ describe("ipLockout middleware", () => {
   })
 
   it("should throw 429 with Retry-After when count exceeds the limit", async () => {
-    jest
-      .mocked(cache.increment)
-      .mockResolvedValue(env.LOGIN_IP_LOCKOUT_LIMIT + 1)
+    jest.mocked(cache.increment).mockResolvedValue(env.LOGIN_IP_LOCKOUT_LIMIT + 1)
 
     ctx.throw = jest.fn().mockImplementation((status, message) => {
       const error = new Error(message)
@@ -64,18 +59,10 @@ describe("ipLockout middleware", () => {
       throw error
     })
 
-    await expect(ipLockout(ctx, next)).rejects.toThrow(
-      "Too many login attempts. Try again later."
-    )
+    await expect(ipLockout(ctx, next)).rejects.toThrow("Too many login attempts. Try again later.")
 
     expect(next).not.toHaveBeenCalled()
-    expect(ctx.set).toHaveBeenCalledWith(
-      "Retry-After",
-      String(env.LOGIN_LOCKOUT_SECONDS)
-    )
-    expect(ctx.throw).toHaveBeenCalledWith(
-      429,
-      "Too many login attempts. Try again later."
-    )
+    expect(ctx.set).toHaveBeenCalledWith("Retry-After", String(env.LOGIN_LOCKOUT_SECONDS))
+    expect(ctx.throw).toHaveBeenCalledWith(429, "Too many login attempts. Try again later.")
   })
 })

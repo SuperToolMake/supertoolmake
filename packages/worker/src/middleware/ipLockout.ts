@@ -1,6 +1,6 @@
 import { cache } from "@supertoolmake/backend-core"
-import { Ctx } from "@supertoolmake/types"
-import { Next } from "koa"
+import type { Ctx } from "@supertoolmake/types"
+import type { Next } from "koa"
 import env from "../environment"
 
 const ipKey = (ip: string) => `auth:login:ip:${ip}`
@@ -22,9 +22,7 @@ export default async (ctx: Ctx, next: Next) => {
 
   if (count > env.LOGIN_IP_LOCKOUT_LIMIT) {
     ctx.set("Retry-After", String(env.LOGIN_LOCKOUT_SECONDS))
-    console.log(
-      `[auth] login blocked due to IP lockout ip=${ip} count=${count}`
-    )
+    console.log(`[auth] login blocked due to IP lockout ip=${ip} count=${count}`)
     return ctx.throw(429, "Too many login attempts. Try again later.")
   }
 
