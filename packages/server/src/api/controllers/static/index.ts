@@ -307,13 +307,20 @@ export const getSignedUploadURL = async (
   }
   try {
     let endpoint = datasource?.config?.endpoint
+    const port = datasource?.config?.port
     const useSSL = datasource?.config?.useSSL ?? true
     if (endpoint && !utils.urlHasProtocol(endpoint)) {
       endpoint = `${useSSL ? "https" : "http"}://${endpoint}`
     }
+    if (endpoint && port) {
+      const url = new URL(endpoint)
+      url.port = String(port)
+      endpoint = url.toString()
+    }
     const s3 = new S3({
       region: awsRegion,
       endpoint,
+      forcePathStyle: true,
       credentials: {
         accessKeyId: datasource?.config?.accessKey as string,
         secretAccessKey: datasource?.config?.secretKey as string,
@@ -356,14 +363,21 @@ export const uploadExternalFile = async (ctx: Ctx) => {
 
   const awsRegion = (datasource?.config?.region || "eu-west-1") as string
   let endpoint = datasource?.config?.endpoint
+  const port = datasource?.config?.port
   const useSSL = datasource?.config?.useSSL ?? true
   if (endpoint && !utils.urlHasProtocol(endpoint)) {
     endpoint = `${useSSL ? "https" : "http"}://${endpoint}`
+  }
+  if (endpoint && port) {
+    const url = new URL(endpoint)
+    url.port = String(port)
+    endpoint = url.toString()
   }
 
   const s3 = new S3({
     region: awsRegion,
     endpoint,
+    forcePathStyle: true,
     credentials: {
       accessKeyId: datasource?.config?.accessKey as string,
       secretAccessKey: datasource?.config?.secretKey as string,
