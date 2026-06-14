@@ -12,7 +12,7 @@
     "@types/node": "22.18.0",
     "@types/proper-lockfile": "4.1.4",
     "audit-ci": "7.1.0",
-    "esbuild": "0.25.0",
+    "esbuild": "0.28.1",
     "esbuild-node-externals": "1.14.0",
     "husky": "8.0.3",
     "jest": "30.0.5",
