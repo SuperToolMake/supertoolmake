@@ -2,16 +2,13 @@
 import "@spectrum-css/toast/dist/index-vars.css"
 import { fly } from "svelte/transition"
 import Portal from "svelte-portal"
-import {
-  notifications,
-  type Notification as NotificationItem,
-} from "../Stores/notifications"
+import { notifications, type Notification as NotificationItem } from "../Stores/notifications"
 import Notification from "./Notification.svelte"
 
 let items = $state<NotificationItem[]>([])
 
 $effect(() => {
-  const unsubscribe = notifications.subscribe(value => {
+  const unsubscribe = notifications.subscribe((value) => {
     items = value
   })
   return unsubscribe
