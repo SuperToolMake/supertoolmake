@@ -2,8 +2,8 @@ import type { SSOUser, User } from "@supertoolmake/types"
 
 jest.mock("nodemailer")
 
-import { generator, structures, TestConfiguration } from "../../../../tests"
 import nodemailer from "nodemailer"
+import { generator, structures, TestConfiguration } from "../../../../tests"
 
 const sendMailMock = (nodemailer.createTransport as jest.Mock)().sendMail
 
