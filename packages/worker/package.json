@@ -70,17 +70,13 @@
     "@types/koa": "3.0.1",
     "@types/koa__router": "12.0.4",
     "@types/lodash": "4.14.200",
-    "@types/maildev": "^0.0.7",
     "@types/node-fetch": "2.6.4",
     "@types/nodemailer": "^6.4.17",
-    "@types/supertest": "2.0.14",
-    "cheerio": "^1.0.0",
-    "maildev": "^2.2.1",
     "nock": "^13.5.4",
     "nodemon": "2.0.15",
     "rimraf": "3.0.2",
     "superagent": "^10.1.1",
-    "supertest": "6.3.3",
+    "supertest": "7.2.2",
     "timekeeper": "2.2.0"
   },
   "nx": {
