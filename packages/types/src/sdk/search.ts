@@ -18,6 +18,7 @@ export enum ArrayOperator {
   NOT_CONTAINS = "notContains",
   CONTAINS_ANY = "containsAny",
   ONE_OF = "oneOf",
+  NOT_ONE_OF = "notOneOf",
 }
 
 export enum RangeOperator {
@@ -96,6 +97,7 @@ export interface SearchFilters {
   [BasicOperator.EMPTY]?: BasicFilter
   [BasicOperator.NOT_EMPTY]?: BasicFilter
   [ArrayOperator.ONE_OF]?: ArrayFilter
+  [ArrayOperator.NOT_ONE_OF]?: ArrayFilter
   [ArrayOperator.CONTAINS]?: ArrayFilter
   [ArrayOperator.NOT_CONTAINS]?: ArrayFilter
   [ArrayOperator.CONTAINS_ANY]?: ArrayFilter

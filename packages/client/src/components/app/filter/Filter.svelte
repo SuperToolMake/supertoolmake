@@ -118,7 +118,11 @@ const getValidOperatorsForType = (
   // Map the operators to set an label overrides
   return coreOperators
     .filter((op) => {
-      if (isDateTime && op.value === FilterType.ONE_OF) return false
+      if (
+        isDateTime &&
+        (op.value === FilterType.ONE_OF || op.value === ArrayOperator.NOT_ONE_OF)
+      )
+        return false
       return true
     })
     .map((op) => ({

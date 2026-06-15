@@ -150,7 +150,7 @@ const onOperatorChange = (
     Constants.OperatorOptions.NotEmpty.value,
   ]
   condition.noValue = noValueOptions.includes(newOperator)
-  if (condition.noValue || newOperator === "oneOf") {
+  if (condition.noValue || newOperator === "oneOf" || newOperator === "notOneOf") {
     condition.referenceValue = null
     condition.valueType = "string"
     condition.type = FieldType.STRING
@@ -363,7 +363,9 @@ $: settingOptions = settings
                   popoverAutoWidth
                 />
                 <Select
-                  disabled={condition.noValue || condition.operator === "oneOf"}
+                  disabled={condition.noValue ||
+                    condition.operator === "oneOf" ||
+                    condition.operator === "notOneOf"}
                   options={valueTypeOptions}
                   bind:value={condition.valueType}
                   placeholder={false}

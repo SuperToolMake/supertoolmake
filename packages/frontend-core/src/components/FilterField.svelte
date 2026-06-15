@@ -170,7 +170,7 @@ const validationMap = {
               value={readableValue}
               on:change={onChange}
             />
-          {:else if filter.type === FieldType.ARRAY || (filter.type === FieldType.OPTIONS && filter.operator === ArrayOperator.ONE_OF)}
+          {:else if filter.type === FieldType.ARRAY || (filter.type === FieldType.OPTIONS && (filter.operator === ArrayOperator.ONE_OF || filter.operator === ArrayOperator.NOT_ONE_OF))}
             <Multiselect
               disabled={filter.noValue}
               options={getFieldOptions(filter.field)}

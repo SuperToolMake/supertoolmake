@@ -55,9 +55,31 @@ export const getValidOperatorsForType = (
   datasource?: Datasource & { tableId: any }
 ) => {
   const Op = OperatorOptions
-  const stringOps = [Op.Equals, Op.NotEquals, Op.StartsWith, Op.Like, Op.Empty, Op.NotEmpty, Op.In]
-  const numOps = [Op.Equals, Op.NotEquals, Op.MoreThan, Op.LessThan, Op.Empty, Op.NotEmpty, Op.In]
-  const arrayOps = [Op.Contains, Op.NotContains, Op.ContainsAny, Op.Empty, Op.NotEmpty]
+  const stringOps = [
+    Op.Equals,
+    Op.NotEquals,
+    Op.StartsWith,
+    Op.Like,
+    Op.Empty,
+    Op.NotEmpty,
+    Op.In,
+    Op.NotIn,
+  ]
+  const numOps = [
+    Op.Equals,
+    Op.NotEquals,
+    Op.MoreThan,
+    Op.LessThan,
+    Op.Empty,
+    Op.NotEmpty,
+  ]
+  const arrayOps = [
+    Op.Contains,
+    Op.NotContains,
+    Op.ContainsAny,
+    Op.Empty,
+    Op.NotEmpty,
+  ]
   let ops: {
     value: string
     label: string
@@ -72,7 +94,7 @@ export const getValidOperatorsForType = (
   } else if (type === FieldType.NUMBER || type === FieldType.BIGINT) {
     ops = numOps
   } else if (type === FieldType.OPTIONS) {
-    ops = [Op.Equals, Op.NotEquals, Op.Empty, Op.NotEmpty, Op.In]
+    ops = [Op.Equals, Op.NotEquals, Op.Empty, Op.NotEmpty, Op.In, Op.NotIn]
   } else if (type === FieldType.ARRAY) {
     ops = arrayOps
   } else if (type === FieldType.BOOLEAN) {
@@ -85,7 +107,7 @@ export const getValidOperatorsForType = (
     type === FieldType.BB_REFERENCE_SINGLE ||
     schema.isDeprecatedSingleUserColumn(fieldType)
   ) {
-    ops = [Op.Equals, Op.NotEquals, Op.Empty, Op.NotEmpty, Op.In]
+    ops = [Op.Equals, Op.NotEquals, Op.Empty, Op.NotEmpty, Op.In, Op.NotIn]
   } else if (type === FieldType.BB_REFERENCE) {
     ops = arrayOps
   }
@@ -93,7 +115,7 @@ export const getValidOperatorsForType = (
   // Only allow equal/not equal for _id in SQL tables
   const externalTable = datasource?.tableId?.includes("datasource_plus")
   if (field === "_id" && externalTable) {
-    ops = [Op.Equals, Op.NotEquals, Op.In]
+    ops = [Op.Equals, Op.NotEquals, Op.In, Op.NotIn]
   }
 
   return ops
@@ -111,6 +133,7 @@ export const NoEmptyFilterStrings = [
   OperatorOptions.NotContains.value,
   OperatorOptions.ContainsAny.value,
   OperatorOptions.In.value,
+  OperatorOptions.NotIn.value,
 ] as (keyof SearchQueryFields)[]
 
 export function recurseLogicalOperators(
@@ -311,7 +334,7 @@ function buildCondition(filter?: SearchFilter): SearchFilters | undefined {
       break
     case FieldType.NUMBER:
       if (typeof value === "string" && !isHbs) {
-        if (operator === "oneOf") {
+        if (operator === "oneOf" || operator === "notOneOf") {
           value = value.split(",").map(parseFloat)
         } else {
           value = parseFloat(value)
@@ -703,7 +726,7 @@ export function runQuery<T extends Record<string, any>>(docs: T[], query: Search
   const emptyMatch = match(BasicOperator.EMPTY, _empty)
   const notEmptyMatch = match(BasicOperator.NOT_EMPTY, not(_empty))
 
-  const oneOf = match(ArrayOperator.ONE_OF, (docValue: any, testValue: any) => {
+  const _oneOf = (docValue: any, testValue: any) => {
     if (typeof testValue === "string") {
       testValue = testValue.split(",")
     }
@@ -716,8 +739,11 @@ export function runQuery<T extends Record<string, any>>(docs: T[], query: Search
       return false
     }
 
-    return testValue.some((item) => _valueMatches(docValue, item))
-  })
+    return testValue.some(item => _valueMatches(docValue, item))
+  }
+
+  const oneOf = match(ArrayOperator.ONE_OF, _oneOf)
+  const notOneOf = match(ArrayOperator.NOT_ONE_OF, not(_oneOf))
 
   const _contains = (f: "some" | "every") => (docValue: any, testValue: any) => {
     if (!Array.isArray(docValue)) {
@@ -803,6 +829,7 @@ export function runQuery<T extends Record<string, any>>(docs: T[], query: Search
       empty: emptyMatch,
       notEmpty: notEmptyMatch,
       oneOf: oneOf,
+      notOneOf: notOneOf,
       contains: contains,
       containsAny: containsAny,
       notContains: notContains,
