@@ -2,10 +2,9 @@ import type { SSOUser, User } from "@supertoolmake/types"
 
 jest.mock("nodemailer")
 
-import nodemailer from "nodemailer"
-import { generator, structures, TestConfiguration } from "../../../../tests"
+import { generator, mocks, structures, TestConfiguration } from "../../../../tests"
 
-const sendMailMock = (nodemailer.createTransport as jest.Mock)().sendMail
+const sendMailMock = mocks.email.mock()
 
 import { constants } from "@supertoolmake/backend-core"
 import nock from "nock"
@@ -52,7 +51,7 @@ describe("/api/global/auth", () => {
     describe("POST /api/global/auth/:tenantId/login", () => {
       const flushIpCounters = async () => {
         await config.doInTenant(async () => {
-          const { cache } = require("@budibase/backend-core")
+          const { cache } = require("@supertoolmake/backend-core")
           for (const ip of ["127.0.0.1", "::1", "::ffff:127.0.0.1"]) {
             await cache.destroy(`auth:login:ip:${ip}`)
           }

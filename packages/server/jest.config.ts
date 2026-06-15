@@ -12,7 +12,9 @@ const baseConfig: Config = {
     "^.+\\.js?$": "@swc/jest",
     "^.+\\.svelte?$": "<rootDir>/scripts/svelteTransformer.js",
   },
-  transformIgnorePatterns: ["/node_modules/(?!svelte/|esm-env/|devalue/).*"],
+  transformIgnorePatterns: [
+    "/node_modules/(?!(svelte|esm-env|devalue|archiver|compress-commons|crc32-stream|zip-stream|is-stream)/)",
+  ],
   moduleNameMapper: {
     "@supertoolmake/backend-core/(.*)": "<rootDir>/../backend-core/$1",
     "@supertoolmake/shared-core/(.*)": "<rootDir>/../shared-core/$1",

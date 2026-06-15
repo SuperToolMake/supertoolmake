@@ -8,7 +8,11 @@ const config: Config = {
   coverageReporters: ["lcov", "json", "clover"],
   transform: {
     "^.+\\.ts?$": "@swc/jest",
+    "^.+\\.js?$": "@swc/jest",
   },
+  transformIgnorePatterns: [
+    "/node_modules/(?!(archiver|compress-commons|crc32-stream|zip-stream|is-stream)/)",
+  ],
   moduleNameMapper: {
     "@supertoolmake/backend-core/(.*)": "<rootDir>/../backend-core/$1",
     "@supertoolmake/backend-core": "<rootDir>/../backend-core/src",
