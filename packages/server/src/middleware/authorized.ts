@@ -1,10 +1,9 @@
 import { auth, context, permissions, roles, users } from "@supertoolmake/backend-core"
 import { PermissionLevel, PermissionType, type UserCtx } from "@supertoolmake/types"
+import { InternalTables } from "../db/utils"
 import sdk from "../sdk"
 import { builderMiddleware } from "./builder"
 import { paramResource } from "./resourceId"
-import { isWebhookEndpoint } from "./utils"
-import { InternalTables } from "../db/utils"
 
 function hasResource(ctx: any) {
   return ctx.resourceId != null
@@ -120,13 +119,11 @@ const authorized =
 
     // if the resource is public, proceed — but never for internal tables
     const isInternalTable =
-      ctx.resourceId != null &&
-      (Object.values(InternalTables) as string[]).includes(ctx.resourceId)
+      ctx.resourceId != null && (Object.values(InternalTables) as string[]).includes(ctx.resourceId)
     if (
       !isInternalTable &&
       (resourceRoles.includes(roles.BUILTIN_ROLE_IDS.PUBLIC) ||
-        (otherLevelRoles &&
-          otherLevelRoles.includes(roles.BUILTIN_ROLE_IDS.PUBLIC)))
+        otherLevelRoles?.includes(roles.BUILTIN_ROLE_IDS.PUBLIC))
     ) {
       return next()
     }

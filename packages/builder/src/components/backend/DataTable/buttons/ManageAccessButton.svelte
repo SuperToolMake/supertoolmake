@@ -20,94 +20,87 @@ export let resourceId
 const inheritedRoleId = "inherited"
 const builtins = [Roles.ADMIN, Roles.BASIC, Roles.PUBLIC]
 
-  let permissions
-  let excludedRoles = []
-  let showPopover = true
-  let dependantsInfoMessage
+let permissions
+let excludedRoles = []
+let showPopover = true
+let dependantsInfoMessage
 
-  $: fetchPermissions(resourceId)
-  $: loadDependantInfo(resourceId)
-  $: roleMismatch = checkRoleMismatch(permissions)
-  $: selectedRoleID = roleMismatch ? null : permissions?.[0]?.value
-  $: selectedRole = $roles.find(x => x._id === selectedRoleID)
-  $: selectedRoleColor = selectedRole?.uiMetadata?.color
-  $: selectedRoleHighlight = selectedRoleColor
-    ? window
-        .getComputedStyle(document.body)
-        .getPropertyValue(
-          selectedRoleColor.substring(4, selectedRoleColor.length - 1)
-        )
-    : "#ff0000"
-
-  $: readableRole = selectedRoleID ? selectedRole?.uiMetadata.displayName : null
-  $: buttonLabel = readableRole ? `Access: ${readableRole}` : "Access"
-
-  $: builtInRoles = builtins
-    .map(roleId => $roles.find(x => x._id === roleId))
-    .filter(r => !!r)
-    .filter(r => !excludedRoles.includes(r._id))
-  $: customRoles = $roles
-    .filter(x => !builtins.includes(x._id))
-    .slice()
-    .toSorted((a, b) => {
-      const aName = a.uiMetadata.displayName || a.name
-      const bName = b.uiMetadata.displayName || b.name
-      return aName < bName ? -1 : 1
-    })
-
-  const fetchPermissions = async id => {
-    const res = await permissionsStore.forResourceDetailed(id)
-    excludedRoles = res?.excludedRoles || []
-    permissions = Object.entries(res?.permissions || {}).map(([perm, info]) => {
-      let enriched = {
-        permission: perm,
-        value:
-          info.permissionType === PermissionSource.INHERITED
-            ? inheritedRoleId
-            : info.role,
-        options: [...$roles],
-      }
-      if (info.inheritablePermission) {
-        enriched.options.unshift({
-          _id: inheritedRoleId,
-          name: `Inherit (${
-            $roles.find(x => x._id === info.inheritablePermission).name
-          })`,
-        })
-      }
-      return enriched
-    })
-  }
-
-  const checkRoleMismatch = permissions => {
-    if (!permissions || permissions.length < 2) {
-      return false
+const fetchPermissions = async (id) => {
+  const res = await permissionsStore.forResourceDetailed(id)
+  excludedRoles = res?.excludedRoles || []
+  permissions = Object.entries(res?.permissions || {}).map(([perm, info]) => {
+    let enriched = {
+      permission: perm,
+      value: info.permissionType === PermissionSource.INHERITED ? inheritedRoleId : info.role,
+      options: [...$roles],
     }
-    return permissions[0].value !== permissions[1].value || permissions[0].value === inheritedRoleId
-  }
-
-  const changePermission = async (role) => {
-    if (role === selectedRoleID) {
-      return
-    }
-    try {
-      await permissionsStore.save({
-        level: "read",
-        role,
-        resource: resourceId,
+    if (info.inheritablePermission) {
+      enriched.options.unshift({
+        _id: inheritedRoleId,
+        name: `Inherit (${$roles.find((x) => x._id === info.inheritablePermission).name})`,
       })
-      await permissionsStore.save({
-        level: "write",
-        role,
-        resource: resourceId,
-      })
-      await fetchPermissions(resourceId)
-      notifications.success("Updated permissions")
-    } catch (error) {
-      console.error(error)
-      notifications.error("Error updating permissions")
     }
+    return enriched
+  })
+}
+
+const checkRoleMismatch = (permissions) => {
+  if (!permissions || permissions.length < 2) {
+    return false
   }
+  return permissions[0].value !== permissions[1].value || permissions[0].value === inheritedRoleId
+}
+
+$: fetchPermissions(resourceId)
+$: loadDependantInfo(resourceId)
+$: roleMismatch = checkRoleMismatch(permissions)
+$: selectedRoleID = roleMismatch ? null : permissions?.[0]?.value
+$: selectedRole = $roles.find((x) => x._id === selectedRoleID)
+$: selectedRoleColor = selectedRole?.uiMetadata?.color
+$: selectedRoleHighlight = selectedRoleColor
+  ? window
+      .getComputedStyle(document.body)
+      .getPropertyValue(selectedRoleColor.substring(4, selectedRoleColor.length - 1))
+  : "#ff0000"
+
+$: readableRole = selectedRoleID ? selectedRole?.uiMetadata.displayName : null
+$: buttonLabel = readableRole ? `Access: ${readableRole}` : "Access"
+
+$: builtInRoles = builtins
+  .map((roleId) => $roles.find((x) => x._id === roleId))
+  .filter((r) => !!r)
+  .filter((r) => !excludedRoles.includes(r._id))
+$: customRoles = $roles
+  .filter((x) => !builtins.includes(x._id))
+  .slice()
+  .toSorted((a, b) => {
+    const aName = a.uiMetadata.displayName || a.name
+    const bName = b.uiMetadata.displayName || b.name
+    return aName < bName ? -1 : 1
+  })
+
+const changePermission = async (role) => {
+  if (role === selectedRoleID) {
+    return
+  }
+  try {
+    await permissionsStore.save({
+      level: "read",
+      role,
+      resource: resourceId,
+    })
+    await permissionsStore.save({
+      level: "write",
+      role,
+      resource: resourceId,
+    })
+    await fetchPermissions(resourceId)
+    notifications.success("Updated permissions")
+  } catch (error) {
+    console.error(error)
+    notifications.error("Error updating permissions")
+  }
+}
 </script>
 
 <DetailPopover title="Select access role" {showPopover}>

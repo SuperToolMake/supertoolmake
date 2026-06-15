@@ -1,17 +1,5 @@
 import { context, roles } from "@supertoolmake/backend-core"
-import {
-  getTableIdFromViewId,
-  isTableIdOrExternalTableId,
-  isViewId,
-} from "@supertoolmake/shared-core"
-import {
-  type Database,
-  PermissionLevel,
-  PermissionSource,
-  type Role,
-  VirtualDocumentType,
-} from "@supertoolmake/types"
-import sdk from "../.."
+import { type Database, PermissionLevel, PermissionSource, type Role } from "@supertoolmake/types"
 import { getRoleParams, InternalTables } from "../../../db/utils"
 import { removeFromArray } from "../../../utilities"
 import { CURRENTLY_SUPPORTED_LEVELS, getBasePermissions } from "../../../utilities/security"
@@ -50,17 +38,11 @@ export async function getResourcePerms(resourceId: string): Promise<ResourcePerm
 
   const withoutPublic = (perms: ResourcePermissions) =>
     Object.fromEntries(
-      Object.entries(perms).filter(
-        ([, v]) => v.role !== roles.BUILTIN_ROLE_IDS.PUBLIC
-      )
+      Object.entries(perms).filter(([, v]) => v.role !== roles.BUILTIN_ROLE_IDS.PUBLIC)
     )
 
-  const isInternalTable = (Object.values(InternalTables) as string[]).includes(
-    resourceId
-  )
-  const mergeablePermissions = isInternalTable
-    ? withoutPublic(permissions)
-    : permissions
+  const isInternalTable = (Object.values(InternalTables) as string[]).includes(resourceId)
+  const mergeablePermissions = isInternalTable ? withoutPublic(permissions) : permissions
 
   return { ...basePermissions, ...mergeablePermissions }
 }
