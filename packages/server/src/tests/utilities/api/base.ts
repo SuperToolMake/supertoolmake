@@ -1,5 +1,5 @@
 import type { ReadStream } from "node:fs"
-import request, { type Response, type SuperTest, type Test } from "supertest"
+import request, { type Agent, type Response } from "supertest"
 import { getServer } from "../../../app"
 import type TestConfiguration from "../TestConfiguration"
 
@@ -39,7 +39,7 @@ export interface RequestOpts {
 
 export abstract class TestAPI {
   config: TestConfiguration
-  request: SuperTest<Test>
+  request: Agent
   prefix = ""
 
   constructor(config: TestConfiguration) {

@@ -129,6 +129,7 @@
     "nodemon": "2.0.15",
     "openapi-typescript": "5.2.0",
     "rimraf": "3.0.2",
+    "@types/supertest": "^6.0.2",
     "supertest": "7.2.2",
     "swagger-jsdoc": "6.1.0",
     "timekeeper": "2.2.0",
