@@ -1,6 +1,6 @@
 import { context, roles } from "@supertoolmake/backend-core"
 import { type Database, PermissionLevel, PermissionSource, type Role } from "@supertoolmake/types"
-import { getRoleParams } from "../../../db/utils"
+import { getRoleParams, InternalTables } from "../../../db/utils"
 import { removeFromArray } from "../../../utilities"
 import { CURRENTLY_SUPPORTED_LEVELS, getBasePermissions } from "../../../utilities/security"
 
@@ -35,7 +35,16 @@ export async function getResourcePerms(resourceId: string): Promise<ResourcePerm
     p[level] = { role, type: PermissionSource.BASE }
     return p
   }, {})
-  return Object.assign(basePermissions, permissions)
+
+  const withoutPublic = (perms: ResourcePermissions) =>
+    Object.fromEntries(
+      Object.entries(perms).filter(([, v]) => v.role !== roles.BUILTIN_ROLE_IDS.PUBLIC)
+    )
+
+  const isInternalTable = (Object.values(InternalTables) as string[]).includes(resourceId)
+  const mergeablePermissions = isInternalTable ? withoutPublic(permissions) : permissions
+
+  return { ...basePermissions, ...mergeablePermissions }
 }
 
 export async function updatePermissionOnRole(
