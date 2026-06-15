@@ -1,4 +1,5 @@
 import { context, permissions, roles } from "@supertoolmake/backend-core"
+import { InternalTables } from "../../db/utils"
 import type {
   AddPermissionRequest,
   AddPermissionResponse,
@@ -59,6 +60,10 @@ export async function getResourcePerms(ctx: UserCtx<void, GetResourcePermsRespon
   const resourceId = ctx.params.resourceId
   const resourcePermissions = await sdk.permissions.getResourcePerms(resourceId)
 
+  const isInternalTable = (Object.values(InternalTables) as string[]).includes(
+    resourceId
+  )
+
   ctx.body = {
     permissions: Object.entries(resourcePermissions).reduce(
       (p, [level, role]) => {
@@ -70,6 +75,9 @@ export async function getResourcePerms(ctx: UserCtx<void, GetResourcePermsRespon
       },
       {} as Record<string, ResourcePermissionInfo>
     ),
+    excludedRoles: isInternalTable
+      ? [roles.BUILTIN_ROLE_IDS.PUBLIC]
+      : undefined,
   }
 }
 

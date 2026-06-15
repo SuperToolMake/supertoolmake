@@ -1,5 +1,6 @@
 import { DocumentType, permissions, roles } from "@supertoolmake/backend-core"
-import { getDocumentType } from "@supertoolmake/shared-core"
+import { InternalTables, VirtualDocumentType } from "../db/utils"
+import { getDocumentType, getVirtualDocumentType } from "@supertoolmake/shared-core"
 
 export const CURRENTLY_SUPPORTED_LEVELS: string[] = [
   permissions.PermissionLevel.WRITE,
@@ -27,6 +28,15 @@ export function getPermissionType(resourceId: string) {
  *  works out the basic permissions based on builtin roles for a resource, using its ID
  */
 export function getBasePermissions(resourceId: string): Record<string, string> {
+  const isInternalTable = (Object.values(InternalTables) as string[]).includes(
+    resourceId
+  )
+  if (isInternalTable) {
+    return {
+      [permissions.PermissionLevel.READ]: roles.BUILTIN_ROLE_IDS.ADMIN,
+      [permissions.PermissionLevel.WRITE]: roles.BUILTIN_ROLE_IDS.ADMIN,
+    }
+  }
   const type = getPermissionType(resourceId)
   const basePermissions: Record<string, string> = {}
   for (const [roleId, role] of Object.entries(roles.getBuiltinRoles())) {
