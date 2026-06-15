@@ -2,9 +2,10 @@ import type { SSOUser, User } from "@supertoolmake/types"
 
 jest.mock("nodemailer")
 
-import { generator, mocks, structures, TestConfiguration } from "../../../../tests"
+import { generator, structures, TestConfiguration } from "../../../../tests"
+import nodemailer from "nodemailer"
 
-const sendMailMock = mocks.email.mock()
+const sendMailMock = (nodemailer.createTransport as jest.Mock)().sendMail
 
 import { constants } from "@supertoolmake/backend-core"
 import nock from "nock"

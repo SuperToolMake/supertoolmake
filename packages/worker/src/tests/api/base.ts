@@ -1,4 +1,4 @@
-import type { SuperTest, Test } from "supertest"
+import type { Agent } from "supertest"
 import type TestConfiguration from "../TestConfiguration"
 
 export interface TestAPIOpts {
@@ -8,7 +8,7 @@ export interface TestAPIOpts {
 
 export abstract class TestAPI {
   config: TestConfiguration
-  request: SuperTest<Test>
+  request: Agent
 
   constructor(config: TestConfiguration) {
     this.config = config

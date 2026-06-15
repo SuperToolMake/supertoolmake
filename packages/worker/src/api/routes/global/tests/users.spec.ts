@@ -1,10 +1,11 @@
 import { tenancy } from "@supertoolmake/backend-core"
 import type { InviteUsersResponse, OIDCUser, User } from "@supertoolmake/types"
 import * as userSdk from "../../../../sdk/users"
-import { mocks, structures, TestConfiguration } from "../../../../tests"
+import { structures, TestConfiguration } from "../../../../tests"
+import nodemailer from "nodemailer"
 
 jest.mock("nodemailer")
-const sendMailMock = mocks.email.mock()
+const sendMailMock = (nodemailer.createTransport as jest.Mock)().sendMail
 
 describe("/api/global/users", () => {
   const config = new TestConfiguration()
