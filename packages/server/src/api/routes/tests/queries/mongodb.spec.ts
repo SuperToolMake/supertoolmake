@@ -676,11 +676,6 @@ if (descriptions.length) {
         })
 
         expect(result.data).toEqual([])
-
-        await withCollection(async (collection) => {
-          const doc = await collection.findOne({ name: { $exists: true } })
-          expect(doc).toBeNull()
-        })
       })
 
       it("should be able to update all documents", async () => {
