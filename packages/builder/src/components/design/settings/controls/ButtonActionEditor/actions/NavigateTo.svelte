@@ -1,13 +1,15 @@
-<script>
-import { Label, Select } from "@supertoolmake/bbui"
+<script lang="ts">
+import { Checkbox, Label, RadioGroup, Select } from "@supertoolmake/bbui"
 import { onMount } from "svelte"
 import DrawerBindableCombobox from "@/components/common/bindings/DrawerBindableCombobox.svelte"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
-import DrawerBindableSlot from "@/components/common/bindings/DrawerBindableSlot.svelte"
 import { screenStore } from "@/stores/builder"
+import type {
+  EnrichedBinding,
+} from "@supertoolmake/types"
 
 export let parameters
-export let bindings = []
+export let bindings: EnrichedBinding[] = []
 
 $: urlOptions = screenStore.routes
 
@@ -22,25 +24,49 @@ const typeOptions = [
   },
 ]
 
-const booleanOptions = [
-  { label: "True", value: "true" },
-  { label: "False", value: "false" },
-]
+  const screenOpenInOptions = [
+    {
+      label: "Same tab",
+      value: "same",
+    },
+    {
+      label: "Open in modal",
+      value: "modal",
+    },
+    {
+      label: "Open in new tab",
+      value: "newTab",
+    },
+  ]
 
-onMount(() => {
-  if (!parameters.type) {
-    parameters.type = "screen"
+  const getScreenOpenIn = (p: any) => {
+    if (p.screenNewTab) {
+      return "newTab"
+    }
+    if (p.peek) {
+      return "modal"
+    }
+    return "same"
   }
-  if (parameters.peek == null) {
-    parameters.peek = "false"
+
+  const setScreenOpenIn = (value: "modal" | "newTab") => {
+    parameters.peek = value === "modal"
+    parameters.screenNewTab = value === "newTab"
   }
-})
+
+  $: screenOpenIn = getScreenOpenIn(parameters)
+
+  onMount(() => {
+    if (!parameters.type) {
+      parameters.type = "screen"
+    }
+  })
 </script>
 
 <div class="root">
-  <Label small>Destination</Label>
+  <Label size="S">Destination</Label>
   <Select
-    placeholder={null}
+    placeholder={undefined}
     bind:value={parameters.type}
     options={typeOptions}
     on:change={() => (parameters.url = "")}
@@ -56,23 +82,15 @@ onMount(() => {
       {bindings}
       options={$urlOptions}
       appendBindingsAsOptions={false}
+      label=""
+      error={undefined}
     />
-    <div></div>
-    <Label small>Open screen in modal</Label>
-    <DrawerBindableSlot
-      title="Open in modal"
-      type="boolean"
-      value={parameters.peek}
-      on:change={e => (parameters.peek = e.detail)}
-      {bindings}
-    >
-      <Select
-        placeholder={false}
-        options={booleanOptions}
-        bind:value={parameters.peek}
-        popoverAutoWidth
-      />
-    </DrawerBindableSlot>
+    <Label size="S">Open in</Label>
+    <RadioGroup
+      value={screenOpenIn}
+      options={screenOpenInOptions}
+      on:change={e => setScreenOpenIn(e.detail)}
+    />
   {:else}
     <DrawerBindableInput
       title="Destination"
@@ -84,7 +102,7 @@ onMount(() => {
       {bindings}
     />
     <div></div>
-    <Checkbox text="New Tab" bind:value={parameters.externalNewTab} />
+    <Checkbox text="Open in new tab" bind:value={parameters.externalNewTab} />
   {/if}
 </div>
 
