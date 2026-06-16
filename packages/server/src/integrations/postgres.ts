@@ -363,7 +363,7 @@ class PostgresIntegration extends Sql implements DatasourcePlus {
     }
     const search_path = this.config.schema
       .split(",")
-      .map(item => quotePostgresIdentifier(item.trim()))
+      .map((item) => quotePostgresIdentifier(item.trim()))
     await this.client.query(`SET search_path TO ${search_path.join(",")};`)
     await this.client.query(`SET TIME ZONE 'UTC';`)
     this.open = true

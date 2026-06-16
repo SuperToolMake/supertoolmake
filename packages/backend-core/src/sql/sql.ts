@@ -735,25 +735,19 @@ class InternalBuilder {
           if (shouldOr) {
             q = q.or
           }
-          if (this.client === SqlClient.ORACLE) {
-            // @ts-ignore
-            key = this.convertClobs(key)
-          } else if (
+          if (
             this.client === SqlClient.SQL_LITE &&
             schema?.type === FieldType.DATETIME &&
             schema.dateOnly
           ) {
             // Include rows that don't match any of the dates, as well as
             // rows where the value is empty.
-            return q.where(inner => {
+            return q.where((inner) => {
               inner
-                .whereNot(notInner => {
+                .whereNot((notInner) => {
                   for (const value of values) {
                     if (value != null) {
-                      notInner.orWhereLike(
-                        key,
-                        `${value.toISOString().slice(0, 10)}%`
-                      )
+                      notInner.orWhereLike(key, `${value.toISOString().slice(0, 10)}%`)
                     }
                   }
                 })
@@ -762,17 +756,13 @@ class InternalBuilder {
           }
           // Rows where the value is empty are not "in" the list, so they
           // should be returned by a "not in" filter.
-          return q.where(inner => {
+          return q.where((inner) => {
             inner.whereNotIn(key, values).orWhereNull(key)
           })
         },
         (q, key: string[], array) => {
           if (shouldOr) {
             q = q.or
-          }
-          if (this.client === SqlClient.ORACLE) {
-            // @ts-ignore
-            key = key.map(k => this.convertClobs(k))
           }
           return q.whereNotIn(key, Array.isArray(array) ? array : [array])
         }

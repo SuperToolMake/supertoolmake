@@ -49,13 +49,11 @@ const enrichJsonValue = (
   options: Required<EnrichContextOpts>
 ): JSONValue => {
   if (Array.isArray(value)) {
-    return value.map(item => enrichJsonValue(item, parameters, options))
+    return value.map((item) => enrichJsonValue(item, parameters, options))
   }
 
   if (value === null || typeof value !== "object") {
-    return typeof value === "string"
-      ? processTemplateString(value, parameters, options)
-      : value
+    return typeof value === "string" ? processTemplateString(value, parameters, options) : value
   }
 
   const enrichedQuery: Record<string, JSONValue> = {}
@@ -65,11 +63,7 @@ const enrichJsonValue = (
       continue
     }
     const enrichedKey = processTemplateString(key, parameters, options)
-    enrichedQuery[enrichedKey] = enrichJsonValue(
-      fieldValue,
-      parameters,
-      options
-    )
+    enrichedQuery[enrichedKey] = enrichJsonValue(fieldValue, parameters, options)
   }
   return enrichedQuery
 }
@@ -91,18 +85,13 @@ const enrichContextObject = async (
         ? enrichJsonTemplate(fieldValue, parameters, options)
         : processTemplateString(fieldValue, parameters, options)
     } else {
-      enrichedQuery[enrichedKey] = enrichJsonValue(
-        fieldValue,
-        parameters,
-        options
-      )
+      enrichedQuery[enrichedKey] = enrichJsonValue(fieldValue, parameters, options)
     }
   }
   return enrichedQuery
 }
 
-const isBlankJsonField = (value: any) =>
-  typeof value === "string" && value.trim() === ""
+const isBlankJsonField = (value: any) => typeof value === "string" && value.trim() === ""
 
 function updateSchema(query: Query): Query {
   if (!query.schema) {
@@ -200,10 +189,7 @@ export async function enrichContext(
   const parameters = { ...inputs, env }
   const enrichedQuery = await enrichContextObject(fields, parameters, options)
   for (const key of ["json", "customData", "requestBody"]) {
-    if (
-      !Object.hasOwn(enrichedQuery, key) ||
-      isBlankJsonField(enrichedQuery[key])
-    ) {
+    if (!Object.hasOwn(enrichedQuery, key) || isBlankJsonField(enrichedQuery[key])) {
       continue
     }
     try {

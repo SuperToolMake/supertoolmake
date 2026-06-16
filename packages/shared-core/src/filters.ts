@@ -65,21 +65,8 @@ export const getValidOperatorsForType = (
     Op.In,
     Op.NotIn,
   ]
-  const numOps = [
-    Op.Equals,
-    Op.NotEquals,
-    Op.MoreThan,
-    Op.LessThan,
-    Op.Empty,
-    Op.NotEmpty,
-  ]
-  const arrayOps = [
-    Op.Contains,
-    Op.NotContains,
-    Op.ContainsAny,
-    Op.Empty,
-    Op.NotEmpty,
-  ]
+  const numOps = [Op.Equals, Op.NotEquals, Op.MoreThan, Op.LessThan, Op.Empty, Op.NotEmpty]
+  const arrayOps = [Op.Contains, Op.NotContains, Op.ContainsAny, Op.Empty, Op.NotEmpty]
   let ops: {
     value: string
     label: string
@@ -739,7 +726,7 @@ export function runQuery<T extends Record<string, any>>(docs: T[], query: Search
       return false
     }
 
-    return testValue.some(item => _valueMatches(docValue, item))
+    return testValue.some((item) => _valueMatches(docValue, item))
   }
 
   const oneOf = match(ArrayOperator.ONE_OF, _oneOf)

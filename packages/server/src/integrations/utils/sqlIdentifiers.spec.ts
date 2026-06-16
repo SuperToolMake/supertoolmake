@@ -12,14 +12,10 @@ describe("sql identifiers", () => {
   })
 
   it("quotes mysql identifiers", () => {
-    expect(quoteMySqlIdentifier("safe`; SELECT SLEEP(1); --")).toBe(
-      "`safe``; SELECT SLEEP(1); --`"
-    )
+    expect(quoteMySqlIdentifier("safe`; SELECT SLEEP(1); --")).toBe("`safe``; SELECT SLEEP(1); --`")
   })
 
   it("quotes sql server identifiers", () => {
-    expect(quoteSqlServerIdentifier("safe]; SELECT 1; --")).toBe(
-      "[safe]]; SELECT 1; --]"
-    )
+    expect(quoteSqlServerIdentifier("safe]; SELECT 1; --")).toBe("[safe]]; SELECT 1; --]")
   })
 })

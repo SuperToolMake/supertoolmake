@@ -106,7 +106,7 @@ function cleanupConfig(config: RunConfig, table: Table): RunConfig {
   }
   // check the row and filters to make sure they aren't a key of some sort
   if (config.filters) {
-    for (let [key, filter] of Object.entries(config.filters)) {
+    for (const [key, filter] of Object.entries(config.filters)) {
       // oneOf/notOneOf are arrays, don't iterate
       if (
         typeof filter !== "object" ||

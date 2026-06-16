@@ -235,7 +235,7 @@ const triggerAutomationHandler = async (action) => {
     return false
   }
 }
-const navigationHandler = action => {
+const navigationHandler = (action) => {
   let { url, peek, externalNewTab, screenNewTab, type } = action.parameters
 
   // Ensure in-app navigation starts with a slash

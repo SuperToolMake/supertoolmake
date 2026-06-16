@@ -991,7 +991,8 @@ export interface components {
               | "contains"
               | "notContains"
               | "containsAny"
-              | "oneOf" | "notOneOf"
+              | "oneOf"
+              | "notOneOf"
               | "range"
             /** @description The field in the view to perform the search on. */
             field?: string
@@ -1021,7 +1022,8 @@ export interface components {
                 | "contains"
                 | "notContains"
                 | "containsAny"
-                | "oneOf" | "notOneOf"
+                | "oneOf"
+                | "notOneOf"
                 | "range"
               /** @description The field in the view to perform the search on. */
               field?: string
@@ -1123,7 +1125,8 @@ export interface components {
                 | "contains"
                 | "notContains"
                 | "containsAny"
-                | "oneOf" | "notOneOf"
+                | "oneOf"
+                | "notOneOf"
                 | "range"
               /** @description The field in the view to perform the search on. */
               field?: string
@@ -1153,7 +1156,8 @@ export interface components {
                   | "contains"
                   | "notContains"
                   | "containsAny"
-                  | "oneOf" | "notOneOf"
+                  | "oneOf"
+                  | "notOneOf"
                   | "range"
                 /** @description The field in the view to perform the search on. */
                 field?: string
@@ -1257,7 +1261,8 @@ export interface components {
                 | "contains"
                 | "notContains"
                 | "containsAny"
-                | "oneOf" | "notOneOf"
+                | "oneOf"
+                | "notOneOf"
                 | "range"
               /** @description The field in the view to perform the search on. */
               field?: string
@@ -1287,7 +1292,8 @@ export interface components {
                   | "contains"
                   | "notContains"
                   | "containsAny"
-                  | "oneOf" | "notOneOf"
+                  | "oneOf"
+                  | "notOneOf"
                   | "range"
                 /** @description The field in the view to perform the search on. */
                 field?: string

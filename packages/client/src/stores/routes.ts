@@ -82,12 +82,7 @@ const createRouteStore = () => {
       return state
     })
   }
-  const navigate = (
-    url: string,
-    peek: boolean,
-    externalNewTab: boolean,
-    screenNewTab = false
-  ) => {
+  const navigate = (url: string, peek: boolean, externalNewTab: boolean, screenNewTab = false) => {
     if (get(builderStore).inBuilder) {
       return
     }

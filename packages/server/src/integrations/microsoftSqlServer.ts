@@ -406,9 +406,7 @@ class SqlServerIntegration extends Sql implements DatasourcePlus {
       // get the column definition (type)
       const definition = await this.runSQL(this.getDefinitionSQL(tableName, schemaName))
       // find primary key constraints
-      const constraints = await this.runSQL(
-        this.getConstraintsSQL(tableName, schemaName)
-      )
+      const constraints = await this.runSQL(this.getConstraintsSQL(tableName, schemaName))
       // find the computed and identity columns (auto columns)
       const columns: MSSQLColumn[] = await this.runSQL(
         this.getAutoColumnsSQL(tableName, schemaName)

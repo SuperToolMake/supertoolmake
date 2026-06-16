@@ -4,9 +4,7 @@ import { onMount } from "svelte"
 import DrawerBindableCombobox from "@/components/common/bindings/DrawerBindableCombobox.svelte"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
 import { screenStore } from "@/stores/builder"
-import type {
-  EnrichedBinding,
-} from "@supertoolmake/types"
+import type { EnrichedBinding } from "@supertoolmake/types"
 
 export let parameters
 export let bindings: EnrichedBinding[] = []
@@ -24,43 +22,43 @@ const typeOptions = [
   },
 ]
 
-  const screenOpenInOptions = [
-    {
-      label: "Same tab",
-      value: "same",
-    },
-    {
-      label: "Open in modal",
-      value: "modal",
-    },
-    {
-      label: "Open in new tab",
-      value: "newTab",
-    },
-  ]
+const screenOpenInOptions = [
+  {
+    label: "Same tab",
+    value: "same",
+  },
+  {
+    label: "Open in modal",
+    value: "modal",
+  },
+  {
+    label: "Open in new tab",
+    value: "newTab",
+  },
+]
 
-  const getScreenOpenIn = (p: any) => {
-    if (p.screenNewTab) {
-      return "newTab"
-    }
-    if (p.peek) {
-      return "modal"
-    }
-    return "same"
+const getScreenOpenIn = (p: any) => {
+  if (p.screenNewTab) {
+    return "newTab"
   }
-
-  const setScreenOpenIn = (value: "modal" | "newTab") => {
-    parameters.peek = value === "modal"
-    parameters.screenNewTab = value === "newTab"
+  if (p.peek) {
+    return "modal"
   }
+  return "same"
+}
 
-  $: screenOpenIn = getScreenOpenIn(parameters)
+const setScreenOpenIn = (value: "modal" | "newTab") => {
+  parameters.peek = value === "modal"
+  parameters.screenNewTab = value === "newTab"
+}
 
-  onMount(() => {
-    if (!parameters.type) {
-      parameters.type = "screen"
-    }
-  })
+$: screenOpenIn = getScreenOpenIn(parameters)
+
+onMount(() => {
+  if (!parameters.type) {
+    parameters.type = "screen"
+  }
+})
 </script>
 
 <div class="root">

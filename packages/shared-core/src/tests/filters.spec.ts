@@ -1,4 +1,3 @@
-import { buildQuery, runQuery } from "../filters"
 import {
   BasicOperator,
   EmptyFilterOption,
@@ -6,6 +5,7 @@ import {
   UILogicalOperator,
   type UISearchFilter,
 } from "@supertoolmake/types"
+import { buildQuery, runQuery } from "../filters"
 
 describe("filter to query conversion", () => {
   it("handles a filter with 1 group", () => {
@@ -165,17 +165,17 @@ describe("runQuery notOneOf", () => {
 
   it("returns docs whose value is not in the list", () => {
     const result = runQuery(docs, { notOneOf: { name: ["foo"] } })
-    expect(result.map(d => d.id)).toEqual([2, 3, 4])
+    expect(result.map((d) => d.id)).toEqual([2, 3, 4])
   })
 
   it("excludes all matching values", () => {
     const result = runQuery(docs, { notOneOf: { name: ["foo", "bar"] } })
-    expect(result.map(d => d.id)).toEqual([3, 4])
+    expect(result.map((d) => d.id)).toEqual([3, 4])
   })
 
   it("includes docs with an empty value", () => {
     const result = runQuery(docs, { notOneOf: { name: ["baz"] } })
-    expect(result.map(d => d.id)).toEqual([1, 2, 4])
+    expect(result.map((d) => d.id)).toEqual([1, 2, 4])
   })
 
   it("is the inverse of oneOf for non-empty values", () => {
@@ -183,7 +183,7 @@ describe("runQuery notOneOf", () => {
     const notOneOfResult = runQuery(docs, {
       notOneOf: { name: ["foo", "bar"] },
     })
-    expect(oneOfResult.map(d => d.id)).toEqual([1, 2])
-    expect(notOneOfResult.map(d => d.id)).toEqual([3, 4])
+    expect(oneOfResult.map((d) => d.id)).toEqual([1, 2])
+    expect(notOneOfResult.map((d) => d.id)).toEqual([3, 4])
   })
 })
