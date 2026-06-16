@@ -105,6 +105,7 @@ export interface MongoQueryFields {
       | "count"
       | "distinct"
       | "insertOne"
+      | "insertMany"
       | "deleteOne"
       | "deleteMany"
   }

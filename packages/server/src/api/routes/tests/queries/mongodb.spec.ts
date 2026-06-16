@@ -619,6 +619,70 @@ if (descriptions.length) {
         })
       })
 
+      it("a find query with a parameterised key", async () => {
+        await withCollection(collection =>
+          collection.insertOne({
+            name: "apartment",
+            accommodates: 9,
+          })
+        )
+
+        const query = await createQuery({
+          fields: {
+            json: `{
+              "{{ field }}": 9
+            }`,
+            extra: {
+              actionType: "find",
+            },
+          },
+          parameters: [
+            {
+              name: "field",
+              default: "accommodates",
+            },
+          ],
+        })
+
+        const result = await config.api.query.execute(query._id!)
+
+        expect(result.data).toEqual([
+          {
+            _id: expectValidId,
+            name: "apartment",
+            accommodates: 9,
+          },
+        ])
+      })
+
+      it("does not allow quoted find parameters to inject Mongo operators", async () => {
+        const query = await createQuery({
+          fields: {
+            json: '{"name": "{{ name }}"}',
+            extra: {
+              actionType: "find",
+            },
+          },
+          parameters: [
+            {
+              name: "name",
+              default: "",
+            },
+          ],
+        })
+
+        const result = await config.api.query.execute(query._id!, {
+          parameters: { name: "" },
+        })
+
+        expect(result.data).toEqual([])
+
+        await withCollection(async collection => {
+          const doc = await collection.findOne({ name: { $exists: true } })
+          expect(doc).toBeNull()
+        })
+      })
+
       it("should be able to update all documents", async () => {
         const query = await createQuery({
           fields: {
@@ -716,8 +780,390 @@ if (descriptions.length) {
               actionType: "find",
               collection,
             },
-          },
-          transformer: `return data.map(x => ({
+          })
+
+          const result = await config.api.query.execute(query._id!)
+          const values = result.data.map(o => o.value).sort()
+          expect(values).toEqual(["five", "four", "one", "three", "two"])
+        })
+
+        it("a create query with parameters", async () => {
+          const query = await createQuery({
+            fields: {
+              json: { foo: "{{ foo }}" },
+              extra: {
+                actionType: "insertOne",
+              },
+            },
+            queryVerb: "create",
+            parameters: [
+              {
+                name: "foo",
+                default: "default",
+              },
+            ],
+          })
+
+          const result = await config.api.query.execute(query._id!, {
+            parameters: { foo: "bar" },
+          })
+
+          expect(result.data).toEqual([
+            {
+              acknowledged: true,
+              insertedId: expectValidId,
+            },
+          ])
+
+          await withCollection(async collection => {
+            const doc = await collection.findOne({ foo: { $eq: "bar" } })
+            expect(doc).toEqual({
+              _id: expectValidBsonObjectId,
+              foo: "bar",
+            })
+          })
+        })
+
+        it("a create query with a json string document parameter", async () => {
+          const query = await createQuery({
+            fields: {
+              json: "{{ doc }}",
+              extra: {
+                actionType: "insertOne",
+              },
+            },
+            queryVerb: "create",
+            parameters: [
+              {
+                name: "doc",
+                default: "{}",
+              },
+            ],
+          })
+
+          const result = await config.api.query.execute(query._id!, {
+            parameters: {
+              doc: '{"foo":"bar","nested":{"enabled":true}}',
+            },
+          })
+
+          expect(result.data).toEqual([
+            {
+              acknowledged: true,
+              insertedId: expectValidId,
+            },
+          ])
+
+          await withCollection(async collection => {
+            const doc = await collection.findOne({ foo: { $eq: "bar" } })
+            expect(doc).toEqual({
+              _id: expectValidBsonObjectId,
+              foo: "bar",
+              nested: {
+                enabled: true,
+              },
+            })
+          })
+        })
+
+        it("a create query with a parameterised key", async () => {
+          const query = await createQuery({
+            fields: {
+              json: [
+                {
+                  "{{ fieldName }}": "Yellow",
+                },
+              ],
+              extra: {
+                actionType: "insertMany",
+              },
+            },
+            queryVerb: "create",
+            parameters: [
+              {
+                name: "fieldName",
+                default: "defaultField",
+              },
+            ],
+          })
+
+          const result = await config.api.query.execute(query._id!, {
+            parameters: { fieldName: "Banana" },
+          })
+
+          expect(result.data).toEqual([
+            {
+              acknowledged: true,
+              insertedCount: 1,
+              insertedIds: {
+                "0": expectValidId,
+              },
+            },
+          ])
+
+          await withCollection(async collection => {
+            const doc = await collection.findOne({ Banana: { $eq: "Yellow" } })
+            expect(doc).toEqual({
+              _id: expectValidBsonObjectId,
+              Banana: "Yellow",
+            })
+          })
+        })
+
+        it("a delete query with parameters", async () => {
+          const query = await createQuery({
+            fields: {
+              json: { name: { $eq: "{{ name }}" } },
+              extra: {
+                actionType: "deleteOne",
+              },
+            },
+            queryVerb: "delete",
+            parameters: [
+              {
+                name: "name",
+                default: "",
+              },
+            ],
+          })
+
+          const result = await config.api.query.execute(query._id!, {
+            parameters: { name: "one" },
+          })
+
+          expect(result.data).toEqual([
+            {
+              acknowledged: true,
+              deletedCount: 1,
+            },
+          ])
+
+          await withCollection(async collection => {
+            const doc = await collection.findOne({ name: { $eq: "one" } })
+            expect(doc).toBeNull()
+          })
+        })
+
+        it("an update query with parameters", async () => {
+          const query = await createQuery({
+            fields: {
+              json: {
+                filter: { name: { $eq: "{{ name }}" } },
+                update: { $set: { name: "{{ newName }}" } },
+              },
+              extra: {
+                actionType: "updateOne",
+              },
+            },
+            queryVerb: "update",
+            parameters: [
+              {
+                name: "name",
+                default: "",
+              },
+              {
+                name: "newName",
+                default: "",
+              },
+            ],
+          })
+
+          const result = await config.api.query.execute(query._id!, {
+            parameters: { name: "one", newName: "newOne" },
+          })
+
+          expect(result.data).toEqual([
+            {
+              acknowledged: true,
+              matchedCount: 1,
+              modifiedCount: 1,
+              upsertedCount: 0,
+              upsertedId: null,
+            },
+          ])
+
+          await withCollection(async collection => {
+            const doc = await collection.findOne({ name: { $eq: "newOne" } })
+            expect(doc).toEqual({
+              _id: expectValidBsonObjectId,
+              name: "newOne",
+            })
+
+            const oldDoc = await collection.findOne({ name: { $eq: "one" } })
+            expect(oldDoc).toBeNull()
+          })
+        })
+
+        it("does not allow quoted updateMany parameters to widen the filter", async () => {
+          const query = await createQuery({
+            fields: {
+              json: '{"filter":{"name":"{{ name }}"},"update":{"$set":{"touched":true}}}',
+              extra: {
+                actionType: "updateMany",
+              },
+            },
+            queryVerb: "update",
+            parameters: [
+              {
+                name: "name",
+                default: "",
+              },
+            ],
+          })
+
+          const result = await config.api.query.execute(query._id!, {
+            parameters: {
+              name: 'x","name":{"$exists":true},"$comment":"esc',
+            },
+          })
+
+          expect(result.data).toEqual([
+            {
+              acknowledged: true,
+              matchedCount: 0,
+              modifiedCount: 0,
+              upsertedCount: 0,
+              upsertedId: null,
+            },
+          ])
+
+          await withCollection(async collection => {
+            expect(await collection.countDocuments({ touched: true })).toBe(0)
+          })
+        })
+
+        it("should be able to delete all records", async () => {
+          const query = await createQuery({
+            fields: {
+              json: {},
+              extra: {
+                actionType: "deleteMany",
+              },
+            },
+            queryVerb: "delete",
+          })
+
+          const result = await config.api.query.execute(query._id!)
+
+          expect(result.data).toEqual([
+            {
+              acknowledged: true,
+              deletedCount: 5,
+            },
+          ])
+
+          await withCollection(async collection => {
+            const docs = await collection.find().toArray()
+            expect(docs).toHaveLength(0)
+          })
+        })
+
+        it("should be able to update all documents", async () => {
+          const query = await createQuery({
+            fields: {
+              json: {
+                filter: {},
+                update: { $set: { name: "newName" } },
+              },
+              extra: {
+                actionType: "updateMany",
+              },
+            },
+            queryVerb: "update",
+          })
+
+          const result = await config.api.query.execute(query._id!)
+
+          expect(result.data).toEqual([
+            {
+              acknowledged: true,
+              matchedCount: 5,
+              modifiedCount: 5,
+              upsertedCount: 0,
+              upsertedId: null,
+            },
+          ])
+
+          await withCollection(async collection => {
+            const docs = await collection.find().toArray()
+            expect(docs).toHaveLength(5)
+            for (const doc of docs) {
+              expect(doc).toEqual({
+                _id: expectValidBsonObjectId,
+                name: "newName",
+              })
+            }
+          })
+        })
+
+        it("should be able to select a ObjectId in a transformer", async () => {
+          const query = await createQuery({
+            fields: {
+              json: {},
+              extra: {
+                actionType: "find",
+              },
+            },
+            transformer: "return data.map(x => ({ id: x._id }))",
+          })
+
+          const result = await config.api.query.execute(query._id!)
+
+          expect(result.data).toEqual([
+            { id: expectValidId },
+            { id: expectValidId },
+            { id: expectValidId },
+            { id: expectValidId },
+            { id: expectValidId },
+          ])
+        })
+
+        it("can handle all bson field types with transformers", async () => {
+          collection = generator.guid()
+          await withCollection(async collection => {
+            await collection.insertOne({
+              _id: new BSON.ObjectId("65b0123456789abcdef01234"),
+              stringField: "This is a string",
+              numberField: 42,
+              doubleField: new BSON.Double(42.42),
+              integerField: new BSON.Int32(123),
+              longField: new BSON.Long("9223372036854775807"),
+              booleanField: true,
+              nullField: null,
+              arrayField: [1, 2, 3, "four", { nested: true }],
+              objectField: {
+                nestedString: "nested",
+                nestedNumber: 99,
+              },
+              dateField: new Date(Date.UTC(2025, 0, 30, 12, 30, 20)),
+              timestampField: new BSON.Timestamp({ t: 1706616000, i: 1 }),
+              binaryField: new BSON.Binary(
+                new TextEncoder().encode("bufferValue")
+              ),
+              objectIdField: new BSON.ObjectId("65b0123456789abcdef01235"),
+              regexField: new BSON.BSONRegExp("^Hello.*", "i"),
+              minKeyField: new BSON.MinKey(),
+              maxKeyField: new BSON.MaxKey(),
+              decimalField: new BSON.Decimal128("12345.6789"),
+              codeField: new BSON.Code(
+                "function() { return 'Hello, World!'; }"
+              ),
+              codeWithScopeField: new BSON.Code(
+                "function(x) { return x * 2; }",
+                { x: 10 }
+              ),
+            })
+          })
+
+          const query = await createQuery({
+            fields: {
+              json: {},
+              extra: {
+                actionType: "find",
+                collection,
+              },
+            },
+            transformer: `return data.map(x => ({
                   ...x,
                   binaryField: x.binaryField?.toString('utf8'),
                   decimalField: x.decimalField.toString(),
