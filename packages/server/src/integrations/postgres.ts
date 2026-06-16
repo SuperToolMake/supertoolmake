@@ -30,6 +30,7 @@ import {
   generateColumnDefinition,
   getSqlQuery,
   HOST_ADDRESS,
+  quotePostgresIdentifier,
 } from "./utils"
 
 // Return "date" and "timestamp" types as plain strings.
@@ -360,7 +361,9 @@ class PostgresIntegration extends Sql implements DatasourcePlus {
     if (!this.config.schema) {
       this.config.schema = "public"
     }
-    const search_path = this.config.schema.split(",").map((item) => `"${item.trim()}"`)
+    const search_path = this.config.schema
+      .split(",")
+      .map(item => quotePostgresIdentifier(item.trim()))
     await this.client.query(`SET search_path TO ${search_path.join(",")};`)
     await this.client.query(`SET TIME ZONE 'UTC';`)
     this.open = true

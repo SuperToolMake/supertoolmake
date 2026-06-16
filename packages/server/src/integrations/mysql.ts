@@ -28,6 +28,7 @@ import {
   generateColumnDefinition,
   getSqlQuery,
   HOST_ADDRESS,
+  quoteMySqlIdentifier,
 } from "./utils"
 
 const Sql = sql.Sql
@@ -291,7 +292,7 @@ class MySQLIntegration extends Sql implements DatasourcePlus {
         const primaryKeys = []
         const schema: TableSchema = {}
         const descResp: MySQLColumn[] = await this.internalQuery(
-          { sql: `DESCRIBE \`${tableName}\`;` },
+          { sql: `DESCRIBE ${quoteMySqlIdentifier(tableName)}` },
           { connect: false }
         )
         for (const column of descResp) {
