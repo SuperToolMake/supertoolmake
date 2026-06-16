@@ -730,29 +730,9 @@ class InternalBuilder {
         filters.notOneOf,
         ArrayOperator.NOT_ONE_OF,
         (q, key: string, array) => {
-          const schema = this.getFieldSchema(key)
           const values = Array.isArray(array) ? array : [array]
           if (shouldOr) {
             q = q.or
-          }
-          if (
-            this.client === SqlClient.SQL_LITE &&
-            schema?.type === FieldType.DATETIME &&
-            schema.dateOnly
-          ) {
-            // Include rows that don't match any of the dates, as well as
-            // rows where the value is empty.
-            return q.where((inner) => {
-              inner
-                .whereNot((notInner) => {
-                  for (const value of values) {
-                    if (value != null) {
-                      notInner.orWhereLike(key, `${value.toISOString().slice(0, 10)}%`)
-                    }
-                  }
-                })
-                .orWhereNull(key)
-            })
           }
           // Rows where the value is empty are not "in" the list, so they
           // should be returned by a "not in" filter.
