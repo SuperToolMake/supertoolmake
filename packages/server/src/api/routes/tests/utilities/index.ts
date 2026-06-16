@@ -7,8 +7,7 @@ export function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-let request: supertest.SuperTest<supertest.Test> | undefined | null,
-  config: TestConfiguration | null
+let request: supertest.Agent | undefined | null, config: TestConfiguration | null
 
 export function beforeAll() {
   config = new TestConfiguration()

@@ -1,7 +1,6 @@
 import { svelte } from "@sveltejs/vite-plugin-svelte"
 import replace from "@rollup/plugin-replace"
 import { defineConfig, loadEnv } from "vite"
-import { viteStaticCopy } from "vite-plugin-static-copy"
 import path from "path"
 import { fileURLToPath } from "url"
 import typescript from "@rollup/plugin-typescript"
@@ -15,39 +14,13 @@ const ignoredWarnings = [
   "element_invalid_self_closing_tag",
 ]
 
-const copyFonts = dest =>
-  viteStaticCopy({
-    targets: [
-      {
-        src: "./assets/source-sans-3",
-        dest,
-      },
-      {
-        src: "./assets/phosphor-icons",
-        dest,
-      },
-      {
-        src: "./assets/inter",
-        dest,
-      },
-      {
-        src: "../../node_modules/remixicon/fonts/*",
-        dest,
-      },
-    ],
-  })
-
 export default defineConfig(({ mode }) => {
   const isProduction = mode === "production"
   const env = loadEnv(mode, process.cwd())
   const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
   // Plugins to only run in dev
-  const devOnlyPlugins = [
-    // Copy fonts to an additional path so that svelte's automatic
-    // prefixing of the base URL path can still resolve assets
-    copyFonts("builder/fonts"),
-  ]
+  const devOnlyPlugins = []
 
   return {
     test: {
@@ -102,7 +75,6 @@ export default defineConfig(({ mode }) => {
           isProduction ? "production" : "development"
         ),
       }),
-      copyFonts("fonts"),
       ...(isProduction ? [] : devOnlyPlugins),
     ],
     optimizeDeps: {

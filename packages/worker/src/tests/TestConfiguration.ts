@@ -33,7 +33,7 @@ import structures, { CSRF_TOKEN } from "./structures"
 class TestConfiguration {
   server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse> = undefined!
 
-  request: supertest.SuperTest<supertest.Test> = undefined!
+  request: supertest.Agent = undefined!
 
   api: API
   tenantId: string

@@ -52,7 +52,6 @@ const checkRoleMismatch = (permissions) => {
 }
 
 $: fetchPermissions(resourceId)
-$: loadDependantInfo(resourceId)
 $: roleMismatch = checkRoleMismatch(permissions)
 $: selectedRoleID = roleMismatch ? null : permissions?.[0]?.value
 $: selectedRole = $roles.find((x) => x._id === selectedRoleID)

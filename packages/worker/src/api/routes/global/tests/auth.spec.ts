@@ -51,7 +51,7 @@ describe("/api/global/auth", () => {
     describe("POST /api/global/auth/:tenantId/login", () => {
       const flushIpCounters = async () => {
         await config.doInTenant(async () => {
-          const { cache } = require("@budibase/backend-core")
+          const { cache } = require("@supertoolmake/backend-core")
           for (const ip of ["127.0.0.1", "::1", "::ffff:127.0.0.1"]) {
             await cache.destroy(`auth:login:ip:${ip}`)
           }

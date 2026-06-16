@@ -2,7 +2,7 @@ import { writable } from "svelte/store"
 
 const NOTIFICATION_TIMEOUT = 3000
 
-interface Notification {
+export interface Notification {
   id: string
   type: string
   message: string

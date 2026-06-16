@@ -72,7 +72,7 @@ export interface TableToBuild extends Omit<Table, "sourceId" | "sourceType"> {
 
 export default class TestConfiguration {
   server?: Server
-  request?: supertest.SuperTest<supertest.Test>
+  request?: supertest.Agent
   started: boolean
   devWorkspaceId?: string
   defaultWorkspaceAppId?: string
@@ -96,7 +96,7 @@ export default class TestConfiguration {
       env.PORT = "0"
       this.server = require("../../app").getServer()
       // we need the request for logging in, involves cookies, hard to fake
-      this.request = supertest(this.server)
+      this.request = supertest(this.server!)
       this.started = true
     } else {
       this.started = false
