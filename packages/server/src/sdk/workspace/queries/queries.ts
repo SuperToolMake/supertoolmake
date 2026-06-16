@@ -193,7 +193,9 @@ export async function enrichContext(
       continue
     }
     try {
-      const json = enrichedQuery.json || enrichedQuery.customData || enrichedQuery.requestBody
+      const json = [enrichedQuery.json, enrichedQuery.customData, enrichedQuery.requestBody].find(
+        (v) => v !== undefined && !(typeof v === "string" && v.trim() === "")
+      )
       enrichedQuery.json = typeof json === "string" ? JSON.parse(json) : json
     } catch (_err) {
       // no json found, ignore
