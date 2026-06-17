@@ -67,7 +67,7 @@ onMount(async () => {
       <Body size="S"
         >To update your self-host installation, follow the docs found <Link
           size="L"
-          href="https://docs.budibase.com/docs/updating-budibase">here.</Link
+          href="https://github.com/SuperToolMake/supertoolmake#--running-via-docker" target=_blank>here.</Link
         ></Body
       >
     </Layout>

@@ -84,7 +84,7 @@ function getPackageJsonFields(): {
       const lernaContent = readFileSync(lernaFile, "utf-8")
       const lerna = JSON.parse(lernaContent)
       return {
-        VERSION: process.env.BUDIBASE_VERSION || lerna.version,
+        VERSION: process.env.SUPER_VERSION || lerna.version,
         SERVICE_NAME: lerna.name,
       }
     }
@@ -97,7 +97,7 @@ function getPackageJsonFields(): {
     if (packageJsonFile) {
       const parsedContent = JSON.parse(readFileSync(packageJsonFile, "utf-8"))
       return {
-        VERSION: process.env.BUDIBASE_VERSION || parsedContent.version,
+        VERSION: process.env.SUPER_VERSION || parsedContent.version,
         SERVICE_NAME: parsedContent.name,
       }
     }
@@ -105,7 +105,7 @@ function getPackageJsonFields(): {
     //
   }
 
-  return { VERSION: process.env.BUDIBASE_VERSION || "", SERVICE_NAME: "" }
+  return { VERSION: process.env.SUPER_VERSION || "", SERVICE_NAME: "" }
 }
 
 function isWorker() {
