@@ -82,9 +82,7 @@ export const save = async (ctx: UserCtx<UnsavedUser, SaveUserResponse>) => {
   }
 }
 
-export const changeTenantOwnerEmail = async (
-  ctx: Ctx<ChangeTenantOwnerEmailRequest, void>
-) => {
+export const changeTenantOwnerEmail = async (ctx: Ctx<ChangeTenantOwnerEmailRequest, void>) => {
   if (!ctx.internal) {
     ctx.throw(403, "Unauthorized")
   }
