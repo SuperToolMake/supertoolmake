@@ -18,7 +18,7 @@
     "nano": "11.0.3",
     "@types/json-schema": "^7.0.15",
     "@types/koa": "3.0.0",
-    "@types/nodemailer": "^6.4.17",
+    "@types/nodemailer": "8.0.0",
     "@types/redlock": "4.0.7",
     "koa-useragent": "^4.1.0",
     "rimraf": "3.0.2",

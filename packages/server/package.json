@@ -135,7 +135,7 @@
     "timekeeper": "2.2.0",
     "ts-node": "10.8.1",
     "tsconfig-paths": "4.0.0",
-    "undici": "^7.24.0",
+    "undici": "7.28.0",
     "yargs": "^17.7.2",
     "zod": "^4.1.12"
   },
