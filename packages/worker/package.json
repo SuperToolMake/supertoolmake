@@ -59,11 +59,11 @@
     "maildev": "^2.2.1",
     "marked": "15.0.11",
     "node-fetch": "2.6.7",
-    "nodemailer": "8.0.9",
+    "nodemailer": "9.0.1",
     "passport-google-oauth": "2.0.0",
     "passport-local": "1.0.0",
     "pouchdb": "7.3.0",
-    "undici": "7.24.0",
+    "undici": "7.28.0",
     "yaml": "2.8.3"
   },
   "devDependencies": {
@@ -73,7 +73,7 @@
     "@types/lodash": "4.14.200",
     "@types/maildev": "^0.0.7",
     "@types/node-fetch": "2.6.4",
-    "@types/nodemailer": "^6.4.17",
+    "@types/nodemailer": "8.0.0",
     "nock": "^13.5.4",
     "nodemon": "2.0.15",
     "rimraf": "3.0.2",
