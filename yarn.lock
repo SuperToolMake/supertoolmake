@@ -4078,10 +4078,10 @@
     "@smithy/uuid" "^1.1.2"
     tslib "^2.6.2"
 
-"@smithy/core@^3.25.0":
-  version "3.25.0"
-  resolved "https://registry.yarnpkg.com/@smithy/core/-/core-3.25.0.tgz#7247961c444311bdb19125a4802f876e16344b34"
-  integrity sha512-TTD6el7tvKyafkXBf7XO3jLOE+qVxOTrLjp/fEGiV3BMfUHK/LfdYlQO9YgZvzxC7kqA3H/IhJXNqQgnbgjb7A==
+"@smithy/core@^3.25.1":
+  version "3.25.1"
+  resolved "https://registry.yarnpkg.com/@smithy/core/-/core-3.25.1.tgz#93d342dd50a82973fcbb7b562f17a6f0e2a20009"
+  integrity sha512-zpDbpXBCBsxfLtG2GEUyfgvHvSFrw5CwDZSNzL0v52gx/c3oPlPbm+7W7num8xs6vyiUBn+bvYPHcQDOXZynCQ==
   dependencies:
     "@aws-crypto/crc32" "5.2.0"
     "@smithy/types" "^4.15.0"
@@ -4301,11 +4301,11 @@
     tslib "^2.6.2"
 
 "@smithy/protocol-http@^5.3.12":
-  version "5.5.0"
-  resolved "https://registry.yarnpkg.com/@smithy/protocol-http/-/protocol-http-5.5.0.tgz#579f2977929927e0879032621db965ae1077a18d"
-  integrity sha512-gqvRWWZIcqmj7iS68p+hrxiOg1fGQcfzNPUlSGJ69hzLHyCyIRApasCpAp/xMGRgb6QqVH/YQhztOYgs+ZI3kA==
+  version "5.5.1"
+  resolved "https://registry.yarnpkg.com/@smithy/protocol-http/-/protocol-http-5.5.1.tgz#7234afacc8246ab7cd1900b4b91fc297bc7f0cce"
+  integrity sha512-GRQofBqr/pPNjR04mU0JjdjsbV8F33KCxSHMFXBb2mWJXxyEalNe814Y4cFd4Efd5tNucaOc31L3/8wXlymjfg==
   dependencies:
-    "@smithy/core" "^3.25.0"
+    "@smithy/core" "^3.25.1"
     tslib "^2.6.2"
 
 "@smithy/protocol-http@^5.3.14":
@@ -4317,11 +4317,11 @@
     tslib "^2.6.2"
 
 "@smithy/querystring-builder@^4.2.12":
-  version "4.4.0"
-  resolved "https://registry.yarnpkg.com/@smithy/querystring-builder/-/querystring-builder-4.4.0.tgz#3cce259fe584263629b1930aaea8b0bc94b9de93"
-  integrity sha512-ZHEOgPH2R9ihWx1NbJ8AXyOIp+mp3ndIPFP77UCEn7fYhDiLoaixveTw5SwtuqjxTEumEjrI/tlCDhQRg1+A5g==
+  version "4.4.1"
+  resolved "https://registry.yarnpkg.com/@smithy/querystring-builder/-/querystring-builder-4.4.1.tgz#fae8750f651d528baf439f6072f3d69583fe6ef7"
+  integrity sha512-XxLjVjrjM2OApKycAT51r45Z9diI+c0DWP9vRONE/gw6PzIma0SyXe/QWiS9+Tp3AOWommjTKUTPcx0cTJsBpQ==
   dependencies:
-    "@smithy/core" "^3.25.0"
+    "@smithy/core" "^3.25.1"
     tslib "^2.6.2"
 
 "@smithy/querystring-builder@^4.2.14":
@@ -11238,10 +11238,17 @@ js-tokens@^4.0.0:
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
   integrity sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==
 
-js-yaml@4.1.1, js-yaml@^4.1.0:
+js-yaml@4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-4.1.1.tgz#854c292467705b699476e1a2decc0c8a3458806b"
   integrity sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==
+  dependencies:
+    argparse "^2.0.1"
+
+js-yaml@4.2.0, js-yaml@^4.1.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-4.2.0.tgz#2bd9e85682dd91bd469afb809d816043b3d49524"
+  integrity sha512-ePWsvanv0DWuDRsW8dnt+R4jQ31SCRCQ7hhNcPXZPsoBZiemuZNYGf7adZdqX2D86j6rvKp3RpCxVTSb8WQlOw==
   dependencies:
     argparse "^2.0.1"
 
