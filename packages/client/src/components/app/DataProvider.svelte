@@ -11,6 +11,7 @@ import type {
   UserDatasource,
 } from "@supertoolmake/types"
 import { EmptyFilterOption, LogicalOperator } from "@supertoolmake/types"
+import { get } from "svelte/store"
 import { getContext, onDestroy } from "svelte"
 import { createAutoRefresh } from "@/utils/autoRefresh"
 
@@ -23,12 +24,17 @@ export let sortOrder: SortOrder
 export let limit: number
 export let paginate: boolean
 export let autoRefresh: number
+export let scrollPages: boolean = false
+export let maxItems: number = 1000
 
 const { styleable, Provider, ActionTypes, API, builderStore } = getContext("sdk")
 const component = getContext("component")
 
 const autoRefreshActions = createAutoRefresh()
 let queryExtensions: Record<string, any> = {}
+let containerEl: HTMLDivElement
+let scrollObserver: IntersectionObserver | null = null
+let loadingNext = false
 
 const createFetch = (datasource: ProviderDatasource) => {
   return fetchData({
@@ -40,6 +46,8 @@ const createFetch = (datasource: ProviderDatasource) => {
       sortOrder,
       limit,
       paginate,
+      scrollPages,
+      maxItems,
     },
   })
 }
@@ -103,6 +111,8 @@ $: fetch.update({
   sortOrder,
   limit,
   paginate,
+  scrollPages,
+  maxItems,
 })
 $: schema = sanitizeSchema($fetch.schema)
 $: autoRefreshEnabled = !($builderStore.inBuilder && $builderStore.selectedComponentId)
@@ -156,12 +166,66 @@ $: dataContext = {
   loaded: $fetch.loaded,
 }
 
+const disconnectObserver = () => {
+  scrollObserver?.disconnect()
+  scrollObserver = null
+}
+
+const loadMore = async () => {
+  if (loadingNext) {
+    return
+  }
+  const state = get(fetch)
+  if (state.loading || !state.hasNextPage || state.rows.length >= maxItems) {
+    return
+  }
+  loadingNext = true
+  await fetch.nextPage()
+  loadingNext = false
+}
+
+const setupScrollObserver = (sentinel: HTMLDivElement) => {
+  disconnectObserver()
+  let sentinelWasVisible = false
+  scrollObserver = new IntersectionObserver(
+    (entries) => {
+      const isVisible = !!entries[0]?.isIntersecting
+      if (isVisible && !sentinelWasVisible && !loadingNext) {
+        sentinelWasVisible = true
+        loadMore()
+      } else if (!isVisible) {
+        sentinelWasVisible = false
+      }
+    },
+    { rootMargin: "200px" }
+  )
+  scrollObserver.observe(sentinel)
+}
+
+const onSentinel = (node: HTMLDivElement) => {
+  setupScrollObserver(node)
+  return {
+    destroy() {
+      disconnectObserver()
+    },
+  }
+}
+
+$: if (!scrollPages) {
+  disconnectObserver()
+}
+
 onDestroy(() => {
-  autoRefreshActions.clear() // Clears auto-refresh when navigating away
+  autoRefreshActions.clear()
+  disconnectObserver()
 })
 </script>
 
-<div use:styleable={$component.styles} class="container">
+<div
+  use:styleable={$component.styles}
+  class="container"
+  bind:this={containerEl}
+>
   <Provider {actions} data={dataContext}>
     {#if !$fetch.loaded}
       <div class="loading">
@@ -169,7 +233,14 @@ onDestroy(() => {
       </div>
     {:else}
       <slot />
-      {#if paginate && $fetch.supportsPagination}
+      {#if scrollPages}
+        <div use:onSentinel class="scroll-sentinel"></div>
+        {#if $fetch.loading}
+          <div class="loading">
+            <ProgressCircle />
+          </div>
+        {/if}
+      {:else if paginate && $fetch.supportsPagination}
         <div class="pagination">
           <Pagination
             page={$fetch.pageNumber + 1}
@@ -204,5 +275,9 @@ onDestroy(() => {
     justify-content: flex-end;
     align-items: center;
     margin-top: var(--spacing-xl);
+  }
+  .scroll-sentinel {
+    height: 1px;
+    width: 100%;
   }
 </style>

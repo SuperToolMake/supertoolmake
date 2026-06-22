@@ -13,6 +13,8 @@ export let filter
 export let sortColumn
 export let sortOrder
 export let paginate
+export let scrollPages
+export let maxItems
 export let limit
 export let showTitleButton
 export let titleButtonText
@@ -177,6 +179,8 @@ $: titleButtonAction = [
           sortColumn,
           sortOrder,
           paginate,
+          scrollPages,
+          maxItems,
           limit,
           autoRefresh,
         }}

@@ -113,6 +113,10 @@ export default abstract class BaseDataFetch<
       // Pagination config
       paginate: true,
 
+      // Scroll pagination config
+      scrollPages: false,
+      maxItems: 1000,
+
       // Client side feature customisation
       clientSideSearching: true,
       clientSideSorting: true,
@@ -271,17 +275,24 @@ export default abstract class BaseDataFetch<
 
     // Actually fetch data
     const page = await this.getPage()
-    this.store.update(($store) => ({
-      ...$store,
-      loading: false,
-      loaded: true,
-      pageNumber: 0,
-      rows: page.rows,
-      info: page.info,
-      cursors: paginate && page.hasNextPage ? [null, page.cursor] : [null],
-      error: page.error,
-      resetKey: Math.random().toString(),
-    }))
+    this.store.update(($store) => {
+      // For scroll pagination, cap initial rows at maxItems
+      let rows = page.rows
+      if (paginate && this.options.scrollPages) {
+        rows = rows.slice(0, this.options.maxItems)
+      }
+      return {
+        ...$store,
+        loading: false,
+        loaded: true,
+        pageNumber: 0,
+        rows,
+        info: page.info,
+        cursors: paginate && page.hasNextPage ? [null, page.cursor] : [null],
+        error: page.error,
+        resetKey: Math.random().toString(),
+      }
+    })
   }
 
   /**
@@ -487,7 +498,12 @@ export default abstract class BaseDataFetch<
    * @return {boolean} whether there is a next page of data or not
    */
   private hasNextPage(state: DataFetchStore<TDefinition, TQuery, TRow>): boolean {
-    return state.cursors[state.pageNumber + 1] != null
+    const hasMorePages = state.cursors[state.pageNumber + 1] != null
+    if (!this.options.scrollPages) {
+      return hasMorePages
+    }
+    // For scroll pagination, also check if we've hit the max items limit
+    return hasMorePages && state.rows.length < this.options.maxItems
   }
 
   /**
@@ -525,9 +541,19 @@ export default abstract class BaseDataFetch<
       if (hasNextPage) {
         cursors[pageNumber + 1] = cursor
       }
+
+      // For scroll pagination, append rows instead of replacing
+      let newRows: TRow[]
+      if (this.options.scrollPages) {
+        const maxItems = this.options.maxItems
+        newRows = [...$store.rows, ...rows].slice(0, maxItems)
+      } else {
+        newRows = rows
+      }
+
       return {
         ...$store,
-        rows,
+        rows: newRows,
         info,
         cursors,
         loading: false,

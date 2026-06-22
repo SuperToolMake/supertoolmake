@@ -12,6 +12,8 @@ export let sortColumn
 export let sortOrder
 export let limit
 export let paginate
+export let scrollPages
+export let maxItems
 export let noRowsMessage
 export let direction
 export let hAlign
@@ -48,6 +50,8 @@ export const getAdditionalDataContext = () => {
       sortOrder,
       limit,
       paginate,
+      scrollPages,
+      maxItems,
       autoRefresh,
     }}
   >

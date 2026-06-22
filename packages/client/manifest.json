@@ -5422,6 +5422,20 @@
         "key": "paginate",
         "defaultValue": true,
         "info": "Pagination is only available for data stored in tables"
+      },
+      {
+        "type": "boolean",
+        "label": "Scrolling pages",
+        "key": "scrollPages",
+        "defaultValue": false,
+        "dependsOn": "paginate"
+      },
+      {
+        "type": "number",
+        "label": "Max items",
+        "key": "maxItems",
+        "defaultValue": 1000,
+        "dependsOn": "scrollPages"
       }
     ],
     "context": {
@@ -6840,6 +6854,20 @@
         "key": "paginate"
       },
       {
+        "type": "boolean",
+        "label": "Scrolling pages",
+        "key": "scrollPages",
+        "defaultValue": false,
+        "dependsOn": "paginate"
+      },
+      {
+        "type": "number",
+        "label": "Max items",
+        "key": "maxItems",
+        "defaultValue": 1000,
+        "dependsOn": "scrollPages"
+      },
+      {
         "type": "text",
         "label": "Empty text",
         "key": "noRowsMessage",
@@ -7042,6 +7070,20 @@
         "type": "boolean",
         "label": "Paginate",
         "key": "paginate"
+      },
+      {
+        "type": "boolean",
+        "label": "Scrolling pages",
+        "key": "scrollPages",
+        "defaultValue": false,
+        "dependsOn": "paginate"
+      },
+      {
+        "type": "number",
+        "label": "Max items",
+        "key": "maxItems",
+        "defaultValue": 1000,
+        "dependsOn": "scrollPages"
       },
       {
         "section": true,

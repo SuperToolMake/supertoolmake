@@ -13,4 +13,7 @@ export interface DataFetchOptions<TQuery = SearchFilters> {
   // Pagination config
   limit: number
   paginate: boolean
+  // Scroll pagination config
+  scrollPages: boolean
+  maxItems: number
 }
