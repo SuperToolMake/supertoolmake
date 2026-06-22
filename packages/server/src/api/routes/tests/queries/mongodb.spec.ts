@@ -12,6 +12,7 @@ if (descriptions.length) {
   describe.each(descriptions)("/queries ($dbName)", ({ config, dsProvider }) => {
     let collection: string
     let datasource: Datasource
+    let rawDatasource: Datasource
 
     async function createQuery(query: Partial<Query>): Promise<Query> {
       const defaultQuery: Query = {
@@ -32,7 +33,7 @@ if (descriptions.length) {
     }
 
     async function withClient<T>(callback: (client: MongoClient) => Promise<T>): Promise<T> {
-      const client = new MongoClient(datasource.config!.connectionString)
+      const client = new MongoClient(rawDatasource.config!.connectionString)
       await client.connect()
       try {
         return await callback(client)
@@ -43,7 +44,7 @@ if (descriptions.length) {
 
     async function withDb<T>(callback: (db: Db) => Promise<T>): Promise<T> {
       return await withClient(async (client) => {
-        return await callback(client.db(datasource.config!.db))
+        return await callback(client.db(rawDatasource.config!.db))
       })
     }
 
@@ -56,6 +57,7 @@ if (descriptions.length) {
     beforeAll(async () => {
       const ds = await dsProvider()
       datasource = ds.datasource!
+      rawDatasource = ds.rawDatasource!
     })
 
     beforeEach(async () => {
