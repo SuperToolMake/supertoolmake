@@ -237,19 +237,14 @@ const handleUpdateFieldValue = ({
 }) => {
   // Coerce legacy single-field format into the new multi-field format
   const resolvedFields = fields ?? (field ? [field] : [])
-  const resolvedFieldValues =
-    fieldValues ?? (field !== undefined ? { [field]: value } : {})
+  const resolvedFieldValues = fieldValues ?? (field !== undefined ? { [field]: value } : {})
 
   if (type === "set" && Object.keys(resolvedFieldValues).length > 0) {
     Object.entries(resolvedFieldValues).forEach(([fieldName, fieldValue]) => {
       formApi.setFieldValue(fieldName, fieldValue)
     })
-  } else if (
-    type === "reset" &&
-    Array.isArray(resolvedFields) &&
-    resolvedFields.length > 0
-  ) {
-    resolvedFields.forEach(fieldName => {
+  } else if (type === "reset" && Array.isArray(resolvedFields) && resolvedFields.length > 0) {
+    resolvedFields.forEach((fieldName) => {
       formApi.resetField(fieldName)
     })
   }

@@ -1,12 +1,12 @@
 <script>
-  import { Select, Label, Multiselect } from "@supertoolmake/bbui"
-  import { onMount } from "svelte"
-  import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
-  import { selectedScreen, componentStore } from "@/stores/builder"
-  import { getActionProviders, buildFormSchema } from "@/dataBinding"
-  import { findComponent } from "@/helpers/components"
+import { Select, Label, Multiselect } from "@supertoolmake/bbui"
+import { onMount } from "svelte"
+import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import { selectedScreen, componentStore } from "@/stores/builder"
+import { getActionProviders, buildFormSchema } from "@/dataBinding"
+import { findComponent } from "@/helpers/components"
 
-  let { parameters, bindings = [], nested } = $props()
+let { parameters, bindings = [], nested } = $props()
 
 const typeOptions = [
   {
@@ -19,53 +19,48 @@ const typeOptions = [
   },
 ]
 
-  const formComponent = $derived(
-    getFormComponent($selectedScreen.props, parameters.componentId)
-  )
-  const formSchema = $derived(buildFormSchema(formComponent))
-  const fieldOptions = $derived(Object.keys(formSchema || {}))
-  const actionProviders = $derived(
-    getActionProviders(
-      $selectedScreen,
-      $componentStore.selectedComponentId,
-      "ValidateForm",
-      { includeSelf: nested }
-    )
-  )
-
-  const getFormComponent = (asset, id) => {
-    let component = findComponent(asset, id)
-    if (component) {
-      return component
-    }
-    // Check for block component IDs, and use the block itself instead
-    if (id?.includes("-")) {
-      return findComponent(asset, id.split("-")[0])
-    }
-    return null
+const getFormComponent = (asset, id) => {
+  let component = findComponent(asset, id)
+  if (component) {
+    return component
   }
+  // Check for block component IDs, and use the block itself instead
+  if (id?.includes("-")) {
+    return findComponent(asset, id.split("-")[0])
+  }
+  return null
+}
 
-  onMount(() => {
-    if (!parameters.type) {
-      parameters.type = "set"
-    }
+const formComponent = $derived(getFormComponent($selectedScreen.props, parameters.componentId))
+const formSchema = $derived(buildFormSchema(formComponent))
+const fieldOptions = $derived(Object.keys(formSchema || {}))
+const actionProviders = $derived(
+  getActionProviders($selectedScreen, $componentStore.selectedComponentId, "ValidateForm", {
+    includeSelf: nested,
   })
+)
 
-  const handleFieldChange = e => {
-    // Convert from single field to multi-select format
-    parameters.fields = e.detail || []
-    // Initialize fieldValues for new fields
-    if (!parameters.fieldValues) {
-      parameters.fieldValues = {}
-    }
+onMount(() => {
+  if (!parameters.type) {
+    parameters.type = "set"
   }
+})
 
-  const handleFieldValueChange = (fieldName, value) => {
-    if (!parameters.fieldValues) {
-      parameters.fieldValues = {}
-    }
-    parameters.fieldValues[fieldName] = value
+const handleFieldChange = (e) => {
+  // Convert from single field to multi-select format
+  parameters.fields = e.detail || []
+  // Initialize fieldValues for new fields
+  if (!parameters.fieldValues) {
+    parameters.fieldValues = {}
   }
+}
+
+const handleFieldValueChange = (fieldName, value) => {
+  if (!parameters.fieldValues) {
+    parameters.fieldValues = {}
+  }
+  parameters.fieldValues[fieldName] = value
+}
 </script>
 
 <div class="root">

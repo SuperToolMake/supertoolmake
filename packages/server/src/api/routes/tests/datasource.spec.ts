@@ -74,8 +74,7 @@ describe("/datasources", () => {
 
   describe("secret redaction", () => {
     it("should redact and preserve MongoDB connection strings", async () => {
-      const connectionString =
-        "mongodb://leakuser:SuperSecretPw123@prod-db.internal:27017/payments"
+      const connectionString = "mongodb://leakuser:SuperSecretPw123@prod-db.internal:27017/payments"
       const mongoDatasource = await config.api.datasource.create({
         type: "datasource",
         name: generator.guid(),
@@ -86,16 +85,10 @@ describe("/datasources", () => {
         },
       })
 
-      expect(mongoDatasource.config!.connectionString).toBe(
-        PASSWORD_REPLACEMENT
-      )
+      expect(mongoDatasource.config!.connectionString).toBe(PASSWORD_REPLACEMENT)
 
-      const fetchedDatasource = await config.api.datasource.get(
-        mongoDatasource._id!
-      )
-      expect(fetchedDatasource.config!.connectionString).toBe(
-        PASSWORD_REPLACEMENT
-      )
+      const fetchedDatasource = await config.api.datasource.get(mongoDatasource._id!)
+      expect(fetchedDatasource.config!.connectionString).toBe(PASSWORD_REPLACEMENT)
 
       const datasources = await config.api.datasource.fetch()
       expect(datasources).toContainEqual(
@@ -136,9 +129,7 @@ describe("/datasources", () => {
 
       expect(firestoreDatasource.config!.privateKey).toBe(PASSWORD_REPLACEMENT)
 
-      const fetchedDatasource = await config.api.datasource.get(
-        firestoreDatasource._id!
-      )
+      const fetchedDatasource = await config.api.datasource.get(firestoreDatasource._id!)
       expect(fetchedDatasource.config!.privateKey).toBe(PASSWORD_REPLACEMENT)
 
       const datasources = await config.api.datasource.fetch()
