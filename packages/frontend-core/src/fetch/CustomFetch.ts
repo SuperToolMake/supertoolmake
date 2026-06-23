@@ -5,6 +5,11 @@ type CustomDefinition = Record<string, any>
 
 export default class CustomFetch extends BaseDataFetch<CustomDatasource, CustomDefinition> {
   // Gets the correct type for a JS value
+  getDefaultSortColumn() {
+    return null
+  }
+
+  // Gets the correct Budibase type for a JS value
   getType(value: any) {
     if (value == null) {
       return "string"
