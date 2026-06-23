@@ -544,6 +544,7 @@ const handleBannerActionClick = () => {
     class={"size--" + ($sidePanelStore.size || "small")}
     class:position--left={sidePanelPosition === "left"}
     class:position--right={sidePanelPosition !== "left"}
+    inert={$sidePanelStore.open ? undefined : true}
   >
     <div class="side-panel-header" class:left={sidePanelPosition === "left"}>
       <button
