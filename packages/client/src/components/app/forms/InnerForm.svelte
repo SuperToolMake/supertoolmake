@@ -394,7 +394,7 @@ const formApi = {
 
     // Determine the initial value for this field
     // Priority: existing field value > persisted value > initialValues > default
-    let initialValue = defaultValue
+    let initialValue: unknown = defaultValue
     let initialError = null
     let fieldId = `id-${Helpers.uuid()}`
     const existingField = getField(field)
