@@ -77,6 +77,7 @@ $: displayValue = getDateDisplayValue(value, { enableTime, timeOnly })
   }
   .spectrum-Datepicker {
     width: 100%;
+    min-width: 104px;
     overflow: hidden;
   }
   .spectrum-Datepicker .spectrum-Textfield {
