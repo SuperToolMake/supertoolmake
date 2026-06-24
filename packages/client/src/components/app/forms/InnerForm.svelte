@@ -44,6 +44,7 @@ export let schema: TableSchema | undefined = undefined
 export let definition: Table | undefined = undefined
 export let disableSchemaValidation: boolean = false
 export let editAutoColumns: boolean = false
+export let rememberValues: boolean = false
 
 // For internal use only, to disable context when being used with standalone
 // fields
@@ -55,6 +56,41 @@ export let currentStep: Writable<number>
 
 const component = getContext("component")
 const { styleable, Provider, ActionTypes } = getContext("sdk")
+
+// LocalStorage persistence for remembered values
+const getPersistedValues = (): Record<string, any> => {
+  if (!rememberValues) {
+    return {}
+  }
+  const appId = window["##SUPER_APP_ID##"] || "app"
+  const componentId = $component?.id || "form"
+  const storageKey = `${appId}.form.remembered.${componentId}`
+  try {
+    const stored = localStorage.getItem(storageKey)
+    if (stored) {
+      return JSON.parse(stored)
+    }
+  } catch {}
+  return {}
+}
+
+const persistValues = (values: Record<string, any>) => {
+  if (!rememberValues) {
+    return
+  }
+  const appId = window["##SUPER_APP_ID##"] || "app"
+  const componentId = $component?.id || "form"
+  const storageKey = `${appId}.form.remembered.${componentId}`
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(values))
+  } catch {}
+}
+
+// Track persisted values to avoid unnecessary writes
+let lastPersistedValues: Record<string, any> = getPersistedValues()
+
+// Track whether fields have been registered to avoid persisting empty values
+let fieldsRegistered = false
 
 let fields: Writable<FieldInfo>[] = []
 const formState = writable({
@@ -294,6 +330,17 @@ $: {
 // Derive value of whole form
 $: formValue = deriveFormValue(initialValues, $values, $enrichments)
 
+// Persist form values to localStorage when rememberValues is enabled
+// Only persist after fields have been registered to avoid saving empty values
+$: if (rememberValues && formValue && fieldsRegistered) {
+  // Only persist if values have actually changed to avoid unnecessary writes
+  const currentValuesJson = JSON.stringify(formValue)
+  if (currentValuesJson !== JSON.stringify(lastPersistedValues)) {
+    lastPersistedValues = formValue
+    persistValues(formValue)
+  }
+}
+
 // Create data context to provide
 $: dataContext = {
   ...formValue,
@@ -330,8 +377,24 @@ const formApi = {
     // Sanitise the default value to ensure it doesn't contain invalid data
     defaultValue = sanitiseValue(defaultValue, schema?.[field], type)
 
-    // If we've already registered this field then keep some existing state
-    let initialValue = Helpers.deepGet(initialValues, field) ?? defaultValue
+    // Check for persisted values from localStorage
+    const persistedValues = getPersistedValues()
+    const persistedValue = persistedValues[field]
+
+    // Helper to check if a value is considered "empty" (for remember values logic)
+    const isEmptyValue = (value: any) => {
+      if (value === null || value === undefined || value === "") {
+        return true
+      }
+      if (Array.isArray(value) && value.length === 0) {
+        return true
+      }
+      return false
+    }
+
+    // Determine the initial value for this field
+    // Priority: existing field value > persisted value > initialValues > default
+    let initialValue: unknown = defaultValue
     let initialError = null
     let fieldId = `id-${Helpers.uuid()}`
     const existingField = getField(field)
@@ -363,6 +426,15 @@ const formApi = {
       if (fieldState.error) {
         initialError = validator?.(initialValue)
       }
+    } else {
+      // For new fields, check persisted values (they override defaults)
+      // But only if there's no initial value from data context (for Update forms)
+      const contextValue = Helpers.deepGet(initialValues, field)
+      if (!hasUserValue(contextValue, defaultValue) && !isEmptyValue(persistedValue)) {
+        initialValue = sanitiseValue(persistedValue, schema?.[field], type)
+      } else {
+        initialValue = contextValue ?? defaultValue
+      }
     }
 
     // Auto columns are always disabled
@@ -393,6 +465,11 @@ const formApi = {
       fields = [...otherFields, fieldInfo]
     } else {
       fields = [...fields, fieldInfo]
+    }
+
+    // Mark fields as registered once at least one field exists
+    if (!fieldsRegistered) {
+      fieldsRegistered = true
     }
 
     return fieldInfo

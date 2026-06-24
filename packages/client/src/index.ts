@@ -65,19 +65,19 @@ window.svelteInternal = svelteInternal
 declare global {
   interface Window {
     // Data from builder
-    "##BUDIBASE_APP_ID##": string
-    "##BUDIBASE_IN_BUILDER##"?: true
-    "##BUDIBASE_PREVIEW_SCREEN##"?: Screen
-    "##BUDIBASE_SELECTED_COMPONENT_ID##"?: string
-    "##BUDIBASE_PREVIEW_ID##"?: number
-    "##BUDIBASE_PREVIEW_THEME##"?: Theme
-    "##BUDIBASE_PREVIEW_CUSTOM_THEME##"?: AppCustomTheme
-    "##BUDIBASE_PREVIEW_DEVICE##"?: PreviewDevice
-    "##BUDIBASE_APP_EMBEDDED##"?: string // This is a bool wrapped in a string
-    "##BUDIBASE_PREVIEW_NAVIGATION##"?: AppNavigation
-    "##BUDIBASE_HIDDEN_COMPONENT_IDS##"?: string[]
-    "##BUDIBASE_SNIPPETS##"?: Snippet[]
-    "##BUDIBASE_COMPONENT_ERRORS##"?: Record<string, UIComponentError[]>
+    "##SUPER_APP_ID##": string
+    "##SUPER_IN_BUILDER##"?: true
+    "##SUPER_PREVIEW_SCREEN##"?: Screen
+    "##SUPER_SELECTED_COMPONENT_ID##"?: string
+    "##SUPER_PREVIEW_ID##"?: number
+    "##SUPER_PREVIEW_THEME##"?: Theme
+    "##SUPER_PREVIEW_CUSTOM_THEME##"?: AppCustomTheme
+    "##SUPER_PREVIEW_DEVICE##"?: PreviewDevice
+    "##SUPER_APP_EMBEDDED##"?: string // This is a bool wrapped in a string
+    "##SUPER_PREVIEW_NAVIGATION##"?: AppNavigation
+    "##SUPER_HIDDEN_COMPONENT_IDS##"?: string[]
+    "##SUPER_SNIPPETS##"?: Snippet[]
+    "##SUPER_COMPONENT_ERRORS##"?: Record<string, UIComponentError[]>
 
     // Other flags
     MIGRATING_APP: boolean
@@ -121,25 +121,25 @@ const loadBudibase = async () => {
   // Update builder store with any builder flags
   builderStore.set({
     ...get(builderStore),
-    inBuilder: Boolean(window["##BUDIBASE_IN_BUILDER##"]),
-    screen: window["##BUDIBASE_PREVIEW_SCREEN##"],
-    selectedComponentId: window["##BUDIBASE_SELECTED_COMPONENT_ID##"],
-    previewId: window["##BUDIBASE_PREVIEW_ID##"],
-    theme: window["##BUDIBASE_PREVIEW_THEME##"],
-    customTheme: window["##BUDIBASE_PREVIEW_CUSTOM_THEME##"],
-    previewDevice: window["##BUDIBASE_PREVIEW_DEVICE##"],
-    navigation: window["##BUDIBASE_PREVIEW_NAVIGATION##"],
-    hiddenComponentIds: window["##BUDIBASE_HIDDEN_COMPONENT_IDS##"],
-    snippets: window["##BUDIBASE_SNIPPETS##"],
-    componentErrors: window["##BUDIBASE_COMPONENT_ERRORS##"],
+    inBuilder: Boolean(window["##SUPER_IN_BUILDER##"]),
+    screen: window["##SUPER_PREVIEW_SCREEN##"],
+    selectedComponentId: window["##SUPER_SELECTED_COMPONENT_ID##"],
+    previewId: window["##SUPER_PREVIEW_ID##"],
+    theme: window["##SUPER_PREVIEW_THEME##"],
+    customTheme: window["##SUPER_PREVIEW_CUSTOM_THEME##"],
+    previewDevice: window["##SUPER_PREVIEW_DEVICE##"],
+    navigation: window["##SUPER_PREVIEW_NAVIGATION##"],
+    hiddenComponentIds: window["##SUPER_HIDDEN_COMPONENT_IDS##"],
+    snippets: window["##SUPER_SNIPPETS##"],
+    componentErrors: window["##SUPER_COMPONENT_ERRORS##"],
   })
 
   // Set app ID - this window flag is set by both the preview and the real
   // server rendered app HTML
-  appStore.actions.setAppId(window["##BUDIBASE_APP_ID##"])
+  appStore.actions.setAppId(window["##SUPER_APP_ID##"])
 
   // Set the flag used to determine if the app is being loaded via an iframe
-  appStore.actions.setAppEmbedded(window["##BUDIBASE_APP_EMBEDDED##"] === "true")
+  appStore.actions.setAppEmbedded(window["##SUPER_APP_EMBEDDED##"] === "true")
 
   if (window.MIGRATING_APP) {
     if (!app) {
@@ -157,7 +157,7 @@ const loadBudibase = async () => {
 
   // Register handler for runtime events from the builder
   window.handleBuilderRuntimeEvent = (type, data) => {
-    if (!window["##BUDIBASE_IN_BUILDER##"]) {
+    if (!window["##SUPER_IN_BUILDER##"]) {
       return
     }
     if (type === "event-completed") {

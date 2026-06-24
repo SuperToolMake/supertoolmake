@@ -3203,6 +3203,12 @@
         "label": "Initial form step",
         "key": "initialFormStep",
         "defaultValue": 1
+      },
+      {
+        "type": "boolean",
+        "label": "Remember values",
+        "key": "rememberValues",
+        "defaultValue": false
       }
     ],
     "context": [
@@ -7734,6 +7740,12 @@
             "type": "boolean",
             "label": "Disabled",
             "key": "disabled",
+            "defaultValue": false
+          },
+          {
+            "type": "boolean",
+            "label": "Remember values",
+            "key": "rememberValues",
             "defaultValue": false
           }
         ]

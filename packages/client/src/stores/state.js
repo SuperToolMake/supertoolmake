@@ -2,7 +2,7 @@ import { createLocalStorageStore } from "@supertoolmake/frontend-core"
 import { derived, get, writable } from "svelte/store"
 
 const createStateStore = () => {
-  const appId = window["##BUDIBASE_APP_ID##"] || "app"
+  const appId = window["##SUPER_APP_ID##"] || "app"
   const localStorageKey = `${appId}.state`
   const persistentStore = createLocalStorageStore(localStorageKey, {})
 

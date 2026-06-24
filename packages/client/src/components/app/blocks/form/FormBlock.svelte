@@ -26,6 +26,7 @@ export let noRowsMessage: string
 export let notificationOverride: boolean
 export let buttonsCollapsed: boolean
 export let buttonsCollapsedText: string
+export let rememberValues: boolean = false
 
 // Legacy
 export let showDeleteButton: boolean
@@ -126,5 +127,6 @@ $: buttonsOrDefault =
     buttonPosition={buttons ? buttonPosition : "top"}
     {buttonsCollapsed}
     {buttonsCollapsedText}
+    {rememberValues}
   />
 </FormBlockWrapper>

@@ -16,6 +16,7 @@ export let buttonPosition = "bottom"
 export let buttonsCollapsed
 export let buttonsCollapsedText
 export let schema
+export let rememberValues = false
 
 const context = getContext("context")
 
@@ -33,6 +34,7 @@ $: renderHeader = buttons || title
       size,
       disabled,
       readonly: !disabled && actionType === "View",
+      rememberValues,
     }}
     styles={{
       normal: {
