@@ -92,18 +92,18 @@
       } = parsed
 
       // Set some flags so the app knows we're in the builder
-      window["##BUDIBASE_IN_BUILDER##"] = true
-      window["##BUDIBASE_APP_ID##"] = appId
-      window["##BUDIBASE_PREVIEW_SCREEN##"] = screen
-      window["##BUDIBASE_SELECTED_COMPONENT_ID##"] = selectedComponentId
-      window["##BUDIBASE_PREVIEW_ID##"] = Math.random()
-      window["##BUDIBASE_PREVIEW_THEME##"] = theme
-      window["##BUDIBASE_PREVIEW_CUSTOM_THEME##"] = customTheme
-      window["##BUDIBASE_PREVIEW_DEVICE##"] = previewDevice
-      window["##BUDIBASE_PREVIEW_NAVIGATION##"] = navigation
-      window["##BUDIBASE_HIDDEN_COMPONENT_IDS##"] = hiddenComponentIds
-      window["##BUDIBASE_SNIPPETS##"] = snippets
-      window['##BUDIBASE_COMPONENT_ERRORS##'] = componentErrors
+      window["##SUPER_IN_BUILDER##"] = true
+      window["##SUPER_APP_ID##"] = appId
+      window["##SUPER_PREVIEW_SCREEN##"] = screen
+      window["##SUPER_SELECTED_COMPONENT_ID##"] = selectedComponentId
+      window["##SUPER_PREVIEW_ID##"] = Math.random()
+      window["##SUPER_PREVIEW_THEME##"] = theme
+      window["##SUPER_PREVIEW_CUSTOM_THEME##"] = customTheme
+      window["##SUPER_PREVIEW_DEVICE##"] = previewDevice
+      window["##SUPER_PREVIEW_NAVIGATION##"] = navigation
+      window["##SUPER_HIDDEN_COMPONENT_IDS##"] = hiddenComponentIds
+      window["##SUPER_SNIPPETS##"] = snippets
+      window['##SUPER_COMPONENT_ERRORS##'] = componentErrors
 
       // Initialise app
       const bootBudibase = () => {

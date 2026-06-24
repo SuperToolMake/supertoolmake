@@ -11,6 +11,7 @@ export let disabled: boolean = false
 export let readonly: boolean = false
 export let actionType: "Create" = "Create"
 export let initialFormStep: string | number = 1
+export let rememberValues: boolean = false
 
 // Not exposed as a builder setting. Used internally to disable validation
 // for fields rendered in things like search blocks.
@@ -110,6 +111,7 @@ $: resetKey = Helpers.hashString(schemaKey + JSON.stringify(initialValues) + dis
       {disableSchemaValidation}
       {editAutoColumns}
       {currentStep}
+      {rememberValues}
     >
       <slot />
     </InnerForm>

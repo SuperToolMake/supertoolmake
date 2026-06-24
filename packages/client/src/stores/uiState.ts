@@ -14,7 +14,7 @@ export class UIStateStore {
   update: Writable<Record<string, any>>["update"]
 
   constructor() {
-    this.appId = window["##BUDIBASE_APP_ID##"] || "app"
+    this.appId = window["##SUPER_APP_ID##"] || "app"
     this.localStorageKey = `${this.appId}.ui`
     this.persistentStore = createLocalStorageStore(this.localStorageKey, {})
     this.subscribe = this.persistentStore.subscribe

@@ -8,7 +8,7 @@ describe("specific test case for whether or not full app template can still be r
           {{{head}}}
         </head>
         <script>
-          window["##BUDIBASE_APP_ID##"] = "{{appId}}"
+          window["##SUPER_APP_ID##"] = "{{appId}}"
         </script>
         {{{body}}}
         </html>`
@@ -24,7 +24,7 @@ describe("specific test case for whether or not full app template can still be r
           <title>App</title>
         </head>
         <script>
-          window["##BUDIBASE_APP_ID##"] = "App1"
+          window["##SUPER_APP_ID##"] = "App1"
         </script>
         <body><p>App things</p></body>
         </html>`)

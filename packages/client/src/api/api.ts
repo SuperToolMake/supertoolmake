@@ -10,8 +10,8 @@ export const API = createAPIClient({
   // Attach client specific headers
   attachHeaders: (headers) => {
     // Attach app ID header
-    if (window["##BUDIBASE_APP_ID##"]) {
-      headers["x-budibase-app-id"] = window["##BUDIBASE_APP_ID##"]
+    if (window["##SUPER_APP_ID##"]) {
+      headers["x-budibase-app-id"] = window["##SUPER_APP_ID##"]
     }
 
     // Attach the iframe location pathname to ensure the app url is fully preserved.
@@ -22,7 +22,7 @@ export const API = createAPIClient({
     }
 
     // Attach client header if not inside the builder preview
-    if (!window["##BUDIBASE_IN_BUILDER##"]) {
+    if (!window["##SUPER_IN_BUILDER##"]) {
       headers["x-budibase-type"] = "client"
     }
 
