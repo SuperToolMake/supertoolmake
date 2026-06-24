@@ -3,6 +3,7 @@ import { Body, Heading, Layout } from "@supertoolmake/bbui"
 import {
   Constants,
   CookieUtils,
+  derivedMemo,
   invalidationMessage,
   popNumSessionsInvalidated,
 } from "@supertoolmake/frontend-core"
@@ -149,6 +150,15 @@ onMount(async () => {
     window.removeEventListener("hashchange", handleHashChange)
   }
 })
+
+const builderActiveScreenId = derivedMemo(
+  [builderStore, screenStore],
+  ([$builderStore, $screenStore]) =>
+    $builderStore.inBuilder ? $screenStore.activeScreen?._id : undefined
+)
+$: if ($builderActiveScreenId) {
+  sidePanelStore.actions.close()
+}
 
 $: {
   if (dataLoaded && fontsLoaded) {

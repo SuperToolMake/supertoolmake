@@ -7,4 +7,9 @@ declare module "./memo" {
     store: Readable<TStore>,
     derivation: (store: TStore) => TResult
   ): Readable<TResult>
+
+  export function derivedMemo<TResult>(
+    stores: Readable<any>[],
+    derivation: (stores: any[]) => TResult
+  ): Readable<TResult>
 }
