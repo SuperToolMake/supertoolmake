@@ -2,11 +2,9 @@
   import {
     ActionButton,
     Body,
-    Button,
     Checkbox,
     Divider,
     Heading,
-    Icon,
     Input,
     Label,
     notifications,
@@ -250,7 +248,8 @@
           Run query
         </ActionButton>
         <div class="tooltip" title="Run your query to enable saving">
-          <Button
+          <ActionButton
+            icon="floppy-disk"
             on:click={async () => {
               const response = await saveQuery()
 
@@ -268,11 +267,9 @@
               nameError ||
               rows.length === 0
             )}
-            overBackground
           >
-            <Icon size="S" name="floppy-disk" />
             Save
-          </Button>
+          </ActionButton>
         </div>
       </div>
     </div>
@@ -524,19 +521,19 @@
     color: var(--ink);
   }
 
-  .controls :global(.is-disabled) {
+  .controls :global(.disabled) {
     pointer-events: none;
     background-color: transparent;
+    color: var(--grey-3);
+  }
+
+  .controls :global(.disabled i) {
     color: var(--grey-3);
   }
 
   .controls :global(span) {
     display: flex;
     align-items: center;
-  }
-
-  .controls :global(.icon) {
-    margin-right: 8px;
   }
 
   .configField {
