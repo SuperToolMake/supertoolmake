@@ -1,6 +1,6 @@
 import { DocumentType } from "@supertoolmake/types"
-import { getDB } from "../db"
 import { structures } from "../../../tests"
+import { getDB } from "../db"
 import Replication from "../Replication"
 
 const ensureDb = async (dbName: string) => {
@@ -79,7 +79,9 @@ describe("Replication", () => {
 
       expect(await getDB(target).get(`${DocumentType.ROLE}_admin`)).toMatchObject({ name: "admin" })
       expect(await getDB(target).get(`${DocumentType.ROLE}_user`)).toMatchObject({ name: "user" })
-      expect(await getDB(target).get(`${DocumentType.DATASOURCE}_ds1`)).toMatchObject({ type: "postgres" })
+      expect(await getDB(target).get(`${DocumentType.DATASOURCE}_ds1`)).toMatchObject({
+        type: "postgres",
+      })
     }, 30000)
 
     it("excludes automation log documents", async () => {
