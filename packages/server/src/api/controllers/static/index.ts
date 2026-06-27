@@ -393,13 +393,13 @@ export const uploadExternalFile = async (ctx: Ctx) => {
     const image = sharp(buffer)
     const metadata = await image.metadata()
     if (!compress.maxWidth) {
-      buffer = await image.avif({ quality }).toBuffer()
+      buffer = (await image.avif({ quality }).toBuffer()) as Buffer
     }
     if (metadata.width && metadata.width > compress.maxWidth) {
-      buffer = await image
+      buffer = (await image
         .resize(compress.maxWidth, null, { withoutEnlargement: true })
         .avif({ quality })
-        .toBuffer()
+        .toBuffer()) as Buffer
     }
     uploadKey = key.replace(/\.[^.]+$/, ".avif")
   }
