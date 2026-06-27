@@ -42,7 +42,7 @@ class Replication {
       toDev: boolean
       syncAllTables: boolean
       tableSyncList?: string[]
-      customFilter?: (doc: Document) => boolean
+      customFilter?: (doc: Document) => boolean | undefined
     }
   ): boolean {
     const { isCreation, toDev, syncAllTables, tableSyncList, customFilter } = opts
@@ -145,7 +145,7 @@ class Replication {
     toDev: boolean
     syncAllTables: boolean
     tableSyncList?: string[]
-    customFilter?: (doc: Document) => boolean
+    customFilter?: (doc: Document) => boolean | undefined
   }) {
     const targetDb = getDB(this.targetName, { skip_setup: true })
     const allDocs = await targetDb.allDocs({ include_docs: true })
