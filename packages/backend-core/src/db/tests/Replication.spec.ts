@@ -7,7 +7,7 @@ type TestDocument = Document & Record<string, unknown>
 type NamedDocument = Document & { name: string }
 type ReplicationFilterDoc = Document & { filters: Record<string, string> }
 
-const adminFilter = (doc: Document) => Boolean(doc._id && doc._id.includes("admin"))
+const adminFilter = (doc: Document) => Boolean(doc._id?.includes("admin"))
 
 const ensureDb = async (dbName: string) => {
   const db = getDB(dbName)
