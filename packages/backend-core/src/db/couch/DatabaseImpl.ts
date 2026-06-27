@@ -327,13 +327,16 @@ export class CouchDatabase implements Database {
     })
   }
 
-  async bulkDocs(documents: AnyDocument[]) {
+  async bulkDocs(documents: AnyDocument[], opts?: { new_edits?: boolean }) {
     const now = new Date().toISOString()
     return this.performCallWithDBCreation((db) => {
-      return () =>
-        db.bulk({
-          docs: documents.map((d) => ({ createdAt: now, ...d, updatedAt: now })),
-        })
+      const body: any = {
+        docs: documents.map((d) => ({ createdAt: now, ...d, updatedAt: now })),
+      }
+      if (opts?.new_edits !== undefined) {
+        body.new_edits = opts.new_edits
+      }
+      return () => db.bulk(body)
     })
   }
 
@@ -477,51 +480,31 @@ export class CouchDatabase implements Database {
   }
 
   async load(stream: ReadStream) {
-    return new Promise<{ ok: boolean }>((resolve, reject) => {
-      let buffer = ""
+    const chunks: Buffer[] = []
+    for await (const chunk of stream) {
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
+    }
+    const content = Buffer.concat(chunks).toString()
+    const lines = content.split("\n")
 
-      stream.on("data", async (chunk: string | Buffer) => {
-        buffer += chunk.toString()
-        const lines = buffer.split("\n")
-        // Keep the last incomplete line in the buffer
-        buffer = lines.pop() || ""
-
-        const docs: any[] = []
-        for (const line of lines) {
-          if (line.trim()) {
-            try {
-              docs.push(JSON.parse(line))
-            } catch {
-              // skip malformed lines
-            }
-          }
+    const docs: any[] = []
+    for (const line of lines) {
+      if (!line.trim()) continue
+      try {
+        const parsed = JSON.parse(line)
+        // PouchDB dump format: batch lines have a "docs" array
+        if (Array.isArray(parsed.docs)) {
+          docs.push(...parsed.docs)
         }
-
-        if (docs.length > 0) {
-          try {
-            await this.bulkDocs(docs)
-          } catch (err) {
-            reject(err)
-            return
-          }
-        }
-      })
-
-      stream.on("end", async () => {
-        // Process any remaining data in the buffer
-        if (buffer.trim()) {
-          try {
-            const doc = JSON.parse(buffer)
-            await this.bulkDocs([doc])
-          } catch {
-            // skip malformed lines
-          }
-        }
-        resolve({ ok: true })
-      })
-
-      stream.on("error", reject)
-    })
+        // Skip metadata headers (have "version"/"db_info") and seq tracking
+      } catch {
+        // skip malformed lines
+      }
+    }
+    if (docs.length > 0) {
+      await this.bulkDocs(docs, { new_edits: false })
+    }
+    return { ok: true }
   }
 
   async createIndex(opts: DatabaseCreateIndexOpts) {

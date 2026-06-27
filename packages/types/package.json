@@ -15,7 +15,7 @@
     "check:types": "tsc -p tsconfig.json --noEmit --paths null"
   },
   "devDependencies": {
-    "nano": "11.0.3",
+    "nano": "11.0.5",
     "@types/json-schema": "^7.0.15",
     "@types/koa": "3.0.0",
     "@types/nodemailer": "8.0.0",

@@ -12324,10 +12324,10 @@ nan@2.22.0, nan@^2.19.0, nan@^2.23.0:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.22.0.tgz#31bc433fc33213c97bad36404bb68063de604de3"
   integrity sha512-nbajikzWTMwsW+eSsNm3QwlOs7het9gGJU5dDZzRTQGk03vyBOauxgI4VakDzE0PtsGTmXPsXTbbjVhRwR5mpw==
 
-nano@11.0.3:
-  version "11.0.3"
-  resolved "https://registry.yarnpkg.com/nano/-/nano-11.0.3.tgz#61dffb1133d9f844030550008964835098ccc8d2"
-  integrity sha512-bOiBWTW5sA92Rp2Tuu5LmujUe0rre5AAKuiXuhjD4tBAVRZRrKWK0AJyEYWFm9PN8TRktsbUfUdDb//c5Cr3Dg==
+nano@11.0.5:
+  version "11.0.5"
+  resolved "https://registry.yarnpkg.com/nano/-/nano-11.0.5.tgz#4a6e5fe3e6b7824e3fdd75b6b51fa9ae08680dba"
+  integrity sha512-yLYmFH7S33OWYPAG12wNqMR6l9hC3qOWLbr7hZPqKBVKO8BYhAaLlWENeJEpPY8Rm12lGvzKWBp8LGEgWhEqmw==
 
 nanoid@^3.3.11:
   version "3.3.11"
