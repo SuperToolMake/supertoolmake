@@ -59,8 +59,6 @@ class DevRevertProcessor extends queue.QueuedProcessor<DevRevertQueueData> {
       return { message: "Reverted changes successfully." }
     } catch (err) {
       throw new Error(`Unable to revert. ${err}`, { cause: err })
-    } finally {
-      await replication.close()
     }
   }
 }

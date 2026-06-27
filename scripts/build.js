@@ -107,7 +107,6 @@ async function runBuild(entry, outfile) {
       "mock-aws-s3",
       "nock",
       "bull",
-      "pouchdb",
       "bcrypt",
       "bcryptjs",
       "graphql/*",

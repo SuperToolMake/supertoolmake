@@ -1,25 +1,30 @@
 import { type Document, DocumentType } from "@supertoolmake/types"
-import PouchDB from "pouchdb"
 import { DesignDocuments, SEPARATOR, USER_METADATA_PREFIX } from "../constants"
-import { closePouchDB, getPouchDB } from "./couch"
+import { newid } from "../docIds/newid"
+import { directCouchCall, directCouchQuery } from "./couch"
+import { getDB } from "./db"
 
-const _PouchDB = PouchDB // Keep Prettier from removing import
+const FILTER_DESIGN_ID = `_design/${newid()}`
 
 enum ReplicationDirection {
   TO_PRODUCTION = "toProduction",
   TO_DEV = "toDev",
 }
 
-type DocumentWithID = Omit<Document, "_id"> & { _id: string }
+interface ReplicateOpts {
+  isCreation?: boolean
+  tablesToSync?: string[] | "all"
+  filter?: (doc: Document) => boolean
+}
 
 class Replication {
-  source: PouchDB.Database
-  target: PouchDB.Database
+  sourceName: string
+  targetName: string
   direction: ReplicationDirection | undefined
 
   constructor({ source, target }: { source: string; target: string }) {
-    this.source = getPouchDB(source)
-    this.target = getPouchDB(target)
+    this.sourceName = source
+    this.targetName = target
     if (
       source.startsWith(DocumentType.WORKSPACE_DEV) &&
       target.startsWith(DocumentType.WORKSPACE)
@@ -33,44 +38,12 @@ class Replication {
     }
   }
 
-  async close() {
-    await Promise.all([closePouchDB(this.source), closePouchDB(this.target)])
-  }
-
-  replicate(opts: PouchDB.Replication.ReplicateOptions = {}) {
-    return new Promise<PouchDB.Replication.ReplicationResult<{}>>((resolve) => {
-      this.source.replicate
-        .to(this.target, opts)
-        .on("denied", (err) => {
-          // a document failed to replicate (e.g. due to permissions)
-          throw new Error(`Denied: Document failed to replicate ${err}`)
-        })
-        .on("complete", (info) => resolve(info))
-        .on("error", (err) => {
-          throw err
-        })
-    })
-  }
-
-  appReplicateOpts(
-    opts: PouchDB.Replication.ReplicateOptions & {
-      isCreation?: boolean
-      tablesToSync?: string[] | "all"
-    } = {}
-  ): PouchDB.Replication.ReplicateOptions {
-    if (typeof opts.filter === "string") {
-      return opts
-    }
-
-    const filter = opts.filter
+  async replicate(opts: ReplicateOpts = {}) {
     const direction = this.direction
     const toDev = direction === ReplicationDirection.TO_DEV
-    delete opts.filter
-
     const isCreation = opts.isCreation
     const tablesToSync = opts.tablesToSync
-    delete opts.isCreation
-    delete opts.tablesToSync
+    const customFilter = opts.filter
 
     let syncAllTables = false,
       tableSyncList: string[] | undefined
@@ -80,60 +53,122 @@ class Replication {
       tableSyncList = tablesToSync
     }
 
-    const startsWithID = (_id: string, documentType: string) => {
-      return _id?.startsWith(documentType + SEPARATOR)
-    }
+    let filterFunction: string
+    if (customFilter) {
+      const filterBody = customFilter.toString().replace(/\n/g, " ").replace(/"/g, '\\"')
+      filterFunction = `function (doc, req) {
+        var fn = (${filterBody});
+        return fn(doc) ? 1 : 0;
+      }`
+    } else {
+      filterFunction = `function (doc, req) {
+        if (!req.query) { req.query = {}; }
+        var isCreation = req.query.isCreation === 'true';
+        var toDev = req.query.toDev === 'true';
+        var syncAllTables = req.query.syncAllTables === 'true';
+        var tableSyncList = req.query.tableSyncList ? req.query.tableSyncList.split(',') : [];
 
-    const isData = (_id: string) =>
-      startsWithID(_id, DocumentType.ROW) || startsWithID(_id, DocumentType.LINK)
+        function startsWithID(_id, documentType) {
+          return _id && _id.indexOf(documentType + '${SEPARATOR}') === 0;
+        }
 
-    return {
-      ...opts,
-      filter: (doc: DocumentWithID, params: any) => {
-        if (!isCreation && doc._id === DesignDocuments.MIGRATIONS) {
-          return false
+        function isData(_id) {
+          return startsWithID(_id, '${DocumentType.ROW}') || startsWithID(_id, '${DocumentType.LINK}');
         }
-        // don't sync design documents
-        if (toDev && doc._id.startsWith("_design")) {
-          return false
+
+        if (!isCreation && doc._id === '${DesignDocuments.MIGRATIONS}') {
+          return false;
         }
-        // always replicate deleted documents
+        if (toDev && doc._id.indexOf('_design') === 0) {
+          return false;
+        }
         if (doc._deleted) {
-          return true
+          return true;
         }
-        // always sync users from dev
-        if (startsWithID(doc._id, USER_METADATA_PREFIX)) {
-          return true
+        if (startsWithID(doc._id, '${USER_METADATA_PREFIX}')) {
+          return true;
         }
-        if (
-          direction === ReplicationDirection.TO_PRODUCTION &&
-          !isCreation &&
-          startsWithID(doc._id, DocumentType.AUTO_COLUMN_STATE)
-        ) {
-          return false
+        if ('${direction}' === '${ReplicationDirection.TO_PRODUCTION}' && !isCreation && startsWithID(doc._id, '${DocumentType.AUTO_COLUMN_STATE}')) {
+          return false;
         }
         if (isData(doc._id)) {
-          return Boolean(tableSyncList?.find((id) => doc._id.includes(id))) || syncAllTables
+          if (syncAllTables) { return true; }
+          for (var i = 0; i < tableSyncList.length; i++) {
+            if (doc._id.indexOf(tableSyncList[i]) !== -1) { return true; }
+          }
+          return false;
         }
-        if (startsWithID(doc._id, DocumentType.AUTOMATION_LOG)) {
-          return false
+        if (startsWithID(doc._id, '${DocumentType.AUTOMATION_LOG}')) {
+          return false;
         }
-        if (doc._id === DocumentType.WORKSPACE_METADATA) {
-          return false
+        if (doc._id === '${DocumentType.WORKSPACE_METADATA}') {
+          return false;
         }
-        return filter ? filter(doc, params) : true
-      },
+        return true;
+      }`
+    }
+
+    const sourceDb = getDB(this.sourceName, { skip_setup: true })
+    try {
+      await sourceDb.put({
+        _id: FILTER_DESIGN_ID,
+        filters: {
+          replication: filterFunction,
+        },
+      } as any)
+    } catch (err: any) {
+      if (err.status !== 409) {
+        throw err
+      }
+      const existing = await sourceDb.get<any>(FILTER_DESIGN_ID)
+      await sourceDb.put({
+        _id: FILTER_DESIGN_ID,
+        _rev: existing._rev,
+        filters: {
+          replication: filterFunction,
+        },
+      } as any)
+    }
+
+    try {
+      const queryParams: Record<string, string> = {}
+      if (!customFilter) {
+        queryParams.isCreation = String(!!isCreation)
+        queryParams.toDev = String(!!toDev)
+        queryParams.syncAllTables = String(!!syncAllTables)
+        if (tableSyncList) {
+          queryParams.tableSyncList = tableSyncList.join(",")
+        }
+      }
+
+      const replicateBody: any = {
+        source: this.sourceName,
+        target: this.targetName,
+        filter: `${FILTER_DESIGN_ID}/replication`,
+        query_params: queryParams,
+        create_target: true,
+      }
+
+      const response = await directCouchCall("_replicate", "POST", replicateBody)
+      const result = await response.json()
+
+      if (result.history?.find((h: any) => h.errors && h.errors.length > 0)) {
+        throw new Error(`Replication failed: ${JSON.stringify(result.history)}`)
+      }
+
+      return result
+    } finally {
+      try {
+        const existing = await sourceDb.get<any>(FILTER_DESIGN_ID)
+        await sourceDb.remove(FILTER_DESIGN_ID, existing._rev)
+      } catch {}
     }
   }
 
-  /**
-   * Rollback the target DB back to the state of the source DB
-   */
   async rollback() {
-    await this.target.destroy()
-    // Recreate the DB again
-    this.target = getPouchDB(this.target.name)
-    // take the opportunity to remove deleted tombstones
+    const targetDb = getDB(this.targetName, { skip_setup: true })
+    await targetDb.destroy()
+    await directCouchQuery(`/${this.targetName}`, "PUT")
     await this.replicate()
   }
 }

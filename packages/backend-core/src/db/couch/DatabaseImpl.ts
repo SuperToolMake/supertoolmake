@@ -5,6 +5,7 @@ import {
   type Database,
   type DatabaseCreateIndexOpts,
   type DatabaseDeleteIndexOpts,
+  type DatabaseDumpOpts,
   type DatabaseOpts,
   type DatabasePutOpts,
   type DatabaseQueryOpts,
@@ -19,7 +20,6 @@ import { newid } from "../../docIds/newid"
 import { checkSlashesInUrl } from "../../helpers"
 import { DDInstrumentedDatabase } from "../instrumentation"
 import { getCouchInfo } from "./connections"
-import { getPouchDB } from "./pouchDB"
 import { directCouchUrlCall } from "./utils"
 
 const DATABASE_NOT_FOUND = "Database does not exist."
@@ -438,27 +438,103 @@ export class CouchDatabase implements Database {
     })
   }
 
-  // All below functions are in-frequently called, just utilise PouchDB
-  // for them as it implements them better than we can
-  async dump(stream: WriteStream, opts?: { filter?: any }) {
-    const pouch = getPouchDB(this.name)
-    // @ts-expect-error
-    return pouch.dump(stream, opts)
+  async dump(stream: WriteStream, opts?: DatabaseDumpOpts) {
+    const batchSize = opts?.batch_size || 1000
+    let startKey = ""
+    let hasMore = true
+
+    const filterFn = opts?.filter
+
+    while (hasMore) {
+      const params: DocumentListParams = {
+        include_docs: true,
+        limit: batchSize,
+        startkey: startKey || undefined,
+      }
+
+      const response = await this.allDocs(params)
+      const rows = response.rows || []
+
+      if (rows.length === 0) {
+        hasMore = false
+        break
+      }
+
+      for (const row of rows) {
+        const doc = row.doc as any
+        if (doc && (!filterFn || filterFn(doc))) {
+          stream.write(`${JSON.stringify(doc)}\n`)
+        }
+        startKey = row.key as string
+      }
+
+      if (rows.length < batchSize) {
+        hasMore = false
+      }
+    }
+
+    stream.end()
   }
 
   async load(stream: ReadStream) {
-    const pouch = getPouchDB(this.name)
-    // @ts-expect-error
-    return pouch.load(stream)
+    return new Promise<{ ok: boolean }>((resolve, reject) => {
+      let buffer = ""
+
+      stream.on("data", async (chunk: string | Buffer) => {
+        buffer += chunk.toString()
+        const lines = buffer.split("\n")
+        // Keep the last incomplete line in the buffer
+        buffer = lines.pop() || ""
+
+        const docs: any[] = []
+        for (const line of lines) {
+          if (line.trim()) {
+            try {
+              docs.push(JSON.parse(line))
+            } catch {
+              // skip malformed lines
+            }
+          }
+        }
+
+        if (docs.length > 0) {
+          try {
+            await this.bulkDocs(docs)
+          } catch (err) {
+            reject(err)
+            return
+          }
+        }
+      })
+
+      stream.on("end", async () => {
+        // Process any remaining data in the buffer
+        if (buffer.trim()) {
+          try {
+            const doc = JSON.parse(buffer)
+            await this.bulkDocs([doc])
+          } catch {
+            // skip malformed lines
+          }
+        }
+        resolve({ ok: true })
+      })
+
+      stream.on("error", reject)
+    })
   }
 
   async createIndex(opts: DatabaseCreateIndexOpts) {
-    const pouch = getPouchDB(this.name)
-    return pouch.createIndex(opts)
+    return this.performCall((db) => {
+      return () => db.createIndex(opts)
+    })
   }
 
   async deleteIndex(opts: DatabaseDeleteIndexOpts) {
-    const pouch = getPouchDB(this.name)
-    return pouch.deleteIndex(opts)
+    await directCouchUrlCall({
+      url: `${this.couchInfo.url}/${this.name}/_index/${opts.ddoc}/${opts.name}`,
+      method: "DELETE",
+      cookie: this.couchInfo.cookie,
+    })
   }
 }

@@ -190,125 +190,115 @@ export const publishWorkspaceInternal = async (ctx: PublishContext) => {
 
   try {
     const publish = async () => {
-      let replication
-      try {
-        const devId = dbCore.getDevWorkspaceID(appId)
-        const prodId = dbCore.getProdWorkspaceID(appId)
+      const devId = dbCore.getDevWorkspaceID(appId)
+      const prodId = dbCore.getProdWorkspaceID(appId)
 
-        if (!(await sdk.workspaces.isWorkspacePublished(prodId))) {
-          const allWorkspaceApps = await sdk.workspaceApps.fetch()
-          for (const workspaceApp of allWorkspaceApps) {
-            if (workspaceApp.disabled !== undefined) {
-              continue
-            }
-
-            await sdk.workspaceApps.update({ ...workspaceApp, disabled: true })
+      if (!(await sdk.workspaces.isWorkspacePublished(prodId))) {
+        const allWorkspaceApps = await sdk.workspaceApps.fetch()
+        for (const workspaceApp of allWorkspaceApps) {
+          if (workspaceApp.disabled !== undefined) {
+            continue
           }
-        }
 
-        const isPublished = await sdk.workspaces.isWorkspacePublished(prodId)
-        const config = {
-          source: devId,
-          target: prodId,
-        }
-        replication = new dbCore.Replication(config)
-        const devDb = context.getDevWorkspaceDB()
-
-        await devDb.compact()
-        await replication.replicate(
-          replication.appReplicateOpts({
-            isCreation: !isPublished,
-            tablesToSync,
-            checkpoint: false,
-          })
-        )
-
-        const updatedProdTables = await applyPendingColumnRenames(prodId)
-
-        // Keep development revs aligned with production after renaming, so the
-        // next publish doesn't see production ahead and delete / tombstone the doc.
-        if (updatedProdTables.length > 0) {
-          await context.doInWorkspaceContext(devId, async () => {
-            const devDb = context.getWorkspaceDB()
-            for (const prodTable of updatedProdTables) {
-              try {
-                const devTable = await devDb.tryGet<Table>(prodTable._id!)
-                if (!devTable) {
-                  console.warn(
-                    `Failed to get development table for table ${prodTable._id} when applying column renames`
-                  )
-                  continue
-                }
-
-                const prodRevNum = getRevisionNumber(prodTable._rev)
-                let devRevNum = getRevisionNumber(devTable._rev)
-
-                let docForPut: Table = {
-                  ...prodTable,
-                  _rev: devTable._rev,
-                }
-
-                // Bump dev revisions until dev is at least prod (avoids prod-ahead).
-                while (devRevNum < prodRevNum) {
-                  const res = await devDb.put(docForPut)
-                  docForPut = { ...docForPut, _rev: res.rev }
-                  devRevNum = getRevisionNumber(res.rev)
-                }
-
-                // Ensure final content is written with the latest dev rev (handles equal case).
-                await devDb.put(docForPut)
-              } catch (err) {
-                console.warn(
-                  `Failed to update development table with production table 
-                  revision when applying column renames for table ${prodTable._id}: ${err}`
-                )
-              }
-            }
-          })
-        }
-
-        await clearPendingColumnRenames(devId)
-
-        const db = context.getProdWorkspaceDB()
-        const appDoc = await sdk.workspaces.metadata.tryGet({
-          production: false,
-        })
-        if (!appDoc) {
-          throw new Error("Unable to publish - cannot retrieve development app metadata")
-        }
-        const prodAppDoc = await sdk.workspaces.metadata.tryGet({
-          production: true,
-        })
-        if (prodAppDoc) {
-          appDoc._rev = prodAppDoc._rev
-        } else {
-          delete appDoc._rev
-        }
-
-        deployment.appUrl = appDoc.url
-        appDoc.appId = prodId
-        appDoc.instance._id = prodId
-        const [workspaceApps, tables] = await Promise.all([
-          sdk.workspaceApps.fetch(),
-          sdk.tables.getAllInternalTables(),
-        ])
-        const workspaceAppIds = workspaceApps.map((app) => app._id!)
-        const tableIds = tables.map((table) => table._id!)
-        const fullMap = [...(workspaceAppIds ?? []), ...(tableIds ?? [])]
-        appDoc.resourcesPublishedAt = {
-          ...prodAppDoc?.resourcesPublishedAt,
-          ...Object.fromEntries(fullMap.map((id) => [id, new Date().toISOString()])),
-        }
-        delete appDoc.automationErrors
-        await db.put(appDoc)
-        await cache.workspace.invalidateWorkspaceMetadata(prodId)
-
-        return { app: appDoc, prodWorkspaceId: prodId }
-      } finally {
-        if (replication) {
-          await replication.close()
+          await sdk.workspaceApps.update({ ...workspaceApp, disabled: true })
         }
       }
+
+      const isPublished = await sdk.workspaces.isWorkspacePublished(prodId)
+      const config = {
+        source: devId,
+        target: prodId,
+      }
+      const replication = new dbCore.Replication(config)
+      const devDb = context.getDevWorkspaceDB()
+
+      await devDb.compact()
+      await replication.replicate({
+        isCreation: !isPublished,
+        tablesToSync,
+      })
+
+      const updatedProdTables = await applyPendingColumnRenames(prodId)
+
+      // Keep development revs aligned with production after renaming, so the
+      // next publish doesn't see production ahead and delete / tombstone the doc.
+      if (updatedProdTables.length > 0) {
+        await context.doInWorkspaceContext(devId, async () => {
+          const devDb = context.getWorkspaceDB()
+          for (const prodTable of updatedProdTables) {
+            try {
+              const devTable = await devDb.tryGet<Table>(prodTable._id!)
+              if (!devTable) {
+                console.warn(
+                  `Failed to get development table for table ${prodTable._id} when applying column renames`
+                )
+                continue
+              }
+
+              const prodRevNum = getRevisionNumber(prodTable._rev)
+              let devRevNum = getRevisionNumber(devTable._rev)
+
+              let docForPut: Table = {
+                ...prodTable,
+                _rev: devTable._rev,
+              }
+
+              // Bump dev revisions until dev is at least prod (avoids prod-ahead).
+              while (devRevNum < prodRevNum) {
+                const res = await devDb.put(docForPut)
+                docForPut = { ...docForPut, _rev: res.rev }
+                devRevNum = getRevisionNumber(res.rev)
+              }
+
+              // Ensure final content is written with the latest dev rev (handles equal case).
+              await devDb.put(docForPut)
+            } catch (err) {
+              console.warn(
+                `Failed to update development table with production table 
+                  revision when applying column renames for table ${prodTable._id}: ${err}`
+              )
+            }
+          }
+        })
+      }
+
+      await clearPendingColumnRenames(devId)
+
+      const db = context.getProdWorkspaceDB()
+      const appDoc = await sdk.workspaces.metadata.tryGet({
+        production: false,
+      })
+      if (!appDoc) {
+        throw new Error("Unable to publish - cannot retrieve development app metadata")
+      }
+      const prodAppDoc = await sdk.workspaces.metadata.tryGet({
+        production: true,
+      })
+      if (prodAppDoc) {
+        appDoc._rev = prodAppDoc._rev
+      } else {
+        delete appDoc._rev
+      }
+
+      deployment.appUrl = appDoc.url
+      appDoc.appId = prodId
+      appDoc.instance._id = prodId
+      const [workspaceApps, tables] = await Promise.all([
+        sdk.workspaceApps.fetch(),
+        sdk.tables.getAllInternalTables(),
+      ])
+      const workspaceAppIds = workspaceApps.map((app) => app._id!)
+      const tableIds = tables.map((table) => table._id!)
+      const fullMap = [...(workspaceAppIds ?? []), ...(tableIds ?? [])]
+      appDoc.resourcesPublishedAt = {
+        ...prodAppDoc?.resourcesPublishedAt,
+        ...Object.fromEntries(fullMap.map((id) => [id, new Date().toISOString()])),
+      }
+      delete appDoc.automationErrors
+      await db.put(appDoc)
+      await cache.workspace.invalidateWorkspaceMetadata(prodId)
+
+      return { app: appDoc, prodWorkspaceId: prodId }
     }
     await publish()
   } catch (error: unknown) {

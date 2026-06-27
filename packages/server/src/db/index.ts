@@ -2,9 +2,7 @@ import * as core from "@supertoolmake/backend-core"
 import env from "../environment"
 
 export function init() {
-  const dbConfig: any = {
-    replication: true,
-  }
+  const dbConfig: any = {}
 
   if (env.isTest() && !env.COUCH_DB_URL) {
     dbConfig.inMemory = true
