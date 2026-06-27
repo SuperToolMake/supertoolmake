@@ -352,9 +352,12 @@ export class CouchDatabase implements Database {
     params: DocumentListParams
   ): Promise<AllDocsResponse<T>> {
     return this.performCall((db) => {
+      const cleanParams = Object.fromEntries(
+        Object.entries(params).filter(([, value]) => value !== undefined)
+      ) as DocumentListParams
       return async () => {
         try {
-          return (await db.list(params)) as AllDocsResponse<T>
+          return (await db.list(cleanParams)) as AllDocsResponse<T>
         } catch (err: any) {
           if (err.reason === DATABASE_NOT_FOUND) {
             return {
@@ -443,7 +446,7 @@ export class CouchDatabase implements Database {
 
   async dump(stream: WriteStream, opts?: DatabaseDumpOpts) {
     const batchSize = opts?.batch_size || 1000
-    let startKey = ""
+    let startKey: string | undefined
     let hasMore = true
 
     const filterFn = opts?.filter
@@ -452,7 +455,8 @@ export class CouchDatabase implements Database {
       const params: DocumentListParams = {
         include_docs: true,
         limit: batchSize,
-        startkey: startKey || undefined,
+        startkey: startKey,
+        skip: startKey ? 1 : undefined,
       }
 
       const response = await this.allDocs(params)
@@ -488,21 +492,28 @@ export class CouchDatabase implements Database {
     const lines = content.split("\n")
 
     const docs: any[] = []
+    const pouchDumpDocs: any[] = []
     for (const line of lines) {
       if (!line.trim()) continue
       try {
         const parsed = JSON.parse(line)
         // PouchDB dump format: batch lines have a "docs" array
         if (Array.isArray(parsed.docs)) {
-          docs.push(...parsed.docs)
+          pouchDumpDocs.push(...parsed.docs)
+        } else if (parsed._id) {
+          const { _rev, ...doc } = parsed
+          docs.push(doc)
         }
         // Skip metadata headers (have "version"/"db_info") and seq tracking
       } catch {
         // skip malformed lines
       }
     }
+    if (pouchDumpDocs.length > 0) {
+      await this.bulkDocs(pouchDumpDocs, { new_edits: false })
+    }
     if (docs.length > 0) {
-      await this.bulkDocs(docs, { new_edits: false })
+      await this.bulkDocs(docs)
     }
     return { ok: true }
   }

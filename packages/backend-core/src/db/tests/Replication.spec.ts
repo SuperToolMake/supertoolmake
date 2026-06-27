@@ -183,6 +183,48 @@ describe("Replication", () => {
       expect(ids).not.toContain(`${DocumentType.ROLE}_user`)
     }, 30000)
 
+    it("does not remove existing target documents excluded by a custom filter", async () => {
+      const source = structures.db.id()
+      const target = structures.db.id()
+      await ensureDb(source)
+      await ensureDb(target)
+
+      await getDB(source).bulkDocs([
+        makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" }),
+        makeDoc(`${DocumentType.ROLE}_user`, { name: "user" }),
+      ])
+      await getDB(target).bulkDocs([
+        makeDoc(`${DocumentType.ROLE}_existing`, { name: "existing" }),
+        makeDoc(`${DocumentType.DATASOURCE}_existing`, { type: "postgres" }),
+      ])
+
+      const rep = new Replication({ source, target })
+      await rep.replicate({ filter: (doc: any) => doc._id.includes("admin") })
+
+      const ids = await getAllDocIds(target)
+      expect(ids).toContain(`${DocumentType.ROLE}_admin`)
+      expect(ids).toContain(`${DocumentType.ROLE}_existing`)
+      expect(ids).toContain(`${DocumentType.DATASOURCE}_existing`)
+      expect(ids).not.toContain(`${DocumentType.ROLE}_user`)
+    }, 30000)
+
+    it("cleans up temporary replication filter design documents", async () => {
+      const source = structures.db.id()
+      const target = structures.db.id()
+      await ensureDb(source)
+      await ensureDb(target)
+
+      await getDB(source).put(makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" }))
+
+      const rep = new Replication({ source, target })
+      await rep.replicate()
+
+      const sourceIds = await getAllDocIds(source)
+      const targetIds = await getAllDocIds(target)
+      expect(sourceIds.some((id: string) => id.startsWith("_design/replication_"))).toBe(false)
+      expect(targetIds.some((id: string) => id.startsWith("_design/replication_"))).toBe(false)
+    }, 30000)
+
     it("excludes design documents when replicating to dev (TO_DEV)", async () => {
       const source = `${DocumentType.WORKSPACE}_${structures.db.id()}`
       const target = `${DocumentType.WORKSPACE_DEV}_${structures.db.id()}`
