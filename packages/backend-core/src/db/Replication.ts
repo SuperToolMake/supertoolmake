@@ -1,7 +1,7 @@
 import { type Document, DocumentType } from "@supertoolmake/types"
 import { DesignDocuments, SEPARATOR, USER_METADATA_PREFIX } from "../constants"
 import { newid } from "../docIds/newid"
-import { directCouchCall, directCouchQuery, getCouchInfo } from "./couch"
+import { directCouchCall, directCouchQuery } from "./couch"
 import { getDB } from "./db"
 
 const FILTER_NAME = "replication"
@@ -27,6 +27,11 @@ type ReplicationResponse = {
   history?: Array<{
     errors?: unknown[]
   }>
+}
+
+type ReplicationErrorResponse = {
+  error?: string
+  reason?: string
 }
 
 type ReplicationBody = {
@@ -103,18 +108,23 @@ class Replication {
         queryParams.tableSyncList = tableSyncList.join(",")
       }
 
-      const { url, auth } = getCouchInfo()
-      const parsed = new URL(url)
-      const internalUrl = `http://${auth.username}:${auth.password}@${parsed.hostname}:5984`
       const replicateBody: ReplicationBody = {
-        source: `${internalUrl}/${this.sourceName}`,
-        target: `${internalUrl}/${this.targetName}`,
+        source: this.sourceName,
+        target: this.targetName,
         filter: `${filterDesignName}/${FILTER_NAME}`,
         query_params: queryParams,
         create_target: true,
       }
 
       const response = await directCouchCall("_replicate", "POST", replicateBody)
+      if (!response.ok) {
+        const error = (await response.json()) as ReplicationErrorResponse
+        throw new Error(
+          `Replication failed: ${error.error || response.status} - ${
+            error.reason || response.statusText
+          }`
+        )
+      }
       const result = (await response.json()) as ReplicationResponse
 
       if (result.history?.find((h) => h.errors && h.errors.length > 0)) {

@@ -48,6 +48,7 @@ services:
       - "${COUCH_DB_PORT}:5984"
     volumes:
       - couchdb_data:/data
+      - ./single/couch/10-docker-default.ini:/opt/couchdb/etc/local.d/10-docker-default.ini
 
   redis-service:
     container_name: super-tool-redis-dev

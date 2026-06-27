@@ -92,6 +92,9 @@ export default async function setup() {
           [httpd]
           socket_options = [{nodelay, true}]
 
+          [chttpd]
+          bind_address = 0.0.0.0
+
           [couchdb]
           single_node = true
 
@@ -129,7 +132,23 @@ export default async function setup() {
         Wait.forHttp("/minio/health/ready", 9000).withStartupTimeout(10000)
       )
 
-    await Promise.all([couchdb.start(), minio.start()])
+    const [startedCouchdb] = await Promise.all([couchdb.start(), minio.start()])
+    const couchPort = startedCouchdb.getMappedPort(5984)
+    const couchAuth = Buffer.from("budibase:budibase").toString("base64")
+    const response = await fetch(
+      `http://127.0.0.1:${couchPort}/_node/nonode@nohost/_config/chttpd/bind_address`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Basic ${couchAuth}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify("0.0.0.0"),
+      }
+    )
+    if (!response.ok) {
+      throw new Error("Unable to configure CouchDB bind address")
+    }
   } finally {
     lockfile.unlockSync(lockPath)
   }
