@@ -11,7 +11,7 @@ enum ReplicationDirection {
 interface ReplicateOpts {
   isCreation?: boolean
   tablesToSync?: string[] | "all"
-  filter?: (doc: Document) => boolean
+  filter?: (doc: Document) => boolean | undefined
 }
 
 class Replication {
@@ -97,7 +97,7 @@ class Replication {
     }
 
     if (customFilter) {
-      return customFilter(doc as Document)
+      return !!customFilter(doc as Document)
     }
 
     return true
