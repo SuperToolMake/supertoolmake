@@ -1,10 +1,7 @@
 import { type Document, DocumentType } from "@supertoolmake/types"
 import { DesignDocuments, SEPARATOR, USER_METADATA_PREFIX } from "../constants"
-import { newid } from "../docIds/newid"
-import { directCouchCall, directCouchQuery } from "./couch"
+import { directCouchCall, directCouchQuery, getCouchInfo } from "./couch"
 import { getDB } from "./db"
-
-const FILTER_DESIGN_ID = `_design/${newid()}`
 
 enum ReplicationDirection {
   TO_PRODUCTION = "toProduction",
@@ -38,6 +35,74 @@ class Replication {
     }
   }
 
+  private shouldKeepDoc(
+    doc: { _id: string; _deleted?: boolean },
+    opts: {
+      isCreation?: boolean
+      toDev: boolean
+      syncAllTables: boolean
+      tableSyncList?: string[]
+      customFilter?: (doc: Document) => boolean
+    }
+  ): boolean {
+    const { isCreation, toDev, syncAllTables, tableSyncList, customFilter } = opts
+    const toProduction = !toDev
+
+    const startsWithType = (id: string, docType: string) =>
+      id && id.indexOf(docType + SEPARATOR) === 0
+
+    const isData = (id: string) =>
+      startsWithType(id, DocumentType.ROW) || startsWithType(id, DocumentType.LINK)
+
+    if (doc._deleted) {
+      return true
+    }
+
+    if (!isCreation && doc._id === DesignDocuments.MIGRATIONS) {
+      return false
+    }
+
+    if (toDev && doc._id.indexOf("_design") === 0) {
+      return false
+    }
+
+    if (doc._id && doc._id.indexOf(USER_METADATA_PREFIX) === 0) {
+      return true
+    }
+
+    if (toProduction && !isCreation && startsWithType(doc._id, DocumentType.AUTO_COLUMN_STATE)) {
+      return false
+    }
+
+    if (isData(doc._id)) {
+      if (syncAllTables) {
+        return true
+      }
+      if (tableSyncList) {
+        for (const tableId of tableSyncList) {
+          if (doc._id.indexOf(tableId) !== -1) {
+            return true
+          }
+        }
+      }
+      return false
+    }
+
+    if (startsWithType(doc._id, DocumentType.AUTOMATION_LOG)) {
+      return false
+    }
+
+    if (doc._id === DocumentType.WORKSPACE_METADATA) {
+      return false
+    }
+
+    if (customFilter) {
+      return customFilter(doc as Document)
+    }
+
+    return true
+  }
+
   async replicate(opts: ReplicateOpts = {}) {
     const direction = this.direction
     const toDev = direction === ReplicationDirection.TO_DEV
@@ -53,115 +118,51 @@ class Replication {
       tableSyncList = tablesToSync
     }
 
-    let filterFunction: string
-    if (customFilter) {
-      const filterBody = customFilter.toString().replace(/\n/g, " ").replace(/"/g, '\\"')
-      filterFunction = `function (doc, req) {
-        var fn = (${filterBody});
-        return fn(doc) ? 1 : 0;
-      }`
-    } else {
-      filterFunction = `function (doc, req) {
-        if (!req.query) { req.query = {}; }
-        var isCreation = req.query.isCreation === 'true';
-        var toDev = req.query.toDev === 'true';
-        var syncAllTables = req.query.syncAllTables === 'true';
-        var tableSyncList = req.query.tableSyncList ? req.query.tableSyncList.split(',') : [];
-
-        function startsWithID(_id, documentType) {
-          return _id && _id.indexOf(documentType + '${SEPARATOR}') === 0;
-        }
-
-        function isData(_id) {
-          return startsWithID(_id, '${DocumentType.ROW}') || startsWithID(_id, '${DocumentType.LINK}');
-        }
-
-        if (!isCreation && doc._id === '${DesignDocuments.MIGRATIONS}') {
-          return false;
-        }
-        if (toDev && doc._id.indexOf('_design') === 0) {
-          return false;
-        }
-        if (doc._deleted) {
-          return true;
-        }
-        if (startsWithID(doc._id, '${USER_METADATA_PREFIX}')) {
-          return true;
-        }
-        if ('${direction}' === '${ReplicationDirection.TO_PRODUCTION}' && !isCreation && startsWithID(doc._id, '${DocumentType.AUTO_COLUMN_STATE}')) {
-          return false;
-        }
-        if (isData(doc._id)) {
-          if (syncAllTables) { return true; }
-          for (var i = 0; i < tableSyncList.length; i++) {
-            if (doc._id.indexOf(tableSyncList[i]) !== -1) { return true; }
-          }
-          return false;
-        }
-        if (startsWithID(doc._id, '${DocumentType.AUTOMATION_LOG}')) {
-          return false;
-        }
-        if (doc._id === '${DocumentType.WORKSPACE_METADATA}') {
-          return false;
-        }
-        return true;
-      }`
+    const { url, auth } = getCouchInfo()
+    const parsed = new URL(url)
+    const internalUrl = `http://${auth.username}:${auth.password}@${parsed.hostname}:5984`
+    const replicateBody: any = {
+      source: `${internalUrl}/${this.sourceName}`,
+      target: `${internalUrl}/${this.targetName}`,
+      create_target: true,
     }
 
-    const sourceDb = getDB(this.sourceName, { skip_setup: true })
-    try {
-      await sourceDb.put({
-        _id: FILTER_DESIGN_ID,
-        filters: {
-          replication: filterFunction,
-        },
-      } as any)
-    } catch (err: any) {
-      if (err.status !== 409) {
-        throw err
-      }
-      const existing = await sourceDb.get<any>(FILTER_DESIGN_ID)
-      await sourceDb.put({
-        _id: FILTER_DESIGN_ID,
-        _rev: existing._rev,
-        filters: {
-          replication: filterFunction,
-        },
-      } as any)
+    const response = await directCouchCall("_replicate", "POST", replicateBody)
+    const result = await response.json()
+
+    if (result.history?.find((h: any) => h.errors && h.errors.length > 0)) {
+      throw new Error(`Replication failed: ${JSON.stringify(result.history)}`)
     }
 
-    try {
-      const queryParams: Record<string, string> = {}
-      if (!customFilter) {
-        queryParams.isCreation = String(!!isCreation)
-        queryParams.toDev = String(!!toDev)
-        queryParams.syncAllTables = String(!!syncAllTables)
-        if (tableSyncList) {
-          queryParams.tableSyncList = tableSyncList.join(",")
-        }
+    const filterOpts = { isCreation, toDev, syncAllTables, tableSyncList, customFilter }
+    await this.cleanupTarget(filterOpts)
+
+    return result
+  }
+
+  private async cleanupTarget(opts: {
+    isCreation?: boolean
+    toDev: boolean
+    syncAllTables: boolean
+    tableSyncList?: string[]
+    customFilter?: (doc: Document) => boolean
+  }) {
+    const targetDb = getDB(this.targetName, { skip_setup: true })
+    const allDocs = await targetDb.allDocs({ include_docs: true })
+    const docsToDelete: { _id: string; _rev: string; _deleted: true }[] = []
+
+    for (const row of allDocs.rows) {
+      const doc = row.doc as any
+      if (!doc || !doc._id) {
+        continue
       }
-
-      const replicateBody: any = {
-        source: this.sourceName,
-        target: this.targetName,
-        filter: `${FILTER_DESIGN_ID}/replication`,
-        query_params: queryParams,
-        create_target: true,
+      if (!this.shouldKeepDoc(doc, opts)) {
+        docsToDelete.push({ _id: doc._id, _rev: doc._rev, _deleted: true })
       }
+    }
 
-      const response = await directCouchCall("_replicate", "POST", replicateBody)
-      const result = await response.json()
-
-      if (result.history?.find((h: any) => h.errors && h.errors.length > 0)) {
-        throw new Error(`Replication failed: ${JSON.stringify(result.history)}`)
-      }
-
-      return result
-    } finally {
-      try {
-        const existing = await sourceDb.get<any>(FILTER_DESIGN_ID)
-        await sourceDb.remove(FILTER_DESIGN_ID, existing._rev)
-      } catch {}
+    if (docsToDelete.length > 0) {
+      await targetDb.bulkDocs(docsToDelete)
     }
   }
 

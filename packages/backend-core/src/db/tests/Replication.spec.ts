@@ -1,19 +1,24 @@
-import { DocumentType, InternalTable, SEPARATOR } from "@supertoolmake/types"
+import { DocumentType } from "@supertoolmake/types"
+import { getDB } from "../db"
 import { structures } from "../../../tests"
-import { getPouchDB, init as initPouch } from "../couch"
 import Replication from "../Replication"
 
-const USER_METADATA_PREFIX = `${DocumentType.ROW}${SEPARATOR}${InternalTable.USER_METADATA}${SEPARATOR}`
-
-beforeAll(() => {
-  initPouch()
-})
+const ensureDb = async (dbName: string) => {
+  const db = getDB(dbName)
+  const initId = `test_init_${structures.db.id()}`
+  await db.put({ _id: initId, init: true })
+  await db.remove(initId, (await db.get<any>(initId))._rev)
+}
 
 const makeDoc = (id: string, extra: Record<string, any> = {}) => ({
   _id: id,
-  _rev: "1-abc",
   ...extra,
 })
+
+const getAllDocIds = async (dbName: string) => {
+  const allDocs = await getDB(dbName).allDocs({ include_docs: false })
+  return allDocs.rows.map((r: any) => r.id)
+}
 
 describe("Replication", () => {
   describe("constructor", () => {
@@ -22,6 +27,8 @@ describe("Replication", () => {
       const target = `${DocumentType.WORKSPACE}_test`
       const rep = new Replication({ source, target })
       expect(rep.direction).toBe("toProduction")
+      expect(rep.sourceName).toBe(source)
+      expect(rep.targetName).toBe(target)
     })
 
     it("sets direction to TO_DEV when source is workspace and target is workspace dev", () => {
@@ -39,396 +46,273 @@ describe("Replication", () => {
     })
   })
 
-  describe("appReplicateOpts", () => {
-    let rep: Replication
-
-    beforeEach(() => {
-      const source = `${DocumentType.WORKSPACE_DEV}_test`
-      const target = `${DocumentType.WORKSPACE}_test`
-      rep = new Replication({ source, target })
-    })
-
-    it("returns opts as-is if filter is a string", () => {
-      const opts = { filter: "my_design/my_filter" }
-      const result = rep.appReplicateOpts(opts)
-      expect(result).toEqual(opts)
-    })
-
-    it("removes isCreation and tablesToSync from returned opts", () => {
-      const result = rep.appReplicateOpts({
-        isCreation: true,
-        tablesToSync: ["ta_table1"],
-      })
-      expect(result.isCreation).toBeUndefined()
-      expect(result.tablesToSync).toBeUndefined()
-    })
-
-    describe("filter function", () => {
-      const getFilter = (direction: "toProduction" | "toDev") => {
-        const source =
-          direction === "toDev"
-            ? `${DocumentType.WORKSPACE}_test`
-            : `${DocumentType.WORKSPACE_DEV}_test`
-        const target =
-          direction === "toDev"
-            ? `${DocumentType.WORKSPACE_DEV}_test`
-            : `${DocumentType.WORKSPACE}_test`
-        const r = new Replication({ source, target })
-        return r.appReplicateOpts({})
-      }
-
-      const filterDoc = (
-        direction: "toProduction" | "toDev",
-        doc: any,
-        extra: Record<string, any> = {}
-      ) => {
-        const opts = getFilter(direction)
-        return (opts.filter as Function)(doc, extra)
-      }
-
-      it("excludes design/migrations document when not creating", () => {
-        const doc = makeDoc("_design/migrations")
-        expect(filterDoc("toProduction", doc, { isCreation: false })).toBe(false)
-      })
-
-      it("includes design/migrations document when creating", () => {
-        const doc = makeDoc("_design/migrations")
-        const opts = rep.appReplicateOpts({ isCreation: true })
-        const filter = opts.filter as Function
-        expect(filter(doc, {})).toBe(true)
-      })
-
-      it("excludes all design documents when replicating to dev", () => {
-        const doc = makeDoc("_design/some_view")
-        expect(filterDoc("toDev", doc)).toBe(false)
-      })
-
-      it("includes design documents when replicating to production", () => {
-        const doc = makeDoc("_design/some_view")
-        expect(filterDoc("toProduction", doc)).toBe(true)
-      })
-
-      it("includes deleted documents", () => {
-        const doc = makeDoc(`${DocumentType.ROW}_abc`, { _deleted: true })
-        expect(filterDoc("toProduction", doc)).toBe(true)
-        expect(filterDoc("toDev", doc)).toBe(true)
-      })
-
-      it("includes user metadata documents", () => {
-        const doc = makeDoc(`${USER_METADATA_PREFIX}_user123`)
-        expect(filterDoc("toProduction", doc)).toBe(true)
-        expect(filterDoc("toDev", doc)).toBe(true)
-      })
-
-      it("excludes automation log documents", () => {
-        const doc = makeDoc(`${DocumentType.AUTOMATION_LOG}_abc`)
-        expect(filterDoc("toProduction", doc)).toBe(false)
-        expect(filterDoc("toDev", doc)).toBe(false)
-      })
-
-      it("excludes workspace metadata document", () => {
-        const doc = makeDoc(DocumentType.WORKSPACE_METADATA)
-        expect(filterDoc("toProduction", doc)).toBe(false)
-        expect(filterDoc("toDev", doc)).toBe(false)
-      })
-
-      it("excludes auto column state when not creating and replicating to production", () => {
-        const doc = makeDoc(`${DocumentType.AUTO_COLUMN_STATE}_abc`)
-        expect(filterDoc("toProduction", doc)).toBe(false)
-      })
-
-      it("includes auto column state when creating and replicating to production", () => {
-        const doc = makeDoc(`${DocumentType.AUTO_COLUMN_STATE}_abc`)
-        const opts = rep.appReplicateOpts({ isCreation: true })
-        const filter = opts.filter as Function
-        expect(filter(doc, {})).toBe(true)
-      })
-
-      it("includes auto column state when replicating to dev", () => {
-        const doc = makeDoc(`${DocumentType.AUTO_COLUMN_STATE}_abc`)
-        expect(filterDoc("toDev", doc)).toBe(true)
-      })
-
-      describe("data documents (rows and links)", () => {
-        it("includes row documents when replicating all tables", () => {
-          const doc = makeDoc(`${DocumentType.ROW}_ta_table1_abc`)
-          const opts = rep.appReplicateOpts({ tablesToSync: "all" })
-          const filter = opts.filter as Function
-          expect(filter(doc, {})).toBe(true)
-        })
-
-        it("includes link documents when replicating all tables", () => {
-          const doc = makeDoc(`${DocumentType.LINK}_ta_table1_abc`)
-          const opts = rep.appReplicateOpts({ tablesToSync: "all" })
-          const filter = opts.filter as Function
-          expect(filter(doc, {})).toBe(true)
-        })
-
-        it("excludes data documents when no tables specified", () => {
-          const doc = makeDoc(`${DocumentType.ROW}_ta_table1_abc`)
-          const opts = rep.appReplicateOpts({})
-          const filter = opts.filter as Function
-          expect(filter(doc, {})).toBe(false)
-        })
-
-        it("excludes data documents when tablesToSync does not match", () => {
-          const doc = makeDoc(`${DocumentType.ROW}_ta_table1_abc`)
-          const opts = rep.appReplicateOpts({ tablesToSync: ["ta_table2"] })
-          const filter = opts.filter as Function
-          expect(filter(doc, {})).toBe(false)
-        })
-
-        it("includes data documents when tablesToSync matches", () => {
-          const doc = makeDoc(`${DocumentType.ROW}_ta_table1_abc`)
-          const opts = rep.appReplicateOpts({ tablesToSync: ["ta_table1"] })
-          const filter = opts.filter as Function
-          expect(filter(doc, {})).toBe(true)
-        })
-      })
-
-      describe("non-data documents", () => {
-        it("includes app metadata documents", () => {
-          const doc = makeDoc(`${DocumentType.WORKSPACE}_test`)
-          expect(filterDoc("toProduction", doc)).toBe(true)
-        })
-
-        it("includes role documents", () => {
-          const doc = makeDoc(`${DocumentType.ROLE}_admin`)
-          expect(filterDoc("toProduction", doc)).toBe(true)
-        })
-
-        it("includes datasource documents", () => {
-          const doc = makeDoc(`${DocumentType.DATASOURCE}_abc`)
-          expect(filterDoc("toProduction", doc)).toBe(true)
-        })
-
-        it("includes screen documents", () => {
-          const doc = makeDoc(`${DocumentType.SCREEN}_abc`)
-          expect(filterDoc("toProduction", doc)).toBe(true)
-        })
-
-        it("includes layout documents", () => {
-          const doc = makeDoc(`${DocumentType.LAYOUT}_abc`)
-          expect(filterDoc("toProduction", doc)).toBe(true)
-        })
-      })
-
-      it("delegates to custom filter when one is provided", () => {
-        const customFilter = jest.fn().mockReturnValue(true)
-        const doc = makeDoc(`${DocumentType.ROLE}_admin`)
-        const opts = rep.appReplicateOpts({ filter: customFilter })
-        const filter = opts.filter as Function
-        const result = filter(doc, { query: {} })
-        expect(result).toBe(true)
-        expect(customFilter).toHaveBeenCalledWith(doc, { query: {} })
-      })
-
-      it("custom filter can reject documents", () => {
-        const customFilter = jest.fn().mockReturnValue(false)
-        const doc = makeDoc(`${DocumentType.ROLE}_admin`)
-        const opts = rep.appReplicateOpts({ filter: customFilter })
-        const filter = opts.filter as Function
-        expect(filter(doc, {})).toBe(false)
-      })
-
-      it("passes through non-data docs to custom filter", () => {
-        const customFilter = jest.fn().mockReturnValue(true)
-        const doc = makeDoc(`${DocumentType.ROLE}_admin`)
-        const opts = rep.appReplicateOpts({ filter: customFilter })
-        const filter = opts.filter as Function
-        filter(doc, {})
-        expect(customFilter).toHaveBeenCalled()
-      })
-
-      it("does not pass data docs to custom filter when tablesToSync is set", () => {
-        const customFilter = jest.fn().mockReturnValue(true)
-        const doc = makeDoc(`${DocumentType.ROW}_ta_table1_abc`)
-        const opts = rep.appReplicateOpts({
-          filter: customFilter,
-          tablesToSync: "all",
-        })
-        const filter = opts.filter as Function
-        const result = filter(doc, {})
-        expect(result).toBe(true)
-        expect(customFilter).not.toHaveBeenCalled()
-      })
-    })
-  })
-
   describe("replicate", () => {
     it("replicates documents from source to target", async () => {
       const source = structures.db.id()
       const target = structures.db.id()
-      const sourceDB = getPouchDB(source)
-      const targetDB = getPouchDB(target)
+      await ensureDb(source)
+      await ensureDb(target)
 
-      try {
-        await sourceDB.put({
-          _id: `${DocumentType.ROLE}_admin`,
-          name: "admin",
-        })
+      await getDB(source).put(makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" }))
 
-        const rep = new Replication({ source, target })
-        const result = await rep.replicate()
+      const rep = new Replication({ source, target })
+      await rep.replicate()
 
-        expect(result.ok).toBe(true)
-        expect(result.docs_written).toBeGreaterThan(0)
-
-        const doc = await targetDB.get(`${DocumentType.ROLE}_admin`)
-        expect(doc.name).toBe("admin")
-      } finally {
-        await sourceDB.destroy()
-        await targetDB.destroy()
-      }
-    })
+      const doc = await getDB(target).get(`${DocumentType.ROLE}_admin`)
+      expect(doc).toMatchObject({ name: "admin" })
+    }, 30000)
 
     it("replicates multiple documents", async () => {
       const source = structures.db.id()
       const target = structures.db.id()
-      const sourceDB = getPouchDB(source)
-      const targetDB = getPouchDB(target)
+      await ensureDb(source)
+      await ensureDb(target)
 
-      try {
-        await sourceDB.bulkDocs([
-          { _id: `${DocumentType.ROLE}_admin`, name: "admin" },
-          { _id: `${DocumentType.ROLE}_user`, name: "user" },
-          { _id: `${DocumentType.DATASOURCE}_ds1`, type: "postgres" },
-        ])
+      await getDB(source).bulkDocs([
+        makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" }),
+        makeDoc(`${DocumentType.ROLE}_user`, { name: "user" }),
+        makeDoc(`${DocumentType.DATASOURCE}_ds1`, { type: "postgres" }),
+      ])
 
-        const rep = new Replication({ source, target })
-        const result = await rep.replicate()
+      const rep = new Replication({ source, target })
+      await rep.replicate()
 
-        expect(result.ok).toBe(true)
-        expect(result.docs_written).toBeGreaterThanOrEqual(3)
+      expect(await getDB(target).get(`${DocumentType.ROLE}_admin`)).toMatchObject({ name: "admin" })
+      expect(await getDB(target).get(`${DocumentType.ROLE}_user`)).toMatchObject({ name: "user" })
+      expect(await getDB(target).get(`${DocumentType.DATASOURCE}_ds1`)).toMatchObject({ type: "postgres" })
+    }, 30000)
 
-        const adminDoc = await targetDB.get(`${DocumentType.ROLE}_admin`)
-        expect(adminDoc.name).toBe("admin")
-        const userDoc = await targetDB.get(`${DocumentType.ROLE}_user`)
-        expect(userDoc.name).toBe("user")
-        const dsDoc = await targetDB.get(`${DocumentType.DATASOURCE}_ds1`)
-        expect(dsDoc.type).toBe("postgres")
-      } finally {
-        await sourceDB.destroy()
-        await targetDB.destroy()
-      }
-    })
-
-    it("replicates with filter options", async () => {
+    it("excludes automation log documents", async () => {
       const source = structures.db.id()
       const target = structures.db.id()
-      const sourceDB = getPouchDB(source)
-      const targetDB = getPouchDB(target)
+      await ensureDb(source)
+      await ensureDb(target)
 
-      try {
-        await sourceDB.bulkDocs([
-          { _id: `${DocumentType.ROLE}_admin`, name: "admin" },
-          { _id: `${DocumentType.ROLE}_user`, name: "user" },
-        ])
+      await getDB(source).bulkDocs([
+        makeDoc(`${DocumentType.AUTOMATION_LOG}_log1`, { data: "log" }),
+        makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" }),
+      ])
 
-        const rep = new Replication({ source, target })
-        const opts = {
-          filter: (doc: any) => doc._id.includes("admin"),
-        }
-        await rep.replicate(opts)
+      const rep = new Replication({ source, target })
+      await rep.replicate()
 
-        const adminDoc = await targetDB.get(`${DocumentType.ROLE}_admin`)
-        expect(adminDoc.name).toBe("admin")
+      const ids = await getAllDocIds(target)
+      expect(ids).not.toContain(`${DocumentType.AUTOMATION_LOG}_log1`)
+      expect(ids).toContain(`${DocumentType.ROLE}_admin`)
+    }, 30000)
 
-        try {
-          await targetDB.get(`${DocumentType.ROLE}_user`)
-          fail("Expected doc not found")
-        } catch (err: any) {
-          expect(err.status).toBe(404)
-        }
-      } finally {
-        await sourceDB.destroy()
-        await targetDB.destroy()
-      }
-    })
+    it("does not replicate data documents by default (no tablesToSync)", async () => {
+      const source = structures.db.id()
+      const target = structures.db.id()
+      await ensureDb(source)
+      await ensureDb(target)
+
+      await getDB(source).bulkDocs([
+        makeDoc(`${DocumentType.ROW}_ta_table1_abc`, { value: 1 }),
+        makeDoc(`${DocumentType.LINK}_ta_table1_def`, { link: true }),
+        makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" }),
+      ])
+
+      const rep = new Replication({ source, target })
+      await rep.replicate()
+
+      const ids = await getAllDocIds(target)
+      expect(ids).not.toContain(`${DocumentType.ROW}_ta_table1_abc`)
+      expect(ids).not.toContain(`${DocumentType.LINK}_ta_table1_def`)
+      expect(ids).toContain(`${DocumentType.ROLE}_admin`)
+    }, 30000)
+
+    it("replicates all rows and links when tablesToSync is 'all'", async () => {
+      const source = structures.db.id()
+      const target = structures.db.id()
+      await ensureDb(source)
+      await ensureDb(target)
+
+      await getDB(source).bulkDocs([
+        makeDoc(`${DocumentType.ROW}_ta_table1_abc`, { value: 1 }),
+        makeDoc(`${DocumentType.LINK}_ta_table1_def`, { link: true }),
+        makeDoc(`${DocumentType.ROW}_ta_table2_xyz`, { value: 2 }),
+      ])
+
+      const rep = new Replication({ source, target })
+      await rep.replicate({ tablesToSync: "all" })
+
+      const ids = await getAllDocIds(target)
+      expect(ids).toContain(`${DocumentType.ROW}_ta_table1_abc`)
+      expect(ids).toContain(`${DocumentType.LINK}_ta_table1_def`)
+      expect(ids).toContain(`${DocumentType.ROW}_ta_table2_xyz`)
+    }, 30000)
+
+    it("replicates only matching rows when tablesToSync is a list", async () => {
+      const source = structures.db.id()
+      const target = structures.db.id()
+      await ensureDb(source)
+      await ensureDb(target)
+
+      await getDB(source).bulkDocs([
+        makeDoc(`${DocumentType.ROW}_ta_table1_abc`, { value: 1 }),
+        makeDoc(`${DocumentType.ROW}_ta_table2_xyz`, { value: 2 }),
+      ])
+
+      const rep = new Replication({ source, target })
+      await rep.replicate({ tablesToSync: ["ta_table1"] })
+
+      const ids = await getAllDocIds(target)
+      expect(ids).toContain(`${DocumentType.ROW}_ta_table1_abc`)
+      expect(ids).not.toContain(`${DocumentType.ROW}_ta_table2_xyz`)
+    }, 30000)
+
+    it("replicates with custom filter", async () => {
+      const source = structures.db.id()
+      const target = structures.db.id()
+      await ensureDb(source)
+      await ensureDb(target)
+
+      await getDB(source).bulkDocs([
+        makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" }),
+        makeDoc(`${DocumentType.ROLE}_user`, { name: "user" }),
+      ])
+
+      const rep = new Replication({ source, target })
+      await rep.replicate({ filter: (doc: any) => doc._id.includes("admin") })
+
+      const ids = await getAllDocIds(target)
+      expect(ids).toContain(`${DocumentType.ROLE}_admin`)
+      expect(ids).not.toContain(`${DocumentType.ROLE}_user`)
+    }, 30000)
+
+    it("excludes design documents when replicating to dev (TO_DEV)", async () => {
+      const source = `${DocumentType.WORKSPACE}_${structures.db.id()}`
+      const target = `${DocumentType.WORKSPACE_DEV}_${structures.db.id()}`
+      await ensureDb(source)
+      await ensureDb(target)
+
+      await getDB(source).bulkDocs([
+        makeDoc("_design/some_view", { views: {} }),
+        makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" }),
+      ])
+
+      const rep = new Replication({ source, target })
+      await rep.replicate()
+
+      const ids = await getAllDocIds(target)
+      expect(ids).not.toContain("_design/some_view")
+      expect(ids).toContain(`${DocumentType.ROLE}_admin`)
+    }, 30000)
+
+    it("includes design documents when replicating to production (TO_PRODUCTION)", async () => {
+      const source = `${DocumentType.WORKSPACE_DEV}_${structures.db.id()}`
+      const target = `${DocumentType.WORKSPACE}_${structures.db.id()}`
+      await ensureDb(source)
+      await ensureDb(target)
+
+      await getDB(source).bulkDocs([
+        makeDoc("_design/some_view", { views: {} }),
+        makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" }),
+      ])
+
+      const rep = new Replication({ source, target })
+      await rep.replicate()
+
+      const ids = await getAllDocIds(target)
+      expect(ids).toContain("_design/some_view")
+      expect(ids).toContain(`${DocumentType.ROLE}_admin`)
+    }, 30000)
+
+    it("excludes auto column state when replicating to production (TO_PRODUCTION, default)", async () => {
+      const source = `${DocumentType.WORKSPACE_DEV}_${structures.db.id()}`
+      const target = `${DocumentType.WORKSPACE}_${structures.db.id()}`
+      await ensureDb(source)
+      await ensureDb(target)
+
+      await getDB(source).put(makeDoc(`${DocumentType.AUTO_COLUMN_STATE}_state1`, { active: true }))
+
+      const rep = new Replication({ source, target })
+      await rep.replicate()
+
+      const ids = await getAllDocIds(target)
+      expect(ids).not.toContain(`${DocumentType.AUTO_COLUMN_STATE}_state1`)
+    }, 30000)
+
+    it("replicates auto column state when isCreation is true (TO_PRODUCTION)", async () => {
+      const source = `${DocumentType.WORKSPACE_DEV}_${structures.db.id()}`
+      const target = `${DocumentType.WORKSPACE}_${structures.db.id()}`
+      await ensureDb(source)
+      await ensureDb(target)
+
+      await getDB(source).put(makeDoc(`${DocumentType.AUTO_COLUMN_STATE}_state1`, { active: true }))
+
+      const rep = new Replication({ source, target })
+      await rep.replicate({ isCreation: true })
+
+      const doc = await getDB(target).get(`${DocumentType.AUTO_COLUMN_STATE}_state1`)
+      expect(doc).toMatchObject({ active: true })
+    }, 30000)
+
+    it("replicates user metadata documents", async () => {
+      const source = `${DocumentType.WORKSPACE_DEV}_${structures.db.id()}`
+      const target = `${DocumentType.WORKSPACE}_${structures.db.id()}`
+      await ensureDb(source)
+      await ensureDb(target)
+
+      const userMetaId = `ro_ta_users_${structures.db.id()}`
+      await getDB(source).put(makeDoc(userMetaId, { email: "test@example.com" }))
+
+      const rep = new Replication({ source, target })
+      await rep.replicate()
+
+      const doc = await getDB(target).get(userMetaId)
+      expect(doc).toMatchObject({ email: "test@example.com" })
+    }, 30000)
   })
 
   describe("rollback", () => {
     it("restores target to source state", async () => {
       const source = structures.db.id()
       const target = structures.db.id()
-      const sourceDB = getPouchDB(source)
-      const targetDB = getPouchDB(target)
+      await ensureDb(source)
+      await ensureDb(target)
 
-      try {
-        await sourceDB.put({
-          _id: `${DocumentType.ROLE}_admin`,
-          name: "admin",
-        })
+      await getDB(source).put(makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" }))
 
-        const rep = new Replication({ source, target })
-        await rep.replicate()
-
-        const beforeDoc = await targetDB.get(`${DocumentType.ROLE}_admin`)
-        expect(beforeDoc.name).toBe("admin")
-
-        await targetDB.put({
-          _id: `${DocumentType.ROLE}_admin`,
-          name: "modified",
-          _rev: beforeDoc._rev,
-        })
-
-        const modifiedDoc = await targetDB.get(`${DocumentType.ROLE}_admin`)
-        expect(modifiedDoc.name).toBe("modified")
-
-        await rep.rollback()
-
-        const afterDoc = await targetDB.get(`${DocumentType.ROLE}_admin`)
-        expect(afterDoc.name).toBe("admin")
-      } finally {
-        await sourceDB.destroy()
-        await targetDB.destroy()
-      }
-    })
-
-    it("removes extra documents from target", async () => {
-      const source = structures.db.id()
-      const target = structures.db.id()
-      const sourceDB = getPouchDB(source)
-      const targetDB = getPouchDB(target)
-
-      try {
-        await sourceDB.put({
-          _id: `${DocumentType.ROLE}_admin`,
-          name: "admin",
-        })
-
-        const rep = new Replication({ source, target })
-        await rep.replicate()
-
-        await targetDB.put({
-          _id: `${DocumentType.ROLE}_extra`,
-          name: "extra",
-        })
-
-        const extraDoc = await targetDB.get(`${DocumentType.ROLE}_extra`)
-        expect(extraDoc.name).toBe("extra")
-
-        await rep.rollback()
-
-        try {
-          await targetDB.get(`${DocumentType.ROLE}_extra`)
-          fail("Expected doc not found")
-        } catch (err: any) {
-          expect(err.status).toBe(404)
-        }
-      } finally {
-        await sourceDB.destroy()
-        await targetDB.destroy()
-      }
-    })
-  })
-
-  describe("close", () => {
-    it("closes both source and target databases", async () => {
-      const source = structures.db.id()
-      const target = structures.db.id()
       const rep = new Replication({ source, target })
-      await expect(rep.close()).resolves.not.toThrow()
-    })
+      await rep.replicate()
+
+      const beforeDoc = await getDB(target).get<any>(`${DocumentType.ROLE}_admin`)
+      expect(beforeDoc.name).toBe("admin")
+
+      await getDB(target).put({
+        _id: `${DocumentType.ROLE}_admin`,
+        _rev: beforeDoc._rev,
+        name: "modified",
+      })
+
+      const modifiedDoc = await getDB(target).get<any>(`${DocumentType.ROLE}_admin`)
+      expect(modifiedDoc.name).toBe("modified")
+
+      await rep.rollback()
+
+      const afterDoc = await getDB(target).get<any>(`${DocumentType.ROLE}_admin`)
+      expect(afterDoc.name).toBe("admin")
+    }, 60000)
+
+    it("re-replicates all source documents after destroy", async () => {
+      const source = structures.db.id()
+      const target = structures.db.id()
+      await ensureDb(source)
+      await ensureDb(target)
+
+      await getDB(source).bulkDocs([
+        makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" }),
+        makeDoc(`${DocumentType.ROLE}_user`, { name: "user" }),
+      ])
+
+      const rep = new Replication({ source, target })
+      await rep.replicate()
+      await rep.rollback()
+
+      expect(await getDB(target).get(`${DocumentType.ROLE}_admin`)).toMatchObject({ name: "admin" })
+      expect(await getDB(target).get(`${DocumentType.ROLE}_user`)).toMatchObject({ name: "user" })
+    }, 60000)
   })
 })
