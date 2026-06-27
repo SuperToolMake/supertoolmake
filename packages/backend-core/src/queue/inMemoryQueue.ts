@@ -282,13 +282,11 @@ export class InMemoryQueue<T = any> implements Partial<Queue<T>> {
   }
 
   on(event: string, callback: (...args: any[]) => void): Queue {
-    // @ts-expect-error - this callback can be one of many types
     this._emitter.on(event, callback)
     return this as unknown as Queue
   }
 
   off(event: string, callback: (...args: any[]) => void): Queue {
-    // @ts-expect-error - this callback can be one of many types
     this._emitter.off(event, callback)
     return this as unknown as Queue
   }

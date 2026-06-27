@@ -9,7 +9,7 @@
     "@swc/core": "1.13.5",
     "@swc/jest": "0.2.39",
     "@types/jest": "30.0.0",
-    "@types/node": "22.18.0",
+    "@types/node": "25.5.0",
     "@types/proper-lockfile": "4.1.4",
     "audit-ci": "7.1.0",
     "esbuild": "0.28.1",

@@ -385,7 +385,7 @@ export const uploadExternalFile = async (ctx: Ctx) => {
   })
 
   const filePath = (file as BBUploadedFile).filepath
-  let buffer = await fs.promises.readFile(filePath)
+  let buffer: Buffer<ArrayBuffer> = await fs.promises.readFile(filePath)
   let uploadKey = key
 
   if (compress && (file as BBUploadedFile).mimetype?.startsWith("image/")) {
@@ -393,13 +393,15 @@ export const uploadExternalFile = async (ctx: Ctx) => {
     const image = sharp(buffer)
     const metadata = await image.metadata()
     if (!compress.maxWidth) {
-      buffer = (await image.avif({ quality }).toBuffer()) as Buffer
+      buffer = Buffer.from(await image.avif({ quality }).toBuffer())
     }
     if (metadata.width && metadata.width > compress.maxWidth) {
-      buffer = (await image
-        .resize(compress.maxWidth, null, { withoutEnlargement: true })
-        .avif({ quality })
-        .toBuffer()) as Buffer
+      buffer = Buffer.from(
+        await image
+          .resize(compress.maxWidth, null, { withoutEnlargement: true })
+          .avif({ quality })
+          .toBuffer()
+      )
     }
     uploadKey = key.replace(/\.[^.]+$/, ".avif")
   }
