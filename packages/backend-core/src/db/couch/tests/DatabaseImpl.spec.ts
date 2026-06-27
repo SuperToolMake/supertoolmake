@@ -180,7 +180,10 @@ describe("DatabaseImpl", () => {
   })
 
   describe("dump", () => {
-    async function collectDump(database: CouchDatabase, opts?: Parameters<CouchDatabase["dump"]>[1]) {
+    async function collectDump(
+      database: CouchDatabase,
+      opts?: Parameters<CouchDatabase["dump"]>[1]
+    ) {
       const chunks: string[] = []
       const stream = new Writable({
         write(chunk, _encoding, callback) {
