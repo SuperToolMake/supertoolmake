@@ -53,8 +53,3 @@ export * from "./constants"
 export * from "./errors"
 // expose warning classes directly
 export * from "./warnings"
-
-// expose package init function
-export const init = (_opts: any = {}) => {
-  // PouchDB removed — no initialization needed
-}

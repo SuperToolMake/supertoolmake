@@ -1,6 +1,3 @@
-import * as db from "../../db"
-
-db.init()
 mockAuthWithNoCookie()
 mockWorker()
 

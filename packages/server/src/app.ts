@@ -1,7 +1,3 @@
-import * as db from "./db"
-
-db.init()
-
 import { env as coreEnv } from "@supertoolmake/backend-core"
 import { ServiceType } from "@supertoolmake/types"
 

@@ -1,8 +1,5 @@
-import * as dbConfig from "../db"
 import env from "../environment"
 import * as controllers from "./controllers"
-
-dbConfig.init()
 
 import type http from "node:http"
 import {
