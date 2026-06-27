@@ -11,6 +11,7 @@ import {
   type CsvToJsonRequest,
   type CsvToJsonResponse,
   type DeleteTableResponse,
+  type Document,
   DocumentType,
   type FetchTablesResponse,
   FieldType,
@@ -273,7 +274,7 @@ export async function publish(ctx: UserCtx<PublishTableRequest, PublishTableResp
         _id.lastIndexOf(tableSuffix) === _id.length - tableSuffix.length ||
         _id.indexOf(tableSegment) !== -1;
     `
-  ) as (doc: any) => boolean
+  ) as (doc: Document) => boolean
 
   await replication.replicate({
     tablesToSync: undefined,

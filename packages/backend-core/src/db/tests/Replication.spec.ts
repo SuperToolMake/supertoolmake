@@ -1,23 +1,29 @@
-import { DocumentType } from "@supertoolmake/types"
+import { type Document, DocumentType, type RowValue } from "@supertoolmake/types"
 import { structures } from "../../../tests"
 import { getDB } from "../db"
 import Replication from "../Replication"
+
+type TestDocument = Document & Record<string, unknown>
+type NamedDocument = Document & { name: string }
+type ReplicationFilterDoc = Document & { filters: Record<string, string> }
+
+const adminFilter = (doc: Document) => Boolean(doc._id && doc._id.includes("admin"))
 
 const ensureDb = async (dbName: string) => {
   const db = getDB(dbName)
   const initId = `test_init_${structures.db.id()}`
   await db.put({ _id: initId, init: true })
-  await db.remove(initId, (await db.get<any>(initId))._rev)
+  await db.remove(initId, (await db.get<Document>(initId))._rev)
 }
 
-const makeDoc = (id: string, extra: Record<string, any> = {}) => ({
+const makeDoc = (id: string, extra: Record<string, unknown> = {}): TestDocument => ({
   _id: id,
   ...extra,
 })
 
 const getAllDocIds = async (dbName: string) => {
-  const allDocs = await getDB(dbName).allDocs({ include_docs: false })
-  return allDocs.rows.map((r: any) => r.id)
+  const allDocs = await getDB(dbName).allDocs<RowValue>({ include_docs: false })
+  return allDocs.rows.map((row) => row.id)
 }
 
 describe("Replication", () => {
@@ -176,7 +182,7 @@ describe("Replication", () => {
       ])
 
       const rep = new Replication({ source, target })
-      await rep.replicate({ filter: (doc: any) => doc._id.includes("admin") })
+      await rep.replicate({ filter: adminFilter })
 
       const ids = await getAllDocIds(target)
       expect(ids).toContain(`${DocumentType.ROLE}_admin`)
@@ -199,13 +205,36 @@ describe("Replication", () => {
       ])
 
       const rep = new Replication({ source, target })
-      await rep.replicate({ filter: (doc: any) => doc._id.includes("admin") })
+      await rep.replicate({ filter: adminFilter })
 
       const ids = await getAllDocIds(target)
       expect(ids).toContain(`${DocumentType.ROLE}_admin`)
       expect(ids).toContain(`${DocumentType.ROLE}_existing`)
       expect(ids).toContain(`${DocumentType.DATASOURCE}_existing`)
       expect(ids).not.toContain(`${DocumentType.ROLE}_user`)
+    }, 30000)
+
+    it("reuses a stable replication filter design document", async () => {
+      const source = structures.db.id()
+      const target = structures.db.id()
+      await ensureDb(source)
+      await ensureDb(target)
+
+      await getDB(source).put(makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" }))
+
+      const rep = new Replication({ source, target })
+      await rep.replicate()
+      const firstFilterDoc = await getDB(source).get<ReplicationFilterDoc>(
+        "_design/super_replication"
+      )
+      await rep.replicate()
+      const secondFilterDoc = await getDB(source).get<ReplicationFilterDoc>(
+        "_design/super_replication"
+      )
+
+      const targetIds = await getAllDocIds(target)
+      expect(secondFilterDoc._rev).toEqual(firstFilterDoc._rev)
+      expect(targetIds).not.toContain("_design/super_replication")
     }, 30000)
 
     it("cleans up temporary replication filter design documents", async () => {
@@ -217,7 +246,7 @@ describe("Replication", () => {
       await getDB(source).put(makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" }))
 
       const rep = new Replication({ source, target })
-      await rep.replicate()
+      await rep.replicate({ filter: adminFilter })
 
       const sourceIds = await getAllDocIds(source)
       const targetIds = await getAllDocIds(target)
@@ -322,7 +351,7 @@ describe("Replication", () => {
       const rep = new Replication({ source, target })
       await rep.replicate()
 
-      const beforeDoc = await getDB(target).get<any>(`${DocumentType.ROLE}_admin`)
+      const beforeDoc = await getDB(target).get<NamedDocument>(`${DocumentType.ROLE}_admin`)
       expect(beforeDoc.name).toBe("admin")
 
       await getDB(target).put({
@@ -331,12 +360,12 @@ describe("Replication", () => {
         name: "modified",
       })
 
-      const modifiedDoc = await getDB(target).get<any>(`${DocumentType.ROLE}_admin`)
+      const modifiedDoc = await getDB(target).get<NamedDocument>(`${DocumentType.ROLE}_admin`)
       expect(modifiedDoc.name).toBe("modified")
 
       await rep.rollback()
 
-      const afterDoc = await getDB(target).get<any>(`${DocumentType.ROLE}_admin`)
+      const afterDoc = await getDB(target).get<NamedDocument>(`${DocumentType.ROLE}_admin`)
       expect(afterDoc.name).toBe("admin")
     }, 60000)
 

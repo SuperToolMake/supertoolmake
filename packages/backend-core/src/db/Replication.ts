@@ -5,6 +5,8 @@ import { directCouchCall, directCouchQuery, getCouchInfo } from "./couch"
 import { getDB } from "./db"
 
 const FILTER_NAME = "replication"
+const FILTER_DESIGN_NAME = "super_replication"
+const FILTER_DESIGN_ID = `_design/${FILTER_DESIGN_NAME}`
 
 enum ReplicationDirection {
   TO_PRODUCTION = "toProduction",
@@ -15,6 +17,34 @@ interface ReplicateOpts {
   isCreation?: boolean
   tablesToSync?: string[] | "all"
   filter?: (doc: Document) => boolean | undefined
+}
+
+type ReplicationFilterDoc = Document & {
+  filters: Record<string, string>
+}
+
+type ReplicationResponse = {
+  history?: Array<{
+    errors?: unknown[]
+  }>
+}
+
+type ReplicationBody = {
+  source: string
+  target: string
+  filter: string
+  query_params: Record<string, string>
+  create_target: boolean
+}
+
+function isNotFoundError(err: unknown) {
+  return (
+    typeof err === "object" &&
+    err !== null &&
+    ("status" in err || "statusCode" in err) &&
+    ((err as { status?: unknown }).status === 404 ||
+      (err as { statusCode?: unknown }).statusCode === 404)
+  )
 }
 
 class Replication {
@@ -53,19 +83,15 @@ class Replication {
       tableSyncList = tablesToSync
     }
 
-    const filterDesignName = `replication_${newid()}`
-    const filterDesignId = `_design/${filterDesignName}`
+    const filterDesignName = customFilter ? `replication_${newid()}` : FILTER_DESIGN_NAME
+    const filterDesignId = customFilter ? `_design/${filterDesignName}` : FILTER_DESIGN_ID
     const sourceDb = getDB(this.sourceName, { skip_setup: true })
+    const filterFunction = this.buildFilterFunction({
+      filterDesignId,
+      customFilter,
+    })
 
-    await sourceDb.put({
-      _id: filterDesignId,
-      filters: {
-        [FILTER_NAME]: this.buildFilterFunction({
-          filterDesignId,
-          customFilter,
-        }),
-      },
-    } as any)
+    await this.ensureFilter(sourceDb, filterDesignId, filterFunction)
 
     try {
       const queryParams: Record<string, string> = {
@@ -80,7 +106,7 @@ class Replication {
       const { url, auth } = getCouchInfo()
       const parsed = new URL(url)
       const internalUrl = `http://${auth.username}:${auth.password}@${parsed.hostname}:5984`
-      const replicateBody: any = {
+      const replicateBody: ReplicationBody = {
         source: `${internalUrl}/${this.sourceName}`,
         target: `${internalUrl}/${this.targetName}`,
         filter: `${filterDesignName}/${FILTER_NAME}`,
@@ -89,18 +115,48 @@ class Replication {
       }
 
       const response = await directCouchCall("_replicate", "POST", replicateBody)
-      const result = await response.json()
+      const result = (await response.json()) as ReplicationResponse
 
-      if (result.history?.find((h: any) => h.errors && h.errors.length > 0)) {
+      if (result.history?.find((h) => h.errors && h.errors.length > 0)) {
         throw new Error(`Replication failed: ${JSON.stringify(result.history)}`)
       }
 
       return result
     } finally {
-      try {
-        const existing = await sourceDb.get<any>(filterDesignId)
-        await sourceDb.remove(filterDesignId, existing._rev)
-      } catch {}
+      if (customFilter) {
+        try {
+          const existing = await sourceDb.get<ReplicationFilterDoc>(filterDesignId)
+          await sourceDb.remove(filterDesignId, existing._rev)
+        } catch {}
+      }
+    }
+  }
+
+  private async ensureFilter(
+    sourceDb: ReturnType<typeof getDB>,
+    filterDesignId: string,
+    filterFunction: string
+  ) {
+    const doc = {
+      _id: filterDesignId,
+      filters: {
+        [FILTER_NAME]: filterFunction,
+      },
+    } satisfies ReplicationFilterDoc
+    try {
+      const existing = await sourceDb.get<ReplicationFilterDoc>(filterDesignId)
+      if (existing.filters?.[FILTER_NAME] === filterFunction) {
+        return
+      }
+      await sourceDb.put({
+        ...doc,
+        _rev: existing._rev,
+      })
+    } catch (err: unknown) {
+      if (!isNotFoundError(err)) {
+        throw err
+      }
+      await sourceDb.put(doc)
     }
   }
 

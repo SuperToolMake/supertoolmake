@@ -210,9 +210,7 @@ export const publishWorkspaceInternal = async (ctx: PublishContext) => {
         target: prodId,
       }
       const replication = new dbCore.Replication(config)
-      const devDb = context.getDevWorkspaceDB()
 
-      await devDb.compact()
       await replication.replicate({
         isCreation: !isPublished,
         tablesToSync,
