@@ -381,5 +381,21 @@ describe("Replication", () => {
       expect(await getDB(target).get(`${DocumentType.ROLE}_admin`)).toMatchObject({ name: "admin" })
       expect(await getDB(target).get(`${DocumentType.ROLE}_user`)).toMatchObject({ name: "user" })
     }, 60000)
+
+    it("replicates workspace metadata during rollback", async () => {
+      const source = structures.db.id()
+      const target = structures.db.id()
+      await ensureDb(source)
+      await ensureDb(target)
+
+      await getDB(source).put(makeDoc(DocumentType.WORKSPACE_METADATA, { appId: source }))
+
+      const rep = new Replication({ source, target })
+      await rep.rollback()
+
+      expect(await getDB(target).get(DocumentType.WORKSPACE_METADATA)).toMatchObject({
+        appId: source,
+      })
+    }, 60000)
   })
 })

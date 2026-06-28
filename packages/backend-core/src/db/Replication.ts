@@ -13,6 +13,7 @@ interface ReplicateOpts {
   isCreation?: boolean
   tablesToSync?: string[] | "all"
   filter?: (doc: Document) => boolean | undefined
+  useAppFilters?: boolean
 }
 
 type ReplicationResponse = {
@@ -121,10 +122,7 @@ class Replication {
         continue
       }
 
-      const filteredChanges = results.filter((change) => {
-        const doc = change.doc || ({ _id: change.id, _deleted: change.deleted } as Document)
-        return this.shouldReplicateDoc(doc, opts)
-      })
+      const filteredChanges = results.filter((change) => this.shouldReplicateChange(change, opts))
       const revsDiff = await this.getMissingRevisions(filteredChanges)
       const docs = await this.getMissingDocs(revsDiff)
 
@@ -225,6 +223,17 @@ class Replication {
     return readJson<BulkDocsResponse>(response)
   }
 
+  private shouldReplicateChange(
+    change: NonNullable<ChangesResponse["results"]>[number],
+    opts: ReplicateOpts
+  ) {
+    const doc = change.doc || ({ _id: change.id, _deleted: change.deleted } as Document)
+    if (opts.useAppFilters === false) {
+      return Boolean(doc._id)
+    }
+    return this.shouldReplicateDoc(doc, opts)
+  }
+
   private shouldReplicateDoc(doc: Document, opts: ReplicateOpts) {
     if (!doc?._id) {
       return false
@@ -282,7 +291,7 @@ class Replication {
       await throwReplicationError(response, "target deletion")
     }
     await this.ensureTarget()
-    await this.replicate()
+    await this.replicate({ useAppFilters: false })
   }
 }
 
