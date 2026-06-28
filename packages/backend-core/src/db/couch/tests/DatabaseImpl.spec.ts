@@ -229,6 +229,28 @@ describe("DatabaseImpl", () => {
 
       expect(docs.map((doc) => doc._id)).toEqual(["dump_filter_1", "dump_filter_3"])
     })
+
+    it("waits for the dump stream to finish before resolving", async () => {
+      const dumpDb = new CouchDatabase(structures.db.id())
+      await dumpDb.bulkDocs([{ _id: "dump_finish_doc", value: 1 }])
+
+      let finalised = false
+      const stream = new Writable({
+        write(_chunk, _encoding, callback) {
+          callback()
+        },
+        final(callback) {
+          setTimeout(() => {
+            finalised = true
+            callback()
+          }, 10)
+        },
+      })
+
+      await dumpDb.dump(stream as any)
+
+      expect(finalised).toBe(true)
+    })
   })
 
   describe("load", () => {
@@ -255,6 +277,31 @@ describe("DatabaseImpl", () => {
       })
     })
 
+    it("preserves timestamps from JSON-lines document dumps", async () => {
+      const loadDb = new CouchDatabase(structures.db.id())
+      const createdAt = "2023-01-01T00:00:00.000Z"
+      const updatedAt = "2023-01-02T00:00:00.000Z"
+      tk.travel(new Date("2024-01-01T00:00:00.000Z"))
+      const stream = Readable.from(
+        JSON.stringify({
+          _id: "load_timestamp_doc",
+          _rev: "1-source",
+          createdAt,
+          updatedAt,
+          value: 1,
+        })
+      )
+
+      await loadDb.load(stream as any)
+
+      expect(await loadDb.get("load_timestamp_doc")).toMatchObject({
+        _id: "load_timestamp_doc",
+        createdAt,
+        updatedAt,
+        value: 1,
+      })
+    })
+
     it("loads PouchDB batch dumps", async () => {
       const loadDb = new CouchDatabase(structures.db.id())
       const stream = Readable.from(
@@ -277,6 +324,39 @@ describe("DatabaseImpl", () => {
 
       expect(await loadDb.get("load_pouch_doc_1")).toMatchObject({
         _id: "load_pouch_doc_1",
+        value: 1,
+      })
+    })
+
+    it("preserves timestamps from PouchDB batch dumps", async () => {
+      const loadDb = new CouchDatabase(structures.db.id())
+      const createdAt = "2023-01-01T00:00:00.000Z"
+      const updatedAt = "2023-01-02T00:00:00.000Z"
+      tk.travel(new Date("2024-01-01T00:00:00.000Z"))
+      const stream = Readable.from(
+        `${JSON.stringify({
+          docs: [
+            {
+              _id: "load_pouch_timestamp_doc",
+              _rev: "1-967a00dff5e02add41819138abb3284d",
+              createdAt,
+              updatedAt,
+              value: 1,
+              _revisions: {
+                start: 1,
+                ids: ["967a00dff5e02add41819138abb3284d"],
+              },
+            },
+          ],
+        })}\n`
+      )
+
+      await loadDb.load(stream as any)
+
+      expect(await loadDb.get("load_pouch_timestamp_doc")).toMatchObject({
+        _id: "load_pouch_timestamp_doc",
+        createdAt,
+        updatedAt,
         value: 1,
       })
     })

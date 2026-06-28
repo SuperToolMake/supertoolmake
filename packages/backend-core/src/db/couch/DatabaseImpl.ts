@@ -1,4 +1,7 @@
-import type { ReadStream, WriteStream } from "node:fs"
+import { once } from "node:events"
+import type { ReadStream } from "node:fs"
+import type { Writable } from "node:stream"
+import { finished } from "node:stream/promises"
 import {
   type AllDocsResponse,
   type AnyDocument,
@@ -35,6 +38,12 @@ function buildNano(couchInfo: { url: string; cookie: string }) {
 
 type DBCall<T> = () => Promise<T>
 type DBCallback<T> = (db: Nano.DocumentScope<any>) => Promise<DBCall<T>> | DBCall<T>
+
+async function writeToStream(stream: Writable, chunk: string) {
+  if (!stream.write(chunk)) {
+    await once(stream, "drain")
+  }
+}
 
 class CouchDBError extends Error implements DBError {
   status: number
@@ -340,6 +349,18 @@ export class CouchDatabase implements Database {
     })
   }
 
+  private async bulkDocsRaw(documents: AnyDocument[], opts?: { new_edits?: boolean }) {
+    return this.performCallWithDBCreation((db) => {
+      const body: any = {
+        docs: documents,
+      }
+      if (opts?.new_edits !== undefined) {
+        body.new_edits = opts.new_edits
+      }
+      return () => db.bulk(body)
+    })
+  }
+
   async find<T extends Document>(params: Nano.MangoQuery): Promise<Nano.MangoResponse<T>> {
     return this.performCall((db) => {
       return async () => {
@@ -444,12 +465,14 @@ export class CouchDatabase implements Database {
     })
   }
 
-  async dump(stream: WriteStream, opts?: DatabaseDumpOpts) {
+  async dump(stream: Writable, opts?: DatabaseDumpOpts) {
     const batchSize = opts?.batch_size || 1000
     let startKey: string | undefined
     let hasMore = true
 
     const filterFn = opts?.filter
+    const streamFinished = finished(stream)
+    streamFinished.catch(() => undefined)
 
     while (hasMore) {
       const params: DocumentListParams = {
@@ -470,7 +493,7 @@ export class CouchDatabase implements Database {
       for (const row of rows) {
         const doc = row.doc as any
         if (doc && (!filterFn || filterFn(doc))) {
-          stream.write(`${JSON.stringify(doc)}\n`)
+          await writeToStream(stream, `${JSON.stringify(doc)}\n`)
         }
         startKey = row.key as string
       }
@@ -481,6 +504,7 @@ export class CouchDatabase implements Database {
     }
 
     stream.end()
+    await streamFinished
   }
 
   async load(stream: ReadStream) {
@@ -510,10 +534,10 @@ export class CouchDatabase implements Database {
       }
     }
     if (pouchDumpDocs.length > 0) {
-      await this.bulkDocs(pouchDumpDocs, { new_edits: false })
+      await this.bulkDocsRaw(pouchDumpDocs, { new_edits: false })
     }
     if (docs.length > 0) {
-      await this.bulkDocs(docs)
+      await this.bulkDocsRaw(docs)
     }
     return { ok: true }
   }
