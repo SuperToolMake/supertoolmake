@@ -1,8 +1,4 @@
-import {
-  type Document,
-  DocumentType,
-  type RowValue,
-} from "@supertoolmake/types"
+import { type Document, DocumentType, type RowValue } from "@supertoolmake/types"
 import { structures } from "../../../tests"
 import { getDB } from "../db"
 import Replication from "../Replication"
@@ -19,17 +15,14 @@ const ensureDb = async (dbName: string) => {
   await db.remove(initId, (await db.get<Document>(initId))._rev)
 }
 
-const makeDoc = (
-  id: string,
-  extra: Record<string, unknown> = {}
-): TestDocument => ({
+const makeDoc = (id: string, extra: Record<string, unknown> = {}): TestDocument => ({
   _id: id,
   ...extra,
 })
 
 const getAllDocIds = async (dbName: string) => {
   const allDocs = await getDB(dbName).allDocs<RowValue>({ include_docs: false })
-  return allDocs.rows.map(row => row.id)
+  return allDocs.rows.map((row) => row.id)
 }
 
 describe("Replication", () => {
@@ -65,9 +58,7 @@ describe("Replication", () => {
       await ensureDb(source)
       await ensureDb(target)
 
-      await getDB(source).put(
-        makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" })
-      )
+      await getDB(source).put(makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" }))
 
       const rep = new Replication({ source, target })
       await rep.replicate()
@@ -91,15 +82,9 @@ describe("Replication", () => {
       const rep = new Replication({ source, target })
       await rep.replicate()
 
-      expect(
-        await getDB(target).get(`${DocumentType.ROLE}_admin`)
-      ).toMatchObject({ name: "admin" })
-      expect(
-        await getDB(target).get(`${DocumentType.ROLE}_user`)
-      ).toMatchObject({ name: "user" })
-      expect(
-        await getDB(target).get(`${DocumentType.DATASOURCE}_ds1`)
-      ).toMatchObject({
+      expect(await getDB(target).get(`${DocumentType.ROLE}_admin`)).toMatchObject({ name: "admin" })
+      expect(await getDB(target).get(`${DocumentType.ROLE}_user`)).toMatchObject({ name: "user" })
+      expect(await getDB(target).get(`${DocumentType.DATASOURCE}_ds1`)).toMatchObject({
         type: "postgres",
       })
     }, 30000)
@@ -234,9 +219,7 @@ describe("Replication", () => {
       await ensureDb(source)
       await ensureDb(target)
 
-      await getDB(source).put(
-        makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" })
-      )
+      await getDB(source).put(makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" }))
 
       const rep = new Replication({ source, target })
       await rep.replicate()
@@ -254,21 +237,15 @@ describe("Replication", () => {
       await ensureDb(source)
       await ensureDb(target)
 
-      await getDB(source).put(
-        makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" })
-      )
+      await getDB(source).put(makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" }))
 
       const rep = new Replication({ source, target })
       await rep.replicate({ filter: adminFilter })
 
       const sourceIds = await getAllDocIds(source)
       const targetIds = await getAllDocIds(target)
-      expect(
-        sourceIds.some((id: string) => id.startsWith("_design/replication_"))
-      ).toBe(false)
-      expect(
-        targetIds.some((id: string) => id.startsWith("_design/replication_"))
-      ).toBe(false)
+      expect(sourceIds.some((id: string) => id.startsWith("_design/replication_"))).toBe(false)
+      expect(targetIds.some((id: string) => id.startsWith("_design/replication_"))).toBe(false)
     }, 30000)
 
     it("excludes design documents when replicating to dev (TO_DEV)", async () => {
@@ -315,9 +292,7 @@ describe("Replication", () => {
       await ensureDb(source)
       await ensureDb(target)
 
-      await getDB(source).put(
-        makeDoc(`${DocumentType.AUTO_COLUMN_STATE}_state1`, { active: true })
-      )
+      await getDB(source).put(makeDoc(`${DocumentType.AUTO_COLUMN_STATE}_state1`, { active: true }))
 
       const rep = new Replication({ source, target })
       await rep.replicate()
@@ -332,16 +307,12 @@ describe("Replication", () => {
       await ensureDb(source)
       await ensureDb(target)
 
-      await getDB(source).put(
-        makeDoc(`${DocumentType.AUTO_COLUMN_STATE}_state1`, { active: true })
-      )
+      await getDB(source).put(makeDoc(`${DocumentType.AUTO_COLUMN_STATE}_state1`, { active: true }))
 
       const rep = new Replication({ source, target })
       await rep.replicate({ isCreation: true })
 
-      const doc = await getDB(target).get(
-        `${DocumentType.AUTO_COLUMN_STATE}_state1`
-      )
+      const doc = await getDB(target).get(`${DocumentType.AUTO_COLUMN_STATE}_state1`)
       expect(doc).toMatchObject({ active: true })
     }, 30000)
 
@@ -352,9 +323,7 @@ describe("Replication", () => {
       await ensureDb(target)
 
       const userMetaId = `ro_ta_users_${structures.db.id()}`
-      await getDB(source).put(
-        makeDoc(userMetaId, { email: "test@example.com" })
-      )
+      await getDB(source).put(makeDoc(userMetaId, { email: "test@example.com" }))
 
       const rep = new Replication({ source, target })
       await rep.replicate()
@@ -371,16 +340,12 @@ describe("Replication", () => {
       await ensureDb(source)
       await ensureDb(target)
 
-      await getDB(source).put(
-        makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" })
-      )
+      await getDB(source).put(makeDoc(`${DocumentType.ROLE}_admin`, { name: "admin" }))
 
       const rep = new Replication({ source, target })
       await rep.replicate()
 
-      const beforeDoc = await getDB(target).get<NamedDocument>(
-        `${DocumentType.ROLE}_admin`
-      )
+      const beforeDoc = await getDB(target).get<NamedDocument>(`${DocumentType.ROLE}_admin`)
       expect(beforeDoc.name).toBe("admin")
 
       await getDB(target).put({
@@ -389,16 +354,12 @@ describe("Replication", () => {
         name: "modified",
       })
 
-      const modifiedDoc = await getDB(target).get<NamedDocument>(
-        `${DocumentType.ROLE}_admin`
-      )
+      const modifiedDoc = await getDB(target).get<NamedDocument>(`${DocumentType.ROLE}_admin`)
       expect(modifiedDoc.name).toBe("modified")
 
       await rep.rollback()
 
-      const afterDoc = await getDB(target).get<NamedDocument>(
-        `${DocumentType.ROLE}_admin`
-      )
+      const afterDoc = await getDB(target).get<NamedDocument>(`${DocumentType.ROLE}_admin`)
       expect(afterDoc.name).toBe("admin")
     }, 60000)
 
@@ -417,12 +378,8 @@ describe("Replication", () => {
       await rep.replicate()
       await rep.rollback()
 
-      expect(
-        await getDB(target).get(`${DocumentType.ROLE}_admin`)
-      ).toMatchObject({ name: "admin" })
-      expect(
-        await getDB(target).get(`${DocumentType.ROLE}_user`)
-      ).toMatchObject({ name: "user" })
+      expect(await getDB(target).get(`${DocumentType.ROLE}_admin`)).toMatchObject({ name: "admin" })
+      expect(await getDB(target).get(`${DocumentType.ROLE}_user`)).toMatchObject({ name: "user" })
     }, 60000)
   })
 })

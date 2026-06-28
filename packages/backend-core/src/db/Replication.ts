@@ -1,8 +1,4 @@
-import {
-  type AnyDocument,
-  type Document,
-  DocumentType,
-} from "@supertoolmake/types"
+import { type AnyDocument, type Document, DocumentType } from "@supertoolmake/types"
 import { DesignDocuments, SEPARATOR, USER_METADATA_PREFIX } from "../constants"
 import { directCouchCall } from "./couch"
 
@@ -65,9 +61,7 @@ type BulkDocsResponse = Array<{
   reason?: string
 }>
 
-async function readJson<T>(
-  response: Awaited<ReturnType<typeof directCouchCall>>
-): Promise<T> {
+async function readJson<T>(response: Awaited<ReturnType<typeof directCouchCall>>): Promise<T> {
   return (await response.json()) as T
 }
 
@@ -127,10 +121,8 @@ class Replication {
         continue
       }
 
-      const filteredChanges = results.filter(change => {
-        const doc =
-          change.doc ||
-          ({ _id: change.id, _deleted: change.deleted } as Document)
+      const filteredChanges = results.filter((change) => {
+        const doc = change.doc || ({ _id: change.id, _deleted: change.deleted } as Document)
         return this.shouldReplicateDoc(doc, opts)
       })
       const revsDiff = await this.getMissingRevisions(filteredChanges)
@@ -139,8 +131,8 @@ class Replication {
       docsRead += docs.length
       if (docs.length) {
         const response = await this.writeDocs(docs)
-        docsWritten += response.filter(row => row.ok).length
-        docWriteFailures += response.filter(row => row.error).length
+        docsWritten += response.filter((row) => row.ok).length
+        docWriteFailures += response.filter((row) => row.error).length
       }
 
       since = changes.last_seq
@@ -167,16 +159,12 @@ class Replication {
   }
 
   private async getChanges(since: unknown): Promise<ChangesResponse> {
-    const response = await directCouchCall(
-      `${this.sourceName}/_changes`,
-      "POST",
-      {
-        since,
-        limit: REPLICATION_BATCH_SIZE,
-        style: "all_docs",
-        include_docs: true,
-      }
-    )
+    const response = await directCouchCall(`${this.sourceName}/_changes`, "POST", {
+      since,
+      limit: REPLICATION_BATCH_SIZE,
+      style: "all_docs",
+      include_docs: true,
+    })
     if (!response.ok) {
       await throwReplicationError(response, "changes read")
     }
@@ -188,8 +176,7 @@ class Replication {
   ): Promise<RevsDiffResponse> {
     const revsById: Record<string, string[]> = {}
     for (const change of changes || []) {
-      const revs =
-        change.changes?.map(change => change.rev).filter(Boolean) || []
+      const revs = change.changes?.map((change) => change.rev).filter(Boolean) || []
       if (revs.length) {
         revsById[change.id] = revs
       }
@@ -198,54 +185,40 @@ class Replication {
       return {}
     }
 
-    const response = await directCouchCall(
-      `${this.targetName}/_revs_diff`,
-      "POST",
-      revsById
-    )
+    const response = await directCouchCall(`${this.targetName}/_revs_diff`, "POST", revsById)
     if (!response.ok) {
       await throwReplicationError(response, "revision diff")
     }
     return readJson<RevsDiffResponse>(response)
   }
 
-  private async getMissingDocs(
-    revsDiff: RevsDiffResponse
-  ): Promise<AnyDocument[]> {
+  private async getMissingDocs(revsDiff: RevsDiffResponse): Promise<AnyDocument[]> {
     const docsToFetch = Object.entries(revsDiff).flatMap(([id, diff]) =>
-      (diff.missing || []).map(rev => ({ id, rev }))
+      (diff.missing || []).map((rev) => ({ id, rev }))
     )
     if (!docsToFetch.length) {
       return []
     }
 
-    const response = await directCouchCall(
-      `${this.sourceName}/_bulk_get?revs=true`,
-      "POST",
-      {
-        docs: docsToFetch,
-      }
-    )
+    const response = await directCouchCall(`${this.sourceName}/_bulk_get?revs=true`, "POST", {
+      docs: docsToFetch,
+    })
     if (!response.ok) {
       await throwReplicationError(response, "bulk get")
     }
 
     const body = await readJson<BulkGetResponse>(response)
     return (body.results || [])
-      .flatMap(result => result.docs || [])
-      .map(result => result.ok)
+      .flatMap((result) => result.docs || [])
+      .map((result) => result.ok)
       .filter((doc): doc is AnyDocument => !!doc)
   }
 
   private async writeDocs(docs: AnyDocument[]): Promise<BulkDocsResponse> {
-    const response = await directCouchCall(
-      `${this.targetName}/_bulk_docs`,
-      "POST",
-      {
-        docs,
-        new_edits: false,
-      }
-    )
+    const response = await directCouchCall(`${this.targetName}/_bulk_docs`, "POST", {
+      docs,
+      new_edits: false,
+    })
     if (!response.ok) {
       await throwReplicationError(response, "bulk write")
     }
@@ -263,8 +236,7 @@ class Replication {
     const startsWithType = (id: string, docType: string) =>
       id.indexOf(`${docType}${SEPARATOR}`) === 0
     const isData = (id: string) =>
-      startsWithType(id, DocumentType.ROW) ||
-      startsWithType(id, DocumentType.LINK)
+      startsWithType(id, DocumentType.ROW) || startsWithType(id, DocumentType.LINK)
 
     let syncAllTables = false
     let tableSyncList: string[] | undefined
@@ -286,18 +258,14 @@ class Replication {
     if (doc._id.indexOf(USER_METADATA_PREFIX) === 0) {
       return true
     }
-    if (
-      toProduction &&
-      !isCreation &&
-      startsWithType(doc._id, DocumentType.AUTO_COLUMN_STATE)
-    ) {
+    if (toProduction && !isCreation && startsWithType(doc._id, DocumentType.AUTO_COLUMN_STATE)) {
       return false
     }
     if (isData(doc._id)) {
       if (syncAllTables) {
         return true
       }
-      return Boolean(tableSyncList?.some(id => doc._id?.includes(id)))
+      return Boolean(tableSyncList?.some((id) => doc._id?.includes(id)))
     }
     if (startsWithType(doc._id, DocumentType.AUTOMATION_LOG)) {
       return false
