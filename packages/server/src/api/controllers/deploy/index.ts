@@ -9,7 +9,6 @@ import {
   type PublishTableResponse,
   type PublishWorkspaceRequest,
   type PublishWorkspaceResponse,
-  type Table,
   type UserCtx,
 } from "@supertoolmake/types"
 import { DocumentType } from "../../../db/utils"
@@ -66,77 +65,6 @@ async function storeDeploymentHistory(deployment: Deployment) {
   await db.put(deploymentDoc)
   deployment.fromJSON(deploymentDoc.history[deploymentId])
   return deployment
-}
-
-async function applyPendingColumnRenames(workspaceId: string): Promise<Table[]> {
-  return await context.doInWorkspaceContext(workspaceId, async () => {
-    const db = context.getWorkspaceDB()
-    const tables = await sdk.tables.getAllInternalTables()
-    const updatedTables: Table[] = []
-
-    for (let table of tables) {
-      if (table._deleted) {
-        continue
-      }
-      const pendingColumnRenames = table.pendingColumnRenames
-      if (!pendingColumnRenames?.length) {
-        continue
-      }
-
-      for (const rename of pendingColumnRenames) {
-        const tableToUpdate: Table = {
-          ...table,
-          schema: { ...table.schema },
-        }
-
-        const existingNew = tableToUpdate.schema[rename.updated]
-        const existingOld = tableToUpdate.schema[rename.old]
-
-        // If the updatd column schema doesn't exist (replication left the old schema),
-        // use the old column schema to the new name so the rename can complete.
-        if (!existingNew && existingOld) {
-          tableToUpdate.schema[rename.updated] = {
-            ...existingOld,
-            name: rename.updated,
-          }
-          delete tableToUpdate.schema[rename.old]
-        }
-
-        await sdk.tables.update(tableToUpdate, rename)
-        table = await sdk.tables.getTable(table._id!)
-      }
-
-      const updatedTable: Table = { ...table, pendingColumnRenames: [] }
-      const putResult = await db.put(updatedTable)
-      const persistedTable: Table = { ...updatedTable, _rev: putResult.rev }
-      updatedTables.push(persistedTable)
-    }
-
-    return updatedTables
-  })
-}
-
-const getRevisionNumber = (rev?: string) => parseInt(rev?.split("-")?.[0] || "0", 10)
-
-async function clearPendingColumnRenames(workspaceId: string) {
-  await context.doInWorkspaceContext(workspaceId, async () => {
-    const db = context.getWorkspaceDB()
-    const tables = await sdk.tables.getAllInternalTables()
-
-    for (const table of tables) {
-      if (table._deleted) {
-        continue
-      }
-      if (!table.pendingColumnRenames?.length) {
-        continue
-      }
-      const updatedTable: Table = {
-        ...table,
-        pendingColumnRenames: [],
-      }
-      await db.put(updatedTable)
-    }
-  })
 }
 
 export async function fetchDeployments(ctx: UserCtx<void, FetchDeploymentResponse>) {
@@ -215,52 +143,6 @@ export const publishWorkspaceInternal = async (ctx: PublishContext) => {
         isCreation: !isPublished,
         tablesToSync,
       })
-
-      const updatedProdTables = await applyPendingColumnRenames(prodId)
-
-      // Keep development revs aligned with production after renaming, so the
-      // next publish doesn't see production ahead and delete / tombstone the doc.
-      if (updatedProdTables.length > 0) {
-        await context.doInWorkspaceContext(devId, async () => {
-          const devDb = context.getWorkspaceDB()
-          for (const prodTable of updatedProdTables) {
-            try {
-              const devTable = await devDb.tryGet<Table>(prodTable._id!)
-              if (!devTable) {
-                console.warn(
-                  `Failed to get development table for table ${prodTable._id} when applying column renames`
-                )
-                continue
-              }
-
-              const prodRevNum = getRevisionNumber(prodTable._rev)
-              let devRevNum = getRevisionNumber(devTable._rev)
-
-              let docForPut: Table = {
-                ...prodTable,
-                _rev: devTable._rev,
-              }
-
-              // Bump dev revisions until dev is at least prod (avoids prod-ahead).
-              while (devRevNum < prodRevNum) {
-                const res = await devDb.put(docForPut)
-                docForPut = { ...docForPut, _rev: res.rev }
-                devRevNum = getRevisionNumber(res.rev)
-              }
-
-              // Ensure final content is written with the latest dev rev (handles equal case).
-              await devDb.put(docForPut)
-            } catch (err) {
-              console.warn(
-                `Failed to update development table with production table 
-                  revision when applying column renames for table ${prodTable._id}: ${err}`
-              )
-            }
-          }
-        })
-      }
-
-      await clearPendingColumnRenames(devId)
 
       const db = context.getProdWorkspaceDB()
       const appDoc = await sdk.workspaces.metadata.tryGet({

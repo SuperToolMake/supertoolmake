@@ -260,12 +260,6 @@ class TableSaveFunctions {
   }
 }
 
-export function mergePendingColumnRenames(existing: RenameColumn[], renaming: RenameColumn) {
-  const pending = existing ? [...existing] : []
-  pending.push(renaming)
-  return pending
-}
-
 export function generateForeignKey(column: RelationshipFieldMetadata, relatedTable: Table) {
   return `fk_${relatedTable.name}_${column.fieldName}`
 }
