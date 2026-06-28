@@ -1,10 +1,14 @@
-import type { ReadStream, WriteStream } from "node:fs"
+import { once } from "node:events"
+import type { ReadStream } from "node:fs"
+import type { Writable } from "node:stream"
+import { finished } from "node:stream/promises"
 import {
   type AllDocsResponse,
   type AnyDocument,
   type Database,
   type DatabaseCreateIndexOpts,
   type DatabaseDeleteIndexOpts,
+  type DatabaseDumpOpts,
   type DatabaseOpts,
   type DatabasePutOpts,
   type DatabaseQueryOpts,
@@ -19,7 +23,6 @@ import { newid } from "../../docIds/newid"
 import { checkSlashesInUrl } from "../../helpers"
 import { DDInstrumentedDatabase } from "../instrumentation"
 import { getCouchInfo } from "./connections"
-import { getPouchDB } from "./pouchDB"
 import { directCouchUrlCall } from "./utils"
 
 const DATABASE_NOT_FOUND = "Database does not exist."
@@ -35,6 +38,12 @@ function buildNano(couchInfo: { url: string; cookie: string }) {
 
 type DBCall<T> = () => Promise<T>
 type DBCallback<T> = (db: Nano.DocumentScope<any>) => Promise<DBCall<T>> | DBCall<T>
+
+async function writeToStream(stream: Writable, chunk: string) {
+  if (!stream.write(chunk)) {
+    await once(stream, "drain")
+  }
+}
 
 class CouchDBError extends Error implements DBError {
   status: number
@@ -327,13 +336,28 @@ export class CouchDatabase implements Database {
     })
   }
 
-  async bulkDocs(documents: AnyDocument[]) {
+  async bulkDocs(documents: AnyDocument[], opts?: { new_edits?: boolean }) {
     const now = new Date().toISOString()
     return this.performCallWithDBCreation((db) => {
-      return () =>
-        db.bulk({
-          docs: documents.map((d) => ({ createdAt: now, ...d, updatedAt: now })),
-        })
+      const body: any = {
+        docs: documents.map((d) => ({ createdAt: now, ...d, updatedAt: now })),
+      }
+      if (opts?.new_edits !== undefined) {
+        body.new_edits = opts.new_edits
+      }
+      return () => db.bulk(body)
+    })
+  }
+
+  private async bulkDocsRaw(documents: AnyDocument[], opts?: { new_edits?: boolean }) {
+    return this.performCallWithDBCreation((db) => {
+      const body: any = {
+        docs: documents,
+      }
+      if (opts?.new_edits !== undefined) {
+        body.new_edits = opts.new_edits
+      }
+      return () => db.bulk(body)
     })
   }
 
@@ -349,9 +373,12 @@ export class CouchDatabase implements Database {
     params: DocumentListParams
   ): Promise<AllDocsResponse<T>> {
     return this.performCall((db) => {
+      const cleanParams = Object.fromEntries(
+        Object.entries(params).filter(([, value]) => value !== undefined)
+      ) as DocumentListParams
       return async () => {
         try {
-          return (await db.list(params)) as AllDocsResponse<T>
+          return (await db.list(cleanParams)) as AllDocsResponse<T>
         } catch (err: any) {
           if (err.reason === DATABASE_NOT_FOUND) {
             return {
@@ -438,27 +465,94 @@ export class CouchDatabase implements Database {
     })
   }
 
-  // All below functions are in-frequently called, just utilise PouchDB
-  // for them as it implements them better than we can
-  async dump(stream: WriteStream, opts?: { filter?: any }) {
-    const pouch = getPouchDB(this.name)
-    // @ts-expect-error
-    return pouch.dump(stream, opts)
+  async dump(stream: Writable, opts?: DatabaseDumpOpts) {
+    const batchSize = opts?.batch_size || 1000
+    let startKey: string | undefined
+    let hasMore = true
+
+    const filterFn = opts?.filter
+    const streamFinished = finished(stream)
+    streamFinished.catch(() => undefined)
+
+    while (hasMore) {
+      const params: DocumentListParams = {
+        include_docs: true,
+        limit: batchSize,
+        startkey: startKey,
+        skip: startKey ? 1 : undefined,
+      }
+
+      const response = await this.allDocs(params)
+      const rows = response.rows || []
+
+      if (rows.length === 0) {
+        hasMore = false
+        break
+      }
+
+      for (const row of rows) {
+        const doc = row.doc as any
+        if (doc && (!filterFn || filterFn(doc))) {
+          await writeToStream(stream, `${JSON.stringify(doc)}\n`)
+        }
+        startKey = row.key as string
+      }
+
+      if (rows.length < batchSize) {
+        hasMore = false
+      }
+    }
+
+    stream.end()
+    await streamFinished
   }
 
   async load(stream: ReadStream) {
-    const pouch = getPouchDB(this.name)
-    // @ts-expect-error
-    return pouch.load(stream)
+    const chunks: Buffer[] = []
+    for await (const chunk of stream) {
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
+    }
+    const content = Buffer.concat(chunks).toString()
+    const lines = content.split("\n")
+
+    const docs: any[] = []
+    const pouchDumpDocs: any[] = []
+    for (const line of lines) {
+      if (!line.trim()) continue
+      try {
+        const parsed = JSON.parse(line)
+        // PouchDB dump format: batch lines have a "docs" array
+        if (Array.isArray(parsed.docs)) {
+          pouchDumpDocs.push(...parsed.docs)
+        } else if (parsed._id) {
+          const { _rev, ...doc } = parsed
+          docs.push(doc)
+        }
+        // Skip metadata headers (have "version"/"db_info") and seq tracking
+      } catch {
+        // skip malformed lines
+      }
+    }
+    if (pouchDumpDocs.length > 0) {
+      await this.bulkDocsRaw(pouchDumpDocs, { new_edits: false })
+    }
+    if (docs.length > 0) {
+      await this.bulkDocsRaw(docs)
+    }
+    return { ok: true }
   }
 
   async createIndex(opts: DatabaseCreateIndexOpts) {
-    const pouch = getPouchDB(this.name)
-    return pouch.createIndex(opts)
+    return this.performCall((db) => {
+      return () => db.createIndex(opts)
+    })
   }
 
   async deleteIndex(opts: DatabaseDeleteIndexOpts) {
-    const pouch = getPouchDB(this.name)
-    return pouch.deleteIndex(opts)
+    await directCouchUrlCall({
+      url: `${this.couchInfo.url}/${this.name}/_index/${opts.ddoc}/${opts.name}`,
+      method: "DELETE",
+      cookie: this.couchInfo.cookie,
+    })
   }
 }

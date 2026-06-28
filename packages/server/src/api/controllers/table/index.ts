@@ -11,6 +11,7 @@ import {
   type CsvToJsonRequest,
   type CsvToJsonResponse,
   type DeleteTableResponse,
+  type Document,
   DocumentType,
   type FetchTablesResponse,
   FieldType,
@@ -246,37 +247,39 @@ export async function publish(ctx: UserCtx<PublishTableRequest, PublishTableResp
     await publishWorkspaceInternal(ctx)
   }
 
-  const tableSegment = `${SEPARATOR}${tableId}${SEPARATOR}`
-  const matchesTable = (_id: string) =>
-    _id === tableId || _id.endsWith(`${SEPARATOR}${tableId}`) || _id.includes(tableSegment)
-
   const replication = new dbCore.Replication({
     source: dbCore.getDevWorkspaceID(appId),
     target: prodWorkspaceId,
   })
 
-  await replication.replicate(
-    replication.appReplicateOpts({
-      tablesToSync: undefined,
-      checkpoint: false,
-      filter: (doc: any) => {
-        const _id = doc?._id as string
-        if (!_id || _id.startsWith("_design")) {
-          return false
-        }
-        if (_id.startsWith(DocumentType.AUTOMATION_LOG)) {
-          return false
-        }
-        if (_id.startsWith(DocumentType.WORKSPACE_METADATA)) {
-          return false
-        }
-        if (!matchesTable(_id)) {
-          return false
-        }
-        return true
-      },
-    })
-  )
+  const filter = new Function(
+    "doc",
+    `
+      var _id = doc && doc._id;
+      var tableId = ${JSON.stringify(tableId)};
+      var separator = ${JSON.stringify(SEPARATOR)};
+      var tableSegment = separator + tableId + separator;
+      var tableSuffix = separator + tableId;
+
+      if (!_id || _id.indexOf("_design") === 0) {
+        return false;
+      }
+      if (_id.indexOf(${JSON.stringify(DocumentType.AUTOMATION_LOG)}) === 0) {
+        return false;
+      }
+      if (_id.indexOf(${JSON.stringify(DocumentType.WORKSPACE_METADATA)}) === 0) {
+        return false;
+      }
+      return _id === tableId ||
+        _id.lastIndexOf(tableSuffix) === _id.length - tableSuffix.length ||
+        _id.indexOf(tableSegment) !== -1;
+    `
+  ) as (doc: Document) => boolean
+
+  await replication.replicate({
+    tablesToSync: undefined,
+    filter,
+  })
 
   const metadata = await sdk.workspaces.metadata.tryGet({
     production: true,

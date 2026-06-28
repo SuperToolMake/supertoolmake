@@ -1,15 +1,7 @@
-import * as core from "@supertoolmake/backend-core"
-import env from "../environment"
+import { db as dbCore } from "@supertoolmake/backend-core"
+
+export * from "./utils"
 
 export function init() {
-  const dbConfig: any = {
-    replication: true,
-  }
-
-  if (env.isTest() && !env.COUCH_DB_URL) {
-    dbConfig.inMemory = true
-    dbConfig.allDbs = true
-  }
-
-  core.init({ db: dbConfig })
+  dbCore.CouchDatabase.init()
 }

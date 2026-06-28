@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "lib": ["es2022"],
+    "lib": ["es2022", "dom"],
     "strict": true,
     "noImplicitAny": true,
     "esModuleInterop": true,

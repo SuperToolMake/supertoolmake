@@ -1,9 +1,3 @@
-import * as dbConfig from "../db"
-import env from "../environment"
-import * as controllers from "./controllers"
-
-dbConfig.init()
-
 import type http from "node:http"
 import {
   constants,
@@ -27,7 +21,9 @@ import {
 import jwt, { type Secret } from "jsonwebtoken"
 import supertest from "supertest"
 import { Config } from "../constants"
+import env from "../environment"
 import API from "./api"
+import * as controllers from "./controllers"
 import structures, { CSRF_TOKEN } from "./structures"
 
 class TestConfiguration {

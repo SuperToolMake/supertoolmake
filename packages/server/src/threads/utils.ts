@@ -1,5 +1,4 @@
 import { db as dbCore, redis } from "@supertoolmake/backend-core"
-import * as db from "../db"
 import env from "../environment"
 import * as jsRunner from "../jsRunner"
 import type { QueryVariable } from "./definitions"
@@ -33,7 +32,6 @@ export function threadSetup() {
 
   console.debug(`[${env.FORKED_PROCESS_NAME}] thread setup running`)
   jsRunner.init()
-  db.init()
 }
 
 export async function getCachedVariable(queryId: string, variable: string) {

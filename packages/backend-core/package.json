@@ -34,8 +34,7 @@
     "@aws-sdk/client-s3": "3.1041.0",
     "@aws-sdk/lib-storage": "3.1041.0",
     "@smithy/node-http-handler": "4.1.1",
-    "nano": "11.0.3",
-    "@budibase/pouchdb-replication-stream": "1.2.11",
+    "nano": "11.0.5",
     "@supertoolmake/shared-core": "*",
     "@supertoolmake/types": "*",
     "@techpass/passport-openidconnect": "1.0.0",
@@ -62,7 +61,6 @@
     "passport-oauth2-refresh": "2.1.0",
     "pino": "8.11.0",
     "pino-http": "8.3.3",
-    "pouchdb": "9.0.0",
     "redlock": "4.2.0",
     "rotating-file-stream": "3.1.0",
     "sanitize-s3-objectkey": "0.0.1",
@@ -78,7 +76,6 @@
     "@types/koa": "3.0.0",
     "@types/lodash": "4.14.200",
     "@types/node-fetch": "2.6.4",
-    "@types/pouchdb": "6.4.2",
     "@types/redlock": "4.0.7",
     "@types/semver": "7.3.7",
     "@types/tar-fs": "2.0.4",
@@ -86,7 +83,6 @@
     "ioredis-mock": "8.13.1",
     "nock": "^13.5.6",
     "pino-pretty": "10.0.0",
-    "pouchdb-adapter-memory": "9.0.0",
     "timekeeper": "2.2.0"
   },
   "nx": {

@@ -1,3 +1,4 @@
+import { Readable, Writable } from "node:stream"
 import tk from "timekeeper"
 import { generator, structures } from "../../../../tests"
 import { CouchDatabase } from ".."
@@ -175,6 +176,189 @@ describe("DatabaseImpl", () => {
           updatedAt: new Date().toISOString(),
         })
       }
+    })
+  })
+
+  describe("dump", () => {
+    async function collectDump(
+      database: CouchDatabase,
+      opts?: Parameters<CouchDatabase["dump"]>[1]
+    ) {
+      const chunks: string[] = []
+      const stream = new Writable({
+        write(chunk, _encoding, callback) {
+          chunks.push(chunk.toString())
+          callback()
+        },
+      })
+
+      await database.dump(stream as any, opts)
+
+      return chunks
+        .join("")
+        .split("\n")
+        .filter(Boolean)
+        .map((line) => JSON.parse(line))
+    }
+
+    it("dumps documents across multiple batches", async () => {
+      const dumpDb = new CouchDatabase(structures.db.id())
+      await dumpDb.bulkDocs([
+        { _id: "dump_doc_1", value: 1 },
+        { _id: "dump_doc_2", value: 2 },
+        { _id: "dump_doc_3", value: 3 },
+      ])
+
+      const docs = await collectDump(dumpDb, { batch_size: 2 })
+
+      expect(docs.map((doc) => doc._id)).toEqual(["dump_doc_1", "dump_doc_2", "dump_doc_3"])
+    })
+
+    it("applies filters while dumping across multiple batches", async () => {
+      const dumpDb = new CouchDatabase(structures.db.id())
+      await dumpDb.bulkDocs([
+        { _id: "dump_filter_1", include: true },
+        { _id: "dump_filter_2", include: false },
+        { _id: "dump_filter_3", include: true },
+      ])
+
+      const docs = await collectDump(dumpDb, {
+        batch_size: 2,
+        filter: (doc: any) => doc.include,
+      })
+
+      expect(docs.map((doc) => doc._id)).toEqual(["dump_filter_1", "dump_filter_3"])
+    })
+
+    it("waits for the dump stream to finish before resolving", async () => {
+      const dumpDb = new CouchDatabase(structures.db.id())
+      await dumpDb.bulkDocs([{ _id: "dump_finish_doc", value: 1 }])
+
+      let finalised = false
+      const stream = new Writable({
+        write(_chunk, _encoding, callback) {
+          callback()
+        },
+        final(callback) {
+          setTimeout(() => {
+            finalised = true
+            callback()
+          }, 10)
+        },
+      })
+
+      await dumpDb.dump(stream as any)
+
+      expect(finalised).toBe(true)
+    })
+  })
+
+  describe("load", () => {
+    it("loads JSON-lines document dumps", async () => {
+      const loadDb = new CouchDatabase(structures.db.id())
+      const stream = Readable.from(
+        [
+          JSON.stringify({ _id: "load_doc_1", _rev: "1-source", value: 1 }),
+          JSON.stringify({ _id: "load_doc_2", _rev: "1-source", value: 2 }),
+        ].join("\n")
+      )
+
+      await loadDb.load(stream as any)
+
+      expect(await loadDb.get("load_doc_1")).toMatchObject({
+        _id: "load_doc_1",
+        _rev: expect.any(String),
+        value: 1,
+      })
+      expect(await loadDb.get("load_doc_2")).toMatchObject({
+        _id: "load_doc_2",
+        _rev: expect.any(String),
+        value: 2,
+      })
+    })
+
+    it("preserves timestamps from JSON-lines document dumps", async () => {
+      const loadDb = new CouchDatabase(structures.db.id())
+      const createdAt = "2023-01-01T00:00:00.000Z"
+      const updatedAt = "2023-01-02T00:00:00.000Z"
+      tk.travel(new Date("2024-01-01T00:00:00.000Z"))
+      const stream = Readable.from(
+        JSON.stringify({
+          _id: "load_timestamp_doc",
+          _rev: "1-source",
+          createdAt,
+          updatedAt,
+          value: 1,
+        })
+      )
+
+      await loadDb.load(stream as any)
+
+      expect(await loadDb.get("load_timestamp_doc")).toMatchObject({
+        _id: "load_timestamp_doc",
+        createdAt,
+        updatedAt,
+        value: 1,
+      })
+    })
+
+    it("loads PouchDB batch dumps", async () => {
+      const loadDb = new CouchDatabase(structures.db.id())
+      const stream = Readable.from(
+        `${JSON.stringify({
+          docs: [
+            {
+              _id: "load_pouch_doc_1",
+              _rev: "1-967a00dff5e02add41819138abb3284d",
+              value: 1,
+              _revisions: {
+                start: 1,
+                ids: ["967a00dff5e02add41819138abb3284d"],
+              },
+            },
+          ],
+        })}\n`
+      )
+
+      await loadDb.load(stream as any)
+
+      expect(await loadDb.get("load_pouch_doc_1")).toMatchObject({
+        _id: "load_pouch_doc_1",
+        value: 1,
+      })
+    })
+
+    it("preserves timestamps from PouchDB batch dumps", async () => {
+      const loadDb = new CouchDatabase(structures.db.id())
+      const createdAt = "2023-01-01T00:00:00.000Z"
+      const updatedAt = "2023-01-02T00:00:00.000Z"
+      tk.travel(new Date("2024-01-01T00:00:00.000Z"))
+      const stream = Readable.from(
+        `${JSON.stringify({
+          docs: [
+            {
+              _id: "load_pouch_timestamp_doc",
+              _rev: "1-967a00dff5e02add41819138abb3284d",
+              createdAt,
+              updatedAt,
+              value: 1,
+              _revisions: {
+                start: 1,
+                ids: ["967a00dff5e02add41819138abb3284d"],
+              },
+            },
+          ],
+        })}\n`
+      )
+
+      await loadDb.load(stream as any)
+
+      expect(await loadDb.get("load_pouch_timestamp_doc")).toMatchObject({
+        _id: "load_pouch_timestamp_doc",
+        createdAt,
+        updatedAt,
+        value: 1,
+      })
     })
   })
 })

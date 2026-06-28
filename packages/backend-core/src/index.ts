@@ -53,10 +53,3 @@ export * from "./constants"
 export * from "./errors"
 // expose warning classes directly
 export * from "./warnings"
-
-// expose package init function
-import * as db from "./db"
-
-export const init = (opts: any = {}) => {
-  db.init(opts.db)
-}

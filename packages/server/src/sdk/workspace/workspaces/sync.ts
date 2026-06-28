@@ -173,12 +173,9 @@ export async function syncWorkspace(workspaceId: string): Promise<{ message: str
       target: workspaceId,
     })
     try {
-      const replOpts = replication.appReplicateOpts()
-      await replication.replicate(replOpts)
+      await replication.replicate()
     } catch (err) {
       error = err
-    } finally {
-      await replication.close()
     }
   }
 

@@ -37,7 +37,6 @@ import {
 } from "@supertoolmake/types"
 import jwt, { type Secret } from "jsonwebtoken"
 import supertest from "supertest"
-import { init as dbInit } from "../../db"
 import { generateUserMetadataID } from "../../db/utils"
 import env from "../../environment"
 import { startup } from "../../startup"
@@ -62,8 +61,6 @@ import {
 } from "./structures"
 
 const newid = utils.newid
-
-dbInit()
 
 export interface TableToBuild extends Omit<Table, "sourceId" | "sourceType"> {
   sourceId?: string

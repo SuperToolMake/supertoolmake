@@ -17,10 +17,7 @@ import Application, { type Middleware } from "koa"
 import koaBody, { HttpMethodEnum } from "koa-body"
 import api from "./api"
 import { loadTemplateConfig } from "./constants/templates"
-import * as db from "./db"
 import env from "./environment"
-
-db.init()
 
 const koaSession = require("koa-session").default
 

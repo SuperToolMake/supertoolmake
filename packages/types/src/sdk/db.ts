@@ -152,8 +152,6 @@ export interface Database {
   ): Promise<AllDocsResponse<T>>
   destroy(): Promise<Nano.OkResponse>
   compact(): Promise<Nano.OkResponse>
-  // these are all PouchDB related functions that are rarely used - in future
-  // should be replaced by better typed/non-pouch implemented methods
   dump(stream: Writable, opts?: DatabaseDumpOpts): Promise<any>
   load(stream: ReadStream): Promise<any>
 }
