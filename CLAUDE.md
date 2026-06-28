@@ -42,6 +42,7 @@
   against, provided there are no type errors.
 - Avoid adding nested ternary statements.
 - When writing tests involving a URL, use example.com as the domain.
+- Provide a termination condition instead of using while (true)
 
 ## Test style - packages/server
 

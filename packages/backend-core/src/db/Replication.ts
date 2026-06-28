@@ -1,17 +1,17 @@
-import { type Document, DocumentType } from "@supertoolmake/types"
+import {
+  type AnyDocument,
+  type Document,
+  DocumentType,
+} from "@supertoolmake/types"
 import { DesignDocuments, SEPARATOR, USER_METADATA_PREFIX } from "../constants"
-import { newid } from "../docIds/newid"
-import { directCouchCall, directCouchQuery } from "./couch"
-import { getDB } from "./db"
-
-const FILTER_NAME = "replication"
-const FILTER_DESIGN_NAME = "super_replication"
-const FILTER_DESIGN_ID = `_design/${FILTER_DESIGN_NAME}`
+import { directCouchCall } from "./couch"
 
 enum ReplicationDirection {
   TO_PRODUCTION = "toProduction",
   TO_DEV = "toDev",
 }
+
+const REPLICATION_BATCH_SIZE = 200
 
 interface ReplicateOpts {
   isCreation?: boolean
@@ -19,14 +19,14 @@ interface ReplicateOpts {
   filter?: (doc: Document) => boolean | undefined
 }
 
-type ReplicationFilterDoc = Document & {
-  filters: Record<string, string>
-}
-
 type ReplicationResponse = {
-  history?: Array<{
-    errors?: unknown[]
-  }>
+  ok: true
+  docs_read: number
+  docs_written: number
+  doc_write_failures: number
+  start_time: string
+  end_time: string
+  last_seq?: unknown
 }
 
 type ReplicationErrorResponse = {
@@ -34,21 +34,55 @@ type ReplicationErrorResponse = {
   reason?: string
 }
 
-type ReplicationBody = {
-  source: string
-  target: string
-  filter: string
-  query_params: Record<string, string>
-  create_target: boolean
+type ChangesResponse = {
+  results?: Array<{
+    id: string
+    changes?: Array<{ rev: string }>
+    deleted?: boolean
+    doc?: AnyDocument
+    seq?: unknown
+  }>
+  last_seq?: unknown
+  pending?: number
 }
 
-function isNotFoundError(err: unknown) {
-  return (
-    typeof err === "object" &&
-    err !== null &&
-    ("status" in err || "statusCode" in err) &&
-    ((err as { status?: unknown }).status === 404 ||
-      (err as { statusCode?: unknown }).statusCode === 404)
+type RevsDiffResponse = Record<string, { missing?: string[] }>
+
+type BulkGetResponse = {
+  results?: Array<{
+    docs?: Array<{
+      ok?: AnyDocument
+      error?: ReplicationErrorResponse
+    }>
+  }>
+}
+
+type BulkDocsResponse = Array<{
+  id?: string
+  rev?: string
+  ok?: boolean
+  error?: string
+  reason?: string
+}>
+
+async function readJson<T>(
+  response: Awaited<ReturnType<typeof directCouchCall>>
+): Promise<T> {
+  return (await response.json()) as T
+}
+
+async function throwReplicationError(
+  response: Awaited<ReturnType<typeof directCouchCall>>,
+  action: string
+) {
+  let error: ReplicationErrorResponse = {}
+  try {
+    error = await readJson<ReplicationErrorResponse>(response)
+  } catch {}
+  throw new Error(
+    `Replication ${action} failed: ${error.error || response.status} - ${
+      error.reason || response.statusText
+    }`
   )
 }
 
@@ -74,194 +108,212 @@ class Replication {
   }
 
   async replicate(opts: ReplicateOpts = {}) {
-    const direction = this.direction
-    const toDev = direction === ReplicationDirection.TO_DEV
-    const isCreation = opts.isCreation
-    const tablesToSync = opts.tablesToSync
-    const customFilter = opts.filter
+    const startTime = new Date().toISOString()
+    await this.ensureTarget()
 
-    let syncAllTables = false,
-      tableSyncList: string[] | undefined
-    if (typeof tablesToSync === "string" && tablesToSync === "all") {
-      syncAllTables = true
-    } else if (tablesToSync) {
-      tableSyncList = tablesToSync
-    }
+    let since: unknown = 0
+    let docsRead = 0
+    let docsWritten = 0
+    let docWriteFailures = 0
+    let lastSeq: unknown
+    let hasMoreChanges = true
 
-    const filterDesignName = customFilter ? `replication_${newid()}` : FILTER_DESIGN_NAME
-    const filterDesignId = customFilter ? `_design/${filterDesignName}` : FILTER_DESIGN_ID
-    const sourceDb = getDB(this.sourceName, { skip_setup: true })
-    const filterFunction = this.buildFilterFunction({
-      filterDesignId,
-      customFilter,
-    })
-
-    await this.ensureFilter(sourceDb, filterDesignId, filterFunction)
-
-    try {
-      const queryParams: Record<string, string> = {
-        isCreation: String(!!isCreation),
-        toDev: String(!!toDev),
-        syncAllTables: String(!!syncAllTables),
-      }
-      if (tableSyncList) {
-        queryParams.tableSyncList = tableSyncList.join(",")
+    while (hasMoreChanges) {
+      const changes = await this.getChanges(since)
+      const results = changes.results || []
+      if (!results.length) {
+        lastSeq = changes.last_seq ?? lastSeq
+        hasMoreChanges = false
+        continue
       }
 
-      const replicateBody: ReplicationBody = {
-        source: this.sourceName,
-        target: this.targetName,
-        filter: `${filterDesignName}/${FILTER_NAME}`,
-        query_params: queryParams,
-        create_target: true,
-      }
-
-      const response = await directCouchCall("_replicate", "POST", replicateBody)
-      if (!response.ok) {
-        const error = (await response.json()) as ReplicationErrorResponse
-        throw new Error(
-          `Replication failed: ${error.error || response.status} - ${
-            error.reason || response.statusText
-          }`
-        )
-      }
-      const result = (await response.json()) as ReplicationResponse
-
-      if (result.history?.find((h) => h.errors && h.errors.length > 0)) {
-        throw new Error(`Replication failed: ${JSON.stringify(result.history)}`)
-      }
-
-      return result
-    } finally {
-      if (customFilter) {
-        try {
-          const existing = await sourceDb.get<ReplicationFilterDoc>(filterDesignId)
-          await sourceDb.remove(filterDesignId, existing._rev)
-        } catch {}
-      }
-    }
-  }
-
-  private async ensureFilter(
-    sourceDb: ReturnType<typeof getDB>,
-    filterDesignId: string,
-    filterFunction: string
-  ) {
-    const doc = {
-      _id: filterDesignId,
-      filters: {
-        [FILTER_NAME]: filterFunction,
-      },
-    } satisfies ReplicationFilterDoc
-    try {
-      const existing = await sourceDb.get<ReplicationFilterDoc>(filterDesignId)
-      if (existing.filters?.[FILTER_NAME] === filterFunction) {
-        return
-      }
-      await sourceDb.put({
-        ...doc,
-        _rev: existing._rev,
+      const filteredChanges = results.filter(change => {
+        const doc =
+          change.doc ||
+          ({ _id: change.id, _deleted: change.deleted } as Document)
+        return this.shouldReplicateDoc(doc, opts)
       })
-    } catch (err: unknown) {
-      if (!isNotFoundError(err)) {
-        throw err
+      const revsDiff = await this.getMissingRevisions(filteredChanges)
+      const docs = await this.getMissingDocs(revsDiff)
+
+      docsRead += docs.length
+      if (docs.length) {
+        const response = await this.writeDocs(docs)
+        docsWritten += response.filter(row => row.ok).length
+        docWriteFailures += response.filter(row => row.error).length
       }
-      await sourceDb.put(doc)
+
+      since = changes.last_seq
+      lastSeq = changes.last_seq
+      hasMoreChanges = changes.pending !== 0 && changes.last_seq !== undefined
+    }
+
+    return {
+      ok: true,
+      docs_read: docsRead,
+      docs_written: docsWritten,
+      doc_write_failures: docWriteFailures,
+      start_time: startTime,
+      end_time: new Date().toISOString(),
+      last_seq: lastSeq,
+    } satisfies ReplicationResponse
+  }
+
+  private async ensureTarget() {
+    const response = await directCouchCall(this.targetName, "PUT")
+    if (![201, 202, 412].includes(response.status)) {
+      await throwReplicationError(response, "target creation")
     }
   }
 
-  private buildFilterFunction({
-    filterDesignId,
-    customFilter,
-  }: {
-    filterDesignId: string
-    customFilter?: (doc: Document) => boolean | undefined
-  }) {
-    const customFilterSource = customFilter ? customFilter.toString() : undefined
+  private async getChanges(since: unknown): Promise<ChangesResponse> {
+    const response = await directCouchCall(
+      `${this.sourceName}/_changes`,
+      "POST",
+      {
+        since,
+        limit: REPLICATION_BATCH_SIZE,
+        style: "all_docs",
+        include_docs: true,
+      }
+    )
+    if (!response.ok) {
+      await throwReplicationError(response, "changes read")
+    }
+    return readJson<ChangesResponse>(response)
+  }
 
-    return `function (doc, req) {
-      if (!doc || !doc._id) {
-        return false;
+  private async getMissingRevisions(
+    changes: ChangesResponse["results"]
+  ): Promise<RevsDiffResponse> {
+    const revsById: Record<string, string[]> = {}
+    for (const change of changes || []) {
+      const revs =
+        change.changes?.map(change => change.rev).filter(Boolean) || []
+      if (revs.length) {
+        revsById[change.id] = revs
       }
-      if (doc._id === ${JSON.stringify(filterDesignId)}) {
-        return false;
-      }
-      if (!req.query) {
-        req.query = {};
-      }
+    }
+    if (!Object.keys(revsById).length) {
+      return {}
+    }
 
-      var isCreation = req.query.isCreation === "true";
-      var toDev = req.query.toDev === "true";
-      var syncAllTables = req.query.syncAllTables === "true";
-      var tableSyncList = req.query.tableSyncList ? req.query.tableSyncList.split(",") : [];
-      var toProduction = !toDev;
+    const response = await directCouchCall(
+      `${this.targetName}/_revs_diff`,
+      "POST",
+      revsById
+    )
+    if (!response.ok) {
+      await throwReplicationError(response, "revision diff")
+    }
+    return readJson<RevsDiffResponse>(response)
+  }
 
-      function startsWithType(id, docType) {
-        return id && id.indexOf(docType + ${JSON.stringify(SEPARATOR)}) === 0;
-      }
+  private async getMissingDocs(
+    revsDiff: RevsDiffResponse
+  ): Promise<AnyDocument[]> {
+    const docsToFetch = Object.entries(revsDiff).flatMap(([id, diff]) =>
+      (diff.missing || []).map(rev => ({ id, rev }))
+    )
+    if (!docsToFetch.length) {
+      return []
+    }
 
-      function isData(id) {
-        return startsWithType(id, ${JSON.stringify(DocumentType.ROW)}) ||
-          startsWithType(id, ${JSON.stringify(DocumentType.LINK)});
+    const response = await directCouchCall(
+      `${this.sourceName}/_bulk_get?revs=true`,
+      "POST",
+      {
+        docs: docsToFetch,
       }
+    )
+    if (!response.ok) {
+      await throwReplicationError(response, "bulk get")
+    }
 
-      if (doc._deleted) {
-        return true;
-      }
+    const body = await readJson<BulkGetResponse>(response)
+    return (body.results || [])
+      .flatMap(result => result.docs || [])
+      .map(result => result.ok)
+      .filter((doc): doc is AnyDocument => !!doc)
+  }
 
-      if (!isCreation && doc._id === ${JSON.stringify(DesignDocuments.MIGRATIONS)}) {
-        return false;
+  private async writeDocs(docs: AnyDocument[]): Promise<BulkDocsResponse> {
+    const response = await directCouchCall(
+      `${this.targetName}/_bulk_docs`,
+      "POST",
+      {
+        docs,
+        new_edits: false,
       }
+    )
+    if (!response.ok) {
+      await throwReplicationError(response, "bulk write")
+    }
+    return readJson<BulkDocsResponse>(response)
+  }
 
-      if (toDev && doc._id.indexOf("_design") === 0) {
-        return false;
-      }
+  private shouldReplicateDoc(doc: Document, opts: ReplicateOpts) {
+    if (!doc?._id) {
+      return false
+    }
 
-      if (doc._id.indexOf(${JSON.stringify(USER_METADATA_PREFIX)}) === 0) {
-        return true;
-      }
+    const isCreation = opts.isCreation
+    const toDev = this.direction === ReplicationDirection.TO_DEV
+    const toProduction = !toDev
+    const startsWithType = (id: string, docType: string) =>
+      id.indexOf(`${docType}${SEPARATOR}`) === 0
+    const isData = (id: string) =>
+      startsWithType(id, DocumentType.ROW) ||
+      startsWithType(id, DocumentType.LINK)
 
-      if (
-        toProduction &&
-        !isCreation &&
-        startsWithType(doc._id, ${JSON.stringify(DocumentType.AUTO_COLUMN_STATE)})
-      ) {
-        return false;
-      }
+    let syncAllTables = false
+    let tableSyncList: string[] | undefined
+    if (opts.tablesToSync === "all") {
+      syncAllTables = true
+    } else if (opts.tablesToSync) {
+      tableSyncList = opts.tablesToSync
+    }
 
-      if (isData(doc._id)) {
-        if (syncAllTables) {
-          return true;
-        }
-        for (var i = 0; i < tableSyncList.length; i++) {
-          if (doc._id.indexOf(tableSyncList[i]) !== -1) {
-            return true;
-          }
-        }
-        return false;
+    if (doc._deleted) {
+      return true
+    }
+    if (!isCreation && doc._id === DesignDocuments.MIGRATIONS) {
+      return false
+    }
+    if (toDev && doc._id.indexOf("_design") === 0) {
+      return false
+    }
+    if (doc._id.indexOf(USER_METADATA_PREFIX) === 0) {
+      return true
+    }
+    if (
+      toProduction &&
+      !isCreation &&
+      startsWithType(doc._id, DocumentType.AUTO_COLUMN_STATE)
+    ) {
+      return false
+    }
+    if (isData(doc._id)) {
+      if (syncAllTables) {
+        return true
       }
-
-      if (startsWithType(doc._id, ${JSON.stringify(DocumentType.AUTOMATION_LOG)})) {
-        return false;
-      }
-
-      if (doc._id === ${JSON.stringify(DocumentType.WORKSPACE_METADATA)}) {
-        return false;
-      }
-
-      ${
-        customFilterSource
-          ? `var customFilter = (${customFilterSource});
-      return !!customFilter(doc);`
-          : "return true;"
-      }
-    }`
+      return Boolean(tableSyncList?.some(id => doc._id?.includes(id)))
+    }
+    if (startsWithType(doc._id, DocumentType.AUTOMATION_LOG)) {
+      return false
+    }
+    if (doc._id === DocumentType.WORKSPACE_METADATA) {
+      return false
+    }
+    return opts.filter ? !!opts.filter(doc) : true
   }
 
   async rollback() {
-    const targetDb = getDB(this.targetName, { skip_setup: true })
-    await targetDb.destroy()
-    await directCouchQuery(`/${this.targetName}`, "PUT")
+    const response = await directCouchCall(this.targetName, "DELETE")
+    if (![200, 202, 404].includes(response.status)) {
+      await throwReplicationError(response, "target deletion")
+    }
+    await this.ensureTarget()
     await this.replicate()
   }
 }
