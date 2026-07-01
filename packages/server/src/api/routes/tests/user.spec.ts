@@ -1,5 +1,6 @@
 import { roles, utils } from "@supertoolmake/backend-core"
 import type { UserMetadata } from "@supertoolmake/types"
+import { SSOProviderType, UserSSO } from "@supertoolmake/types"
 import * as setup from "./utilities"
 import { checkPermissionsEndpoint } from "./utilities/TestFunctions"
 
@@ -33,7 +34,7 @@ describe("/users", () => {
       const res = await config.api.user.fetch()
       expect(res.length).toBe(3)
 
-      const ids = res.map((u) => u._id)
+      const ids = res.map(u => u._id)
       expect(ids).toContain(`ro_ta_users_${id1}`)
       expect(ids).toContain(`ro_ta_users_${id2}`)
     })
@@ -76,6 +77,36 @@ describe("/users", () => {
         roleId: roles.BUILTIN_ROLE_IDS.ADMIN,
       })
       expect(res2.ok).toEqual(true)
+    })
+
+    it("should strip sensitive fields from user metadata updates", async () => {
+      const user = await config.createUser()
+      const metadata: UserMetadata & Partial<UserSSO> = {
+        ...user,
+        oauth2: { accessToken: "access", refreshToken: "refresh" },
+        provider: "google",
+        providerType: SSOProviderType.GOOGLE,
+        profile: { displayName: "Metadata User" },
+        thirdPartyProfile: { id: "external" },
+        ssoId: "sso-user",
+        forceResetPassword: false,
+      }
+      delete metadata._rev
+
+      await config.api.user.update(metadata)
+
+      const found = await config.api.user.find(user._id!)
+      for (const field of [
+        "oauth2",
+        "provider",
+        "providerType",
+        "profile",
+        "thirdPartyProfile",
+        "ssoId",
+        "forceResetPassword",
+      ]) {
+        expect(found).not.toHaveProperty(field)
+      }
     })
 
     it("should require the _rev field for multiple updates", async () => {
