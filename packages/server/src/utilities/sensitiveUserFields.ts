@@ -1,4 +1,4 @@
-import { type UserSSO } from "@budibase/types"
+import { type UserSSO } from "@supertoolmake/types"
 
 interface SensitiveUserFields extends Partial<UserSSO> {
   password?: string
