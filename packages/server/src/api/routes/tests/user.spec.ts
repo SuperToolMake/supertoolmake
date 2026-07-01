@@ -1,6 +1,6 @@
 import { roles, utils } from "@supertoolmake/backend-core"
 import type { UserMetadata } from "@supertoolmake/types"
-import { SSOProviderType, UserSSO } from "@supertoolmake/types"
+import { SSOProviderType, type UserSSO } from "@supertoolmake/types"
 import * as setup from "./utilities"
 import { checkPermissionsEndpoint } from "./utilities/TestFunctions"
 
@@ -34,7 +34,7 @@ describe("/users", () => {
       const res = await config.api.user.fetch()
       expect(res.length).toBe(3)
 
-      const ids = res.map(u => u._id)
+      const ids = res.map((u) => u._id)
       expect(ids).toContain(`ro_ta_users_${id1}`)
       expect(ids).toContain(`ro_ta_users_${id2}`)
     })

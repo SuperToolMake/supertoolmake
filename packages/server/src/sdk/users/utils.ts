@@ -23,14 +23,11 @@ export function combineMetadataAndUser(
 ): ContextUserMetadata | null {
   const metadataId = generateUserMetadataID(user._id!)
   const foundMetadata = Array.isArray(metadata)
-    ? metadata.find(doc => doc._id === metadataId)
+    ? metadata.find((doc) => doc._id === metadataId)
     : metadata
   const found = foundMetadata && stripSensitiveUserFields({ ...foundMetadata })
   // skip users with no access
-  if (
-    user.roleId == null ||
-    user.roleId === rolesCore.BUILTIN_ROLE_IDS.PUBLIC
-  ) {
+  if (user.roleId == null || user.roleId === rolesCore.BUILTIN_ROLE_IDS.PUBLIC) {
     // If it exists and it should not, we must remove it
     if (found?._id) {
       return { ...found, _deleted: true }
@@ -74,7 +71,7 @@ export async function rawUserMetadata(db?: Database): Promise<UserMetadata[]> {
         include_docs: true,
       })
     )
-  ).rows.map(row => row.doc!)
+  ).rows.map((row) => row.doc!)
 }
 
 export async function fetchMetadata(): Promise<ContextUserMetadata[]> {
@@ -83,7 +80,7 @@ export async function fetchMetadata(): Promise<ContextUserMetadata[]> {
   const users: ContextUserMetadata[] = []
   for (const user of global) {
     // find the metadata that matches up to the global ID
-    const info = metadata.find(meta => meta._id!.includes(user._id!))
+    const info = metadata.find((meta) => meta._id!.includes(user._id!))
     const strippedInfo = info && stripSensitiveUserFields({ ...info })
     // remove these props, not for the correct DB
     users.push({
@@ -104,10 +101,7 @@ export async function syncGlobalUsers() {
     if (!(await db.exists())) {
       continue
     }
-    const [users, metadata] = await Promise.all([
-      getGlobalUsers(),
-      rawUserMetadata(db),
-    ])
+    const [users, metadata] = await Promise.all([getGlobalUsers(), rawUserMetadata(db)])
     const toWrite = []
     for (const user of users) {
       const combined = combineMetadataAndUser(user, metadata)
@@ -120,10 +114,9 @@ export async function syncGlobalUsers() {
       if (!data._id) {
         continue
       }
-      const alreadyExisting =
-        data.email && foundEmails.indexOf(data.email) !== -1
+      const alreadyExisting = data.email && foundEmails.indexOf(data.email) !== -1
       const globalId = getGlobalIDFromUserMetadataID(data._id)
-      if (!users.find(user => user._id === globalId) || alreadyExisting) {
+      if (!users.find((user) => user._id === globalId) || alreadyExisting) {
         toWrite.push({ ...data, _deleted: true })
       }
       if (data.email) {

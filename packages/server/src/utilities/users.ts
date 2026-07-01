@@ -1,16 +1,10 @@
 import { context, roles } from "@supertoolmake/backend-core"
-import type {
-  ContextUserMetadata,
-  UserCtx,
-  UserMetadata,
-} from "@supertoolmake/types"
+import type { ContextUserMetadata, UserCtx, UserMetadata } from "@supertoolmake/types"
 import { InternalTables } from "../db/utils"
 import { getGlobalUser } from "./global"
 import { stripSensitiveUserFields } from "./sensitiveUserFields"
 
-export async function getFullUser(
-  userId: string
-): Promise<ContextUserMetadata> {
+export async function getFullUser(userId: string): Promise<ContextUserMetadata> {
   const global = await getGlobalUser(userId)
   let metadata: UserMetadata | undefined
 
@@ -24,7 +18,7 @@ export async function getFullUser(
     metadata = await db.get<UserMetadata>(userId)
     delete metadata.csrfToken
     stripSensitiveUserFields(metadata)
-  } catch (err) {
+  } catch (_err) {
     // it is fine if there is no user metadata yet
   }
   return {

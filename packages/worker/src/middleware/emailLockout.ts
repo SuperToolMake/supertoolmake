@@ -22,9 +22,7 @@ export default async (ctx: Ctx, next: Next) => {
   }
 
   if (await isLocked(email)) {
-    console.log(
-      `[auth] login blocked due to lock email=${normalizeEmail(email)}`
-    )
+    console.log(`[auth] login blocked due to lock email=${normalizeEmail(email)}`)
     ctx.set("X-Account-Locked", "1")
     ctx.set("Retry-After", String(env.LOGIN_LOCKOUT_SECONDS))
     ctx.throw(403, "Account temporarily locked. Try again later.")

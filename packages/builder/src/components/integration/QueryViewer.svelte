@@ -1,85 +1,121 @@
 <script lang="ts">
-  import {
-    ActionButton,
-    Body,
-    Checkbox,
-    Divider,
-    Heading,
-    Input,
-    Label,
-    notifications,
-    Select,
-  } from "@supertoolmake/bbui"
-  import { Utils } from "@supertoolmake/frontend-core"
-  import { ValidQueryNameRegex } from "@supertoolmake/shared-core"
-  import { goto } from "@roxi/routify"
-  import { cloneDeep } from "lodash/fp"
-  import CodeMirrorEditor from "@/components/common/CodeMirrorEditor.svelte"
-  import IntegrationQueryEditor from "@/components/integration/index.svelte"
-  import BindingBuilder from "@/components/integration/QueryViewerBindingBuilder.svelte"
-  import { capitalise } from "@/helpers"
-  import { getErrorMessage } from "@/helpers/errors"
-  import { datasources, integrations, queries } from "@/stores/builder"
-  import AccessLevelSelect from "./AccessLevelSelect.svelte"
-  import ConnectedQueryScreens from "./ConnectedQueryScreens.svelte"
-  import ExtraQueryConfig from "./ExtraQueryConfig.svelte"
-  import QueryViewerSidePanel from "./QueryViewerSidePanel/index.svelte"
-  import type {
-    Datasource,
-    Integration,
-    PreviewQueryResponse,
-    Query,
-    QuerySchema,
-    PaginationConfig,
-  } from "@supertoolmake/types"
+import {
+  ActionButton,
+  Body,
+  Checkbox,
+  Divider,
+  Heading,
+  Input,
+  Label,
+  notifications,
+  Select,
+} from "@supertoolmake/bbui"
+import { Utils } from "@supertoolmake/frontend-core"
+import { ValidQueryNameRegex } from "@supertoolmake/shared-core"
+import { goto } from "@roxi/routify"
+import { cloneDeep } from "lodash/fp"
+import CodeMirrorEditor from "@/components/common/CodeMirrorEditor.svelte"
+import IntegrationQueryEditor from "@/components/integration/index.svelte"
+import BindingBuilder from "@/components/integration/QueryViewerBindingBuilder.svelte"
+import { capitalise } from "@/helpers"
+import { getErrorMessage } from "@/helpers/errors"
+import { datasources, integrations, queries } from "@/stores/builder"
+import AccessLevelSelect from "./AccessLevelSelect.svelte"
+import ConnectedQueryScreens from "./ConnectedQueryScreens.svelte"
+import ExtraQueryConfig from "./ExtraQueryConfig.svelte"
+import QueryViewerSidePanel from "./QueryViewerSidePanel/index.svelte"
+import type {
+  Datasource,
+  Integration,
+  PreviewQueryResponse,
+  Query,
+  QuerySchema,
+  PaginationConfig,
+} from "@supertoolmake/types"
 
-  export let query: Query
-  let queryHash = ""
+export let query: Query
+let queryHash = ""
 
-  let loading = false
-  let modified = false
-  let scrolling = false
-  let showSidePanel = false
-  let nameError: string | null = null
+let loading = false
+let modified = false
+let scrolling = false
+let showSidePanel = false
+let nameError: string | null = null
 
-  let newQuery: Query
+let newQuery: Query
 
-  let datasource: Datasource
-  let integration: Integration
-  let schemaType: string
+let datasource: Datasource
+let integration: Integration
+let schemaType: string
 
-  let schema: Record<string, QuerySchema | string> = {}
-  let nestedSchemaFields: Record<
-    string,
-    Record<string, string | QuerySchema>
-  > = {}
-  let rows: PreviewQueryResponse["rows"] = []
+let schema: Record<string, QuerySchema | string> = {}
+let nestedSchemaFields: Record<string, Record<string, string | QuerySchema>> = {}
+let rows: PreviewQueryResponse["rows"] = []
 
-  let pagination: PaginationConfig | undefined
+let pagination: PaginationConfig | undefined
 
-  const parseQuery = (query: Query) => {
-    modified = false
-    const foundDatasource = $datasources.list.find(
-      (ds: Datasource) => ds._id === query.datasourceId
-    )
-    if (!foundDatasource) {
+const parseQuery = (query: Query) => {
+  modified = false
+  const foundDatasource = $datasources.list.find((ds: Datasource) => ds._id === query.datasourceId)
+  if (!foundDatasource) {
+    return
+  }
+  datasource = foundDatasource
+
+  const matchingIntegration = $integrations[datasource.source]
+  if (!matchingIntegration) {
+    return
+  }
+  integration = matchingIntegration
+  schemaType = integration.query[query.queryVerb].type
+
+  newQuery = cloneDeep(query)
+  // init schema from the query if one already exists
+  schema = newQuery.schema
+  // Set the location where the query code will be written to an empty string so that it doesn't
+  // get changed from undefined -> "" by the input, breaking our unsaved changes checks
+  ;(newQuery.fields as Record<string, any>)[schemaType] ??= ""
+
+  // Initialize pagination for SQL Read queries
+  if (newQuery.queryVerb === "read" && schemaType === "sql") {
+    if (!newQuery.fields.pagination) {
+      newQuery.fields.pagination = {
+        enabled: false,
+        offsetBinding: "offset",
+        limitBinding: "limit",
+      }
+    }
+    pagination = newQuery.fields.pagination
+  } else {
+    pagination = undefined
+  }
+
+  queryHash = JSON.stringify(newQuery)
+}
+
+const checkIsModified = (newQuery: Query) => {
+  const newQueryHash = JSON.stringify(newQuery)
+  modified = newQueryHash !== queryHash
+
+  return modified
+}
+
+async function runQuery({ suppressErrors = true }: { suppressErrors?: boolean } = {}) {
+  try {
+    showSidePanel = true
+    loading = true
+    const response = await queries.preview(newQuery)
+    if (response.rows.length === 0) {
+      notifications.info(
+        "Query results empty. Please execute a query with results to create your schema."
+      )
       return
     }
-    datasource = foundDatasource
 
-    const matchingIntegration = $integrations[datasource.source]
-    if (!matchingIntegration) {
-      return
-    }
-    integration = matchingIntegration
-    schemaType = integration.query[query.queryVerb].type
+    nestedSchemaFields = response.nestedSchemaFields
 
-    newQuery = cloneDeep(query)
-    // init schema from the query if one already exists
-    schema = newQuery.schema
-    // Set the location where the query code will be written to an empty string so that it doesn't
-    // get changed from undefined -> "" by the input, breaking our unsaved changes checks
-    ;(newQuery.fields as Record<string, any>)[schemaType] ??= ""
+    schema = response.schema
+    rows = response.rows
 
     // Initialize pagination for SQL Read queries
     if (newQuery.queryVerb === "read" && schemaType === "sql") {
@@ -95,136 +131,88 @@
       pagination = undefined
     }
 
-    queryHash = JSON.stringify(newQuery)
+    notifications.success("Query executed successfully")
+  } catch (error) {
+    notifications.error(`Query Error: ${getErrorMessage(error)}`)
+
+    if (!suppressErrors) {
+      throw error
+    }
+  } finally {
+    loading = false
   }
+}
 
-  const checkIsModified = (newQuery: Query) => {
-    const newQueryHash = JSON.stringify(newQuery)
-    modified = newQueryHash !== queryHash
+async function saveQuery() {
+  try {
+    showSidePanel = true
+    loading = true
+    const response = await queries.save(newQuery.datasourceId, {
+      ...newQuery,
+      schema,
+      nestedSchemaFields,
+    })
 
-    return modified
+    notifications.success("Query saved successfully")
+    return response
+  } catch (error) {
+    notifications.error(getErrorMessage(error) || "Error saving query")
+  } finally {
+    loading = false
   }
+}
 
-  async function runQuery({
-    suppressErrors = true,
-  }: { suppressErrors?: boolean } = {}) {
-    try {
-      showSidePanel = true
-      loading = true
-      const response = await queries.preview(newQuery)
-      if (response.rows.length === 0) {
-        notifications.info(
-          "Query results empty. Please execute a query with results to create your schema."
-        )
-        return
-      }
+function resetDependentFields() {
+  if (newQuery.fields.extra) {
+    newQuery.fields.extra = {} as Query["fields"]["extra"]
+  }
+}
 
-      nestedSchemaFields = response.nestedSchemaFields
-
-      schema = response.schema
-      rows = response.rows
-
-      // Initialize pagination for SQL Read queries
-      if (newQuery.queryVerb === "read" && schemaType === "sql") {
-        if (!newQuery.fields.pagination) {
-          newQuery.fields.pagination = {
-            enabled: false,
-            offsetBinding: "offset",
-            limitBinding: "limit",
-          }
-        }
-        pagination = newQuery.fields.pagination
-      } else {
-        pagination = undefined
-      }
-
-      notifications.success("Query executed successfully")
-    } catch (error) {
-      notifications.error(`Query Error: ${getErrorMessage(error)}`)
-
-      if (!suppressErrors) {
-        throw error
-      }
-    } finally {
-      loading = false
+const setPaginationField = (field: string, value: unknown) => {
+  if (!newQuery.fields.pagination) {
+    newQuery.fields.pagination = {
+      enabled: false,
+      offsetBinding: "offset",
+      limitBinding: "limit",
     }
   }
-
-  async function saveQuery() {
-    try {
-      showSidePanel = true
-      loading = true
-      const response = await queries.save(newQuery.datasourceId, {
-        ...newQuery,
-        schema,
-        nestedSchemaFields,
-      })
-
-      notifications.success("Query saved successfully")
-      return response
-    } catch (error) {
-      notifications.error(getErrorMessage(error) || "Error saving query")
-    } finally {
-      loading = false
-    }
+  const newPagination = {
+    ...newQuery.fields.pagination,
+    [field]: value,
   }
-
-  function resetDependentFields() {
-    if (newQuery.fields.extra) {
-      newQuery.fields.extra = {} as Query["fields"]["extra"]
-    }
+  // Reassign the parent fields object to trigger Svelte reactivity
+  newQuery.fields = {
+    ...newQuery.fields,
+    pagination: newPagination,
   }
+  pagination = newQuery.fields.pagination
+}
 
-  const setPaginationField = (field: string, value: unknown) => {
-    if (!newQuery.fields.pagination) {
-      newQuery.fields.pagination = {
-        enabled: false,
-        offsetBinding: "offset",
-        limitBinding: "limit",
-      }
-    }
-    const newPagination = {
-      ...newQuery.fields.pagination,
-      [field]: value,
-    }
-    // Reassign the parent fields object to trigger Svelte reactivity
-    newQuery.fields = {
-      ...newQuery.fields,
-      pagination: newPagination,
-    }
-    pagination = newQuery.fields.pagination
+function populateExtraQuery(extraQueryFields: Query["fields"]["extra"]) {
+  newQuery.fields.extra = extraQueryFields
+}
+
+const handleScroll = (e: Event) => {
+  scrolling = e.currentTarget instanceof HTMLElement ? e.currentTarget.scrollTop !== 0 : false
+}
+
+const handleSchemaChange = (newSchema?: Record<string, QuerySchema | string>) => {
+  if (newSchema) {
+    schema = newSchema
   }
+}
 
-  function populateExtraQuery(extraQueryFields: Query["fields"]["extra"]) {
-    newQuery.fields.extra = extraQueryFields
+async function handleKeyDown(evt: KeyboardEvent) {
+  if (evt.key === "Enter" && (evt.metaKey || evt.ctrlKey)) {
+    await runQuery({ suppressErrors: false })
   }
+}
 
-  const handleScroll = (e: Event) => {
-    scrolling =
-      e.currentTarget instanceof HTMLElement
-        ? e.currentTarget.scrollTop !== 0
-        : false
-  }
+$: parseQuery(query)
 
-  const handleSchemaChange = (
-    newSchema?: Record<string, QuerySchema | string>
-  ) => {
-    if (newSchema) {
-      schema = newSchema
-    }
-  }
+const debouncedCheckIsModified = Utils.debounce(checkIsModified, 1000)
 
-  async function handleKeyDown(evt: KeyboardEvent) {
-    if (evt.key === "Enter" && (evt.metaKey || evt.ctrlKey)) {
-      await runQuery({ suppressErrors: false })
-    }
-  }
-
-  $: parseQuery(query)
-
-  const debouncedCheckIsModified = Utils.debounce(checkIsModified, 1000)
-
-  $: debouncedCheckIsModified(newQuery)
+$: debouncedCheckIsModified(newQuery)
 </script>
 
 <svelte:window on:keydown={handleKeyDown} />

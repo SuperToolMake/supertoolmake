@@ -184,12 +184,9 @@ describe("/api/global/auth", () => {
                 })
               }
 
-              const response = await config.api.auth.login(
-                tenantId,
-                email,
-                password,
-                { status: 403 }
-              )
+              const response = await config.api.auth.login(tenantId, email, password, {
+                status: 403,
+              })
 
               expect(response.headers["x-account-locked"]).toBe("1")
               expect(response.headers["retry-after"]).toBe("900")

@@ -220,9 +220,7 @@ describe("syncGlobalUsers", () => {
       await syncGlobalUsers()
 
       const metadata = await fetchMetadata()
-      const found = metadata.find(
-        doc => doc._id === db.generateUserMetadataID(user._id!)
-      )
+      const found = metadata.find((doc) => doc._id === db.generateUserMetadataID(user._id!))
 
       expect(found).toEqual(
         expect.objectContaining({
@@ -348,7 +346,7 @@ describe("syncGlobalUsers", () => {
       })
 
       const metadata = await fetchMetadata()
-      const found = metadata.find(doc => doc._id === userMetadataId)
+      const found = metadata.find((doc) => doc._id === userMetadataId)
       expect(found?.fullName).toEqual("Jane Doe")
     })
   })
@@ -384,7 +382,7 @@ describe("syncGlobalUsers", () => {
       })
 
       const metadata = await fetchMetadata()
-      const found = metadata.find(doc => doc._id === userMetadataId)
+      const found = metadata.find((doc) => doc._id === userMetadataId)
 
       for (const field of [
         "oauth2",

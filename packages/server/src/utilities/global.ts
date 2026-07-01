@@ -1,21 +1,11 @@
-import {
-  cache,
-  context,
-  db as dbCore,
-  roles,
-  tenancy,
-  users,
-} from "@supertoolmake/backend-core"
+import { cache, context, db as dbCore, roles, tenancy, users } from "@supertoolmake/backend-core"
 import type { ContextUser, User, UserCtx } from "@supertoolmake/types"
 import cloneDeep from "lodash/cloneDeep"
 import { getGlobalIDFromUserMetadataID } from "../db/utils"
 import env from "../environment"
 import { stripSensitiveUserFields } from "./sensitiveUserFields"
 
-export async function processUser(
-  user: ContextUser,
-  opts: { appId?: string } = {}
-) {
+export async function processUser(user: ContextUser, opts: { appId?: string } = {}) {
   if (!user?.roles) {
     return user
   }
@@ -26,11 +16,7 @@ export async function processUser(
     throw new Error("Unable to process user without app ID")
   }
   // if in a multi-tenancy environment and in wrong tenant make sure roles are never updated
-  if (
-    env.MULTI_TENANCY &&
-    workspaceId &&
-    !tenancy.isUserInWorkspaceTenant(workspaceId, user)
-  ) {
+  if (env.MULTI_TENANCY && workspaceId && !tenancy.isUserInWorkspaceTenant(workspaceId, user)) {
     user = users.removePortalUserPermissions(user)
     user.roleId = roles.BUILTIN_ROLE_IDS.PUBLIC
     return user
@@ -52,10 +38,7 @@ export async function processUser(
   return user
 }
 
-export async function getCachedSelf(
-  ctx: UserCtx,
-  appId: string
-): Promise<ContextUser> {
+export async function getCachedSelf(ctx: UserCtx, appId: string): Promise<ContextUser> {
   // this has to be tenant aware, can't depend on the context to find it out
   // running some middlewares before the tenancy causes context to break
   const user = await cache.user.getUser({
@@ -89,25 +72,21 @@ export async function getRawGlobalUsers(userIds?: string[]): Promise<User[]> {
           include_docs: true,
         })
       )
-    ).rows.map(row => row.doc!)
+    ).rows.map((row) => row.doc!)
   }
-  return globalUsers
-    .filter(user => user != null)
-    .map(user => stripSensitiveUserFields(user))
+  return globalUsers.filter((user) => user != null).map((user) => stripSensitiveUserFields(user))
 }
 
-export async function getGlobalUsers(
-  userIds?: string[]
-): Promise<ContextUser[]> {
+export async function getGlobalUsers(userIds?: string[]): Promise<ContextUser[]> {
   const users = await getRawGlobalUsers(userIds)
-  return Promise.all(users.map(user => processUser(user)))
+  return Promise.all(users.map((user) => processUser(user)))
 }
 
 export async function getGlobalUsersFromMetadata(users: ContextUser[]) {
-  const globalUsers = await getGlobalUsers(users.map(user => user._id!))
-  return users.map(user => {
+  const globalUsers = await getGlobalUsers(users.map((user) => user._id!))
+  return users.map((user) => {
     const globalUser = globalUsers.find(
-      globalUser => globalUser && user._id?.includes(globalUser._id!)
+      (globalUser) => globalUser && user._id?.includes(globalUser._id!)
     )
     const metadata = stripSensitiveUserFields(cloneDeep(user))
     return {

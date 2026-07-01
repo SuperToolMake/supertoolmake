@@ -1,4 +1,4 @@
-import { type UserSSO } from "@supertoolmake/types"
+import type { UserSSO } from "@supertoolmake/types"
 
 interface SensitiveUserFields extends Partial<UserSSO> {
   password?: string
@@ -7,9 +7,7 @@ interface SensitiveUserFields extends Partial<UserSSO> {
   forceResetPassword?: boolean
 }
 
-export function stripSensitiveUserFields<T extends SensitiveUserFields>(
-  user: T
-): T {
+export function stripSensitiveUserFields<T extends SensitiveUserFields>(user: T): T {
   delete user.password
   delete user.oauth2
   delete user.provider
