@@ -16,6 +16,7 @@ import {
 } from "../../db/utils"
 import { getGlobalUsers } from "../../utilities/global"
 import { stripSensitiveUserFields } from "../../utilities/sensitiveUserFields"
+import { getUserFullName } from "../../utilities/users"
 
 export function combineMetadataAndUser(
   user: ContextUser,
@@ -83,12 +84,16 @@ export async function fetchMetadata(): Promise<ContextUserMetadata[]> {
     const info = metadata.find((meta) => meta._id!.includes(user._id!))
     const strippedInfo = info && stripSensitiveUserFields({ ...info })
     // remove these props, not for the correct DB
-    users.push({
+    const mergedUser = {
       ...user,
       ...strippedInfo,
       tableId: InternalTables.USER_METADATA,
       // make sure the ID is always a local ID, not a global one
       _id: generateUserMetadataID(user._id!),
+    }
+    users.push({
+      ...mergedUser,
+      fullName: getUserFullName(mergedUser),
     })
   }
   return users

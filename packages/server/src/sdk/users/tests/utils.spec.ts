@@ -203,20 +203,20 @@ describe("syncGlobalUsers", () => {
         [config.getProdWorkspaceId()]: roles.BUILTIN_ROLE_IDS.BASIC,
       },
     })
-    // Add SSO fields via direct DB update
-    const db = context.getWorkspaceDB()
-    await db.put({
-      ...user,
-      oauth2: { accessToken: "access", refreshToken: "refresh" },
-      provider: "google",
-      providerType: "google",
-      profile: { displayName: "SSO User" },
-      thirdPartyProfile: { id: "external" },
-      ssoId: "sso-user",
-      forceResetPassword: false,
-    })
 
     await config.doInContext(config.devWorkspaceId, async () => {
+      const workspaceDb = context.getWorkspaceDB()
+      await workspaceDb.put({
+        ...user,
+        oauth2: { accessToken: "access", refreshToken: "refresh" },
+        provider: "google",
+        providerType: "google",
+        profile: { displayName: "SSO User" },
+        thirdPartyProfile: { id: "external" },
+        ssoId: "sso-user",
+        forceResetPassword: false,
+      })
+
       await syncGlobalUsers()
 
       const metadata = await fetchMetadata()
@@ -251,20 +251,20 @@ describe("syncGlobalUsers", () => {
         [config.getProdWorkspaceId()]: roles.BUILTIN_ROLE_IDS.BASIC,
       },
     })
-    // Add SSO fields via direct DB update
-    const db = context.getWorkspaceDB()
-    await db.put({
-      ...user,
-      oauth2: { accessToken: "access", refreshToken: "refresh" },
-      provider: "google",
-      providerType: "google",
-      profile: { displayName: "SSO User" },
-      thirdPartyProfile: { id: "external" },
-      ssoId: "sso-user",
-      forceResetPassword: false,
-    })
 
     await config.doInContext(config.devWorkspaceId, async () => {
+      const workspaceDb = context.getWorkspaceDB()
+      await workspaceDb.put({
+        ...user,
+        oauth2: { accessToken: "access", refreshToken: "refresh" },
+        provider: "google",
+        providerType: "google",
+        profile: { displayName: "SSO User" },
+        thirdPartyProfile: { id: "external" },
+        ssoId: "sso-user",
+        forceResetPassword: false,
+      })
+
       const found = await getGlobalUser(db.generateUserMetadataID(user._id!))
 
       expect(found).toEqual(
