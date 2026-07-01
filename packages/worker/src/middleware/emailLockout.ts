@@ -2,7 +2,6 @@ import { cache } from "@supertoolmake/backend-core"
 import type { Ctx } from "@supertoolmake/types"
 import type { Next } from "koa"
 import env from "../environment"
-import * as userSdk from "../sdk/users"
 
 const normalizeEmail = (e: string) => (e || "").toLowerCase()
 const lockKey = (email: string) => `auth:login:lock:${normalizeEmail(email)}`
@@ -22,9 +21,10 @@ export default async (ctx: Ctx, next: Next) => {
     return await next()
   }
 
-  const dbUser = await userSdk.db.getUserByEmail(email)
-  if (dbUser && (await isLocked(email))) {
-    console.log(`[auth] login blocked due to lock email=${normalizeEmail(email)}`)
+  if (await isLocked(email)) {
+    console.log(
+      `[auth] login blocked due to lock email=${normalizeEmail(email)}`
+    )
     ctx.set("X-Account-Locked", "1")
     ctx.set("Retry-After", String(env.LOGIN_LOCKOUT_SECONDS))
     ctx.throw(403, "Account temporarily locked. Try again later.")

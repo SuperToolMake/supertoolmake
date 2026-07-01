@@ -46,7 +46,9 @@ const isLocked = async (email: string) => {
 const handleLockoutResponse = (ctx: Ctx, email: string) => {
   ctx.set("X-Account-Locked", "1")
   ctx.set("Retry-After", String(env.LOGIN_LOCKOUT_SECONDS))
-  console.log(`[auth] login blocked (post-failure) due to lock email=${normalizeEmail(email)}`)
+  console.log(
+    `[auth] login blocked (post-failure) due to lock email=${normalizeEmail(email)}`
+  )
   return ctx.throw(403, "Account temporarily locked. Try again later.")
 }
 const onFailed = async (email: string) => {
@@ -55,7 +57,9 @@ const onFailed = async (email: string) => {
   const currentAttempt = Number((await cache.get(key)) || 0) || 0
   const nextAttempt = currentAttempt + 1
   await cache.store(key, nextAttempt, env.LOGIN_LOCKOUT_SECONDS)
-  console.log(`[auth] failed login email=${normalizeEmail(email)} count=${nextAttempt}`)
+  console.log(
+    `[auth] failed login email=${normalizeEmail(email)} count=${nextAttempt}`
+  )
   if (nextAttempt >= env.LOGIN_MAX_FAILED_ATTEMPTS) {
     await cache.store(lockKey(email), "1", env.LOGIN_LOCKOUT_SECONDS)
     await cache.destroy(key)
@@ -98,41 +102,55 @@ async function passportCallback(
 
   // add session invalidation info to response headers for frontend to handle
   if (loginResult.invalidatedSessionCount > 0) {
-    ctx.set("X-Session-Invalidated-Count", loginResult.invalidatedSessionCount.toString())
+    ctx.set(
+      "X-Session-Invalidated-Count",
+      loginResult.invalidatedSessionCount.toString()
+    )
   }
 }
 
-export const login = async (ctx: Ctx<LoginRequest, LoginResponse>, next: Next) => {
+export const login = async (
+  ctx: Ctx<LoginRequest, LoginResponse>,
+  next: Next
+) => {
   const email = ctx.request.body.username
 
   const dbUser = await userSdk.db.getUserByEmail(email)
   if (dbUser && (await userSdk.db.isPreventPasswordActions(dbUser))) {
-    console.log(`[auth] login prevented due to sso enforcement email=${normalizeEmail(email)}`)
+    console.log(
+      `[auth] login prevented due to sso enforcement email=${normalizeEmail(email)}`
+    )
     ctx.throw(403, "Invalid credentials")
   }
 
-  return passport.authenticate("local", async (err: any, user: User, info: any) => {
-    if (err || !user) {
-      if (dbUser) {
+  return passport.authenticate(
+    "local",
+    async (err: any, user: User, info: any) => {
+      if (err || !user) {
         await onFailed(email)
+        if (await isLocked(email)) {
+          return handleLockoutResponse(ctx, email)
+        }
+        const reason =
+          (info && info.message) || (err && err.message) || "unknown"
+        console.log(
+          `[auth] password auth failed email=${normalizeEmail(email)} reason=${reason}`
+        )
+        // delegate to shared passport failure handling to preserve specific messages (e.g. expired)
+        return passportCallback(ctx, user as any, err, info)
       }
-      if (await isLocked(email)) {
-        return handleLockoutResponse(ctx, email)
-      }
-      const reason = info?.message || err?.message || "unknown"
-      console.log(`[auth] password auth failed email=${normalizeEmail(email)} reason=${reason}`)
-      // delegate to shared passport failure handling to preserve specific messages (e.g. expired)
-      return passportCallback(ctx, user as any, err, info)
-    }
 
-    await clearFailureState(email)
-    console.log(`[auth] password auth success email=${normalizeEmail(user.email)}`)
-    await passportCallback(ctx, user, err, info)
-    ctx.body = {
-      message: "Login successful",
-      userId: user.userId,
+      await clearFailureState(email)
+      console.log(
+        `[auth] password auth success email=${normalizeEmail(user.email)}`
+      )
+      await passportCallback(ctx, user, err, info)
+      ctx.body = {
+        message: "Login successful",
+        userId: user.userId,
+      }
     }
-  })(ctx, next)
+  )(ctx, next)
 }
 
 export const logout = async (ctx: UserCtx<void, LogoutResponse>) => {
@@ -144,7 +162,9 @@ export const logout = async (ctx: UserCtx<void, LogoutResponse>) => {
 
 // INIT
 
-export const setInitInfo = async (ctx: UserCtx<SetInitInfoRequest, SetInitInfoResponse>) => {
+export const setInitInfo = async (
+  ctx: UserCtx<SetInitInfoRequest, SetInitInfoResponse>
+) => {
   const initInfo = ctx.request.body
   setCookie(ctx, initInfo, Cookie.Init)
   ctx.body = {
@@ -166,7 +186,9 @@ export const getInitInfo = async (ctx: UserCtx<void, GetInitInfoResponse>) => {
 /**
  * Reset the user password, used as part of a forgotten password flow.
  */
-export const reset = async (ctx: Ctx<PasswordResetRequest, PasswordResetResponse>) => {
+export const reset = async (
+  ctx: Ctx<PasswordResetRequest, PasswordResetResponse>
+) => {
   const { email } = ctx.request.body
 
   const lcEmail = (email || "").toLowerCase()
@@ -184,15 +206,24 @@ export const reset = async (ctx: Ctx<PasswordResetRequest, PasswordResetResponse
   }
 
   // apply per-email and per-ip rate limits
-  const nextEmail = await increment(emailKey, env.PASSWORD_RESET_RATE_EMAIL_WINDOW_SECONDS)
-  const nextIp = await increment(ipKey, env.PASSWORD_RESET_RATE_IP_WINDOW_SECONDS)
+  const nextEmail = await increment(
+    emailKey,
+    env.PASSWORD_RESET_RATE_EMAIL_WINDOW_SECONDS
+  )
+  const nextIp = await increment(
+    ipKey,
+    env.PASSWORD_RESET_RATE_IP_WINDOW_SECONDS
+  )
 
   const emailLimited = nextEmail > env.PASSWORD_RESET_RATE_EMAIL_LIMIT
   const ipLimited = nextIp > env.PASSWORD_RESET_RATE_IP_LIMIT
 
   if (emailLimited || ipLimited) {
     // surfaced for ui to display
-    ctx.set("X-RateLimit-Email-Limit", String(env.PASSWORD_RESET_RATE_EMAIL_LIMIT))
+    ctx.set(
+      "X-RateLimit-Email-Limit",
+      String(env.PASSWORD_RESET_RATE_EMAIL_LIMIT)
+    )
     ctx.set(
       "X-RateLimit-Email-Remaining",
       String(Math.max(env.PASSWORD_RESET_RATE_EMAIL_LIMIT - nextEmail, 0))
@@ -242,7 +273,10 @@ export const resetUpdate = async (
 
 // DATASOURCE
 
-export const datasourcePreAuth = async (ctx: UserCtx<void, void>, next: Next) => {
+export const datasourcePreAuth = async (
+  ctx: UserCtx<void, void>,
+  next: Next
+) => {
   const provider = ctx.params.provider
   const { middleware } = require(`@supertoolmake/backend-core`)
   const handler = middleware.datasource[provider]
@@ -260,7 +294,10 @@ export const datasourcePreAuth = async (ctx: UserCtx<void, void>, next: Next) =>
 }
 
 export const datasourceAuth = async (ctx: UserCtx<void, void>, next: Next) => {
-  const authStateCookie = getCookie<DatasourceAuthCookie>(ctx, Cookie.DatasourceAuth)
+  const authStateCookie = getCookie<DatasourceAuthCookie>(
+    ctx,
+    Cookie.DatasourceAuth
+  )
   if (!authStateCookie) {
     throw new Error("Unable to retrieve datasource authentication cookie")
   }
@@ -286,7 +323,11 @@ export const googlePreAuth = async (ctx: Ctx<void, void>, next: Next) => {
     return ctx.throw(400, "Google config not found")
   }
   const callbackUrl = await googleCallbackUrl(config)
-  const strategy = await google.strategyFactory(config, callbackUrl, userSdk.db.save)
+  const strategy = await google.strategyFactory(
+    config,
+    callbackUrl,
+    userSdk.db.save
+  )
 
   return passport.authenticate(strategy, {
     scope: ["profile", "email"],
@@ -301,7 +342,11 @@ export const googleCallback = async (ctx: Ctx<void, void>, next: Next) => {
     return ctx.throw(400, "Google config not found")
   }
   const callbackUrl = await googleCallbackUrl(config)
-  const strategy = await google.strategyFactory(config, callbackUrl, userSdk.db.save)
+  const strategy = await google.strategyFactory(
+    config,
+    callbackUrl,
+    userSdk.db.save
+  )
 
   return passport.authenticate(
     strategy,
@@ -354,7 +399,9 @@ export const oidcPreAuth = async (ctx: Ctx<void, void>, next: Next) => {
   }
 
   const authScopes =
-    config.scopes?.length > 0 ? config.scopes : ["profile", "email", "offline_access"]
+    config.scopes?.length > 0
+      ? config.scopes
+      : ["profile", "email", "offline_access"]
 
   return passport.authenticate(strategy, {
     // required 'openid' scope is added by oidc strategy factory
