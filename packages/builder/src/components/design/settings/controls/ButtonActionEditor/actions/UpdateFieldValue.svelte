@@ -1,129 +1,115 @@
 <script lang="ts">
-  import { Select, Label, Multiselect } from "@supertoolmake/bbui"
-  import { onMount } from "svelte"
-  import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
-  import { selectedScreen, componentStore } from "@/stores/builder"
-  import { getActionProviders, buildFormSchema } from "@/dataBinding"
-  import { findComponent } from "@/helpers/components"
-  import type { Component } from "@supertoolmake/types"
+import { Select, Label, Multiselect } from "@supertoolmake/bbui"
+import { onMount } from "svelte"
+import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import { selectedScreen, componentStore } from "@/stores/builder"
+import { getActionProviders, buildFormSchema } from "@/dataBinding"
+import { findComponent } from "@/helpers/components"
+import type { Component } from "@supertoolmake/types"
 
-  type UpdateFieldValueType = "set" | "reset"
+type UpdateFieldValueType = "set" | "reset"
 
-  interface Parameters {
-    componentId?: string
-    type?: UpdateFieldValueType
-    fields?: string[]
-    fieldValues?: Record<string, string>
-  }
+interface Parameters {
+  componentId?: string
+  type?: UpdateFieldValueType
+  fields?: string[]
+  fieldValues?: Record<string, string>
+}
 
-  interface Props {
-    parameters?: Parameters
-    bindings?: unknown[]
-    nested?: boolean
-  }
+interface Props {
+  parameters?: Parameters
+  bindings?: unknown[]
+  nested?: boolean
+}
 
-  let {
-    parameters = $bindable<Parameters>({}),
-    bindings = [],
-    nested,
-  }: Props = $props()
+let { parameters = $bindable<Parameters>({}), bindings = [], nested }: Props = $props()
 
-  const typeOptions = [
-    {
-      label: "Set value",
-      value: "set",
-    },
-    {
-      label: "Reset to default value",
-      value: "reset",
-    },
-  ]
+const typeOptions = [
+  {
+    label: "Set value",
+    value: "set",
+  },
+  {
+    label: "Reset to default value",
+    value: "reset",
+  },
+]
 
-  const getFormComponent = (
-    asset: Component | undefined,
-    id: string | undefined
-  ) => {
-    if (!id) {
-      return null
-    }
-    let component = findComponent(asset, id)
-    if (component) {
-      return component
-    }
-    const componentId = id?.replace(/-(form|provider)$/, "")
-    if (componentId && componentId !== id) {
-      return findComponent(asset, componentId)
-    }
+const getFormComponent = (asset: Component | undefined, id: string | undefined) => {
+  if (!id) {
     return null
   }
+  let component = findComponent(asset, id)
+  if (component) {
+    return component
+  }
+  const componentId = id?.replace(/-(form|provider)$/, "")
+  if (componentId && componentId !== id) {
+    return findComponent(asset, componentId)
+  }
+  return null
+}
 
-  const formComponent = $derived(
-    getFormComponent($selectedScreen?.props, parameters.componentId)
-  )
-  const formSchema = $derived(buildFormSchema(formComponent))
-  const fieldOptions = $derived(Object.keys(formSchema || {}))
-  const selectedFields = $derived(parameters.fields || [])
-  const actionProviders = $derived(
-    getActionProviders(
-      $selectedScreen,
-      $componentStore.selectedComponentId,
-      "UpdateFieldValue",
-      { includeSelf: nested || false }
-    )
-  )
-
-  onMount(() => {
-    if (!parameters.type) {
-      parameters = {
-        ...parameters,
-        type: "set",
-      }
-    }
+const formComponent = $derived(getFormComponent($selectedScreen?.props, parameters.componentId))
+const formSchema = $derived(buildFormSchema(formComponent))
+const fieldOptions = $derived(Object.keys(formSchema || {}))
+const selectedFields = $derived(parameters.fields || [])
+const actionProviders = $derived(
+  getActionProviders($selectedScreen, $componentStore.selectedComponentId, "UpdateFieldValue", {
+    includeSelf: nested || false,
   })
+)
 
-  const handleFormChange = (e: CustomEvent<string | undefined>) => {
-    if (!e.detail) {
-      return
-    }
-
+onMount(() => {
+  if (!parameters.type) {
     parameters = {
       ...parameters,
-      componentId: e.detail,
-      fields: [],
-      fieldValues: {},
+      type: "set",
     }
   }
+})
 
-  const handleTypeChange = (
-    e: CustomEvent<UpdateFieldValueType | undefined>
-  ) => {
-    if (!e.detail) {
-      return
-    }
-
-    parameters = {
-      ...parameters,
-      type: e.detail,
-    }
+const handleFormChange = (e: CustomEvent<string | undefined>) => {
+  if (!e.detail) {
+    return
   }
 
-  const handleFieldChange = (e: CustomEvent<string[]>) => {
-    parameters = {
-      ...parameters,
-      fields: e.detail || [],
-      fieldValues: parameters.fieldValues || {},
-    }
+  parameters = {
+    ...parameters,
+    componentId: e.detail,
+    fields: [],
+    fieldValues: {},
+  }
+}
+
+const handleTypeChange = (e: CustomEvent<UpdateFieldValueType | undefined>) => {
+  if (!e.detail) {
+    return
   }
 
-  const handleFieldValueChange = (fieldName: string, value: string) => {
-    parameters = {
-      ...parameters,
-      fieldValues: {
-        ...(parameters.fieldValues || {}),
-        [fieldName]: value,
-      },
-    }
+  parameters = {
+    ...parameters,
+    type: e.detail,
   }
+}
+
+const handleFieldChange = (e: CustomEvent<string[]>) => {
+  parameters = {
+    ...parameters,
+    fields: e.detail || [],
+    fieldValues: parameters.fieldValues || {},
+  }
+}
+
+const handleFieldValueChange = (fieldName: string, value: string) => {
+  parameters = {
+    ...parameters,
+    fieldValues: {
+      ...(parameters.fieldValues || {}),
+      [fieldName]: value,
+    },
+  }
+}
 </script>
 
 <div class="root">
