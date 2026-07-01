@@ -1,10 +1,20 @@
-<script>
+<script lang="ts">
   import { Select, Label, Multiselect } from "@supertoolmake/bbui"
   import { onMount } from "svelte"
   import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
   import { selectedScreen, componentStore } from "@/stores/builder"
   import { getActionProviders, buildFormSchema } from "@/dataBinding"
   import { findComponent } from "@/helpers/components"
+  import type { Component } from "@supertoolmake/types"
+
+  type UpdateFieldValueType = "set" | "reset"
+
+  interface Parameters {
+    componentId?: string
+    type?: UpdateFieldValueType
+    fields?: string[]
+    fieldValues?: Record<string, string>
+  }
 
   interface Props {
     parameters?: Parameters
@@ -117,7 +127,7 @@
 </script>
 
 <div class="root">
-  <Label small>Form</Label>
+  <Label size="S">Form</Label>
   <Select
     value={parameters.componentId}
     on:change={handleFormChange}
@@ -125,14 +135,14 @@
     getOptionLabel={x => x.readableBinding}
     getOptionValue={x => x.runtimeBinding}
   />
-  <Label small>Type</Label>
+  <Label size="S">Type</Label>
   <Select
     placeholder={false}
     value={parameters.type}
     on:change={handleTypeChange}
     options={typeOptions}
   />
-  <Label small>Fields</Label>
+  <Label size="S">Fields</Label>
   <Multiselect
     value={parameters.fields || []}
     on:change={handleFieldChange}
@@ -141,7 +151,7 @@
       ? "Select fields to reset"
       : "Select fields to set"}
   />
-  {#if parameters.type === "set" && parameters.fields?.length > 0}
+  {#if parameters.type === "set" && parameters.fields && parameters.fields.length > 0}
     <div class="field-values">
       {#each parameters.fields as fieldName}
         <div class="field-value-pair">
