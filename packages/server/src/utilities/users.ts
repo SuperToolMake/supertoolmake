@@ -4,11 +4,7 @@ import { InternalTables } from "../db/utils"
 import { getGlobalUser } from "./global"
 import { stripSensitiveUserFields } from "./sensitiveUserFields"
 
-export function getUserFullName(user: {
-  firstName?: string
-  lastName?: string
-  email?: string
-}) {
+export function getUserFullName(user: { firstName?: string; lastName?: string; email?: string }) {
   const firstName = user.firstName?.trim()
   const lastName = user.lastName?.trim()
 
