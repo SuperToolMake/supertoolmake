@@ -88,6 +88,18 @@ const isValidBoolean = (value) => {
   return value == null || value === "false" || value === "true" || value === ""
 }
 
+const isValidNumber = (value) => {
+  if (value == null || value === "") {
+    return true
+  }
+
+  if (typeof value === "string" && value.trim() === "") {
+    return false
+  }
+
+  return Number.isFinite(Number(value))
+}
+
 const validationMap = {
   date: isValidDate,
   datetime: isValidDate,
@@ -97,6 +109,7 @@ const validationMap = {
   array: hasValidOptions,
   longform: (value) => !isJSBinding(value),
   json: (value) => !isJSBinding(value),
+  number: isValidNumber,
   options: (value) => !(isJSBinding(value) || findHBSBlocks(value)?.length),
   boolean: isValidBoolean,
 }
@@ -116,7 +129,16 @@ const getIconClass = (value, type) => {
   if (type === "date" || type === "datetime") {
     return "date-slot-icon"
   }
-  if (!["string", "number", "bigint"].includes(type)) {
+  if (!isValid(value)) {
+    return "slot-icon"
+  }
+  if (
+    ![
+      "string",
+      "number",
+      "bigint",
+    ].includes(type)
+  ) {
     return "slot-icon"
   }
   return ""
@@ -223,6 +245,7 @@ const getIconClass = (value, type) => {
   }
 
   .icon {
+    right: 1px;
     bottom: 1px;
     position: absolute;
     justify-content: center;

@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Button, Drawer, Icon, Input, TextArea } from "@supertoolmake/bbui"
-import { isJSBinding } from "@supertoolmake/string-templates"
+import { findHBSBlocks, isJSBinding } from "@supertoolmake/string-templates"
 import { createEventDispatcher, setContext } from "svelte"
 import type { HTMLInputTypeAttribute } from "svelte/elements"
 import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
@@ -57,6 +57,8 @@ const onDrawerHide = (e: any) => {
 $: readableValue = runtimeToReadableBinding(bindings, value)
 $: tempValue = readableValue
 $: isJS = isJSBinding(value)
+$: hasBinding = !!findHBSBlocks(value)?.length
+$: resolvedInputType = hasBinding ? "text" : inputType
 
 setContext("binding-drawer-actions", {
   save: saveBinding,
@@ -78,7 +80,7 @@ setContext("binding-drawer-actions", {
     placeholder={placeholder || undefined}
     {updateOnChange}
     {autocomplete}
-    type={multiline ? undefined : inputType}
+    type={multiline ? undefined : resolvedInputType}
   >
     {#if !disabled && !disableBindings}
       <div
