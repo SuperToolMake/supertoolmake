@@ -96,6 +96,7 @@ export function processJS(handlebars: string, context: any) {
       clonedContext = cloneDeep(context)
     }
 
+    const indirectEval = eval
     const sandboxContext: Record<string, any> = {
       $: (path: string) => getContextValue(path, clonedContext),
       helpers: getJsHelperList(),
@@ -105,7 +106,7 @@ export function processJS(handlebars: string, context: any) {
         {
           get: (_, name) => {
             if (!(name in snippetCache)) {
-              snippetCache[name] = (0, eval)(iifeWrapper(snippetMap[name]))
+              snippetCache[name] = indirectEval(iifeWrapper(snippetMap[name]))
             }
             return snippetCache[name]
           },
