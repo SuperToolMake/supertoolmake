@@ -45,9 +45,6 @@
     "vite-plugin-css-injected-by-js": "3.5.2",
     "vitest": "4.1.9"
   },
-  "resolutions": {
-    "loader-utils": "1.4.1"
-  },
   "nx": {
     "targets": {
       "build": {

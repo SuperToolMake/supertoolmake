@@ -82,9 +82,6 @@
     "svelte-dnd-action": "0.9.8",
     "svelte-portal": "2.2.1"
   },
-  "resolutions": {
-    "loader-utils": "1.4.1"
-  },
   "nx": {
     "targets": {
       "build": {
