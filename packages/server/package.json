@@ -99,7 +99,7 @@
     "zod-validation-error": "5.0.0"
   },
   "devDependencies": {
-    "@babel/core": "7.29.0",
+    "@babel/core": "7.29.6",
     "@babel/preset-env": "7.29.5",
     "@types/formidable": "^3.4.6",
     "@types/global-agent": "2.1.1",
