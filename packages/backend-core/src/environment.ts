@@ -51,15 +51,6 @@ function getAPIEncryptionKey() {
   return process.env.API_ENCRYPTION_KEY ? process.env.API_ENCRYPTION_KEY : process.env.JWT_SECRET // fallback to the JWT_SECRET used historically
 }
 
-function httpLogging() {
-  if (process.env.HTTP_LOGGING === undefined) {
-    // on by default unless otherwise specified
-    return true
-  }
-
-  return process.env.HTTP_LOGGING
-}
-
 function getPackageJsonFields(): {
   VERSION: string
   SERVICE_NAME: string
@@ -192,7 +183,6 @@ const environment = {
   LOG_LEVEL: process.env.LOG_LEVEL || "info",
   SESSION_UPDATE_PERIOD: process.env.SESSION_UPDATE_PERIOD,
   DEPLOYMENT_ENVIRONMENT: process.env.DEPLOYMENT_ENVIRONMENT || "docker-compose",
-  HTTP_LOGGING: httpLogging(),
   ENABLE_AUDIT_LOG_IP_ADDR: process.env.ENABLE_AUDIT_LOG_IP_ADDR,
   // Couch/search
   SQL_LOGGING_ENABLE: process.env.SQL_LOGGING_ENABLE,
@@ -217,7 +207,6 @@ const environment = {
    */
   ENABLE_SSO_MAINTENANCE_MODE: selfHosted ? process.env.ENABLE_SSO_MAINTENANCE_MODE : false,
   ...getPackageJsonFields(),
-  DISABLE_PINO_LOGGER: process.env.DISABLE_PINO_LOGGER,
   OFFLINE_MODE: process.env.OFFLINE_MODE,
   SESSION_EXPIRY_SECONDS: process.env.SESSION_EXPIRY_SECONDS,
   _set(key: any, value: any) {
@@ -225,7 +214,6 @@ const environment = {
     // @ts-expect-error
     environment[key] = value
   },
-  ROLLING_LOG_MAX_SIZE: process.env.ROLLING_LOG_MAX_SIZE || "10M",
   ENABLE_SCIM_LOGGER: process.env.ENABLE_SCIM_LOGGER,
   BB_ADMIN_USER_EMAIL: process.env.BB_ADMIN_USER_EMAIL,
   BB_ADMIN_USER_PASSWORD: process.env.BB_ADMIN_USER_PASSWORD,

@@ -1,4 +1,4 @@
-import { constants, env as coreEnv, logging, tenancy } from "@supertoolmake/backend-core"
+import { constants, env as coreEnv, tenancy } from "@supertoolmake/backend-core"
 import {
   type Ctx,
   type EmailAttachment,
@@ -59,7 +59,6 @@ export function createRequest<TBody>(request: Request<TBody>): RequestInit {
     requestInit.body = JSON.stringify(request.body)
   }
 
-  logging.correlation.setHeader(headers)
   requestInit.headers = headers
   return requestInit
 }

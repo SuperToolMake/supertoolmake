@@ -3,7 +3,8 @@
   "compilerOptions": {
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["@testing-library/jest-dom"],
     "baseUrl": ".",
     "paths": {
       "@supertoolmake/*": [

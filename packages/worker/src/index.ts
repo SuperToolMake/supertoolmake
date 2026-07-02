@@ -84,8 +84,6 @@ const sessionMiddleware: Middleware = async (ctx: any, next: any) => {
 
 app.use(sessionMiddleware)
 
-app.use(middleware.correlation)
-app.use(middleware.pino)
 app.use(middleware.ip)
 if (!coreEnv.DISABLE_CONTENT_SECURITY_POLICY) {
   app.use(middleware.csp)

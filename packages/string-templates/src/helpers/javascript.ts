@@ -105,7 +105,7 @@ export function processJS(handlebars: string, context: any) {
         {
           get: (_, name) => {
             if (!(name in snippetCache)) {
-              snippetCache[name] = eval(iifeWrapper(snippetMap[name]))
+              snippetCache[name] = (0, eval)(iifeWrapper(snippetMap[name]))
             }
             return snippetCache[name]
           },

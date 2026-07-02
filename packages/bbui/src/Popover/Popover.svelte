@@ -1,8 +1,6 @@
 <script context="module" lang="ts">
-export interface PopoverAPI {
-  show: () => void
-  hide: () => void
-}
+import type { PopoverAPI } from "./PopoverAPI"
+export type { PopoverAPI }
 </script>
 
 <script lang="ts">

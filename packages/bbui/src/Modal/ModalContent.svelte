@@ -1,5 +1,6 @@
 <script context="module" lang="ts">
-export const keepOpen = Symbol("keepOpen")
+import { keepOpen } from "./keepOpen"
+export { keepOpen }
 </script>
 
 <script lang="ts">

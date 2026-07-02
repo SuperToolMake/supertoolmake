@@ -18,7 +18,6 @@ export enum Header {
   RETURN_RESET_PASSWORD_CODE = "x-budibase-return-reset-password-code",
   TOKEN = "x-budibase-token",
   CSRF_TOKEN = "x-csrf-token",
-  CORRELATION_ID = "x-budibase-correlation-id",
   AUTHORIZATION = "authorization",
   MIGRATING_APP = "x-budibase-migrating-app",
   COOKIE = "cookie",

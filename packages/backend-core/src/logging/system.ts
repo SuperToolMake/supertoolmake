@@ -1,8 +1,6 @@
 import fs from "node:fs"
 import path from "node:path"
-import * as rfs from "rotating-file-stream"
 
-import env from "../environment"
 import { budibaseTempDir } from "../objectStore"
 
 const logsFileName = `budibase.log`
@@ -46,21 +44,6 @@ export function getSingleFileMaxSizeInfo(totalMaxSize: string) {
   }
 
   return { size: `1${unit}`, totalHistoryFiles: size - 1 }
-}
-
-export function localFileDestination() {
-  const fileInfo = getSingleFileMaxSizeInfo(env.ROLLING_LOG_MAX_SIZE)
-  const outFile = rfs.createStream(logsFileName, {
-    // As we have a rolling size, we want to half the max size
-    size: fileInfo?.size,
-    path: logsPath,
-    maxFiles: fileInfo?.totalHistoryFiles || 1,
-    immutable: true,
-    history: budibaseLogsHistoryFileName,
-    initialRotation: false,
-  })
-
-  return outFile
 }
 
 export function getLogReadStream() {

@@ -1,5 +1,3 @@
-export { correlationMiddleware as correlation } from "../logging/correlation/middleware"
-export { pinoMiddleware as pino } from "../logging/pino/middleware"
 export { activeTenant } from "./activation"
 export { adminOnly } from "./adminOnly"
 export { authenticated } from "./authenticated"

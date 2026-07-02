@@ -1,10 +1,6 @@
 <script lang="ts" context="module">
-export interface ModalAPI {
-  show: () => void
-  hide: () => void
-  toggle: () => void
-  cancel: (_: ModalCancelFrom) => void
-}
+import type { ModalAPI } from "./ModalAPI"
+export type { ModalAPI }
 </script>
 
 <script lang="ts">

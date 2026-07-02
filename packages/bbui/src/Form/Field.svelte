@@ -61,10 +61,4 @@ export let tooltip: string | undefined = undefined
     color: var(--spectrum-global-color-gray-800);
     font-size: var(--spectrum-global-dimension-font-size-75);
   }
-  .description {
-    margin-bottom: var(--spacing-xs);
-  }
-  .description :global(label) {
-    white-space: normal;
-  }
 </style>
