@@ -56,7 +56,7 @@ SuperToolMake considers a lightweight and modular approach, focusing on the core
 
 **SuperToolMake has a total memory footprint under 0.5GB, and comfortably runs on a 1GB box.**
 
-Currently I am running an app on *Scaleway Stardust*, which costs ~ €3.50/month: <a href="https://app.gullinfo.org/larus/app" target=_blank>https://app.gullinfo.org/app/larus</a>
+Currently I am running an app on *Scaleway Stardust*, which costs ~ €4.40/month: <a href="https://app.gullinfo.org/larus/app" target=_blank>https://app.gullinfo.org/app/larus</a>
 
 I am also using [Supabase](https://supabase.com/) as my Postgres provider.
 
