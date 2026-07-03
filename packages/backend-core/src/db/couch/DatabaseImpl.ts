@@ -339,19 +339,21 @@ export class CouchDatabase implements Database {
   async bulkDocs(documents: AnyDocument[], opts?: { new_edits?: boolean }) {
     const now = new Date().toISOString()
     return this.performCallWithDBCreation((db) => {
-      return () => db.bulk({
-        docs: documents.map((d) => ({ createdAt: now, ...d, updatedAt: now })),
-        new_edits: opts?.new_edits,
-      })
+      return () =>
+        db.bulk({
+          docs: documents.map((d) => ({ createdAt: now, ...d, updatedAt: now })),
+          new_edits: opts?.new_edits,
+        })
     })
   }
 
   private async bulkDocsRaw(documents: AnyDocument[], opts?: { new_edits?: boolean }) {
     return this.performCallWithDBCreation((db) => {
-      return () => db.bulk({
-        docs: documents,
-        new_edits: opts?.new_edits,
-      })
+      return () =>
+        db.bulk({
+          docs: documents,
+          new_edits: opts?.new_edits,
+        })
     })
   }
 
