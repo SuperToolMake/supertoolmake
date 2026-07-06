@@ -1,5 +1,5 @@
 import type http from "node:http"
-import { permissions } from "@supertoolmake/backend-core"
+import { auth, permissions } from "@supertoolmake/backend-core"
 import { BuilderSocketEvent } from "@supertoolmake/shared-core"
 import type {
   ContextUser,
@@ -12,11 +12,14 @@ import type {
   Workspace,
   WorkspaceApp,
 } from "@supertoolmake/types"
-import type Koa from "koa"
+import Koa from "koa"
+import { userAgent } from "koa-useragent"
 import type { Socket } from "socket.io"
 import { authorizedMiddleware as authorized } from "../middleware/authorized"
+import { currentWorkspaceMiddleware as currentWorkspace } from "../middleware/currentWorkspace"
 import { clearLock, updateLock } from "../utilities/redis"
 import { gridSocket } from "./index"
+import { createContext, runMiddlewares } from "./middleware"
 import { BaseSocket, type EmitOptions } from "./websocket"
 
 export default class BuilderSocket extends BaseSocket {
@@ -27,19 +30,42 @@ export default class BuilderSocket extends BaseSocket {
   async onConnect(socket?: Socket) {
     // Initial identification of selected app
     socket?.on(BuilderSocketEvent.SelectApp, async ({ appId }, callback) => {
-      await this.joinRoom(socket, appId)
-      const sessions = await this.getRoomSessions(appId)
+      if (!appId) {
+        socket.disconnect(true)
+        return
+      }
 
-      // Track collaboration usage by unique users
-      const userIdMap: Record<string, boolean> = {}
-      sessions?.forEach((session) => {
-        if (session._id) {
-          userIdMap[session._id] = true
-        }
-      })
+      // The handshake middleware only confirms the user is a builder of
+      // *some* workspace (it runs before appId is known). Re-check
+      // permissions for this specific appId here, otherwise a builder of
+      // one workspace could join the room of another by sending its id.
+      const ctx = createContext(this.app, socket, { appId })
+      const middlewares = [
+        userAgent,
+        auth.buildAuthMiddleware([]),
+        currentWorkspace,
+        authorized(permissions.BUILDER),
+      ]
 
-      // Reply with all current sessions
-      callback({ users: sessions })
+      try {
+        await runMiddlewares(ctx, middlewares, async () => {
+          await this.joinRoom(socket, appId)
+          const sessions = await this.getRoomSessions(appId)
+
+          // Track collaboration usage by unique users
+          let userIdMap: Record<string, boolean> = {}
+          sessions?.forEach(session => {
+            if (session._id) {
+              userIdMap[session._id] = true
+            }
+          })
+
+          // Reply with all current sessions
+          callback({ users: sessions })
+        })
+      } catch (error) {
+        socket.disconnect(true)
+      }
     })
 
     // Handle users selecting a new cell
