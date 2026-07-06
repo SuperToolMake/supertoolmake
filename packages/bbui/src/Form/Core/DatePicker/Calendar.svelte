@@ -87,13 +87,11 @@ let wheelTimer
 let touchStartX = 0
 let touchStartY = 0
 
-const changeMonth = forward => {
-  calendarDate = forward
-    ? calendarDate.add(1, "month")
-    : calendarDate.subtract(1, "month")
+const changeMonth = (forward) => {
+  calendarDate = forward ? calendarDate.add(1, "month") : calendarDate.subtract(1, "month")
 }
 
-const handleWheel = e => {
+const handleWheel = (e) => {
   if (wheelLock) {
     return
   }
@@ -106,12 +104,12 @@ const handleWheel = e => {
   changeMonth(delta > 0)
 }
 
-const handleTouchStart = e => {
+const handleTouchStart = (e) => {
   touchStartX = e.changedTouches[0].clientX
   touchStartY = e.changedTouches[0].clientY
 }
 
-const handleTouchEnd = e => {
+const handleTouchEnd = (e) => {
   const dx = e.changedTouches[0].clientX - touchStartX
   const dy = e.changedTouches[0].clientY - touchStartY
   if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {

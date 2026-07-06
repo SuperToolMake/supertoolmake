@@ -132,13 +132,7 @@ const getIconClass = (value, type) => {
   if (!isValid(value)) {
     return "slot-icon"
   }
-  if (
-    ![
-      "string",
-      "number",
-      "bigint",
-    ].includes(type)
-  ) {
+  if (!["string", "number", "bigint"].includes(type)) {
     return "slot-icon"
   }
   return ""

@@ -1,6 +1,6 @@
 <script lang="ts">
-  export const show = () => {}
-  export const hide = () => {}
+export const show = () => {}
+export const hide = () => {}
 </script>
 
 <div>

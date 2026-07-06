@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/svelte"
 import { encodeJSBinding } from "@budibase/string-templates"
+import { render, screen } from "@testing-library/svelte"
 import { describe, expect, it, vi } from "vitest"
 
 vi.mock("@budibase/bbui", async () => {

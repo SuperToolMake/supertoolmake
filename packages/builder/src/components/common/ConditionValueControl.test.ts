@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/svelte"
 import { FieldType } from "@budibase/types"
+import { fireEvent, render, screen } from "@testing-library/svelte"
 import { describe, expect, it, vi } from "vitest"
 
 vi.mock("@budibase/bbui", async () => {
@@ -58,8 +58,8 @@ const renderControl = (props: Record<string, any> = {}) => {
   const instance = render(ConditionValueControl, {
     props: componentProps,
     events: {
-      blur: event => onBlur(event.detail),
-      change: event => onChange(event.detail),
+      blur: (event) => onBlur(event.detail),
+      change: (event) => onChange(event.detail),
     },
   })
 
@@ -67,8 +67,7 @@ const renderControl = (props: Record<string, any> = {}) => {
     ...instance,
     onBlur,
     onChange,
-    rerender: (nextProps: Record<string, any>) =>
-      instance.rerender(nextProps as any),
+    rerender: (nextProps: Record<string, any>) => instance.rerender(nextProps as any),
   }
 }
 
@@ -88,47 +87,41 @@ describe("ConditionValueControl", () => {
     [FieldType.NUMBER, "Value", "INPUT", "number"],
     [FieldType.DATETIME, "Date value", "INPUT", undefined],
     [FieldType.BOOLEAN, "Select", "SELECT", undefined],
-  ])(
-    "renders the expected direct value control for %s",
-    (valueType, label, tagName, inputType) => {
-      renderControl({
-        value: valueType === FieldType.BOOLEAN ? "true" : "",
-        valueType,
-      })
+  ])("renders the expected direct value control for %s", (valueType, label, tagName, inputType) => {
+    renderControl({
+      value: valueType === FieldType.BOOLEAN ? "true" : "",
+      valueType,
+    })
 
-      const controls = screen.getAllByLabelText(label)
-      const valueControl = controls[controls.length - 1]
-      expect(valueControl.tagName).toBe(tagName)
-      if (inputType) {
-        expect(valueControl).toHaveAttribute("type", inputType)
-      }
-      if (valueType === FieldType.BOOLEAN) {
-        expect(valueControl).toHaveTextContent("True")
-        expect(valueControl).toHaveTextContent("False")
-      }
+    const controls = screen.getAllByLabelText(label)
+    const valueControl = controls[controls.length - 1]
+    expect(valueControl.tagName).toBe(tagName)
+    if (inputType) {
+      expect(valueControl).toHaveAttribute("type", inputType)
     }
-  )
+    if (valueType === FieldType.BOOLEAN) {
+      expect(valueControl).toHaveTextContent("True")
+      expect(valueControl).toHaveTextContent("False")
+    }
+  })
 
   it.each([
     [FieldType.STRING, "hello", "text"],
     [FieldType.NUMBER, "42", "number"],
-  ])(
-    "dispatches direct %s value updates",
-    async (valueType, value, inputType) => {
-      const { onBlur, onChange } = renderControl({ valueType })
-      const input = screen.getByLabelText(
-        valueType === FieldType.NUMBER ? "Value" : "Condition value"
-      )
+  ])("dispatches direct %s value updates", async (valueType, value, inputType) => {
+    const { onBlur, onChange } = renderControl({ valueType })
+    const input = screen.getByLabelText(
+      valueType === FieldType.NUMBER ? "Value" : "Condition value"
+    )
 
-      expect(input).toHaveAttribute("type", inputType)
+    expect(input).toHaveAttribute("type", inputType)
 
-      await fireEvent.input(input, { target: { value } })
-      expect(onChange).toHaveBeenLastCalledWith({ value })
+    await fireEvent.input(input, { target: { value } })
+    expect(onChange).toHaveBeenLastCalledWith({ value })
 
-      await fireEvent.blur(input)
-      expect(onBlur).toHaveBeenLastCalledWith({ value })
-    }
-  )
+    await fireEvent.blur(input)
+    expect(onBlur).toHaveBeenLastCalledWith({ value })
+  })
 
   it("switches from a direct value to a number value type", async () => {
     const { onChange } = renderControl({
@@ -200,59 +193,52 @@ describe("ConditionValueControl", () => {
     [FieldType.NUMBER, "Value"],
     [FieldType.DATETIME, "Date value"],
     [FieldType.BOOLEAN, "Select"],
-  ])(
-    "shows a free-form binding value for %s and restores the typed control when cleared",
-    async (valueType, directControlLabel) => {
-      const { onChange, rerender } = renderControl({
-        value:
-          valueType === FieldType.BOOLEAN
-            ? "true"
-            : valueType === FieldType.NUMBER
-              ? "42"
-              : "2026-05-01",
-        valueType,
-      })
+  ])("shows a free-form binding value for %s and restores the typed control when cleared", async (valueType, directControlLabel) => {
+    const { onChange, rerender } = renderControl({
+      value:
+        valueType === FieldType.BOOLEAN
+          ? "true"
+          : valueType === FieldType.NUMBER
+            ? "42"
+            : "2026-05-01",
+      valueType,
+    })
 
-      const directControls = screen.getAllByLabelText(directControlLabel)
-      expect(directControls[directControls.length - 1]).toBeInTheDocument()
-      expect(screen.queryByLabelText("Binding value")).not.toBeInTheDocument()
+    const directControls = screen.getAllByLabelText(directControlLabel)
+    expect(directControls[directControls.length - 1]).toBeInTheDocument()
+    expect(screen.queryByLabelText("Binding value")).not.toBeInTheDocument()
 
-      await rerender({
-        value: "{{ trigger.fields.value }}",
-        valueType,
-        bindings: [],
-      })
+    await rerender({
+      value: "{{ trigger.fields.value }}",
+      valueType,
+      bindings: [],
+    })
 
-      const bindingInput = screen.getByLabelText("Value")
-      expect(bindingInput).toHaveValue("{{ trigger.fields.value }}")
-      if (valueType === FieldType.BOOLEAN) {
-        expect(screen.getAllByLabelText("Select")).toHaveLength(1)
-      } else if (valueType === FieldType.NUMBER) {
-        expect(bindingInput).toHaveAttribute("type", "text")
-      } else {
-        expect(
-          screen.queryByLabelText(directControlLabel)
-        ).not.toBeInTheDocument()
-      }
-
-      await fireEvent.click(screen.getByLabelText("x"))
-      expect(onChange).toHaveBeenLastCalledWith({
-        value: "",
-      })
-
-      await rerender({
-        value: "",
-        valueType,
-        bindings: [],
-      })
-
-      expect(
-        screen.queryByDisplayValue("{{ trigger.fields.value }}")
-      ).not.toBeInTheDocument()
-      const restoredControls = screen.getAllByLabelText(directControlLabel)
-      expect(restoredControls[restoredControls.length - 1]).toBeInTheDocument()
+    const bindingInput = screen.getByLabelText("Value")
+    expect(bindingInput).toHaveValue("{{ trigger.fields.value }}")
+    if (valueType === FieldType.BOOLEAN) {
+      expect(screen.getAllByLabelText("Select")).toHaveLength(1)
+    } else if (valueType === FieldType.NUMBER) {
+      expect(bindingInput).toHaveAttribute("type", "text")
+    } else {
+      expect(screen.queryByLabelText(directControlLabel)).not.toBeInTheDocument()
     }
-  )
+
+    await fireEvent.click(screen.getByLabelText("x"))
+    expect(onChange).toHaveBeenLastCalledWith({
+      value: "",
+    })
+
+    await rerender({
+      value: "",
+      valueType,
+      bindings: [],
+    })
+
+    expect(screen.queryByDisplayValue("{{ trigger.fields.value }}")).not.toBeInTheDocument()
+    const restoredControls = screen.getAllByLabelText(directControlLabel)
+    expect(restoredControls[restoredControls.length - 1]).toBeInTheDocument()
+  })
 
   it("shows a free-form value input for whitespace-only number values", async () => {
     renderControl({

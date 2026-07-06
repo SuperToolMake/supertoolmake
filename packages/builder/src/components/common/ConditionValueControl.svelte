@@ -1,61 +1,61 @@
 <script>
-  import { DatePicker, Input, Select } from "@budibase/bbui"
-  import { FieldType } from "@budibase/types"
-  import { createEventDispatcher } from "svelte"
-  import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
-  import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
-  import DrawerBindableSlot from "@/components/common/bindings/DrawerBindableSlot.svelte"
+import { DatePicker, Input, Select } from "@budibase/bbui"
+import { FieldType } from "@budibase/types"
+import { createEventDispatcher } from "svelte"
+import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
+import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
+import DrawerBindableSlot from "@/components/common/bindings/DrawerBindableSlot.svelte"
 
-  export let bindings = []
-  export let value = null
-  export let valueType = FieldType.STRING
-  export let disabled = false
-  export let typeSelectDisabled = undefined
-  export let context = {}
-  export let panel = ClientBindingPanel
-  export let showTypeSelect = true
+export let bindings = []
+export let value = null
+export let valueType = FieldType.STRING
+export let disabled = false
+export let typeSelectDisabled = undefined
+export let context = {}
+export let panel = ClientBindingPanel
+export let showTypeSelect = true
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  let currentValue = value
+let currentValue = value
 
-  $: effectiveValueType = valueType || FieldType.STRING
-  $: resolvedTypeSelectDisabled = typeSelectDisabled ?? disabled
-  $: currentValue = value
+$: effectiveValueType = valueType || FieldType.STRING
+$: resolvedTypeSelectDisabled = typeSelectDisabled ?? disabled
+$: currentValue = value
 
-  const valueTypeOptions = [
-    { value: FieldType.STRING, label: "Text" },
-    { value: FieldType.NUMBER, label: "Number" },
-    { value: FieldType.DATETIME, label: "Date" },
-    { value: FieldType.BOOLEAN, label: "Boolean" },
-  ]
+const valueTypeOptions = [
+  { value: FieldType.STRING, label: "Text" },
+  { value: FieldType.NUMBER, label: "Number" },
+  { value: FieldType.DATETIME, label: "Date" },
+  { value: FieldType.BOOLEAN, label: "Boolean" },
+]
 
-  const bindingValueTypes = [FieldType.STRING, "Binding"]
+const bindingValueTypes = [FieldType.STRING, "Binding"]
 
-  const updateType = newType => {
-    const update = {
-      value: null,
-      valueType: newType,
-    }
-    if (newType === FieldType.BOOLEAN) {
-      update.value = "true"
-    }
-    dispatch("change", update)
+const updateType = (newType) => {
+  const update = {
+    value: null,
+    valueType: newType,
   }
-
-  const updateValue = newValue => {
-    currentValue = newValue
-    dispatch("change", {
-      value: newValue,
-    })
+  if (newType === FieldType.BOOLEAN) {
+    update.value = "true"
   }
+  dispatch("change", update)
+}
 
-  const commitValue = newValue => {
-    updateValue(newValue)
-    dispatch("blur", {
-      value: newValue,
-    })
-  }
+const updateValue = (newValue) => {
+  currentValue = newValue
+  dispatch("change", {
+    value: newValue,
+  })
+}
+
+const commitValue = (newValue) => {
+  updateValue(newValue)
+  dispatch("blur", {
+    value: newValue,
+  })
+}
 </script>
 
 {#if showTypeSelect}

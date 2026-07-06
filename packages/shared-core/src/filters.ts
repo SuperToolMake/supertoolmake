@@ -65,22 +65,8 @@ export const getValidOperatorsForType = (
     Op.In,
     Op.NotIn,
   ]
-  const numOps = [
-    Op.Equals,
-    Op.NotEquals,
-    Op.MoreThan,
-    Op.LessThan,
-    Op.Empty,
-    Op.NotEmpty,
-    Op.In,
-  ]
-  const arrayOps = [
-    Op.Contains,
-    Op.NotContains,
-    Op.ContainsAny,
-    Op.Empty,
-    Op.NotEmpty,
-  ]
+  const numOps = [Op.Equals, Op.NotEquals, Op.MoreThan, Op.LessThan, Op.Empty, Op.NotEmpty, Op.In]
+  const arrayOps = [Op.Contains, Op.NotContains, Op.ContainsAny, Op.Empty, Op.NotEmpty]
   let ops: {
     value: string
     label: string
