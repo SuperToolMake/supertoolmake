@@ -96,6 +96,10 @@ const getRouteWithoutQueryParams = (route) => {
 }
 
 const canAccessSubLink = (subLink, accessibleRoutes) => {
+  if ($builderStore.inBuilder) {
+    return true
+  }
+
   const url = subLink?.url
   if (!url) {
     return false
