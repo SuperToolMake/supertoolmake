@@ -40,6 +40,7 @@ import type { QueryEvent, QueryEventParameters } from "../../../threads/definiti
 import { invalidateCachedVariable } from "../../../threads/utils"
 import { save as saveDatasource } from "../datasource"
 import { RestImporter } from "./import"
+import { mergePreviewSchema } from "./schema"
 
 const Runner = new Thread(ThreadType.QUERY, {
   timeoutMs: env.QUERY_THREAD_TIMEOUT,
@@ -384,20 +385,17 @@ export async function preview(ctx: UserCtx<PreviewQueryRequest, PreviewQueryResp
   const { rows, keys, info, extra } = queryResponse
   const { previewSchema, nestedSchemaFields } = getSchemaFields(rows, keys)
 
-  // if existing schema, update to include any previous schema keys
-  if (existingSchema) {
-    for (const key of Object.keys(existingSchema)) {
-      if (!previewSchema[key]) {
-        previewSchema[key] = existingSchema[key]
-      }
-    }
-  }
+  const schema = mergePreviewSchema({
+    previewSchema,
+    existingSchema,
+    firstRow: rows?.[0],
+  })
   // remove configuration before sending event
   delete datasource.config
   ctx.body = {
     rows,
     nestedSchemaFields,
-    schema: previewSchema,
+    schema,
     info,
     extra,
   }
