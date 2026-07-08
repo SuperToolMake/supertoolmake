@@ -172,6 +172,17 @@ $: if (fieldSchema?.type === FieldType.DATETIME) {
   timeOnly = Boolean(fieldSchema?.timeOnly)
   ignoreTimezones = Boolean(fieldSchema?.ignoreTimezones)
 }
+
+const applyFilter = () => {
+  const sanitized = sanitizeOperator(editableFilter)
+  const { noValue, value, operator } = sanitized || {}
+
+  // Check for empty filter. if empty on invalid set it to undefined.
+  const update = (!noValue && !value) || !operator ? undefined : sanitized
+
+  dispatch("change", update)
+  hide()
+}
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -217,6 +228,7 @@ $: if (fieldSchema?.type === FieldType.DATETIME) {
 
         {#if editableFilter?.type && [FieldType.STRING, FieldType.LONGFORM, FieldType.NUMBER, FieldType.BIGINT].includes(editableFilter.type)}
           <Input
+            autofocus
             disabled={editableFilter.noValue}
             value={editableFilter.value}
             on:change={e => {
@@ -226,6 +238,7 @@ $: if (fieldSchema?.type === FieldType.DATETIME) {
                 value: e.detail,
               })
             }}
+            on:enterkey={applyFilter}
           />
         {:else if (editableFilter?.type && editableFilter?.type === FieldType.ARRAY) || (editableFilter.type === FieldType.OPTIONS && (editableFilter.operator === ArrayOperator.ONE_OF || editableFilter.operator === ArrayOperator.NOT_ONE_OF))}
           {@const isMulti = isArrayOperator(editableFilter.operator)}
@@ -342,20 +355,7 @@ $: if (fieldSchema?.type === FieldType.DATETIME) {
           <Input disabled />
         {/if}
         <!-- Needs to be disabled if there is nothing-->
-        <Button
-          cta
-          on:click={() => {
-            const sanitized = sanitizeOperator(editableFilter)
-            const { noValue, value, operator } = sanitized || {}
-
-            // Check for empty filter. if empty on invalid set it to undefined.
-            const update =
-              (!noValue && !value) || !operator ? undefined : sanitized
-
-            dispatch("change", update)
-            hide()
-          }}
-        >
+        <Button cta on:click={applyFilter}>
           {buttonText || "Apply"}
         </Button>
       {/if}
