@@ -1,4 +1,4 @@
-import { FieldType, QuerySchema } from "@budibase/types"
+import { FieldType, type QuerySchema } from "@supertoolmake/types"
 import { coerce } from "../../../utilities/rowProcessor"
 
 type SchemaEntry = string | QuerySchema
@@ -40,11 +40,7 @@ const stringFitsType = (value: string, type: FieldType): boolean => {
 // boolean, json, array, datetime) always win, so a genuine data change still
 // updates the schema. One deliberate asymmetry: an explicit Text override
 // sticks for any scalar value.
-const keepExisting = (
-  existing: SchemaEntry,
-  detected: SchemaEntry,
-  value: unknown
-): boolean => {
+const keepExisting = (existing: SchemaEntry, detected: SchemaEntry, value: unknown): boolean => {
   const existingType = getType(existing)
   if (!existingType) {
     return false

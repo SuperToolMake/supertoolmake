@@ -12,7 +12,7 @@ import type {
   Workspace,
   WorkspaceApp,
 } from "@supertoolmake/types"
-import Koa from "koa"
+import type Koa from "koa"
 import { userAgent } from "koa-useragent"
 import type { Socket } from "socket.io"
 import { authorizedMiddleware as authorized } from "../middleware/authorized"
@@ -53,8 +53,8 @@ export default class BuilderSocket extends BaseSocket {
           const sessions = await this.getRoomSessions(appId)
 
           // Track collaboration usage by unique users
-          let userIdMap: Record<string, boolean> = {}
-          sessions?.forEach(session => {
+          const userIdMap: Record<string, boolean> = {}
+          sessions?.forEach((session) => {
             if (session._id) {
               userIdMap[session._id] = true
             }

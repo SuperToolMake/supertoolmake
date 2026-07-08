@@ -1,8 +1,8 @@
+import { constants, env as coreEnv, utils } from "@supertoolmake/backend-core"
+import { generator } from "@supertoolmake/backend-core/tests"
+import { BuilderSocketEvent } from "@supertoolmake/shared-core"
+import jwt, { type Secret } from "jsonwebtoken"
 import Koa from "koa"
-import jwt, { Secret } from "jsonwebtoken"
-import { constants, env as coreEnv, utils } from "@budibase/backend-core"
-import { generator } from "@budibase/backend-core/tests"
-import { BuilderSocketEvent } from "@budibase/shared-core"
 import TestConfiguration from "../tests/utilities/TestConfiguration"
 import BuilderSocket from "./builder"
 
@@ -79,10 +79,7 @@ describe("BuilderSocket - SelectApp authorization", () => {
     await socketInstance.onConnect(fakeSocket)
 
     const callback = jest.fn()
-    await handlers[BuilderSocketEvent.SelectApp](
-      { appId: workspaceBDevId },
-      callback
-    )
+    await handlers[BuilderSocketEvent.SelectApp]({ appId: workspaceBDevId }, callback)
 
     // The connecting user is only a builder of Workspace A. They must not
     // be able to join Workspace B's room just by sending its id.
@@ -100,10 +97,7 @@ describe("BuilderSocket - SelectApp authorization", () => {
     await socketInstance.onConnect(fakeSocket)
 
     const callback = jest.fn()
-    await handlers[BuilderSocketEvent.SelectApp](
-      { appId: workspaceBDevId },
-      callback
-    )
+    await handlers[BuilderSocketEvent.SelectApp]({ appId: workspaceBDevId }, callback)
 
     expect(callback).not.toHaveBeenCalled()
   })
@@ -118,15 +112,9 @@ describe("BuilderSocket - SelectApp authorization", () => {
     await socketInstance.onConnect(fakeSocket)
 
     const callback = jest.fn()
-    await handlers[BuilderSocketEvent.SelectApp](
-      { appId: workspaceADevId },
-      callback
-    )
+    await handlers[BuilderSocketEvent.SelectApp]({ appId: workspaceADevId }, callback)
 
-    expect(socketInstance.joinRoom).toHaveBeenCalledWith(
-      fakeSocket,
-      workspaceADevId
-    )
+    expect(socketInstance.joinRoom).toHaveBeenCalledWith(fakeSocket, workspaceADevId)
     expect(fakeSocket.disconnect).not.toHaveBeenCalled()
     expect(callback).toHaveBeenCalledWith({ users: [] })
   })
