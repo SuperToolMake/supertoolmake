@@ -63,7 +63,7 @@ export default class BuilderSocket extends BaseSocket {
           // Reply with all current sessions
           callback({ users: sessions })
         })
-      } catch (error) {
+      } catch (_error) {
         socket.disconnect(true)
       }
     })
