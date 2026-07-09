@@ -1,17 +1,17 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte"
+import { createEventDispatcher } from "svelte"
 
-  export let value: any = ""
-  export let disabled = false
-  export let placeholder = "Value"
+export let value: any = ""
+export let disabled = false
+export let placeholder = "Value"
 
-  const dispatch = createEventDispatcher()
+const dispatch = createEventDispatcher()
 
-  const onInput = (event: Event) => {
-    const target = event.target as HTMLInputElement
-    value = target.value
-    dispatch("change", target.value)
-  }
+const onInput = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  value = target.value
+  dispatch("change", target.value)
+}
 </script>
 
 <input
