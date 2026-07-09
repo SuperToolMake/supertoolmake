@@ -15,7 +15,46 @@ import * as sso from "./sso"
 
 const OIDCStrategy = require("@techpass/passport-openidconnect").Strategy
 
-export function buildVerifyFn(saveUserFn: SaveSSOUserFunction) {
+type OIDCUserInfoProfile = {
+  id?: string
+  displayName?: string
+  name?: { givenName?: string; familyName?: string }
+  _json?: {
+    email?: string
+    email_verified?: boolean
+  }
+  provider?: string
+}
+
+// the id_token profile also exposes the raw claims via _json
+type OIDCIdProfile = {
+  id?: string
+  displayName?: string
+  name?: { givenName?: string; familyName?: string }
+  emails?: { value: string }[]
+  username?: string
+  _json?: {
+    email?: string
+    email_verified?: boolean
+  }
+}
+
+type VerifyFunction = (
+  issuer: string,
+  sub: string,
+  profile: SSOProfile,
+  jwtClaims: JwtClaims,
+  accessToken: string,
+  refreshToken: string,
+  idToken: string,
+  params: any,
+  done: Function
+) => Promise<void>
+
+export function buildVerifyFn(
+  saveUserFn: SaveSSOUserFunction,
+  allowUnverifiedEmailLinking = false
+): VerifyFunction {
   /**
    * @param issuer The identity provider base URL
    * @param sub The user ID
@@ -45,6 +84,7 @@ export function buildVerifyFn(saveUserFn: SaveSSOUserFunction) {
       userId: profile.id,
       profile: profile,
       email: getEmail(profile, jwtClaims),
+      emailVerified: getEmailVerified(profile, jwtClaims),
       oauth2: {
         accessToken: accessToken,
         refreshToken: refreshToken,
@@ -55,8 +95,46 @@ export function buildVerifyFn(saveUserFn: SaveSSOUserFunction) {
       details,
       false, // don't require local accounts to exist
       done,
-      saveUserFn
+      saveUserFn,
+      allowUnverifiedEmailLinking
     )
+  }
+}
+
+export function normalizeProfile(
+  uiProfile: OIDCUserInfoProfile | undefined,
+  idProfile: OIDCIdProfile
+): SSOProfile {
+  const profileJson = { ...(uiProfile?._json || {}) }
+
+  if (!profileJson.email && idProfile.emails?.length) {
+    profileJson.email = idProfile.emails[0].value
+    // keep email_verified aligned with the email it describes
+    profileJson.email_verified = idProfile._json?.email_verified
+  }
+
+  const displayName = uiProfile?.displayName || idProfile.displayName
+
+  return {
+    id: uiProfile?.id || idProfile.id || "",
+    name:
+      uiProfile?.name ||
+      idProfile.name ||
+      (!!displayName && { givenName: displayName, familyName: "" }) ||
+      undefined,
+    _json: profileJson,
+    provider: uiProfile?.provider,
+  }
+}
+
+export function buildJwtClaims(
+  uiProfile: OIDCUserInfoProfile | undefined,
+  idProfile: OIDCIdProfile
+): JwtClaims {
+  return {
+    email: uiProfile?._json?.email || idProfile.emails?.[0]?.value,
+    email_verified: idProfile._json?.email_verified,
+    preferred_username: idProfile.username,
   }
 }
 
@@ -89,6 +167,27 @@ function getEmail(profile: SSOProfile, jwtClaims: JwtClaims) {
 }
 
 /**
+ * Determines whether the identity provider has verified the email that
+ * getEmail resolved. Mirrors getEmail's source precedence so the returned flag
+ * describes the same claim. An absent email_verified is treated as unverified
+ * (OIDC Core §5.7). A preferred_username used as an email is never considered
+ * verified.
+ * @param profile The structured profile created by passport using the user info endpoint
+ * @param jwtClaims The claims returned in the id token
+ */
+function getEmailVerified(profile: SSOProfile, jwtClaims: JwtClaims): boolean {
+  if (profile._json.email) {
+    return profile._json.email_verified === true
+  }
+
+  if (jwtClaims.email) {
+    return jwtClaims.email_verified === true
+  }
+
+  return false
+}
+
+/**
  * Create an instance of the oidc passport strategy. This wrapper fetches the configuration
  * from couchDB rather than environment variables, using this factory is necessary for dynamically configuring passport.
  * @returns Dynamically configured Passport OIDC Strategy
@@ -98,7 +197,7 @@ export async function strategyFactory(
   saveUserFn: SaveSSOUserFunction
 ) {
   try {
-    const verify = buildVerifyFn(saveUserFn)
+    const verify = buildVerifyFn(saveUserFn, config.allowUnverifiedEmailLinking)
     const strategy = new OIDCStrategy(config, verify)
     strategy.name = "oidc"
     return strategy
@@ -112,7 +211,7 @@ export async function fetchStrategyConfig(
   callbackUrl?: string
 ): Promise<OIDCStrategyConfiguration> {
   try {
-    const { clientID, clientSecret, configUrl } = oidcConfig
+    const { clientID, clientSecret, configUrl, pkce, allowUnverifiedEmailLinking } = oidcConfig
 
     if (!(clientID && clientSecret && callbackUrl && configUrl)) {
       // check for remote config and all required elements
@@ -139,6 +238,8 @@ export async function fetchStrategyConfig(
       clientID: clientID,
       clientSecret: clientSecret,
       callbackURL: callbackUrl,
+      pkce: pkce,
+      allowUnverifiedEmailLinking: allowUnverifiedEmailLinking,
     }
   } catch (err) {
     throw new Error(`Error constructing OIDC authentication configuration - ${err}`)

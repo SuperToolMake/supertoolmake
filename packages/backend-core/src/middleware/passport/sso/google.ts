@@ -19,6 +19,7 @@ export function buildVerifyFn(saveUserFn: SaveSSOUserFunction) {
       userId: profile.id,
       profile: profile,
       email: profile._json.email,
+      emailVerified: profile._json.email_verified === true,
       oauth2: {
         accessToken,
         refreshToken,

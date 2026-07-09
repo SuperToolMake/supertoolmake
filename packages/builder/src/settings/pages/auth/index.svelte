@@ -154,6 +154,10 @@ let google
 let oidc
 const providers = { google, oidc }
 
+$: oidcConfig = providers?.oidc?.config?.configs?.[0] ?? {
+  allowUnverifiedEmailLinking: false,
+}
+
 // control the state of the save button depending on whether form has changed
 let originalOidcDoc
 let oidcSaveButtonDisabled
@@ -161,7 +165,6 @@ $: {
   // delete the callback url which is never saved to the oidc
   // config doc, to ensure an accurate comparison
   delete providers.oidc?.config.configs[0].callbackURL
-
   oidcSaveButtonDisabled = isEqual(providers.oidc?.config, originalOidcDoc?.config)
 }
 
@@ -222,12 +225,27 @@ onMount(async () => {
   if (!oidcDoc?._id) {
     providers.oidc = {
       type: ConfigTypes.OIDC,
-      config: { configs: [{ activated: false, scopes: defaultScopes }] },
+      config: {
+        configs: [
+          {
+            activated: false,
+            scopes: defaultScopes,
+            allowUnverifiedEmailLinking: false,
+          },
+        ],
+      },
     }
   } else {
-    originalOidcDoc = cloneDeep(oidcDoc)
+    if (!oidcDoc.config.configs[0].scopes) {
+      oidcDoc.config.configs[0].scopes = [...defaultScopes]
+    }
+    if (oidcDoc.config.configs[0].allowUnverifiedEmailLinking === undefined) {
+      oidcDoc.config.configs[0].allowUnverifiedEmailLinking = false
+    }
     providers.oidc = oidcDoc
   }
+  originalOidcDoc = cloneDeep(providers.oidc)
+  delete originalOidcDoc?.config?.configs[0]?.callbackURL
 })
 </script>
 
@@ -319,6 +337,17 @@ onMount(async () => {
           text=""
           bind:value={providers.oidc.config.configs[0].activated}
         />
+      </div>
+      <div class="form-row">
+        <div class="lock">
+          <Label
+            size="L"
+            tooltip="When off, a login is only linked to an existing account if the identity provider confirms the email is verified. Only enable this if you fully trust the provider to assert email addresses - otherwise it can allow account takeover."
+          >
+            Allow unverified email linking
+          </Label>
+        </div>
+        <Toggle text="" bind:value={oidcConfig.allowUnverifiedEmailLinking} />
       </div>
     </Layout>
 

@@ -5,6 +5,7 @@ import type { Document } from "../document"
 
 export interface SSOProfileJson {
   email?: string
+  email_verified?: boolean
   picture?: string
 }
 

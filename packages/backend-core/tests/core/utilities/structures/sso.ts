@@ -37,6 +37,7 @@ export function authDetails(userDoc?: User): SSOAuthDetails {
 
   return {
     email: userDoc.email,
+    emailVerified: true,
     oauth2: OAuth(),
     profile,
     provider,
@@ -61,6 +62,7 @@ export function ssoProfile(user?: User): SSOProfile {
     },
     _json: {
       email: user.email,
+      email_verified: true,
       picture: "http://example.com",
     },
     provider: generator.string(),
