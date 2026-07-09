@@ -1,6 +1,6 @@
 <script>
-import { DatePicker, Input, Select } from "@budibase/bbui"
-import { FieldType } from "@budibase/types"
+import { DatePicker, Input, Select } from "@supertoolmake/bbui"
+import { FieldType } from "@supertoolmake/types"
 import { createEventDispatcher } from "svelte"
 import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"

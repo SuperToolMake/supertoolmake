@@ -7,6 +7,7 @@ export let title
 export let subtitle
 export let description
 export let imageURL
+export let imageHeight
 export let linkURL
 export let linkPeek
 export let horizontal
@@ -43,7 +44,7 @@ const handleLink = (e) => {
   {#if imageURL}
     <div
       class="spectrum-Card-coverPhoto"
-      style="background-image: url({imageURL})"
+      style="background-image: url({imageURL}); {imageHeight ? `height: ${imageHeight}` : ''}"
     ></div>
   {/if}
   <div class="spectrum-Card-container">

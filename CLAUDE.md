@@ -4,7 +4,7 @@
 
 - Workspace uses Lerna monorepo with packages in `packages/`
 - Main packages: server, worker, backend-core, frontend-core, client, builder, shared-core, bbui
-- Use `@budibase/` scoped imports between packages
+- Use `@supertoolmake/` scoped imports between packages
 - Backend packages (NodeJS): server, worker, backend-core
 - Frontend packages (browser): builder, frontend-core, bbui
 - Shared (NodeJS and browser): shared-core

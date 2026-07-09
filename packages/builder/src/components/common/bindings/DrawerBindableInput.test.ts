@@ -1,8 +1,8 @@
-import { encodeJSBinding } from "@budibase/string-templates"
+import { encodeJSBinding } from "@supertoolmake/string-templates"
 import { render, screen } from "@testing-library/svelte"
 import { describe, expect, it, vi } from "vitest"
 
-vi.mock("@budibase/bbui", async () => {
+vi.mock("@supertoolmake/bbui", async () => {
   const { default: Button } = await import("../tests/MockButton.svelte")
   const { default: Drawer } = await import("../tests/MockDrawer.svelte")
   const { default: Icon } = await import("../tests/MockIcon.svelte")

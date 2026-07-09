@@ -1,4 +1,4 @@
-import { FieldType, JsonFieldSubType } from "@budibase/types"
+import { FieldType, JsonFieldSubType } from "@supertoolmake/types"
 import { mergePreviewSchema } from "../schema"
 
 describe("mergePreviewSchema", () => {

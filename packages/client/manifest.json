@@ -5668,6 +5668,13 @@
         "label": "Image URL"
       },
       {
+        "type": "text",
+        "key": "imageHeight",
+        "label": "Image height",
+        "placeholder": "e.g. 200px, 16rem, auto",
+        "defaultValue": "170px"
+      },
+      {
         "type": "url",
         "key": "linkURL",
         "label": "Link URL"

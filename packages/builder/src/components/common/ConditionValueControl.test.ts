@@ -1,8 +1,8 @@
-import { FieldType } from "@budibase/types"
+import { FieldType } from "@supertoolmake/types"
 import { fireEvent, render, screen } from "@testing-library/svelte"
 import { describe, expect, it, vi } from "vitest"
 
-vi.mock("@budibase/bbui", async () => {
+vi.mock("@supertoolmake/bbui", async () => {
   const { default: Select } = await import("./tests/MockSelect.svelte")
   const { default: DatePicker } = await import("./tests/MockDatePicker.svelte")
   const { default: Input } = await import("./tests/MockInput.svelte")

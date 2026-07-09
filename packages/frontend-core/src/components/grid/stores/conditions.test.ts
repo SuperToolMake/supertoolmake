@@ -1,4 +1,4 @@
-import type { UICondition } from "@budibase/types"
+import type { UICondition } from "@supertoolmake/types"
 import { describe, expect, it, vi } from "vitest"
 
 vi.mock("../../../utils", () => ({
