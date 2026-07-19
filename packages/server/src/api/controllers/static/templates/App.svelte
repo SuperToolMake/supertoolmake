@@ -24,7 +24,6 @@ export let props
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:site" content="@budibase" />
   <meta property="twitter:image" content={props.metaImage} />
   <meta property="twitter:image:alt" content={props.metaTitle} />
   <meta property="twitter:title" content={props.metaTitle} />

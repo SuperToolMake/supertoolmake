@@ -58,6 +58,12 @@ export const orgRoutes = (user: GetGlobalSelfResponse, admin: AdminState): Route
           title: "Organisation",
           comp: Pages.get("org"),
         },
+        {
+          path: "branding",
+          access: () => isAdmin,
+          title: "Branding",
+          comp: Pages.get("branding"),
+        },
       ],
     },
     {

@@ -59,6 +59,16 @@ export interface SettingsInnerConfig {
   createdVersion?: string
   lockedBy?: LockReason
   active?: boolean
+  // Branding fields
+  faviconUrl?: string
+  faviconUrlEtag?: string
+  emailBrandingEnabled?: boolean
+  platformTitle?: string
+  loginHeading?: string
+  loginButton?: string
+  metaDescription?: string
+  metaImageUrl?: string
+  metaTitle?: string
 }
 
 export interface SettingsConfig extends Config<SettingsInnerConfig> {}

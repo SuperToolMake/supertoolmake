@@ -126,7 +126,7 @@ export const serveApp = async (ctx: UserCtx<void, ServeAppResponse>) => {
   }
 
   const bbHeaderEmbed = ctx.request.get("x-budibase-embed")?.toLowerCase() === "true"
-  await Promise.all([configs.getSettingsConfigDoc()])
+  const [settingsConfigDoc] = await Promise.all([configs.getSettingsConfigDoc()])
   // incase running direct from TS
   let appHbsPath = join(__dirname, "app.hbs")
   if (!fs.existsSync(appHbsPath)) {
@@ -153,18 +153,37 @@ export const serveApp = async (ctx: UserCtx<void, ServeAppResponse>) => {
        */
       const appName = workspaceApp?.name || `${appInfo.name}`
       const nonce = ctx.state.nonce || ""
+      const branding = settingsConfigDoc?.config || {}
+
+      const appTitle = branding.platformTitle || appName
+      const metaTitle = branding.metaTitle || `${appName} - built with SuperToolMake`
+      const metaDescription = branding.metaDescription || ""
+      const metaImageRaw = branding.metaImageUrl || "/builder/url_preview.png"
+      // OG images require absolute URLs for social media crawlers
+      const metaImage = metaImageRaw.startsWith("http")
+        ? metaImageRaw
+        : `${ctx.origin}${metaImageRaw}`
+
+      let favicon = ""
+      if (branding.faviconUrl) {
+        favicon = await objectStore.getGlobalFileUrl(
+          "settings",
+          "faviconUrl",
+          branding.faviconUrlEtag
+        )
+      }
+
       const props: AppProps = {
-        title: appName,
+        title: appTitle,
         showSkeletonLoader: appInfo.features?.skeletonLoader ?? false,
         hideDevTools,
         sideNav,
         hideFooter,
-        metaImage:
-          "https://res.cloudinary.com/daog6scxm/image/upload/v1698759482/meta-images/plain-branded-meta-image-coral_ocxmgu.png",
-        metaDescription: "",
-        metaTitle: `${appName} - built with SuperToolMake`,
+        metaImage,
+        metaDescription,
+        metaTitle,
         clientCacheKey: await objectStore.getClientCacheKey(appInfo.version),
-        favicon: "",
+        favicon,
         nonce,
         workspaceId,
       }

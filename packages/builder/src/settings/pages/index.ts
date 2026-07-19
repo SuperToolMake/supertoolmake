@@ -1,5 +1,6 @@
 import type { Component } from "svelte"
 import AuthPage from "@/settings/pages/auth/index.svelte"
+import BrandingPage from "@/settings/pages/branding.svelte"
 import DiagnosticsPage from "@/settings/pages/diagnostics.svelte"
 import EmailTemplatesPage from "@/settings/pages/email/EmailTemplates.svelte"
 import EmailTemplatePage from "@/settings/pages/email/Template.svelte"
@@ -26,6 +27,7 @@ const componentMap = {
   email_templates: EmailTemplatesPage,
   email_template: EmailTemplatePage,
   auth: AuthPage,
+  branding: BrandingPage,
   org: OrgPage,
   version: VersionPage,
   diagnostics: DiagnosticsPage,
