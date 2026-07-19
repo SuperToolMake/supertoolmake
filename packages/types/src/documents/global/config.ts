@@ -143,8 +143,7 @@ export interface ProviderConfig {
   defaultModel?: string
 }
 
-export const isConfig = (config: Object): config is Config =>
-  "type" in config && "config" in config
+export const isConfig = (config: Object): config is Config => "type" in config && "config" in config
 
 export const isSettingsConfig = (config: Config): config is SettingsConfig =>
   config.type === ConfigType.SETTINGS
@@ -169,15 +168,14 @@ export enum ConfigType {
   AI = "ai",
 }
 
-export type ConfigTypeToConfig<T extends ConfigType> =
-  T extends ConfigType.SETTINGS
-    ? SettingsConfig
-    : T extends ConfigType.SMTP
-      ? SMTPConfig
-      : T extends ConfigType.GOOGLE
-        ? GoogleConfig
-        : T extends ConfigType.OIDC
-          ? OIDCConfig
-          : T extends ConfigType.OIDC_LOGOS
-            ? OIDCLogosConfig
-            : never
+export type ConfigTypeToConfig<T extends ConfigType> = T extends ConfigType.SETTINGS
+  ? SettingsConfig
+  : T extends ConfigType.SMTP
+    ? SMTPConfig
+    : T extends ConfigType.GOOGLE
+      ? GoogleConfig
+      : T extends ConfigType.OIDC
+        ? OIDCConfig
+        : T extends ConfigType.OIDC_LOGOS
+          ? OIDCLogosConfig
+          : never

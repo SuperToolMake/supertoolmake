@@ -49,10 +49,7 @@ export const Pages = {
   },
 }
 
-export const routeActions = (
-  node: HTMLElement,
-  target = ".route-header .page-actions"
-) => {
+export const routeActions = (node: HTMLElement, target = ".route-header .page-actions") => {
   const targetEl = document.querySelector(target)
 
   if (targetEl) {

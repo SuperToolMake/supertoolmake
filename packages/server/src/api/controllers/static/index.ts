@@ -3,13 +3,7 @@ import fs from "node:fs"
 import path from "node:path"
 import { PutObjectCommand, S3 } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-import {
-  BadRequestError,
-  configs,
-  context,
-  objectStore,
-  utils,
-} from "@supertoolmake/backend-core"
+import { BadRequestError, configs, context, objectStore, utils } from "@supertoolmake/backend-core"
 import { InvalidFileExtensions } from "@supertoolmake/shared-core"
 import { processString } from "@supertoolmake/string-templates"
 import {
@@ -80,15 +74,13 @@ export const uploadFile = async (ctx: Ctx<void, ProcessAttachmentResponse>) => {
   const files = file && Array.isArray(file) ? Array.from(file) : [file]
 
   ctx.body = await Promise.all(
-    files.map(async file => {
+    files.map(async (file) => {
       const fileName = getUploadFilename(file)
       const filePath = getUploadPath(file)
       const rawMimeType = getUploadMimeType(file)
 
       if (!fileName) {
-        throw new BadRequestError(
-          "Attempted to upload a file without a filename"
-        )
+        throw new BadRequestError("Attempted to upload a file without a filename")
       }
 
       const extension = [...fileName.split(".")].pop()
@@ -98,13 +90,8 @@ export const uploadFile = async (ctx: Ctx<void, ProcessAttachmentResponse>) => {
         )
       }
 
-      if (
-        !env.SELF_HOSTED &&
-        InvalidFileExtensions.includes(extension.toLowerCase())
-      ) {
-        throw new BadRequestError(
-          `File "${fileName}" has an invalid extension: "${extension}"`
-        )
+      if (!env.SELF_HOSTED && InvalidFileExtensions.includes(extension.toLowerCase())) {
+        throw new BadRequestError(`File "${fileName}" has an invalid extension: "${extension}"`)
       }
 
       // filenames converted to UUIDs so they are unique
@@ -138,11 +125,8 @@ export const serveApp = async (ctx: UserCtx<void, ServeAppResponse>) => {
     return
   }
 
-  const bbHeaderEmbed =
-    ctx.request.get("x-budibase-embed")?.toLowerCase() === "true"
-  const [settingsConfigDoc] = await Promise.all([
-    configs.getSettingsConfigDoc(),
-  ])
+  const bbHeaderEmbed = ctx.request.get("x-budibase-embed")?.toLowerCase() === "true"
+  const [settingsConfigDoc] = await Promise.all([configs.getSettingsConfigDoc()])
   // incase running direct from TS
   let appHbsPath = join(__dirname, "app.hbs")
   if (!fs.existsSync(appHbsPath)) {
@@ -172,11 +156,9 @@ export const serveApp = async (ctx: UserCtx<void, ServeAppResponse>) => {
       const branding = settingsConfigDoc?.config || {}
 
       const appTitle = branding.platformTitle || appName
-      const metaTitle =
-        branding.metaTitle || `${appName} - built with SuperToolMake`
+      const metaTitle = branding.metaTitle || `${appName} - built with SuperToolMake`
       const metaDescription = branding.metaDescription || ""
-      const metaImageRaw =
-        branding.metaImageUrl || "/builder/url_preview.png"
+      const metaImageRaw = branding.metaImageUrl || "/builder/url_preview.png"
       // OG images require absolute URLs for social media crawlers
       const metaImage = metaImageRaw.startsWith("http")
         ? metaImageRaw
@@ -234,9 +216,7 @@ export const serveApp = async (ctx: UserCtx<void, ServeAppResponse>) => {
   }
 }
 
-export const serveBuilderPreview = async (
-  ctx: Ctx<void, ServeBuilderPreviewResponse>
-) => {
+export const serveBuilderPreview = async (ctx: Ctx<void, ServeBuilderPreviewResponse>) => {
   const db = context.getWorkspaceDB({ skip_setup: true })
   const appInfo = await db.get<Workspace>(DocumentType.WORKSPACE_METADATA)
 
@@ -247,10 +227,7 @@ export const serveBuilderPreview = async (
     const previewHbs = loadHandlebarsFile(join(previewLoc, "preview.hbs"))
     const nonce = ctx.state.nonce || ""
     const props: any = {
-      clientLibPath: await objectStore.clientLibraryUrl(
-        appId!,
-        appInfo.version
-      ),
+      clientLibPath: await objectStore.clientLibraryUrl(appId!, appInfo.version),
       nonce,
     }
 
@@ -265,19 +242,12 @@ function serveLocalFile(ctx: Ctx, fileName: string) {
   const pkgJsonPath = require.resolve("@supertoolmake/client/package.json")
   const pkgDir = path.dirname(pkgJsonPath)
   const distFromPkg = join(pkgDir, "dist")
-  const fallbackDist = join(
-    NODE_MODULES_PATH,
-    "@supertoolmake",
-    "client",
-    "dist"
-  )
+  const fallbackDist = join(NODE_MODULES_PATH, "@supertoolmake", "client", "dist")
   const root = distFromPkg || fallbackDist
   return send(ctx, fileName, { root })
 }
 
-export const serveClientLibrary = async (
-  ctx: Ctx<void, ServeClientLibraryResponse>
-) => {
+export const serveClientLibrary = async (ctx: Ctx<void, ServeClientLibraryResponse>) => {
   const workspaceId = context.getWorkspaceId()
 
   if (!workspaceId) {
