@@ -4022,11 +4022,11 @@
     "@sinonjs/commons" "^3.0.1"
 
 "@smithy/abort-controller@^4.2.12":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@smithy/abort-controller/-/abort-controller-4.3.0.tgz#672e93f6b965c404ffd862b2c6abd559215c9e0c"
-  integrity sha512-u3id1QgrXUgDv9Mb5v8KzDqicHBdPSIL1nl+psna6DKkkwqg7PIC4Ig0LYT3qVsIAAnreOSrrUoLnFTanCMI3w==
+  version "4.3.3"
+  resolved "https://registry.yarnpkg.com/@smithy/abort-controller/-/abort-controller-4.3.3.tgz#8a35a86988a453178ca42e42e2521b7279be624f"
+  integrity sha512-rQzc/M6ejh96yTAWk4tupBaQ3v+r4fS9W5sH6mXJlg9T195bIdPZC/mf6nn8J4MxFw6G2BezSMjmCiI84Vm+uw==
   dependencies:
-    "@smithy/types" "^4.15.0"
+    "@smithy/types" "^4.16.1"
     tslib "^2.6.2"
 
 "@smithy/chunked-blob-reader-native@^4.2.3":
@@ -4072,13 +4072,12 @@
     "@smithy/uuid" "^1.1.2"
     tslib "^2.6.2"
 
-"@smithy/core@^3.25.1":
-  version "3.25.1"
-  resolved "https://registry.yarnpkg.com/@smithy/core/-/core-3.25.1.tgz#93d342dd50a82973fcbb7b562f17a6f0e2a20009"
-  integrity sha512-zpDbpXBCBsxfLtG2GEUyfgvHvSFrw5CwDZSNzL0v52gx/c3oPlPbm+7W7num8xs6vyiUBn+bvYPHcQDOXZynCQ==
+"@smithy/core@^3.29.5":
+  version "3.29.5"
+  resolved "https://registry.yarnpkg.com/@smithy/core/-/core-3.29.5.tgz#ea1012125719f4287b07aed67f7087b8f5eb70ee"
+  integrity sha512-i0dk2t5B+CwV/dcJdUHILYkOQF5lof8f44dFCfDWToGCxjT9YQ+CgHqTAvJxzc3+zqQwm2QtVoJ5IqiNar/CnQ==
   dependencies:
-    "@aws-crypto/crc32" "5.2.0"
-    "@smithy/types" "^4.15.0"
+    "@smithy/types" "^4.16.1"
     tslib "^2.6.2"
 
 "@smithy/credential-provider-imds@^4.2.14":
@@ -4295,11 +4294,11 @@
     tslib "^2.6.2"
 
 "@smithy/protocol-http@^5.3.12":
-  version "5.5.1"
-  resolved "https://registry.yarnpkg.com/@smithy/protocol-http/-/protocol-http-5.5.1.tgz#7234afacc8246ab7cd1900b4b91fc297bc7f0cce"
-  integrity sha512-GRQofBqr/pPNjR04mU0JjdjsbV8F33KCxSHMFXBb2mWJXxyEalNe814Y4cFd4Efd5tNucaOc31L3/8wXlymjfg==
+  version "5.5.10"
+  resolved "https://registry.yarnpkg.com/@smithy/protocol-http/-/protocol-http-5.5.10.tgz#627a86c187f1abbc97ae62256452c59d89cbfd57"
+  integrity sha512-0AnsOUvCHQBOXnBJbrX9QGidpvbb3F4aIUFlWPXCfRYxYCcoxj9Uq+b8j75wIZRIwhwiKDWJDZmoHjjQ82GYZA==
   dependencies:
-    "@smithy/core" "^3.25.1"
+    "@smithy/core" "^3.29.5"
     tslib "^2.6.2"
 
 "@smithy/protocol-http@^5.3.14":
@@ -4311,11 +4310,11 @@
     tslib "^2.6.2"
 
 "@smithy/querystring-builder@^4.2.12":
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/@smithy/querystring-builder/-/querystring-builder-4.4.1.tgz#fae8750f651d528baf439f6072f3d69583fe6ef7"
-  integrity sha512-XxLjVjrjM2OApKycAT51r45Z9diI+c0DWP9vRONE/gw6PzIma0SyXe/QWiS9+Tp3AOWommjTKUTPcx0cTJsBpQ==
+  version "4.4.10"
+  resolved "https://registry.yarnpkg.com/@smithy/querystring-builder/-/querystring-builder-4.4.10.tgz#a447f254de9a6ffaa56f0fad23f809c408977143"
+  integrity sha512-ewIEbszh/qUrY/1lDDpUhAAoweEwbmht1uHLGGCZ3XeBiL9S/AKOGUKLyO2gqLfUtqYQehk2EUxO0GTQd0V0DA==
   dependencies:
-    "@smithy/core" "^3.25.1"
+    "@smithy/core" "^3.29.5"
     tslib "^2.6.2"
 
 "@smithy/querystring-builder@^4.2.14":
@@ -4398,10 +4397,10 @@
   dependencies:
     tslib "^2.6.2"
 
-"@smithy/types@^4.15.0":
-  version "4.15.0"
-  resolved "https://registry.yarnpkg.com/@smithy/types/-/types-4.15.0.tgz#0346065c3e810755428df89c9a84427969931357"
-  integrity sha512-Z5TAOxygoFvybJV3igo5SloFflSokHx2hu1eFA+DxDTcn+FtKxUSui+rbTRG1pAafMA888Z3MVvCWUuvCrTXjg==
+"@smithy/types@^4.16.1":
+  version "4.16.1"
+  resolved "https://registry.yarnpkg.com/@smithy/types/-/types-4.16.1.tgz#19e199c234829a51c085caf63f0bb17bb80187e4"
+  integrity sha512-0JFs3V2y2M9tKW5na/qxe69Zv+uxLMO7QBbhxF/FHu/Gp2NFZAAL9tWl9PU02xxo07pb3G9FTyjNc6D5uZrJIg==
   dependencies:
     tslib "^2.6.2"
 
@@ -8582,10 +8581,10 @@ execa@^5.1.1:
     signal-exit "^3.0.3"
     strip-final-newline "^2.0.0"
 
-exifreader@4.39.0:
-  version "4.39.0"
-  resolved "https://registry.yarnpkg.com/exifreader/-/exifreader-4.39.0.tgz#248af3fc63c1a6ec9f6481fd892a190c8ff18a25"
-  integrity sha512-lP/BslNNbT3zZDtNyVli8XaPCxKE8f0OXb5hGhPVqaoIGCvOVanICwM3FXO45MkDjI3KHgFBk0KKVAw/W4xP2A==
+exifreader@4.40.1:
+  version "4.40.1"
+  resolved "https://registry.yarnpkg.com/exifreader/-/exifreader-4.40.1.tgz#4b0554645f9409e00a4dbb7943f2adc297b534a1"
+  integrity sha512-Xavsts17ZYZoxUsUn+HCvGf8LB2ry7/pLSk2bYhXPGNLKciQDOxsY2EoytnKWfGmBRm4yvHVkw8RWsG5J8s3pA==
   optionalDependencies:
     "@xmldom/xmldom" "^0.9.9"
 
