@@ -21,7 +21,10 @@ export const globalRoutes = (user: GetGlobalSelfResponse) => {
   ]
 }
 
-export const orgRoutes = (user: GetGlobalSelfResponse, admin: AdminState): Route[] => {
+export const orgRoutes = (
+  user: GetGlobalSelfResponse,
+  admin: AdminState
+): Route[] => {
   const isAdmin = user != null && sdk.users.isAdmin(user)
   const isGlobalBuilder = user != null && sdk.users.isGlobalBuilder(user)
   const cloud = admin?.cloud
@@ -57,6 +60,12 @@ export const orgRoutes = (user: GetGlobalSelfResponse, admin: AdminState): Route
           access: () => isAdmin,
           title: "Organisation",
           comp: Pages.get("org"),
+        },
+        {
+          path: "branding",
+          access: () => isAdmin,
+          title: "Branding",
+          comp: Pages.get("branding"),
         },
       ],
     },
@@ -134,7 +143,10 @@ export const orgRoutes = (user: GetGlobalSelfResponse, admin: AdminState): Route
   }))
 }
 
-export const appRoutes = (appStore: AppMetaState, _appsStore: PortalAppsStore): Route[] => {
+export const appRoutes = (
+  appStore: AppMetaState,
+  _appsStore: PortalAppsStore
+): Route[] => {
   if (!appStore?.appId) {
     return []
   }
@@ -144,7 +156,9 @@ export const appRoutes = (appStore: AppMetaState, _appsStore: PortalAppsStore): 
       section: "General",
       icon: "sliders-horizontal",
       path: "general",
-      routes: [{ path: "info", comp: Pages.get("general_info"), title: "Info" }],
+      routes: [
+        { path: "info", comp: Pages.get("general_info"), title: "Info" },
+      ],
     },
     {
       section: "Apps",
@@ -162,12 +176,14 @@ export const appRoutes = (appStore: AppMetaState, _appsStore: PortalAppsStore): 
 // doesn't have permission or the install does not require/allow it
 export const filterRoutes = (routes: Route[]): Route[] =>
   routes
-    .filter((e) => (typeof e.access === "function" ? e.access() : true))
-    .map((route) => {
-      const filteredChildRoutes = route?.routes ? filterRoutes(route.routes) : []
+    .filter(e => (typeof e.access === "function" ? e.access() : true))
+    .map(route => {
+      const filteredChildRoutes = route?.routes
+        ? filterRoutes(route.routes)
+        : []
 
       // Check if any child has an error
-      const hasChildError = filteredChildRoutes.some((child) => child.error?.())
+      const hasChildError = filteredChildRoutes.some(child => child.error?.())
 
       // Check if this route itself has an error
       const hasOwnError = route.error?.()

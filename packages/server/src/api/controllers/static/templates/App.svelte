@@ -1,7 +1,7 @@
 <script>
-import ClientAppSkeleton from "@supertoolmake/frontend-core/src/components/ClientAppSkeleton.svelte"
+  import ClientAppSkeleton from "@supertoolmake/frontend-core/src/components/ClientAppSkeleton.svelte"
 
-export let props
+  export let props
 </script>
 
 <svelte:head>
@@ -24,7 +24,6 @@ export let props
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:site" content="@budibase" />
   <meta property="twitter:image" content={props.metaImage} />
   <meta property="twitter:image:alt" content={props.metaTitle} />
   <meta property="twitter:title" content={props.metaTitle} />
