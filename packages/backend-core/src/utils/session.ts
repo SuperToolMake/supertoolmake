@@ -1,5 +1,5 @@
-import { Duration } from "./Duration"
 import env from "../environment"
+import { Duration } from "./Duration"
 
 export function getSessionExpirySeconds() {
   const DEFAULT = Duration.fromDays(7).toSeconds()
