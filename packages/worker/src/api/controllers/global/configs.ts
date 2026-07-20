@@ -155,7 +155,6 @@ export async function save(ctx: UserCtx<SaveConfigRequest, SaveConfigResponse>) 
       } = existingConfig.config
 
       body.config = {
-        ...body.config,
         emailBrandingEnabled,
         platformTitle,
         metaDescription,
@@ -163,6 +162,7 @@ export async function save(ctx: UserCtx<SaveConfigRequest, SaveConfigResponse>) 
         loginButton,
         metaImageUrl,
         metaTitle,
+        ...body.config,
       }
     }
   } catch (e) {
