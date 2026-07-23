@@ -583,48 +583,13 @@ export const inviteAccept = async (ctx: Ctx<AcceptUserInviteRequest, AcceptUserI
         // info is an extension of the user object that was stored by global
         const { email, info } = await cache.invite.getCode(inviteCode, resolvedTenantId)
         const user = await tenancy.doInTenant(info.tenantId, async () => {
-          const appRoles = info.apps || {}
-          const creatorAppsFromRoles = Object.keys(appRoles).filter(
-            (appId) => appRoles[appId] === "CREATOR"
-          )
-
-          const builderApps = [...(info?.builder?.apps || []), ...creatorAppsFromRoles]
-          const uniqueBuilderApps = [...new Set(builderApps)]
-          const hasCreatorPerms = Boolean(info?.builder?.creator) || creatorAppsFromRoles.length > 0
-
-          let request: any = {
+          const request: any = {
             firstName,
             lastName,
             password,
             email,
-            admin: { global: info?.admin?.global },
-            roles: appRoles,
             tenantId: info.tenantId,
-          }
-          const builder: {
-            global: boolean
-            creator?: boolean
-            apps?: string[]
-          } = {
-            global: Boolean(info?.builder?.global),
-          }
-
-          if (hasCreatorPerms) {
-            builder.creator = true
-          }
-          if (uniqueBuilderApps.length) {
-            builder.apps = uniqueBuilderApps
-          }
-
-          const cleanedInviteInfo = { ...info }
-          delete cleanedInviteInfo.apps
-          delete cleanedInviteInfo.builder
-          request = {
-            ...request,
-            ...cleanedInviteInfo,
-          }
-          if (info?.builder || hasCreatorPerms || uniqueBuilderApps.length) {
-            request.builder = builder
+            ...users.deriveUserFieldsFromInvite(info),
           }
 
           const saved = await userSdk.db.save(request)
