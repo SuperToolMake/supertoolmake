@@ -12,7 +12,7 @@ jest.mock("../../sdk", () => ({
   },
 }))
 
-import { SourceName } from "@budibase/types"
+import { SourceName } from "@supertoolmake/types"
 import { interpolateSQL } from "../queries/sql"
 
 describe("interpolateSQL SQL injection hardening", () => {
