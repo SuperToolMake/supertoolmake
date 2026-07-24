@@ -677,7 +677,7 @@ export class RestIntegration implements IntegrationBase {
     }
 
     const isCrossOrigin = expectedOriginUrls.some(
-      expectedUrl => this.getOrigin(expectedUrl) !== finalOrigin
+      (expectedUrl) => this.getOrigin(expectedUrl) !== finalOrigin
     )
     if (isCrossOrigin) {
       throw new Error("REST query path must remain on the datasource origin")
@@ -709,12 +709,7 @@ export class RestIntegration implements IntegrationBase {
     }
 
     this.startTimeMs = performance.now()
-    const url = this.getUrl(
-      path,
-      mergedQueryString,
-      pagination,
-      paginationValues
-    )
+    const url = this.getUrl(path, mergedQueryString, pagination, paginationValues)
 
     // Resolve and validate the destination BEFORE attaching any
     // datasource-scoped credentials or headers below.
@@ -762,11 +757,7 @@ export class RestIntegration implements IntegrationBase {
     let hasDispatcher = false
     let usedProxyDispatcher = false
 
-    const setDispatcher = (
-      requestInput: RequestInit,
-      requestUrl: string,
-      pinnedIp: string
-    ) => {
+    const setDispatcher = (requestInput: RequestInit, requestUrl: string, pinnedIp: string) => {
       if (isHttpMockingActive) {
         return requestInput
       }
@@ -788,22 +779,11 @@ export class RestIntegration implements IntegrationBase {
 
     let response: Response
     try {
-      response = await coreUtils.fetchWithBlacklist<RequestInit, Response>(
-        url,
-        input,
-        {
-          rejectCrossOriginRedirects: true,
-          fetchFn: async (
-            requestUrl: string,
-            requestInput: RequestInit,
-            pinnedIp: string
-          ) =>
-            fetch(
-              requestUrl,
-              setDispatcher(requestInput, requestUrl, pinnedIp)
-            ),
-        }
-      )
+      response = await coreUtils.fetchWithBlacklist<RequestInit, Response>(url, input, {
+        rejectCrossOriginRedirects: true,
+        fetchFn: async (requestUrl: string, requestInput: RequestInit, pinnedIp: string) =>
+          fetch(requestUrl, setDispatcher(requestInput, requestUrl, pinnedIp)),
+      })
     } catch (err) {
       const error = err as Error & {
         cause?: {

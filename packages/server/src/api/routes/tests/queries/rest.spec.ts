@@ -6,17 +6,17 @@ import {
   OAuth2CredentialsMethod,
   OAuth2GrantType,
   RestAuthType,
-  RestQueryFields,
+  type RestQueryFields,
   SourceName,
 } from "@supertoolmake/types"
 import nock, { cleanAll as nockCleanAll } from "nock"
 import type { MockAgent } from "undici"
 import { setEnv as setServerEnv } from "../../../../environment"
 import { installHttpMocking, resetHttpMocking } from "../../../../tests/jestEnv"
+import type { Expectations } from "../../../../tests/utilities/api/base"
 import type TestConfiguration from "../../../../tests/utilities/TestConfiguration"
 import { getCachedVariable } from "../../../../threads/utils"
 import * as setup from "../utilities"
-import { Expectations } from "../../../../tests/utilities/api/base"
 
 describe("rest", () => {
   let config: TestConfiguration

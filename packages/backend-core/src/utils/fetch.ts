@@ -1,5 +1,5 @@
+import type { LookupFunction } from "node:net"
 import { Agent, type Dispatcher, ProxyAgent } from "undici"
-import type { LookupFunction } from "net"
 
 /**
  * Check if a URL matches any pattern in the NO_PROXY list.
@@ -166,7 +166,11 @@ function createProxyAgent(rejectUnauthorized: boolean): ProxyAgent {
  * @param options Configuration for the dispatcher
  * @returns A Dispatcher (ProxyAgent for proxied requests, Agent for direct requests)
  */
-function createDispatcher(options?: { rejectUnauthorized?: boolean; url?: string; lookup?: LookupFunction }): Dispatcher {
+function createDispatcher(options?: {
+  rejectUnauthorized?: boolean
+  url?: string
+  lookup?: LookupFunction
+}): Dispatcher {
   const rejectUnauthorized = options?.rejectUnauthorized ?? true
 
   if (shouldBypassProxy(options?.url)) {
@@ -174,9 +178,7 @@ function createDispatcher(options?: { rejectUnauthorized?: boolean; url?: string
   }
 
   if (options?.lookup) {
-    console.log(
-      "[fetch] Proxy configured; IP pinning is not applied to proxied requests"
-    )
+    console.log("[fetch] Proxy configured; IP pinning is not applied to proxied requests")
   }
 
   return createProxyAgent(rejectUnauthorized)
@@ -196,6 +198,10 @@ function createDispatcher(options?: { rejectUnauthorized?: boolean; url?: string
  * @param options Configuration for the dispatcher
  * @returns A Dispatcher ready to use with fetch
  */
-export function getDispatcher(options: { rejectUnauthorized?: boolean; url: string; lookup?: LookupFunction }): Dispatcher {
+export function getDispatcher(options: {
+  rejectUnauthorized?: boolean
+  url: string
+  lookup?: LookupFunction
+}): Dispatcher {
   return createDispatcher(options)
 }

@@ -1,17 +1,12 @@
-import http from "http"
-import https from "https"
-import { isBlacklisted, resolveAddress } from "../blacklist"
+import http from "node:http"
+import https from "node:https"
+import type { LookupFunction } from "node:net"
 import fetch, { Headers, type RequestInit, type Response } from "node-fetch"
-import type { LookupFunction } from "net"
+import { isBlacklisted, resolveAddress } from "../blacklist"
 
 const MAX_REDIRECTS = 5
 const ALLOWED_PROTOCOLS = new Set(["http:", "https:"])
-const SENSITIVE_REDIRECT_HEADERS = [
-  "authorization",
-  "cookie",
-  "cookie2",
-  "proxy-authorization",
-]
+const SENSITIVE_REDIRECT_HEADERS = ["authorization", "cookie", "cookie2", "proxy-authorization"]
 
 function parseUrl(url: string): URL {
   let parsed: URL
@@ -67,9 +62,7 @@ export function createPinnedLookup(ip: string): LookupFunction {
 function makePinnedAgent(url: string, ip: string): http.Agent | https.Agent {
   const protocol = new URL(url).protocol
   const lookup = createPinnedLookup(ip)
-  return protocol === "https:"
-    ? new https.Agent({ lookup })
-    : new http.Agent({ lookup })
+  return protocol === "https:" ? new https.Agent({ lookup }) : new http.Agent({ lookup })
 }
 
 function nextRequestForRedirect<TRequest extends FetchRequest>(
@@ -93,10 +86,7 @@ function nextRequestForRedirect<TRequest extends FetchRequest>(
   } as RedirectSafeRequest<TRequest>
 }
 
-function shouldStripSensitiveHeadersForRedirect(
-  currentUrl: string,
-  redirectUrl: string
-): boolean {
+function shouldStripSensitiveHeadersForRedirect(currentUrl: string, redirectUrl: string): boolean {
   return new URL(currentUrl).origin !== new URL(redirectUrl).origin
 }
 
@@ -107,7 +97,7 @@ function stripSensitiveHeadersForRedirect<TRequest extends FetchRequest>(
     return request
   }
   const headers = new Headers(request.headers as RequestInit["headers"])
-  SENSITIVE_REDIRECT_HEADERS.forEach(header => headers.delete(header))
+  SENSITIVE_REDIRECT_HEADERS.forEach((header) => headers.delete(header))
   return {
     ...request,
     headers,
@@ -210,9 +200,7 @@ export async function fetchWithBlacklist<
         error.message = `Failed to connect to resolved IP for ${hostname}: ${error.message}`
         throw error
       }
-      throw new Error(
-        `Failed to connect to resolved IP for ${hostname}: unknown network error`
-      )
+      throw new Error(`Failed to connect to resolved IP for ${hostname}: unknown network error`)
     }
     if (!isRedirect(response.status)) {
       return response
@@ -236,9 +224,7 @@ export async function fetchWithBlacklist<
       throw new Error("Maximum redirect reached.")
     }
 
-    const redirectUrl = parseUrl(
-      new URL(location, nextUrl).toString()
-    ).toString()
+    const redirectUrl = parseUrl(new URL(location, nextUrl).toString()).toString()
     nextRequest = nextRequestForRedirect(nextRequest, response.status)
     if (shouldStripSensitiveHeadersForRedirect(nextUrl, redirectUrl)) {
       if (rejectCrossOriginRedirects) {

@@ -1,5 +1,5 @@
-import { buildMongoClientOptions, MongoDBConfig } from "../mongodb"
 import { withEnv } from "../../environment"
+import { buildMongoClientOptions, type MongoDBConfig } from "../mongodb"
 
 describe("MongoDB Integration", () => {
   const baseConfig: MongoDBConfig = {

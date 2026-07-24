@@ -2,13 +2,11 @@ jest.mock("../../sdk", () => ({
   __esModule: true,
   default: {
     queries: {
-      enrichContext: jest.fn(
-        async (bindings: string[], parameters: Record<string, any>) =>
-          bindings.map(binding => parameters[binding.replace(/[{} ]/g, "")])
+      enrichContext: jest.fn(async (bindings: string[], parameters: Record<string, any>) =>
+        bindings.map((binding) => parameters[binding.replace(/[{} ]/g, "")])
       ),
-      enrichArrayContext: jest.fn(
-        async (bindings: string[], parameters: Record<string, any>) =>
-          bindings.map(binding => parameters[binding.replace(/[{} ]/g, "")])
+      enrichArrayContext: jest.fn(async (bindings: string[], parameters: Record<string, any>) =>
+        bindings.map((binding) => parameters[binding.replace(/[{} ]/g, "")])
       ),
     },
   },
@@ -56,9 +54,7 @@ describe("interpolateSQL SQL injection hardening", () => {
       { nullDefaultSupport: false }
     )
 
-    expect(result.sql).toBe(
-      "SELECT * FROM users WHERE name = concat('', ?, '')"
-    )
+    expect(result.sql).toBe("SELECT * FROM users WHERE name = concat('', ?, '')")
     expect(result.sql).not.toContain("DROP TABLE")
     expect(result.bindings).toEqual(["'; DROP TABLE users; --"])
   })

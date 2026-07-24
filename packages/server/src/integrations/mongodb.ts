@@ -349,9 +349,7 @@ const getSchema = () => {
 
 const SCHEMA: Integration = getSchema()
 
-export function buildMongoClientOptions(
-  config: MongoDBConfig
-): MongoClientOptions {
+export function buildMongoClientOptions(config: MongoDBConfig): MongoClientOptions {
   return environment.SELF_HOSTED
     ? {
         tlsCertificateKeyFile: config.tlsCertificateKeyFile || undefined,

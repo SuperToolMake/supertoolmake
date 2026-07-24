@@ -1,7 +1,7 @@
 import fetch, { Headers } from "node-fetch"
+import { generator } from "../../../tests"
 import { isBlacklisted, resolveAddress } from "../../blacklist"
 import { createPinnedLookup, fetchWithBlacklist } from "../outboundFetch"
-import { generator } from "../../../tests"
 
 // Expose the real Headers class so the redirect header-stripping logic works
 jest.mock("node-fetch", () => {
@@ -16,12 +16,8 @@ jest.mock("../../blacklist", () => ({
 
 describe("outboundFetch", () => {
   const fetchMock = fetch as jest.MockedFunction<typeof fetch>
-  const isBlacklistedMock = isBlacklisted as jest.MockedFunction<
-    typeof isBlacklisted
-  >
-  const resolveAddressMock = resolveAddress as jest.MockedFunction<
-    typeof resolveAddress
-  >
+  const isBlacklistedMock = isBlacklisted as jest.MockedFunction<typeof isBlacklisted>
+  const resolveAddressMock = resolveAddress as jest.MockedFunction<typeof resolveAddress>
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -33,9 +29,9 @@ describe("outboundFetch", () => {
   it("blocks blacklisted urls", async () => {
     isBlacklistedMock.mockResolvedValue(true)
 
-    await expect(
-      fetchWithBlacklist("http://169.254.169.254/metadata/v1/")
-    ).rejects.toThrow("URL is blocked or could not be resolved safely.")
+    await expect(fetchWithBlacklist("http://169.254.169.254/metadata/v1/")).rejects.toThrow(
+      "URL is blocked or could not be resolved safely."
+    )
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
@@ -51,18 +47,18 @@ describe("outboundFetch", () => {
   it("rejects URL with embedded username", async () => {
     isBlacklistedMock.mockResolvedValue(false)
 
-    await expect(
-      fetchWithBlacklist("https://attacker@example.com/")
-    ).rejects.toThrow("URL must not include credentials.")
+    await expect(fetchWithBlacklist("https://attacker@example.com/")).rejects.toThrow(
+      "URL must not include credentials."
+    )
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
   it("rejects URL with embedded username and password", async () => {
     isBlacklistedMock.mockResolvedValue(false)
 
-    await expect(
-      fetchWithBlacklist("https://user:pass@169.254.169.254/")
-    ).rejects.toThrow("URL must not include credentials.")
+    await expect(fetchWithBlacklist("https://user:pass@169.254.169.254/")).rejects.toThrow(
+      "URL must not include credentials."
+    )
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
@@ -97,9 +93,9 @@ describe("outboundFetch", () => {
       body: { resume },
     } as any)
 
-    await expect(
-      fetchWithBlacklist("https://example.com/spec.json")
-    ).rejects.toThrow("URL is blocked or could not be resolved safely.")
+    await expect(fetchWithBlacklist("https://example.com/spec.json")).rejects.toThrow(
+      "URL is blocked or could not be resolved safely."
+    )
     expect(fetchMock).toHaveBeenCalledTimes(1)
     expect(resume).toHaveBeenCalledTimes(1)
   })
@@ -115,11 +111,7 @@ describe("outboundFetch", () => {
     } as any)
 
     await expect(
-      fetchWithBlacklist(
-        "https://example.com/plugin.tar.gz",
-        {},
-        { followRedirects: false }
-      )
+      fetchWithBlacklist("https://example.com/plugin.tar.gz", {}, { followRedirects: false })
     ).rejects.toThrow("Redirects are not permitted.")
     expect(fetchMock).toHaveBeenCalledTimes(1)
     expect(resume).toHaveBeenCalledTimes(1)
@@ -147,9 +139,9 @@ describe("outboundFetch", () => {
     resolveAddressMock.mockResolvedValue(["203.0.113.10", "127.0.0.1"])
     isBlacklistedMock.mockResolvedValueOnce(false).mockResolvedValueOnce(true)
 
-    await expect(
-      fetchWithBlacklist("https://example.com/start")
-    ).rejects.toThrow("URL is blocked or could not be resolved safely.")
+    await expect(fetchWithBlacklist("https://example.com/start")).rejects.toThrow(
+      "URL is blocked or could not be resolved safely."
+    )
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
@@ -163,11 +155,7 @@ describe("outboundFetch", () => {
       headers: { get: jest.fn() },
     })
 
-    await fetchWithBlacklist(
-      "https://example.com/start",
-      {},
-      { fetchFn: customFetch as any }
-    )
+    await fetchWithBlacklist("https://example.com/start", {}, { fetchFn: customFetch as any })
 
     expect(customFetch).toHaveBeenCalledWith(
       "https://example.com/start",
@@ -186,10 +174,7 @@ describe("outboundFetch", () => {
         agent.options.lookup(
           "example.com",
           { all: true },
-          (
-            err: Error | null,
-            addresses: Array<{ address: string; family: number }>
-          ) => {
+          (err: Error | null, addresses: Array<{ address: string; family: number }>) => {
             if (err) {
               reject(err)
               return
@@ -211,39 +196,34 @@ describe("outboundFetch", () => {
     resolveAddressMock.mockResolvedValue(["203.0.113.10"])
     fetchMock.mockRejectedValueOnce(new Error("Invalid IP address: undefined"))
 
-    await expect(
-      fetchWithBlacklist("http://example.com/start")
-    ).rejects.toThrow(
+    await expect(fetchWithBlacklist("http://example.com/start")).rejects.toThrow(
       "Failed to connect to resolved IP for example.com: Invalid IP address: undefined"
     )
   })
 
-  it.each([301, 302, 303, 307, 308])(
-    "treats %d as a redirect status",
-    async status => {
-      isBlacklistedMock.mockResolvedValue(false)
-      const resume = jest.fn()
+  it.each([301, 302, 303, 307, 308])("treats %d as a redirect status", async (status) => {
+    isBlacklistedMock.mockResolvedValue(false)
+    const resume = jest.fn()
 
-      fetchMock
-        .mockResolvedValueOnce({
-          status,
-          headers: {
-            get: jest.fn().mockReturnValue("https://example.com/final"),
-          },
-          body: { resume },
-        } as any)
-        .mockResolvedValueOnce({
-          status: 200,
-          ok: true,
-          headers: { get: jest.fn() },
-        } as any)
+    fetchMock
+      .mockResolvedValueOnce({
+        status,
+        headers: {
+          get: jest.fn().mockReturnValue("https://example.com/final"),
+        },
+        body: { resume },
+      } as any)
+      .mockResolvedValueOnce({
+        status: 200,
+        ok: true,
+        headers: { get: jest.fn() },
+      } as any)
 
-      await fetchWithBlacklist("https://example.com/start")
+    await fetchWithBlacklist("https://example.com/start")
 
-      expect(fetchMock).toHaveBeenCalledTimes(2)
-      expect(resume).toHaveBeenCalledTimes(1)
-    }
-  )
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(resume).toHaveBeenCalledTimes(1)
+  })
 
   it("rejects redirect to URL with embedded credentials", async () => {
     isBlacklistedMock.mockResolvedValue(false)
@@ -257,9 +237,9 @@ describe("outboundFetch", () => {
       body: { resume },
     } as any)
 
-    await expect(
-      fetchWithBlacklist("https://example.com/start")
-    ).rejects.toThrow("URL must not include credentials.")
+    await expect(fetchWithBlacklist("https://example.com/start")).rejects.toThrow(
+      "URL must not include credentials."
+    )
   })
 
   it("throws after exceeding the maximum redirect count", async () => {
@@ -274,9 +254,9 @@ describe("outboundFetch", () => {
       body: { resume },
     } as any)
 
-    await expect(
-      fetchWithBlacklist("https://example.com/start")
-    ).rejects.toThrow("Maximum redirect reached.")
+    await expect(fetchWithBlacklist("https://example.com/start")).rejects.toThrow(
+      "Maximum redirect reached."
+    )
 
     // Loop runs for redirects 0..5 inclusive → 6 fetch calls
     expect(fetchMock).toHaveBeenCalledTimes(6)
@@ -313,34 +293,31 @@ describe("outboundFetch", () => {
   it.each([
     [301, "POST"],
     [302, "POST"],
-  ])(
-    "converts method from POST to GET on %d redirect",
-    async (status, initialMethod) => {
-      isBlacklistedMock.mockResolvedValue(false)
-      const resume = jest.fn()
+  ])("converts method from POST to GET on %d redirect", async (status, initialMethod) => {
+    isBlacklistedMock.mockResolvedValue(false)
+    const resume = jest.fn()
 
-      fetchMock
-        .mockResolvedValueOnce({
-          status,
-          headers: {
-            get: jest.fn().mockReturnValue("https://example.com/final"),
-          },
-          body: { resume },
-        } as any)
-        .mockResolvedValueOnce({
-          status: 200,
-          ok: true,
-          headers: { get: jest.fn() },
-        } as any)
+    fetchMock
+      .mockResolvedValueOnce({
+        status,
+        headers: {
+          get: jest.fn().mockReturnValue("https://example.com/final"),
+        },
+        body: { resume },
+      } as any)
+      .mockResolvedValueOnce({
+        status: 200,
+        ok: true,
+        headers: { get: jest.fn() },
+      } as any)
 
-      await fetchWithBlacklist("https://example.com/resource", {
-        method: initialMethod,
-      })
+    await fetchWithBlacklist("https://example.com/resource", {
+      method: initialMethod,
+    })
 
-      const secondCallRequest = fetchMock.mock.calls[1][1]
-      expect(secondCallRequest?.method).toBe("GET")
-    }
-  )
+    const secondCallRequest = fetchMock.mock.calls[1][1]
+    expect(secondCallRequest?.method).toBe("GET")
+  })
 
   it("converts method to GET on 303 redirect regardless of original method", async () => {
     isBlacklistedMock.mockResolvedValue(false)
@@ -366,34 +343,31 @@ describe("outboundFetch", () => {
     expect(secondCallRequest?.method).toBe("GET")
   })
 
-  it.each([307, 308])(
-    "preserves method on %d redirect",
-    async redirectStatus => {
-      isBlacklistedMock.mockResolvedValue(false)
-      const resume = jest.fn()
+  it.each([307, 308])("preserves method on %d redirect", async (redirectStatus) => {
+    isBlacklistedMock.mockResolvedValue(false)
+    const resume = jest.fn()
 
-      fetchMock
-        .mockResolvedValueOnce({
-          status: redirectStatus,
-          headers: {
-            get: jest.fn().mockReturnValue("https://example.com/final"),
-          },
-          body: { resume },
-        } as any)
-        .mockResolvedValueOnce({
-          status: 200,
-          ok: true,
-          headers: { get: jest.fn() },
-        } as any)
+    fetchMock
+      .mockResolvedValueOnce({
+        status: redirectStatus,
+        headers: {
+          get: jest.fn().mockReturnValue("https://example.com/final"),
+        },
+        body: { resume },
+      } as any)
+      .mockResolvedValueOnce({
+        status: 200,
+        ok: true,
+        headers: { get: jest.fn() },
+      } as any)
 
-      await fetchWithBlacklist("https://example.com/resource", {
-        method: "POST",
-      })
+    await fetchWithBlacklist("https://example.com/resource", {
+      method: "POST",
+    })
 
-      const secondCallRequest = fetchMock.mock.calls[1][1]
-      expect(secondCallRequest?.method).toBe("POST")
-    }
-  )
+    const secondCallRequest = fetchMock.mock.calls[1][1]
+    expect(secondCallRequest?.method).toBe("POST")
+  })
 
   it("does not convert method to GET on 301 GET redirect", async () => {
     isBlacklistedMock.mockResolvedValue(false)
@@ -424,36 +398,36 @@ describe("outboundFetch", () => {
 
   // ─── Header stripping on cross-origin redirect ────────────────────────────
 
-  it.each(["authorization", "cookie", "cookie2", "proxy-authorization"])(
-    "strips the %s header when redirected to a different origin",
-    async sensitiveHeader => {
-      isBlacklistedMock.mockResolvedValue(false)
-      const resume = jest.fn()
+  it.each([
+    "authorization",
+    "cookie",
+    "cookie2",
+    "proxy-authorization",
+  ])("strips the %s header when redirected to a different origin", async (sensitiveHeader) => {
+    isBlacklistedMock.mockResolvedValue(false)
+    const resume = jest.fn()
 
-      fetchMock
-        .mockResolvedValueOnce({
-          status: 302,
-          headers: {
-            get: jest.fn().mockReturnValue("https://other.example.com/final"),
-          },
-          body: { resume },
-        } as any)
-        .mockResolvedValueOnce({
-          status: 200,
-          ok: true,
-          headers: { get: jest.fn() },
-        } as any)
+    fetchMock
+      .mockResolvedValueOnce({
+        status: 302,
+        headers: {
+          get: jest.fn().mockReturnValue("https://other.example.com/final"),
+        },
+        body: { resume },
+      } as any)
+      .mockResolvedValueOnce({
+        status: 200,
+        ok: true,
+        headers: { get: jest.fn() },
+      } as any)
 
-      await fetchWithBlacklist("https://example.com/resource", {
-        headers: { [sensitiveHeader]: "secret-value" },
-      })
+    await fetchWithBlacklist("https://example.com/resource", {
+      headers: { [sensitiveHeader]: "secret-value" },
+    })
 
-      const secondCallHeaders = new Headers(
-        fetchMock.mock.calls[1][1]?.headers as any
-      )
-      expect(secondCallHeaders.get(sensitiveHeader)).toBeNull()
-    }
-  )
+    const secondCallHeaders = new Headers(fetchMock.mock.calls[1][1]?.headers as any)
+    expect(secondCallHeaders.get(sensitiveHeader)).toBeNull()
+  })
 
   it("preserves sensitive headers when redirected to the same origin", async () => {
     isBlacklistedMock.mockResolvedValue(false)
@@ -463,9 +437,7 @@ describe("outboundFetch", () => {
       .mockResolvedValueOnce({
         status: 302,
         headers: {
-          get: jest
-            .fn()
-            .mockReturnValue("https://example.com/same-origin-path"),
+          get: jest.fn().mockReturnValue("https://example.com/same-origin-path"),
         },
         body: { resume },
       } as any)
@@ -479,9 +451,7 @@ describe("outboundFetch", () => {
       headers: { authorization: "Bearer token" },
     })
 
-    const secondCallHeaders = new Headers(
-      fetchMock.mock.calls[1][1]?.headers as any
-    )
+    const secondCallHeaders = new Headers(fetchMock.mock.calls[1][1]?.headers as any)
     expect(secondCallHeaders.get("authorization")).toBe("Bearer token")
   })
 
@@ -513,9 +483,7 @@ describe("outboundFetch", () => {
       .mockResolvedValueOnce({
         status: 302,
         headers: {
-          get: jest
-            .fn()
-            .mockReturnValue("https://budibase.com/same-origin-path"),
+          get: jest.fn().mockReturnValue("https://budibase.com/same-origin-path"),
         },
         body: { resume },
       } as any)
@@ -525,11 +493,9 @@ describe("outboundFetch", () => {
         headers: { get: jest.fn() },
       } as any)
 
-    const response = await fetchWithBlacklist(
-      "https://budibase.com/resource",
-      undefined,
-      { rejectCrossOriginRedirects: true }
-    )
+    const response = await fetchWithBlacklist("https://budibase.com/resource", undefined, {
+      rejectCrossOriginRedirects: true,
+    })
 
     expect(response.status).toBe(200)
     expect(fetchMock).toHaveBeenCalledTimes(2)
@@ -542,20 +508,16 @@ describe("outboundFetch", () => {
       const lookup = createPinnedLookup("203.0.113.10")
 
       await new Promise<void>((resolve, reject) => {
-        lookup(
-          "attacker-controlled.example.com",
-          {},
-          (err, address, family) => {
-            try {
-              expect(err).toBeNull()
-              expect(address).toBe("203.0.113.10")
-              expect(family).toBe(4)
-              resolve()
-            } catch (error) {
-              reject(error)
-            }
+        lookup("attacker-controlled.example.com", {}, (err, address, family) => {
+          try {
+            expect(err).toBeNull()
+            expect(address).toBe("203.0.113.10")
+            expect(family).toBe(4)
+            resolve()
+          } catch (error) {
+            reject(error)
           }
-        )
+        })
       })
     })
 
@@ -563,20 +525,16 @@ describe("outboundFetch", () => {
       const lookup = createPinnedLookup("2001:db8::1")
 
       await new Promise<void>((resolve, reject) => {
-        lookup(
-          "attacker-controlled.example.com",
-          {},
-          (err, address, family) => {
-            try {
-              expect(err).toBeNull()
-              expect(address).toBe("2001:db8::1")
-              expect(family).toBe(6)
-              resolve()
-            } catch (error) {
-              reject(error)
-            }
+        lookup("attacker-controlled.example.com", {}, (err, address, family) => {
+          try {
+            expect(err).toBeNull()
+            expect(address).toBe("2001:db8::1")
+            expect(family).toBe(6)
+            resolve()
+          } catch (error) {
+            reject(error)
           }
-        )
+        })
       })
     })
 
@@ -584,21 +542,15 @@ describe("outboundFetch", () => {
       const lookup = createPinnedLookup("203.0.113.10")
 
       await new Promise<void>((resolve, reject) => {
-        lookup(
-          "attacker-controlled.example.com",
-          { all: true },
-          (err, addresses) => {
-            try {
-              expect(err).toBeNull()
-              expect(addresses).toEqual([
-                { address: "203.0.113.10", family: 4 },
-              ])
-              resolve()
-            } catch (error) {
-              reject(error)
-            }
+        lookup("attacker-controlled.example.com", { all: true }, (err, addresses) => {
+          try {
+            expect(err).toBeNull()
+            expect(addresses).toEqual([{ address: "203.0.113.10", family: 4 }])
+            resolve()
+          } catch (error) {
+            reject(error)
           }
-        )
+        })
       })
     })
   })
