@@ -51,7 +51,56 @@ describe("public users API", () => {
       expect(newUser._id).toBeDefined()
     })
 
-    describe("role creation", () => {
+    it("rejects malformed builder app assignments", async () => {
+      const apiKey = await config.generateApiKey(globalUser._id)
+      const response = await config
+        .request!.post("/api/public/v1/users")
+        .set(
+          config.defaultHeaders({
+            "x-budibase-api-key": apiKey,
+          })
+        )
+        .send({
+          email: generator.email({ domain: "example.com" }),
+          builder: { apps: {} },
+        })
+
+      expect(response.status).toBe(400)
+    })
+
+    describe("role creation on free tier", () => {
+      it("should not allow 'roles' to be updated", async () => {
+        const newUser = await config.api.public.user.create({
+          email: generator.email({ domain: "example.com" }),
+          roles: { app_a: "BASIC" },
+        })
+        expect(newUser.roles["app_a"]).toBeUndefined()
+      })
+
+      it("should not allow 'admin' to be updated", async () => {
+        const newUser = await config.api.public.user.create({
+          email: generator.email({ domain: "example.com" }),
+          roles: {},
+          admin: { global: true },
+        })
+        expect(newUser.admin).toBeUndefined()
+      })
+
+      it("should not allow 'builder' to be updated", async () => {
+        const newUser = await config.api.public.user.create({
+          email: generator.email({ domain: "example.com" }),
+          roles: {},
+          builder: { global: true },
+        })
+        expect(newUser.builder).toBeUndefined()
+      })
+    })
+
+    describe("role creation on business tier", () => {
+      beforeAll(() => {
+        mocks.licenses.useExpandedPublicApi()
+      })
+
       it("should allow 'roles' to be updated", async () => {
         const newUser = await config.api.public.user.create({
           email: generator.email({ domain: "example.com" }),

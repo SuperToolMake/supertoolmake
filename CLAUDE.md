@@ -41,6 +41,7 @@
 - Avoid adding nested ternary statements.
 - When writing tests involving a URL, use example.com as the domain.
 - Provide a termination condition instead of using while (true)
+- Prefer object params for function signatures.
 
 ## Test style - packages/server
 
