@@ -23,7 +23,7 @@ export const createContext = (app: Koa, socket: Socket, options?: WebsocketConte
     request: {
       url: "/fake",
       headers: {
-        [Header.APP_ID]: options?.appId,
+        [Header.WORKSPACE_ID]: options?.appId,
       },
     },
     cookies: new Cookies(socket.request, res),

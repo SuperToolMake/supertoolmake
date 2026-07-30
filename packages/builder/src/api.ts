@@ -6,11 +6,19 @@ import { auth, navigation } from "./stores/portal"
 
 const newClient = (opts?: { production?: boolean }) =>
   createAPIClient({
-    attachHeaders: (headers) => {
-      // Attach app ID header from store
-      const appId = get(appStore).appId
-      if (appId) {
-        headers[Header.APP_ID] = opts?.production ? sdk.applications.getProdAppID(appId) : appId
+    attachHeaders: (headers, request) => {
+      const isWorkspaceDeleteRequest =
+        request?.method === "DELETE" &&
+        /^\/api\/applications\/app_dev_/.test(request.url)
+
+      // Attach the workspace ID header from the store.
+      const workspaceId = get(appStore).appId
+      if (workspaceId) {
+        if (!isWorkspaceDeleteRequest) {
+          headers[Header.WORKSPACE_ID] = opts?.production
+            ? sdk.workspaces.getProdWorkspaceID(workspaceId)
+            : workspaceId
+        }
         headers[Header.CLIENT] = ClientHeader.BUILDER
       }
 

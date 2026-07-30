@@ -24,11 +24,15 @@ describe("/static", () => {
 
     it("should serve the app by url", async () => {
       const headers = config.defaultHeaders()
-      delete headers[constants.Header.APP_ID]
+      delete headers[constants.Header.WORKSPACE_ID]
+      const workspaceId = config.getProdWorkspaceId()
 
       const res = await request.get(`/app${config.getProdWorkspace().url}`).set(headers).expect(200)
 
-      expect(res.body.appId).toBe(config.prodWorkspaceId)
+      expect(res.body.appId).toBe(workspaceId)
+      expect(res.body.clientLibPath).toContain(
+        `/api/assets/${workspaceId}/client?`
+      )
     })
 
     it("should serve the app preview by id", async () => {

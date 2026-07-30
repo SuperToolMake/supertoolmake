@@ -29,12 +29,16 @@ function buildUserCtx(user: User) {
   return ctx
 }
 
-async function doInWorkspaceContext(ctx: any, workspaceId: string, fnc: () => Promise<void>) {
-  ctx.request.headers[Header.APP_ID] = workspaceId
+async function doInWorkspaceContext(
+  ctx: any,
+  workspaceId: string,
+  fnc: () => Promise<void>
+) {
+  ctx.request.headers[Header.WORKSPACE_ID] = workspaceId
   try {
     await fnc()
   } finally {
-    delete ctx.request.headers[Header.APP_ID]
+    delete ctx.request.headers[Header.WORKSPACE_ID]
   }
 }
 
