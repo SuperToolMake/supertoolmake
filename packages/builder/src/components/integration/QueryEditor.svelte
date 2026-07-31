@@ -190,7 +190,6 @@ onMount(() => {
     if (editor) editor.toTextArea()
   }
 })
-
 </script>
 
 {#if label}
