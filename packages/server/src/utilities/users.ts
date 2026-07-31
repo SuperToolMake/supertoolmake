@@ -49,8 +49,8 @@ export function publicApiUserFix(ctx: UserCtx) {
   if (!ctx.request.body._id && ctx.params.userId) {
     ctx.request.body._id = ctx.params.userId
   }
-  if (!ctx.request.body.roles) {
-    ctx.request.body.roles = {}
-  }
+  delete ctx.request.body.admin
+  delete ctx.request.body.builder
+  ctx.request.body.roles = {}
   return ctx
 }
