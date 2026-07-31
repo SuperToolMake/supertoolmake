@@ -41,6 +41,7 @@ export const EditorModes = {
   const dispatch = createEventDispatcher()
   let textarea
   let editor
+  let container
 
   // Keep editor up to date with value
   // Creates an instance of a code mirror editor
@@ -113,10 +114,14 @@ $: editor?.setOption("mode", mode)
 
   onMount(() => {
     // Create the editor with initial value
-    createEditor(mode, value)
+    const resizeObserver = new ResizeObserver(() => editor?.refresh())
+    resizeObserver.observe(container)
+
+    createEditor(mode, value).then(() => editor?.refresh())
 
     // Clean up editor on unmount
     return () => {
+      resizeObserver.disconnect()
       if (editor) {
         editor.toTextArea()
       }
@@ -130,6 +135,7 @@ $: editor?.setOption("mode", mode)
   </div>
 {/if}
 <div
+  bind:this={container}
   style={`--code-mirror-height: ${height}px; --code-mirror-resize: ${resize}`}
 >
   <textarea tabindex="0" bind:this={textarea} readonly {value}></textarea>
