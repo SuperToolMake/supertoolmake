@@ -1,6 +1,6 @@
+import { randomUUID } from "node:crypto"
 import { cache, middleware, tenancy } from "@supertoolmake/backend-core"
 import type { InviteUsersResponse, OIDCUser, User } from "@supertoolmake/types"
-import { randomUUID } from "crypto"
 import * as userSdk from "../../../../sdk/users"
 import { mocks, structures, TestConfiguration } from "../../../../tests"
 

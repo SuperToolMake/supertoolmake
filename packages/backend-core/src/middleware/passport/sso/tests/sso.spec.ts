@@ -1,10 +1,5 @@
-import type {
-  InviteWithCode,
-  SSOAuthDetails,
-  SSOUser,
-  User,
-  UserStatus,
-} from "@supertoolmake/types"
+import type { InviteWithCode, SSOAuthDetails, SSOUser, User } from "@supertoolmake/types"
+import { UserStatus } from "@supertoolmake/types"
 import nock from "nock"
 import { structures } from "../../../../../tests"
 import { testEnv } from "../../../../../tests/extra"
@@ -364,7 +359,7 @@ describe("sso", () => {
         await sso.authenticate(details, false, mockDone, mockSaveUser)
 
         expect(mockSaveUser).toHaveBeenCalledWith(
-          expect.objectContaining({ _id: "us_" + details.userId }),
+          expect.objectContaining({ _id: `us_${details.userId}` }),
           expect.anything()
         )
       })
@@ -378,7 +373,7 @@ describe("sso", () => {
         await sso.authenticate(details, false, mockDone, mockSaveUser)
 
         expect(mockSaveUser).toHaveBeenCalledWith(
-          expect.objectContaining({ _id: "us_" + details.userId }),
+          expect.objectContaining({ _id: `us_${details.userId}` }),
           expect.anything()
         )
       })
@@ -392,7 +387,7 @@ describe("sso", () => {
         await sso.authenticate(details, false, mockDone, mockSaveUser)
 
         expect(mockSaveUser).toHaveBeenCalledWith(
-          expect.objectContaining({ _id: "us_" + details.userId }),
+          expect.objectContaining({ _id: `us_${details.userId}` }),
           expect.anything()
         )
       })
@@ -406,7 +401,7 @@ describe("sso", () => {
         await sso.authenticate(details, false, mockDone, mockSaveUser)
 
         expect(mockSaveUser).toHaveBeenCalledWith(
-          expect.objectContaining({ _id: "us_" + details.userId }),
+          expect.objectContaining({ _id: `us_${details.userId}` }),
           expect.anything()
         )
       })
@@ -474,7 +469,7 @@ describe("sso", () => {
 
         expect(mockSaveUser).toHaveBeenCalledWith(
           expect.objectContaining({
-            _id: "us_" + details.userId,
+            _id: `us_${details.userId}`,
             email: details.email,
             roles: assignments.roles,
             admin: assignments.admin,
@@ -505,7 +500,7 @@ describe("sso", () => {
         mockInvite.getCode.mockRejectedValueOnce(new Error("invalid invite"))
 
         const existingUser = structures.users.user({
-          _id: "us_" + details.userId,
+          _id: `us_${details.userId}`,
           email: details.email,
         })
         users.getById.mockResolvedValueOnce(existingUser)
@@ -585,7 +580,7 @@ describe("sso", () => {
         expect(mockInvite.deleteCode).not.toHaveBeenCalled()
         expect(mockSaveUser).toHaveBeenCalledWith(
           expect.objectContaining({
-            _id: "us_" + details.userId,
+            _id: `us_${details.userId}`,
             roles: {},
           }),
           expect.anything()
