@@ -144,7 +144,7 @@ export function buildJwtClaims(
  */
 function getEmail(profile: SSOProfile, jwtClaims: JwtClaims) {
   // profile not guaranteed to contain email e.g. github connected azure ad account
-  if (profile._json.email) {
+  if (profile._json?.email) {
     return profile._json.email.toLowerCase()
   }
 
@@ -176,7 +176,7 @@ function getEmail(profile: SSOProfile, jwtClaims: JwtClaims) {
  * @param jwtClaims The claims returned in the id token
  */
 function getEmailVerified(profile: SSOProfile, jwtClaims: JwtClaims): boolean {
-  if (profile._json.email) {
+  if (profile._json?.email) {
     return profile._json.email_verified === true
   }
 

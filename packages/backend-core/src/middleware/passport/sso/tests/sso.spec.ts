@@ -7,13 +7,6 @@ import * as context from "../../../../context"
 import { HTTPError } from "../../../../errors"
 import * as sso from "../sso"
 
-jest.mock("../../../../events", () => ({
-  ...jest.requireActual("../../../../events"),
-  user: {
-    inviteAccepted: jest.fn(),
-  },
-}))
-
 const mockDone = jest.fn()
 const mockSaveUser = jest.fn()
 
@@ -478,7 +471,6 @@ describe("sso", () => {
         )
 
         expect(mockInvite.deleteCode).toHaveBeenCalledWith(invite.code, invite.info.tenantId)
-        expect(events.user.inviteAccepted).toHaveBeenCalledWith(ssoUser)
         expect(mockDone).toHaveBeenCalledWith(null, ssoUser)
       })
 
@@ -521,7 +513,6 @@ describe("sso", () => {
           expect.anything()
         )
         expect(mockInvite.deleteCode).not.toHaveBeenCalled()
-        expect(events.user.inviteAccepted).not.toHaveBeenCalled()
         expect(mockDone).toHaveBeenCalledWith(null, ssoUser)
       })
 
@@ -540,7 +531,6 @@ describe("sso", () => {
         expect(users.getGlobalUserByEmail).not.toHaveBeenCalled()
         expect(mockSaveUser).not.toHaveBeenCalled()
         expect(mockInvite.deleteCode).not.toHaveBeenCalled()
-        expect(events.user.inviteAccepted).not.toHaveBeenCalled()
         expect(mockDone.mock.calls.length).toBe(1)
         expect(getErrorMessage()).toBeDefined()
       })

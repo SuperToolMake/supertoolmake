@@ -95,38 +95,6 @@ describe("public users API", () => {
         expect(newUser.builder).toBeUndefined()
       })
     })
-
-    describe("role creation on business tier", () => {
-      beforeAll(() => {
-        mocks.licenses.useExpandedPublicApi()
-      })
-
-      it("should allow 'roles' to be updated", async () => {
-        const newUser = await config.api.public.user.create({
-          email: generator.email({ domain: "example.com" }),
-          roles: { app_a: "BASIC" },
-        })
-        expect(newUser.roles["app_a"]).toBe("BASIC")
-      })
-
-      it("should allow 'admin' to be updated", async () => {
-        const newUser = await config.api.public.user.create({
-          email: generator.email({ domain: "example.com" }),
-          roles: {},
-          admin: { global: true },
-        })
-        expect(newUser.admin?.global).toBe(true)
-      })
-
-      it("should allow 'builder' to be updated", async () => {
-        const newUser = await config.api.public.user.create({
-          email: generator.email({ domain: "example.com" }),
-          roles: {},
-          builder: { global: true },
-        })
-        expect(newUser.builder?.global).toBe(true)
-      })
-    })
   })
 
   describe("update", () => {

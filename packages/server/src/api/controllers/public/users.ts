@@ -29,6 +29,9 @@ const NO_ROLES_MSG =
 async function createUpdateResponse(ctx: UserCtx, user?: User) {
   const base = cloneDeep(ctx.request.body)
   const requestedApps = ctx.request.body.builder?.apps
+  // check the ctx before any updates to it
+  const removed = rolesRemoved(base, ctx)
+  ctx = publicApiUserFix(ctx)
   validateGlobalRoleUpdate(ctx, {
     admin: !!ctx.request.body.admin?.global !== !!user?.admin?.global,
     builder: !!ctx.request.body.builder?.global !== !!user?.builder?.global,
@@ -38,9 +41,6 @@ async function createUpdateResponse(ctx: UserCtx, user?: User) {
     requestedApps,
     currentBuilder: user?.builder,
   })
-  // check the ctx before any updates to it
-  const removed = rolesRemoved(base, ctx)
-  ctx = publicApiUserFix(ctx)
   const response = await saveGlobalUser(ctx)
   ctx.body = await getUser(ctx, response._id)
   if (removed) {

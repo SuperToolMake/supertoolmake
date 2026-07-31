@@ -36,9 +36,5 @@ export function deriveUserFieldsFromInvite(info: Invite["info"]): InviteUserAssi
     }
   }
 
-  if (info.userGroups?.length) {
-    assignments.userGroups = info.userGroups
-  }
-
   return assignments
 }

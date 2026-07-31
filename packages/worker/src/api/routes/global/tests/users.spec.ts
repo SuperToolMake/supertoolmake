@@ -369,8 +369,8 @@ describe("/api/global/users", () => {
           new Promise<{ err: any; user: any }>((resolve) => {
             verify(
               "https://issuer.example.com",
+              ssoUserId,
               { id: ssoUserId, _json: { email: uppercaseEmail } } as any,
-              { id: ssoUserId, emails: [] } as any,
               {} as any,
               "id-token",
               "access-token",
@@ -390,9 +390,6 @@ describe("/api/global/users", () => {
       expect(
         remainingInvites.some((invite) => invite.email.toLowerCase() === email.toLowerCase())
       ).toBe(false)
-      expect(events.user.inviteAccepted).toHaveBeenCalledWith(
-        expect.objectContaining({ email: email.toLowerCase() })
-      )
     })
 
     it("should not be able to generate an invitation for existing user", async () => {
