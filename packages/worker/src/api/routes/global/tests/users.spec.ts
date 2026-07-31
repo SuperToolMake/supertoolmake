@@ -369,8 +369,8 @@ describe("/api/global/users", () => {
           new Promise<{ err: any; user: any }>((resolve) => {
             verify(
               "https://issuer.example.com",
+              ssoUserId,
               { id: ssoUserId, _json: { email: uppercaseEmail } } as any,
-              { id: ssoUserId, emails: [] } as any,
               {} as any,
               "id-token",
               "access-token",
