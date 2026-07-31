@@ -1,4 +1,10 @@
-import type { SSOAuthDetails, User, InviteWithCode, SSOUser, UserStatus } from "@supertoolmake/types"
+import type {
+  InviteWithCode,
+  SSOAuthDetails,
+  SSOUser,
+  User,
+  UserStatus,
+} from "@supertoolmake/types"
 import nock from "nock"
 import { structures } from "../../../../../tests"
 import { testEnv } from "../../../../../tests/extra"
@@ -31,6 +37,7 @@ jest.mock("../../../../cache", () => ({
     deleteCode: jest.fn(),
   },
 }))
+
 import * as cache from "../../../../cache"
 
 const mockInvite = cache.invite as unknown as {
@@ -40,6 +47,7 @@ const mockInvite = cache.invite as unknown as {
 }
 
 jest.mock("../../../../redis/redlockImpl")
+
 import * as _locks from "../../../../redis/redlockImpl"
 
 const locks = jest.mocked(_locks)
@@ -245,9 +253,7 @@ describe("sso", () => {
 
       it("does not link to an already-claimed account by email", async () => {
         // existingUser has a password set, so it is not linkable
-        users.getGlobalUserByEmail.mockReturnValue(
-          Promise.resolve(existingUser)
-        )
+        users.getGlobalUserByEmail.mockReturnValue(Promise.resolve(existingUser))
         const ssoUser = structures.users.ssoUser({
           user: existingUser,
           details,
@@ -264,9 +270,7 @@ describe("sso", () => {
       })
 
       it("rejects when a local account is required and no linkable account exists", async () => {
-        users.getGlobalUserByEmail.mockReturnValueOnce(
-          Promise.resolve(undefined)
-        )
+        users.getGlobalUserByEmail.mockReturnValueOnce(Promise.resolve(undefined))
 
         await sso.authenticate(details, true, mockDone, mockSaveUser)
 
@@ -478,10 +482,7 @@ describe("sso", () => {
           expect.anything()
         )
 
-        expect(mockInvite.deleteCode).toHaveBeenCalledWith(
-          invite.code,
-          invite.info.tenantId
-        )
+        expect(mockInvite.deleteCode).toHaveBeenCalledWith(invite.code, invite.info.tenantId)
         expect(events.user.inviteAccepted).toHaveBeenCalledWith(ssoUser)
         expect(mockDone).toHaveBeenCalledWith(null, ssoUser)
       })

@@ -1,12 +1,6 @@
-import { tenancy } from "@supertoolmake/backend-core"
+import { cache, middleware, tenancy } from "@supertoolmake/backend-core"
 import type { InviteUsersResponse, OIDCUser, User } from "@supertoolmake/types"
 import { randomUUID } from "crypto"
-
-import {
-  cache,
-  middleware,
-  tenancy as _tenancy,
-} from "@supertoolmake/backend-core"
 import * as userSdk from "../../../../sdk/users"
 import { mocks, structures, TestConfiguration } from "../../../../tests"
 
@@ -372,7 +366,7 @@ describe("/api/global/users", () => {
 
       const { err, user: loggedInUser } = await config.doInTenant(
         () =>
-          new Promise<{ err: any; user: any }>(resolve => {
+          new Promise<{ err: any; user: any }>((resolve) => {
             verify(
               "https://issuer.example.com",
               { id: ssoUserId, _json: { email: uppercaseEmail } } as any,
@@ -392,13 +386,9 @@ describe("/api/global/users", () => {
       expect(loggedInUser.roles?.[workspaceId]).toBe("BASIC")
 
       // a single reconciled user, invite consumed
-      const remainingInvites = await config.doInTenant(() =>
-        cache.invite.getInviteCodes()
-      )
+      const remainingInvites = await config.doInTenant(() => cache.invite.getInviteCodes())
       expect(
-        remainingInvites.some(
-          invite => invite.email.toLowerCase() === email.toLowerCase()
-        )
+        remainingInvites.some((invite) => invite.email.toLowerCase() === email.toLowerCase())
       ).toBe(false)
       expect(events.user.inviteAccepted).toHaveBeenCalledWith(
         expect.objectContaining({ email: email.toLowerCase() })

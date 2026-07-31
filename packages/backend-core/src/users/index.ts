@@ -1,5 +1,5 @@
 export { UserDB } from "./db"
+export * from "./invites"
 export * from "./lookup"
 export * from "./users"
 export * from "./utils"
-export * from "./invites"

@@ -1,11 +1,17 @@
-import type { SaveSSOUserFunction, SSOAuthDetails, SSOUser, User, InviteWithCode } from "@supertoolmake/types"
+import type {
+  InviteWithCode,
+  SaveSSOUserFunction,
+  SSOAuthDetails,
+  SSOUser,
+  User,
+} from "@supertoolmake/types"
 import { isSSOUser, LockName, LockType, UserStatus } from "@supertoolmake/types"
+import * as cache from "../../../cache"
 import * as context from "../../../context"
 import { generateGlobalUserID } from "../../../db"
+import * as locks from "../../../redis/redlockImpl"
 import * as users from "../../../users"
 import { authError } from "../utils"
-import * as cache from "../../../cache"
-import * as locks from "../../../redis/redlockImpl"
 
 // no-op function for user save
 // - this allows datasource auth and access token refresh to work correctly
@@ -59,29 +65,20 @@ export async function authenticate(
     pendingInvite = invites[0]
   }
 
-  const emailLookupWasSkipped =
-    !details.emailVerified && !allowUnverifiedEmailLinking
+  const emailLookupWasSkipped = !details.emailVerified && !allowUnverifiedEmailLinking
   if (!dbUser && !pendingInvite && emailLookupWasSkipped) {
     dbUser = await findLinkableAccountByEmail(details)
   }
 
   // exit early if there is still no user/invite and auto creation is disabled
   if (!dbUser && !pendingInvite && requireLocalAccount) {
-    return authError(
-      done,
-      "Email does not yet exist. You must set up your local account first."
-    )
+    return authError(done, "Email does not yet exist. You must set up your local account first.")
   }
 
   let ssoUser: SSOUser
   try {
     if (pendingInvite) {
-      ssoUser = await claimInviteAndSaveUser(
-        pendingInvite,
-        userId,
-        details,
-        saveUserFn
-      )
+      ssoUser = await claimInviteAndSaveUser(pendingInvite, userId, details, saveUserFn)
     } else {
       if (!dbUser) {
         // first time creation - no invite or existing account to draw from
@@ -123,26 +120,16 @@ async function syncAndSaveUser(
 // admin, and if already an SSO user, only from the same identity provider
 // that linked it
 function isAccountLinkable(user: User, details: SSOAuthDetails): boolean {
-  if (
-    user.password ||
-    user.status === UserStatus.INACTIVE ||
-    user.admin?.global ||
-    user.ssoId
-  ) {
+  if (user.password || user.status === UserStatus.INACTIVE || user.admin?.global || user.ssoId) {
     return false
   }
   if (isSSOUser(user)) {
-    return (
-      user.provider === details.provider &&
-      user.providerType === details.providerType
-    )
+    return user.provider === details.provider && user.providerType === details.providerType
   }
   return true
 }
 
-async function findLinkableAccountByEmail(
-  details: SSOAuthDetails
-): Promise<User | undefined> {
+async function findLinkableAccountByEmail(details: SSOAuthDetails): Promise<User | undefined> {
   const user = await users.getGlobalUserByEmail(details.email!)
   if (user && isAccountLinkable(user, details)) {
     return user

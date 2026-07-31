@@ -1,4 +1,4 @@
-import { Invite, UserRoles } from "@budibase/types"
+import type { Invite, UserRoles } from "@supertoolmake/types"
 
 export interface InviteUserAssignments {
   roles: UserRoles
@@ -11,18 +11,15 @@ export interface InviteUserAssignments {
  * Translates the role/permission info stored against a pending invite into
  * the fields a User document needs
  */
-export function deriveUserFieldsFromInvite(
-  info: Invite["info"]
-): InviteUserAssignments {
+export function deriveUserFieldsFromInvite(info: Invite["info"]): InviteUserAssignments {
   const appRoles = info.apps || {}
   const creatorAppsFromRoles = Object.keys(appRoles).filter(
-    appId => appRoles[appId] === "CREATOR"
+    (appId) => appRoles[appId] === "CREATOR"
   )
 
   const builderApps = [...(info.builder?.apps || []), ...creatorAppsFromRoles]
   const uniqueBuilderApps = [...new Set(builderApps)]
-  const hasCreatorPerms =
-    !!info.builder?.creator || creatorAppsFromRoles.length > 0
+  const hasCreatorPerms = !!info.builder?.creator || creatorAppsFromRoles.length > 0
 
   const assignments: InviteUserAssignments = {
     roles: appRoles,
