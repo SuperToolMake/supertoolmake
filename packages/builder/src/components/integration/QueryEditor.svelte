@@ -20,9 +20,11 @@ export let tab = true
 export let mode
 export let editorHeight = 500
 export let editorWidth = 640
+export let autoHeight = false
 
 let width
 let height
+$: sqlMode = mode === "sql" || mode?.startsWith("text/x-")
 
 // We have to expose set and update methods, rather
 // than making this state-driven through props,
@@ -36,7 +38,10 @@ export async function set(new_value, new_mode) {
 
   value = new_value
   updating_externally = true
-  if (editor) editor.setValue(value)
+  if (editor) {
+    editor.setValue(value)
+    adjustEditorHeight()
+  }
   updating_externally = false
 }
 
@@ -47,6 +52,7 @@ export function update(new_value) {
     const { left, top } = editor.getScrollInfo()
     editor.setValue(value)
     editor.scrollTo(left, top)
+    adjustEditorHeight()
   }
 }
 
@@ -83,10 +89,29 @@ const modes = {
   },
 }
 
+const bindingOverlay = {
+  token(stream) {
+    if (stream.match(/\{\{[^}]*\}\}/)) {
+      return "binding"
+    }
+
+    while (!stream.match(/\{\{/, false) && stream.next() != null) {}
+    return null
+  },
+}
+
 const refs = {}
 let editor
 let updating_externally = false
 let destroyed = false
+
+function adjustEditorHeight() {
+  if (!autoHeight || !editor) return
+
+  const lineHeight = editor.defaultTextHeight()
+  const lineCount = Math.max(editor.lineCount(), 3)
+  editor.setSize(null, `${lineCount * lineHeight + 8}px`)
+}
 
 async function createEditor(mode) {
   if (destroyed || !CodeMirror) return
@@ -99,7 +124,7 @@ async function createEditor(mode) {
     indentWithTabs: true,
     indentUnit: 2,
     tabSize: 2,
-    value: "",
+    value: value || "",
     mode: modes[mode] || {
       name: mode,
     },
@@ -116,10 +141,6 @@ async function createEditor(mode) {
       "Shift-Tab": tab,
     }
 
-  // Creating a text editor is a lot of work, so we yield
-  // the main thread for a moment. This helps reduce jank
-  if (first) await sleep(50)
-
   if (destroyed) return
 
   CodeMirror.commands.autocomplete = (cm) => {
@@ -127,8 +148,10 @@ async function createEditor(mode) {
   }
 
   editor = CodeMirror.fromTextArea(refs.editor, opts)
+  if (sqlMode) editor.addOverlay(bindingOverlay)
 
   editor.on("change", (instance) => {
+    adjustEditorHeight()
     if (!updating_externally) {
       const value = instance.getValue()
       dispatch("change", { value })
@@ -147,14 +170,7 @@ async function createEditor(mode) {
   //   })
   // })
 
-  if (first) await sleep(50)
   editor.refresh()
-
-  first = false
-}
-
-function sleep(ms) {
-  return new Promise((fulfil) => setTimeout(fulfil, ms))
 }
 
 $: if (editor && width && height) {
@@ -163,7 +179,10 @@ $: if (editor && width && height) {
 
 onMount(() => {
   createEditor(mode).then(() => {
-    if (editor) editor.setValue(value || "")
+    if (editor) {
+      editor.refresh()
+      adjustEditorHeight()
+    }
   })
 
   return () => {
@@ -171,15 +190,14 @@ onMount(() => {
     if (editor) editor.toTextArea()
   }
 })
-
-let first = true
 </script>
 
 {#if label}
   <Label small>{label}</Label>
 {/if}
 <div
-  style={`--code-mirror-height: ${editorHeight}px; --code-mirror-width: ${editorWidth}px;`}
+  class:sqlMode
+  style={`--code-mirror-height: ${editorHeight}px; --code-mirror-width: ${editorWidth}px; --code-mirror-resize: ${autoHeight ? "none" : "vertical"};`}
 >
   <textarea tabindex="0" bind:this={refs.editor} readonly {value}></textarea>
 </div>
@@ -195,9 +213,20 @@ let first = true
 
   div :global(.CodeMirror) {
     height: var(--code-mirror-height);
+    min-height: 200px;
     border-radius: var(--border-radius-s);
     font-family: var(--font-mono);
     line-height: 1.3;
-    resize: vertical;
+    resize: var(--code-mirror-resize);
+  }
+
+  div.sqlMode :global(span.cm-keyword) {
+    color: #2BAB72 !important;
+    font-weight: 700;
+  }
+
+  div.sqlMode :global(span.cm-binding) {
+    color: #6E99C4 !important;
+    font-weight: 400 !important;
   }
 </style>

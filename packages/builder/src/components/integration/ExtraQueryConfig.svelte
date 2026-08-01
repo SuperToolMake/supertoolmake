@@ -17,21 +17,49 @@ $: extraFields = Object.keys(config).map((key) => ({
 $: extraQueryFields = query.fields.extra || {}
 </script>
 
-{#each extraFields as { key, displayName, type }}
-  <Label>{displayName}</Label>
-  {#if type === "string"}
-    <Input
-      on:change={() => populateExtraQuery(extraQueryFields)}
-      bind:value={extraQueryFields[key]}
-    />
-  {/if}
+<div class="extra-fields">
+  {#each extraFields as { key, displayName, type }}
+    <div class="extra-field">
+      <Label>{displayName}</Label>
+      {#if type === "string"}
+        <Input
+          on:change={() => populateExtraQuery(extraQueryFields)}
+          bind:value={extraQueryFields[key]}
+        />
+      {/if}
 
-  {#if type === "list"}
-    <Select
-      on:change={() => populateExtraQuery(extraQueryFields)}
-      bind:value={extraQueryFields[key]}
-      options={config[key].data[query.queryVerb]}
-      getOptionLabel={current => current}
-    />
-  {/if}
-{/each}
+      {#if type === "list"}
+        <Select
+          on:change={() => populateExtraQuery(extraQueryFields)}
+          bind:value={extraQueryFields[key]}
+          options={config[key].data[query.queryVerb]}
+          getOptionLabel={current => current}
+        />
+      {/if}
+    </div>
+  {/each}
+</div>
+
+<style>
+  .extra-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-l);
+  }
+
+  .extra-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .extra-field :global(.spectrum-Form-item) {
+    width: 100%;
+  }
+
+  @media (max-width: 700px) {
+    .extra-fields {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
