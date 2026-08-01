@@ -505,6 +505,8 @@ $: debouncedCheckIsModified(newQuery)
     align-items: center;
     padding: 8px 0 8px 16px;
     display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-s);
     width: 100%;
     max-width: calc(1050px + 23px);
     box-sizing: border-box;
