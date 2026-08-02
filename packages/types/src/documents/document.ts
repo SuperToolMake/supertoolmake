@@ -41,6 +41,7 @@ export enum DocumentType {
   AI_CONFIG = "aiconfig",
   WORKSPACE_APP = "workspace_app",
   WORKSPACE_FAVOURITE = "workspace_favourite",
+  WORKSPACE_API = "workspace_api",
   AUTO_COLUMN_STATE = "autocolumn_state",
 }
 
@@ -58,6 +59,7 @@ export const DocumentTypesToImport: DocumentType[] = [
   DocumentType.MEM_VIEW,
   DocumentType.WORKSPACE_APP,
   DocumentType.WORKSPACE_FAVOURITE,
+  DocumentType.WORKSPACE_API,
   // Deprecated but still copied
   DocumentType.INSTANCE,
   DocumentType.LAYOUT,

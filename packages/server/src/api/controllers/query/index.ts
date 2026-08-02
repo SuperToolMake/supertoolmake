@@ -22,12 +22,14 @@ import {
   type Query,
   type QueryResponse,
   type QuerySchema,
+  type RestConfig,
   type SaveQueryRequest,
   type SaveQueryResponse,
   type SessionCookie,
   SourceName,
   SSOProviderType,
   type UserCtx,
+  WORKSPACE_API_CONFIG_ID,
 } from "@supertoolmake/types"
 import { cloneDeep, merge } from "lodash"
 import { ObjectId } from "mongodb"
@@ -50,6 +52,41 @@ function sanitiseUserStructure(user: ContextUser) {
   const copiedUser = cloneDeep(user)
   delete copiedUser.roles
   return copiedUser
+}
+
+const getDatasource = async (datasourceId: string) => {
+  if (datasourceId === WORKSPACE_API_CONFIG_ID) {
+    return await sdk.workspaceApis.getWithEnvVars()
+  }
+  const result = await sdk.datasources.getWithEnvVars(datasourceId)
+  if (result.datasource.source !== SourceName.REST) {
+    return result
+  }
+
+  const shared = await sdk.workspaceApis.getWithEnvVars()
+  const datasourceConfig = result.datasource.config || {}
+  const { url: _sharedUrl, ...sharedConfig } = shared.datasource.config || {}
+  const sharedAuth = sharedConfig.authConfigs || []
+  const datasourceAuth = datasourceConfig.authConfigs || []
+  const datasourceAuthIds = new Set(datasourceAuth.map((auth: any) => auth._id))
+
+  result.datasource.config = {
+    ...sharedConfig,
+    ...datasourceConfig,
+    defaultHeaders: {
+      ...(sharedConfig.defaultHeaders || {}),
+      ...(datasourceConfig.defaultHeaders || {}),
+    },
+    staticVariables: {
+      ...(sharedConfig.staticVariables || {}),
+      ...(datasourceConfig.staticVariables || {}),
+    },
+    authConfigs: [
+      ...sharedAuth.filter((auth: any) => !datasourceAuthIds.has(auth._id)),
+      ...datasourceAuth,
+    ],
+  }
+  return result
 }
 
 function validateQueryInputs(parameters: QueryEventParameters) {
@@ -138,6 +175,11 @@ const _import = async (ctx: UserCtx<ImportRestQueryRequest, ImportRestQueryRespo
   } else {
     // use existing datasource
     datasourceId = body.datasourceId
+    if (datasourceId === WORKSPACE_API_CONFIG_ID) {
+      const { datasource } = await sdk.workspaceApis.getWithEnvVars()
+      importer.prepareDatasourceConfig(datasource)
+      await sdk.workspaceApis.save((datasource.config || {}) as RestConfig)
+    }
   }
 
   let importResult
@@ -244,9 +286,7 @@ function enrichParameters(
 }
 
 export async function preview(ctx: UserCtx<PreviewQueryRequest, PreviewQueryResponse>) {
-  const { datasource, envVars } = await sdk.datasources.getWithEnvVars(
-    ctx.request.body.datasourceId
-  )
+  const { datasource, envVars } = await getDatasource(ctx.request.body.datasourceId)
   // preview may not have a queryId as it hasn't been saved, but if it does
   // this stops dynamic variables from calling the same query
   const queryId = ctx.request.body.queryId
@@ -408,7 +448,7 @@ async function execute(
   const db = context.getWorkspaceDB()
 
   const query = await db.get<Query>(ctx.params.queryId)
-  const { datasource, envVars } = await sdk.datasources.getWithEnvVars(query.datasourceId)
+  const { datasource, envVars } = await getDatasource(query.datasourceId)
 
   let authConfigCtx = {}
   if (!opts.isAutomation) {
@@ -476,6 +516,20 @@ export async function executeV2AsAutomation(
 const removeDynamicVariables = async (queryId: string) => {
   const db = context.getWorkspaceDB()
   const query = await db.get<Query>(queryId)
+  if (query.datasourceId === WORKSPACE_API_CONFIG_ID) {
+    const { datasource } = await sdk.workspaceApis.getWithEnvVars()
+    const dynamicVariables = datasource.config?.dynamicVariables as any[]
+    if (dynamicVariables) {
+      datasource.config!.dynamicVariables = dynamicVariables.filter(
+        (dv: any) => dv.queryId !== queryId
+      )
+      await sdk.workspaceApis.save((datasource.config || {}) as RestConfig)
+      const variablesToDelete = dynamicVariables.filter((dv: any) => dv.queryId === queryId)
+      await invalidateCachedVariable(variablesToDelete)
+    }
+    return
+  }
+
   const datasource = await sdk.datasources.get(query.datasourceId)
   const dynamicVariables = datasource.config?.dynamicVariables as any[]
 

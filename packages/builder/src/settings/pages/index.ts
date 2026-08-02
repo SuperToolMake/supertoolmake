@@ -1,4 +1,5 @@
 import type { Component } from "svelte"
+import APIsPage from "@/settings/pages/apis.svelte"
 import AuthPage from "@/settings/pages/auth/index.svelte"
 import BrandingPage from "@/settings/pages/branding.svelte"
 import DiagnosticsPage from "@/settings/pages/diagnostics.svelte"
@@ -35,6 +36,7 @@ const componentMap = {
   general_info: GeneralInfoPage,
   embed: EmbedPage,
   agplv3: Agplv3Page,
+  apis: APIsPage,
 } satisfies Record<string, Component<any>>
 
 export const Pages = {

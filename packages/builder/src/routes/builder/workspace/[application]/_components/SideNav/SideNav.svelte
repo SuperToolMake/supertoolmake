@@ -19,6 +19,7 @@ import {
   type UIWorkspaceApp,
   type WorkspaceFavourite,
   WorkspaceResource,
+  WORKSPACE_API_CONFIG_ID,
 } from "@supertoolmake/types"
 import { goto as gotoStore, isActive, url } from "@roxi/routify"
 import BBLogo from "assets/BBLogo.svelte"
@@ -98,7 +99,8 @@ const generateResourceLookup = (allResourceStores: Readable<AllResourceStores>) 
         const isRestQuery =
           favourite.resourceType === WorkspaceResource.QUERY &&
           isQueryResource(resource) &&
-          datasourceMap[resource.datasourceId]?.source === IntegrationTypes.REST
+          (datasourceMap[resource.datasourceId]?.source === IntegrationTypes.REST ||
+            resource.datasourceId === WORKSPACE_API_CONFIG_ID)
 
         const entry: UIFavouriteResource = {
           name: resource.name,
@@ -178,7 +180,10 @@ const resourceLink = (favourite: WorkspaceFavourite): ResourceLinkResult | null 
       const datasourceMap = get(datasourceLookup) || {}
       const query = queriesStore.list?.find((q) => q._id === id)
       const datasource = query?.datasourceId ? datasourceMap[query.datasourceId] : undefined
-      const basePath = helpers.isSQL(datasource) ? "data" : "apis"
+      const basePath =
+        query?.datasourceId === WORKSPACE_API_CONFIG_ID || !helpers.isSQL(datasource)
+          ? "apis"
+          : "data"
       return {
         path: `${appPrefix}${basePath}/query/[queryId]`,
         params: { application: currentAppId, queryId: id },

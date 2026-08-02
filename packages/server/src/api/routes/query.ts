@@ -1,4 +1,7 @@
 import { permissions } from "@supertoolmake/backend-core"
+import type { Ctx } from "@supertoolmake/types"
+import { WORKSPACE_API_CONFIG_ID } from "@supertoolmake/types"
+import type { Next } from "koa"
 import { authorizedMiddleware as authorized } from "../../middleware/authorized"
 import { bodyResource, bodySubResource, paramResource } from "../../middleware/resourceId"
 import * as queryController from "../controllers/query"
@@ -19,19 +22,28 @@ const writeRoutes = endpointGroupList.group({
   first: false,
 })
 
+const queryDatasourceResource = (ctx: Ctx, next: Next) => {
+  if (ctx.request.body?.datasourceId === WORKSPACE_API_CONFIG_ID) {
+    return next()
+  }
+  return bodySubResource("datasourceId", "_id")(ctx, next)
+}
+
+const previewDatasourceResource = (ctx: Ctx, next: Next) => {
+  if (ctx.request.body?.datasourceId === WORKSPACE_API_CONFIG_ID) {
+    return next()
+  }
+  return bodyResource("datasourceId")(ctx, next)
+}
+
 builderRoutes
   .get("/api/queries", queryController.fetchQueries)
-  .post(
-    "/api/queries",
-    bodySubResource("datasourceId", "_id"),
-    generateQueryValidation(),
-    queryController.save
-  )
+  .post("/api/queries", queryDatasourceResource, generateQueryValidation(), queryController.save)
   .post("/api/queries/import/info", queryController.importInfo)
   .post("/api/queries/import", queryController.import)
   .post(
     "/api/queries/preview",
-    bodyResource("datasourceId"),
+    previewDatasourceResource,
     generateQueryPreviewValidation(),
     queryController.preview
   )

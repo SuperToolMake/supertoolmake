@@ -20,6 +20,7 @@ $isActive
 
 export let datasource
 export let query
+export let indentLevel = 1
 
 const favourites = workspaceFavouriteStore.lookup
 
@@ -94,7 +95,7 @@ $: goto = $gotoStore
 
 <NavItem
   on:contextmenu={openContextMenu}
-  indentLevel={1}
+  {indentLevel}
   {icon}
   iconText={iconVerb}
   {iconColor}

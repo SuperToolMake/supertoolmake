@@ -15,7 +15,7 @@ export interface ImportRestQueryRequest {
   datasourceId?: string
   data?: string
   url?: string
-  datasource: Datasource
+  datasource?: Datasource
   selectedEndpointId?: string
 }
 

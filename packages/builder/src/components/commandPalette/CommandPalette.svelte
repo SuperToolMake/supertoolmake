@@ -5,6 +5,7 @@ import { goto, isActive, params } from "@roxi/routify"
 import { getContext } from "svelte"
 import { API } from "@/api"
 import { IntegrationTypes } from "@/constants/backend"
+import { WORKSPACE_API_CONFIG_ID } from "@supertoolmake/types"
 import { bb } from "@/stores/bb"
 import {
   appStore,
@@ -93,7 +94,8 @@ const queryCommands = (queries) => {
   )
   return queries.map((query) => {
     const datasource = datasourceLookup.get(query.datasourceId)
-    const isRest = datasource?.source === IntegrationTypes.REST
+    const isRest =
+      datasource?.source === IntegrationTypes.REST || query.datasourceId === WORKSPACE_API_CONFIG_ID
     return {
       type: "Query",
       name: query.name,
