@@ -60,7 +60,7 @@ jobs:
           cache: yarn
       - run: yarn --frozen-lockfile
       - name: Run audit-ci
-        run: yarn audit-ci --critical --allowlist GHSA-mh99-v99m-4gvg
+        run: yarn audit-ci --moderate --allowlist GHSA-mh99-v99m-4gvg
 
   build:
     runs-on: ubuntu-24.04
