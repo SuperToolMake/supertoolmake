@@ -79,7 +79,7 @@
     "env:selfhost:disable": "node scripts/dev/selfhost.js disable",
     "mode:self": "yarn env:selfhost:enable && yarn env:multi:disable && yarn env:account:disable",
     "mode:cloud": "yarn env:selfhost:disable && yarn env:multi:enable && yarn env:account:disable",
-    "security:audit": "node scripts/audit.js",
+    "security:audit": "yarn audit-ci --moderate --config .audit-ci.json",
     "postinstall": "husky install",
     "add-app-migration": "node scripts/add-app-migration.js --title"
   },
