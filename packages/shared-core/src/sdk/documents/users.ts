@@ -8,7 +8,7 @@ import {
   type UserBuilderInfo,
   type UserRoleInfo,
 } from "@supertoolmake/types"
-import { getProdAppID } from "./applications"
+import { getProdWorkspaceID } from "./workspaces"
 
 // checks if a user is specifically a builder, given an app ID
 // TODO: check its usages, as appId checks are not actually checked for global builders
@@ -18,7 +18,7 @@ export function isBuilder(user?: UserBuilderInfo, appId?: string): boolean {
   }
   if (user.builder?.global) {
     return true
-  } else if (appId && user.builder?.apps?.includes(getProdAppID(appId))) {
+  } else if (appId && user.builder?.apps?.includes(getProdWorkspaceID(appId))) {
     return true
   }
   return false
@@ -54,7 +54,7 @@ export function isAdminOrWorkspaceBuilder(
     return true
   }
 
-  if (appId && user.builder?.apps?.includes(getProdAppID(appId))) {
+  if (appId && user.builder?.apps?.includes(getProdWorkspaceID(appId))) {
     return true
   }
 
