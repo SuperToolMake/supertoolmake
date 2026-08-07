@@ -155,7 +155,7 @@ const hidePasswordConfirmationModal = () => {
   onHide()
 }
 
-$: currentWorkspaceId = $appStore.appId ? sdk.applications.getProdAppID($appStore.appId) : ""
+$: currentWorkspaceId = $appStore.appId ? sdk.workspaces.getProdWorkspaceID($appStore.appId) : ""
 
 onMount(() => {
   roles.fetch()
