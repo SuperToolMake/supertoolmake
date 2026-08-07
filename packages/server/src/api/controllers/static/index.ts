@@ -203,7 +203,10 @@ export const serveApp = async (ctx: UserCtx<void, ServeAppResponse>) => {
       })
     } else {
       // just return the app info for jest to assert on
-      ctx.body = appInfo
+      ctx.body = {
+        ...appInfo,
+        clientLibPath: await objectStore.clientLibraryUrl(workspaceId, appInfo.version),
+      }
     }
   } catch (error: any) {
     let msg = "An unknown error occurred"
