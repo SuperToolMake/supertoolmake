@@ -30,6 +30,7 @@ import { integrations } from "./integrations"
 import { sortedIntegrations } from "./sortedIntegrations"
 import { queries } from "./queries"
 import componentTreeNodesStore from "./componentTreeNodes"
+import { componentTreeSearchStore } from "./componentTreeSearch"
 import { oauth2 } from "./oauth2"
 import { workspaceApis } from "./workspaceApis"
 import { dataEnvironmentStore, dataAPI } from "./dataEnvironment"
@@ -42,6 +43,7 @@ export {
   builderStore,
   componentStore,
   componentTreeNodesStore,
+  componentTreeSearchStore,
   contextMenuStore,
   dataAPI,
   dataEnvironmentStore,

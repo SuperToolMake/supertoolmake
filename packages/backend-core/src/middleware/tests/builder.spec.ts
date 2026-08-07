@@ -30,11 +30,11 @@ function buildUserCtx(user: User) {
 }
 
 async function doInWorkspaceContext(ctx: any, workspaceId: string, fnc: () => Promise<void>) {
-  ctx.request.headers[Header.APP_ID] = workspaceId
+  ctx.request.headers[Header.WORKSPACE_ID] = workspaceId
   try {
     await fnc()
   } finally {
-    delete ctx.request.headers[Header.APP_ID]
+    delete ctx.request.headers[Header.WORKSPACE_ID]
   }
 }
 

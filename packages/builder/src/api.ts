@@ -7,10 +7,12 @@ import { auth, navigation } from "./stores/portal"
 const newClient = (opts?: { production?: boolean }) =>
   createAPIClient({
     attachHeaders: (headers) => {
-      // Attach app ID header from store
-      const appId = get(appStore).appId
-      if (appId) {
-        headers[Header.APP_ID] = opts?.production ? sdk.applications.getProdAppID(appId) : appId
+      // Attach the workspace ID header from the store.
+      const workspaceId = get(appStore).appId
+      if (workspaceId) {
+        headers[Header.WORKSPACE_ID] = opts?.production
+          ? sdk.workspaces.getProdWorkspaceID(workspaceId)
+          : workspaceId
         headers[Header.CLIENT] = ClientHeader.BUILDER
       }
 

@@ -18,7 +18,7 @@ export function devClientLibPath() {
  * @returns {Promise<void>}
  */
 export async function updateClientLibrary(appId: string) {
-  appId = sdk.applications.getProdAppID(appId)
+  appId = sdk.workspaces.getProdWorkspaceID(appId)
 
   let manifest: string, client: string
   let dependencies = []
@@ -103,7 +103,7 @@ export async function updateClientLibrary(appId: string) {
  * @returns {Promise<void>}
  */
 export async function revertClientLibrary(appId: string) {
-  appId = sdk.applications.getProdAppID(appId)
+  appId = sdk.workspaces.getProdWorkspaceID(appId)
 
   let manifestContent
   let hasBackup = false

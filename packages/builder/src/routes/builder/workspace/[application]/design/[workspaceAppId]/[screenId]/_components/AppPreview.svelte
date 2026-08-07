@@ -13,6 +13,7 @@ import {
   builderStore,
   componentStore,
   componentTreeNodesStore,
+  componentTreeSearchStore,
   hoverStore,
   navigationStore,
   previewStore,
@@ -169,6 +170,7 @@ const cancelDeleteComponent = () => {
 }
 
 const toggleAddComponent = () => {
+  componentTreeSearchStore.clearSearch()
   if ($isActive(`./[componentId]`, { componentId: "new" })) {
     $goto(`./[componentId]`, { componentId: selectedComponentId })
   } else {

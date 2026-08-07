@@ -49,7 +49,7 @@ const keyHandlers = {
     }
   },
   "Ctrl+Enter": () => {
-    $goto(`./:componentId/new`)
+    $goto(`./[componentId]/new`, { componentId: "new" })
   },
   Delete: (component) => {
     // Don't show confirmation for the screen itself

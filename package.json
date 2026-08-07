@@ -26,7 +26,7 @@
     "svelte": "5.55.7",
     "svelte-check": "4.4.6",
     "svelte-preprocess": "6.0.3",
-    "testcontainers": "12.0.4",
+    "testcontainers": "12.1.0",
     "typescript": "5.9.2",
     "update-dotenv": "1.1.1",
     "yargs": "17.7.2"
@@ -79,7 +79,7 @@
     "env:selfhost:disable": "node scripts/dev/selfhost.js disable",
     "mode:self": "yarn env:selfhost:enable && yarn env:multi:disable && yarn env:account:disable",
     "mode:cloud": "yarn env:selfhost:disable && yarn env:multi:enable && yarn env:account:disable",
-    "security:audit": "node scripts/audit.js",
+    "security:audit": "yarn audit-ci --moderate --config .audit-ci.json",
     "postinstall": "husky install",
     "add-app-migration": "node scripts/add-app-migration.js --title"
   },
@@ -119,9 +119,9 @@
     "tmp": "0.2.7",
     "ws": "8.21.0",
     "sigstore": "4.1.1",
-    "js-yaml": "4.3.0",
+    "js-yaml": "4.3.1",
     "tar": "7.5.21",
-    "fast-uri": "3.1.4",
+    "fast-uri": "3.1.5",
     "postcss": "8.5.25"
   },
   "engines": {
