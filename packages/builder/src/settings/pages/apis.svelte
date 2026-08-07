@@ -4,29 +4,15 @@ import { cloneDeep } from "lodash/fp"
 import { onMount } from "svelte"
 import KeyValueBuilder from "@/components/integration/KeyValueBuilder.svelte"
 import RestAuthenticationBuilder from "@/routes/builder/workspace/[application]/data/datasource/[datasourceId]/_components/panels/Authentication/RestAuthenticationBuilder.svelte"
-import { getRestBindings, readableToRuntimeBinding, runtimeToReadableMap } from "@/dataBinding"
 import { workspaceApis } from "@/stores/builder"
 
 let config = {}
 let originalConfig = {}
 let initialized = false
 let saving = false
-const restBindings = getRestBindings()
 
 const updateConfig = (updates) => {
   config = { ...config, ...updates }
-}
-
-const updateHeaders = (entries) => {
-  const headers = entries.reduce((result, entry) => {
-    const name = `${entry?.name || ""}`.trim()
-    const value = `${entry?.value || ""}`.trim()
-    if (name || value) {
-      result[name] = readableToRuntimeBinding(restBindings, entry.value)
-    }
-    return result
-  }, {})
-  updateConfig({ defaultHeaders: headers })
 }
 
 const updateStaticVariables = (entries) => {
@@ -65,7 +51,6 @@ onMount(async () => {
   }
 })
 
-$: parsedHeaders = runtimeToReadableMap(restBindings, config.defaultHeaders || {})
 $: hasChanges = initialized && JSON.stringify(config) !== JSON.stringify(originalConfig)
 </script>
 
@@ -76,16 +61,6 @@ $: hasChanges = initialized && JSON.stringify(config) !== JSON.stringify(origina
     <RestAuthenticationBuilder
       authConfigs={config.authConfigs || []}
       on:change={(event) => updateConfig({ authConfigs: event.detail })}
-    />
-  </Layout>
-
-  <Layout noPadding gap="XS">
-    <Heading size="S">Headers</Heading>
-    <Body size="S">These headers are added to REST API requests unless a query overrides them.</Body>
-    <KeyValueBuilder
-      object={parsedHeaders}
-      bindings={restBindings}
-      on:change={(event) => updateHeaders(event.detail)}
     />
   </Layout>
 

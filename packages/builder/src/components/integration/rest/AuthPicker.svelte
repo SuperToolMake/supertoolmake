@@ -15,11 +15,11 @@ import { bb } from "@/stores/bb"
 import { oauth2 } from "@/stores/builder"
 
 function addBasicConfiguration() {
-  bb.settings("/apis")
+  bb.settings("/apis/config")
 }
 
 function addOAuth2Configuration() {
-  bb.settings("/general/oauth2")
+  bb.settings("/apis/oauth2")
 }
 
 function selectConfiguration(id: string, type?: RestAuthType) {

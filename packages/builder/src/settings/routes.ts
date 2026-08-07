@@ -162,7 +162,10 @@ export const appRoutes = (appStore: AppMetaState, _appsStore: PortalAppsStore): 
       section: "APIs",
       icon: "globe-simple",
       path: "apis",
-      comp: Pages.get("apis"),
+      routes: [
+        { path: "config", comp: Pages.get("apis"), title: "Config" },
+        { path: "oauth2", comp: Pages.get("oauth2"), title: "OAuth2" },
+      ],
     },
   ].map((entry: Route) => ({
     ...entry,

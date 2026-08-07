@@ -17,6 +17,7 @@ import WorkspaceUsersPage from "@/settings/pages/people/users/workspace.svelte"
 import ProfilePage from "@/settings/pages/profile.svelte"
 import SystemLogsPage from "@/settings/pages/systemLogs.svelte"
 import VersionPage from "@/settings/pages/version.svelte"
+import OAuth2Page from "@/settings/pages/oauth2/index.svelte"
 import Agplv3Page from "./agplv3.svelte"
 
 const componentMap = {
@@ -31,6 +32,7 @@ const componentMap = {
   branding: BrandingPage,
   org: OrgPage,
   version: VersionPage,
+  oauth2: OAuth2Page,
   diagnostics: DiagnosticsPage,
   system_logs: SystemLogsPage,
   general_info: GeneralInfoPage,
