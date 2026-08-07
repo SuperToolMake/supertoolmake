@@ -9,6 +9,7 @@ import EmailPage from "@/settings/pages/email.svelte"
 import EmbedPage from "@/settings/pages/embed.svelte"
 // App pages
 import GeneralInfoPage from "@/settings/pages/general.svelte"
+import OAuth2Page from "@/settings/pages/oauth2/index.svelte"
 import OrgPage from "@/settings/pages/organisation.svelte"
 import UserInvitesPage from "@/settings/pages/people/users/invites.svelte"
 import UserPage from "@/settings/pages/people/users/user.svelte"
@@ -17,7 +18,6 @@ import WorkspaceUsersPage from "@/settings/pages/people/users/workspace.svelte"
 import ProfilePage from "@/settings/pages/profile.svelte"
 import SystemLogsPage from "@/settings/pages/systemLogs.svelte"
 import VersionPage from "@/settings/pages/version.svelte"
-import OAuth2Page from "@/settings/pages/oauth2/index.svelte"
 import Agplv3Page from "./agplv3.svelte"
 
 const componentMap = {
