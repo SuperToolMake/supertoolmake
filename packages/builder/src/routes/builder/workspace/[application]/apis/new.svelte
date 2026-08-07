@@ -1,6 +1,5 @@
 <script lang="ts">
-import { Body } from "@supertoolmake/bbui"
-import { notifications } from "@supertoolmake/bbui"
+import { Body, Button, Modal, notifications } from "@supertoolmake/bbui"
 import { goto as gotoStore } from "@roxi/routify"
 import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
 import CreationPage from "@/components/common/CreationPage.svelte"
@@ -8,6 +7,7 @@ import { IntegrationTypes } from "@/constants/backend"
 import { datasources, sortedIntegrations as integrations } from "@/stores/builder"
 import CreateExternalDatasourceModal from "../data/_components/CreateExternalDatasourceModal/index.svelte"
 import DatasourceOption from "../data/_components/DatasourceOption.svelte"
+import RestImportQueriesModal from "../data/datasource/[datasourceId]/_components/panels/Queries/RestImportQueriesModal.svelte"
 import { helpers } from "@supertoolmake/shared-core"
 
 const openDatasourceModal = (integration: any) => {
@@ -17,6 +17,8 @@ const openDatasourceModal = (integration: any) => {
   }
   externalDatasourceModal.show(integration)
 }
+
+const openRestQuery = () => goto("../query/new")
 
 const close = () => {
   if (nonSqlDatasources.length) {
@@ -32,6 +34,7 @@ $: goto = $gotoStore
 
 let externalDatasourceModal: CreateExternalDatasourceModal
 let externalDatasourceLoading = false
+let restImportModal
 
 $: nonSqlIntegrations = ($integrations || []).filter(
   (integration) => !helpers.isSQL({ source: integration.name })
@@ -59,7 +62,7 @@ $: disabled = externalDatasourceLoading
   {#if restIntegration}
     <div class="options">
       <DatasourceOption
-        on:click={() => openDatasourceModal(restIntegration)}
+        on:click={openRestQuery}
         title={restIntegration.friendlyName}
         {disabled}
       >
@@ -69,6 +72,7 @@ $: disabled = externalDatasourceLoading
           size="32"
         />
       </DatasourceOption>
+      <Button secondary on:click={() => restImportModal.show()}>Import</Button>
     </div>
   {/if}
   {#if otherNonSqlIntegrations.length > 0}
@@ -92,6 +96,10 @@ $: disabled = externalDatasourceLoading
     </div>
   {/if}
 </CreationPage>
+
+<Modal bind:this={restImportModal}>
+  <RestImportQueriesModal createDatasource={false} />
+</Modal>
 
 <style>
   .subHeading {

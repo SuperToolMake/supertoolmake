@@ -32,6 +32,7 @@ import { queries } from "./queries"
 import componentTreeNodesStore from "./componentTreeNodes"
 import { componentTreeSearchStore } from "./componentTreeSearch"
 import { oauth2 } from "./oauth2"
+import { workspaceApis } from "./workspaceApis"
 import { dataEnvironmentStore, dataAPI } from "./dataEnvironment"
 
 import type { FetchAppPackageResponse } from "@supertoolmake/types"
@@ -73,6 +74,7 @@ export {
   userSelectedResourceMap,
   userStore,
   workspaceAppStore,
+  workspaceApis,
   workspaceDeploymentStore,
   workspaceFavouriteStore,
 }

@@ -1,5 +1,6 @@
 import * as dev from "./dev"
 import { default as users } from "./users"
+import workspaceApis from "./workspace/apis"
 import { default as backups } from "./workspace/backups"
 import * as common from "./workspace/common"
 import { default as datasources } from "./workspace/datasources"
@@ -11,7 +12,6 @@ import * as oauth2 from "./workspace/oauth2"
 import * as permissions from "./workspace/permissions"
 import { default as queries } from "./workspace/queries"
 import * as resources from "./workspace/resources"
-
 import { default as rows } from "./workspace/rows"
 import * as screens from "./workspace/screens"
 import { default as tables } from "./workspace/tables"
@@ -32,6 +32,7 @@ const sdk = {
   common,
   oauth2,
   workspaceApps,
+  workspaceApis,
   navigation,
   resources,
   deployment,

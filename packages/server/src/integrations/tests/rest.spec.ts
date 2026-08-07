@@ -230,7 +230,7 @@ describe("REST Integration", () => {
     })
 
     await expect(integration.read({ path: "redirect" })).rejects.toThrow(
-      "Redirect to a different origin is not permitted."
+      "This API URL redirects to a different hostname, port, or protocol. Enter the final URL directly (www.example.com instead of example.com)."
     )
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })

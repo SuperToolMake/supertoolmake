@@ -1,6 +1,7 @@
 import { context } from "@supertoolmake/backend-core"
-import type { Datasource, Query } from "@supertoolmake/types"
+import { type Datasource, type Query, WORKSPACE_API_CONFIG_ID } from "@supertoolmake/types"
 import { generateQueryID } from "../../../../db/utils"
+import sdk from "../../../../sdk"
 import { queryValidation } from "../validation"
 import type { ImportInfo, ImportSource } from "./sources/base"
 import { Curl } from "./sources/curl"
@@ -174,6 +175,10 @@ export class RestImporter {
       return {}
     }
     const db = context.getWorkspaceDB()
+    if (datasourceId === WORKSPACE_API_CONFIG_ID) {
+      const workspaceAPI = await sdk.workspaceApis.getWithEnvVars()
+      return { ...(workspaceAPI.datasource.config?.staticVariables || {}) }
+    }
     let datasource: Datasource | undefined
     try {
       datasource = await db.get<Datasource>(datasourceId)

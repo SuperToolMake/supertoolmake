@@ -1,4 +1,5 @@
 import type { Component } from "svelte"
+import APIsPage from "@/settings/pages/apis.svelte"
 import AuthPage from "@/settings/pages/auth/index.svelte"
 import BrandingPage from "@/settings/pages/branding.svelte"
 import DiagnosticsPage from "@/settings/pages/diagnostics.svelte"
@@ -8,6 +9,7 @@ import EmailPage from "@/settings/pages/email.svelte"
 import EmbedPage from "@/settings/pages/embed.svelte"
 // App pages
 import GeneralInfoPage from "@/settings/pages/general.svelte"
+import OAuth2Page from "@/settings/pages/oauth2/index.svelte"
 import OrgPage from "@/settings/pages/organisation.svelte"
 import UserInvitesPage from "@/settings/pages/people/users/invites.svelte"
 import UserPage from "@/settings/pages/people/users/user.svelte"
@@ -30,11 +32,13 @@ const componentMap = {
   branding: BrandingPage,
   org: OrgPage,
   version: VersionPage,
+  oauth2: OAuth2Page,
   diagnostics: DiagnosticsPage,
   system_logs: SystemLogsPage,
   general_info: GeneralInfoPage,
   embed: EmbedPage,
   agplv3: Agplv3Page,
+  apis: APIsPage,
 } satisfies Record<string, Component<any>>
 
 export const Pages = {

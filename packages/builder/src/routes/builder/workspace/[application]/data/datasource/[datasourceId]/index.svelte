@@ -1,62 +1,19 @@
 <script>
 import { Body, Heading, Layout, Tab, Tabs } from "@supertoolmake/bbui"
 import { params } from "@roxi/routify"
-import { cloneDeep } from "lodash/fp"
 import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
 import { IntegrationTypes } from "@/constants/backend"
 import { datasources, integrations } from "@/stores/builder"
 import EditDatasourceConfig from "./_components/EditDatasourceConfig.svelte"
 import PromptQueryModal from "./_components/PromptQueryModal.svelte"
-import RestAuthenticationPanel from "./_components/panels/Authentication/index.svelte"
-import RestHeadersPanel from "./_components/panels/Headers.svelte"
 import QueriesPanel from "./_components/panels/Queries/index.svelte"
 import RelationshipsPanel from "./_components/panels/Relationships.svelte"
-import SaveDatasourceButton from "./_components/panels/SaveDatasourceButton.svelte"
 import TablesPanel from "./_components/panels/Tables/index.svelte"
-import Tooltip from "./_components/panels/Tooltip.svelte"
-import RestVariablesPanel from "./_components/panels/Variables/index.svelte"
-
-const REST_PANEL_SECTIONS = [
-  { title: "", component: QueriesPanel },
-  {
-    title: "Authentication",
-    component: RestAuthenticationPanel,
-  },
-  {
-    title: "Headers",
-    component: RestHeadersPanel,
-  },
-  {
-    title: "Variables",
-    component: RestVariablesPanel,
-    tooltip: {
-      title: "REST variables",
-      href: "https://docs.budibase.com/docs/rest-variables",
-    },
-  },
-]
 
 $params
 
 let selectedPanel = $params.tab ?? null
 let panelOptions = []
-
-const markDirty = () => {
-  if (!updatedDatasource) {
-    return
-  }
-  restConfigDirty = true
-  // trigger reactivity for children like Save button
-  updatedDatasource = { ...updatedDatasource }
-}
-
-const handleRestConfigSaved = () => {
-  if (!updatedDatasource) {
-    return
-  }
-  restConfigDirty = false
-  updatedDatasource = cloneDeep(datasource ?? updatedDatasource)
-}
 
 const getOptions = (datasource) => {
   if (!datasource) {
@@ -73,24 +30,14 @@ const getOptions = (datasource) => {
         : ["Tables", "Relationships", "Queries"]
     selectedPanel = panelOptions.includes(selectedPanel) ? selectedPanel : "Tables"
   } else {
-    const isRest = datasource.source === "REST"
-    panelOptions = isRest ? [] : ["Queries"]
-    selectedPanel = isRest ? null : "Queries"
+    panelOptions = ["Queries"]
+    selectedPanel = "Queries"
   }
 }
 
 $: datasource = $datasources.selected
 
-$: isRestDatasource = datasource?.source === IntegrationTypes.REST
 $: getOptions(datasource)
-
-// Central updated datasource state for REST config edits
-let updatedDatasource
-let restConfigDirty = false
-$: if (datasource && (!updatedDatasource || updatedDatasource._id !== datasource._id)) {
-  updatedDatasource = cloneDeep(datasource)
-  restConfigDirty = false
-}
 </script>
 
 <PromptQueryModal />
@@ -107,47 +54,10 @@ $: if (datasource && (!updatedDatasource || updatedDatasource._id !== datasource
         <Heading size="M">{$datasources.selected?.name}</Heading>
       </header>
     </Layout>
-    <EditDatasourceConfig {datasource} />
-    {#if isRestDatasource}
-      <div class="rest-sections">
-        {#each REST_PANEL_SECTIONS as restPanel (restPanel.title)}
-          <div class="rest-section">
-            {#if restPanel.title}
-              <div class="rest-section__title">
-                <Heading size="S" class="rest-section__heading">
-                  {restPanel.title}
-                </Heading>
-                {#if restPanel.tooltip}
-                  <Tooltip
-                    title={restPanel.tooltip.title}
-                    href={restPanel.tooltip.href}
-                    showLabel={false}
-                  />
-                {/if}
-              </div>
-            {/if}
-            {#if restPanel.component === QueriesPanel}
-              <svelte:component this={restPanel.component} {datasource}>
-                <SaveDatasourceButton
-                  slot="global-save"
-                  {datasource}
-                  {updatedDatasource}
-                  isDirty={restConfigDirty}
-                  onSaved={handleRestConfigSaved}
-                />
-              </svelte:component>
-            {:else}
-              <svelte:component
-                this={restPanel.component}
-                {datasource}
-                {updatedDatasource}
-                {markDirty}
-              />
-            {/if}
-          </div>
-        {/each}
-      </div>
+    {#if datasource?.source === IntegrationTypes.REST}
+      <Body>REST API settings are managed in Workspace settings under APIs.</Body>
     {:else}
+      <EditDatasourceConfig {datasource} />
       <div class="tabs">
         <Tabs size="L" noPadding noHorizPadding selected={selectedPanel}>
           {#each panelOptions as panelOption}
@@ -188,21 +98,4 @@ $: if (datasource && (!updatedDatasource || updatedDatasource._id !== datasource
     margin-bottom: 12px;
   }
 
-  .rest-sections {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xxl);
-    margin-top: var(--spacing-xl);
-  }
-
-  .rest-section {
-    margin-bottom: 35px;
-  }
-
-  .rest-section__title {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-s);
-    margin-bottom: var(--spacing-m);
-  }
 </style>

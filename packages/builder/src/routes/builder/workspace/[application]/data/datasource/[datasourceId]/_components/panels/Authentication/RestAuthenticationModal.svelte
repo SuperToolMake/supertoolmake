@@ -204,7 +204,40 @@ const onConfirmInternal = () => {
       on:blur={() => (blurred.type = true)}
       error={blurred.type ? errors.type : undefined}
     />
-    {#if form.type === AUTH_TYPES.BEARER}
+    {#if form.type === AUTH_TYPES.BASIC}
+      <BindableCombobox
+        label="Username"
+        value={form.basic.username}
+        bindings={[...getAuthBindings()]}
+        on:change={e => {
+          form.basic.username = e.detail
+          onFieldChange()
+        }}
+        on:blur={() => {
+          blurred.basic.username = true
+          onFieldChange()
+        }}
+        placeholder="Username"
+        appendBindingsAsOptions={true}
+        error={blurred.basic.username ? errors.basic.username : null}
+      />
+      <BindableCombobox
+        label="Password"
+        value={form.basic.password}
+        bindings={[...getAuthBindings()]}
+        on:change={e => {
+          form.basic.password = e.detail
+          onFieldChange()
+        }}
+        on:blur={() => {
+          blurred.basic.password = true
+          onFieldChange()
+        }}
+        placeholder="Password"
+        appendBindingsAsOptions={true}
+        error={blurred.basic.password ? errors.basic.password : null}
+      />
+    {:else if form.type === AUTH_TYPES.BEARER}
       <BindableCombobox
         label="Token"
         value={form.bearer.token}
