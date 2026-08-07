@@ -28,6 +28,7 @@ export let compact: boolean = false
 export let hovering: boolean = false
 export let disabled: boolean = false
 export let nonSelectable: boolean = false
+export let bodyInteractive: boolean = false
 
 const scrollApi = getContext("scroll")
 const dispatch = createEventDispatcher()
@@ -125,15 +126,19 @@ $: style = getStyle(indentLevel)
         />
       </div>
     {/if}
-    <div class="nav-item-body" title={showTooltip ? text : null}>
-      <div class="text">
-        <span title={text}>{text}</span>
-        {#if subtext}
-          <span class="subtext">
-            {subtext}
-          </span>
-        {/if}
-      </div>
+    <div class="nav-item-body" class:bodyInteractive title={showTooltip ? text : null}>
+      {#if $$slots.text}
+        <slot name="text" />
+      {:else}
+        <div class="text">
+          <span title={text}>{text}</span>
+          {#if subtext}
+            <span class="subtext">
+              {subtext}
+            </span>
+          {/if}
+        </div>
+      {/if}
       {#if selectedBy}
         <UserAvatars size="XS" users={selectedBy} />
       {/if}
@@ -313,6 +318,9 @@ $: style = getStyle(indentLevel)
     overflow: hidden;
     pointer-events: none;
     gap: var(--spacing-s);
+  }
+  .nav-item-body.bodyInteractive {
+    pointer-events: all;
   }
   .nav-item-body span {
     white-space: nowrap;
