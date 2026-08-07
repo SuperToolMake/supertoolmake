@@ -10,7 +10,7 @@ class ComponentTreeSearchStore extends BudiStore<ComponentTreeSearchState> {
   }
 
   clearSearch() {
-    this.update(state => {
+    this.update((state) => {
       state.clearSearchSequence += 1
       return state
     })

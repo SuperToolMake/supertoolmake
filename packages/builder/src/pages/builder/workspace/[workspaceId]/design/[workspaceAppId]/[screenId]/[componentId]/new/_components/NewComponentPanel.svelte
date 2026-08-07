@@ -1,246 +1,239 @@
 <script>
-  import Panel from "@/components/design/Panel.svelte"
-  import { goto } from "@roxi/routify"
-  import { Layout, Search, Icon, Body, notifications } from "@supertoolmake/bbui"
-  import { getComponentStructure } from "./componentStructure"
-  import {
-    previewStore,
-    selectedScreen,
-    componentStore,
-    componentTreeSearchStore,
-    selectedComponent,
-  } from "@/stores/builder"
-  import { onMount } from "svelte"
-  import { fly } from "svelte/transition"
-  import { findComponentPath } from "@/helpers/components"
-  import NewPill from "@/components/common/NewPill.svelte"
+import Panel from "@/components/design/Panel.svelte"
+import { goto } from "@roxi/routify"
+import { Layout, Search, Icon, Body, notifications } from "@supertoolmake/bbui"
+import { getComponentStructure } from "./componentStructure"
+import {
+  previewStore,
+  selectedScreen,
+  componentStore,
+  componentTreeSearchStore,
+  selectedComponent,
+} from "@/stores/builder"
+import { onMount } from "svelte"
+import { fly } from "svelte/transition"
+import { findComponentPath } from "@/helpers/components"
+import NewPill from "@/components/common/NewPill.svelte"
 
-  $goto
+$goto
 
-  // Smallest possible 1x1 transparent GIF
-  const ghost = new Image(1, 1)
-  ghost.src =
-    "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
+// Smallest possible 1x1 transparent GIF
+const ghost = new Image(1, 1)
+ghost.src = "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
 
-  // Aliases for other strings to match to when searching
-  const aliases = {
-    text: ["headline", "heading", "title", "paragraph", "markdown"],
+// Aliases for other strings to match to when searching
+const aliases = {
+  text: ["headline", "heading", "title", "paragraph", "markdown"],
+}
+
+let searchString
+let searchRef
+let selectedIndex
+let componentList = []
+
+const getAllowedComponents = (allComponents, screen, component) => {
+  // Default to using the root screen container if no component specified
+  if (!component) {
+    component = screen.props
+  }
+  const path = findComponentPath(screen?.props, component?._id)
+  if (!path?.length) {
+    return []
   }
 
-  let searchString
-  let searchRef
-  let selectedIndex
-  let componentList = []
-
-  $: allowedComponents = getAllowedComponents(
-    $componentStore.components,
-    $selectedScreen,
-    $selectedComponent
-  )
-  $: structure = getComponentStructure()
-  $: enrichedStructure = enrichStructure(
-    structure,
-    $componentStore.components,
-    $componentStore.customComponents
-  )
-  $: filteredStructure = filterStructure(
-    enrichedStructure,
-    allowedComponents,
-    searchString
-  )
-  $: orderMap = createComponentOrderMap(componentList)
-
-  const getAllowedComponents = (allComponents, screen, component) => {
-    // Default to using the root screen container if no component specified
-    if (!component) {
-      component = screen.props
-    }
-    const path = findComponentPath(screen?.props, component?._id)
-    if (!path?.length) {
-      return []
-    }
-
-    // Get initial set of allowed components
-    let allowedComponents = []
-    const definition = componentStore.getDefinition(component?._component)
-    if (definition?.legalDirectChildren?.length) {
-      allowedComponents = definition.legalDirectChildren.map(x => {
-        return `@supertoolmake/standard-components/${x}`
-      })
-    } else {
-      allowedComponents = Object.keys(allComponents)
-    }
-
-    // Build up list of illegal children from ancestors
-    let illegalChildren = definition?.illegalChildren || []
-    path.forEach(ancestor => {
-      // Sidepanels and modals can be nested anywhere in the component tree, but really they are always rendered at the top level.
-      // Because of this, it doesn't make sense to carry over any parent illegal children to them, so the array is reset here.
-      if (
-        [
-          "@supertoolmake/standard-components/sidepanel",
-          "@supertoolmake/standard-components/modal",
-        ].includes(ancestor._component)
-      ) {
-        illegalChildren = []
-      }
-      const def = componentStore.getDefinition(ancestor._component)
-      const blacklist = def?.illegalChildren?.map(x => {
-        return `@supertoolmake/standard-components/${x}`
-      })
-      illegalChildren = [...illegalChildren, ...(blacklist || [])]
+  // Get initial set of allowed components
+  let allowedComponents = []
+  const definition = componentStore.getDefinition(component?._component)
+  if (definition?.legalDirectChildren?.length) {
+    allowedComponents = definition.legalDirectChildren.map((x) => {
+      return `@supertoolmake/standard-components/${x}`
     })
-    illegalChildren = [...new Set(illegalChildren)]
-
-    // Filter out illegal children from allowed components
-    allowedComponents = allowedComponents.filter(x => {
-      return !illegalChildren.includes(x)
-    })
-
-    return allowedComponents
+  } else {
+    allowedComponents = Object.keys(allComponents)
   }
 
-  // Creates a simple lookup map from an array, so we can find the selected
-  // component much faster
-  const createComponentOrderMap = list => {
-    let map = {}
-    list.forEach((component, idx) => {
-      map[component] = idx
+  // Build up list of illegal children from ancestors
+  let illegalChildren = definition?.illegalChildren || []
+  path.forEach((ancestor) => {
+    // Sidepanels and modals can be nested anywhere in the component tree, but really they are always rendered at the top level.
+    // Because of this, it doesn't make sense to carry over any parent illegal children to them, so the array is reset here.
+    if (
+      [
+        "@supertoolmake/standard-components/sidepanel",
+        "@supertoolmake/standard-components/modal",
+      ].includes(ancestor._component)
+    ) {
+      illegalChildren = []
+    }
+    const def = componentStore.getDefinition(ancestor._component)
+    const blacklist = def?.illegalChildren?.map((x) => {
+      return `@supertoolmake/standard-components/${x}`
     })
-    return map
+    illegalChildren = [...illegalChildren, ...(blacklist || [])]
+  })
+  illegalChildren = [...new Set(illegalChildren)]
+
+  // Filter out illegal children from allowed components
+  allowedComponents = allowedComponents.filter((x) => {
+    return !illegalChildren.includes(x)
+  })
+
+  return allowedComponents
+}
+
+// Creates a simple lookup map from an array, so we can find the selected
+// component much faster
+const createComponentOrderMap = (list) => {
+  let map = {}
+  list.forEach((component, idx) => {
+    map[component] = idx
+  })
+  return map
+}
+
+// Parses the structure in the manifest and returns an enriched structure with
+// explicit categories
+const enrichStructure = (structure, definitions, customComponents) => {
+  let enrichedStructure = []
+
+  // Add custom components category
+  if (customComponents?.length) {
+    enrichedStructure.push({
+      name: "Plugins",
+      isCategory: true,
+      children: customComponents
+        .map((x) => ({
+          ...definitions[x],
+          name: definitions[x].friendlyName || definitions[x].name,
+        }))
+        .sort((a, b) => {
+          return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
+        }),
+    })
   }
 
-  // Parses the structure in the manifest and returns an enriched structure with
-  // explicit categories
-  const enrichStructure = (structure, definitions, customComponents) => {
-    let enrichedStructure = []
-
-    // Add custom components category
-    if (customComponents?.length) {
-      enrichedStructure.push({
-        name: "Plugins",
-        isCategory: true,
-        children: customComponents
-          .map(x => ({
-            ...definitions[x],
-            name: definitions[x].friendlyName || definitions[x].name,
-          }))
-          .sort((a, b) => {
-            return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
-          }),
-      })
-    }
-
-    structure.forEach(item => {
-      if (typeof item === "string") {
-        const def = definitions[`@supertoolmake/standard-components/${item}`]
-        if (def) {
-          enrichedStructure.push({
-            ...def,
-            isCategory: false,
-          })
-        }
-      } else {
+  structure.forEach((item) => {
+    if (typeof item === "string") {
+      const def = definitions[`@supertoolmake/standard-components/${item}`]
+      if (def) {
         enrichedStructure.push({
-          ...item,
-          isCategory: true,
-          children: enrichStructure(item.children || [], definitions),
+          ...def,
+          isCategory: false,
         })
       }
-    })
-
-    return enrichedStructure
-  }
-
-  const filterStructure = (structure, allowedComponents, search) => {
-    if (!structure?.length) {
-      return []
-    }
-    search = search?.toLowerCase()
-    selectedIndex = search ? 0 : null
-    componentList = []
-
-    // Return only items which match the search string
-    let filteredStructure = []
-    structure.forEach(category => {
-      let matchedChildren = category.children.filter(child => {
-        const name = child.name.toLowerCase()
-
-        // Check if the component matches the search string
-        if (search) {
-          const nameMatch = name.includes(search)
-          const aliasMatch = (aliases[name] || []).some(x => x.includes(search))
-          if (!nameMatch && !aliasMatch) {
-            return false
-          }
-        }
-
-        // Check if the component is allowed as a child
-        return allowedComponents.includes(child.component)
+    } else {
+      enrichedStructure.push({
+        ...item,
+        isCategory: true,
+        children: enrichStructure(item.children || [], definitions),
       })
-      if (matchedChildren.length) {
-        filteredStructure.push({
-          ...category,
-          children: matchedChildren,
-        })
-
-        // Create a flat list of all components so that we can reference them by
-        // order later
-        componentList = componentList.concat(
-          matchedChildren.map(x => x.component)
-        )
-      }
-    })
-    structure = filteredStructure
-    return structure
-  }
-
-  const addComponent = async component => {
-    componentTreeSearchStore.clearSearch()
-    try {
-      await componentStore.create(component)
-    } catch (error) {
-      notifications.error(error || "Error creating component")
-    }
-  }
-
-  const handleKeyDown = e => {
-    if (e.key === "Tab" || e.key === "ArrowDown" || e.key === "ArrowUp") {
-      // Cycle selected components on tab press
-      if (selectedIndex == null) {
-        selectedIndex = 0
-      } else {
-        const direction = e.key === "ArrowUp" ? -1 : 1
-        selectedIndex = (selectedIndex + direction) % componentList.length
-      }
-      e.preventDefault()
-      e.stopPropagation()
-      return false
-    } else if (e.key === "Enter") {
-      // Add selected component on enter press
-      if (componentList[selectedIndex]) {
-        addComponent(componentList[selectedIndex])
-      }
-    }
-  }
-
-  onMount(() => {
-    searchRef.focus()
-    window.addEventListener("keydown", handleKeyDown)
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
     }
   })
 
-  const onDragStart = (e, component) => {
-    e.dataTransfer.setDragImage(ghost, 0, 0)
-    previewStore.startDrag(component)
-  }
+  return enrichedStructure
+}
 
-  const onDragEnd = () => {
-    previewStore.stopDrag()
+const filterStructure = (structure, allowedComponents, search) => {
+  if (!structure?.length) {
+    return []
   }
+  search = search?.toLowerCase()
+  selectedIndex = search ? 0 : null
+  componentList = []
+
+  // Return only items which match the search string
+  let filteredStructure = []
+  structure.forEach((category) => {
+    let matchedChildren = category.children.filter((child) => {
+      const name = child.name.toLowerCase()
+
+      // Check if the component matches the search string
+      if (search) {
+        const nameMatch = name.includes(search)
+        const aliasMatch = (aliases[name] || []).some((x) => x.includes(search))
+        if (!nameMatch && !aliasMatch) {
+          return false
+        }
+      }
+
+      // Check if the component is allowed as a child
+      return allowedComponents.includes(child.component)
+    })
+    if (matchedChildren.length) {
+      filteredStructure.push({
+        ...category,
+        children: matchedChildren,
+      })
+
+      // Create a flat list of all components so that we can reference them by
+      // order later
+      componentList = componentList.concat(matchedChildren.map((x) => x.component))
+    }
+  })
+  structure = filteredStructure
+  return structure
+}
+
+$: allowedComponents = getAllowedComponents(
+  $componentStore.components,
+  $selectedScreen,
+  $selectedComponent
+)
+$: structure = getComponentStructure()
+$: enrichedStructure = enrichStructure(
+  structure,
+  $componentStore.components,
+  $componentStore.customComponents
+)
+$: filteredStructure = filterStructure(enrichedStructure, allowedComponents, searchString)
+$: orderMap = createComponentOrderMap(componentList)
+
+const addComponent = async (component) => {
+  componentTreeSearchStore.clearSearch()
+  try {
+    await componentStore.create(component)
+  } catch (error) {
+    notifications.error(error || "Error creating component")
+  }
+}
+
+const handleKeyDown = (e) => {
+  if (e.key === "Tab" || e.key === "ArrowDown" || e.key === "ArrowUp") {
+    // Cycle selected components on tab press
+    if (selectedIndex == null) {
+      selectedIndex = 0
+    } else {
+      const direction = e.key === "ArrowUp" ? -1 : 1
+      selectedIndex = (selectedIndex + direction) % componentList.length
+    }
+    e.preventDefault()
+    e.stopPropagation()
+    return false
+  } else if (e.key === "Enter") {
+    // Add selected component on enter press
+    if (componentList[selectedIndex]) {
+      addComponent(componentList[selectedIndex])
+    }
+  }
+}
+
+onMount(() => {
+  searchRef.focus()
+  window.addEventListener("keydown", handleKeyDown)
+
+  return () => {
+    window.removeEventListener("keydown", handleKeyDown)
+  }
+})
+
+const onDragStart = (e, component) => {
+  e.dataTransfer.setDragImage(ghost, 0, 0)
+  previewStore.startDrag(component)
+}
+
+const onDragEnd = () => {
+  previewStore.stopDrag()
+}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

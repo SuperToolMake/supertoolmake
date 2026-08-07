@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from "vitest"
 import type { Component } from "@supertoolmake/types"
+import { describe, expect, it, vi } from "vitest"
 
 vi.mock("@/stores/builder", async () => {
   const { writable } = await import("svelte/store")
@@ -35,12 +35,7 @@ interface ComponentTestConfig {
   children?: Component[]
 }
 
-const component = ({
-  id,
-  type,
-  name = "",
-  children = [],
-}: ComponentTestConfig): Component => ({
+const component = ({ id, type, name = "", children = [] }: ComponentTestConfig): Component => ({
   _id: id,
   _component: type,
   _instanceName: name,
@@ -125,10 +120,7 @@ describe("component tree search", () => {
     const results = getComponentTreeSearchResults(tree, "table")
 
     expect(Array.from(results.matchingIds)).toEqual(["table-1"])
-    expect(Array.from(results.visibleIds).sort()).toEqual([
-      "container-1",
-      "table-1",
-    ])
+    expect(Array.from(results.visibleIds).sort()).toEqual(["container-1", "table-1"])
     expect(Array.from(results.expandedIds)).toEqual(["container-1"])
   })
 
@@ -164,20 +156,14 @@ describe("component tree search", () => {
 
     const results = getComponentTreeSearchResults(tree, "container")
 
-    expect(Array.from(results.matchingIds)).toEqual([
-      "container-1",
-      "container-2",
-    ])
+    expect(Array.from(results.matchingIds)).toEqual(["container-1", "container-2"])
     expect(Array.from(results.visibleIds)).toEqual([
       "container-1",
       "button-1",
       "container-2",
       "table-1",
     ])
-    expect(Array.from(results.expandedIds)).toEqual([
-      "container-1",
-      "container-2",
-    ])
+    expect(Array.from(results.expandedIds)).toEqual(["container-1", "container-2"])
   })
 
   it("returns empty sets when there are no matches", () => {

@@ -30,9 +30,7 @@ describe("/static", () => {
       const res = await request.get(`/app${config.getProdWorkspace().url}`).set(headers).expect(200)
 
       expect(res.body.appId).toBe(workspaceId)
-      expect(res.body.clientLibPath).toContain(
-        `/api/assets/${workspaceId}/client?`
-      )
+      expect(res.body.clientLibPath).toContain(`/api/assets/${workspaceId}/client?`)
     })
 
     it("should serve the app preview by id", async () => {

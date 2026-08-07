@@ -8,8 +8,7 @@ const newClient = (opts?: { production?: boolean }) =>
   createAPIClient({
     attachHeaders: (headers, request) => {
       const isWorkspaceDeleteRequest =
-        request?.method === "DELETE" &&
-        /^\/api\/applications\/app_dev_/.test(request.url)
+        request?.method === "DELETE" && /^\/api\/applications\/app_dev_/.test(request.url)
 
       // Attach the workspace ID header from the store.
       const workspaceId = get(appStore).appId

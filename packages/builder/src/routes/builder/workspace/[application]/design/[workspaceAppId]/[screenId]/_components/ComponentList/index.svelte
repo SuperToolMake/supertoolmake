@@ -1,141 +1,127 @@
 <script lang="ts">
-  import { tick } from "svelte"
-  import { notifications, Icon } from "@supertoolmake/bbui"
-  import type { Component } from "@supertoolmake/types"
-  import {
-    selectedScreen,
-    screenStore,
-    componentStore,
-    componentTreeNodesStore,
-    componentTreeSearchStore,
-    userSelectedResourceMap,
-    hoverStore,
-    contextMenuStore,
-  } from "@/stores/builder"
-  import NavItem from "@/components/common/NavItem.svelte"
-  import ComponentTree from "./ComponentTree.svelte"
-  import { dndStore, DropPosition } from "./dndStore.js"
-  import DNDPositionIndicator from "./DNDPositionIndicator.svelte"
-  import ComponentScrollWrapper from "./ComponentScrollWrapper.svelte"
-  import getScreenContextMenuItems from "./getScreenContextMenuItems"
-  import { getComponentTreeSearchResults } from "@/helpers/components"
+import { tick } from "svelte"
+import { notifications, Icon } from "@supertoolmake/bbui"
+import type { Component } from "@supertoolmake/types"
+import {
+  selectedScreen,
+  screenStore,
+  componentStore,
+  componentTreeNodesStore,
+  componentTreeSearchStore,
+  userSelectedResourceMap,
+  hoverStore,
+  contextMenuStore,
+} from "@/stores/builder"
+import NavItem from "@/components/common/NavItem.svelte"
+import ComponentTree from "./ComponentTree.svelte"
+import { dndStore, DropPosition } from "./dndStore.js"
+import DNDPositionIndicator from "./DNDPositionIndicator.svelte"
+import ComponentScrollWrapper from "./ComponentScrollWrapper.svelte"
+import getScreenContextMenuItems from "./getScreenContextMenuItems"
+import { getComponentTreeSearchResults } from "@/helpers/components"
 
-  $: screenComponentId = `${$screenStore.selectedScreenId}-screen`
-  $: navComponentId = `${$screenStore.selectedScreenId}-navigation`
-  let searchTerm = ""
-  let searchOpen = false
-  let searchInput: HTMLInputElement | undefined
-  let handledClearSearchSequence = $componentTreeSearchStore.clearSearchSequence
+$: screenComponentId = `${$screenStore.selectedScreenId}-screen`
+$: navComponentId = `${$screenStore.selectedScreenId}-navigation`
+let searchTerm = ""
+let searchOpen = false
+let searchInput: HTMLInputElement | undefined
+let handledClearSearchSequence = $componentTreeSearchStore.clearSearchSequence
 
-  $: isSearching = !!searchTerm.trim()
-  $: searchResults = getComponentTreeSearchResults(
-    $selectedScreen?.props?._children,
-    searchTerm
-  )
-  $: if (
-    $componentTreeSearchStore.clearSearchSequence !== handledClearSearchSequence
-  ) {
+const closeSearch = () => {
+  searchOpen = false
+  searchTerm = ""
+}
+
+$: isSearching = !!searchTerm.trim()
+$: searchResults = getComponentTreeSearchResults($selectedScreen?.props?._children, searchTerm)
+$: if ($componentTreeSearchStore.clearSearchSequence !== handledClearSearchSequence) {
+  closeSearch()
+  handledClearSearchSequence = $componentTreeSearchStore.clearSearchSequence
+}
+
+const openSearch = async () => {
+  searchOpen = true
+  await tick()
+  searchInput?.focus()
+}
+
+const toggleSearch = () => {
+  if (searchOpen) {
     closeSearch()
-    handledClearSearchSequence = $componentTreeSearchStore.clearSearchSequence
+    return
   }
+  openSearch()
+}
 
-  const openSearch = async () => {
-    searchOpen = true
-    await tick()
-    searchInput?.focus()
+const onKeyDown = (e: KeyboardEvent) => {
+  if (e.key === "Escape" && searchOpen) {
+    closeSearch()
   }
+}
 
-  const closeSearch = () => {
-    searchOpen = false
-    searchTerm = ""
-  }
-
-  const toggleSearch = () => {
-    if (searchOpen) {
-      closeSearch()
-      return
-    }
-    openSearch()
-  }
-
-  const onKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Escape" && searchOpen) {
-      closeSearch()
-    }
-  }
-
-  const onSearchInputKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Escape") {
-      e.preventDefault()
-      e.stopPropagation()
-      closeSearch()
-      return
-    }
-
-    if (e.key !== "Enter") {
-      return
-    }
-
-    const [componentId] = searchResults.matchingIds
-    if (!componentId) {
-      return
-    }
-
+const onSearchInputKeyDown = (e: KeyboardEvent) => {
+  if (e.key === "Escape") {
     e.preventDefault()
     e.stopPropagation()
-    componentTreeNodesStore.makeNodeVisible(componentId)
-    componentStore.select(componentId)
+    closeSearch()
+    return
   }
 
-  const onDrop = async () => {
-    if (isSearching) {
-      return
-    }
-
-    try {
-      await dndStore.actions.drop()
-    } catch (error) {
-      console.error(error)
-      notifications.error("Error saving component")
-    }
+  if (e.key !== "Enter") {
+    return
   }
 
-  const hover = hoverStore.hover
-
-  // showCopy is used to hide the copy button when the user right-clicks the empty
-  // background of their component tree. Pasting in the empty space makes sense,
-  // but copying it doesn't
-  const openScreenContextMenu = (
-    e: MouseEvent,
-    showCopy: boolean | Component | undefined
-  ) => {
-    const screenComponent = $selectedScreen?.props
-    const definition = screenComponent?._component
-      ? componentStore.getDefinition(screenComponent._component)
-      : null
-    const editable =
-      definition && "editable" in definition ? definition.editable : undefined
-    const isStatic =
-      definition && "static" in definition ? definition.static : undefined
-    // "editable" has been repurposed for inline text editing.
-    // It remains here for legacy compatibility.
-    // Future components should define "static": true for indicate they should
-    // not show a context menu.
-    if (editable !== false && isStatic !== true) {
-      e.preventDefault()
-      e.stopPropagation()
-
-      const items = getScreenContextMenuItems(screenComponent, showCopy)
-      contextMenuStore.open(
-        `${showCopy ? "background-" : ""}screenComponent._id`,
-        items,
-        {
-          x: e.clientX,
-          y: e.clientY,
-        }
-      )
-    }
+  const [componentId] = searchResults.matchingIds
+  if (!componentId) {
+    return
   }
+
+  e.preventDefault()
+  e.stopPropagation()
+  componentTreeNodesStore.makeNodeVisible(componentId)
+  componentStore.select(componentId)
+}
+
+const onDrop = async () => {
+  if (isSearching) {
+    return
+  }
+
+  try {
+    await dndStore.actions.drop()
+  } catch (error) {
+    console.error(error)
+    notifications.error("Error saving component")
+  }
+}
+
+const hover = hoverStore.hover
+
+// showCopy is used to hide the copy button when the user right-clicks the empty
+// background of their component tree. Pasting in the empty space makes sense,
+// but copying it doesn't
+const openScreenContextMenu = (e: MouseEvent, showCopy: boolean | Component | undefined) => {
+  const screenComponent = $selectedScreen?.props
+  const definition = screenComponent?._component
+    ? componentStore.getDefinition(screenComponent._component)
+    : null
+  const editable = definition && "editable" in definition ? definition.editable : undefined
+  const isStatic = definition && "static" in definition ? definition.static : undefined
+  // "editable" has been repurposed for inline text editing.
+  // It remains here for legacy compatibility.
+  // Future components should define "static": true for indicate they should
+  // not show a context menu.
+  if (editable !== false && isStatic !== true) {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const items = getScreenContextMenuItems(screenComponent, showCopy)
+    contextMenuStore.open(`${showCopy ? "background-" : ""}screenComponent._id`, items, {
+      x: e.clientX,
+      y: e.clientY,
+    })
+  }
+}
 </script>
 
 <svelte:window on:keydown={onKeyDown} />

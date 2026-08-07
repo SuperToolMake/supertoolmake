@@ -220,7 +220,8 @@ export const getComponentText = (component: Component) => {
   if (component?._instanceName) {
     return component._instanceName
   }
-  const type = component._component?.replace("@supertoolmake/standard-components/", "") || "component"
+  const type =
+    component._component?.replace("@supertoolmake/standard-components/", "") || "component"
   return capitalise(type)
 }
 
@@ -266,19 +267,15 @@ export const normaliseComponentSearchTerm = (searchTerm: string) => {
   return searchTerm.trim().toLowerCase()
 }
 
-export const componentMatchesSearchTerm = (
-  component: Component,
-  searchTerm: string
-) => {
+export const componentMatchesSearchTerm = (component: Component, searchTerm: string) => {
   const normalisedSearchTerm = normaliseComponentSearchTerm(searchTerm)
   if (!normalisedSearchTerm) {
     return false
   }
 
-  return [
-    getComponentText(component),
-    getComponentTypeSearchText(component),
-  ].some(text => text.toLowerCase().includes(normalisedSearchTerm))
+  return [getComponentText(component), getComponentTypeSearchText(component)].some((text) =>
+    text.toLowerCase().includes(normalisedSearchTerm)
+  )
 }
 
 export const getComponentTreeSearchResults = (
@@ -294,10 +291,7 @@ export const getComponentTreeSearchResults = (
     return { matchingIds, visibleIds, expandedIds }
   }
 
-  const searchComponent = (
-    component: Component,
-    visibleFromAncestorMatch = false
-  ): boolean => {
+  const searchComponent = (component: Component, visibleFromAncestorMatch = false): boolean => {
     const componentId = component._id
     if (!componentId) {
       return false
@@ -320,8 +314,7 @@ export const getComponentTreeSearchResults = (
 
     let descendantMatches = false
     for (const child of component._children || []) {
-      descendantMatches =
-        searchComponent(child, visibleSubtree) || descendantMatches
+      descendantMatches = searchComponent(child, visibleSubtree) || descendantMatches
     }
 
     if (descendantMatches) {
@@ -335,7 +328,7 @@ export const getComponentTreeSearchResults = (
     return matches || descendantMatches
   }
 
-  components.forEach(component => searchComponent(component))
+  components.forEach((component) => searchComponent(component))
 
   return { matchingIds, visibleIds, expandedIds }
 }
