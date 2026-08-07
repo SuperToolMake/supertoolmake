@@ -67,10 +67,12 @@ $: hasChanges = initialized && JSON.stringify(config) !== JSON.stringify(origina
   <Layout noPadding gap="XS">
     <Heading size="S">Variables</Heading>
     <Body size="S">Static variables are available to every REST API query.</Body>
-    <KeyValueBuilder
-      object={config.staticVariables || {}}
-      on:change={(event) => updateStaticVariables(event.detail)}
-    />
+    {#if initialized}
+      <KeyValueBuilder
+        object={config.staticVariables || {}}
+        on:change={(event) => updateStaticVariables(event.detail)}
+      />
+    {/if}
   </Layout>
 
   <div class="actions">

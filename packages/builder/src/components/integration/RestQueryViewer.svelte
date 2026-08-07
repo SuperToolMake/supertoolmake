@@ -354,7 +354,13 @@ const urlChanged = (evt) => {
   }
 }
 
-$: staticVariables = datasource?.config?.staticVariables || {}
+$: staticVariables =
+  mergeSharedConfig(
+    query?.datasourceId === WORKSPACE_API_CONFIG_ID
+      ? undefined
+      : $datasources.list.find((ds) => ds._id === query?.datasourceId),
+    $workspaceApis.datasource
+  )?.config?.staticVariables || {}
 $: if (query?._id && query._id !== lastSyncedQueryId) {
   lastSyncedQueryId = query._id
   lastSyncedQueryName = query.name
