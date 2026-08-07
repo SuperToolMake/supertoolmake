@@ -9,18 +9,13 @@ import {
   PopoverAlignment,
 } from "@supertoolmake/bbui"
 import { RestAuthType } from "@supertoolmake/types"
-import { goto as gotoStore } from "@roxi/routify"
 import { onMount } from "svelte"
 import DetailPopover from "@/components/common/DetailPopover.svelte"
 import { bb } from "@/stores/bb"
-import { appStore, oauth2 } from "@/stores/builder"
+import { oauth2 } from "@/stores/builder"
 
 function addBasicConfiguration() {
-  goto(`/builder/workspace/[application]/apis/datasource/[datasourceId]`, {
-    application: $appStore.appId,
-    datasourceId,
-    tab: "Authentication",
-  })
+  bb.settings("/apis")
 }
 
 function addOAuth2Configuration() {
@@ -38,14 +33,11 @@ function selectConfiguration(id: string, type?: RestAuthType) {
   popover.hide()
 }
 
-$: goto = $gotoStore
-
 type Config = { label: string; value: string }
 
 export let authConfigId: string | undefined
 export let authConfigType: RestAuthType | undefined
 export let authConfigs: Config[]
-export let datasourceId: string
 
 let popover: DetailPopover
 let allConfigs: Config[]

@@ -94,11 +94,11 @@ function getSelectedQuery() {
   )
 }
 
-const mergeSharedConfig = (legacyDatasource) => {
+const mergeSharedConfig = (legacyDatasource, sharedDatasource) => {
   if (!legacyDatasource) {
-    return $workspaceApis.datasource
+    return sharedDatasource
   }
-  const { url: _sharedUrl, ...sharedConfig } = $workspaceApis.datasource.config || {}
+  const { url: _sharedUrl, ...sharedConfig } = sharedDatasource.config || {}
   const datasourceConfig = legacyDatasource.config || {}
   const datasourceAuthIds = new Set((datasourceConfig.authConfigs || []).map((auth) => auth._id))
   return {
@@ -186,10 +186,13 @@ async function saveQuery(redirectIfNew = true) {
     const { _id } = await queries.save(toSave.datasourceId, toSave)
     saveId = _id
     if (dynamicVariables) {
-      datasource.config.dynamicVariables = rebuildVariables(saveId)
       if (toSave.datasourceId === WORKSPACE_API_CONFIG_ID) {
-        await workspaceApis.save(datasource.config)
+        await workspaceApis.save({
+          ...$workspaceApis.datasource.config,
+          dynamicVariables: rebuildVariables(saveId, $workspaceApis.datasource),
+        })
       } else {
+        datasource.config.dynamicVariables = rebuildVariables(saveId)
         datasource = await datasources.save({
           integration: integrationInfo,
           datasource,
@@ -300,7 +303,7 @@ const getDynamicVariables = (datasource, queryId, matchFn) => {
 }
 
 // convert dynamic variables object back to a list, enrich with query id
-const rebuildVariables = (queryId) => {
+const rebuildVariables = (queryId, sourceDatasource = datasource) => {
   let variables = []
   if (dynamicVariables) {
     variables = Object.entries(dynamicVariables).map((entry) => {
@@ -312,7 +315,7 @@ const rebuildVariables = (queryId) => {
     })
   }
 
-  let existing = datasource?.config?.dynamicVariables || []
+  let existing = sourceDatasource?.config?.dynamicVariables || []
   // remove existing query variables (for changes and deletions)
   existing = existing.filter((variable) => variable.queryId !== queryId)
   // re-add the new query variables
@@ -411,7 +414,14 @@ $: url = buildUrl(query?.fields?.path, breakQs)
 $: checkQueryName(url)
 $: responseSuccess = response?.info?.code >= 200 && response?.info?.code < 400
 $: isGet = query?.queryVerb === "read"
-$: authConfigs = buildAuthConfigs(datasource)
+$: authConfigs = buildAuthConfigs(
+  mergeSharedConfig(
+    query?.datasourceId === WORKSPACE_API_CONFIG_ID
+      ? undefined
+      : $datasources.list.find((ds) => ds._id === query?.datasourceId),
+    $workspaceApis.datasource
+  )
+)
 $: schemaReadOnly = !responseSuccess
 $: variablesReadOnly = !responseSuccess
 $: showVariablesTab = shouldShowVariables(dynamicVariables, variablesReadOnly)
@@ -476,7 +486,8 @@ onMount(async () => {
   datasource = mergeSharedConfig(
     query?.datasourceId === WORKSPACE_API_CONFIG_ID
       ? undefined
-      : $datasources.list.find((ds) => ds._id === query?.datasourceId)
+      : $datasources.list.find((ds) => ds._id === query?.datasourceId),
+    $workspaceApis.datasource
   )
   const datasourceUrl = datasource?.config.url
   const qs = query?.fields.queryString
@@ -714,7 +725,6 @@ onMount(async () => {
               bind:authConfigId={query.fields.authConfigId}
               bind:authConfigType={query.fields.authConfigType}
               {authConfigs}
-              datasourceId={datasource._id}
             />
           </div>
         </Tabs>
