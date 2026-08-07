@@ -251,7 +251,7 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
     getAppID: (): string => {
       const headers: Headers = {}
       config?.attachHeaders?.(headers)
-      return headers?.[Header.APP_ID]
+      return headers?.[Header.WORKSPACE_ID]
     },
   }
 
