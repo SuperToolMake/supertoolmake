@@ -20,7 +20,9 @@ let password: string | null = null
 const validation = createValidationStore()
 validation.addValidatorType("password", "password", true, { minLength: 12 })
 const exportApp = async () => {
-  const id = published ? sdk.workspaces.getProdWorkspaceID(appId) : sdk.workspaces.getDevWorkspaceID(appId)
+  const id = published
+    ? sdk.workspaces.getProdWorkspaceID(appId)
+    : sdk.workspaces.getDevWorkspaceID(appId)
   const url = `/api/backups/export?appId=${id}`
 
   try {
