@@ -20,7 +20,7 @@ import type {
 } from "@supertoolmake/types"
 import { BasicOperator, FieldType } from "@supertoolmake/types"
 import { cloneDeep } from "lodash"
-import { generate } from "shortid"
+import { nanoid } from "nanoid"
 import { createEventDispatcher } from "svelte"
 import { flip } from "svelte/animate"
 import { dndzone } from "svelte-dnd-action"
@@ -45,7 +45,7 @@ export let componentBindings: EnrichedBinding[] = []
 let drawer: Drawer
 const dispatch = createEventDispatcher()
 const flipDurationMs = 150
-const zoneType = generate()
+const zoneType = nanoid(9)
 const actionOptions = [
   {
     label: "Hide component",
@@ -107,7 +107,7 @@ const addCondition = () => {
   conditions = [
     ...conditions,
     {
-      id: generate(),
+      id: nanoid(9),
       action: "hide",
       operator: BasicOperator.EQUAL,
       valueType: "string",
@@ -122,7 +122,7 @@ const removeCondition = (id: string) => {
 
 const duplicateCondition = (id: string) => {
   const condition: ComponentCondition = conditions.find((link) => link.id === id)!
-  const duplicate = { ...condition, id: generate() }
+  const duplicate = { ...condition, id: nanoid(9) }
   conditions = [...conditions, duplicate]
 }
 

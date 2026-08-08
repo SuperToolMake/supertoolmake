@@ -15,7 +15,7 @@ import {
 import { Constants, FilterUsers, QueryUtils } from "@supertoolmake/frontend-core"
 import { FieldType } from "@supertoolmake/types"
 import { cloneDeep } from "lodash"
-import { generate } from "shortid"
+import { nanoid } from "nanoid"
 import { createEventDispatcher } from "svelte"
 import { flip } from "svelte/animate"
 import { dndzone } from "svelte-dnd-action"
@@ -81,7 +81,7 @@ const save = async () => {
 
 const addCondition = () => {
   const condition = {
-    id: generate(),
+    id: nanoid(9),
     target: targetOptions[0].value,
     metadataKey: conditionOptions[0].value,
     operator: operatorOptions[0]?.value,
@@ -92,7 +92,7 @@ const addCondition = () => {
 }
 
 const duplicateCondition = (condition) => {
-  const dupe = { ...condition, id: generate() }
+  const dupe = { ...condition, id: nanoid(9) }
   tempValue = [...tempValue, dupe]
 }
 

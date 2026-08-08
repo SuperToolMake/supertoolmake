@@ -15,7 +15,7 @@ import {
 import { DEFAULT_URL_VALIDATION_PROTOCOLS, URL_VALIDATION_PROTOCOLS } from "@supertoolmake/types"
 import type { Component, EnrichedBinding, UrlValidationProtocol } from "@supertoolmake/types"
 import { isJSBinding } from "@supertoolmake/string-templates"
-import { generate } from "shortid"
+import { nanoid } from "nanoid"
 import { SvelteSet } from "svelte/reactivity"
 import { selectedScreen, selectedComponent } from "@/stores/builder"
 import { findClosestMatchingComponent } from "@/helpers/components"
@@ -241,7 +241,7 @@ const exists = (value: unknown): boolean => {
 }
 
 const addRule = (): void => {
-  const id = generate()
+  const id = nanoid(9)
   rules = [
     ...(rules || []),
     {
@@ -264,7 +264,7 @@ const duplicateRule = (id: string): void => {
   if (!existingRule) {
     return
   }
-  const newRule = { ...existingRule, id: generate() }
+  const newRule = { ...existingRule, id: nanoid(9) }
   rules = [...rules, newRule]
   expandedRules.add(newRule.id)
 }

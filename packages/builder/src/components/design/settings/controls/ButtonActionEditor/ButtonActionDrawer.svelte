@@ -9,7 +9,7 @@ import {
   Search,
 } from "@supertoolmake/bbui"
 import { cloneDeep } from "lodash/fp"
-import { generate } from "shortid"
+import { nanoid } from "nanoid"
 import { tick } from "svelte"
 import { dndzone } from "svelte-dnd-action"
 import {
@@ -24,7 +24,7 @@ const EVENT_TYPE_KEY = "##eventHandlerType"
 const IF_TYPE = "IF / ELSE"
 const actionTypes = getAvailableActions()
 const flipDurationMs = 150
-const zoneType = generate()
+const zoneType = nanoid(9)
 
 const branchConfigs = [
   { key: "actions", label: "THEN" },
@@ -35,7 +35,7 @@ const createAction = (actionType) => {
   const newAction = {
     parameters: {},
     [EVENT_TYPE_KEY]: actionType.name,
-    id: generate(),
+    id: nanoid(9),
   }
   if (isIFBlock(newAction)) {
     newAction.parameters.actions = []
@@ -454,7 +454,7 @@ $: allBindings = getAllBindings(
 $: {
   if (actions) {
     actions.forEach((action) => {
-      if (!action.id) action.id = generate()
+      if (!action.id) action.id = nanoid(9)
     })
   }
 }

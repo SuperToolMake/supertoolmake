@@ -8,7 +8,7 @@ import {
   Input,
   Layout,
 } from "@supertoolmake/bbui"
-import { generate } from "shortid"
+import { nanoid } from "nanoid"
 import { flip } from "svelte/animate"
 import { dndzone } from "svelte-dnd-action"
 import DrawerBindableCombobox from "@/components/common/bindings/DrawerBindableCombobox.svelte"
@@ -46,7 +46,7 @@ $: buttonText = `${count || "No"} sub link${count === 1 ? "" : "s"}`
 $: drawerTitle = navItem.text ? `${navItem.text} sub links` : "Sub links"
 $: subLinks.forEach((subLink) => {
   if (!subLink.id) {
-    subLink.id = generate()
+    subLink.id = nanoid(9)
   }
 })
 $: urlOptions = screenStore.routes

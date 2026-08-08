@@ -1,5 +1,5 @@
 <script>
-import { generate } from "shortid"
+import { nanoid } from "nanoid"
 import { getContext, onDestroy } from "svelte"
 import Component from "@/components/Component.svelte"
 import { builderStore } from "@/stores/builder"
@@ -18,7 +18,7 @@ export let id = undefined
 
 const component = getContext("component")
 const block = getContext("block")
-const rand = generate()
+const rand = nanoid(9)
 
 // Create a fake component instance so that we can use the core Component
 // to render this part of the block, taking advantage of binding enrichment

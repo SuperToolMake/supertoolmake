@@ -2,7 +2,7 @@
 import { Button, Body, Icon, Toggle, DrawerContent, Layout, Select } from "@supertoolmake/bbui"
 import { flip } from "svelte/animate"
 import { dndzone } from "svelte-dnd-action"
-import { generate } from "shortid"
+import { nanoid } from "nanoid"
 import DrawerBindableInput from "@/components/common/bindings/DrawerBindableInput.svelte"
 import ConditionValueControl from "@/components/common/ConditionValueControl.svelte"
 import { QueryUtils, Constants } from "@supertoolmake/frontend-core"
@@ -16,7 +16,7 @@ export let componentBindings = []
 export let actionOptions = null
 
 const flipDurationMs = 150
-const zoneType = generate()
+const zoneType = nanoid(9)
 const defaultActionOptions = [
   {
     label: "Hide component",
@@ -48,7 +48,7 @@ $: settingOptions = settings
   }))
 $: conditions.forEach((link) => {
   if (!link.id) {
-    link.id = generate()
+    link.id = nanoid(9)
   }
   if (link.valueType === "Binding") {
     link.valueType = "string"
@@ -84,7 +84,7 @@ const addCondition = () => {
     ...conditions,
     {
       valueType: "string",
-      id: generate(),
+      id: nanoid(9),
       action: "hide",
       operator: Constants.OperatorOptions.Equals.value,
     },
@@ -97,7 +97,7 @@ const removeCondition = (id) => {
 
 const duplicateCondition = (id) => {
   const condition = conditions.find((link) => link.id === id)
-  const duplicate = { ...condition, id: generate() }
+  const duplicate = { ...condition, id: nanoid(9) }
   conditions = [...conditions, duplicate]
 }
 
