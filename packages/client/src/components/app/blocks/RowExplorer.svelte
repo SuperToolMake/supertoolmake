@@ -1,6 +1,6 @@
 <script>
 import { makePropSafe as safe } from "@supertoolmake/string-templates"
-import { generate } from "shortid"
+import { nanoid } from "nanoid"
 import { getContext } from "svelte"
 import { get } from "svelte/store"
 import Block from "@/components/Block.svelte"
@@ -18,7 +18,7 @@ export let detailTitle
 export let noRowsMessage
 export let autoRefresh
 
-const stateKey = generate()
+const stateKey = nanoid(9)
 const context = getContext("context")
 const { generateGoldenSample } = getContext("sdk")
 

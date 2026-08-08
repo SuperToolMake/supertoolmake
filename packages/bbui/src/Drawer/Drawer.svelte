@@ -57,7 +57,7 @@ const unobserve = () => {
 </script>
 
 <script>
-  import { generate } from "shortid"
+  import { nanoid } from "nanoid"
   import { createEventDispatcher, onDestroy, setContext } from "svelte"
   import Portal from "svelte-portal"
   import ActionButton from "../ActionButton/ActionButton.svelte"
@@ -73,7 +73,7 @@ const unobserve = () => {
   const spacing = 11
 
   let visible = false
-  let drawerId = generate()
+  let drawerId = nanoid(9)
 
   const handleCancel = () => {
     if (onCancel) {

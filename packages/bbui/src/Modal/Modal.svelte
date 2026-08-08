@@ -11,7 +11,7 @@ export type { ModalAPI }
   import Portal from "svelte-portal"
   import Context from "../context"
   import { ModalCancelFrom } from "../constants"
-  import { generate } from "shortid"
+  import { nanoid } from "nanoid"
 
   export let fixed: boolean = false
   export let inline: boolean = false
@@ -22,7 +22,7 @@ export type { ModalAPI }
 
   // Ensure any popovers inside this modal are rendered inside this modal
   // Unique ids are required to ensure nested modals are parented correctly
-  const uniqueId = generate()
+  const uniqueId = nanoid(9)
   setContext(Context.PopoverRoot, `.spectrum-Modal-${uniqueId}`)
 
   const dispatch = createEventDispatcher<{

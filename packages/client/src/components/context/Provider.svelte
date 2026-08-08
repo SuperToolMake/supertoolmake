@@ -1,5 +1,5 @@
 <script>
-import { generate } from "shortid"
+import { nanoid } from "nanoid"
 import { getContext, onDestroy, setContext } from "svelte"
 import { ActionTypes } from "@/constants"
 import { createContextStore, dataSourceStore } from "@/stores"
@@ -23,7 +23,7 @@ if (scope === ContextScopes.Local) {
 
 // Generate a permanent unique ID for this component and use it to register
 // any datasource actions
-const instanceId = generate()
+const instanceId = nanoid(9)
 
 // Keep previous state around so we can avoid updating unless necessary
 let lastDataKey

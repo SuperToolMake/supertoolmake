@@ -1,7 +1,7 @@
 <script>
 import { Utils } from "@supertoolmake/frontend-core"
 import { makePropSafe as safe } from "@supertoolmake/string-templates"
-import { generate } from "shortid"
+import { nanoid } from "nanoid"
 import { getContext } from "svelte"
 import { get } from "svelte/store"
 import Block from "@/components/Block.svelte"
@@ -38,7 +38,7 @@ export let autoRefresh
 const { fetchDatasourceSchema, API, generateGoldenSample } = getContext("sdk")
 const component = getContext("component")
 const context = getContext("context")
-const stateKey = `ID_${generate()}`
+const stateKey = `ID_${nanoid(9)}`
 
 let formId
 let dataProviderId
