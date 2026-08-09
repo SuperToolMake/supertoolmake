@@ -1,10 +1,16 @@
-import type { Locale } from "date-fns"
-import * as dateFnsLocales from "date-fns/locale"
-
 interface Input {
   max: number
   pad: number
   fallback: string
+}
+
+interface LocaleWeekInfo {
+  firstDay?: number
+}
+
+interface LocaleWithWeekInfo {
+  readonly weekInfo?: LocaleWeekInfo
+  getWeekInfo?: () => LocaleWeekInfo
 }
 
 export type Weekday =
@@ -34,52 +40,6 @@ const normalizeLocaleCode = (code?: string | null) => {
   return code.toLowerCase().replace(/_/g, "-")
 }
 
-const normalizeLocaleKey = (key?: string) => {
-  if (!key) {
-    return null
-  }
-  return key
-    .replace(/_/g, "-")
-    .replace(/([a-z])([A-Z])/g, "$1-$2")
-    .toLowerCase()
-}
-
-const localeLookup = (() => {
-  const lookup = new Map<string, Locale>()
-
-  const register = (key: string, locale: Locale | undefined) => {
-    if (!locale) {
-      return
-    }
-    const codeCandidates = new Set<string>()
-    const normalizedKey = normalizeLocaleKey(key)
-    if (normalizedKey) {
-      codeCandidates.add(normalizedKey)
-    }
-    const normalizedLocaleCode = normalizeLocaleCode(locale.code)
-    if (normalizedLocaleCode) {
-      codeCandidates.add(normalizedLocaleCode)
-    }
-    for (const candidate of codeCandidates) {
-      if (!lookup.has(candidate)) {
-        lookup.set(candidate, locale)
-      }
-      const base = candidate.split("-")[0]
-      if (base && !lookup.has(base)) {
-        lookup.set(base, locale)
-      }
-    }
-  }
-
-  for (const [key, locale] of Object.entries(dateFnsLocales)) {
-    if (typeof locale === "object" && locale) {
-      register(key, locale as Locale)
-    }
-  }
-
-  return lookup
-})()
-
 const getNavigatorLocales = (): readonly string[] => {
   if (typeof navigator === "undefined") {
     return []
@@ -90,6 +50,22 @@ const getNavigatorLocales = (): readonly string[] => {
   return navigator.language ? [navigator.language] : []
 }
 
+const getLocaleWeekInfo = (code: string): LocaleWeekInfo | undefined => {
+  if (typeof Intl.Locale !== "function") {
+    return undefined
+  }
+
+  try {
+    if (Intl.DateTimeFormat.supportedLocalesOf([code]).length === 0) {
+      return undefined
+    }
+    const locale = new Intl.Locale(code) as Intl.Locale & LocaleWithWeekInfo
+    return locale.weekInfo ?? locale.getWeekInfo?.()
+  } catch {
+    return undefined
+  }
+}
+
 export const getLocaleStartDayOfWeek = (
   locales: readonly string[] = getNavigatorLocales()
 ): Weekday => {
@@ -98,11 +74,9 @@ export const getLocaleStartDayOfWeek = (
     if (!normalized) {
       continue
     }
-    const match = localeLookup.get(normalized) || localeLookup.get(normalized.split("-")[0])
-    const weekStartsOn = match?.options?.weekStartsOn
-    if (typeof weekStartsOn === "number") {
-      const index = ((weekStartsOn % 7) + 7) % 7
-      return WEEKDAY_BY_INDEX[index]
+    const firstDay = getLocaleWeekInfo(normalized)?.firstDay
+    if (typeof firstDay === "number" && firstDay >= 1 && firstDay <= 7) {
+      return WEEKDAY_BY_INDEX[firstDay % 7]
     }
   }
   return DEFAULT_WEEKDAY
