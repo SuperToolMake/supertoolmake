@@ -1,7 +1,7 @@
 import { Utils } from "@supertoolmake/frontend-core"
 import { makePropSafe as safe } from "@supertoolmake/string-templates"
 import type { Screen as ScreenDoc, UIPermissions } from "@supertoolmake/types"
-import { generate } from "shortid"
+import { nanoid } from "nanoid"
 import { capitalise } from "@/helpers"
 import type { SourceOption } from "@/routes/builder/workspace/[application]/design/_components/NewScreen/utils"
 import { Component } from "../../Component"
@@ -84,7 +84,7 @@ const modal = ({
   /*
     Edit Row
    */
-  const stateKey = `ID_${generate()}`
+  const stateKey = `ID_${nanoid(9)}`
   const detailsModal = new Component("@budibase/standard-components/modal")
     .instanceName("Edit row modal")
     .customProps({

@@ -1,6 +1,6 @@
 <script>
 import { Constants } from "@supertoolmake/frontend-core"
-import { generate } from "shortid"
+import { nanoid } from "nanoid"
 import DraggableList from "@/components/design/settings/controls/DraggableList.svelte"
 import { getSequentialName } from "@/helpers/duplicate"
 import { navigationStore } from "@/stores/builder"
@@ -11,7 +11,7 @@ export let bindings
 const enrichNavItems = (links) => {
   return (links || []).map((link) => ({
     ...link,
-    id: link.id || generate(),
+    id: link.id || nanoid(9),
   }))
 }
 
@@ -41,7 +41,7 @@ const addNavItem = async () => {
   await save([
     ...navItems,
     {
-      id: generate(),
+      id: nanoid(9),
       text: getSequentialName(navItems, "Nav Item ", {
         getName: (x) => x.text,
       }),

@@ -1,6 +1,6 @@
 <script>
 import { Icon } from "@supertoolmake/bbui"
-import { generate } from "shortid"
+import { nanoid } from "nanoid"
 import { createEventDispatcher, setContext } from "svelte"
 import { get, writable } from "svelte/store"
 import { dndzone } from "svelte-dnd-action"
@@ -13,7 +13,7 @@ export let listItemKey
 export let draggable = true
 export let focus = undefined
 
-let zoneType = generate()
+let zoneType = nanoid(9)
 
 let store = writable({
   selected: null,
@@ -33,7 +33,7 @@ const buildDraggable = (items) => {
   const seenIds = new Set()
   return items
     .map((item) => {
-      let id = listItemKey ? item[listItemKey] : generate()
+      let id = listItemKey ? item[listItemKey] : nanoid(9)
       return {
         id,
         item,

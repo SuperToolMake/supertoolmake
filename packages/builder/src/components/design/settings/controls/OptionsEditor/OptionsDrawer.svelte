@@ -1,6 +1,6 @@
 <script>
 import { Body, Button, DrawerContent, Icon, Input, Label, Layout } from "@supertoolmake/bbui"
-import { generate } from "shortid"
+import { nanoid } from "nanoid"
 
 export let options = []
 
@@ -12,7 +12,7 @@ const addOption = () => {
   options = [
     ...options,
     {
-      id: generate(),
+      id: nanoid(9),
       label: null,
       value: null,
     },

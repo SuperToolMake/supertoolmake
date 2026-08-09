@@ -9,7 +9,7 @@ import {
   Layout,
   Select,
 } from "@supertoolmake/bbui"
-import { generate } from "shortid"
+import { nanoid } from "nanoid"
 import { flip } from "svelte/animate"
 import { dndzone } from "svelte-dnd-action"
 import CellEditor from "./CellEditor.svelte"
@@ -80,7 +80,7 @@ const reset = () => {
 $: unselectedColumns = getUnselectedColumns(options, columns)
 $: columns.forEach((column) => {
   if (!column.id) {
-    column.id = generate()
+    column.id = nanoid(9)
   }
 })
 </script>

@@ -14,7 +14,8 @@
   },
   "scripts": {
     "build": "vite build",
-    "dev": "vite build --watch --mode=dev"
+    "dev": "vite build --watch --mode=dev",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^6.1.3",
@@ -30,8 +31,6 @@
   ],
   "dependencies": {
     "@adobe/spectrum-css-workflow-icons": "1.2.1",
-    "@supertoolmake/shared-core": "*",
-    "@supertoolmake/string-templates": "*",
     "@spectrum-css/accordion": "3.0.24",
     "@spectrum-css/actionbutton": "1.0.1",
     "@spectrum-css/actiongroup": "1.0.1",
@@ -75,7 +74,8 @@
     "@spectrum-css/typography": "3.0.1",
     "@spectrum-css/underlay": "2.0.9",
     "@spectrum-css/vars": "3.0.1",
-    "date-fns": "4.1.0",
+    "@supertoolmake/shared-core": "*",
+    "@supertoolmake/string-templates": "*",
     "dayjs": "1.10.8",
     "easymde": "2.16.1",
     "sanitize-html": "2.17.6",
