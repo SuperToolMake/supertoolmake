@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Avatar, TooltipPosition } from "@supertoolmake/bbui"
-import { UserAvatar } from "@supertoolmake/frontend-core"
+import UserAvatar from "./UserAvatar.svelte"
 import type { UIUser } from "@supertoolmake/types"
 
 type OrderType = "ltr" | "rtl"
