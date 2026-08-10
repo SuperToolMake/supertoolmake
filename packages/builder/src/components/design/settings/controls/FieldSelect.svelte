@@ -6,7 +6,6 @@ import { getDatasourceForProvider, getSchemaForDatasource } from "@/dataBinding"
 import { selectedScreen } from "@/stores/builder"
 import { Explanation } from "./Explanation"
 
-
 export let componentInstance = {}
 export let value = ""
 export let placeholder

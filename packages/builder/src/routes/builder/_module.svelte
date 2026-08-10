@@ -175,8 +175,7 @@ derivedMemo(
       }
 
       // Default workspace selection for builders
-      const isOnWorkspaceRoute =
-        $isActive("./workspace") || $isActive("./workspace/updating")
+      const isOnWorkspaceRoute = $isActive("./workspace") || $isActive("./workspace/updating")
       if (isBuilder && $appsStore.apps.length && !isOnWorkspaceRoute && !$isActive("./apps")) {
         // Find first editable app to redirect to
         const defaultApp = $enrichedApps.find((app) => app.editable)

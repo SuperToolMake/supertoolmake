@@ -33,9 +33,7 @@ const resetSelectedRows = () => {
 }
 
 const selectRelationship = ({ tableId, rowId, fieldName }) => {
-  $goto(
-    `/builder/workspace/data/table/${tableId}/relationship/${rowId}/${fieldName}`
-  )
+  $goto(`/builder/workspace/data/table/${tableId}/relationship/${rowId}/${fieldName}`)
 }
 
 $: if (schema) {

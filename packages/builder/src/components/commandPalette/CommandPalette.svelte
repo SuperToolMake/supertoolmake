@@ -93,14 +93,9 @@ const queryCommands = (queries) => {
       name: query.name,
       icon: isRest ? "globe-hemisphere-west" : "database",
       action: () =>
-        $goto(
-          isRest
-            ? `/builder/workspace/apis/query/:id`
-            : `/builder/workspace/data/query/:id`,
-          {
-            id: query._id,
-          }
-        ),
+        $goto(isRest ? `/builder/workspace/apis/query/:id` : `/builder/workspace/data/query/:id`, {
+          id: query._id,
+        }),
       requiresApp: true,
     }
   })
