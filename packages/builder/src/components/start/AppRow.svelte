@@ -23,11 +23,11 @@ const handleDefaultClick = () => {
 }
 
 const goToBuilder = () => {
-  goto?.(`../../workspace/${app.devId}`)
+  goto?.("../../workspace")
 }
 
 const goToOverview = () => {
-  goto?.(`../../workspace/${app.devId}/settings`)
+  goto?.("../../workspace/settings")
 }
 
 const goToApp = () => {

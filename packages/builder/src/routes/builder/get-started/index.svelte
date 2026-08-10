@@ -7,7 +7,7 @@ import { goto } from "@roxi/routify"
 import BBLogo from "assets/BBLogo.svelte"
 import { appsStore } from "@/stores/portal/apps"
 import { auth } from "@/stores/portal/auth"
-import CreateWorkspaceModal from "../workspace/[application]/_components/CreateWorkspaceModal.svelte"
+import CreateWorkspaceModal from "../workspace/_components/CreateWorkspaceModal.svelte"
 import ExampleApp from "./_components/ExampleApp.svelte"
 
 let createWorkspaceModal: Modal
@@ -23,9 +23,7 @@ const initialise = async (event: CustomEvent<CreateWorkspaceResponse>) => {
   // Refresh the apps list to include the newly created app
   await appsStore.load()
   // Redirect to the newly created workspace
-  $goto(`/builder/workspace/[application]`, {
-    application: event.detail.instance._id,
-  })
+  $goto("/builder/workspace")
 }
 </script>
 

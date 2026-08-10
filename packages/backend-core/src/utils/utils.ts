@@ -44,7 +44,7 @@ export function isServingApp(ctx: Ctx) {
 }
 
 export function isServingBuilder(ctx: Ctx): boolean {
-  return ctx.path.startsWith("/builder/workspace/")
+  return ctx.path === "/builder/workspace" || ctx.path.startsWith("/builder/workspace/")
 }
 
 export function isServingBuilderPreview(ctx: Ctx): boolean {

@@ -74,7 +74,7 @@ const tableUrl = derived(url, ($url) => (tableId) => $url(`../[tableId]`, { tabl
 <div class="nav">
   {#if !isUsersTable}
     <a
-      href={`/builder/workspace/${$appStore.appId}/data/datasource/${datasource?._id}`}
+      href={`/builder/workspace/data/datasource/${datasource?._id}`}
     >
       <IntegrationIcon
         integrationType={datasource?.source}

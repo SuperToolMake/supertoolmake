@@ -36,7 +36,7 @@ export const show = async () => {
 function processScreens(screens: { url: string; _id: string }[]): { text: string; url: string }[] {
   return screens.map(({ url, _id }) => ({
     text: url,
-    url: `/builder/workspace/${$appStore.appId}/design/${_id}`,
+    url: `/builder/workspace/design/${_id}`,
   }))
 }
 

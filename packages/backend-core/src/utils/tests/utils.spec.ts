@@ -199,9 +199,9 @@ describe("utils", () => {
       expectResult(true)
     })
 
-    it("returns false if current path doesn't have '/' suffix", async () => {
+    it("returns true for the workspace root and false for unrelated paths", async () => {
       ctx.path = "/builder/workspace"
-      expectResult(false)
+      expectResult(true)
 
       ctx.path = "/xx"
       expectResult(false)

@@ -70,7 +70,7 @@ const toggleSelection = (tableOrView: SourceOption) => {
 $: datasources = getDatasources($datasourcesStore.list)
 
 let dataUrl = ""
-$: dataUrl = $appStore.appId ? `/builder/workspace/${$appStore.appId}/data` : ""
+$: dataUrl = $appStore.appId ? "/builder/workspace/data" : ""
 </script>
 
 <ModalContent

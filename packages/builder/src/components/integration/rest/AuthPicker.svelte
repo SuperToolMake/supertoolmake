@@ -16,8 +16,7 @@ import { bb } from "@/stores/bb"
 import { appStore, oauth2 } from "@/stores/builder"
 
 function addBasicConfiguration() {
-  goto(`/builder/workspace/[application]/apis/datasource/[datasourceId]`, {
-    application: $appStore.appId,
+  goto(`/builder/workspace/apis/datasource/[datasourceId]`, {
     datasourceId,
     tab: "Authentication",
   })

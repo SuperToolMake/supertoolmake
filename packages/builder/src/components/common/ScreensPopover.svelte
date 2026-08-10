@@ -57,7 +57,7 @@ $: hasManyWorkspaceApps = $workspaceAppStore.workspaceApps.length > 1
         {#each appScreens as screen}
           <ListItem
             title={screen.url}
-            url={`/builder/workspace/${$appStore.appId}/design/${screen._id}`}
+            url={`/builder/workspace/design/${screen._id}`}
             showArrow
           />
         {/each}

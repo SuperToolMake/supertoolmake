@@ -1,13 +1,11 @@
 <script>
 import { ContextTooltip, Select } from "@supertoolmake/bbui"
-import { params } from "@roxi/routify"
 import { debounce } from "lodash"
 import { createEventDispatcher } from "svelte"
 import { getDatasourceForProvider, getSchemaForDatasource } from "@/dataBinding"
 import { selectedScreen } from "@/stores/builder"
 import { Explanation } from "./Explanation"
 
-$params
 
 export let componentInstance = {}
 export let value = ""
@@ -78,7 +76,7 @@ const updateTooltip = debounce((e, option) => {
     offset={20}
   >
     <Explanation
-      tableHref={`/builder/workspace/${$params.application}/data/table/${datasource?.tableId}`}
+      tableHref={`/builder/workspace/data/table/${datasource?.tableId}`}
       schema={schema[currentOption]}
       name={currentOption}
       {explanation}

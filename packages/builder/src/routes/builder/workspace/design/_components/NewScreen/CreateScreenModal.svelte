@@ -185,15 +185,13 @@ const loadNewScreen = (screen: Screen) => {
   if (screen.props?._children?.length) {
     // Focus on the main component for the screen type
     const mainComponent = screen.props?._children?.[0]._id
-    $goto(`/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]`, {
-      application: $appStore.appId,
+    $goto(`/builder/workspace/design/[workspaceAppId]/[screenId]/[componentId]`, {
       workspaceAppId: workspaceAppId!,
       screenId: screen._id!,
       componentId: mainComponent!,
     })
   } else {
-    $goto(`/builder/workspace/[application]/design/[workspaceAppId]/[screenId]`, {
-      application: $appStore.appId,
+    $goto(`/builder/workspace/design/[workspaceAppId]/[screenId]`, {
       workspaceAppId: workspaceAppId!,
       screenId: screen._id!,
     })

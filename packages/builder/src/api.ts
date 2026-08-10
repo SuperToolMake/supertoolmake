@@ -57,7 +57,9 @@ const newClient = (opts?: { production?: boolean }) =>
       }
     },
     onMigrationDetected: (appId) => {
-      const updatingUrl = `/builder/workspace/updating/${appId}`
+      const updatingUrl = "/builder/workspace/updating"
+
+      appStore.update((state) => ({ ...state, appId }))
 
       if (window.location.pathname === updatingUrl) {
         return

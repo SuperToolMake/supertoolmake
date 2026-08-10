@@ -55,7 +55,7 @@ $: hasRestDatasources = restDatasources.length > 0
 $: nonSqlDatasources = ($datasources.list || []).filter((datasource) => !helpers.isSQL(datasource))
 $: hasNonSqlDatasources = nonSqlDatasources.length > 0
 
-const APIS_BASE_ROUTE = "/builder/workspace/[application]/apis"
+const APIS_BASE_ROUTE = "/builder/workspace/apis"
 
 $: shouldRedirectToNew =
   !(hasNonSqlDatasources || hasRestDatasources || $isActive("./new")) && $isActive(APIS_BASE_ROUTE)

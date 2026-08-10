@@ -139,7 +139,6 @@ interface ResourceLinkResult {
 
 const resourceLink = (favourite: WorkspaceFavourite): ResourceLinkResult | null => {
   const appPrefix = "./"
-  const currentAppId = $appStore.appId
   const link: Record<WorkspaceResource, (id: string) => ResourceLinkResult> = {
     [WorkspaceResource.DATASOURCE]: (id: string) => {
       const datasourceMap = get(datasourceLookup) || {}
@@ -147,12 +146,12 @@ const resourceLink = (favourite: WorkspaceFavourite): ResourceLinkResult | null 
       const basePath = helpers.isSQL(datasource) ? "data" : "apis"
       return {
         path: `${appPrefix}${basePath}/datasource/[datasourceId]`,
-        params: { application: currentAppId, datasourceId: id },
+        params: { datasourceId: id },
       }
     },
     [WorkspaceResource.TABLE]: (id: string) => ({
       path: `${appPrefix}data/table/[tableId]`,
-      params: { application: currentAppId, tableId: id },
+      params: { tableId: id },
     }),
     [WorkspaceResource.WORKSPACE_APP]: (id: string) => {
       const wsa = $workspaceAppStore.workspaceApps.find((app: UIWorkspaceApp) => app._id === id)
@@ -161,16 +160,12 @@ const resourceLink = (favourite: WorkspaceFavourite): ResourceLinkResult | null 
         notifications.error("Could not resolve the workspace app URL")
         return {
           path: "",
-          params: {
-            application: currentAppId,
-            workspaceAppId: id,
-            screenId: "",
-          },
+          params: { workspaceAppId: id, screenId: "" },
         }
       }
       return {
         path: `./design/[workspaceAppId]/[screenId]`,
-        params: { application: currentAppId, workspaceAppId: id, screenId },
+        params: { workspaceAppId: id, screenId },
       }
     },
     [WorkspaceResource.QUERY]: (id: string) => {
@@ -181,7 +176,7 @@ const resourceLink = (favourite: WorkspaceFavourite): ResourceLinkResult | null 
       const basePath = helpers.isSQL(datasource) ? "data" : "apis"
       return {
         path: `${appPrefix}${basePath}/query/[queryId]`,
-        params: { application: currentAppId, queryId: id },
+        params: { queryId: id },
       }
     },
   }
@@ -332,8 +327,8 @@ onDestroy(() => {
             <SideNavLink
               icon="browser"
               text="Apps"
-              url={$url("./design", { application: appId })}
-              isActive={$isActive("./design", { application: appId })}
+              url={$url("./design")}
+              isActive={$isActive("./design")}
               {collapsed}
               on:click={keepCollapsed}
             />
@@ -341,16 +336,16 @@ onDestroy(() => {
             <SideNavLink
               icon="globe-simple"
               text="APIs"
-              url={$url("./apis", { application: appId })}
-              isActive={$isActive("./apis", { application: appId })}
+              url={$url("./apis")}
+              isActive={$isActive("./apis")}
               {collapsed}
               on:click={keepCollapsed}
             />
             <SideNavLink
               icon="database"
               text="SQL tables"
-              url={$url("./data", { application: appId })}
-              isActive={$isActive("./data", { application: appId })}
+              url={$url("./data")}
+              isActive={$isActive("./data")}
               {collapsed}
               on:click={keepCollapsed}
             />
@@ -453,8 +448,8 @@ onDestroy(() => {
           <SideNavLink
             icon="user-gear"
             text="Custom roles"
-            url={$url("./roles", { application: appId })}
-            isActive={$isActive("./roles", { application: appId })}
+            url={$url("./roles")}
+            isActive={$isActive("./roles")}
             {collapsed}
             on:click={keepCollapsed}
           />

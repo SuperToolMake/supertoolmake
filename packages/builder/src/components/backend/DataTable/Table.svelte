@@ -1,7 +1,7 @@
 <script>
 import { Heading, Layout, Table } from "@supertoolmake/bbui"
 import { canBeSortColumn } from "@supertoolmake/frontend-core"
-import { goto, params } from "@roxi/routify"
+import { goto } from "@roxi/routify"
 import { createEventDispatcher } from "svelte"
 import { fade } from "svelte/transition"
 import Spinner from "@/components/common/Spinner.svelte"
@@ -9,7 +9,6 @@ import { TableNames, UNEDITABLE_USER_FIELDS } from "@/constants"
 import RoleCell from "./cells/RoleCell.svelte"
 
 $goto
-$params
 
 export let schema = {}
 export let data = []
@@ -35,7 +34,7 @@ const resetSelectedRows = () => {
 
 const selectRelationship = ({ tableId, rowId, fieldName }) => {
   $goto(
-    `/builder/workspace/${$params.application}/data/table/${tableId}/relationship/${rowId}/${fieldName}`
+    `/builder/workspace/data/table/${tableId}/relationship/${rowId}/${fieldName}`
   )
 }
 

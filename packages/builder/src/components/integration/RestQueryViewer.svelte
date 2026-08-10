@@ -166,9 +166,8 @@ async function saveQuery(redirectIfNew = true) {
     notifications.success(`Request saved successfully`)
     if (isNew && redirectIfNew) {
       isModified = false
-      goto(`/builder/workspace/[application]/apis/query/[queryId]`, {
+      goto(`/builder/workspace/apis/query/[queryId]`, {
         queryId: _id,
-        application: $params.application,
       })
     }
 

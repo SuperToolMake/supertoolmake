@@ -12,7 +12,7 @@ import { PermissionSource } from "@supertoolmake/types"
 import DetailPopover from "@/components/common/DetailPopover.svelte"
 import { Roles } from "@/constants/backend"
 import { capitalise } from "@/helpers"
-import InfoDisplay from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
+import InfoDisplay from "@/routes/builder/workspace/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
 import { permissions as permissionsStore, roles } from "@/stores/builder"
 
 export let resourceId
