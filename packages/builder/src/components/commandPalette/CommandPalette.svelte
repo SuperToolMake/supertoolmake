@@ -1,7 +1,7 @@
 <script>
 import { Context, Detail, Icon, Input, ModalContent, notifications } from "@supertoolmake/bbui"
 import { BUILDER_URLS, ThemeOptions } from "@supertoolmake/shared-core"
-import { goto, isActive, params } from "@roxi/routify"
+import { goto, isActive } from "@roxi/routify"
 import { getContext } from "svelte"
 import { API } from "@/api"
 import { IntegrationTypes } from "@/constants/backend"
@@ -19,7 +19,6 @@ import { themeStore } from "@/stores/portal"
 
 $goto
 $isActive
-$params
 
 const modalContext = getContext(Context.Modal)
 
@@ -34,11 +33,11 @@ const navigationCommands = () => {
     },
     {
       name: "Data",
-      url: "/builder/workspace/:application/data",
+      url: "/builder/workspace/data",
     },
     {
       name: "Design",
-      url: "/builder/workspace/:application/design",
+      url: "/builder/workspace/design",
     },
   ]
   return routes.map((route) => ({
@@ -46,10 +45,7 @@ const navigationCommands = () => {
     name: route.name,
     icon: "compass",
     action: () => {
-      const gotoParams = route.url.includes(":application")
-        ? { application: $params.application }
-        : {}
-      $goto(route.url, gotoParams)
+      $goto(route.url)
     },
     requiresApp: true,
   }))
@@ -63,10 +59,9 @@ const datasourceCommands = (datasourceList) => {
     action: () =>
       $goto(
         datasource.source === IntegrationTypes.REST
-          ? `/builder/workspace/:application/apis/datasource/:id`
-          : `/builder/workspace/:application/data/datasource/:id`,
+          ? `/builder/workspace/apis/datasource/:id`
+          : `/builder/workspace/data/datasource/:id`,
         {
-          application: $params.application,
           id: datasource._id,
         }
       ),
@@ -80,8 +75,7 @@ const tableCommands = (tables) => {
     name: table.name,
     icon: "table",
     action: () =>
-      $goto(`/builder/workspace/:application/data/table/:id`, {
-        application: $params.application,
+      $goto(`/builder/workspace/data/table/:id`, {
         id: table._id,
       }),
     requiresApp: true,
@@ -101,15 +95,9 @@ const queryCommands = (queries) => {
       name: query.name,
       icon: isRest ? "globe-hemisphere-west" : "database",
       action: () =>
-        $goto(
-          isRest
-            ? `/builder/workspace/:application/apis/query/:id`
-            : `/builder/workspace/:application/data/query/:id`,
-          {
-            application: $params.application,
-            id: query._id,
-          }
-        ),
+        $goto(isRest ? `/builder/workspace/apis/query/:id` : `/builder/workspace/data/query/:id`, {
+          id: query._id,
+        }),
       requiresApp: true,
     }
   })
@@ -121,8 +109,7 @@ const screenCommands = (screens) => {
     name: screen.routing.route,
     icon: "browser",
     action: () =>
-      $goto(`/builder/workspace/:application/design/:screenId/:componentId`, {
-        application: $params.application,
+      $goto(`/builder/workspace/design/:screenId/:componentId`, {
         screenId: screen._id,
         componentId: `${screen._id}-screen`,
       }),
@@ -222,7 +209,7 @@ const runAction = (command) => {
   modalContext.hide()
 }
 
-$: inApp = $isActive("/builder/workspace/:application")
+$: inApp = $isActive("/builder/workspace")
 $: commands = [
   {
     type: "Access",

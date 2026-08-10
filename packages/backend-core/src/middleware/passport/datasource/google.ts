@@ -66,7 +66,7 @@ export async function postAuth(passport: Passport, ctx: UserCtx, next: Function)
     ),
     { successRedirect: "/", failureRedirect: "/error" },
     async (_err: any, tokens: string[]) => {
-      const baseUrl = `/builder/workspace/${authStateCookie.appId}/data`
+      const baseUrl = "/builder/workspace/data"
 
       const id = utils.newid()
       await cache.store(`datasource:creation:${authStateCookie.appId}:google:${id}`, {

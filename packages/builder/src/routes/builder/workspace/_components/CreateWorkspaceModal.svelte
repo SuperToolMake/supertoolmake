@@ -119,9 +119,7 @@ async function createNewApp() {
       // Refresh for access to created applications
       await auth.getSelf()
     }
-    $goto(`/builder/workspace/[application]`, {
-      application: createdApp.instance._id,
-    })
+    $goto("/builder/workspace")
   } catch (error) {
     creating = false
     builderStore.appCreated(false)

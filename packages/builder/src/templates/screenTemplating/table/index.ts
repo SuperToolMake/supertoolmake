@@ -1,5 +1,5 @@
 import type { Screen, UIPermissions } from "@supertoolmake/types"
-import type { SourceOption } from "@/routes/builder/workspace/[application]/design/_components/NewScreen/utils"
+import type { SourceOption } from "@/routes/builder/workspace/design/_components/NewScreen/utils"
 import inline from "./inline"
 import modal from "./modal"
 import newScreen from "./newScreen"

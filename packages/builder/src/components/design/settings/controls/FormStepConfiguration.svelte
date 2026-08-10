@@ -5,7 +5,7 @@ import { cloneDeep, isEqual } from "lodash"
 import { createEventDispatcher, setContext } from "svelte"
 import { derived, writable } from "svelte/store"
 import { getDatasourceForProvider } from "@/dataBinding"
-import ComponentSettingsSection from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/ComponentSettingsSection.svelte"
+import ComponentSettingsSection from "@/routes/builder/workspace/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/ComponentSettingsSection.svelte"
 import { componentStore, previewStore, selectedScreen } from "@/stores/builder"
 
 export let componentInstance

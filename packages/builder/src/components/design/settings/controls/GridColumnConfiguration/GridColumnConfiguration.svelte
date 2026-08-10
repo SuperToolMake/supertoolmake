@@ -2,7 +2,7 @@
 import { enrichSchemaWithRelColumns } from "@supertoolmake/frontend-core"
 import { createEventDispatcher } from "svelte"
 import { getDatasourceForProvider, getSchemaForDatasource } from "@/dataBinding"
-import InfoDisplay from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
+import InfoDisplay from "@/routes/builder/workspace/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
 import { componentStore, selectedScreen } from "@/stores/builder"
 import DraggableList from "../DraggableList.svelte"
 import FieldSetting from "./FieldSetting.svelte"

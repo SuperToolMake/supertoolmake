@@ -33,15 +33,12 @@ const createDefaultWorkspace = async () => {
     notifications.success(`Workspace created successfully`)
     if (homeScreen?.workspaceAppId && homeScreen?._id) {
       const screenId = homeScreen._id
-      goto(`/builder/workspace/[application]/design/[workspaceAppId]/[screenId]`, {
-        application: createdWorkspace.instance._id,
+      goto(`/builder/workspace/design/[workspaceAppId]/[screenId]`, {
         workspaceAppId: homeScreen.workspaceAppId,
         screenId,
       })
     } else {
-      goto(`/builder/workspace/[application]`, {
-        application: createdWorkspace.instance._id,
-      })
+      goto("/builder/workspace")
     }
   } catch (e: any) {
     loading = false

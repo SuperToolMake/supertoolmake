@@ -16,7 +16,7 @@ import {
   getSchemaForDatasource,
 } from "@/dataBinding"
 import { findComponent } from "@/helpers/components"
-import InfoDisplay from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
+import InfoDisplay from "@/routes/builder/workspace/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
 import { selectedScreen, tables } from "@/stores/builder"
 import DraggableList from "../DraggableList.svelte"
 import { removeInvalidAddMissing } from "../GridColumnConfiguration/getColumns.js"

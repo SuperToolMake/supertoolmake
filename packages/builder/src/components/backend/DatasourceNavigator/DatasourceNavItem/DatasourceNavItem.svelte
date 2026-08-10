@@ -61,8 +61,7 @@ let addQueryItem = {
   disabled: false,
   callback: () => {
     const section = isSqlSource ? "data" : "apis"
-    goto(`/builder/workspace/[application]/${section}/query/new/[datasourceId]`, {
-      application: $params.application,
+    goto(`/builder/workspace/${section}/query/new/[datasourceId]`, {
       datasourceId: datasource._id,
     })
   },

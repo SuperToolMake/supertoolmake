@@ -313,9 +313,7 @@ onMount(async () => {
           allowEditColumns={false}
           customRenderers={customAppTableRenderers}
           on:click={e =>
-            goto(`/builder/workspace/[application]`, {
-              application: e.detail.devId,
-            })}
+            goto("/builder/workspace")}
         >
           <div class="placeholder" slot="placeholder">
             <Heading size="S">

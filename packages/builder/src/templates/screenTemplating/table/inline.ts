@@ -1,6 +1,6 @@
 import type { Screen as ScreenDoc, UIPermissions } from "@supertoolmake/types"
 import { capitalise } from "@/helpers"
-import type { SourceOption } from "@/routes/builder/workspace/[application]/design/_components/NewScreen/utils"
+import type { SourceOption } from "@/routes/builder/workspace/design/_components/NewScreen/utils"
 import { Component } from "../../Component"
 import getValidRoute from "../getValidRoute"
 import { Screen } from "../Screen"
