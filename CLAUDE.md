@@ -42,6 +42,9 @@
 - When writing tests involving a URL, use example.com as the domain.
 - Provide a termination condition instead of using while (true)
 - Prefer object params for function signatures.
+- Use object parameters for functions with multiple inputs. This is required for
+  new or refactored functions; only retain positional parameters when preserving
+  an existing external API.
 
 ## Test style - packages/server
 
