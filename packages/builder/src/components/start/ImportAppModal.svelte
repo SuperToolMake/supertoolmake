@@ -27,7 +27,7 @@ async function updateApp() {
     if (encrypted) {
       body.encryptionPassword = password.trim()
     }
-    const appId = sdk.applications.getDevAppID(app.appId)
+    const appId = sdk.workspaces.getDevWorkspaceID(app.appId)
     await API.updateAppFromExport(appId, body, file)
     const pkg = await API.fetchAppPackage(appId)
     await initialise(pkg)

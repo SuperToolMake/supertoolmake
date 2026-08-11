@@ -13,7 +13,7 @@ import { goto as gotoStore } from "@roxi/routify"
 import { onMount } from "svelte"
 import DetailPopover from "@/components/common/DetailPopover.svelte"
 import { bb } from "@/stores/bb"
-import { appStore, oauth2 } from "@/stores/builder"
+import { oauth2 } from "@/stores/builder"
 
 function addBasicConfiguration() {
   goto(`/builder/workspace/apis/datasource/[datasourceId]`, {

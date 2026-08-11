@@ -1,13 +1,13 @@
 <script lang="ts">
 import { Link, notifications } from "@supertoolmake/bbui"
-import { utils } from "@supertoolmake/shared-core"
+import { helpers, utils } from "@supertoolmake/shared-core"
 import type { Datasource, Query, Table } from "@supertoolmake/types"
 import { SourceType, Theme } from "@supertoolmake/types"
 import { goto as gotoStore, params as paramsStore } from "@roxi/routify"
 import { get } from "svelte/store"
 import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
 import { DB_TYPE_EXTERNAL } from "@/constants/backend"
-import { appStore, datasources, queries, screenStore, tables } from "@/stores/builder"
+import { datasources, queries, screenStore, tables } from "@/stores/builder"
 import { themeStore } from "@/stores/portal"
 
 const getDatasourceQueries = () => {
@@ -68,11 +68,14 @@ async function deleteTable(table: Table & { datasourceId?: string }) {
 
 async function deleteDatasource(datasource: Datasource) {
   try {
+    const isLastSqlDatasource =
+      helpers.isSQL(datasource) &&
+      get(datasources).list.filter((existing) => helpers.isSQL(existing)).length === 1
     await datasources.delete(datasource)
     notifications.success("Datasource deleted")
     const isSelected = get(datasources).selectedDatasourceId === datasource._id
     if (isSelected) {
-      goto("./datasource")
+      goto(isLastSqlDatasource ? "./new" : "./datasource")
     }
   } catch {
     notifications.error("Error deleting datasource")
