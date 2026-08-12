@@ -1,8 +1,8 @@
 import type { Layout } from "@supertoolmake/types"
 import { derived, get } from "svelte/store"
 import { API } from "@/api"
-import { componentStore } from "@/stores/builder"
 import { BudiStore } from "../BudiStore"
+import { componentStore } from "./components"
 
 interface LayoutState {
   layouts: Layout[]

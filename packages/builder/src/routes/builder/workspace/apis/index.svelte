@@ -1,9 +1,8 @@
 <script lang="ts">
 import { goto } from "@roxi/routify"
 import { onMount } from "svelte"
-import { IntegrationTypes } from "@/constants/backend"
-import { datasources } from "@/stores/builder"
-import { queries } from "@/stores/builder"
+import { datasources, queries } from "@/stores/builder"
+import { helpers } from "@supertoolmake/shared-core"
 import { WORKSPACE_API_CONFIG_ID } from "@supertoolmake/types"
 
 $goto
@@ -24,7 +23,17 @@ onMount(() => {
       queryId: restQueries[0]._id ?? "",
     })
   } else {
-    $goto("../new")
+    const nonSqlDatasources = ($datasources.list || []).filter(
+      (datasource) => !helpers.isSQL(datasource)
+    )
+
+    if (nonSqlDatasources.length) {
+      $goto(`../datasource/[datasourceId]`, {
+        datasourceId: nonSqlDatasources[0]._id ?? "",
+      })
+    } else {
+      $goto("../new")
+    }
   }
 })
 </script>

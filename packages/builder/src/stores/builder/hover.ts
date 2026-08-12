@@ -1,6 +1,6 @@
 import { get } from "svelte/store"
-import { previewStore } from "@/stores/builder"
 import { BudiStore } from "../BudiStore"
+import { previewStore } from "./preview"
 
 interface BuilderHoverStore {
   hoverTimeout?: NodeJS.Timeout

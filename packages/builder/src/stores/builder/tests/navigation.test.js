@@ -1,8 +1,9 @@
 import { get, writable } from "svelte/store"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { API } from "@/api"
-import { appStore, workspaceAppStore } from "@/stores/builder"
+import { appStore } from "@/stores/builder/app"
 import { INITIAL_NAVIGATION_STATE, NavigationStore } from "@/stores/builder/navigation"
+import { workspaceAppStore } from "@/stores/builder/workspaceApps"
 
 vi.mock("@/api", () => {
   return {
@@ -14,14 +15,18 @@ vi.mock("@/api", () => {
   }
 })
 
-vi.mock("@/stores/builder", async () => {
+vi.mock("@/stores/builder/app", () => {
   const mockAppStore = writable()
-  const appStore = {
-    subscribe: mockAppStore.subscribe,
-    update: mockAppStore.update,
-    set: mockAppStore.set,
+  return {
+    appStore: {
+      subscribe: mockAppStore.subscribe,
+      update: mockAppStore.update,
+      set: mockAppStore.set,
+    },
   }
+})
 
+vi.mock("@/stores/builder/workspaceApps", () => {
   const mockWorkspaceApp = {
     _id: "mockWorkspaceAppId",
     isDefault: true,
@@ -32,16 +37,13 @@ vi.mock("@/stores/builder", async () => {
     selectedWorkspaceApp: mockWorkspaceApp,
     workspaceApps: [mockWorkspaceApp],
   })
-  const workspaceAppStore = {
-    subscribe: mockWorkspaceAppStore.subscribe,
-    update: mockWorkspaceAppStore.update,
-    set: mockWorkspaceAppStore.set,
-    edit: vi.fn(),
-  }
-
   return {
-    appStore,
-    workspaceAppStore,
+    workspaceAppStore: {
+      subscribe: mockWorkspaceAppStore.subscribe,
+      update: mockWorkspaceAppStore.update,
+      set: mockWorkspaceAppStore.set,
+      edit: vi.fn(),
+    },
   }
 })
 

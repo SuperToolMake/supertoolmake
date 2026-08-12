@@ -2,8 +2,9 @@ import { notifications } from "@supertoolmake/bbui"
 import type { AppNavigation, AppNavigationLink, UIObject } from "@supertoolmake/types"
 import { derived, get, type Writable } from "svelte/store"
 import { API } from "@/api"
-import { appStore, workspaceAppStore } from "@/stores/builder"
 import { DerivedBudiStore } from "../BudiStore"
+import { appStore } from "./app"
+import { workspaceAppStore } from "./workspaceApps"
 
 export interface DerivedAppNavigationStore extends AppNavigation {}
 

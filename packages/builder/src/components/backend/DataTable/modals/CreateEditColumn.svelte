@@ -119,7 +119,6 @@ const fixedTypeOrder = [
   FIELDS.USER,
   FIELDS.USERS,
   FIELDS.JSON,
-  FIELDS.BARCODEQR,
   FIELDS.BIGINT,
   FIELDS.AUTO,
 ]
@@ -522,9 +521,13 @@ $: canBeRequired =
   editableColumn?.type !== FieldType.LINK &&
   !uneditable &&
   editableColumn?.type !== FieldType.AUTO &&
-  !editableColumn.autocolumn
+  !editableColumn.autocolumn &&
+  !optionsReadOnly
 $: hasDefault = editableColumn?.default != null && editableColumn?.default !== ""
 $: isExternalTable = table?.sourceType === DB_TYPE_EXTERNAL
+$: optionsReadOnly = Boolean(
+  originalName != null && isExternalTable && table?.sql && editableColumn.type === FieldType.OPTIONS
+)
 // in the case of internal tables the sourceId will just be undefined
 $: tableOptions = $tables.list.filter(
   (opt) => opt.sourceType === table?.sourceType && table.sourceId === opt.sourceId
@@ -594,13 +597,14 @@ $: isFirstColumn = Object.keys(table?.schema || {}).length === 0
       autofocus
       on:input={handleNameInput}
       disabled={uneditable ||
-        (linkEditDisabled && editableColumn.type === FieldType.LINK)}
+        (linkEditDisabled && editableColumn.type === FieldType.LINK) ||
+        optionsReadOnly}
       error={errors?.name}
     />
   {/if}
   <Select
     placeholder={undefined}
-    disabled={!typeEnabled}
+    disabled={!typeEnabled || optionsReadOnly}
     bind:value={editableColumn.fieldId}
     on:change={onHandleTypeChange}
     options={orderedAllowedTypes}
@@ -634,6 +638,7 @@ $: isFirstColumn = Object.keys(table?.schema || {}).length === 0
       bind:constraints={editableColumn.constraints}
       bind:optionColors={editableColumn.optionColors}
       bind:valid={optionsValid}
+      readonly={optionsReadOnly}
     />
   {:else if editableColumn.type === FieldType.LONGFORM}
     <div>
@@ -788,7 +793,7 @@ $: isFirstColumn = Object.keys(table?.schema || {}).length === 0
 
   {#if editableColumn.type === FieldType.OPTIONS}
     <Select
-      disabled={!canHaveDefault}
+      disabled={!canHaveDefault || optionsReadOnly}
       options={editableColumn.constraints?.inclusion || []}
       label="Default value"
       value={editableColumn.default}
@@ -833,7 +838,7 @@ $: isFirstColumn = Object.keys(table?.schema || {}).length === 0
 </Layout>
 
 <div class="action-buttons">
-  {#if !uneditable && originalName != null}
+  {#if !uneditable && originalName != null && !optionsReadOnly}
     <Button quiet warning on:click={confirmDelete}>Delete</Button>
   {/if}
   <Button secondary newStyles on:click={cancelEdit}>Cancel</Button>

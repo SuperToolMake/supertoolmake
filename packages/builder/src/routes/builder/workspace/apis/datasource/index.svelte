@@ -1,23 +1,23 @@
 <script>
 import { goto as gotoStore } from "@roxi/routify"
 import { onMount } from "svelte"
-import { IntegrationTypes } from "@/constants/backend"
 import { datasources } from "@/stores/builder"
+import { helpers } from "@supertoolmake/shared-core"
 
 $: goto = $gotoStore
 
 onMount(async () => {
-  const restDatasources = ($datasources.list || []).filter(
-    (datasource) => datasource.source === IntegrationTypes.REST
+  const nonSqlDatasources = ($datasources.list || []).filter(
+    (datasource) => !helpers.isSQL(datasource)
   )
 
-  if ($datasources.selected?.source === IntegrationTypes.REST) {
+  if ($datasources.selected && !helpers.isSQL($datasources.selected)) {
     goto(`../[datasourceId]`, {
       datasourceId: $datasources.selected?._id,
     })
-  } else if (restDatasources.length) {
+  } else if (nonSqlDatasources.length) {
     goto(`../[datasourceId]`, {
-      datasourceId: restDatasources[0]._id,
+      datasourceId: nonSqlDatasources[0]._id,
     })
   } else {
     goto("../../new")

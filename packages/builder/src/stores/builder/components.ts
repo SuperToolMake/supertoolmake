@@ -14,11 +14,12 @@ import {
   type Table,
 } from "@supertoolmake/types"
 import { cloneDeep } from "lodash/fp"
-import { derived, get } from "svelte/store"
+import { get } from "svelte/store"
 import { API } from "@/api"
 import { BUDIBASE_INTERNAL_DB_ID, DB_TYPE_EXTERNAL } from "@/constants/backend"
 import { buildFormSchema, getSchemaForDatasource } from "@/dataBinding"
 import {
+  findAllComponents,
   findAllMatchingComponents,
   findClosestMatchingComponent,
   findComponent,
@@ -29,17 +30,13 @@ import {
 } from "@/helpers/components"
 import { getSequentialName } from "@/helpers/duplicate"
 import { getComponentFieldOptions } from "@/helpers/formFields"
-import {
-  appStore,
-  builderStore,
-  componentTreeNodesStore,
-  previewStore,
-  screenComponentsList,
-  screenStore,
-  tables,
-} from "@/stores/builder"
 import { BudiStore } from "../BudiStore"
-import { selectedScreen } from "./screens"
+import { appStore } from "./app"
+import { builderStore } from "./builder"
+import componentTreeNodesStore from "./componentTreeNodes"
+import { previewStore } from "./preview"
+import { screenStore, selectedScreen } from "./screens"
+import { tables } from "./tables"
 
 export interface ComponentState {
   components: Record<string, ComponentDefinition>
@@ -375,7 +372,7 @@ export class ComponentStore extends BudiStore<ComponentState> {
     }
 
     const componentName = getSequentialName(
-      get(screenComponentsList),
+      findAllComponents(screen.props),
       `New ${definition.friendlyName || definition.name}`,
       {
         getName: (c) => c._instanceName,
@@ -420,7 +417,7 @@ export class ComponentStore extends BudiStore<ComponentState> {
     if (componentType.endsWith("/formstep")) {
       const parentForm = findClosestMatchingComponent(
         screen.props,
-        get(selectedComponent)?._id,
+        getSelectedComponent()?._id,
         (component: Component) => component._component.endsWith("/form")
       )
       const formSteps = findAllMatchingComponents(parentForm, (component: Component) =>
@@ -777,7 +774,7 @@ export class ComponentStore extends BudiStore<ComponentState> {
 
   getNext() {
     const state = get(this.store)
-    const component = get(selectedComponent)
+    const component = getSelectedComponent()
     const componentId = component?._id
     const screen = get(selectedScreen)
     if (!screen) {
@@ -1221,22 +1218,14 @@ export class ComponentStore extends BudiStore<ComponentState> {
 
 export const componentStore = new ComponentStore()
 
-export const selectedComponent = derived(
-  [componentStore, selectedScreen],
-  ([$store, $selectedScreen]): Component | null => {
-    if ($selectedScreen && $store.selectedComponentId?.startsWith(`${$selectedScreen._id}-`)) {
-      return {
-        ...$selectedScreen.props,
-        _id: $selectedScreen.props._id!,
-      }
-    }
-    if (!($selectedScreen && $store.selectedComponentId)) {
-      return null
-    }
-    const selected = findComponent($selectedScreen?.props, $store.selectedComponentId)
-
-    const clone = selected ? cloneDeep(selected) : selected
-    componentStore.migrateSettings(clone)
-    return clone
+const getSelectedComponent = (): Component | null => {
+  const $selectedScreen = get(selectedScreen)
+  const selectedComponentId = get(componentStore).selectedComponentId
+  if (!$selectedScreen || !selectedComponentId) {
+    return null
   }
-)
+  if (selectedComponentId.startsWith(`${$selectedScreen._id}-`)) {
+    return $selectedScreen.props
+  }
+  return findComponent($selectedScreen.props, selectedComponentId)
+}

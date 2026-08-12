@@ -3,8 +3,10 @@ import type { Screen } from "@supertoolmake/types"
 import { get, writable } from "svelte/store"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { API } from "@/api"
-import { appStore, componentStore, workspaceAppStore } from "@/stores/builder"
+import { appStore } from "@/stores/builder/app"
+import { componentStore } from "@/stores/builder/components"
 import { initialScreenState, ScreenStore } from "@/stores/builder/screens"
+import { workspaceAppStore } from "@/stores/builder/workspaceApps"
 import {
   COMPONENT_DEFINITIONS,
   componentDefinitionMap,
@@ -34,45 +36,43 @@ declare module "vitest" {
 
 const COMP_PREFIX = "@budibase/standard-components"
 
-vi.mock("@/stores/builder", async () => {
+vi.mock("@/stores/builder/app", () => {
   const mockAppStore = writable()
-  const mockComponentStore = writable()
-  const mockLayoutStore = writable()
-
-  const componentStore = {
-    getDefinition: vi.fn(),
-    enrichEmptySettings: vi.fn(),
-    update: mockComponentStore.update,
-    subscribe: mockComponentStore.subscribe,
-  }
-
-  const appStore = {
-    subscribe: mockAppStore.subscribe,
-    update: mockAppStore.update,
-    set: mockAppStore.set,
-    refresh: vi.fn(),
-    refreshAppNav: vi.fn(),
-  }
-
-  const navigationStore = {
-    deleteLink: vi.fn(),
-  }
-
-  const workspaceAppStore = {
-    refresh: vi.fn(),
-  }
-
   return {
-    componentStore,
-    appStore,
-    navigationStore,
-    layoutStore: {
-      update: mockLayoutStore.update,
-      subscribe: mockComponentStore.subscribe,
+    appStore: {
+      subscribe: mockAppStore.subscribe,
+      update: mockAppStore.update,
+      set: mockAppStore.set,
+      refresh: vi.fn(),
+      refreshAppNav: vi.fn(),
     },
-    workspaceAppStore,
   }
 })
+
+vi.mock("@/stores/builder/components", () => {
+  const mockComponentStore = writable()
+  return {
+    componentStore: {
+      getDefinition: vi.fn(),
+      enrichEmptySettings: vi.fn(),
+      update: mockComponentStore.update,
+      subscribe: mockComponentStore.subscribe,
+    },
+  }
+})
+
+vi.mock("@/stores/builder/layouts", () => ({
+  layoutStore: {
+    update: vi.fn(),
+    subscribe: vi.fn(),
+  },
+}))
+
+vi.mock("@/stores/builder/workspaceApps", () => ({
+  workspaceAppStore: {
+    refresh: vi.fn(),
+  },
+}))
 
 vi.mock("@/stores/builder/components/utils", () => {
   return {
