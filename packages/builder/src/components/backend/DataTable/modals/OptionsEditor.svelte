@@ -10,6 +10,7 @@ import { getSequentialName } from "@/helpers/duplicate"
 export let constraints
 export let optionColors = {}
 export let valid = true
+export let readonly = false
 
 const flipDurationMs = 130
 const { OptionColours } = Constants
@@ -149,21 +150,26 @@ $: valid = $enrichedOptions.every((option) => option.valid)
           value={option.name}
           placeholder="Option name"
           id="option-{option.id}"
+          disabled={readonly}
           on:input={e => handleNameChange(option.id, e.target.value)}
         />
-        <Icon
-          name="x"
-          hoverable
-          size="S"
-          on:click={() => removeInput(option.id)}
-        />
+        {#if !readonly}
+          <Icon
+            name="x"
+            hoverable
+            size="S"
+            on:click={() => removeInput(option.id)}
+          />
+        {/if}
       </div>
     {/each}
   </div>
-  <div on:click={addNewInput} class="add-option">
-    <Icon name="plus" />
-    <div>Add option</div>
-  </div>
+  {#if !readonly}
+    <div on:click={addNewInput} class="add-option">
+      <Icon name="plus" />
+      <div>Add option</div>
+    </div>
+  {/if}
 </div>
 
 <style>
