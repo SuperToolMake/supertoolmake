@@ -1,7 +1,8 @@
 import type { Screen } from "@supertoolmake/types"
 import { derived } from "svelte/store"
-import { screenStore, workspaceAppStore } from "@/stores/builder"
 import { DerivedBudiStore } from "../BudiStore"
+import { screenStore } from "./screens"
+import { workspaceAppStore } from "./workspaceApps"
 
 export type RoutesState = string[]
 

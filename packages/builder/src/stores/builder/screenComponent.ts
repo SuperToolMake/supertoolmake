@@ -12,6 +12,7 @@ import { derived } from "svelte/store"
 import { getBindableProperties } from "@/dataBinding"
 import { bindings } from "@/helpers"
 import { findAllComponents } from "@/helpers/components"
+import { lazyDerived } from "../BudiStore"
 import { componentStore } from "./components"
 import { queries } from "./queries"
 import { selectedScreen } from "./screens"
@@ -34,45 +35,49 @@ const validationKeyByType: Record<UIDatasourceType, string | null> = {
   jsonarray: "value",
 }
 
-export const screenComponentsList = derived([selectedScreen], ([$selectedScreen]): Component[] => {
-  if (!$selectedScreen) {
-    return []
-  }
-
-  return findAllComponents($selectedScreen.props)
-})
-
-export const screenComponentErrorList = derived(
-  [selectedScreen, tables, queries, componentStore],
-  ([$selectedScreen, $tables, $queries, $componentStore]): UIComponentError[] => {
+export const screenComponentsList = lazyDerived(() =>
+  derived([selectedScreen], ([$selectedScreen]): Component[] => {
     if (!$selectedScreen) {
       return []
     }
-    const screen = $selectedScreen
 
-    const datasources = {
-      ...reduceBy("_id", $tables.list),
-      ...reduceBy("_id", $queries.list),
-    }
+    return findAllComponents($selectedScreen.props)
+  })
+)
 
-    const { components: definitions } = $componentStore
-
-    const errors: UIComponentError[] = []
-
-    function checkComponentErrors(component: Component, ancestors: string[]) {
-      errors.push(...getMissingAncestors(component, definitions, ancestors))
-      errors.push(...getInvalidDatasources(screen, component, datasources, definitions))
-      errors.push(...getMissingRequiredSettings(component, definitions))
-
-      for (const child of component._children || []) {
-        checkComponentErrors(child, [...ancestors, component._component])
+export const screenComponentErrorList = lazyDerived(() =>
+  derived(
+    [selectedScreen, tables, queries, componentStore],
+    ([$selectedScreen, $tables, $queries, $componentStore]): UIComponentError[] => {
+      if (!$selectedScreen) {
+        return []
       }
+      const screen = $selectedScreen
+
+      const datasources = {
+        ...reduceBy("_id", $tables.list),
+        ...reduceBy("_id", $queries.list),
+      }
+
+      const { components: definitions } = $componentStore
+
+      const errors: UIComponentError[] = []
+
+      function checkComponentErrors(component: Component, ancestors: string[]) {
+        errors.push(...getMissingAncestors(component, definitions, ancestors))
+        errors.push(...getInvalidDatasources(screen, component, datasources, definitions))
+        errors.push(...getMissingRequiredSettings(component, definitions))
+
+        for (const child of component._children || []) {
+          checkComponentErrors(child, [...ancestors, component._component])
+        }
+      }
+
+      checkComponentErrors($selectedScreen?.props, [])
+
+      return errors
     }
-
-    checkComponentErrors($selectedScreen?.props, [])
-
-    return errors
-  }
+  )
 )
 
 function getInvalidDatasources(
@@ -244,13 +249,12 @@ function getMissingAncestors(
   return result
 }
 
-export const screenComponentErrors = derived(
-  [screenComponentErrorList],
-  ([$list]): Record<string, UIComponentError[]> => {
+export const screenComponentErrors = lazyDerived(() =>
+  derived([screenComponentErrorList], ([$list]): Record<string, UIComponentError[]> => {
     return $list.reduce<Record<string, UIComponentError[]>>((obj, error) => {
       obj[error.componentId] ??= []
       obj[error.componentId].push(error)
       return obj
     }, {})
-  }
+  })
 )

@@ -3,21 +3,19 @@ import { createWebsocket } from "@supertoolmake/frontend-core"
 import { BuilderSocketEvent, helpers, SocketEvent } from "@supertoolmake/shared-core"
 import type { Datasource, Role, Screen, Table, UIUser, WorkspaceApp } from "@supertoolmake/types"
 import { get } from "svelte/store"
-import {
-  appStore,
-  datasources,
-  deploymentStore,
-  navigationStore,
-  roles,
-  snippets,
-  tables,
-  themeStore,
-  userStore,
-  workspaceAppStore,
-  workspaceDeploymentStore,
-} from "@/stores/builder"
 import { appsStore, auth } from "@/stores/portal"
+import { appStore } from "./app"
+import { datasources } from "./datasources"
+import { deploymentStore } from "./deployment"
+import { navigationStore } from "./navigation"
+import { roles } from "./roles"
 import { screenStore } from "./screens"
+import { snippets } from "./snippets"
+import { tables } from "./tables"
+import { themeStore } from "./theme"
+import { userStore } from "./users"
+import { workspaceAppStore } from "./workspaceApps"
+import { workspaceDeploymentStore } from "./workspaceDeployment"
 
 export const createBuilderWebsocket = (appId: string) => {
   const socket = createWebsocket("/socket/builder")

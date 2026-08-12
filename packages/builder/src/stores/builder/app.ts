@@ -11,7 +11,9 @@ import type {
 import { get } from "svelte/store"
 import { API } from "@/api"
 import { BudiStore } from "../BudiStore"
-import { initialise, navigationStore, workspaceAppStore } from "."
+import { initialiseBuilder } from "./initialise"
+import { navigationStore } from "./navigation"
+import { workspaceAppStore } from "./workspaceApps"
 
 interface ClientFeatures {
   spectrumThemes: boolean
@@ -177,7 +179,7 @@ export class AppMetaStore extends BudiStore<AppMetaState> {
   async refresh() {
     const { appId } = get(this.store)
     const appPackage = await API.fetchAppPackage(appId)
-    await initialise(appPackage)
+    await initialiseBuilder(appPackage, this)
   }
 
   async refreshAppNav() {

@@ -1,41 +1,42 @@
-// biome-ignore-all format: The order of imports matters for derived stores
-import { layoutStore } from "./layouts"
-import { workspaceAppStore } from "./workspaceApps"
-import { workspaceFavouriteStore } from "./workspaceFavourites"
+import type { FetchAppPackageResponse } from "@supertoolmake/types"
 import { appStore } from "./app"
-import { componentStore, selectedComponent } from "./components"
-import { navigationStore } from "./navigation"
-import { themeStore } from "./theme"
-import { screenStore, selectedScreen, sortedScreens } from "./screens"
+import { selectedAppUrls } from "./appUrls"
 import { builderStore } from "./builder"
-import { hoverStore } from "./hover"
-import { previewStore } from "./preview"
-import { workspaceDeploymentStore } from "./workspaceDeployment"
-import { userStore, userSelectedResourceMap, isOnlyUser } from "./users"
-import { deploymentStore } from "./deployment"
-import { contextMenuStore } from "./contextMenu"
-import { snippets } from "./snippets"
-import {
-  screenComponentsList,
-  screenComponentErrors,
-  screenComponentErrorList,
-} from "./screenComponent"
-
-// Backend
-import { tables } from "./tables"
-import { permissions } from "./permissions"
-import { roles } from "./roles"
-import { datasources } from "./datasources"
-import { integrations } from "./integrations"
-import { sortedIntegrations } from "./sortedIntegrations"
-import { queries } from "./queries"
+import { componentStore } from "./components"
 import componentTreeNodesStore from "./componentTreeNodes"
 import { componentTreeSearchStore } from "./componentTreeSearch"
+import { contextMenuStore } from "./contextMenu"
+import { dataAPI, dataEnvironmentStore } from "./dataEnvironment"
+import { datasources } from "./datasources"
+import { deploymentStore } from "./deployment"
+import { hoverStore } from "./hover"
+import { initialiseBuilder } from "./initialise"
+import { integrations } from "./integrations"
+import { layoutStore } from "./layouts"
+import { navigationStore } from "./navigation"
 import { oauth2 } from "./oauth2"
-import { dataEnvironmentStore, dataAPI } from "./dataEnvironment"
+import { permissions } from "./permissions"
+import { previewStore } from "./preview"
+import { queries } from "./queries"
+import { roles } from "./roles"
+import {
+  screenComponentErrorList,
+  screenComponentErrors,
+  screenComponentsList,
+} from "./screenComponent"
+import { screenStore, selectedScreen, sortedScreens } from "./screens"
+import { selectedComponent } from "./selectedComponent"
+import { snippets } from "./snippets"
+import { sortedIntegrations } from "./sortedIntegrations"
+// Backend
+import { tables } from "./tables"
+import { themeStore } from "./theme"
+import { isOnlyUser, userSelectedResourceMap, userStore } from "./users"
+import { workspaceAppStore } from "./workspaceApps"
+import { workspaceDeploymentStore } from "./workspaceDeployment"
+import { workspaceFavouriteStore } from "./workspaceFavourites"
 
-import type { FetchAppPackageResponse } from "@supertoolmake/types"
-import { selectedAppUrls } from "./appUrls"
+export const initialise = (pkg: FetchAppPackageResponse) => initialiseBuilder(pkg, appStore)
 
 export {
   appStore,
@@ -85,39 +86,4 @@ export const reset = () => {
   layoutStore.reset()
   navigationStore.reset()
   workspaceDeploymentStore.reset()
-}
-
-const refreshBuilderData = async () => {
-  await Promise.all([
-    datasources.init(),
-    integrations.init(),
-    queries.init(),
-    tables.init(),
-    roles.fetch(),
-    workspaceAppStore.fetch(),
-    workspaceDeploymentStore.fetch(),
-  ])
-}
-
-const resetBuilderHistory = () => {
-  screenStore.history.reset()
-}
-
-export const initialise = async (pkg: FetchAppPackageResponse) => {
-  const { application } = pkg
-  // must be first operation to make sure subsequent requests have correct app ID
-  appStore.syncAppPackage(pkg)
-  await Promise.all([
-    appStore.syncAppRoutes(),
-    componentStore.refreshDefinitions(application?.appId),
-  ])
-  builderStore.init(application)
-  navigationStore.syncAppNavigation(application?.navigation)
-  themeStore.syncAppTheme(application)
-  snippets.syncMetadata(application)
-  screenStore.syncAppScreens(pkg)
-  layoutStore.syncAppLayouts(pkg)
-  await workspaceFavouriteStore.sync()
-  resetBuilderHistory()
-  await refreshBuilderData()
 }

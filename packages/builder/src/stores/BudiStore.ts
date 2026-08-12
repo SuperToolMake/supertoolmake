@@ -50,6 +50,16 @@ export class BudiStore<T> {
   }
 }
 
+export const lazyDerived = <T>(makeDerivedStore: () => Readable<T>): Readable<T> => {
+  let derivedStore: Readable<T> | undefined
+  return {
+    subscribe: (run) => {
+      derivedStore ??= makeDerivedStore()
+      return derivedStore.subscribe(run)
+    },
+  }
+}
+
 // This deliberately does not extend a BudiStore as doing so imposes a requirement that
 // DerivedT must extend T, which is not desirable, due to the type of the subscribe property.
 export class DerivedBudiStore<T, DerivedT> {
@@ -65,7 +75,8 @@ export class DerivedBudiStore<T, DerivedT> {
     opts?: BudiStoreOpts
   ) {
     this.store = new BudiStore(init, opts)
-    this.derivedStore = makeDerivedStore(this.store)
+    // Resolve cross-store dependencies after all store modules have initialized.
+    this.derivedStore = lazyDerived(() => makeDerivedStore(this.store))
     this.subscribe = this.derivedStore.subscribe
     this.update = this.store.update
     this.set = this.store.set

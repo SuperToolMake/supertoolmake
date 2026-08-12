@@ -15,17 +15,14 @@ import { cloneDeep } from "lodash/fp"
 import { derived, get } from "svelte/store"
 import { API } from "@/api"
 import { findAllMatchingComponents } from "@/helpers/components"
-import {
-  appStore,
-  componentStore,
-  layoutStore,
-  previewStore,
-  selectedComponent,
-  workspaceAppStore,
-} from "@/stores/builder"
 import { createHistoryStore, type HistoryStore } from "@/stores/builder/history"
 import { BudiStore } from "../BudiStore"
+import { appStore } from "./app"
+import { componentStore } from "./components"
+import { layoutStore } from "./layouts"
+import { previewStore } from "./preview"
 import { RoutesStore } from "./routes"
+import { workspaceAppStore } from "./workspaceApps"
 
 interface ScreenState {
   screens: Screen[]
@@ -74,7 +71,7 @@ export class ScreenStore extends BudiStore<ScreenState> {
       selectDoc: this.select,
       afterAction: () => {
         // Ensure a valid component is selected
-        if (!get(selectedComponent)) {
+        if (!get(componentStore).selectedComponentId) {
           componentStore.update((state) => ({
             ...state,
             selectedComponentId: get(selectedScreen)?._id,
