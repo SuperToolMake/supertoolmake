@@ -73,8 +73,8 @@ export {
   themeStore,
   userSelectedResourceMap,
   userStore,
-  workspaceAppStore,
   workspaceApis,
+  workspaceAppStore,
   workspaceDeploymentStore,
   workspaceFavouriteStore,
 }
