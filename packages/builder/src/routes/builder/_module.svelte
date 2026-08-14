@@ -48,6 +48,15 @@ async function initBuilder() {
     // Don't show a notification here, as we might 403 initially due to not
     // being logged in. API error handler will clear user if session was destroyed.
     console.error("Error during builder initialization:", error)
+
+    // A stale session can be cleared by the self request before a later
+    // initialization request returns 401/403. Redirect directly instead of
+    // rendering the initialization error screen and waiting for a refresh.
+    if (!$auth.user && [401, 403].includes(error?.status)) {
+      goto("./auth")
+      return
+    }
+
     // Rethrow to trigger catch block in template
     throw error
   }
