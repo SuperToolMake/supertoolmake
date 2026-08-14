@@ -3,6 +3,7 @@ import { Divider, Heading, Icon } from "@supertoolmake/bbui"
 import QueryVerbBadge from "@/components/common/QueryVerbBadge.svelte"
 import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
 import { IntegrationTypes } from "@/constants/backend"
+import { TableNames } from "@/constants"
 import { customQueryIconColor, customQueryIconText } from "@/helpers/data/utils"
 import { datasources } from "@/stores/builder"
 
@@ -46,7 +47,7 @@ const isSqlQuery = (entry) => {
 }
 
 const getDatasourceForEntry = (entry) => {
-  if (entry?.type !== "query") {
+  if (entry?.type !== "query" && entry?.type !== "table") {
     return null
   }
   return $datasources.list.find((ds) => ds._id === entry.datasourceId)
@@ -66,9 +67,7 @@ $: displayDatasourceName = $datasources.list.length > 1
 
 $: filteredDataSet = dataSet?.filter(shouldInclude) ?? []
 
-$: containsRestQuery = filteredDataSet?.some((entry) => isRestQuery(entry)) ?? false
-
-$: iconMinWidth = containsRestQuery ? "64px" : "42px"
+$: iconMinWidth = "64px"
 </script>
 
 {#if dividerState}
@@ -121,6 +120,26 @@ $: iconMinWidth = containsRestQuery ? "64px" : "42px"
                 />
               {/if}
             {/if}
+          </span>
+        {:else if data?.type === "table"}
+          {@const ds = getDatasourceForEntry(data)}
+          {#if data.tableId === TableNames.USERS || ds}
+            <span class="query-icon">
+              {#if data.tableId === TableNames.USERS}
+                <Icon name="users-three" size="L" />
+              {:else}
+                <IntegrationIcon
+                  integrationType={ds.source}
+                  schema={ds.schema}
+                  iconUrl={ds.config?.iconUrl}
+                  size="22"
+                />
+              {/if}
+            </span>
+          {/if}
+        {:else if data?.type === "custom"}
+          <span class="query-icon">
+            <Icon name="brackets-curly" size="L" />
           </span>
         {/if}
         <span class="label-text">

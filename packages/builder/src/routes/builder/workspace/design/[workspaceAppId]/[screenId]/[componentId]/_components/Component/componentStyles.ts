@@ -301,6 +301,10 @@ export const background: StyleGroup = {
           label: "Black Noir",
           value: "linear-gradient(312deg, rgba(60,60,60,1) 0%, rgba(42,42,42,1) 100%);",
         },
+        {
+          label: "Blueberry Blastoff",
+          value: "linear-gradient(135deg, #0a1628 0%, #134c94 50%, #1a6cd3 100%)",
+        },
       ],
     },
   ],

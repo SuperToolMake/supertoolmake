@@ -7,6 +7,7 @@ import { workspaceFavouriteStore } from "@/stores/builder"
 export let favourite: WorkspaceFavourite | undefined = undefined
 export let size: "S" | "XS" | "M" | "L" | "XL" | "XXL" | "XXXL" = "XS"
 export let position: TooltipPosition = TooltipPosition.Top
+export let tooltipType: TooltipType = TooltipType.Info
 export let noWrap = false
 
 let waiting = false
@@ -21,7 +22,7 @@ let waiting = false
       ? "var(--spectrum-global-color-yellow-1000)"
       : undefined}
     tooltip={favourite._id ? "Remove from favourites" : "Add to favourites"}
-    tooltipType={TooltipType.Info}
+    {tooltipType}
     tooltipPosition={position}
     tooltipWrap={noWrap}
     hoverColor={favourite._id

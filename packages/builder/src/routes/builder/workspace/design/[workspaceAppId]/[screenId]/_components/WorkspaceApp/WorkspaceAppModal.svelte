@@ -196,7 +196,7 @@ $: editingPublishedApp = workspaceApp?.publishStatus.state === PublishResourceSt
     {#if editingPublishedApp}
       <div class="edit-info">
         <Icon size="M" name="info" />
-        <Body size="S">Unpublish your app to edit its name and URL</Body>
+        <Body size="S">Switch off your app to edit its name and URL</Body>
       </div>
     {/if}
   </ModalContent>

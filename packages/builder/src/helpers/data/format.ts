@@ -8,6 +8,7 @@ export const datasourceSelect = {
       label: table.name,
       tableId: table._id,
       type: "table",
+      datasourceId: datasource?._id,
       datasourceName: datasource?.name,
     }
   },
