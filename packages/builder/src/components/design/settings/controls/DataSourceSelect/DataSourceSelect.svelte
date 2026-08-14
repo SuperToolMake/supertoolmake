@@ -16,12 +16,17 @@ import { makePropSafe as safe } from "@supertoolmake/string-templates"
 import { createEventDispatcher } from "svelte"
 import { API } from "@/api"
 import ClientBindingPanel from "@/components/common/bindings/ClientBindingPanel.svelte"
+import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
+import QueryVerbBadge from "@/components/common/QueryVerbBadge.svelte"
+import { TableNames } from "@/constants"
+import { IntegrationTypes } from "@/constants/backend"
 import DataSourceCategory from "@/components/design/settings/controls/DataSourceSelect/DataSourceCategory.svelte"
 import IntegrationQueryEditor from "@/components/integration/index.svelte"
 import BindingBuilder from "@/components/integration/QueryBindingBuilder.svelte"
 import { readableToRuntimeBinding, runtimeToReadableBinding } from "@/dataBinding"
 import { extractFields, extractJSONArrayFields, extractRelationships } from "@/helpers/bindings"
 import { findAllComponents } from "@/helpers/components"
+import { customQueryIconColor, customQueryIconText } from "@/helpers/data/utils"
 import { sortAndFormat } from "@/helpers/data/format"
 import {
   componentStore,
@@ -62,6 +67,88 @@ const getQueryParams = (query) => {
 
 const getQueryDatasource = (query) => {
   return $datasources.list.find((ds) => ds._id === query?.datasourceId)
+}
+
+const getSelectedIcon = (entry, datasourceList, tableList) => {
+  if (entry?.type === "custom") {
+    return {
+      component: Icon,
+      props: { name: "brackets-curly", size: "L" },
+    }
+  }
+
+  if (entry?.type === "table") {
+    if (entry.tableId === TableNames.USERS) {
+      return {
+        component: Icon,
+        props: { name: "users-three", size: "L" },
+      }
+    }
+
+    const table = tableList.find((table) => table._id === entry.tableId)
+    const datasourceId = entry.datasourceId || table?.sourceId || table?.datasourceId
+    const datasource = datasourceList.find((ds) => ds._id === datasourceId)
+    if (datasource) {
+      return {
+        component: IntegrationIcon,
+        props: {
+          integrationType: datasource.source,
+          schema: datasource.schema,
+          iconUrl: datasource.config?.iconUrl,
+          size: "22",
+        },
+      }
+    }
+  }
+
+  if (entry?.type === "query") {
+    const datasource = datasourceList.find((ds) => ds._id === entry.datasourceId)
+    if (datasource?.source === IntegrationTypes.REST) {
+      return {
+        component: QueryVerbBadge,
+        props: {
+          verb: customQueryIconText(entry),
+          color: customQueryIconColor(entry),
+        },
+      }
+    }
+
+    if (
+      datasource?.source === IntegrationTypes.POSTGRES ||
+      datasource?.source === IntegrationTypes.MYSQL ||
+      datasource?.source === IntegrationTypes.SQL_SERVER
+    ) {
+      return {
+        component: Icon,
+        props: {
+          name: "file-sql",
+          size: "L",
+          color: "var(--spectrum-global-color-gray-700)",
+        },
+      }
+    }
+
+    if (datasource) {
+      return {
+        component: IntegrationIcon,
+        props: {
+          integrationType: datasource.source,
+          schema: datasource.schema,
+          iconUrl: datasource.config?.iconUrl,
+          size: "22",
+        },
+      }
+    }
+
+    return {
+      component: Icon,
+      props: {
+        name: "file-magnifying-glass",
+        size: "L",
+        color: "var(--spectrum-global-color-gray-800)",
+      },
+    }
+  }
 }
 
 const openQueryParamsDrawer = () => {
@@ -116,6 +203,11 @@ const handleCSV = async (e) => {
 }
 
 $: text = value?.label ?? "Choose an option"
+$: selectedIcon = getSelectedIcon(value, $datasources.list, $tablesStore.list)
+$: isSelectedRestQuery =
+  value?.type === "query" &&
+  $datasources.list.find((datasource) => datasource._id === value.datasourceId)?.source ===
+    IntegrationTypes.REST
 $: tables = sortAndFormat.tables($tablesStore.list, $datasources.list)
 $: queries = $queriesStore.list
   .filter((q) => showAllQueries || q.queryVerb === "read" || q.readable)
@@ -149,17 +241,25 @@ $: custom = {
 </script>
 
 <div class="container" bind:this={anchorRight}>
-  <Select
-    readonly
-    value={text}
-    options={[text]}
-    on:click={dropdownRight.show}
-  />
-  {#if value?.type === "query"}
+  <div class="select">
+    <Select
+      readonly
+      value={text}
+      options={[text]}
+      on:click={dropdownRight.show}
+    />
+  </div>
+  {#if value?.type === "query" || selectedIcon}
     <div class="icon">
-      <Icon hoverable name="gear" on:click={openQueryParamsDrawer} />
+      {#if isSelectedRestQuery}
+        <Icon hoverable name="gear" on:click={openQueryParamsDrawer} />
+      {:else if selectedIcon}
+        <svelte:component this={selectedIcon.component} {...selectedIcon.props} />
+      {/if}
     </div>
-    <Drawer title={"Query Bindings"} bind:this={drawer}>
+  {/if}
+  {#if value?.type === "query"}
+      <Drawer title={"Query Bindings"} bind:this={drawer}>
       <Button slot="buttons" cta on:click={saveQueryParams}>Save</Button>
       <DrawerContent slot="body">
         <Layout noPadding gap="XS">
@@ -182,12 +282,9 @@ $: custom = {
           />
         </Layout>
       </DrawerContent>
-    </Drawer>
+      </Drawer>
   {/if}
   {#if value?.type === "custom"}
-    <div class="icon">
-      <Icon hoverable name="gear" on:click={openCustomDrawer} />
-    </div>
     <Drawer title="Custom data" bind:this={drawer}>
       <div slot="buttons" style="display:contents">
         <Button primary on:click={promptForCSV}>Load CSV</Button>
@@ -294,8 +391,9 @@ $: custom = {
     justify-content: flex-start;
     align-items: center;
   }
-  .container :global(:first-child) {
+  .select {
     flex: 1 1 auto;
+    min-width: 0;
   }
 
   .dropdown {
