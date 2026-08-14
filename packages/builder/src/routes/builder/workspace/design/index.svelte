@@ -1,32 +1,45 @@
 <script lang="ts">
+import { tick } from "svelte"
 import {
   AbsTooltip,
-  ActionButton,
   Body,
   Button,
   Helpers,
+  Heading,
   Icon,
   notifications,
+  Toggle,
   TooltipPosition,
+  TooltipType,
 } from "@supertoolmake/bbui"
+import { helpers } from "@supertoolmake/shared-core"
 import { PublishResourceState, type UIWorkspaceApp, WorkspaceResource } from "@supertoolmake/types"
 import { url } from "@roxi/routify"
 import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
 import PublishStatusBadge from "@/components/common/PublishStatusBadge.svelte"
 import TopBar from "@/components/common/TopBar.svelte"
-import { capitalise, durationFromNow } from "@/helpers"
+import { durationFromNow } from "@/helpers"
 import { buildLiveUrl } from "@/helpers/urls"
 import FavouriteResourceButton from "@/routes/builder/_components/FavouriteResourceButton.svelte"
 import WorkspaceAppModal from "@/routes/builder/workspace/design/[workspaceAppId]/[screenId]/_components/WorkspaceApp/WorkspaceAppModal.svelte"
 import { contextMenuStore, workspaceAppStore, workspaceFavouriteStore } from "@/stores/builder"
+import { auth } from "@/stores/portal"
 import NoResults from "../_components/NoResults.svelte"
 
 let showHighlight = false
-let filter: PublishResourceState | undefined
 let selectedWorkspaceApp: UIWorkspaceApp | undefined
 let workspaceAppModal: WorkspaceAppModal
 let confirmDeleteDialog: ConfirmDialog
 let appChangingStatus: string | undefined
+
+const toggleApp = async (workspaceApp: UIWorkspaceApp, enabled: boolean) => {
+  try {
+    appChangingStatus = workspaceApp._id
+    await workspaceAppStore.toggleDisabled(workspaceApp._id!, !enabled)
+  } finally {
+    appChangingStatus = undefined
+  }
+}
 
 const deleteWorkspaceApp = async () => {
   if (!selectedWorkspaceApp) {
@@ -67,21 +80,23 @@ const openLiveWorkspaceApp = (liveUrl: string | null) => {
   window.open(liveUrl, "_blank")
 }
 
+const getStatusTimestamp = (workspaceApp: UIWorkspaceApp) => {
+  if (workspaceApp.publishStatus.state === PublishResourceState.PUBLISHED) {
+    return workspaceApp.publishStatus.publishedAt ?? workspaceApp.updatedAt
+  }
+
+  return workspaceApp.updatedAt
+}
+
+const getStatusDurationLabel = (workspaceApp: UIWorkspaceApp) => {
+  const isLive = workspaceApp.publishStatus.state === PublishResourceState.PUBLISHED
+  const duration = durationFromNow(getStatusTimestamp(workspaceApp) || "")
+
+  return isLive ? `Last published ${duration} ago` : `Offline for ${duration}`
+}
+
 const getContextMenuOptions = (workspaceApp: UIWorkspaceApp) => {
   const liveUrl = buildLiveWorkspaceAppUrl(workspaceApp)
-  const pause = {
-    icon: workspaceApp.disabled ? "play-circle" : "pause-circle",
-    name: workspaceApp.disabled ? "Switch on" : "Switch off",
-    visible: true,
-    callback: async () => {
-      try {
-        appChangingStatus = workspaceApp._id
-        await workspaceAppStore.toggleDisabled(workspaceApp._id!, !workspaceApp.disabled)
-      } finally {
-        appChangingStatus = undefined
-      }
-    },
-  }
 
   const commands: {
     icon: string
@@ -103,16 +118,29 @@ const getContextMenuOptions = (workspaceApp: UIWorkspaceApp) => {
       callback: () => openLiveWorkspaceApp(liveUrl),
     },
 
-    pause,
     {
       icon: "trash",
       name: "Delete",
       visible: true,
-      callback: () => confirmDeleteDialog.show(),
+      disabled: workspaceApp.publishStatus.state === PublishResourceState.PUBLISHED,
+      callback: () => showDeleteDialog(workspaceApp),
     },
   ]
 
   return commands
+}
+
+const showDeleteDialog = async (workspaceApp: UIWorkspaceApp) => {
+  selectedWorkspaceApp = workspaceApp
+  await tick()
+  confirmDeleteDialog.show()
+}
+
+const handleToggleChange = async (
+  e: CustomEvent<boolean>,
+  workspaceApp: UIWorkspaceApp
+) => {
+  await toggleApp(workspaceApp, e.detail)
 }
 
 const openContextMenu = (e: MouseEvent, workspaceApp: UIWorkspaceApp) => {
@@ -133,40 +161,30 @@ const openContextMenu = (e: MouseEvent, workspaceApp: UIWorkspaceApp) => {
   )
 }
 
+const runTileAction = (
+  e: MouseEvent,
+  workspaceApp: UIWorkspaceApp,
+  callback: () => void
+) => {
+  e.preventDefault()
+  e.stopPropagation()
+  selectedWorkspaceApp = workspaceApp
+  callback()
+}
+
 const createApp = () => {
   selectedWorkspaceApp = undefined
   workspaceAppModal.show()
 }
 
 $: favourites = workspaceFavouriteStore.lookup
-
-const filters: {
-  label: string
-  filterValue: PublishResourceState | undefined
-}[] = [
-  {
-    label: "All apps",
-    filterValue: undefined,
-  },
-  {
-    label: "Live",
-    filterValue: PublishResourceState.PUBLISHED,
-  },
-  {
-    label: "Off",
-    filterValue: PublishResourceState.DISABLED,
-  },
-]
+$: userName =
+  $auth.user?.firstName || $auth.user?.lastName
+    ? helpers.getUserLabel($auth.user)
+    : ""
 
 $: workspaceApps = $workspaceAppStore.workspaceApps
-$: filteredWorkspaceApps = workspaceApps
-  .filter((a) => {
-    if (!filter) {
-      return true
-    }
-
-    return a.publishStatus.state === filter
-  })
+$: displayedWorkspaceApps = workspaceApps
   .map((app) => {
     return {
       ...app,
@@ -177,69 +195,48 @@ $: filteredWorkspaceApps = workspaceApps
     }
   })
   .sort((a, b) => {
-    const aIsFav = Boolean(a.favourite._id)
-    const bIsFav = Boolean(b.favourite._id)
+    const aIsFavourite = Boolean(a.favourite._id)
+    const bIsFavourite = Boolean(b.favourite._id)
 
-    // Group by favourite status
-    if (aIsFav !== bIsFav) {
-      return bIsFav ? 1 : -1
+    if (aIsFavourite !== bIsFavourite) {
+      return bIsFavourite ? 1 : -1
     }
 
-    // Within same group, sort by updatedAt
-    return b.updatedAt!.localeCompare(a.updatedAt!)
+    const aIsLive = a.publishStatus.state === PublishResourceState.PUBLISHED
+    const bIsLive = b.publishStatus.state === PublishResourceState.PUBLISHED
+
+    if (aIsLive !== bIsLive) {
+      return bIsLive ? 1 : -1
+    }
+
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase())
   })
 </script>
 
 <div class="apps-index">
   <TopBar icon="browser" breadcrumbs={[{ text: "Apps" }]} showPublish={false}>
   </TopBar>
-  <div class="secondary-bar">
-    <div class="filter">
-      {#each filters as option}
-        <ActionButton
-          quiet
-          selected={option.filterValue === filter}
-          on:click={() => (filter = option.filterValue)}
-          >{option.label}</ActionButton
-        >
-      {/each}
-    </div>
-
+  <div class="welcome-section">
     <div class="action-buttons">
-      <Button
-        icon="squares-four"
-        secondary
-        on:click={() => {
-          window.open("/builder/apps", "_blank")
-        }}
-      >
-        View app portal
-      </Button>
       <Button
         icon="lightbulb"
         secondary
         on:click={() => {
           window.open(
-            "https://docs.budibase.com/docs/app-building-101",
+            "https://supertoolmake.com/docs/apps/overview/",
             "_blank"
           )
         }}
       >
         Learn
       </Button>
-      <Button cta icon="plus" on:click={createApp}>New app</Button>
+      <Button cta icon="plus" on:click={createApp}>Create new app</Button>
     </div>
   </div>
 
   <div class="table-wrapper">
-    <div class="table-header">
-      <span>Name</span>
-      <span>Status</span>
-      <span>Last updated</span>
-      <span></span>
-    </div>
     <div class="apps">
-      {#each filteredWorkspaceApps as app}
+      {#each displayedWorkspaceApps as app (app._id)}
         <a
           class="app"
           class:favourite={app.favourite?._id}
@@ -249,37 +246,74 @@ $: filteredWorkspaceApps = workspaceApps
           on:contextmenu={e => openContextMenu(e, app)}
           class:active={showHighlight && selectedWorkspaceApp === app}
         >
-          <Body size="S" color="var(--spectrum-global-color-gray-900)"
-            >{app.name}</Body
-          >
-          <div>
-            <PublishStatusBadge
-              status={app.publishStatus.state}
-              loading={appChangingStatus === app._id}
-            />
-          </div>
-          <AbsTooltip text={Helpers.getDateDisplayValue(app.updatedAt)}>
-            <span>
-              {capitalise(durationFromNow(app.updatedAt || ""))}
-            </span>
-          </AbsTooltip>
-          <div class="actions">
-            <div class="ctx-btn">
-              <Icon
-                name="More"
-                size="M"
-                hoverable
-                on:click={e => openContextMenu(e, app)}
-              />
-            </div>
-
+          <div class="app-name">
             <span class="favourite-btn">
               <FavouriteResourceButton
                 favourite={app.favourite}
-                position={TooltipPosition.Left}
+                size="L"
+                position={TooltipPosition.Top}
+                tooltipType={TooltipType.Default}
                 noWrap
               />
             </span>
+            <Icon name="browser" size="L" color="var(--spectrum-global-color-gray-700)" />
+            <Body size="L" color="var(--spectrum-global-color-gray-900)">{app.name}</Body>
+          </div>
+          <div class="status-info">
+            <div class="status-duration">
+              <AbsTooltip
+                position={TooltipPosition.Top}
+                text={Helpers.getDateDisplayValue(getStatusTimestamp(app))}
+              >
+                <span>{getStatusDurationLabel(app)}</span>
+              </AbsTooltip>
+            </div>
+            <div class="status-control">
+              <PublishStatusBadge
+                status={app.publishStatus.state}
+                loading={appChangingStatus === app._id}
+              />
+              <AbsTooltip
+                position={TooltipPosition.Top}
+                text={app.publishStatus.state === PublishResourceState.PUBLISHED
+                  ? "Switch off"
+                  : "Switch on"}
+                noWrap
+              >
+                <span class="status-toggle">
+                  <Toggle
+                    noPadding
+                    value={app.publishStatus.state === PublishResourceState.PUBLISHED}
+                    disabled={appChangingStatus === app._id}
+                    on:change={e => handleToggleChange(e, app)}
+                  />
+                </span>
+              </AbsTooltip>
+            </div>
+          </div>
+          <div class="actions">
+            {#each getContextMenuOptions(app).filter(command => command.visible) as command}
+              <AbsTooltip
+                position={TooltipPosition.Top}
+                text={command.disabled ? "Cannot delete live app" : command.name}
+                noWrap
+              >
+                <button
+                  class="tile-action"
+                  type="button"
+                  aria-label={command.name}
+                  disabled={command.disabled}
+                  on:click={e => runTileAction(e, app, command.callback)}
+                >
+                  <Icon
+                    name={command.icon}
+                    size="L"
+                    hoverable
+                    disabled={command.disabled}
+                  />
+                </button>
+              </AbsTooltip>
+            {/each}
           </div>
         </a>
       {/each}
@@ -321,81 +355,113 @@ $: filteredWorkspaceApps = workspaceApps
     display: flex;
     flex-direction: column;
   }
-  .secondary-bar {
-    padding: 10px 12px;
+  .welcome-section {
+    padding: 28px 0 24px;
     border-bottom: var(--border);
     display: flex;
     justify-content: space-between;
-    align-content: center;
+    align-items: flex-end;
+    gap: var(--spacing-xl);
   }
-  .filter {
-    display: flex;
-    gap: 10px;
+  .welcome-copy {
+    min-width: 0;
   }
-  .filter :global(.spectrum-ActionButton) {
-    border-radius: 8px;
-    transition:
-      border-color 130ms ease-out,
-      background 130ms ease-out;
-    border: 1px solid transparent;
-    padding: 3px 10px;
-    height: auto;
-
-    &.is-selected {
-      background: var(--spectrum-global-color-gray-200);
-      border-color: var(--spectrum-global-color-gray-300);
-    }
+  .welcome-copy :global(.spectrum-Heading) {
+    margin: 0;
+  }
+  .welcome-copy :global(.spectrum-Body) {
+    margin: var(--spacing-xs) 0 0;
   }
   .action-buttons {
     display: flex;
     gap: 8px;
-  }
-  .app,
-  .table-header {
-    display: grid;
-    grid-template-columns: 1fr 200px 200px 50px;
-    border-bottom: var(--border);
-    align-items: center;
-  }
-  .table-header {
-    padding: 5px 12px;
-    color: var(--spectrum-global-color-gray-700);
+    width: min(100%, 1200px);
+    box-sizing: border-box;
+    padding: 0 12px;
+    margin: 0 auto;
+    justify-content: flex-end;
   }
   .app {
-    padding: 9px 12px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 170px;
+    grid-template-rows: auto auto;
+    border-bottom: var(--border);
+    align-items: center;
+    box-sizing: border-box;
+  }
+  .app {
+    min-height: 96px;
+    padding: 16px 12px;
     color: var(--text-color);
     transition: background 130ms ease-out;
 
-    &:hover,
-    &.active {
-      background: var(--spectrum-global-color-gray-200);
-
-      & .actions > * {
-        opacity: 1;
-        pointer-events: all;
+      &:hover,
+      &.active {
+        background: var(--spectrum-global-color-gray-200);
       }
-    }
-    &.favourite {
-      & .actions .favourite-btn {
-        opacity: 1;
-      }
-    }
+  }
+  .app-name {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-l);
+    min-width: 0;
+    grid-column: 1;
+    grid-row: 1;
+    padding-right: 180px;
+  }
+  .app-name :global(.spectrum-Body) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .status-control {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-s);
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    justify-self: end;
+    align-self: center;
+  }
+  .status-info {
+    display: contents;
+  }
+  .status-duration {
+    grid-column: 1;
+    grid-row: 2;
+    margin-left: 73px;
   }
   .actions {
     justify-content: flex-end;
     display: flex;
     align-items: center;
     pointer-events: none;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-s);
+    grid-column: 2;
+    grid-row: 1 / span 2;
   }
 
   .actions > * {
-    opacity: 0;
+    opacity: 1;
+    pointer-events: all;
     transition: opacity 130ms ease-out;
   }
 
-  .actions .favourite-btn {
-    pointer-events: all;
+  .tile-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border: 0;
+    border-radius: var(--border-radius-s);
+    background: transparent;
+    color: var(--spectrum-global-color-gray-700);
+    cursor: pointer;
+  }
+
+  .tile-action:hover {
+    background: var(--spectrum-global-color-gray-200);
+    color: var(--spectrum-global-color-gray-900);
   }
 
   .update-version :global(.spectrum-ActionButton-label) {
@@ -408,10 +474,52 @@ $: filteredWorkspaceApps = workspaceApps
     display: flex;
     flex-direction: column;
     height: 0;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
   }
 
   .apps {
     overflow-y: auto;
     flex: 1 1 auto;
+    border-top: var(--border);
+  }
+
+  @media (max-width: 700px) {
+    .welcome-section {
+      padding: 24px 0;
+      align-items: flex-start;
+      flex-direction: column;
+    }
+    .action-buttons {
+      flex-wrap: wrap;
+      width: 100%;
+      padding: 0 12px 0 20px;
+    }
+    .app {
+      height: 80px;
+      min-height: 0;
+      grid-template-columns: minmax(0, 1fr) 80px;
+      grid-template-rows: auto;
+      row-gap: 0;
+      column-gap: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .app > :nth-child(2) {
+      display: none;
+    }
+    .app-name {
+      grid-column: 1;
+      grid-row: 1;
+      padding-right: 0;
+    }
+    .actions {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .tile-action {
+      display: none;
+    }
   }
 </style>
