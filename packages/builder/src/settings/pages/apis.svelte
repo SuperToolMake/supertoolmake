@@ -3,7 +3,7 @@ import { Body, Button, Heading, Layout, notifications } from "@supertoolmake/bbu
 import { cloneDeep } from "lodash/fp"
 import { onMount } from "svelte"
 import KeyValueBuilder from "@/components/integration/KeyValueBuilder.svelte"
-import RestAuthenticationBuilder from "@/routes/builder/workspace/[application]/data/datasource/[datasourceId]/_components/panels/Authentication/RestAuthenticationBuilder.svelte"
+import RestAuthenticationBuilder from "@/routes/builder/workspace/data/datasource/[datasourceId]/_components/panels/Authentication/RestAuthenticationBuilder.svelte"
 import { workspaceApis } from "@/stores/builder"
 
 let config = {}
