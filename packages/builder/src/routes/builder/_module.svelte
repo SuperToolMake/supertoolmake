@@ -119,7 +119,6 @@ derivedMemo(
       )
     ) {
       CookieUtils.setCookie(Constants.Cookies.ReturnUrl, window.location.href)
-      return
     }
 
     // if tenant is not set go to it
