@@ -136,10 +136,7 @@ const showDeleteDialog = async (workspaceApp: UIWorkspaceApp) => {
   confirmDeleteDialog.show()
 }
 
-const handleToggleChange = async (
-  e: CustomEvent<boolean>,
-  workspaceApp: UIWorkspaceApp
-) => {
+const handleToggleChange = async (e: CustomEvent<boolean>, workspaceApp: UIWorkspaceApp) => {
   await toggleApp(workspaceApp, e.detail)
 }
 
@@ -161,11 +158,7 @@ const openContextMenu = (e: MouseEvent, workspaceApp: UIWorkspaceApp) => {
   )
 }
 
-const runTileAction = (
-  e: MouseEvent,
-  workspaceApp: UIWorkspaceApp,
-  callback: () => void
-) => {
+const runTileAction = (e: MouseEvent, workspaceApp: UIWorkspaceApp, callback: () => void) => {
   e.preventDefault()
   e.stopPropagation()
   selectedWorkspaceApp = workspaceApp
@@ -178,10 +171,7 @@ const createApp = () => {
 }
 
 $: favourites = workspaceFavouriteStore.lookup
-$: userName =
-  $auth.user?.firstName || $auth.user?.lastName
-    ? helpers.getUserLabel($auth.user)
-    : ""
+$: userName = $auth.user?.firstName || $auth.user?.lastName ? helpers.getUserLabel($auth.user) : ""
 
 $: workspaceApps = $workspaceAppStore.workspaceApps
 $: displayedWorkspaceApps = workspaceApps
