@@ -373,7 +373,7 @@ $: debouncedCheckIsModified(newQuery)
                     throughout the query.
                   </Body>
                 </div>
-                {#key newQuery.parameters}
+                {#key parsedQueryKey}
                   <BindingBuilder
                     queryBindings={newQuery.parameters}
                     on:change={e => {

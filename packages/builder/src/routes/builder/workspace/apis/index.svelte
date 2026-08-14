@@ -2,6 +2,7 @@
 import { goto } from "@roxi/routify"
 import { onMount } from "svelte"
 import { datasources, queries } from "@/stores/builder"
+import { IntegrationTypes } from "@/constants/backend"
 import { helpers } from "@supertoolmake/shared-core"
 import { WORKSPACE_API_CONFIG_ID } from "@supertoolmake/types"
 
