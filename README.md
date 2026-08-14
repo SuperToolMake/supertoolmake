@@ -137,6 +137,8 @@ You will know yarn dev has worked correctly when there are no build errors of co
 
 Once running, visit [localhost:10000/builder](http://localhost:10000/builder)
 
-You should be prompted to create an admin:
+| Create the admin user | Welcome app |
+| ------------------- | ---------- |
+| <img src="docs/super_admin.png"> | <img src="docs/welcome_app.png"> |
 
-<img src="docs/super_admin.png" width="640">
+
