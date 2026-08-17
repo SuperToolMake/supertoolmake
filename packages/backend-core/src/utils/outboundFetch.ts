@@ -228,7 +228,9 @@ export async function fetchWithBlacklist<
     nextRequest = nextRequestForRedirect(nextRequest, response.status)
     if (shouldStripSensitiveHeadersForRedirect(nextUrl, redirectUrl)) {
       if (rejectCrossOriginRedirects) {
-        throw new Error("Redirect to a different origin is not permitted.")
+        throw new Error(
+          "This API URL redirects to a different hostname, port, or protocol. Enter the final URL directly (www.example.com instead of example.com)."
+        )
       }
       nextRequest = stripSensitiveHeadersForRedirect(nextRequest)
     }

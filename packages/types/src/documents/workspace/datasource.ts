@@ -75,7 +75,7 @@ export interface DynamicVariable {
 
 export interface RestConfig {
   // Base URL
-  url: string
+  url?: string
   rejectUnauthorized?: boolean
   downloadImages?: boolean
   defaultHeaders?: {

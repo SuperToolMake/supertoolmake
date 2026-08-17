@@ -28,10 +28,10 @@ import { screenStore, selectedScreen, sortedScreens } from "./screens"
 import { selectedComponent } from "./selectedComponent"
 import { snippets } from "./snippets"
 import { sortedIntegrations } from "./sortedIntegrations"
-// Backend
 import { tables } from "./tables"
 import { themeStore } from "./theme"
 import { isOnlyUser, userSelectedResourceMap, userStore } from "./users"
+import { workspaceApis } from "./workspaceApis"
 import { workspaceAppStore } from "./workspaceApps"
 import { workspaceDeploymentStore } from "./workspaceDeployment"
 import { workspaceFavouriteStore } from "./workspaceFavourites"
@@ -73,6 +73,7 @@ export {
   themeStore,
   userSelectedResourceMap,
   userStore,
+  workspaceApis,
   workspaceAppStore,
   workspaceDeploymentStore,
   workspaceFavouriteStore,

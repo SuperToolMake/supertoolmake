@@ -1,15 +1,16 @@
 <script lang="ts">
-import { Layout } from "@supertoolmake/bbui"
-import type { Datasource } from "@supertoolmake/types"
+import { Divider, Layout } from "@supertoolmake/bbui"
+import { WORKSPACE_API_CONFIG_ID, type Datasource } from "@supertoolmake/types"
 import { goto as gotoStore, isActive } from "@roxi/routify"
 import { onMount } from "svelte"
 import DatasourceNavigator from "@/components/backend/DatasourceNavigator/DatasourceNavigator.svelte"
+import RestQueryNavigator from "@/components/backend/DatasourceNavigator/RestQueryNavigator.svelte"
 import NavHeader from "@/components/common/NavHeader.svelte"
 import { getHorizontalResizeActions } from "@/components/common/resizable"
 import TopBar from "@/components/common/TopBar.svelte"
 import Panel from "@/components/design/Panel.svelte"
 import { IntegrationTypes } from "@/constants/backend"
-import { builderStore, datasources } from "@/stores/builder"
+import { builderStore, datasources, queries } from "@/stores/builder"
 import { helpers } from "@supertoolmake/shared-core"
 
 let searchValue: string
@@ -30,7 +31,8 @@ const sortByDatasourceName = (a: SortableDatasource, b: SortableDatasource) =>
     sensitivity: "base",
   })
 
-const datasourceFilter = (datasource: any) => !helpers.isSQL(datasource)
+const datasourceFilter = (datasource: any) =>
+  !helpers.isSQL(datasource) && datasource.source !== IntegrationTypes.REST
 
 $: goto = $gotoStore
 
@@ -47,18 +49,22 @@ onMount(() => {
   loadPanelWidth()
 })
 
-$: restDatasources = ($datasources.list || []).filter(
-  (datasource) => datasource.source === IntegrationTypes.REST
+$: restQueries = ($queries.list || []).filter(
+  (query) =>
+    ($datasources.list || []).some(
+      (datasource) =>
+        datasource._id === query.datasourceId && datasource.source === IntegrationTypes.REST
+    ) || query.datasourceId === WORKSPACE_API_CONFIG_ID
 )
-$: hasRestDatasources = restDatasources.length > 0
+$: hasRestQueries = restQueries.length > 0
 
-$: nonSqlDatasources = ($datasources.list || []).filter((datasource) => !helpers.isSQL(datasource))
+$: nonSqlDatasources = ($datasources.list || []).filter(datasourceFilter)
 $: hasNonSqlDatasources = nonSqlDatasources.length > 0
 
 const APIS_BASE_ROUTE = "/builder/workspace/apis"
 
 $: shouldRedirectToNew =
-  !(hasNonSqlDatasources || hasRestDatasources || $isActive("./new")) && $isActive(APIS_BASE_ROUTE)
+  !(hasNonSqlDatasources || hasRestQueries || $isActive("./new")) && $isActive(APIS_BASE_ROUTE)
 
 $: if (shouldRedirectToNew) {
   goto("./new")
@@ -83,11 +89,19 @@ $: if (shouldRedirectToNew) {
             />
           </span>
           <Layout paddingX="L" paddingY="none" gap="S">
-            <DatasourceNavigator
-              searchTerm={searchValue}
-              {datasourceFilter}
-              datasourceSort={sortByDatasourceName}
-            />
+            {#if hasRestQueries}
+              <RestQueryNavigator searchTerm={searchValue} />
+            {/if}
+            {#if hasRestQueries && hasNonSqlDatasources}
+              <Divider size="S" noMargin />
+            {/if}
+            {#if hasNonSqlDatasources}
+              <DatasourceNavigator
+                searchTerm={searchValue}
+                {datasourceFilter}
+                datasourceSort={sortByDatasourceName}
+              />
+            {/if}
           </Layout>
         </Panel>
         <div class="divider">

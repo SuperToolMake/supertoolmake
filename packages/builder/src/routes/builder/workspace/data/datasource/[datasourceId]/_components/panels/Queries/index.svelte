@@ -6,8 +6,6 @@ import CapitaliseRenderer from "@/components/common/renderers/CapitaliseRenderer
 import { queries } from "@/stores/builder"
 import Panel from "../Panel.svelte"
 import Tooltip from "../Tooltip.svelte"
-import RestImportButton from "./RestImportButton.svelte"
-import RestImportQueriesModal from "./RestImportQueriesModal.svelte"
 
 $goto
 
@@ -16,11 +14,9 @@ export let datasource
 $: queryList = $queries.list.filter((query) => query.datasourceId === datasource._id)
 
 let viewSelectionModal
-let restImportModal
 
 $: supportsViews = datasource.source === "POSTGRES" || datasource.source === "MYSQL"
 $: isRestDatasource = datasource?.source === "REST"
-$: showImportButton = isRestDatasource
 $: createQueryLabel = isRestDatasource ? "Add action" : "Create new query"
 </script>
 
@@ -32,15 +28,6 @@ $: createQueryLabel = isRestDatasource ? "Add action" : "Create new query"
         viewSelectionModal.hide()
         queries.fetch()
       }}
-    />
-  </Modal>
-{/if}
-
-{#if isRestDatasource}
-  <Modal bind:this={restImportModal}>
-    <RestImportQueriesModal
-      datasourceId={datasource._id}
-      createDatasource={false}
     />
   </Modal>
 {/if}
@@ -59,9 +46,6 @@ $: createQueryLabel = isRestDatasource ? "Add action" : "Create new query"
     <slot name="global-save" />
     {#if supportsViews}
       <Button secondary on:click={viewSelectionModal.show}>Fetch views</Button>
-    {/if}
-    {#if showImportButton}
-      <RestImportButton datasourceId={datasource._id} />
     {/if}
   </div>
   <svelte:fragment slot="tooltip">

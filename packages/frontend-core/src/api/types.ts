@@ -22,6 +22,7 @@ import type { SelfEndpoints } from "./self"
 import type { TableEndpoints } from "./tables"
 import type { TemplateEndpoints } from "./templates"
 import type { UserEndpoints } from "./user"
+import type { WorkspaceAPIEndpoints } from "./workspaceApis"
 import type { WorkspaceAppEndpoints } from "./workspaceApps"
 import type { WorkspaceFavouriteEndpoints } from "./workspaceFavourites"
 
@@ -106,7 +107,8 @@ export type APIClient = BaseAPIClient &
   SelfEndpoints &
   TableEndpoints &
   TemplateEndpoints &
-  UserEndpoints & {
+  UserEndpoints &
+  WorkspaceAPIEndpoints & {
     resource: ResourceEndpoints
     oauth2: OAuth2Endpoints
     navigation: NavigationEndpoints

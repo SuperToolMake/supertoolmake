@@ -24,6 +24,7 @@ export let schema
 export let editable = true
 export let height = 500
 export let noLabel = false
+export let autoHeight = false
 
 let stepEditors = []
 
@@ -75,6 +76,7 @@ $: shouldDisplayJsonBox =
     {#if schema.type === QueryTypes.SQL}
       <Editor
         editorHeight={height}
+        {autoHeight}
         label={noLabel ? null : "Query"}
         mode={sqlEditorMode}
         on:change={updateQuery}
@@ -85,6 +87,7 @@ $: shouldDisplayJsonBox =
     {:else if shouldDisplayJsonBox}
       <Editor
         editorHeight={height}
+        {autoHeight}
         label={noLabel ? null : "Query"}
         mode="json"
         on:change={updateQuery}

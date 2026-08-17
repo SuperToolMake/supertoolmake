@@ -1120,7 +1120,8 @@ describe("rest", () => {
         expectations: {
           status: 400,
           body: {
-            message: "Redirect to a different origin is not permitted.",
+            message:
+              "This API URL redirects to a different hostname, port, or protocol. Enter the final URL directly (www.example.com instead of example.com).",
           },
         },
       })
