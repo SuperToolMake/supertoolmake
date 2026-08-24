@@ -193,7 +193,7 @@ describe("Test that JSON string processing works correctly", () => {
     )
 
     expect(output).toEqual(
-      JSON.stringify({ [injectedKey]: "fixed" }) + " " + JSON.stringify({ $set: { touched: true } })
+      `${JSON.stringify({ [injectedKey]: "fixed" })} ${JSON.stringify({ $set: { touched: true } })}`
     )
   })
 

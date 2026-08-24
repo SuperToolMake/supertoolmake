@@ -838,14 +838,6 @@ function runQueryInternal<T extends object>({ docs, query }: RunQueryInternalPar
 
     return testValue[f]((item) => _valueMatches(docValue, item))
   }
-
-  if (typeof testValue === "string") {
-    testValue = testValue.split(",")
-    if (typeof docValue[0] === "number") {
-      testValue = testValue.map((item: string) => parseFloat(item))
-    }
-  }
-  )
   const notContains = match(ArrayOperator.NOT_CONTAINS, not(_contains("every")))
   const containsAny = match(ArrayOperator.CONTAINS_ANY, _contains("some"))
 
