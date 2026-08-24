@@ -1,4 +1,3 @@
-import { buildQuery, cleanupQuery, runQuery } from "../filters"
 import {
   ArrayOperator,
   BasicOperator,
@@ -8,6 +7,7 @@ import {
   UILogicalOperator,
   type UISearchFilter,
 } from "@supertoolmake/types"
+import { buildQuery, cleanupQuery, runQuery } from "../filters"
 
 describe("filter to query conversion", () => {
   it("handles a filter with 1 group", () => {
@@ -185,8 +185,8 @@ describe("runQuery notOneOf", () => {
     const notOneOfResult = runQuery(docs, {
       notOneOf: { name: ["foo", "bar"] },
     })
-    expect(oneOfResult.map(d => d.id)).toEqual([1, 2])
-    expect(notOneOfResult.map(d => d.id)).toEqual([3, 4])
+    expect(oneOfResult.map((d) => d.id)).toEqual([1, 2])
+    expect(notOneOfResult.map((d) => d.id)).toEqual([3, 4])
   })
 })
 
@@ -202,7 +202,7 @@ describe("empty array filters", () => {
     ArrayOperator.CONTAINS,
     ArrayOperator.NOT_CONTAINS,
     ArrayOperator.CONTAINS_ANY,
-  ])("removes an empty %s filter when the query is empty", operator => {
+  ])("removes an empty %s filter when the query is empty", (operator) => {
     const query = cleanupQuery({ [operator]: { name: [] } })
 
     expect(query).toEqual({ [operator]: {} })
@@ -214,7 +214,7 @@ describe("empty array filters", () => {
     ArrayOperator.CONTAINS,
     ArrayOperator.NOT_CONTAINS,
     ArrayOperator.CONTAINS_ANY,
-  ])("preserves an empty %s filter in a populated query", operator => {
+  ])("preserves an empty %s filter in a populated query", (operator) => {
     const query = cleanupQuery({
       [LogicalOperator.AND]: {
         conditions: [
@@ -240,7 +240,7 @@ describe("empty array filters", () => {
     ArrayOperator.CONTAINS,
     ArrayOperator.NOT_CONTAINS,
     ArrayOperator.CONTAINS_ANY,
-  ])("respects RETURN_ALL for an empty %s filter", operator => {
+  ])("respects RETURN_ALL for an empty %s filter", (operator) => {
     const result = runQuery(docs, {
       onEmptyFilter: EmptyFilterOption.RETURN_ALL,
       [operator]: { tags: [] },
@@ -255,7 +255,7 @@ describe("empty array filters", () => {
     ArrayOperator.CONTAINS,
     ArrayOperator.NOT_CONTAINS,
     ArrayOperator.CONTAINS_ANY,
-  ])("respects RETURN_NONE for an empty %s filter", operator => {
+  ])("respects RETURN_NONE for an empty %s filter", (operator) => {
     const result = runQuery(docs, {
       onEmptyFilter: EmptyFilterOption.RETURN_NONE,
       [operator]: { tags: [] },
@@ -329,19 +329,19 @@ describe("empty array filters", () => {
     expect(result).toEqual([docs[0]])
   })
 
-  it.each([ArrayOperator.NOT_CONTAINS, ArrayOperator.CONTAINS_ANY])(
-    "matches no rows for %s with an empty array",
-    operator => {
-      const result = runQuery(docs, {
-        [LogicalOperator.AND]: {
-          conditions: [
-            { [operator]: { tags: [] } },
-            { [BasicOperator.EQUAL]: { status: "Available" } },
-          ],
-        },
-      })
+  it.each([
+    ArrayOperator.NOT_CONTAINS,
+    ArrayOperator.CONTAINS_ANY,
+  ])("matches no rows for %s with an empty array", (operator) => {
+    const result = runQuery(docs, {
+      [LogicalOperator.AND]: {
+        conditions: [
+          { [operator]: { tags: [] } },
+          { [BasicOperator.EQUAL]: { status: "Available" } },
+        ],
+      },
+    })
 
-      expect(result).toEqual([])
-    }
-  )
+    expect(result).toEqual([])
+  })
 })

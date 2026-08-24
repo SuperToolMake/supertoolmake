@@ -452,19 +452,12 @@ export function processJsonStringSync(
     // reopens quote-breaking operator injection for multi-object templates.
     try {
       return documents
-        .map(document => {
+        .map((document) => {
           const preparedDocument = quoteRawJsonBindings(document)
-          const parsed = JSON.parse(
-            preparedDocument.template
-          ) as JsonTemplateValue
-          return processJsonTemplateValue(
-            parsed,
-            preparedDocument.bindings,
-            context,
-            opts
-          )
+          const parsed = JSON.parse(preparedDocument.template) as JsonTemplateValue
+          return processJsonTemplateValue(parsed, preparedDocument.bindings, context, opts)
         })
-        .map(value => JSON.stringify(value))
+        .map((value) => JSON.stringify(value))
         .join(" ")
     } catch {
       throw new Error("Multi-object JSON templates must be valid JSON objects")

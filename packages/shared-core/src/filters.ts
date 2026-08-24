@@ -169,7 +169,7 @@ const removeIgnoredEmptyFilters = (query: SearchFilters) => {
   removeEmptyFilterEntries({
     query,
     operators: NoEmptyFilterStrings,
-    isEmptyValue: value => value == null || value === "",
+    isEmptyValue: (value) => value == null || value === "",
   })
   removeEmptyFilterEntries({
     query,
@@ -194,7 +194,7 @@ const hasConfiguredFilterValues = (query: SearchFilters): boolean => {
     if (!filter || typeof filter !== "object") {
       continue
     }
-    if (Object.values(filter).some(value => !isEmptyArray(value))) {
+    if (Object.values(filter).some((value) => !isEmptyArray(value))) {
       return true
     }
   }
@@ -620,10 +620,7 @@ export function search<T extends Record<string, any>>(
  * @param docs the data
  * @param query the JSON query
  */
-export function runQuery<T extends object>(
-  docs: T[],
-  query: SearchFilters
-): T[] {
+export function runQuery<T extends object>(docs: T[], query: SearchFilters): T[] {
   if (!docs || !Array.isArray(docs)) {
     return []
   }
@@ -642,14 +639,8 @@ interface RunQueryInternalParams<T extends object> {
   query: SearchFilters
 }
 
-function runQueryInternal<T extends object>({
-  docs,
-  query,
-}: RunQueryInternalParams<T>): T[] {
-  if (
-    !hasFilters(query) &&
-    query.onEmptyFilter === EmptyFilterOption.RETURN_NONE
-  ) {
+function runQueryInternal<T extends object>({ docs, query }: RunQueryInternalParams<T>): T[] {
+  if (!hasFilters(query) && query.onEmptyFilter === EmptyFilterOption.RETURN_NONE) {
     return []
   }
 
@@ -829,24 +820,9 @@ function runQueryInternal<T extends object>({
   const oneOf = match(ArrayOperator.ONE_OF, _oneOf)
   const notOneOf = match(ArrayOperator.NOT_ONE_OF, not(_oneOf))
 
-  const _contains =
-    (f: "some" | "every") => (docValue: any, testValue: any) => {
-      if (!Array.isArray(docValue)) {
-        return false
-      }
-
-      if (typeof testValue === "string") {
-        testValue = testValue.split(",")
-        if (typeof docValue[0] === "number") {
-          testValue = testValue.map((item: string) => parseFloat(item))
-        }
-      }
-
-      if (!Array.isArray(testValue)) {
-        return false
-      }
-
-      return testValue[f](item => _valueMatches(docValue, item))
+  const _contains = (f: "some" | "every") => (docValue: any, testValue: any) => {
+    if (!Array.isArray(docValue)) {
+      return false
     }
 
     if (typeof testValue === "string") {
@@ -855,49 +831,57 @@ function runQueryInternal<T extends object>({
         testValue = testValue.map((item: string) => parseFloat(item))
       }
     }
+
+    if (!Array.isArray(testValue)) {
+      return false
+    }
+
+    return testValue[f]((item) => _valueMatches(docValue, item))
+  }
+
+  if (typeof testValue === "string") {
+    testValue = testValue.split(",")
+    if (typeof docValue[0] === "number") {
+      testValue = testValue.map((item: string) => parseFloat(item))
+    }
+  }
   )
   const notContains = match(ArrayOperator.NOT_CONTAINS, not(_contains("every")))
   const containsAny = match(ArrayOperator.CONTAINS_ANY, _contains("some"))
 
-  const and = match(
-    LogicalOperator.AND,
-    (docValue: T, conditions: SearchFilters[]) => {
-      if (!conditions.length) {
-        return false
-      }
-      for (const condition of conditions) {
-        const matchesCondition = runQueryInternal({
-          docs: [docValue],
-          query: condition,
-        })
-        if (!matchesCondition.length) {
-          return false
-        }
-      }
-      return true
-    }
-  )
-  const or = match(
-    LogicalOperator.OR,
-    (docValue: T, conditions: SearchFilters[]) => {
-      if (!conditions.length) {
-        return false
-      }
-      for (const condition of conditions) {
-        const matchesCondition = runQueryInternal({
-          docs: [docValue],
-          query: {
-            ...condition,
-            allOr: true,
-          },
-        })
-        if (matchesCondition.length) {
-          return true
-        }
-      }
+  const and = match(LogicalOperator.AND, (docValue: T, conditions: SearchFilters[]) => {
+    if (!conditions.length) {
       return false
     }
-  )
+    for (const condition of conditions) {
+      const matchesCondition = runQueryInternal({
+        docs: [docValue],
+        query: condition,
+      })
+      if (!matchesCondition.length) {
+        return false
+      }
+    }
+    return true
+  })
+  const or = match(LogicalOperator.OR, (docValue: T, conditions: SearchFilters[]) => {
+    if (!conditions.length) {
+      return false
+    }
+    for (const condition of conditions) {
+      const matchesCondition = runQueryInternal({
+        docs: [docValue],
+        query: {
+          ...condition,
+          allOr: true,
+        },
+      })
+      if (matchesCondition.length) {
+        return true
+      }
+    }
+    return false
+  })
 
   const docMatch = (doc: T) => {
     const filterFunctions: Record<SearchFilterOperator, (doc: T) => boolean> = {
