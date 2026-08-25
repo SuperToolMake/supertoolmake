@@ -4,7 +4,6 @@ import {
   Context,
   Divider,
   Icon,
-  Link,
   notifications,
   StatusLight,
   TooltipPosition,
@@ -367,17 +366,9 @@ onDestroy(() => {
                   size="XS"
                   textAlign="center"
                 >
-                  You have no favourites yet! Favourite an automation, app,
-                  table or API for quicker access.
+                  You have no favourites yet! Favourite an app, table or API
+                  for quicker access.
                 </Body>
-                <Link
-                  href="https://docs.budibase.com/docs/favouriting-in-a-workspace"
-                  target="_blank"
-                  secondary
-                  quiet
-                >
-                  Learn how
-                </Link>
               </div>
             {:else}
               <div class="favourite-links">
