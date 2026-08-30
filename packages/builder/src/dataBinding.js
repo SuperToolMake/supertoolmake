@@ -32,6 +32,8 @@ import {
 } from "@/stores/builder"
 import { TableNames } from "./constants"
 
+/** @typedef {import("@supertoolmake/types").TableSchema} TableSchema */
+
 const { ContextScopes } = Constants
 
 // Regex to match all instances of template strings
@@ -867,7 +869,7 @@ const getEmbedBindings = () => {
  *     fewer fields than a readable schema
  * @param resourceId the DS+ resource ID
  * @param options options for generating the schema
- * @return {{schema: Object, table: Object}}
+ * @return {{schema: TableSchema, table: Object}}
  */
 export const getSchemaForDatasourcePlus = (resourceId, options) => {
   const datasource = { type: "table", tableId: resourceId }
@@ -884,7 +886,7 @@ export const getSchemaForDatasourcePlus = (resourceId, options) => {
  *   optional and only needed for "provider" datasource types.
  * @param datasource the datasource definition
  * @param options options for generating the schema
- * @return {{schema: Object, table: Table}}
+ * @return {{schema: TableSchema, table: Table}}
  */
 export const getSchemaForDatasource = (asset, datasource, options) => {
   options = options || {}

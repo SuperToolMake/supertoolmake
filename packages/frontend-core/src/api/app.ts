@@ -5,8 +5,8 @@ import type {
   CreateWorkspaceResponse,
   DuplicateWorkspaceRequest,
   DuplicateWorkspaceResponse,
-  FetchAppDefinitionResponse,
   FetchAppPackageResponse,
+  FetchComponentDefinitionResponse,
   FetchDeploymentResponse,
   FetchPublishedAppsResponse,
   FetchWorkspacesResponse,
@@ -52,7 +52,7 @@ export interface AppEndpoints {
   ) => Promise<ImportToUpdateWorkspaceResponse>
   fetchSystemDebugInfo: () => Promise<GetDiagnosticsResponse>
   getApps: () => Promise<FetchWorkspacesResponse>
-  fetchComponentLibDefinitions: (workspaceId: string) => Promise<FetchAppDefinitionResponse>
+  fetchComponentLibDefinitions: (workspaceId: string) => Promise<FetchComponentDefinitionResponse>
   getPublishedApps: () => Promise<FetchPublishedAppsResponse["apps"]>
 }
 

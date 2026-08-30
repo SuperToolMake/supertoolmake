@@ -3,6 +3,7 @@ import type { Document } from "../document"
 import type { FieldType } from "./row"
 
 export interface Component extends Document {
+  _id: string
   _instanceName: string
   _styles: { [key: string]: any }
   _component: string
