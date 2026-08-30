@@ -2,12 +2,20 @@ import { JSONUtils } from "@supertoolmake/frontend-core"
 import { describe, expect, it, vi } from "vitest"
 import {
   getSchemaForDatasource,
+  makeReadableKeyPropSafe,
   readableToRuntimeBinding,
   runtimeToReadableBinding,
   updateReferencesInObject,
 } from "@/dataBinding"
 
-function createMockStore(initialValue) {
+interface MockStore<T> {
+  subscribe: (run: (value: T) => void) => () => void
+  set: (newValue: T) => void
+  update: (updater: (value: T) => T) => void
+  _value: () => T
+}
+
+function createMockStore<T>(initialValue: T): MockStore<T> {
   let value = initialValue
   return {
     subscribe: (run) => {
@@ -26,16 +34,16 @@ function createMockStore(initialValue) {
 
 function createBuilderStores() {
   const workspaceAppStore = {}
-  const tables = createMockStore({ list: [] })
-  const queries = createMockStore({ list: [] })
-  const roles = createMockStore({ list: [] })
-  const screenStore = createMockStore({ screens: [] })
-  const appStore = createMockStore({})
-  const layoutStore = createMockStore({})
-  const selectedScreen = createMockStore(null)
+  const tables = createMockStore<{ list: unknown[] }>({ list: [] })
+  const queries = createMockStore<{ list: unknown[] }>({ list: [] })
+  const roles = createMockStore<{ list: unknown[] }>({ list: [] })
+  const screenStore = createMockStore<{ screens: unknown[] }>({ screens: [] })
+  const appStore = createMockStore<Record<string, unknown>>({})
+  const layoutStore = createMockStore<Record<string, unknown>>({})
+  const selectedScreen = createMockStore<unknown>(null)
   const componentStore = {
-    getDefinition: () => null,
-    getComponentSettings: () => [],
+    getDefinition: (_component?: string) => null,
+    getComponentSettings: (_component?: string) => [],
   }
 
   return {
@@ -59,12 +67,26 @@ vi.mock("@/stores/builder", () => createBuilderStores().module)
 
 import { queries as queriesStore, tables as tablesStore } from "@/stores/builder"
 
-const getTablesStore = () => tablesStore
-const getQueriesStore = () => queriesStore
+const getTablesStore = () => tablesStore as unknown as MockStore<{ list: unknown[] }>
+const getQueriesStore = () => queriesStore as unknown as MockStore<{ list: unknown[] }>
 
 describe("Builder dataBinding", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  describe("makeReadableKeyPropSafe", () => {
+    it("wraps readable binding segments containing spaces", () => {
+      expect(makeReadableKeyPropSafe("Query rows")).toBe("[Query rows]")
+    })
+
+    it("preserves readable binding segments without spaces", () => {
+      expect(makeReadableKeyPropSafe("rows")).toBe("rows")
+    })
+
+    it("preserves already wrapped readable binding segments", () => {
+      expect(makeReadableKeyPropSafe("[Query rows]")).toBe("[Query rows]")
+    })
   })
 
   describe("runtimeToReadableBinding", () => {
@@ -87,16 +109,16 @@ describe("Builder dataBinding", () => {
     ]
     it("should convert a runtime binding to a readable one", () => {
       const textWithBindings = `Hello {{ [user].[firstName] }}! The count is {{ count }}.`
-      expect(
-        runtimeToReadableBinding(bindableProperties, textWithBindings, "readableBinding")
-      ).toEqual(`Hello {{ Current User.firstName }}! The count is {{ Binding.count }}.`)
+      expect(runtimeToReadableBinding(bindableProperties, textWithBindings)).toEqual(
+        `Hello {{ Current User.firstName }}! The count is {{ Binding.count }}.`
+      )
     })
 
     it("should not convert to readable binding if it is already readable", () => {
       const textWithBindings = `Hello {{ [user].[firstName] }}! The count is {{ Binding.count }}.`
-      expect(
-        runtimeToReadableBinding(bindableProperties, textWithBindings, "readableBinding")
-      ).toEqual(`Hello {{ Current User.firstName }}! The count is {{ Binding.count }}.`)
+      expect(runtimeToReadableBinding(bindableProperties, textWithBindings)).toEqual(
+        `Hello {{ Current User.firstName }}! The count is {{ Binding.count }}.`
+      )
     })
   })
 
@@ -141,21 +163,21 @@ describe("Builder dataBinding", () => {
     ]
     it("should convert a readable binding to a runtime one", () => {
       const textWithBindings = `Hello {{ Current User.firstName }}! The count is {{ Binding.count }}.`
-      expect(
-        readableToRuntimeBinding(bindableProperties, textWithBindings, "runtimeBinding")
-      ).toEqual(`Hello {{ [user].[firstName] }}! The count is {{ count }}.`)
+      expect(readableToRuntimeBinding(bindableProperties, textWithBindings)).toEqual(
+        `Hello {{ [user].[firstName] }}! The count is {{ count }}.`
+      )
     })
     it("should not convert a partial match", () => {
       const textWithBindings = `location {{ _location Zlocation location locationZ _location_ }}`
-      expect(
-        readableToRuntimeBinding(bindableProperties, textWithBindings, "runtimeBinding")
-      ).toEqual(`location {{ _location Zlocation [location] locationZ _location_ }}`)
+      expect(readableToRuntimeBinding(bindableProperties, textWithBindings)).toEqual(
+        `location {{ _location Zlocation [location] locationZ _location_ }}`
+      )
     })
     it("should handle special characters in the readable binding", () => {
       const textWithBindings = `{{ foo.baz }}`
-      expect(
-        readableToRuntimeBinding(bindableProperties, textWithBindings, "runtimeBinding")
-      ).toEqual(`{{ [foo].[baz] }}`)
+      expect(readableToRuntimeBinding(bindableProperties, textWithBindings)).toEqual(
+        `{{ [foo].[baz] }}`
+      )
     })
   })
 
@@ -237,7 +259,7 @@ describe("Builder dataBinding", () => {
       })
 
       const jsonArraySpy = vi.spyOn(JSONUtils, "getJSONArrayDatasourceSchema").mockReturnValue({
-        value: { type: "string" },
+        value: { type: "string", name: "value", prefixKeys: "" },
       })
 
       const datasource = {
@@ -251,7 +273,7 @@ describe("Builder dataBinding", () => {
 
       expect(jsonArraySpy).toHaveBeenCalledWith(tableSchema, datasource)
       expect(schema.value).toMatchObject({ type: "string", name: "value" })
-      expect(typeof schema.value.display.type).toBe("string")
+      expect(typeof schema.value.display?.type).toBe("string")
 
       jsonArraySpy.mockRestore()
     })

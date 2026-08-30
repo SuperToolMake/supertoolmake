@@ -10,8 +10,6 @@ import {
   type FetchComponentDefinitionResponse,
   FieldType,
   type Screen,
-  type Table,
-  type TableSchema,
 } from "@supertoolmake/types"
 import { cloneDeep } from "lodash/fp"
 import { get } from "svelte/store"
@@ -313,14 +311,10 @@ export class ComponentStore extends BudiStore<ComponentState> {
       if (cardKeys.every((key) => !component[key]) && !component.cardImageURL) {
         const { _id, dataSource } = component
         if (dataSource) {
-          const { schema, table }: { schema: TableSchema; table: Table } = getSchemaForDatasource(
-            screen,
-            dataSource,
-            {}
-          )
+          const { schema, table } = getSchemaForDatasource(screen, dataSource, {})
 
           // Finds fields by types from the schema of the configured datasource
-          const findFieldTypes = (fieldTypes: FieldType | FieldType[]) => {
+          const findFieldTypes = (fieldTypes: string | string[]) => {
             if (!Array.isArray(fieldTypes)) {
               fieldTypes = [fieldTypes]
             }
@@ -531,7 +525,7 @@ export class ComponentStore extends BudiStore<ComponentState> {
   }
 
   async patch(
-    patchFn: (component: Component, screen: Screen) => boolean | null | undefined,
+    patchFn: (component: Component, screen: Screen) => boolean | null,
     componentId?: string,
     screenId?: string
   ) {
@@ -787,10 +781,7 @@ export class ComponentStore extends BudiStore<ComponentState> {
         componentTreeNodesStore.isNodeExpanded(previousSibling._id)
       ) {
         let target = previousSibling
-        while (
-          target._children?.length &&
-          componentTreeNodesStore.isNodeExpanded(target._id)
-        ) {
+        while (target._children?.length && componentTreeNodesStore.isNodeExpanded(target._id)) {
           target = target._children[target._children.length - 1]
         }
         return target._id
@@ -966,10 +957,7 @@ export class ComponentStore extends BudiStore<ComponentState> {
         // If the next sibling has children, and is not collapsed, become the first child
         const nextSibling = parent._children[index]
         const definition = this.getDefinition(nextSibling._component)
-        if (
-          definition?.hasChildren &&
-          componentTreeNodesStore.isNodeExpanded(nextSibling._id)
-        ) {
+        if (definition?.hasChildren && componentTreeNodesStore.isNodeExpanded(nextSibling._id)) {
           if (!nextSibling._children) {
             nextSibling._children = []
           }
@@ -1003,6 +991,7 @@ export class ComponentStore extends BudiStore<ComponentState> {
       } else {
         component._styles.normal[name] = value
       }
+      return true
     })
   }
 
@@ -1013,18 +1002,21 @@ export class ComponentStore extends BudiStore<ComponentState> {
         ...component._styles.normal,
         ...styles,
       }
+      return true
     }, id)
   }
 
   async updateCustomStyle(style: Record<string, string>) {
     await this.patch((component: Component) => {
       component._styles.custom = style
+      return true
     })
   }
 
   async updateConditions(conditions: ComponentCondition[]) {
     await this.patch((component: Component) => {
       component._conditions = conditions
+      return true
     })
   }
 
@@ -1097,7 +1089,7 @@ export class ComponentStore extends BudiStore<ComponentState> {
       })
 
       if (updatedSetting?.type === "dataSource" || updatedSetting?.type === "table") {
-        const { schema }: { schema: TableSchema } = getSchemaForDatasource(null, value, null)
+        const { schema } = getSchemaForDatasource(null, value, null)
         const columnNames = Object.keys(schema || {})
         const multifieldKeysToSelectAll = settings
           .filter((setting: ComponentSetting) => {

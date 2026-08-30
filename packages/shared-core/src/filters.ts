@@ -840,6 +840,7 @@ function runQueryInternal<T extends object>({ docs, query }: RunQueryInternalPar
   }
   const notContains = match(ArrayOperator.NOT_CONTAINS, not(_contains("every")))
   const containsAny = match(ArrayOperator.CONTAINS_ANY, _contains("some"))
+  const contains = match(ArrayOperator.CONTAINS, _contains("every"))
 
   const and = match(LogicalOperator.AND, (docValue: T, conditions: SearchFilters[]) => {
     if (!conditions.length) {

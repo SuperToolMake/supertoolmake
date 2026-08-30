@@ -62,6 +62,7 @@ describe("/workspaceApp", () => {
           routing: { route: "first", roleId: "assistant_to_the_manager" },
           workspaceAppId: firstApp._id,
           props: {
+            _id: "screen_prop_id_first",
             _instanceName: "Æthelstan",
             _styles: {},
             _component: "mc_guffin_9001",
@@ -85,6 +86,7 @@ describe("/workspaceApp", () => {
           routing: { route: "66", roleId: "assistant_to_the_manager" },
           workspaceAppId: originalApp._id,
           props: {
+            _id: "screen_prop_id_second",
             _instanceName: "Æthelstan",
             _styles: {},
             _component: "mc_guffin_9001",
