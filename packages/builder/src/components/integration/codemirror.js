@@ -11,6 +11,7 @@ import "codemirror/mode/handlebars/handlebars"
 // Hints
 import "codemirror/addon/hint/show-hint"
 import "codemirror/addon/hint/show-hint.css"
+import "codemirror/addon/mode/overlay"
 
 // Theming
 import "codemirror/theme/tomorrow-night-eighties.css"

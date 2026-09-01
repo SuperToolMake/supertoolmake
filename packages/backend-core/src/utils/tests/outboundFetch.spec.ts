@@ -471,7 +471,9 @@ describe("outboundFetch", () => {
       fetchWithBlacklist("https://budibase.com/resource", undefined, {
         rejectCrossOriginRedirects: true,
       })
-    ).rejects.toThrow("Redirect to a different origin is not permitted.")
+    ).rejects.toThrow(
+      "This API URL redirects to a different hostname, port, or protocol. Enter the final URL directly (www.example.com instead of example.com)."
+    )
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 

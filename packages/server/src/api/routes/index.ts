@@ -29,6 +29,7 @@ import "./templates"
 import "./user"
 import "./workspace"
 import "./workspaceApp"
+import "./workspaceApis"
 import "./workspaceFavourites"
 
 export { default as assetRoutes } from "./assets"

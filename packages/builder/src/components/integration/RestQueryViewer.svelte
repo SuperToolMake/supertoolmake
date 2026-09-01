@@ -42,6 +42,8 @@ import { capitalise } from "@/helpers"
 import restUtils, { customQueryIconColor } from "@/helpers/data/utils"
 import { getErrorMessage } from "@/helpers/errors"
 import { datasources, integrations, queries } from "@/stores/builder"
+import { workspaceApis } from "@/stores/builder"
+import { WORKSPACE_API_CONFIG_ID } from "@supertoolmake/types"
 import ConnectedQueryScreens from "./ConnectedQueryScreens.svelte"
 import DynamicVariableModal from "./DynamicVariableModal.svelte"
 import {
@@ -80,7 +82,7 @@ let lastSyncedQueryName
 function getSelectedQuery() {
   return cloneDeep(
     $queries.list.find((q) => q._id === queryId) || {
-      datasourceId: $params.datasourceId,
+      datasourceId: $params.datasourceId || WORKSPACE_API_CONFIG_ID,
       parameters: [],
       fields: {
         // only init the objects, everything else is optional strings
@@ -90,6 +92,34 @@ function getSelectedQuery() {
       queryVerb: "read",
     }
   )
+}
+
+const mergeSharedConfig = (legacyDatasource, sharedDatasource) => {
+  if (!legacyDatasource) {
+    return sharedDatasource
+  }
+  const { url: _sharedUrl, ...sharedConfig } = sharedDatasource.config || {}
+  const datasourceConfig = legacyDatasource.config || {}
+  const datasourceAuthIds = new Set((datasourceConfig.authConfigs || []).map((auth) => auth._id))
+  return {
+    ...legacyDatasource,
+    config: {
+      ...sharedConfig,
+      ...datasourceConfig,
+      defaultHeaders: {
+        ...(sharedConfig.defaultHeaders || {}),
+        ...(datasourceConfig.defaultHeaders || {}),
+      },
+      staticVariables: {
+        ...(sharedConfig.staticVariables || {}),
+        ...(datasourceConfig.staticVariables || {}),
+      },
+      authConfigs: [
+        ...(sharedConfig.authConfigs || []).filter((auth) => !datasourceAuthIds.has(auth._id)),
+        ...(datasourceConfig.authConfigs || []),
+      ],
+    },
+  }
 }
 
 const cleanUrl = (inputUrl) =>
@@ -156,11 +186,18 @@ async function saveQuery(redirectIfNew = true) {
     const { _id } = await queries.save(toSave.datasourceId, toSave)
     saveId = _id
     if (dynamicVariables) {
-      datasource.config.dynamicVariables = rebuildVariables(saveId)
-      datasource = await datasources.save({
-        integration: integrationInfo,
-        datasource,
-      })
+      if (toSave.datasourceId === WORKSPACE_API_CONFIG_ID) {
+        await workspaceApis.save({
+          ...$workspaceApis.datasource.config,
+          dynamicVariables: rebuildVariables(saveId, $workspaceApis.datasource),
+        })
+      } else {
+        datasource.config.dynamicVariables = rebuildVariables(saveId)
+        datasource = await datasources.save({
+          integration: integrationInfo,
+          datasource,
+        })
+      }
     }
 
     notifications.success(`Request saved successfully`)
@@ -265,7 +302,7 @@ const getDynamicVariables = (datasource, queryId, matchFn) => {
 }
 
 // convert dynamic variables object back to a list, enrich with query id
-const rebuildVariables = (queryId) => {
+const rebuildVariables = (queryId, sourceDatasource = datasource) => {
   let variables = []
   if (dynamicVariables) {
     variables = Object.entries(dynamicVariables).map((entry) => {
@@ -277,7 +314,7 @@ const rebuildVariables = (queryId) => {
     })
   }
 
-  let existing = datasource?.config?.dynamicVariables || []
+  let existing = sourceDatasource?.config?.dynamicVariables || []
   // remove existing query variables (for changes and deletions)
   existing = existing.filter((variable) => variable.queryId !== queryId)
   // re-add the new query variables
@@ -316,7 +353,13 @@ const urlChanged = (evt) => {
   }
 }
 
-$: staticVariables = datasource?.config?.staticVariables || {}
+$: staticVariables =
+  mergeSharedConfig(
+    query?.datasourceId === WORKSPACE_API_CONFIG_ID
+      ? undefined
+      : $datasources.list.find((ds) => ds._id === query?.datasourceId),
+    $workspaceApis.datasource
+  )?.config?.staticVariables || {}
 $: if (query?._id && query._id !== lastSyncedQueryId) {
   lastSyncedQueryId = query._id
   lastSyncedQueryName = query.name
@@ -376,7 +419,14 @@ $: url = buildUrl(query?.fields?.path, breakQs)
 $: checkQueryName(url)
 $: responseSuccess = response?.info?.code >= 200 && response?.info?.code < 400
 $: isGet = query?.queryVerb === "read"
-$: authConfigs = buildAuthConfigs(datasource)
+$: authConfigs = buildAuthConfigs(
+  mergeSharedConfig(
+    query?.datasourceId === WORKSPACE_API_CONFIG_ID
+      ? undefined
+      : $datasources.list.find((ds) => ds._id === query?.datasourceId),
+    $workspaceApis.datasource
+  )
+)
 $: schemaReadOnly = !responseSuccess
 $: variablesReadOnly = !responseSuccess
 $: showVariablesTab = shouldShowVariables(dynamicVariables, variablesReadOnly)
@@ -433,12 +483,17 @@ onMount(async () => {
 
   try {
     // Clear any unsaved changes to the datasource
-    await datasources.init()
+    await Promise.all([datasources.init(), workspaceApis.fetch()])
   } catch {
     notifications.error("Error getting datasources")
   }
 
-  datasource = $datasources.list.find((ds) => ds._id === query?.datasourceId)
+  datasource = mergeSharedConfig(
+    query?.datasourceId === WORKSPACE_API_CONFIG_ID
+      ? undefined
+      : $datasources.list.find((ds) => ds._id === query?.datasourceId),
+    $workspaceApis.datasource
+  )
   const datasourceUrl = datasource?.config.url
   const qs = query?.fields.queryString
   breakQs = restUtils.breakQueryString(encodeURI(qs ?? ""))
@@ -675,7 +730,6 @@ onMount(async () => {
               bind:authConfigId={query.fields.authConfigId}
               bind:authConfigType={query.fields.authConfigType}
               {authConfigs}
-              datasourceId={datasource._id}
             />
           </div>
         </Tabs>

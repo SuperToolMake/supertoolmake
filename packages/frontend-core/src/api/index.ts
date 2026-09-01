@@ -36,6 +36,7 @@ import {
   HTTPMethod,
 } from "./types"
 import { buildUserEndpoints } from "./user"
+import { buildWorkspaceAPIEndpoints } from "./workspaceApis"
 import { buildWorkspaceAppEndpoints } from "./workspaceApps"
 import { buildWorkspaceFavouriteEndpoints } from "./workspaceFavourites"
 
@@ -259,6 +260,7 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
   return {
     ...API,
     ...buildAppEndpoints(API),
+    ...buildWorkspaceAPIEndpoints(API),
     ...buildAttachmentEndpoints(API),
     ...buildAuthEndpoints(API),
     ...buildConfigEndpoints(API),

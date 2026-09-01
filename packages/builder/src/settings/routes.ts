@@ -158,6 +158,15 @@ export const appRoutes = (appStore: AppMetaState, _appsStore: PortalAppsStore): 
       path: "app",
       routes: [{ path: "embed", comp: Pages.get("embed"), title: "Embed" }],
     },
+    {
+      section: "APIs",
+      icon: "globe-simple",
+      path: "apis",
+      routes: [
+        { path: "config", comp: Pages.get("apis"), title: "Config" },
+        { path: "oauth2", comp: Pages.get("oauth2"), title: "OAuth2" },
+      ],
+    },
   ].map((entry: Route) => ({
     ...entry,
     group: "Workspace",

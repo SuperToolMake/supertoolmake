@@ -11,15 +11,20 @@ import {
   Tabs,
   TextArea,
 } from "@supertoolmake/bbui"
-import type { Datasource, ImportRestQueryRequest, UIFile } from "@supertoolmake/types"
+import {
+  WORKSPACE_API_CONFIG_ID,
+  type Datasource,
+  type ImportRestQueryRequest,
+  type UIFile,
+} from "@supertoolmake/types"
 import { goto } from "@roxi/routify"
 import { writable } from "svelte/store"
-import { datasources, queries } from "@/stores/builder"
+import { datasources, queries, workspaceApis } from "@/stores/builder"
 
 $goto
 
 export let navigateDatasource = false
-export let datasourceId: string | undefined = undefined
+export let datasourceId: string | undefined = WORKSPACE_API_CONFIG_ID
 export let createDatasource = false
 export let onCancel: (() => void) | undefined = undefined
 
@@ -122,7 +127,10 @@ async function importQueries() {
   }
 }
 
-$: datasource = $datasources.selected as Datasource
+$: datasource =
+  datasourceId === WORKSPACE_API_CONFIG_ID
+    ? $workspaceApis.datasource
+    : ($datasources.selected as Datasource)
 let dataStringCache: string | undefined
 </script>
 

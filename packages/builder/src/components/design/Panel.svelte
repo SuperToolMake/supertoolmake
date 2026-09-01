@@ -10,6 +10,8 @@ export let showCloseButton: boolean | undefined = false
 export let onClickAddButton: () => void = () => {}
 export let onClickBackButton: () => void = () => {}
 export let onClickCloseButton: () => void = () => {}
+export let onClickHeader: () => void = () => {}
+export let headerClickable: boolean | undefined = false
 export let borderLeft: boolean | undefined = false
 export let borderRight: boolean | undefined = false
 export let borderBottomHeader: boolean | undefined = true
@@ -30,6 +32,11 @@ $: panelStyle =
     : resizable
       ? `flex: 1 1 auto; min-width: 260px;`
       : undefined
+
+const handleCloseButtonClick = (event: MouseEvent) => {
+  event.stopPropagation()
+  onClickCloseButton()
+}
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -43,11 +50,14 @@ $: panelStyle =
   style={panelStyle}
 >
   {#if title || customTitleContent}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div
       class="header"
       class:custom={customHeaderContent}
       class:borderBottom={borderBottomHeader}
       class:noHeaderBorder
+      class:clickable={headerClickable}
+      on:click={headerClickable ? onClickHeader : undefined}
     >
       {#if showBackButton}
         <Icon name="arrow-left" hoverable on:click={onClickBackButton} />
@@ -81,7 +91,11 @@ $: panelStyle =
         </div>
       {/if}
       {#if showCloseButton}
-        <Icon name={closeButtonIcon} hoverable on:click={onClickCloseButton} />
+        <Icon
+          name={closeButtonIcon}
+          hoverable
+          on:click={handleCloseButtonClick}
+        />
       {/if}
     </div>
   {/if}
@@ -187,6 +201,10 @@ $: panelStyle =
   }
   .header.custom {
     border: none;
+  }
+
+  .header.clickable {
+    cursor: pointer;
   }
   .custom-content-wrap {
     border-bottom: var(--border-light);
