@@ -78,7 +78,7 @@
     "@supertoolmake/string-templates": "*",
     "dayjs": "1.10.8",
     "easymde": "2.16.1",
-    "sanitize-html": "2.17.6",
+    "sanitize-html": "2.17.7",
     "svelte-dnd-action": "0.9.8",
     "svelte-portal": "2.2.1"
   },
