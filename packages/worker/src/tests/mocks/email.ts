@@ -1,8 +1,8 @@
-import { simpleParser } from "mailparser"
 import type { AddressObject, ParsedMail } from "mailparser"
-import { SMTPServer } from "smtp-server"
+import { simpleParser } from "mailparser"
 import type { SMTPServerOptions, SMTPServerSession } from "smtp-server"
-import TestConfiguration from "../TestConfiguration"
+import { SMTPServer } from "smtp-server"
+import type TestConfiguration from "../TestConfiguration"
 
 export function mock() {
   const sendMailMock = jest.fn()
@@ -71,19 +71,11 @@ export function getUnusedPort(): Promise<number> {
   })
 }
 
-function getAddresses(
-  addresses: AddressObject | AddressObject[] | undefined
-): Address[] {
-  const addressObjects = Array.isArray(addresses)
-    ? addresses
-    : addresses
-      ? [addresses]
-      : []
+function getAddresses(addresses: AddressObject | AddressObject[] | undefined): Address[] {
+  const addressObjects = Array.isArray(addresses) ? addresses : addresses ? [addresses] : []
 
-  return addressObjects.flatMap(addressObject =>
-    addressObject.value.flatMap(({ address, name }) =>
-      address ? [{ address, name }] : []
-    )
+  return addressObjects.flatMap((addressObject) =>
+    addressObject.value.flatMap(({ address, name }) => (address ? [{ address, name }] : []))
   )
 }
 
@@ -94,13 +86,11 @@ function parseEmail(message: ParsedMail, session: SMTPServerSession): Email {
 
   const to = getAddresses(message.to)
   const cc = getAddresses(message.cc)
-  const visibleRecipients = new Set(
-    [...to, ...cc].map(recipient => recipient.address)
-  )
+  const visibleRecipients = new Set([...to, ...cc].map((recipient) => recipient.address))
   const calculatedBcc = session.envelope.rcptTo
-    .map(recipient => recipient.address)
-    .filter(address => !visibleRecipients.has(address))
-    .map(address => ({ address, name: "" }))
+    .map((recipient) => recipient.address)
+    .filter((address) => !visibleRecipients.has(address))
+    .map((address) => ({ address, name: "" }))
 
   return {
     attachments: message.attachments,
@@ -112,15 +102,12 @@ function parseEmail(message: ParsedMail, session: SMTPServerSession): Email {
   }
 }
 
-export async function captureEmail(
-  mailserver: Mailserver,
-  f: () => Promise<void>
-): Promise<Email> {
+export async function captureEmail(mailserver: Mailserver, f: () => Promise<void>): Promise<Email> {
   const timeoutMs = 5000
   let timeout: ReturnType<typeof setTimeout> | undefined
   let removeListener: () => void = () => {}
-  const emailPromise = new Promise<Email>(resolve => {
-    removeListener = mailserver.onNewEmail(email => {
+  const emailPromise = new Promise<Email>((resolve) => {
+    removeListener = mailserver.onNewEmail((email) => {
       removeListener()
       resolve(email)
     })
@@ -156,10 +143,10 @@ export async function startMailserver(
     disabledCommands: ["AUTH", "STARTTLS"],
     onData(stream, session, callback) {
       const chunks: Buffer[] = []
-      stream.on("data", chunk => {
+      stream.on("data", (chunk) => {
         chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
       })
-      stream.on("error", error => callback(error))
+      stream.on("error", (error) => callback(error))
       stream.on("end", async () => {
         try {
           const message = await simpleParser(Buffer.concat(chunks))
@@ -200,7 +187,7 @@ export function deleteAllEmail(mailserver: Mailserver) {
 }
 
 export function stopMailserver(mailserver: Mailserver) {
-  return new Promise<void>(resolve => {
+  return new Promise<void>((resolve) => {
     mailserver.server.close(() => resolve())
   })
 }
