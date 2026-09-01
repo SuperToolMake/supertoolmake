@@ -4088,11 +4088,11 @@
     "@sinonjs/commons" "^3.0.1"
 
 "@smithy/abort-controller@^4.2.12":
-  version "4.3.3"
-  resolved "https://registry.yarnpkg.com/@smithy/abort-controller/-/abort-controller-4.3.3.tgz#8a35a86988a453178ca42e42e2521b7279be624f"
-  integrity sha512-rQzc/M6ejh96yTAWk4tupBaQ3v+r4fS9W5sH6mXJlg9T195bIdPZC/mf6nn8J4MxFw6G2BezSMjmCiI84Vm+uw==
+  version "4.4.2"
+  resolved "https://registry.yarnpkg.com/@smithy/abort-controller/-/abort-controller-4.4.2.tgz#a88514c601ed3662e63daf3e94fcb3d16e75ac29"
+  integrity sha512-IINJV4TQAvI1+upIy3YaDtlFcLsWQ5Uw6Nos7CNwiJtpRFw98L1XOn38467Pw54pcYuDi8HGnc2CNbkZBEZq6Q==
   dependencies:
-    "@smithy/types" "^4.16.1"
+    "@smithy/types" "^4.17.2"
     tslib "^2.6.2"
 
 "@smithy/chunked-blob-reader-native@^4.2.3":
@@ -4138,12 +4138,12 @@
     "@smithy/uuid" "^1.1.2"
     tslib "^2.6.2"
 
-"@smithy/core@^3.31.1":
-  version "3.31.1"
-  resolved "https://registry.yarnpkg.com/@smithy/core/-/core-3.31.1.tgz#a57090db8997917d2f99eeb39db50b6283e60d3c"
-  integrity sha512-CyogUINxvi7C7LDsh8Syo6hVJOT9ckz4rG8dRZfTJ8r91HkMY59PnNooaj7WcHyxEkxPfBAmbgztZU+xTo76lg==
+"@smithy/core@^3.33.2":
+  version "3.33.3"
+  resolved "https://registry.yarnpkg.com/@smithy/core/-/core-3.33.3.tgz#c1e801fe17160bcbf6c714cf16e832057e6bf79e"
+  integrity sha512-CsOeKq/9kA3y6VJHt+/+VTCtBaxJ4OTFpgrjIUhPpDIKxBci1k2bJaQASF2h/ELWrulGp+t97DZ0mevfAD8idg==
   dependencies:
-    "@smithy/types" "^4.16.1"
+    "@smithy/types" "^4.17.2"
     tslib "^2.6.2"
 
 "@smithy/credential-provider-imds@^4.2.14":
@@ -4360,11 +4360,11 @@
     tslib "^2.6.2"
 
 "@smithy/protocol-http@^5.3.12":
-  version "5.5.16"
-  resolved "https://registry.yarnpkg.com/@smithy/protocol-http/-/protocol-http-5.5.16.tgz#d47bedeed692e6c099861c7a34856666dd1957d7"
-  integrity sha512-iPaxIe9mTyidyhM6WF2/gSLPezyCwSlZcqlDBj2KCoSS994iw4yf1se1xmZkWsY98ZpwjDR/ZMubOSVx+Nrokw==
+  version "5.6.2"
+  resolved "https://registry.yarnpkg.com/@smithy/protocol-http/-/protocol-http-5.6.2.tgz#9056bc902872f4eff03d9874340af04c48ebd308"
+  integrity sha512-Asd04MaxODN6FNY8EPTeCAM4kPNi3jDUAjZU0Y4F9rHvpLUrrUo7KLcxFgSthywFr6dZfIyDLIJda6jxmVTk5w==
   dependencies:
-    "@smithy/core" "^3.31.1"
+    "@smithy/core" "^3.33.2"
     tslib "^2.6.2"
 
 "@smithy/protocol-http@^5.3.14":
@@ -4376,11 +4376,11 @@
     tslib "^2.6.2"
 
 "@smithy/querystring-builder@^4.2.12":
-  version "4.4.16"
-  resolved "https://registry.yarnpkg.com/@smithy/querystring-builder/-/querystring-builder-4.4.16.tgz#088e76e710c9ecfa681c41624e27f8785e3a91c6"
-  integrity sha512-g/dWVOqxhCExood2x6aYS7ZQpAQpvsWck4LZgpqf42hnkI1cgNltHi/hFTqhw+6LDmbn8r37sNGLsMziXFN8SQ==
+  version "4.5.2"
+  resolved "https://registry.yarnpkg.com/@smithy/querystring-builder/-/querystring-builder-4.5.2.tgz#e5cf5a166c320eda8fcca910513f754e4924d2f7"
+  integrity sha512-TLuVW4cGFCj+LirJylCVcFwxcUCpZ5Av0I7K9k/xhm6v6zAUeXSNuZ9e2QKuxcwkgrejL8LZvQTJy42pmq5bOg==
   dependencies:
-    "@smithy/core" "^3.31.1"
+    "@smithy/core" "^3.33.2"
     tslib "^2.6.2"
 
 "@smithy/querystring-builder@^4.2.14":
@@ -4463,10 +4463,10 @@
   dependencies:
     tslib "^2.6.2"
 
-"@smithy/types@^4.16.1":
-  version "4.16.1"
-  resolved "https://registry.yarnpkg.com/@smithy/types/-/types-4.16.1.tgz#19e199c234829a51c085caf63f0bb17bb80187e4"
-  integrity sha512-0JFs3V2y2M9tKW5na/qxe69Zv+uxLMO7QBbhxF/FHu/Gp2NFZAAL9tWl9PU02xxo07pb3G9FTyjNc6D5uZrJIg==
+"@smithy/types@^4.17.2":
+  version "4.17.2"
+  resolved "https://registry.yarnpkg.com/@smithy/types/-/types-4.17.2.tgz#ad71f6f62460a6409f0e8efc173e2e0f883ea4e6"
+  integrity sha512-FOKpVZob9MPTn2znRzGrnsMHv7BOsKVw3XiP/cOyYLDVZ9qKp4nifIiSCuUU/fIj5Vu0UOAxCFr+qRAtG0NUkA==
   dependencies:
     tslib "^2.6.2"
 
@@ -6277,6 +6277,11 @@ aws-sdk@2.1692.0:
     util "^0.12.4"
     uuid "8.0.0"
     xml2js "0.6.2"
+
+aws-ssl-profiles@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/aws-ssl-profiles/-/aws-ssl-profiles-1.1.2.tgz#157dd77e9f19b1d123678e93f120e6f193022641"
+  integrity sha512-NZKeq9AfyQvEeNlN0zSYAaWrmBffJh3IELMZfRpJVWgrpEbtEpnjvzqBPf+mxoI287JohRDoa+/nsfqqiZmF6g==
 
 axios@1.18.0, axios@1.18.1:
   version "1.18.0"
@@ -11267,7 +11272,7 @@ log-symbols@4.1.0, log-symbols@^4.1.0:
     chalk "^4.1.0"
     is-unicode-supported "^0.1.0"
 
-long@^5.0.0, long@^5.2.1, long@^5.3.2:
+long@^5.0.0, long@^5.3.2:
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/long/-/long-5.3.2.tgz#1d84463095999262d7d7b7f8bfd4a8cc55167f83"
   integrity sha512-mNAgZ1GmyNhD7AuqnTG3/VQ26o760+ZYBPKjPvugO8+nLbYfX6TVpJPseBvopbdY+qpZ/lKUnmEc1LeZYS3QAA==
@@ -11296,15 +11301,10 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
-lru-cache@^8.0.0:
-  version "8.0.5"
-  resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-8.0.5.tgz#983fe337f3e176667f8e567cfcce7cb064ea214e"
-  integrity sha512-MhWWlVnuab1RG5/zMRRcVGXZLCXrZTgfwMikgzCegsPnG62yDQo5JnqKkrK4jO5iKqDAZGItAqN5CtKBCBWRUA==
-
-lru.min@^1.1.0:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/lru.min/-/lru.min-1.1.4.tgz#6ea1737a8c1ba2300cc87ad46910a4bdffa0117b"
-  integrity sha512-DqC6n3QQ77zdFpCMASA1a3Jlb64Hv2N2DciFGkO/4L9+q/IpIAuRlKOvCXabtRW6cQf8usbmM6BE/TOPysCdIA==
+lru.min@^1.1.0, lru.min@^1.1.4:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/lru.min/-/lru.min-1.1.5.tgz#bd32483f4e342261d0eb011b06d2219e6b5ef818"
+  integrity sha512-5J9ysMYUpYIg9RF2vJpy9SinEmSviFSe0GyPpCQ4L5QSkLAgeLXlTAOu2ZwWUU5m+0SBl6gUU1R1ZQB3aKypfA==
 
 luxon@^3.2.1:
   version "3.7.2"
@@ -11771,21 +11771,21 @@ mute-stream@^2.0.0:
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-2.0.0.tgz#a5446fc0c512b71c83c44d908d5c7b7b4c493b2b"
   integrity sha512-WWdIxpyjEn+FhQJQQv9aQAYlHoNVdzIzUySNV1gHUPDSdZJ3yZn7pAAbQcV7B56Mvu881q9FZV+0Vx2xC44VWA==
 
-mysql2@3.9.8:
-  version "3.9.8"
-  resolved "https://registry.yarnpkg.com/mysql2/-/mysql2-3.9.8.tgz#fe8a0f975f2c495ed76ca988ddc5505801dc49ce"
-  integrity sha512-+5JKNjPuks1FNMoy9TYpl77f+5frbTklz7eb3XDwbpsERRLEeXiW2PDEkakYF50UuKU2qwfGnyXpKYvukv8mGA==
+mysql2@3.22.0:
+  version "3.22.0"
+  resolved "https://registry.yarnpkg.com/mysql2/-/mysql2-3.22.0.tgz#1d5df436d1c9603d977596deda610a7f03afabaa"
+  integrity sha512-4jaJYBObj7FhD3lnZhqX1yDMuZN4mQNz+IolDySDXT7fbozMBpeGQNcuWXKUqo4ahkAEfkjUHPjnwuDI0/6VKw==
   dependencies:
+    aws-ssl-profiles "^1.1.2"
     denque "^2.1.0"
     generate-function "^2.3.1"
-    iconv-lite "^0.6.3"
-    long "^5.2.1"
-    lru-cache "^8.0.0"
-    named-placeholders "^1.1.3"
-    seq-queue "^0.0.5"
-    sqlstring "^2.3.2"
+    iconv-lite "^0.7.2"
+    long "^5.3.2"
+    lru.min "^1.1.4"
+    named-placeholders "^1.1.6"
+    sql-escaper "^1.3.3"
 
-named-placeholders@^1.1.3:
+named-placeholders@^1.1.6:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/named-placeholders/-/named-placeholders-1.1.6.tgz#c50c6920b43f258f59c16add1e56654f5cc02bb5"
   integrity sha512-Tz09sEL2EEuv5fFowm419c1+a/jSMiBjI9gHxVLrVdbUkkNUUfjsVYs9pVZu5oCon/kmRh9TfLEObFtkVxmY0w==
@@ -13764,11 +13764,6 @@ send@~0.19.0, send@~0.19.1:
     range-parser "~1.2.1"
     statuses "~2.0.2"
 
-seq-queue@^0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/seq-queue/-/seq-queue-0.0.5.tgz#d56812e1c017a6e4e7c3e3a37a1da6d78dd3c93e"
-  integrity sha512-hr3Wtp/GZIc/6DAGPDcV4/9WoZhjrkXsi5B/07QgX8tsdc6ilr7BFM6PM6rbdAX1kFSDYeZGLipIZZKyQP0O5Q==
-
 serialize-error@7.0.1, serialize-error@^7.0.1:
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/serialize-error/-/serialize-error-7.0.1.tgz#f1360b0447f61ffb483ec4157c737fab7d778e18"
@@ -14166,10 +14161,10 @@ sprintf-js@~1.0.2:
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
   integrity sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==
 
-sqlstring@^2.3.2:
-  version "2.3.3"
-  resolved "https://registry.yarnpkg.com/sqlstring/-/sqlstring-2.3.3.tgz#2ddc21f03bce2c387ed60680e739922c65751d0c"
-  integrity sha512-qC9iz2FlN7DQl3+wjwn3802RTyjCx7sDvfQEXchwa6CWOx07/WVfh91gBmQ9fahw8snwGEWU3xGzOt4tFyHLxg==
+sql-escaper@^1.3.3:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/sql-escaper/-/sql-escaper-1.5.1.tgz#fbaee511294d1f7da92fb68ca1faee2255839c7b"
+  integrity sha512-4toX5E1fQbBrpfXidaHnF0669nkAdETeIPTs2SUjxxD7RRIs9ICG4gtpmfc68JCEKehsdwLFqBu9VlQqZ1P1gg==
 
 ssh-remote-port-forward@^1.0.4:
   version "1.0.4"

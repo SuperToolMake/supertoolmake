@@ -80,7 +80,7 @@
     "minio": "8.0.7",
     "mongodb": "6.7.0",
     "mssql": "12.5.4",
-    "mysql2": "3.9.8",
+    "mysql2": "3.22.0",
     "nano": "11.0.6",
     "node-fetch": "2.6.7",
     "openapi-types": "9.3.1",
