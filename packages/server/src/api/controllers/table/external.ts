@@ -1,6 +1,7 @@
 import {
   type BulkImportRequest,
   type BulkImportResponse,
+  Datasource,
   Operation,
   type RenameColumn,
   type SaveTableRequest,
@@ -30,6 +31,16 @@ function getDatasourceId(table: Table) {
   return breakExternalTableId(table._id).datasourceId
 }
 
+async function emitDatasourceUpdate(ctx: UserCtx, datasource: Datasource) {
+  try {
+    const redactedDatasource =
+      await sdk.datasources.removeSecretSingle(datasource)
+    builderSocket?.emitDatasourceUpdate(ctx, redactedDatasource)
+  } catch (err) {
+    console.error("Failed to broadcast external datasource update", err)
+  }
+}
+
 export async function updateTable(
   ctx: UserCtx<SaveTableRequest, SaveTableResponse>,
   renaming?: RenameColumn
@@ -44,11 +55,12 @@ export async function updateTable(
     inputs.created = true
   }
   try {
-    const { datasource, oldTable, table } = await sdk.tables.external.save(datasourceId!, inputs, {
-      tableId,
-      renaming,
-    })
-    builderSocket?.emitDatasourceUpdate(ctx, datasource)
+    const { datasource, oldTable, table } = await sdk.tables.external.save(
+      datasourceId!,
+      inputs,
+      { tableId, renaming }
+    )
+    await emitDatasourceUpdate(ctx, datasource)
     return { table, oldTable }
   } catch (err: any) {
     if (err instanceof Error) {
@@ -63,8 +75,11 @@ export async function destroy(ctx: UserCtx) {
   const tableToDelete: TableRequest = await sdk.tables.getTable(ctx.params.tableId)
   const datasourceId = getDatasourceId(tableToDelete)
   try {
-    const { datasource, table } = await sdk.tables.external.destroy(datasourceId!, tableToDelete)
-    builderSocket?.emitDatasourceUpdate(ctx, datasource)
+    const { datasource, table } = await sdk.tables.external.destroy(
+      datasourceId!,
+      tableToDelete
+    )
+    await emitDatasourceUpdate(ctx, datasource)
     return table
   } catch (err: any) {
     if (err instanceof Error) {
