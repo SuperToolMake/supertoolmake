@@ -7,7 +7,10 @@ module.exports = {
       css: "injected",
       generate: "server",
     })
-    const { code } = transformSync(js.code, { babelrc: true })
+    const { code } = transformSync(js.code, {
+      babelrc: true,
+      presets: [["@babel/preset-env", { targets: { node: "current" }, modules: "commonjs" }]],
+    })
     return { code: code }
   },
 }
