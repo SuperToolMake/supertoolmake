@@ -1,12 +1,11 @@
 import { URL } from "node:url"
+import type { JSONOutput } from "curlconverter"
 import type { Query } from "../../../../../definitions/common"
 import { type GetQueriesOptions, type ImportInfo, ImportSource } from "./base"
 
-const curlconverter = require("curlconverter")
-
-const parseCurl = (data: string): Promise<any> => {
-  const curlJson = curlconverter.toJsonString(data)
-  return JSON.parse(curlJson)
+const parseCurl = async (data: string): Promise<JSONOutput> => {
+  const { toJsonObject } = await import("curlconverter")
+  return toJsonObject(data)
 }
 
 /**
@@ -14,13 +13,19 @@ const parseCurl = (data: string): Promise<any> => {
  * e.g. --d '{"key":"val"}' produces an object { "{"key":"val"}" : "" }
  * This is not what we want, so we need to parse out the key from the object
  */
-const parseBody = (curl: any) => {
+const parseBody = (curl: JSONOutput) => {
   if (curl.data) {
+    if (typeof curl.data === "string") {
+      try {
+        return JSON.parse(curl.data)
+      } catch {
+        return curl.data
+      }
+    }
     const keys = Object.keys(curl.data)
     if (keys.length) {
       let key = keys[0]
       try {
-        // filter out the dollar syntax used by curl for shell support
         if (key.startsWith("$")) {
           key = key.substring(1)
         }
@@ -33,7 +38,7 @@ const parseBody = (curl: any) => {
   return
 }
 
-const parseCookie = (curl: any) => {
+const parseCookie = (curl: JSONOutput) => {
   if (curl.cookies) {
     return Object.entries(curl.cookies).reduce((acc, entry) => {
       const [key, value] = entry
@@ -49,11 +54,18 @@ const parseCookie = (curl: any) => {
  * https://curl.se/docs/manpage.html
  */
 export class Curl extends ImportSource {
-  curl: any
+  curl: JSONOutput | undefined
+
+  private getCurl(): JSONOutput {
+    if (!this.curl) {
+      throw new Error("Curl not parsed, call isSupported first")
+    }
+    return this.curl
+  }
 
   isSupported = async (data: string): Promise<boolean> => {
     try {
-      this.curl = parseCurl(data)
+      this.curl = await parseCurl(data)
     } catch {
       return false
     }
@@ -61,12 +73,13 @@ export class Curl extends ImportSource {
   }
 
   getUrl = (): URL => {
-    return new URL(this.curl.raw_url)
+    return new URL(this.getCurl().raw_url)
   }
 
   getInfo = async (): Promise<ImportInfo> => {
+    const curl = this.getCurl()
     const url = this.getUrl()
-    const method = this.curl.method
+    const method = curl.method
     const path = url.pathname
     return {
       name: url.hostname,
@@ -78,7 +91,6 @@ export class Curl extends ImportSource {
           name: path || url.hostname,
           method: method?.toUpperCase(),
           path,
-          description: this.curl.description,
           queryVerb: this.verbFromMethod(method),
         },
       ],
@@ -90,13 +102,14 @@ export class Curl extends ImportSource {
   }
 
   getQueries = async (datasourceId: string, options?: GetQueriesOptions): Promise<Query[]> => {
+    const curl = this.getCurl()
     const url = this.getUrl()
     const name = url.pathname
     const path = url.origin + url.pathname
-    const method = this.curl.method
+    const method = curl.method
     const queryString = url.search
-    const headers = this.curl.headers
-    const requestBody = parseBody(this.curl)
+    const headers = curl.headers ?? {}
+    const requestBody = parseBody(curl)
     const filterIds = options?.filterIds
     const endpointId = this.buildEndpointId(method, url.pathname)
 
@@ -104,7 +117,7 @@ export class Curl extends ImportSource {
       return []
     }
 
-    const cookieHeader = parseCookie(this.curl)
+    const cookieHeader = parseCookie(curl)
     if (cookieHeader) {
       headers.Cookie = cookieHeader
     }
