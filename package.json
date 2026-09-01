@@ -2,8 +2,8 @@
   "name": "root",
   "private": true,
   "devDependencies": {
-    "@babel/core": "7.29.6",
-    "@babel/preset-env": "7.29.5",
+    "@babel/core": "8.0.1",
+    "@babel/preset-env": "8.0.2",
     "@biomejs/biome": "2.4.7",
     "@esbuild-plugins/tsconfig-paths": "0.1.2",
     "@swc/core": "1.13.5",

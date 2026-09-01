@@ -55,7 +55,7 @@
     "content-disposition": "0.5.4",
     "cookies": "0.8.0",
     "csvtojson": "2.0.13",
-    "curlconverter": "3.21.0",
+    "curlconverter": "4.12.0",
     "dayjs": "1.10.8",
     "dotenv": "8.2.0",
     "form-data": "4.0.6",
@@ -98,8 +98,8 @@
     "zod-validation-error": "5.0.0"
   },
   "devDependencies": {
-    "@babel/core": "7.29.6",
-    "@babel/preset-env": "7.29.5",
+    "@babel/core": "8.0.1",
+    "@babel/preset-env": "8.0.2",
     "@types/formidable": "^3.4.6",
     "@types/global-agent": "2.1.1",
     "@types/js-yaml": "^4.0.9",
