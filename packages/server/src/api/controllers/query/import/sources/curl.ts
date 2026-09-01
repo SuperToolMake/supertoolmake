@@ -1,6 +1,6 @@
 import { URL } from "node:url"
-import { toJsonObject } from "curlconverter"
 import type { JSONOutput } from "curlconverter"
+import { toJsonObject } from "curlconverter"
 import type { Query } from "../../../../../definitions/common"
 import { type GetQueriesOptions, type ImportInfo, ImportSource } from "./base"
 
