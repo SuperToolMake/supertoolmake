@@ -1,10 +1,10 @@
 import { URL } from "node:url"
 import type { JSONOutput } from "curlconverter"
-import { toJsonObject } from "curlconverter"
 import type { Query } from "../../../../../definitions/common"
 import { type GetQueriesOptions, type ImportInfo, ImportSource } from "./base"
 
 const parseCurl = async (data: string): Promise<JSONOutput> => {
+  const { toJsonObject } = await import("curlconverter")
   return toJsonObject(data)
 }
 
