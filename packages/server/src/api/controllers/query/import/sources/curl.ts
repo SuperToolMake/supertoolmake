@@ -1,11 +1,11 @@
 import { URL } from "node:url"
 import type { JSONOutput } from "curlconverter"
-import { toJsonObject } from "curlconverter"
+import * as curlconverter from "curlconverter"
 import type { Query } from "../../../../../definitions/common"
 import { type GetQueriesOptions, type ImportInfo, ImportSource } from "./base"
 
-const parseCurl = async (data: string): Promise<JSONOutput> => {
-  return toJsonObject(data)
+const parseCurl = (data: string): JSONOutput => {
+  return curlconverter.toJsonObject(data)
 }
 
 /**
@@ -65,7 +65,7 @@ export class Curl extends ImportSource {
 
   isSupported = async (data: string): Promise<boolean> => {
     try {
-      this.curl = await parseCurl(data)
+      this.curl = parseCurl(data)
     } catch {
       return false
     }
