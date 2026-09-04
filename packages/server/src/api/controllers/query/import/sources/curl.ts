@@ -66,7 +66,8 @@ export class Curl extends ImportSource {
   isSupported = async (data: string): Promise<boolean> => {
     try {
       this.curl = await parseCurl(data)
-    } catch {
+    } catch (e) {
+      console.error("curl parse failed", e)
       return false
     }
     return true
