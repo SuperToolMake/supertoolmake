@@ -1715,15 +1715,15 @@ const replaceBetween = (
 /**
  * Utility function for the readableToRuntimeBinding and runtimeToReadableBinding.
  */
-const bindingReplacement = (
+const bindingReplacement = <T>(
   bindableProperties: BindingReference[],
-  textWithBindings: unknown,
+  textWithBindings: T,
   convertTo: BindingKey
-): string => {
+): T => {
   if (typeof textWithBindings !== "string") {
-    return textWithBindings == null ? "" : `${textWithBindings}`
+    return textWithBindings
   }
-  let bindingText = textWithBindings
+  let bindingText: string = textWithBindings
   // Decide from base64 if using JS
   const isJS = isJSBinding(bindingText)
   if (isJS) {
@@ -1783,7 +1783,7 @@ const bindingReplacement = (
     result = encodeJSBinding(result)
   }
 
-  return result
+  return result as T
 }
 
 /**
@@ -1800,20 +1800,20 @@ export const extractLiteralHandlebarsID = (value: unknown): string | null => {
 /**
  * Converts a readable data binding into a runtime data binding
  */
-export const readableToRuntimeBinding = (
+export const readableToRuntimeBinding = <T>(
   bindableProperties: BindingReference[] | undefined,
-  textWithBindings: unknown
-): string => {
+  textWithBindings: T
+): T => {
   return bindingReplacement(bindableProperties || [], textWithBindings, "runtimeBinding")
 }
 
 /**
  * Converts a runtime data binding into a readable data binding
  */
-export const runtimeToReadableBinding = (
+export const runtimeToReadableBinding = <T>(
   bindableProperties: BindingReference[] | undefined,
-  textWithBindings: unknown
-): string => {
+  textWithBindings: T
+): T => {
   return bindingReplacement(bindableProperties || [], textWithBindings, "readableBinding")
 }
 

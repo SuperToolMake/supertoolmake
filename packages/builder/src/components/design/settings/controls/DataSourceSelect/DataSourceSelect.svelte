@@ -249,10 +249,36 @@ $: custom = {
       on:click={dropdownRight.show}
     />
   </div>
-  {#if value?.type === "query" || selectedIcon}
+  {#if value?.type === "query" || value?.type === "custom" || selectedIcon}
     <div class="icon">
       {#if isSelectedRestQuery}
         <Icon hoverable name="gear" on:click={openQueryParamsDrawer} />
+      {:else if value?.type === "query"}
+        <button
+          class="configure-icon"
+          title="Configure query bindings"
+          on:click={openQueryParamsDrawer}
+        >
+          <span class="icon-base">
+            <svelte:component this={selectedIcon.component} {...selectedIcon.props} />
+          </span>
+          <span class="icon-hover">
+            <Icon hoverable name="gear" size="L" />
+          </span>
+        </button>
+      {:else if value?.type === "custom"}
+        <button
+          class="configure-icon"
+          title="Edit custom data"
+          on:click={openCustomDrawer}
+        >
+          <span class="icon-base">
+            <svelte:component this={selectedIcon.component} {...selectedIcon.props} />
+          </span>
+          <span class="icon-hover">
+            <Icon hoverable name="gear" size="L" />
+          </span>
+        </button>
       {:else if selectedIcon}
         <svelte:component this={selectedIcon.component} {...selectedIcon.props} />
       {/if}
@@ -403,5 +429,26 @@ $: custom = {
 
   .icon {
     margin-left: 8px;
+  }
+
+  .configure-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+  .icon-hover {
+    display: none;
+  }
+  .configure-icon:hover .icon-base {
+    display: none;
+  }
+  .configure-icon:hover .icon-hover {
+    display: inline-flex;
   }
 </style>
