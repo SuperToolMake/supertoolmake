@@ -199,7 +199,7 @@ jobs:
           elif [ "${{ matrix.datasource }}" == "postgres_legacy" ]; then
             docker pull postgres:9.5.25
           fi
-          docker pull minio/minio &
+          docker pull cgr.dev/chainguard/minio@${{ steps.dotenv.outputs.MINIO_SHA }} &
           docker pull redis &
           docker pull testcontainers/ryuk:0.5.1 &
           docker pull apache/couchdb:3.5.1 &
