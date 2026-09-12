@@ -1,7 +1,7 @@
 import crypto from "node:crypto"
 import querystring from "node:querystring"
 import url from "node:url"
-import { iifeWrapper, UserScriptError } from "@supertoolmake/string-templates"
+import { UserScriptError } from "@supertoolmake/string-templates"
 import type { Snippet, VM } from "@supertoolmake/types"
 import ivm from "isolated-vm"
 import environment from "../../environment"
