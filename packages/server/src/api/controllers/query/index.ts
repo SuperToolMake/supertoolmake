@@ -30,7 +30,6 @@ import {
   type UserCtx,
 } from "@supertoolmake/types"
 import { cloneDeep, merge } from "lodash"
-import { ObjectId } from "mongodb"
 import fetch from "node-fetch"
 import { generateQueryID } from "../../../db/utils"
 import env from "../../../environment"
@@ -296,8 +295,6 @@ export async function preview(ctx: UserCtx<PreviewQueryRequest, PreviewQueryResp
             } else {
               fieldMetadata = makeQuerySchema(FieldType.ARRAY, key)
             }
-          } else if (field instanceof ObjectId) {
-            fieldMetadata = makeQuerySchema(FieldType.STRING, key)
           } else {
             fieldMetadata = makeQuerySchema(FieldType.JSON, key)
           }

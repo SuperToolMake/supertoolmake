@@ -4,7 +4,6 @@ import type { Knex } from "knex"
 import TestConfiguration from "../../../tests/utilities/TestConfiguration"
 import "./images"
 import * as mariadb from "./mariadb"
-import * as mongodb from "./mongodb"
 import * as mssql from "./mssql"
 import * as mysql from "./mysql"
 import * as postgres from "./postgres"
@@ -16,7 +15,6 @@ export const { startContainer } = testContainerUtils
 export enum DatabaseName {
   POSTGRES = "postgres",
   POSTGRES_LEGACY = "postgres_legacy",
-  MONGODB = "mongodb",
   MYSQL = "mysql",
   SQL_SERVER = "mssql",
   MARIADB = "mariadb",
@@ -37,9 +35,6 @@ const providers: Record<DatabaseName, DatasourceProvider> = {
   [DatabaseName.MYSQL]: mysql.getDatasource,
   [DatabaseName.SQL_SERVER]: mssql.getDatasource,
   [DatabaseName.MARIADB]: mariadb.getDatasource,
-
-  // rest
-  [DatabaseName.MONGODB]: mongodb.getDatasource,
 }
 
 export interface DatasourceDescribeReturnPromise {
@@ -57,7 +52,6 @@ export interface DatasourceDescribeReturn {
   isSql: boolean
   isMySQL: boolean
   isPostgres: boolean
-  isMongodb: boolean
   isMSSQL: boolean
 }
 
@@ -162,7 +156,6 @@ export function datasourceDescribe(opts: DatasourceDescribeOpts) {
     isPostgres: dbName === DatabaseName.POSTGRES || dbName === DatabaseName.POSTGRES_LEGACY,
     // check if any of the legacy tags
     isLegacy: dbName === DatabaseName.POSTGRES_LEGACY,
-    isMongodb: dbName === DatabaseName.MONGODB,
     isMSSQL: dbName === DatabaseName.SQL_SERVER,
     isMariaDB: dbName === DatabaseName.MARIADB,
   }))

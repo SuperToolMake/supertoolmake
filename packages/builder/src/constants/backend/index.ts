@@ -173,7 +173,6 @@ export const IntegrationTypes = {
   FIRESTORE: "FIRESTORE",
   GOOGLE_SHEETS: "GOOGLE_SHEETS",
   INTERNAL: "INTERNAL",
-  MONGODB: "MONGODB",
   MYSQL: "MYSQL",
   POSTGRES: "POSTGRES",
   REDIS: "REDIS",
@@ -184,7 +183,6 @@ export const IntegrationTypes = {
 
 export const IntegrationNames = {
   [IntegrationTypes.POSTGRES]: "PostgreSQL",
-  [IntegrationTypes.MONGODB]: "MongoDB",
   [IntegrationTypes.S3]: "S3",
   [IntegrationTypes.MYSQL]: "MySQL",
   [IntegrationTypes.REST]: "REST",

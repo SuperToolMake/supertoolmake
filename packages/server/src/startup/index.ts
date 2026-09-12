@@ -9,7 +9,6 @@ import {
   tenancy,
   users,
 } from "@supertoolmake/backend-core"
-import bson from "bson"
 import type Koa from "koa"
 import * as api from "../api"
 import env from "../environment"
@@ -111,10 +110,6 @@ export async function startup(opts: { app?: Koa; server?: Server; force?: boolea
         }
       }
     })
-  }
-
-  if (coreEnv.BSON_BUFFER_SIZE) {
-    bson.setInternalBufferSize(coreEnv.BSON_BUFFER_SIZE)
   }
 
   if (env.SELF_HOSTED && !env.MULTI_TENANCY) {

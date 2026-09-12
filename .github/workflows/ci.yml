@@ -163,7 +163,6 @@ jobs:
             mysql,
             postgres,
             postgres_legacy,
-            mongodb,
             mariadb,
             none,
           ]
@@ -195,8 +194,6 @@ jobs:
             docker pull mysql@${{ steps.dotenv.outputs.MYSQL_SHA }}
           elif [ "${{ matrix.datasource }}" == "postgres" ]; then
             docker pull postgres@${{ steps.dotenv.outputs.POSTGRES_SHA }}
-          elif [ "${{ matrix.datasource }}" == "mongodb" ]; then
-            docker pull mongo@${{ steps.dotenv.outputs.MONGODB_SHA }}
           elif [ "${{ matrix.datasource }}" == "mariadb" ]; then
             docker pull mariadb@${{ steps.dotenv.outputs.MARIADB_SHA }}
           elif [ "${{ matrix.datasource }}" == "postgres_legacy" ]; then

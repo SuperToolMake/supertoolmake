@@ -11,7 +11,6 @@ export type IconInfo =
 
 export const PHOSPHOR_ICONS: Record<string, { name: string; weight?: string; color?: string }> = {
   POSTGRES: { name: "lightning", weight: "duotone", color: "#3DD08E" },
-  MONGODB: { name: "leaf", weight: "duotone", color: "#4B9E46" },
   SQL_SERVER: { name: "database", weight: "duotone", color: "#0072C6" },
   REST: { name: "globe-simple", weight: "duotone" },
   FIRESTORE: { name: "flame", weight: "duotone", color: "#FFA000" },

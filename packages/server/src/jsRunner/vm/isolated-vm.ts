@@ -3,7 +3,6 @@ import querystring from "node:querystring"
 import url from "node:url"
 import { iifeWrapper, UserScriptError } from "@supertoolmake/string-templates"
 import type { Snippet, VM } from "@supertoolmake/types"
-import bson from "bson"
 import ivm from "isolated-vm"
 import environment from "../../environment"
 import { BundleType, loadBundle } from "../bundles"
@@ -137,36 +136,6 @@ export class IsolatedVM implements VM {
     } finally {
       this.removeFromContext(Object.keys(context))
     }
-  }
-
-  withParsingBson(data: any) {
-    this.addToContext({
-      bsonData: bson.BSON.serialize({ data }),
-    })
-
-    // If we need to parse bson, we follow the next steps:
-    // 1. Serialise the data from potential BSON to buffer before passing it to the isolate
-    // 2. Deserialise the data within the isolate, to get the original data
-    // 3. Process script
-    // 4. Stringify the result in order to convert the result from BSON to json
-    this.codeWrapper = (code) =>
-      iifeWrapper(`
-        const data = bson.deserialize(bsonData, { validation: { utf8: false } }).data;
-        const result = ${code}
-        return bson.toJson(result);
-      `)
-
-    const bsonSource = loadBundle(BundleType.BSON)
-
-    const bsonPolyfills = loadBundle(BundleType.BSON_POLYFILLS)
-
-    const script = this.isolate.compileScriptSync(`${bsonPolyfills};${bsonSource}`)
-    script.runSync(this.vm, { timeout: this.invocationTimeout, release: false })
-    new Promise(() => {
-      script.release()
-    })
-
-    return this
   }
 
   execute(code: string): any {
