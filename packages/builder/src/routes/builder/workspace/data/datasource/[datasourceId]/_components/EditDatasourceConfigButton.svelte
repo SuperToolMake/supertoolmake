@@ -31,9 +31,6 @@ const getSubtitle = (datasource) => {
   if (datasource.source === IntegrationTypes.FIRESTORE) {
     return datasource.config.projectId
   }
-  if (datasource.source === IntegrationTypes.MONGODB) {
-    return datasource.config.db
-  }
   if (datasource.source === IntegrationTypes.GOOGLE_SHEETS) {
     return datasource.config.spreadsheetId
   }

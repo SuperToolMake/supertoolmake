@@ -110,7 +110,6 @@ async function runBuild(entry, outfile) {
       "bcrypt",
       "bcryptjs",
       "graphql/*",
-      "bson",
       "better-sqlite3",
       "sqlite3",
       "mysql",

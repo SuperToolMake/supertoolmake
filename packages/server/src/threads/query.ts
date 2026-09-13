@@ -181,8 +181,7 @@ class QueryRunner {
     }
 
     // We avoid invoking the transformer if it's trivial because there is a cost
-    // to passing data in and out of the isolate, especially for MongoDB where
-    // we have to bson serialise/deserialise the data.
+    // to passing data in and out of the isolate.
     const hasTransformer =
       transformer != null &&
       transformer.length > 0 &&
@@ -191,10 +190,7 @@ class QueryRunner {
 
     if (transformer && hasTransformer) {
       transformer = iifeWrapper(transformer)
-      let vm = new IsolatedVM()
-      if (datasource.source === SourceName.MONGODB) {
-        vm = vm.withParsingBson(rows)
-      }
+      const vm = new IsolatedVM()
       const ctx = { data: rows, params: enrichedParameters }
       rows = vm.withContext(ctx, () => vm.execute(transformer!))
     }

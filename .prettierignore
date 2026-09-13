@@ -9,7 +9,6 @@ packages/backend-core/coverage
 packages/builder/.routify
 packages/sdk/sdk
 **/*.ivm.bundle.js
-!**/bson-polyfills.ivm.bundle.js
 **/*.hbs
 packages/worker/src/constants/templates/tests/
 .github

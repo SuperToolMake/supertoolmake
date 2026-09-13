@@ -50,7 +50,6 @@ export enum DatasourceFieldType {
 
 export enum SourceName {
   FIRESTORE = "FIRESTORE",
-  MONGODB = "MONGODB",
   MYSQL = "MYSQL",
   POSTGRES = "POSTGRES",
   REDIS = "REDIS",

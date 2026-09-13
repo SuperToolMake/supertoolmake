@@ -27,7 +27,6 @@ const SQL_CLIENT_SOURCE_MAP: Record<SourceName, SqlClient | undefined> = {
   [SourceName.POSTGRES]: SqlClient.POSTGRES,
   [SourceName.MYSQL]: SqlClient.MY_SQL,
   [SourceName.SQL_SERVER]: SqlClient.MS_SQL,
-  [SourceName.MONGODB]: undefined,
   [SourceName.REST]: undefined,
   [SourceName.FIRESTORE]: undefined,
   [SourceName.REDIS]: undefined,

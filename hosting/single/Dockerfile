@@ -62,7 +62,7 @@ RUN mkdir -p /var/log/nginx && \
     usermod -a -G tty www-data
 
 # Setup minio
-COPY --from=minio/minio:latest /usr/bin/minio /minio/minio
+COPY --from=cgr.dev/chainguard/minio:latest /usr/bin/minio /minio/minio
 
 # Setup redis
 COPY hosting/single/redis.conf /etc/redis/redis.conf
