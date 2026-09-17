@@ -33,7 +33,7 @@
     "apexcharts": "3.48.0",
     "dayjs": "1.10.8",
     "downloadjs": "1.4.7",
-    "exifreader": "4.40.1",
+    "exifreader": "4.41.1",
     "nanoid": "6.0.1",
     "svelte-legacy": "npm:svelte@4.2.20",
     "svelte-spa-router": "4.0.1"
