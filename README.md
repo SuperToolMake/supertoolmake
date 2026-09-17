@@ -6,7 +6,7 @@
 </h1>
 
 <h3 align="center">
-  A lightweight fork of <a href="https://github.com/Budibase/budibase">Budibase</a>
+  The lightweight app builder
 </h3>
 <p align="center">
   SuperToolMake is an open source low-code platform for quickly building forms and web apps, with built-in RBAC.
@@ -59,6 +59,22 @@ SuperToolMake considers a lightweight and modular approach, focusing on the core
 Currently I am running an app on *Scaleway Stardust*, which costs ~ €4.50/month: <a href="https://app.gullinfo.org/larus/app" target=_blank>https://app.gullinfo.org/app/larus</a>
 
 I am also using [Supabase](https://supabase.com/) as my Postgres provider.
+
+---
+
+<h3>
+    A lightweight fork of Budibase
+</h3>
+
+SuperToolMake was created as a lightweight fork of <a href="https://github.com/Budibase/budibase">Budibase</a> in late 2025.
+
+Read the license for more detail.
+
+> [!NOTE]
+> Over the past few months I've been keeping SuperToolMake somewhat up-to-date with relevant Budibase features,
+> however the two codebases have now diverged enough to make this increasingly awkward.
+>
+> As of SuperToolMake **2.6.0**, I will no longer sync changes from Budibase with the exception of critical vulnerability fixes. 
 
 ---
 
