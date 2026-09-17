@@ -1,4 +1,3 @@
-import { SourceName } from "@budibase/types"
 import type {
   Datasource,
   SaveTableRequest,
@@ -6,6 +5,7 @@ import type {
   Table,
   UserCtx,
 } from "@budibase/types"
+import { SourceName } from "@budibase/types"
 import sdk from "../../../../sdk"
 import { builderSocket } from "../../../../websockets"
 import { destroy, updateTable } from "../external"
@@ -66,9 +66,7 @@ describe("external table controller", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     consoleErrorSpy = jest.spyOn(console, "error").mockImplementation()
-    jest
-      .mocked(sdk.datasources.removeSecretSingle)
-      .mockResolvedValue(redactedDatasource)
+    jest.mocked(sdk.datasources.removeSecretSingle).mockResolvedValue(redactedDatasource)
   })
 
   afterEach(() => {
@@ -86,10 +84,7 @@ describe("external table controller", () => {
     await updateTable(ctx)
 
     expect(sdk.datasources.removeSecretSingle).toHaveBeenCalledWith(datasource)
-    expect(builderSocket?.emitDatasourceUpdate).toHaveBeenCalledWith(
-      ctx,
-      redactedDatasource
-    )
+    expect(builderSocket?.emitDatasourceUpdate).toHaveBeenCalledWith(ctx, redactedDatasource)
   })
 
   it("redacts the datasource before broadcasting a table deletion", async () => {
@@ -103,10 +98,7 @@ describe("external table controller", () => {
     await destroy(ctx)
 
     expect(sdk.datasources.removeSecretSingle).toHaveBeenCalledWith(datasource)
-    expect(builderSocket?.emitDatasourceUpdate).toHaveBeenCalledWith(
-      ctx,
-      redactedDatasource
-    )
+    expect(builderSocket?.emitDatasourceUpdate).toHaveBeenCalledWith(ctx, redactedDatasource)
   })
 
   it("returns the updated table when datasource redaction fails", async () => {
@@ -116,9 +108,7 @@ describe("external table controller", () => {
       table,
     })
     const redactionError = new Error("Plugin metadata unavailable")
-    jest
-      .mocked(sdk.datasources.removeSecretSingle)
-      .mockRejectedValue(redactionError)
+    jest.mocked(sdk.datasources.removeSecretSingle).mockRejectedValue(redactionError)
     const ctx = createCtx()
 
     await expect(updateTable(ctx)).resolves.toEqual({

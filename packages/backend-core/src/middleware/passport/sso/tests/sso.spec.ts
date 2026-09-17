@@ -458,9 +458,7 @@ describe("sso", () => {
         expect(mockInvite.deleteCode).not.toHaveBeenCalled()
         expect(events.user.inviteAccepted).not.toHaveBeenCalled()
         expect(mockDone.mock.calls.length).toBe(1)
-        expect(getErrorMessage()).toContain(
-          "Email verification is required to accept this invite."
-        )
+        expect(getErrorMessage()).toContain("Email verification is required to accept this invite.")
       })
 
       it("reconciles the invite when the email is verified, deletes it, and fires the accepted event", async () => {
@@ -503,23 +501,14 @@ describe("sso", () => {
           },
         }
         mockInvite.getExistingInvites.mockReset()
-        mockInvite.getExistingInvites.mockResolvedValueOnce([
-          adminInvite,
-          invite,
-        ])
+        mockInvite.getExistingInvites.mockResolvedValueOnce([adminInvite, invite])
         const ssoUser = structures.users.ssoUser({ details })
         mockSaveUser.mockReturnValueOnce(ssoUser)
 
         await sso.authenticate(details, true, mockDone, mockSaveUser, true)
 
-        expect(mockInvite.getCode).toHaveBeenCalledWith(
-          invite.code,
-          invite.info.tenantId
-        )
-        expect(mockInvite.deleteCode).toHaveBeenCalledWith(
-          invite.code,
-          invite.info.tenantId
-        )
+        expect(mockInvite.getCode).toHaveBeenCalledWith(invite.code, invite.info.tenantId)
+        expect(mockInvite.deleteCode).toHaveBeenCalledWith(invite.code, invite.info.tenantId)
         expect(mockDone).toHaveBeenCalledWith(null, ssoUser)
       })
 
@@ -532,9 +521,7 @@ describe("sso", () => {
         expect(mockInvite.deleteCode).not.toHaveBeenCalled()
         expect(events.user.inviteAccepted).not.toHaveBeenCalled()
         expect(mockDone.mock.calls.length).toBe(1)
-        expect(getErrorMessage()).toContain(
-          "Email verification is required to accept this invite."
-        )
+        expect(getErrorMessage()).toContain("Email verification is required to accept this invite.")
       })
 
       it("reuses the account when the same identity's own concurrent login already claimed the invite", async () => {

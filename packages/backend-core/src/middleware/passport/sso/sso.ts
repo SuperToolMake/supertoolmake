@@ -66,7 +66,7 @@ export async function authenticate(
     if (details.emailVerified) {
       pendingInvite = invites[0]
     } else if (allowUnverifiedEmailLinking) {
-      pendingInvite = invites.find(invite => !invite.info.admin?.global)
+      pendingInvite = invites.find((invite) => !invite.info.admin?.global)
     }
     if (!pendingInvite) {
       blockedInvite = invites[0]
@@ -74,10 +74,7 @@ export async function authenticate(
   }
 
   if (blockedInvite) {
-    return authError(
-      done,
-      "Email verification is required to accept this invite."
-    )
+    return authError(done, "Email verification is required to accept this invite.")
   }
 
   const emailLookupWasSkipped = !details.emailVerified && !allowUnverifiedEmailLinking
