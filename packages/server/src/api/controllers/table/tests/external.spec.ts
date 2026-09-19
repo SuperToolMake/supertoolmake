@@ -4,8 +4,8 @@ import type {
   SaveTableResponse,
   Table,
   UserCtx,
-} from "@budibase/types"
-import { SourceName } from "@budibase/types"
+} from "@supertoolmake/types"
+import { SourceName } from "@supertoolmake/types"
 import sdk from "../../../../sdk"
 import { builderSocket } from "../../../../websockets"
 import { destroy, updateTable } from "../external"
