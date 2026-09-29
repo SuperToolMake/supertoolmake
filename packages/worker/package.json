@@ -61,7 +61,7 @@
     "nodemailer": "9.1.0",
     "passport-google-oauth": "2.0.0",
     "passport-local": "1.0.0",
-    "undici": "7.29.0",
+    "undici": "7.29.1",
     "yaml": "2.8.3"
   },
   "devDependencies": {
