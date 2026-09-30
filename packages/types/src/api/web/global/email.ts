@@ -35,6 +35,15 @@ export interface SendEmailRequest {
   invite?: EmailInvite
   attachments?: EmailAttachment[]
 }
-export interface SendEmailResponse extends SMTPTransport.SentMessageInfo {
+export interface SendEmailResponse
+  extends Omit<
+    SMTPTransport.SentMessageInfo,
+    "pending" | "response" | "envelopeTime" | "messageTime" | "messageSize"
+  > {
+  pending: SMTPTransport.SentMessageInfo["pending"]
+  response?: SMTPTransport.SentMessageInfo["response"]
+  envelopeTime?: number
+  messageTime?: number
+  messageSize?: number
   message: string
 }

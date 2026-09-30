@@ -37,6 +37,7 @@ export async function sendEmail(ctx: UserCtx<SendEmailRequest, SendEmailResponse
   })
   ctx.body = {
     ...response,
+    pending: response.pending ?? [],
     message: `Email sent to ${email}.`,
   }
 }
