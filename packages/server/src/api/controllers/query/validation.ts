@@ -1,48 +1,50 @@
 import { auth } from "@supertoolmake/backend-core"
-import Joi from "joi"
+import { z } from "zod"
 
-const OPTIONAL_STRING = Joi.string().optional().allow(null).allow("")
+const OPTIONAL_STRING = z.string().nullish().or(z.literal(""))
 
 function baseQueryValidation() {
   return {
     _id: OPTIONAL_STRING,
     _rev: OPTIONAL_STRING,
-    fields: Joi.object().required(),
-    datasourceId: Joi.string().required(),
-    readable: Joi.boolean(),
-    parameters: Joi.array().items(
-      Joi.object({
-        name: Joi.string(),
-        default: Joi.string().allow(""),
-      })
-    ),
-    queryVerb: Joi.string().required(),
-    extra: Joi.object().optional(),
-    schema: Joi.object({}).required().unknown(true),
+    fields: z.looseObject({}),
+    datasourceId: z.string(),
+    readable: z.boolean().optional(),
+    parameters: z
+      .array(
+        z.strictObject({
+          name: z.string().optional(),
+          default: z.string().optional(),
+        })
+      )
+      .optional(),
+    queryVerb: z.string(),
+    extra: z.looseObject({}).optional(),
+    schema: z.looseObject({}),
     transformer: OPTIONAL_STRING,
-    flags: Joi.object().optional(),
+    flags: z.looseObject({}).optional(),
     queryId: OPTIONAL_STRING,
   }
 }
 
 export function queryValidation() {
-  return Joi.object({
+  return z.looseObject({
     ...baseQueryValidation(),
-    name: Joi.string().required(),
-  }).unknown(true)
+    name: z.string(),
+  })
 }
 
 export function generateQueryValidation() {
   // prettier-ignore
-  return auth.joiValidator.body(queryValidation())
+  return auth.zodValidator.body(queryValidation())
 }
 
 export function generateQueryPreviewValidation() {
   // prettier-ignore
-  return auth.joiValidator.body(
-    Joi.object({
+  return auth.zodValidator.body(
+    z.looseObject({
       ...baseQueryValidation(),
       name: OPTIONAL_STRING,
-    }).unknown(true)
+    })
   )
 }

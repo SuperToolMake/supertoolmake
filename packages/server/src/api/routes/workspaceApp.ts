@@ -1,30 +1,28 @@
 import { middleware } from "@supertoolmake/backend-core"
-import Joi from "joi"
+import { z } from "zod"
 
 import * as controller from "../controllers/workspaceApp"
 import { builderRoutes } from "./endpointGroups"
 
 const baseSchema = {
-  name: Joi.string().required(),
-  url: Joi.string()
-    .required()
-    .regex(/^\/[\w-]*$/),
-  disabled: Joi.boolean().optional(),
+  name: z.string(),
+  url: z.string().regex(/^\/[\w-]*$/),
+  disabled: z.boolean().optional(),
 }
 
-const insertSchema = Joi.object({
+const insertSchema = z.strictObject({
   ...baseSchema,
 })
 
-const updateSchema = Joi.object({
-  _id: Joi.string().required(),
-  _rev: Joi.string().required(),
+const updateSchema = z.strictObject({
+  _id: z.string(),
+  _rev: z.string(),
   ...baseSchema,
-  navigation: Joi.object().required(),
+  navigation: z.looseObject({}),
 })
 
 function workspaceAppValidator(schema: typeof insertSchema | typeof updateSchema) {
-  return middleware.joiValidator.body(schema, { allowUnknown: false })
+  return middleware.zodValidator.body(schema)
 }
 
 builderRoutes

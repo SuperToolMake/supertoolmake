@@ -85,8 +85,8 @@ export class RestImporter {
     const schema = queryValidation()
     queries = queries
       .filter((query) => {
-        const validation = schema.validate(query)
-        if (validation.error) {
+        const validation = schema.safeParse(query)
+        if (!validation.success) {
           errorQueries.push(query)
           return false
         }

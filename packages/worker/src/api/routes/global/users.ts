@@ -1,5 +1,5 @@
 import { auth } from "@supertoolmake/backend-core"
-import Joi from "joi"
+import { z } from "zod"
 import * as controller from "../../controllers/global/users"
 import {
   adminRoutes,
@@ -9,69 +9,63 @@ import {
 } from "../endpointGroups"
 import { users } from "../validation"
 
-const OPTIONAL_STRING = Joi.string().optional().allow(null).allow("")
+const OPTIONAL_STRING = z.string().nullish().or(z.literal(""))
 
 function buildAdminInitValidation() {
-  return auth.joiValidator.body(
-    Joi.object({
-      email: Joi.string().required(),
+  return auth.zodValidator.body(
+    z.strictObject({
+      email: z.string(),
       password: OPTIONAL_STRING,
-      tenantId: Joi.string().required(),
-      ssoId: Joi.string(),
+      tenantId: z.string(),
+      ssoId: z.string().optional(),
       familyName: OPTIONAL_STRING,
       givenName: OPTIONAL_STRING,
     })
-      .required()
-      .unknown(false)
   )
 }
 
 function buildInviteValidation() {
   // prettier-ignore
-  return auth.joiValidator.body(
-    Joi.object({
-      email: Joi.string().required(),
-      userInfo: Joi.object().optional(),
-    }).required()
+  return auth.zodValidator.body(
+    z.strictObject({
+      email: z.string(),
+      userInfo: z.looseObject({}).optional(),
+    })
   )
 }
 
 function buildInviteMultipleValidation() {
   // prettier-ignore
-  return auth.joiValidator.body(
-    Joi.array()
-      .required()
-      .items(
-        Joi.object({
-          email: Joi.string(),
-          userInfo: Joi.object().optional(),
-        })
-      )
+  return auth.zodValidator.body(
+    z.array(
+      z.strictObject({
+        email: z.string().optional(),
+        userInfo: z.looseObject({}).optional(),
+      })
+    )
   )
 }
 
 function buildInviteAcceptValidation() {
   // prettier-ignore
-  return auth.joiValidator.body(
-    Joi.object({
-      inviteCode: Joi.string().required(),
-      password: Joi.string().optional(),
-      firstName: Joi.string().optional(),
-      lastName: Joi.string().optional(),
-      tenantId: Joi.string().optional(),
+  return auth.zodValidator.body(
+    z.looseObject({
+      inviteCode: z.string(),
+      password: z.string().optional(),
+      firstName: z.string().optional(),
+      lastName: z.string().optional(),
+      tenantId: z.string().optional(),
     })
-      .required()
-      .unknown(true)
   )
 }
 
 function buildChangeTenantOwnerEmailValidation() {
-  return auth.joiValidator.body(
-    Joi.object({
-      newAccountEmail: Joi.string().required(),
-      originalEmail: Joi.string().required(),
-      tenantIds: Joi.array().items(Joi.string()).required(),
-    }).required()
+  return auth.zodValidator.body(
+    z.strictObject({
+      newAccountEmail: z.string(),
+      originalEmail: z.string(),
+      tenantIds: z.array(z.string()),
+    })
   )
 }
 

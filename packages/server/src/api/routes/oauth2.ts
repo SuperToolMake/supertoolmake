@@ -1,44 +1,40 @@
 import { middleware } from "@supertoolmake/backend-core"
 import { OAuth2CredentialsMethod, OAuth2GrantType } from "@supertoolmake/types"
-import Joi from "joi"
+import { z } from "zod"
 
 import * as controller from "../controllers/oauth2"
 import { builderRoutes } from "./endpointGroups"
 
 const baseSchema = {
-  url: Joi.string().required(),
-  clientId: Joi.string().required(),
-  clientSecret: Joi.string().required(),
-  method: Joi.string()
-    .required()
-    .valid(...Object.values(OAuth2CredentialsMethod)),
-  grantType: Joi.string()
-    .required()
-    .valid(...Object.values(OAuth2GrantType)),
-  scope: Joi.string().optional(),
+  url: z.string(),
+  clientId: z.string(),
+  clientSecret: z.string(),
+  method: z.enum(Object.values(OAuth2CredentialsMethod)),
+  grantType: z.enum(Object.values(OAuth2GrantType)),
+  scope: z.string().optional(),
 }
 
-const insertSchema = Joi.object({
-  name: Joi.string().required(),
+const insertSchema = z.strictObject({
+  name: z.string(),
   ...baseSchema,
 })
 
-const updateSchema = Joi.object({
-  _id: Joi.string().required(),
-  _rev: Joi.string().required(),
-  name: Joi.string().required(),
+const updateSchema = z.strictObject({
+  _id: z.string(),
+  _rev: z.string(),
+  name: z.string(),
   ...baseSchema,
 })
 
-const validationSchema = Joi.object({
-  _id: Joi.string(),
+const validationSchema = z.strictObject({
+  _id: z.string().optional(),
   ...baseSchema,
 })
 
 function oAuth2ConfigValidator(
   schema: typeof validationSchema | typeof insertSchema | typeof updateSchema
 ) {
-  return middleware.joiValidator.body(schema, { allowUnknown: false })
+  return middleware.zodValidator.body(schema)
 }
 
 builderRoutes
