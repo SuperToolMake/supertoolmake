@@ -194,14 +194,14 @@ export function screenValidator() {
   )
 }
 
-export function applicationValidator(opts = { isCreate: true }) {
+export function applicationValidator() {
   const appNameValidator = z
     .string()
     .regex(APP_NAME_REGEX, "App name must be letters, numbers and spaces only")
   const schema = z.looseObject({
     _id: OPTIONAL_STRING,
     _rev: OPTIONAL_STRING,
-    name: opts.isCreate ? appNameValidator : appNameValidator.optional(),
+    name: appNameValidator.optional(),
     url: OPTIONAL_STRING,
     template: z.looseObject({}).optional(),
     snippets: z
