@@ -100,7 +100,7 @@ function checkWorkspaceName(
   name: string,
   currentWorkspaceId?: string
 ) {
-  // TODO: Replace with Joi
+  // TODO: Move this validation to the request schema
   if (!name) {
     ctx.throw(400, "Name is required")
   }

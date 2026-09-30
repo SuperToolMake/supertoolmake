@@ -1,28 +1,114 @@
-import type { components } from "../../../../definitions/openapi"
+export interface Query {
+  _id: string
+  datasourceId?: string
+  parameters?: string[]
+  fields?: Record<string, unknown>
+  queryVerb?: "create" | "read" | "update" | "delete"
+  name: string
+  schema: Record<string, unknown>
+  transformer?: string
+  readable?: boolean
+}
 
-export type Query = components["schemas"]["query"]
-export type ExecuteQuery = components["schemas"]["executeQueryOutput"]
+export interface ExecuteQuery {
+  data: Record<string, unknown>[]
+  pagination?: Record<string, unknown>
+  extra?: {
+    raw?: string
+    headers?: Record<string, unknown>
+  }
+}
 
-export type Application = components["schemas"]["applicationOutput"]["data"]
-export type CreateApplicationParams = components["schemas"]["application"]
+export interface Application {
+  name: string
+  url: string
+  _id: string
+  status: "development" | "published"
+  createdAt: string
+  updatedAt: string
+  version: string
+  tenantId?: string
+  lockedBy?: Record<string, unknown>
+}
 
-export type Table = components["schemas"]["tableOutput"]["data"]
-export type CreateTableParams = components["schemas"]["table"]
+export interface CreateApplicationParams {
+  name: string
+  url?: string
+}
 
-export type View = components["schemas"]["viewOutput"]["data"]
-export type CreateViewParams = components["schemas"]["view"]
+export interface Table {
+  _id: string
+  name: string
+  schema: Record<string, unknown>
+  primaryDisplay?: string
+}
 
-export type Row = components["schemas"]["rowOutput"]["data"]
-export type RowSearch = components["schemas"]["searchOutput"]
-export type CreateRowParams = components["schemas"]["row"]
+export interface CreateTableParams {
+  name: string
+  primaryDisplay?: string
+  schema: Record<string, unknown>
+}
 
-export type User = components["schemas"]["userOutput"]["data"]
-export type CreateUserParams = components["schemas"]["user"]
+export interface View {
+  _id: string
+  name: string
+  tableId: string
+  [key: string]: unknown
+}
 
-export type RoleAssignRequest = components["schemas"]["rolesAssign"]
-export type RoleUnAssignRequest = components["schemas"]["rolesUnAssign"]
-export type RoleAssignmentResponse = components["schemas"]["rolesOutput"]
+export interface CreateViewParams {
+  name: string
+  tableId: string
+  [key: string]: unknown
+}
 
-export type SearchInputParams =
-  | components["schemas"]["nameSearch"]
-  | components["schemas"]["rowSearch"]
+export type Row = { _id: string; tableId: string } & Record<string, unknown>
+
+export interface RowSearch {
+  data: Record<string, unknown>[]
+  bookmark?: string | number
+  hasNextPage?: boolean
+}
+
+export type CreateRowParams = Record<string, unknown>
+
+export interface User {
+  _id: string
+  email: string
+  password?: string
+  status?: "active"
+  firstName?: string
+  lastName?: string
+  forceResetPassword?: boolean
+  builder?: { global?: boolean }
+  admin?: { global?: boolean }
+  roles?: Record<string, string>
+}
+
+export interface CreateUserParams {
+  email: string
+  password?: string
+  status?: "active"
+  firstName?: string
+  lastName?: string
+  forceResetPassword?: boolean
+  builder?: { global?: boolean }
+  admin?: { global?: boolean }
+  roles?: Record<string, string>
+}
+
+export interface RoleAssignRequest {
+  appBuilder?: { appId: string }
+  builder?: boolean
+  admin?: boolean
+  role?: { roleId: string; appId: string }
+  userIds: string[]
+}
+
+export type RoleUnAssignRequest = RoleAssignRequest
+
+export interface RoleAssignmentResponse {
+  data: { userIds: string[] }
+}
+
+export type SearchInputParams = { name: string } | Record<string, unknown>

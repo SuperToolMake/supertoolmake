@@ -55,19 +55,18 @@ const queryFilterValidation: Record<SearchFilterKey, z.ZodTypeAny> = {
 
 const searchRowRequest = z.object({
   query: z
-    .object({
+    .looseObject({
       allOr: z.boolean().optional(),
-      onEmptyFilter: z.nativeEnum(EmptyFilterOption).optional(),
+      onEmptyFilter: z.enum(EmptyFilterOption).optional(),
       ...queryFilterValidation,
     })
-    .passthrough()
     .optional(),
   paginate: z.boolean().optional(),
   bookmark: z.union([z.string(), z.number()]).nullish(),
   limit: z.number().optional(),
   sort: z.string().nullish(),
-  sortOrder: z.nativeEnum(SortOrder).optional(),
-  sortType: z.nativeEnum(SortType).nullish(),
+  sortOrder: z.enum(SortOrder).optional(),
+  sortType: z.enum(SortType).nullish(),
   version: z.string().optional(),
   disableEscaping: z.boolean().optional(),
   countRows: z.boolean().optional(),

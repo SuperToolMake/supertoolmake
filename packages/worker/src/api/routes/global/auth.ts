@@ -1,41 +1,35 @@
 import { auth } from "@supertoolmake/backend-core"
-import Joi from "joi"
+import { z } from "zod"
 import { emailLockout, ipLockout } from "../../../middleware"
 import * as authController from "../../controllers/global/auth"
 import { loggedInRoutes } from "../endpointGroups"
 
 function buildAuthValidation() {
   // prettier-ignore
-  return auth.joiValidator.body(
-    Joi.object({
-      username: Joi.string().required(),
-      password: Joi.string().required(),
+  return auth.zodValidator.body(
+    z.strictObject({
+      username: z.string(),
+      password: z.string(),
     })
-      .required()
-      .unknown(false)
   )
 }
 
 function buildResetValidation() {
   // prettier-ignore
-  return auth.joiValidator.body(
-    Joi.object({
-      email: Joi.string().required(),
+  return auth.zodValidator.body(
+    z.strictObject({
+      email: z.string(),
     })
-      .required()
-      .unknown(false)
   )
 }
 
 function buildResetUpdateValidation() {
   // prettier-ignore
-  return auth.joiValidator.body(
-    Joi.object({
-      resetCode: Joi.string().required(),
-      password: Joi.string().required(),
+  return auth.zodValidator.body(
+    z.strictObject({
+      resetCode: z.string(),
+      password: z.string(),
     })
-      .required()
-      .unknown(false)
   )
 }
 

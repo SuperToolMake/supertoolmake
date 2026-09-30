@@ -1,122 +1,113 @@
 import { auth } from "@supertoolmake/backend-core"
 import { ConfigType } from "@supertoolmake/types"
-import Joi from "joi"
+import { z } from "zod"
 import * as controller from "../../controllers/global/configs"
 import { adminRoutes, loggedInRoutes } from "../endpointGroups"
 
 function smtpValidation() {
-  // prettier-ignore
-  return Joi.object({
-    port: Joi.number().required(),
-    host: Joi.string().required(),
-    from: Joi.string().email().required(),
-    secure: Joi.boolean().optional(),
-    auth: Joi.object({
-      type: Joi.string().valid("login", "oauth2", null),
-      user: Joi.string().required(),
-      pass: Joi.string().allow("", null),
-    }).optional(),
-  }).unknown(true)
+  return z.looseObject({
+    port: z.number(),
+    host: z.string(),
+    from: z.email(),
+    secure: z.boolean().optional(),
+    auth: z
+      .strictObject({
+        type: z.enum(["login", "oauth2"]).nullable().optional(),
+        user: z.string(),
+        pass: z.string().nullish().or(z.literal("")),
+      })
+      .optional(),
+  })
 }
 
 function settingValidation() {
-  // prettier-ignore
-  return Joi.object({
-    platformUrl: Joi.string().optional(),
-    logoUrl: Joi.string().optional().allow("", null),
-    docsUrl: Joi.string().optional(),
-    company: Joi.string().required(),
-  }).unknown(true)
+  return z.looseObject({
+    platformUrl: z.string().optional(),
+    logoUrl: z.string().nullish().or(z.literal("")),
+    docsUrl: z.string().optional(),
+    company: z.string(),
+  })
 }
 
 function googleValidation() {
-  // prettier-ignore
-  return Joi.object({
-    clientID: Joi.string().required(),
-    clientSecret: Joi.string().required(),
-    activated: Joi.boolean().required(),
-  }).unknown(true)
+  return z.looseObject({
+    clientID: z.string(),
+    clientSecret: z.string(),
+    activated: z.boolean(),
+  })
 }
 
 function oidcValidation() {
-  // prettier-ignore
-  return Joi.object({
-    configs: Joi.array()
-      .items(
-        Joi.object({
-          clientID: Joi.string().required(),
-          clientSecret: Joi.string().required(),
-          configUrl: Joi.string().required(),
-          logo: Joi.string().allow("", null),
-          name: Joi.string().allow("", null),
-          uuid: Joi.string().required(),
-          activated: Joi.boolean().required(),
-          scopes: Joi.array().optional(),
-        })
-      )
-      .required(),
-  }).unknown(true)
+  return z.looseObject({
+    configs: z.array(
+      z.strictObject({
+        clientID: z.string(),
+        clientSecret: z.string(),
+        configUrl: z.string(),
+        logo: z.string().nullish().or(z.literal("")),
+        name: z.string().nullish().or(z.literal("")),
+        uuid: z.string(),
+        activated: z.boolean(),
+        scopes: z.array(z.unknown()).optional(),
+      })
+    ),
+  })
 }
 
 function scimValidation() {
-  // prettier-ignore
-  return Joi.object({
-    enabled: Joi.boolean().required(),
-  }).unknown(true)
+  return z.looseObject({
+    enabled: z.boolean(),
+  })
 }
 
 function buildConfigSaveValidation() {
-  // prettier-ignore
-  return auth.joiValidator.body(
-    Joi.object({
-      _id: Joi.string().optional(),
-      _rev: Joi.string().optional(),
-      workspace: Joi.string().optional(),
-      type: Joi.string()
-        .valid(...Object.values(ConfigType))
-        .required(),
-      createdAt: Joi.string().optional(),
-      updatedAt: Joi.string().optional(),
-      config: Joi.alternatives().conditional("type", {
-        switch: [
-          { is: ConfigType.SMTP, then: smtpValidation() },
-          { is: ConfigType.SETTINGS, then: settingValidation() },
-          { is: ConfigType.ACCOUNT, then: Joi.object().unknown(true) },
-          { is: ConfigType.GOOGLE, then: googleValidation() },
-          { is: ConfigType.OIDC, then: oidcValidation() },
-          { is: ConfigType.SCIM, then: scimValidation() },
-        ],
-      }),
-    })
-      .required()
-      .unknown(true)
+  const configSchemas: Partial<Record<ConfigType, z.ZodType>> = {
+    [ConfigType.SMTP]: smtpValidation(),
+    [ConfigType.SETTINGS]: settingValidation(),
+    [ConfigType.ACCOUNT]: z.looseObject({}),
+    [ConfigType.GOOGLE]: googleValidation(),
+    [ConfigType.OIDC]: oidcValidation(),
+    [ConfigType.SCIM]: scimValidation(),
+  }
+
+  return auth.zodValidator.body(
+    z
+      .looseObject({
+        _id: z.string().optional(),
+        _rev: z.string().optional(),
+        workspace: z.string().optional(),
+        type: z.enum(ConfigType),
+        createdAt: z.string().optional(),
+        updatedAt: z.string().optional(),
+        config: z.unknown(),
+      })
+      .superRefine((value, ctx) => {
+        const schema = configSchemas[value.type]
+        if (!schema) {
+          return
+        }
+        const result = schema.safeParse(value.config)
+        if (!result.success) {
+          ctx.addIssue({ code: "custom", message: result.error.message, path: ["config"] })
+        }
+      })
   )
 }
 
 function buildUploadValidation() {
-  // prettier-ignore
-  return auth.joiValidator.params(
-    Joi.object({
-      type: Joi.string()
-        .valid(...Object.values(ConfigType))
-        .required(),
-      name: Joi.string().required(),
+  return auth.zodValidator.params(
+    z.looseObject({
+      type: z.enum(ConfigType),
+      name: z.string(),
     })
-      .required()
-      .unknown(true)
   )
 }
 
 function buildConfigGetValidation() {
-  // prettier-ignore
-  return auth.joiValidator.params(
-    Joi.object({
-      type: Joi.string()
-        .valid(...Object.values(ConfigType))
-        .required(),
+  return auth.zodValidator.params(
+    z.looseObject({
+      type: z.enum(ConfigType),
     })
-      .required()
-      .unknown(true)
   )
 }
 

@@ -1,30 +1,23 @@
 import { auth as authCore } from "@supertoolmake/backend-core"
-import Joi from "joi"
+import { z } from "zod"
 import { TemplatePurpose, TemplateType } from "../../../constants"
 import * as controller from "../../controllers/global/templates"
 import { adminRoutes, loggedInRoutes } from "../endpointGroups"
 
-const { joiValidator } = authCore
+const { zodValidator } = authCore
 
 function buildTemplateSaveValidation() {
   // prettier-ignore
-  return joiValidator.body(
-    Joi.object({
-      _id: Joi.string().allow(null, ""),
-      _rev: Joi.string().allow(null, ""),
-      ownerId: Joi.string().allow(null, ""),
-      name: Joi.string().allow(null, ""),
-      contents: Joi.string().required(),
-      purpose: Joi.string()
-        .required()
-        .valid(...Object.values(TemplatePurpose)),
-      type: Joi.string()
-        .required()
-        .valid(...Object.values(TemplateType)),
+  return zodValidator.body(
+    z.looseObject({
+      _id: z.string().nullish().or(z.literal("")),
+      _rev: z.string().nullish().or(z.literal("")),
+      ownerId: z.string().nullish().or(z.literal("")),
+      name: z.string().nullish().or(z.literal("")),
+      contents: z.string(),
+      purpose: z.enum(TemplatePurpose),
+      type: z.enum(TemplateType),
     })
-      .required()
-      .unknown(true)
-      .optional()
   )
 }
 

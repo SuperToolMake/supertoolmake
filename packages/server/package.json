@@ -26,7 +26,7 @@
     "dev:stack:nuke": "node scripts/dev/manage.js nuke",
     "dev": "yarn run dev:stack:up && nodemon",
     "dev:built": "yarn run dev:stack:up && yarn run run:docker",
-    "specs": "ts-node specs/generate.ts && openapi-typescript specs/openapi.yaml --output src/definitions/openapi.ts"
+    "specs": "ts-node specs/generate.ts"
   },
   "keywords": [
     "budibase"
@@ -62,7 +62,6 @@
     "http-graceful-shutdown": "3.1.12",
     "ioredis": "5.3.2",
     "isolated-vm": "6.0.1",
-    "joi": "17.13.4",
     "js-yaml": "4.3.2",
     "jsonschema": "1.4.0",
     "jsonwebtoken": "9.0.2",
@@ -77,7 +76,7 @@
     "memorystream": "0.3.1",
     "minio": "8.0.7",
     "mssql": "12.5.4",
-    "mysql2": "3.22.0",
+    "mysql2": "3.23.1",
     "nano": "11.0.6",
     "node-fetch": "2.6.7",
     "openapi-types": "9.3.1",
@@ -92,7 +91,8 @@
     "tmp": "0.2.7",
     "worker-farm": "1.7.0",
     "xml2js": "0.6.2",
-    "zod-validation-error": "5.0.0"
+    "zod-validation-error": "5.0.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@babel/core": "8.0.1",
@@ -121,7 +121,6 @@
     "jest-mock": "^30.0.5",
     "nock": "13.5.4",
     "nodemon": "3.1.14",
-    "openapi-typescript": "5.2.0",
     "rimraf": "3.0.2",
     "@types/supertest": "^6.0.2",
     "supertest": "7.2.2",
@@ -129,9 +128,8 @@
     "timekeeper": "2.2.0",
     "ts-node": "10.8.1",
     "tsconfig-paths": "4.0.0",
-    "undici": "7.29.0",
-    "yargs": "^17.7.2",
-    "zod": "^4.1.12"
+    "undici": "7.29.1",
+    "yargs": "^17.7.2"
   },
   "nx": {
     "targets": {

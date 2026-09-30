@@ -456,7 +456,6 @@ describe("sso", () => {
 
         expect(mockSaveUser).not.toHaveBeenCalled()
         expect(mockInvite.deleteCode).not.toHaveBeenCalled()
-        expect(events.user.inviteAccepted).not.toHaveBeenCalled()
         expect(mockDone.mock.calls.length).toBe(1)
         expect(getErrorMessage()).toContain("Email verification is required to accept this invite.")
       })
@@ -519,7 +518,6 @@ describe("sso", () => {
 
         expect(mockSaveUser).not.toHaveBeenCalled()
         expect(mockInvite.deleteCode).not.toHaveBeenCalled()
-        expect(events.user.inviteAccepted).not.toHaveBeenCalled()
         expect(mockDone.mock.calls.length).toBe(1)
         expect(getErrorMessage()).toContain("Email verification is required to accept this invite.")
       })

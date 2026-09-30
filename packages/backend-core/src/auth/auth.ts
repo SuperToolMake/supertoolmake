@@ -28,10 +28,10 @@ export {
   builderOrAdmin,
   google,
   internalApi,
-  joiValidator,
   oidc,
   ssoCallbackUrl,
   workspaceBuilderOrAdmin,
+  zodValidator,
 } from "../middleware"
 export const buildAuthMiddleware = authenticated
 export const buildTenancyMiddleware = tenancy

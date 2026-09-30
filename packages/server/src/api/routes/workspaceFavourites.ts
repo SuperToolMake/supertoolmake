@@ -1,19 +1,19 @@
 import { middleware } from "@supertoolmake/backend-core"
 import { WorkspaceResource } from "@supertoolmake/types"
-import Joi from "joi"
+import { z } from "zod"
 import * as controller from "../controllers/workspaceFavourites"
 import { builderRoutes } from "./endpointGroups"
 
 function workspaceFavouriteValidator(schema: typeof insertSchema) {
-  return middleware.joiValidator.body(schema, { allowUnknown: false })
+  return middleware.zodValidator.body(schema)
 }
 
 const baseSchema = {
-  resourceType: Joi.string().valid(...Object.values(WorkspaceResource)),
-  resourceId: Joi.string().optional(),
+  resourceType: z.enum(Object.values(WorkspaceResource)).optional(),
+  resourceId: z.string().optional(),
 }
 
-const insertSchema = Joi.object({
+const insertSchema = z.strictObject({
   ...baseSchema,
 })
 

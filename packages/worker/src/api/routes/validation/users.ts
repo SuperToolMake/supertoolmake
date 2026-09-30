@@ -1,79 +1,81 @@
 import { auth } from "@supertoolmake/backend-core"
-import Joi from "joi"
+import { z } from "zod"
 
-const OPTIONAL_STRING = Joi.string().allow(null, "")
+const OPTIONAL_STRING = z.string().nullish().or(z.literal(""))
 
-let schema: any = {
+const userSchema = {
   email: OPTIONAL_STRING,
   password: OPTIONAL_STRING,
-  forceResetPassword: Joi.boolean().optional(),
+  forceResetPassword: z.boolean().optional(),
   firstName: OPTIONAL_STRING,
   lastName: OPTIONAL_STRING,
-  builder: Joi.object({
-    global: Joi.boolean().optional(),
-    apps: Joi.array().optional(),
-  })
-    .unknown(true)
+  builder: z
+    .looseObject({
+      global: z.boolean().optional(),
+      apps: z.array(z.unknown()).optional(),
+    })
     .optional(),
   // maps appId -> roleId for the user
-  roles: Joi.object().pattern(/.*/, Joi.string()).required().unknown(true),
+  roles: z.record(z.string(), z.string()),
 }
 
 export const buildSelfSaveValidation = () => {
-  schema = {
-    password: Joi.string().optional(),
-    forceResetPassword: Joi.boolean().optional(),
-    firstName: OPTIONAL_STRING,
-    lastName: OPTIONAL_STRING,
-    freeTrialConfirmedAt: Joi.string().optional(),
-    appFavourites: Joi.array().optional(),
-    appSort: Joi.string().optional(),
-  }
-  return auth.joiValidator.body(Joi.object(schema).required().unknown(false))
+  return auth.zodValidator.body(
+    z.strictObject({
+      password: z.string().optional(),
+      forceResetPassword: z.boolean().optional(),
+      firstName: OPTIONAL_STRING,
+      lastName: OPTIONAL_STRING,
+      freeTrialConfirmedAt: z.string().optional(),
+      appFavourites: z.array(z.unknown()).optional(),
+      appSort: z.string().optional(),
+    })
+  )
 }
 
 export const buildUserSaveValidation = () => {
-  schema = {
-    ...schema,
-    _id: Joi.string(),
-    _rev: Joi.string(),
-  }
-  return auth.joiValidator.body(Joi.object(schema).required().unknown(true))
+  return auth.zodValidator.body(
+    z.looseObject({
+      ...userSchema,
+      _id: z.string().optional(),
+      _rev: z.string().optional(),
+    })
+  )
 }
 
 export const buildAddSsoSupport = () => {
-  return auth.joiValidator.body(
-    Joi.object({
-      ssoId: Joi.string().required(),
-      email: Joi.string().required(),
-    }).required()
+  return auth.zodValidator.body(
+    z.strictObject({
+      ssoId: z.string(),
+      email: z.string(),
+    })
   )
 }
 
 export const buildUserBulkUserValidation = (isSelf = false) => {
-  if (!isSelf) {
-    schema = {
-      ...schema,
-      _id: Joi.string(),
-      _rev: Joi.string(),
-    }
-  }
+  const bulkUserSchema = isSelf
+    ? userSchema
+    : { ...userSchema, _id: z.string().optional(), _rev: z.string().optional() }
   const bulkSchema = {
-    create: Joi.object({
-      groups: Joi.array().optional(),
-      users: Joi.array().items(Joi.object(schema).required().unknown(true)),
-    }),
-    delete: Joi.object({
-      users: Joi.array().items(
-        Joi.object({
-          email: Joi.string(),
-          userId: Joi.string(),
-        })
-          .required()
-          .unknown(true)
-      ),
-    }),
+    create: z
+      .strictObject({
+        groups: z.array(z.unknown()).optional(),
+        users: z.array(z.looseObject(bulkUserSchema)).optional(),
+      })
+      .optional(),
+    delete: z
+      .strictObject({
+        users: z
+          .array(
+            z.looseObject({
+              email: z.string().optional(),
+              userId: z.string().optional(),
+            })
+          )
+          .optional(),
+      })
+      .optional(),
   }
 
-  return auth.joiValidator.body(Joi.object(bulkSchema).required().unknown(true))
+  return auth.zodValidator.body(z.looseObject(bulkSchema))
 }

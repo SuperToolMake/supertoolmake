@@ -1,21 +1,21 @@
 import { middleware } from "@supertoolmake/backend-core"
-import Joi from "joi"
+import { z } from "zod"
 import * as controller from "../controllers/ops"
 import { publicRoutes } from "./endpointGroups"
 
 export function logsValidator() {
-  return middleware.joiValidator.body(
-    Joi.object({
-      message: Joi.string().required(),
-      data: Joi.object(),
+  return middleware.zodValidator.body(
+    z.strictObject({
+      message: z.string(),
+      data: z.looseObject({}).optional(),
     })
   )
 }
 
 export function errorValidator() {
-  return middleware.joiValidator.body(
-    Joi.object({
-      message: Joi.string().required(),
+  return middleware.zodValidator.body(
+    z.strictObject({
+      message: z.string(),
     })
   )
 }
