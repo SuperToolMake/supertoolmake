@@ -115,7 +115,6 @@
     "@grpc/grpc-js": "1.14.5",
     "**/nx/brace-expansion": "5.0.12",
     "**/ip-address": "10.7.1",
-    "decode-uri-component": "0.5.0",
     "devalue": "5.9.2",
     "engine.io": "6.6.10",
     "tmp": "0.2.7",
@@ -124,7 +123,6 @@
     "js-yaml": "4.3.2",
     "tar": "7.5.21",
     "fast-uri": "3.1.8",
-    "stream-json": "3.5.0",
     "postcss": "8.5.26",
     "pacote": "21.5.1",
     "smol-toml": "1.7.1"

@@ -13,7 +13,7 @@ const baseConfig: Config = {
     "^.+\\.svelte?$": "<rootDir>/scripts/svelteTransformer.js",
   },
   transformIgnorePatterns: [
-    "/node_modules/(?!(svelte|esm-env|devalue|archiver|compress-commons|crc32-stream|zip-stream|is-stream|curlconverter|decode-uri-component|stream-json|stream-chain)/)",
+    "/node_modules/(?!(svelte|esm-env|devalue|archiver|compress-commons|crc32-stream|zip-stream|is-stream|curlconverter)/)",
   ],
   moduleNameMapper: {
     "@supertoolmake/backend-core/(.*)": "<rootDir>/../backend-core/$1",
