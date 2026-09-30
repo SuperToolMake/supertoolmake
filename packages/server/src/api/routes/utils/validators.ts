@@ -105,7 +105,7 @@ export function internalSearchValidator() {
   return auth.zodValidator.body(
     z.strictObject({
       tableId: OPTIONAL_STRING,
-      query: filterObject(),
+      query: filterObject().optional(),
       limit: OPTIONAL_NUMBER,
       sort: OPTIONAL_STRING,
       sortOrder: OPTIONAL_STRING,
@@ -120,7 +120,7 @@ export function internalSearchValidator() {
 export function externalSearchValidator() {
   return auth.zodValidator.body(
     z.strictObject({
-      query: filterObject(),
+      query: filterObject().optional(),
       paginate: z.boolean().optional(),
       bookmark: z.union([OPTIONAL_STRING, OPTIONAL_NUMBER]).optional(),
       limit: OPTIONAL_NUMBER,
