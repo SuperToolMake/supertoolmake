@@ -76,8 +76,8 @@
     "nock": "^13.5.4",
     "nodemon": "3.1.14",
     "rimraf": "3.0.2",
-    "mailparser": "3.9.20",
-    "smtp-server": "3.19.6",
+    "mailparser": "3.9.36",
+    "smtp-server": "3.19.17",
     "superagent": "^10.1.1",
     "supertest": "7.2.2",
     "timekeeper": "2.2.0"
