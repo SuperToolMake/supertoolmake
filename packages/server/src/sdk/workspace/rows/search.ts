@@ -61,16 +61,21 @@ export async function search(
     options.query = await enrichSearchContext(options.query, context)
   }
 
+  options.query = dataFilters.cleanupQuery(options.query)
+
   // need to make sure filters in correct shape before checking for view
   options = searchInputMapping(table, options)
 
-  if (
-    !dataFilters.hasFilters(options.query) &&
-    options.query.onEmptyFilter === EmptyFilterOption.RETURN_NONE
-  ) {
-    return {
-      rows: [],
+  if (!dataFilters.hasFilters(options.query)) {
+    if (options.query.onEmptyFilter === EmptyFilterOption.RETURN_NONE) {
+      return {
+        rows: [],
+      }
     }
+
+    // Empty groups can be interpreted inconsistently by datasource adapters.
+    // Clear the query so an empty filter with RETURN_ALL really returns all rows.
+    options.query = {}
   }
 
   if (options.sortOrder) {

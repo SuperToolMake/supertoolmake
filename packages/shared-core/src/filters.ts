@@ -992,7 +992,7 @@ export const hasFilters = (query?: SearchFilters) => {
         continue
       }
       const filtered = Object.entries(searchValue).filter((entry) => {
-        const valueDefined = entry[1] !== undefined || entry[1] !== null || entry[1] !== ""
+        const valueDefined = entry[1] !== undefined && entry[1] !== null && entry[1] !== ""
         // not empty is an edge case, null is allowed for it - this is covered by test cases
         return search === BasicOperator.NOT_EMPTY || valueDefined
       })

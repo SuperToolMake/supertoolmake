@@ -7,7 +7,7 @@ import {
   UILogicalOperator,
   type UISearchFilter,
 } from "@supertoolmake/types"
-import { buildQuery, cleanupQuery, runQuery } from "../filters"
+import { buildQuery, cleanupQuery, hasFilters, runQuery } from "../filters"
 
 describe("filter to query conversion", () => {
   it("handles a filter with 1 group", () => {
@@ -343,5 +343,27 @@ describe("empty array filters", () => {
     })
 
     expect(result).toEqual([])
+  })
+})
+
+describe("filter presence", () => {
+  it("treats an empty bound value as an unconfigured filter", () => {
+    const query = {
+      onEmptyFilter: EmptyFilterOption.RETURN_ALL,
+      [LogicalOperator.AND]: {
+        conditions: [{ [BasicOperator.EQUAL]: { status: "" } }],
+      },
+    }
+
+    expect(hasFilters(query)).toBe(false)
+    expect(hasFilters(cleanupQuery(query))).toBe(false)
+  })
+
+  it.each([0, false])("keeps %s as a configured filter value", (value) => {
+    expect(hasFilters({ [BasicOperator.EQUAL]: { status: value } })).toBe(true)
+  })
+
+  it("allows null for notEmpty filters", () => {
+    expect(hasFilters({ [BasicOperator.NOT_EMPTY]: { status: null } })).toBe(true)
   })
 })
