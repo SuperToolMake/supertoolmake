@@ -28,9 +28,6 @@ const getSubtitle = (datasource) => {
       ? `${datasource.config.endpoint}:${datasource.config.region}`
       : `s3.${datasource.config.region}.amazonaws.com`
   }
-  if (datasource.source === IntegrationTypes.FIRESTORE) {
-    return datasource.config.projectId
-  }
   if (datasource.source === IntegrationTypes.GOOGLE_SHEETS) {
     return datasource.config.spreadsheetId
   }

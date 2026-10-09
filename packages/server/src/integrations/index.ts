@@ -5,7 +5,6 @@ import {
   SourceName,
 } from "@supertoolmake/types"
 import cloneDeep from "lodash/cloneDeep"
-import firebase from "./firebase"
 import sqlServer from "./microsoftSqlServer"
 import minio from "./minio"
 import mysql from "./mysql"
@@ -18,7 +17,6 @@ const DEFINITIONS: Record<SourceName, Integration | undefined> = {
   [SourceName.SQL_SERVER]: sqlServer.schema,
   [SourceName.MYSQL]: mysql.schema,
   [SourceName.REST]: rest.schema,
-  [SourceName.FIRESTORE]: firebase.schema,
   [SourceName.REDIS]: redis.schema,
   [SourceName.MINIO]: minio.schema,
 }
@@ -37,7 +35,6 @@ const INTEGRATIONS: Record<SourceName, IntegrationBaseConstructor | undefined> =
   [SourceName.SQL_SERVER]: sqlServer.integration,
   [SourceName.MYSQL]: mysql.integration,
   [SourceName.REST]: rest.integration,
-  [SourceName.FIRESTORE]: firebase.integration,
   [SourceName.REDIS]: redis.integration,
   [SourceName.MINIO]: minio.integration,
 }

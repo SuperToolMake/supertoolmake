@@ -170,7 +170,6 @@ export const DB_TYPE_EXTERNAL = "external"
 
 export const IntegrationTypes = {
   COUCHDB: "COUCHDB",
-  FIRESTORE: "FIRESTORE",
   GOOGLE_SHEETS: "GOOGLE_SHEETS",
   INTERNAL: "INTERNAL",
   MYSQL: "MYSQL",
@@ -189,7 +188,6 @@ export const IntegrationNames = {
   [IntegrationTypes.SQL_SERVER]: "SQL Server",
   [IntegrationTypes.INTERNAL]: "Internal",
   [IntegrationTypes.GOOGLE_SHEETS]: "Google Sheets",
-  [IntegrationTypes.FIRESTORE]: "Firestore",
   [IntegrationTypes.REDIS]: "Redis",
 }
 

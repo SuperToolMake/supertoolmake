@@ -13,7 +13,6 @@ export const PHOSPHOR_ICONS: Record<string, { name: string; weight?: string; col
   POSTGRES: { name: "lightning", weight: "duotone", color: "#3DD08E" },
   SQL_SERVER: { name: "database", weight: "duotone", color: "#0072C6" },
   REST: { name: "globe-simple", weight: "duotone" },
-  FIRESTORE: { name: "flame", weight: "duotone", color: "#FFA000" },
   REDIS: { name: "shapes", weight: "duotone", color: "#DC382D" },
   CUSTOM: { name: "plugs-connected", weight: "duotone", color: "#6B6B6B" },
 }

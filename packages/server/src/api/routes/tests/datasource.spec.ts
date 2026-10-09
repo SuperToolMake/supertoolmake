@@ -72,50 +72,6 @@ describe("/datasources", () => {
     })
   })
 
-  describe("secret redaction", () => {
-    it("should redact and preserve Firestore private keys", async () => {
-      const privateKey =
-        "-----BEGIN PRIVATE KEY-----\nMIISECRETKEYMATERIAL\n-----END PRIVATE KEY-----"
-      const firestoreDatasource = await config.api.datasource.create({
-        type: "datasource",
-        name: generator.guid(),
-        source: SourceName.FIRESTORE,
-        config: {
-          email: "service-account@example.iam.gserviceaccount.com",
-          privateKey,
-          projectId: "project-id",
-          databaseId: "(default)",
-        },
-      })
-
-      expect(firestoreDatasource.config!.privateKey).toBe(PASSWORD_REPLACEMENT)
-
-      const fetchedDatasource = await config.api.datasource.get(firestoreDatasource._id!)
-      expect(fetchedDatasource.config!.privateKey).toBe(PASSWORD_REPLACEMENT)
-
-      const datasources = await config.api.datasource.fetch()
-      expect(datasources).toContainEqual(
-        expect.objectContaining({
-          _id: firestoreDatasource._id,
-          config: expect.objectContaining({
-            privateKey: PASSWORD_REPLACEMENT,
-          }),
-        })
-      )
-
-      await config.api.datasource.update(fetchedDatasource)
-
-      const storedPrivateKey = await context.doInWorkspaceContext(
-        config.getDevWorkspaceId(),
-        async () => {
-          const ds = await sdk.datasources.get(firestoreDatasource._id!)
-          return ds.config!.privateKey
-        }
-      )
-      expect(storedPrivateKey).toBe(privateKey)
-    })
-  })
-
   describe("dynamic variables", () => {
     it("should invalidate changed or removed variables", async () => {
       nock("http://www.example.com")
@@ -665,31 +621,6 @@ if (descriptions.length) {
 
         expect(ds.config!.authConfigs[0].config.password).toBe("{{ env.PASSWORD }}")
         expect(ds.config!.authConfigs[0].config.username).toBe("{{ env.USERNAME }}")
-      })
-
-      it("scrubs sensitive longform fields in get response", async () => {
-        const privateKey = [
-          "-----BEGIN PRIVATE KEY-----",
-          "secret-material",
-          "-----END PRIVATE KEY-----",
-        ].join("\n")
-        const created = await config.api.datasource.create({
-          type: "datasource",
-          name: "Snowflake longform secret",
-          source: SourceName.FIRESTORE,
-          config: {
-            account: "test-account",
-            username: "test-user",
-            privateKey,
-            warehouse: "test-warehouse",
-            database: "test-database",
-            schema: "test-schema",
-          },
-        })
-
-        const fetched = await config.api.datasource.get(created._id!)
-
-        expect(fetched.config!.privateKey).toBe(PASSWORD_REPLACEMENT)
       })
     })
 

@@ -28,7 +28,6 @@ const SQL_CLIENT_SOURCE_MAP: Record<SourceName, SqlClient | undefined> = {
   [SourceName.MYSQL]: SqlClient.MY_SQL,
   [SourceName.SQL_SERVER]: SqlClient.MS_SQL,
   [SourceName.REST]: undefined,
-  [SourceName.FIRESTORE]: undefined,
   [SourceName.REDIS]: undefined,
   [SourceName.MINIO]: undefined,
 }
