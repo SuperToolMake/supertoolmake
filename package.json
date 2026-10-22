@@ -101,7 +101,7 @@
     "xml2js": "0.6.2",
     "passport": "0.6.0",
     "fast-xml-parser": "5.7.3",
-    "follow-redirects": "1.16.0",
+    "follow-redirects": "1.16.1",
     "form-data": "4.0.6",
     "@azure/identity": "4.2.1",
     "kind-of": "6.0.3",
