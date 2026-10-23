@@ -650,7 +650,6 @@ describe("/applications", () => {
   })
 
   describe("fetchAppDefinition", () => {
-
     it("should be able to get an apps definition", async () => {
       const res = await config.api.workspace.getDefinition(workspace.appId)
       expect(res.libraries.length).toEqual(1)
