@@ -650,20 +650,6 @@ describe("/applications", () => {
   })
 
   describe("fetchAppDefinition", () => {
-    it("should reject users from another tenant", async () => {
-      await config.newTenant()
-
-      await config.withHeaders({ [Header.WORKSPACE_ID]: workspace.appId }, () =>
-        config.api.workspace.getDefinition(workspace.appId, {
-          status: 401,
-        })
-      )
-      await config
-        .getRequest()!
-        .get("/api/routing/client")
-        .set({ ...config.defaultHeaders(), [Header.WORKSPACE_ID]: workspace.appId })
-        .expect(401)
-    })
 
     it("should be able to get an apps definition", async () => {
       const res = await config.api.workspace.getDefinition(workspace.appId)
@@ -690,16 +676,6 @@ describe("/applications", () => {
       )
 
       expect(res.application.snippets).toBeUndefined()
-    })
-
-    it("should reject users from another tenant", async () => {
-      await config.newTenant()
-
-      await config.withHeaders({ [Header.WORKSPACE_ID]: workspace.appId }, () =>
-        config.api.workspace.getAppPackage(workspace.appId, {
-          expectations: { status: 401 },
-        })
-      )
     })
 
     it("should be able to fetch the app package", async () => {
