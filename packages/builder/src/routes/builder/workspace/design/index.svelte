@@ -311,7 +311,6 @@ $: displayedWorkspaceApps = workspaceApps
         <NoResults
           ctaText="Create your first app"
           onCtaClick={createApp}
-          resourceType="app"
         >
           No apps yet! Build your first app to get started.
         </NoResults>
