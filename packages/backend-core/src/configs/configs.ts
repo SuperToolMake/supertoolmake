@@ -61,7 +61,6 @@ export async function getSettingsConfigDoc(): Promise<SettingsConfig> {
 
   // overridden fields
   config.config.platformUrl = await getPlatformUrl({
-    tenantAware: true,
     config: config.config,
   })
 
@@ -72,27 +71,15 @@ export async function getSettingsConfig(): Promise<SettingsInnerConfig> {
   return (await getSettingsConfigDoc()).config
 }
 
-export async function getPlatformUrl(
-  opts: { tenantAware: boolean; config?: SettingsInnerConfig } = {
-    tenantAware: true,
-  }
-) {
+export async function getPlatformUrl(opts: { config?: SettingsInnerConfig } = {}) {
   let platformUrl = env.PLATFORM_URL || "http://localhost:10000"
 
-  if (!env.SELF_HOSTED && env.MULTI_TENANCY && opts.tenantAware) {
-    // cloud and multi tenant - add the tenant to the default platform url
-    const tenantId = context.getTenantId()
-    if (!platformUrl.includes("localhost:")) {
-      platformUrl = platformUrl.replace("://", `://${tenantId}.`)
-    }
-  } else if (env.SELF_HOSTED) {
-    const config = opts?.config
-      ? opts.config
-      : // direct to db to prevent infinite loop
-        (await getConfig<SettingsConfig>(ConfigType.SETTINGS))?.config
-    if (config?.platformUrl) {
-      platformUrl = config.platformUrl
-    }
+  const config = opts?.config
+    ? opts.config
+    : // direct to db to prevent infinite loop
+      (await getConfig<SettingsConfig>(ConfigType.SETTINGS))?.config
+  if (config?.platformUrl) {
+    platformUrl = config.platformUrl
   }
 
   return platformUrl
@@ -110,15 +97,9 @@ export async function getGoogleConfig(): Promise<GoogleInnerConfig | undefined> 
 }
 
 export async function getGoogleDatasourceConfig(): Promise<GoogleInnerConfig | undefined> {
-  if (!env.SELF_HOSTED) {
-    // always use the env vars in cloud
-    return getDefaultGoogleConfig()
-  }
-
-  // prefer the config in self-host
+  // prefer the config, fallback to env vars
   let config = await getGoogleConfig()
 
-  // fallback to env vars
   if (!config?.activated) {
     config = getDefaultGoogleConfig()
   }

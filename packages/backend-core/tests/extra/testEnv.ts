@@ -11,14 +11,6 @@ export async function withTenant(task: (tenantId: string) => any) {
   })
 }
 
-export function singleTenant() {
-  env._set("MULTI_TENANCY", 0)
-}
-
-export function multiTenant() {
-  env._set("MULTI_TENANCY", 1)
-}
-
 export function selfHosted() {
   env._set("SELF_HOSTED", 1)
 }

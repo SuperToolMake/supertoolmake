@@ -1,4 +1,4 @@
-import { configs, constants, context, db, withEnv } from "@supertoolmake/backend-core"
+import { configs, constants, context, db } from "@supertoolmake/backend-core"
 import { structures, TestConfiguration } from "../../../../tests"
 
 describe("security boundaries", () => {
@@ -10,20 +10,18 @@ describe("security boundaries", () => {
     undefined,
     "invalid-internal-key",
   ])("rejects tenant initialization with key %s before creating a database", async (key) => {
-    await withEnv({ MULTI_TENANCY: "" }, async () => {
-      config.selfHosted()
-      const tenantId = structures.tenant.id()
-      try {
-        const request = config.request.post("/api/global/users/init")
-        if (key) request.set(constants.Header.API_KEY, key)
-        await request
-          .send({ tenantId, email: structures.email(), password: "password123!" })
-          .expect(403)
-        expect(await context.doInTenant(tenantId, () => context.getGlobalDB().exists())).toBe(false)
-      } finally {
-        config.cloudHosted()
-      }
-    })
+    config.selfHosted()
+    const tenantId = structures.tenant.id()
+    try {
+      const request = config.request.post("/api/global/users/init")
+      if (key) request.set(constants.Header.API_KEY, key)
+      await request
+        .send({ tenantId, email: structures.email(), password: "password123!" })
+        .expect(403)
+      expect(await context.doInTenant(tenantId, () => context.getGlobalDB().exists())).toBe(false)
+    } finally {
+      config.cloudHosted()
+    }
   })
 
   it("preserves public single-tenant bootstrap and rejects repeated initialization", async () => {
@@ -31,12 +29,10 @@ describe("security boundaries", () => {
     const database = db.getDB(name)
     const replacement = jest.replaceProperty(constants.StaticDatabases.GLOBAL, "name", name)
     try {
-      await withEnv({ MULTI_TENANCY: "" }, async () => {
-        config.selfHosted()
-        const input = { tenantId: "default", email: structures.email(), password: "password123!" }
-        await config.request.post("/api/global/users/init").send(input).expect(200)
-        await config.request.post("/api/global/users/init").send(input).expect(403)
-      })
+      config.selfHosted()
+      const input = { tenantId: "default", email: structures.email(), password: "password123!" }
+      await config.request.post("/api/global/users/init").send(input).expect(200)
+      await config.request.post("/api/global/users/init").send(input).expect(403)
     } finally {
       replacement.restore()
       config.cloudHosted()
@@ -55,7 +51,7 @@ describe("security boundaries", () => {
       const user = await context.doInTenant(tenantId, () =>
         context.getGlobalDB().get(response.body._id)
       )
-      expect(user).toMatchObject({ tenantId, admin: { global: true } })
+      expect(user).toMatchObject({ tenantId: context.DEFAULT_TENANT_ID, admin: { global: true } })
     } finally {
       await context.doInTenant(tenantId, () => context.getGlobalDB().destroy())
     }
@@ -73,9 +69,11 @@ describe("security boundaries", () => {
   })
 
   it("omits legacy credentials and unknown fields from public settings while preserving branding", async () => {
-    await config.doInTenant(async () => {
+    const original = await context.doInTenant(context.DEFAULT_TENANT_ID, async () => {
+      const db = context.getGlobalDB()
       const settings = await configs.getSettingsConfigDoc()
-      await context.getGlobalDB().put({
+      const raw = await db.get(settings._id).catch(() => undefined)
+      await db.put({
         ...settings,
         config: {
           ...settings.config,
@@ -85,17 +83,30 @@ describe("security boundaries", () => {
           unexpectedSecret: "secret-proof",
         },
       })
+      return { id: settings._id, raw }
     })
-    const response = await config.request
-      .get("/api/global/configs/public")
-      .set(config.tenantIdHeaders())
-      .expect(200)
-    expect(response.body.config).toMatchObject({
-      company: "Example",
-      platformTitle: "Example portal",
-    })
-    expect(response.body.config).not.toHaveProperty("liteLLM")
-    expect(response.body.config).not.toHaveProperty("unexpectedSecret")
-    expect(JSON.stringify(response.body)).not.toContain("secret-proof")
+    try {
+      const response = await config.request
+        .get("/api/global/configs/public")
+        .set(config.tenantIdHeaders())
+        .expect(200)
+      expect(response.body.config).toMatchObject({
+        company: "Example",
+        platformTitle: "Example portal",
+      })
+      expect(response.body.config).not.toHaveProperty("liteLLM")
+      expect(response.body.config).not.toHaveProperty("unexpectedSecret")
+      expect(JSON.stringify(response.body)).not.toContain("secret-proof")
+    } finally {
+      await context.doInTenant(context.DEFAULT_TENANT_ID, async () => {
+        const db = context.getGlobalDB()
+        if (original.raw) {
+          const current = await db.get(original.id!)
+          await db.put({ ...original.raw, _rev: current._rev })
+        } else {
+          await db.remove(original.id!, (await db.get(original.id!))._rev)
+        }
+      })
+    }
   })
 })

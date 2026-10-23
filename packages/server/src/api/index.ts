@@ -49,14 +49,7 @@ router
       publicAllowed: true,
     })
   )
-  // nothing in the server should allow query string tenants
-  // the server can be public anywhere, so nowhere should throw errors
-  // if the tenancy has not been set, it'll have to be discovered at application layer
-  .use(
-    auth.buildTenancyMiddleware([], [], {
-      noTenancyRequired: true,
-    })
-  )
+  .use(auth.buildTenancyMiddleware())
   .use(middleware.activeTenant())
   .use(currentWorkspace)
 

@@ -19,7 +19,6 @@ export class AdminStore extends BudiStore<AdminState> {
     super({
       loaded: false,
       isDev: false,
-      multiTenancy: false,
       cloud: false,
       offlineMode: false,
       maintenance: [],
@@ -44,7 +43,6 @@ export class AdminStore extends BudiStore<AdminState> {
     const environment = await API.getEnvironment()
     this.update((store) => {
       store.isDev = environment.isDev
-      store.multiTenancy = environment.multiTenancy
       store.cloud = environment.cloud
       store.baseUrl = environment.baseUrl
       store.offlineMode = environment.offlineMode

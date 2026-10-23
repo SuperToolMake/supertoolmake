@@ -68,7 +68,6 @@ describe("admin store", () => {
       API.getChecklist.mockReturnValue("checklist")
 
       API.getEnvironment.mockReturnValue({
-        multiTenancy: true,
         cloud: true,
         isDev: true,
         serveDevClientFromStorage: false,
@@ -103,7 +102,6 @@ describe("admin store", () => {
         expect(API.getEnvironment).toHaveBeenCalledWith()
         expect(ctx.writableReturn.update.mock.calls[1][0]({ foo: "foo" })).toEqual({
           foo: "foo",
-          multiTenancy: true,
           cloud: true,
           isDev: true,
         })

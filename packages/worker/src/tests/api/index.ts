@@ -7,7 +7,6 @@ import { RolesAPI } from "./roles"
 import { SelfAPI } from "./self"
 import { StatusAPI } from "./status"
 import { TemplatesAPI } from "./templates"
-import { TenantAPI } from "./tenants"
 import { UserAPI } from "./users"
 
 export default class API {
@@ -18,7 +17,6 @@ export default class API {
   users: UserAPI
   status: StatusAPI
   restore: RestoreAPI
-  tenants: TenantAPI
   roles: RolesAPI
   templates: TemplatesAPI
 
@@ -30,7 +28,6 @@ export default class API {
     this.users = new UserAPI(config)
     this.status = new StatusAPI(config)
     this.restore = new RestoreAPI(config)
-    this.tenants = new TenantAPI(config)
     this.roles = new RolesAPI(config)
     this.templates = new TemplatesAPI(config)
   }

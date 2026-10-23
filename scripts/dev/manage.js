@@ -19,8 +19,6 @@ async function init() {
     COUCH_DB_URL: "http://budibase:budibase@localhost:4005",
     COUCH_DB_USERNAME: "budibase",
     COUCH_DB_PASSWORD: "budibase",
-    // empty string is false
-    MULTI_TENANCY: "",
     DISABLE_ACCOUNT_PORTAL: "1",
     ACCOUNT_PORTAL_URL: "http://localhost:10001",
     ACCOUNT_PORTAL_API_KEY: "budibase",

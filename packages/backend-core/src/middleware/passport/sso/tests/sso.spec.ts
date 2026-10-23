@@ -2,7 +2,6 @@ import type { InviteWithCode, SSOAuthDetails, SSOUser, User } from "@supertoolma
 import { UserStatus } from "@supertoolmake/types"
 import nock from "nock"
 import { structures } from "../../../../../tests"
-import { testEnv } from "../../../../../tests/extra"
 import * as context from "../../../../context"
 import { HTTPError } from "../../../../errors"
 import * as sso from "../sso"
@@ -48,7 +47,6 @@ describe("sso", () => {
   describe("authenticate", () => {
     beforeEach(() => {
       jest.resetAllMocks()
-      testEnv.singleTenant()
       nock.cleanAll()
       mockInvite.getExistingInvites.mockResolvedValue([])
       locks.doWithLock.mockImplementation(async (_opts: any, fn: any) => ({

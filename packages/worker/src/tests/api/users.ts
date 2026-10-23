@@ -174,19 +174,6 @@ export class UserAPI extends TestAPI {
       .expect(opts?.status ? opts.status : 200)
   }
 
-  changeTenantOwnerEmail = (
-    newAccountEmail: string,
-    originalEmail: string,
-    tenantIds: string[],
-    status = 200
-  ) => {
-    return this.request
-      .put(`/api/global/users/tenant/owner`)
-      .send({ newAccountEmail, originalEmail, tenantIds })
-      .set(this.config.internalAPIHeaders())
-      .expect(status)
-  }
-
   addWorkspaceIdToInvite = (code: string, role: string, status = 200) => {
     return this.request
       .post(`/api/global/users/invite/${code}/${role}`)

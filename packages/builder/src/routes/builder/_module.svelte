@@ -39,11 +39,6 @@ async function initBuilder() {
 
       await auth.getInitInfo()
     }
-
-    // Validate tenant if in a multi-tenant env
-    if (multiTenancyEnabled) {
-      await auth.validateTenantId()
-    }
   } catch (error) {
     // Don't show a notification here, as we might 403 initially due to not
     // being logged in. API error handler will clear user if session was destroyed.
@@ -87,7 +82,6 @@ let commandPaletteModal
 let settingsModal
 let hasAuthenticated = false
 
-$: multiTenancyEnabled = $admin.multiTenancy
 $: hasAdminUser = $admin?.checklist?.adminUser?.checked
 $: user = $auth.user
 $: isOwner = sdk.users.hasAdminPermissions(user)
@@ -119,12 +113,6 @@ derivedMemo(
       )
     ) {
       CookieUtils.setCookie(Constants.Cookies.ReturnUrl, window.location.href)
-    }
-
-    // if tenant is not set go to it
-    if (multiTenancyEnabled && !$auth.tenantSet) {
-      goto("./auth/org")
-      return
     }
 
     // Force creation of an admin user if one doesn't exist

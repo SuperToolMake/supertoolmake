@@ -1,38 +1,11 @@
-import {
-  type Ctx,
-  type EndpointMatcher,
-  type GetTenantIdOptions,
-  TenantResolutionStrategy,
-} from "@supertoolmake/types"
+import type { Ctx } from "@supertoolmake/types"
 import type { Middleware, Next } from "koa"
-import { Header } from "../constants"
+import { DEFAULT_TENANT_ID, Header } from "../constants"
 import { doInTenant } from "../context"
-import { getTenantIDFromCtx } from "../tenancy"
-import { buildMatcherRegex, matches } from "./matchers"
 
-export function tenancy(
-  allowQueryStringPatterns: EndpointMatcher[],
-  noTenancyPatterns: EndpointMatcher[],
-  opts: { noTenancyRequired?: boolean } = { noTenancyRequired: false }
-) {
-  const allowQsOptions = buildMatcherRegex(allowQueryStringPatterns)
-  const noTenancyOptions = buildMatcherRegex(noTenancyPatterns)
-
+export function tenancy() {
   return (async (ctx: Ctx, next: Next) => {
-    const allowNoTenant = opts.noTenancyRequired || Boolean(matches(ctx, noTenancyOptions))
-    const tenantOpts: GetTenantIdOptions = {
-      allowNoTenant,
-    }
-
-    const allowQs = Boolean(matches(ctx, allowQsOptions))
-    if (!allowQs) {
-      tenantOpts.excludeStrategies = [TenantResolutionStrategy.QUERY]
-    }
-
-    const tenantId = getTenantIDFromCtx(ctx, tenantOpts)
-    if (tenantId) {
-      ctx.set(Header.TENANT_ID, tenantId)
-    }
-    return doInTenant(tenantId, next)
+    ctx.set(Header.TENANT_ID, DEFAULT_TENANT_ID)
+    return doInTenant(DEFAULT_TENANT_ID, next)
   }) as Middleware
 }

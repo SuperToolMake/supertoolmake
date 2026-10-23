@@ -13,7 +13,6 @@ import "./system/environment"
 import "./system/logs"
 import "./system/restore"
 import "./system/status"
-import "./system/tenants"
 
 const endpointGroupsRouter = new Router()
 for (const endpoint of endpointGroupList.listAllEndpoints()) {

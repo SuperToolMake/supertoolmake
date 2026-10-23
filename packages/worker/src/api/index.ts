@@ -72,59 +72,6 @@ const PUBLIC_ENDPOINTS = [
   },
 ]
 
-const NO_TENANCY_ENDPOINTS = [
-  // system endpoints are not specific to any tenant
-  {
-    route: "/api/system",
-    method: "ALL",
-  },
-  // tenant is determined in request body
-  // used for creating the tenant
-  {
-    route: "/api/global/users/init",
-    method: "POST",
-  },
-  // tenant is retrieved from the user found by the requested email
-  {
-    route: "/api/global/users/sso",
-    method: "POST",
-  },
-  // deprecated single tenant sso callback
-  {
-    route: "/api/admin/auth/google/callback",
-    method: "GET",
-  },
-  // deprecated single tenant sso callback
-  {
-    route: "/api/admin/auth/oidc/callback",
-    method: "GET",
-  },
-  // global user search - no tenancy
-  // :id is user id
-  // TODO: this should really be `/api/system/users/:id`
-  {
-    route: "/api/global/users/tenant/:id",
-    method: "GET",
-  },
-  // tenant is determined from code in redis
-  {
-    route: "/api/global/users/invite/accept",
-    method: "POST",
-  },
-  {
-    route: "/api/global/users/invite/:code",
-    method: "GET",
-  },
-  {
-    route: "/api/global/users/accountholder",
-    method: "GET",
-  },
-  {
-    route: "/api/global/users/tenant/owner",
-    method: "PUT",
-  },
-]
-
 // most public endpoints are gets, but some are posts
 // add them all to be safe
 const NO_CSRF_ENDPOINTS = [...PUBLIC_ENDPOINTS]
@@ -147,7 +94,7 @@ router
   )
   .use("/health", (ctx) => (ctx.status = 200))
   .use(auth.buildAuthMiddleware(PUBLIC_ENDPOINTS))
-  .use(auth.buildTenancyMiddleware(PUBLIC_ENDPOINTS, NO_TENANCY_ENDPOINTS))
+  .use(auth.buildTenancyMiddleware())
   .use(middleware.activeTenant())
   .use(auth.buildCsrfMiddleware({ noCsrfPatterns: NO_CSRF_ENDPOINTS }))
   // for now no public access is allowed to worker (bar health check)

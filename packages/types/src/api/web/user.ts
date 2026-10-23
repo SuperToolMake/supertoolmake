@@ -171,9 +171,3 @@ export interface CheckInviteResponse {
 export type GetUserInvitesResponse = InviteWithCode[]
 
 export interface UpdateInviteResponse extends Invite {}
-
-export interface ChangeTenantOwnerEmailRequest {
-  newAccountEmail: string
-  originalEmail: string
-  tenantIds: string[]
-}

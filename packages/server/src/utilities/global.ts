@@ -2,7 +2,6 @@ import { cache, context, db as dbCore, roles, tenancy, users } from "@supertoolm
 import type { ContextUser, User, UserCtx } from "@supertoolmake/types"
 import cloneDeep from "lodash/cloneDeep"
 import { getGlobalIDFromUserMetadataID } from "../db/utils"
-import env from "../environment"
 import { stripSensitiveUserFields } from "./sensitiveUserFields"
 
 export async function processUser(user: ContextUser, opts: { appId?: string } = {}) {
@@ -14,12 +13,6 @@ export async function processUser(user: ContextUser, opts: { appId?: string } = 
   const workspaceId = opts.appId || context.getWorkspaceId()
   if (!workspaceId) {
     throw new Error("Unable to process user without app ID")
-  }
-  // if in a multi-tenancy environment and in wrong tenant make sure roles are never updated
-  if (env.MULTI_TENANCY && workspaceId && !tenancy.isUserInWorkspaceTenant(workspaceId, user)) {
-    user = users.removePortalUserPermissions(user)
-    user.roleId = roles.BUILTIN_ROLE_IDS.PUBLIC
-    return user
   }
   // builders are always admins within the app
   if (users.isBuilder(user, workspaceId)) {

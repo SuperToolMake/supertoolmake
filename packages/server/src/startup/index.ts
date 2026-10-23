@@ -84,7 +84,7 @@ export async function startup(opts: { app?: Koa; server?: Server; force?: boolea
   // the app user sync
   const bbAdminEmail = coreEnv.BB_ADMIN_USER_EMAIL,
     bbAdminPassword = coreEnv.BB_ADMIN_USER_PASSWORD
-  if (env.SELF_HOSTED && !env.MULTI_TENANCY && bbAdminEmail && bbAdminPassword) {
+  if (env.SELF_HOSTED && bbAdminEmail && bbAdminPassword) {
     console.log("Initialising admin user")
     const tenantId = tenancy.getTenantId()
     await tenancy.doInTenant(tenantId, async () => {
@@ -112,7 +112,7 @@ export async function startup(opts: { app?: Koa; server?: Server; force?: boolea
     })
   }
 
-  if (env.SELF_HOSTED && !env.MULTI_TENANCY) {
+  if (env.SELF_HOSTED) {
     console.log("Updating client library")
     const tenantId = tenancy.getTenantId()
     await tenancy.doInTenant(tenantId, async () => {

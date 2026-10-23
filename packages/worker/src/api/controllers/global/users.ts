@@ -18,7 +18,6 @@ import {
   APIWarningCode,
   type BulkUserRequest,
   type BulkUserResponse,
-  type ChangeTenantOwnerEmailRequest,
   type CheckInviteResponse,
   type CountUserResponse,
   type CreateAdminUserRequest,
@@ -39,7 +38,6 @@ import {
   LockName,
   LockType,
   type LookupTenantUserResponse,
-  type OIDCUser,
   type SaveUserResponse,
   type SearchUsersRequest,
   type SearchUsersResponse,
@@ -78,40 +76,6 @@ export const save = async (ctx: UserCtx<UnsavedUser, SaveUserResponse>) => {
       _rev: user._rev!,
       email: user.email,
     }
-  } catch (err: any) {
-    ctx.throw(err.status || 400, err.message)
-  }
-}
-
-export const changeTenantOwnerEmail = async (ctx: Ctx<ChangeTenantOwnerEmailRequest, void>) => {
-  if (!ctx.internal) {
-    ctx.throw(403, "Unauthorized")
-  }
-
-  const { newAccountEmail, originalEmail, tenantIds } = ctx.request.body
-  try {
-    for (const tenantId of tenantIds) {
-      await tenancy.doInTenant(tenantId, async () => {
-        const tenantUser = (await userSdk.db.getUserByEmail(originalEmail)) as OIDCUser
-        if (!tenantUser) {
-          return
-        }
-        tenantUser.email = newAccountEmail
-
-        tenantUser.provider = undefined
-        tenantUser.providerType = undefined
-        tenantUser.thirdPartyProfile = undefined
-        tenantUser.profile = undefined
-        tenantUser.oauth2 = undefined
-
-        await userSdk.db.save(tenantUser, {
-          currentUserId: tenantUser._id,
-          isAccountHolder: true,
-          allowChangingEmail: true,
-        })
-      })
-    }
-    ctx.status = 200
   } catch (err: any) {
     ctx.throw(err.status || 400, err.message)
   }
@@ -182,7 +146,7 @@ const parseBooleanParam = (param: any) => {
 export const adminUser = async (ctx: Ctx<CreateAdminUserRequest, CreateAdminUserResponse>) => {
   const { email, password, tenantId, ssoId, givenName, familyName } = ctx.request.body
 
-  if (context.isMultiTenant() || (tenantId && tenantId !== constants.DEFAULT_TENANT_ID)) {
+  if (tenantId && tenantId !== constants.DEFAULT_TENANT_ID) {
     const apiKey = ctx.request.headers[constants.Header.API_KEY]
     if (typeof apiKey !== "string" || !backendCoreUtils.isValidInternalAPIKey(apiKey)) {
       ctx.throw(403, "Unauthorized")

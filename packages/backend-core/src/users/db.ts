@@ -21,7 +21,7 @@ import * as sessions from "../security/sessions"
 import { compare, hash } from "../utils"
 import { getFirstPlatformUser, getPlatformUsers, searchExistingEmails } from "./lookup"
 import * as usersCore from "./users"
-import { creatorsInList, isAdmin, isCreatorAsync, validateUniqueUser } from "./utils"
+import { creatorsInList, isAdmin, isCreatorAsync } from "./utils"
 
 type CreateAdminUserOpts = {
   password?: string
@@ -223,15 +223,6 @@ export class UserDB {
     }
 
     const addUsers = async () => {
-      const isNewUser = !dbUser
-      const isEmailChanging = Boolean(email) && dbUser?.email != null && dbUser.email !== email
-      const shouldValidateUniqueUser =
-        !opts.isAccountHolder && Boolean(email) && (isNewUser || isEmailChanging)
-
-      if (shouldValidateUniqueUser) {
-        await validateUniqueUser(email, tenantId)
-      }
-
       let builtUser = await UserDB.buildUser(user, opts, tenantId, dbUser)
       // don't allow a user to update its own roles/perms
       if (opts.currentUserId && opts.currentUserId === dbUser?._id) {

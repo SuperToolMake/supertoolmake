@@ -1,8 +1,5 @@
 import { sdk } from "@supertoolmake/shared-core"
 import type { ContextUser, User } from "@supertoolmake/types"
-import env from "../environment"
-import { EmailUnavailableError } from "../errors"
-import { getFirstPlatformUser } from "./lookup"
 
 // extract from shared-core to make easily accessible from backend-core
 export const isBuilder = sdk.users.isBuilder
@@ -26,14 +23,4 @@ export async function isCreatorAsync(user: User | ContextUser) {
 export function isCreatorSync(user: User | ContextUser) {
   const isCreatorByUserDefinition = sdk.users.isCreator(user)
   return isCreatorByUserDefinition
-}
-
-export async function validateUniqueUser(email: string, tenantId: string) {
-  // check budibase users in other tenants
-  if (env.MULTI_TENANCY) {
-    const tenantUser = await getFirstPlatformUser(email)
-    if (tenantUser != null && tenantUser.tenantId !== tenantId) {
-      throw new EmailUnavailableError(email)
-    }
-  }
 }

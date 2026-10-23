@@ -317,7 +317,6 @@ describe("/api/global/auth", () => {
       return chosenConfig.uuid
     }
 
-    // MULTI TENANT
     describe("GET /api/global/auth/:tenantId/oidc/configs/:configId", () => {
       it("redirects to auth provider", async () => {
         nock("http://someconfigurl").get("/").times(1).reply(200, {
@@ -336,7 +335,7 @@ describe("/api/global/auth", () => {
         expect(location).toBeDefined()
         expect(
           location!.startsWith(
-            `http://example.com/auth?response_type=code&client_id=clientId&redirect_uri=http%3A%2F%2Flocalhost%3A10000%2Fapi%2Fglobal%2Fauth%2F${config.tenantId}%2Foidc%2Fcallback&scope=openid%20profile%20email%20offline_access`
+            `http://example.com/auth?response_type=code&client_id=clientId&redirect_uri=http%3A%2F%2Flocalhost%3A10000%2Fapi%2Fglobal%2Fauth%2Foidc%2Fcallback&scope=openid%20profile%20email%20offline_access`
           )
         ).toBe(true)
       })

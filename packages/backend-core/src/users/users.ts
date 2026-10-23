@@ -256,7 +256,9 @@ export async function paginatedUsers({ bookmark, query, appId, limit }: SearchUs
       cleanup: true,
     })
   } else if (query) {
-    const response = await db.allDocs<User>(getGlobalUserParams(null, { ...opts, limit: 100 }))
+    const response = await db.allDocs<User>(
+      getGlobalUserParams(null, { ...opts, limit: undefined })
+    )
     userList = response.rows.map((row) => row.doc!)
     userList = dataFilters.search(userList, { query, limit: opts.limit }).rows
   } else {

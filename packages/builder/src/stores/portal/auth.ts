@@ -177,54 +177,6 @@ class AuthStore extends BudiStore<PortalAuthStore> {
     const info = await API.fetchDeveloperInfo()
     return info?.apiKey
   }
-
-  /**
-   * Determine the tenantId and set it
-   * This is required for checklist requests on load or logout.
-   * If it can't be determined, "default" is used.
-   */
-  async validateTenantId() {
-    const store = get(this.store)
-    const adminStore = get(admin)
-    const host = window.location.host
-    if (host.includes("localhost:") || !adminStore.baseUrl) {
-      // ignore local dev
-      return
-    }
-    const mainHost = new URL(adminStore.baseUrl).host
-    let urlTenantId
-    // remove the main host part
-    const hostParts = host.split(mainHost).filter((part) => part !== "")
-    // if there is a part left, it has to be the tenant ID subdomain
-    if (hostParts.length === 1) {
-      urlTenantId = hostParts[0].replace(/\./g, "")
-    }
-
-    if (store.user?.tenantId) {
-      if (!urlTenantId) {
-        // redirect to correct tenantId subdomain
-        if (!window.location.host.includes("localhost")) {
-          let redirectUrl = window.location.href
-          redirectUrl = redirectUrl.replace("://", `://${store.user.tenantId}.`)
-          window.location.href = redirectUrl
-        }
-        return
-      }
-
-      if (urlTenantId && store.user.tenantId !== urlTenantId) {
-        // user should not be here - play it safe and log them out
-        try {
-          await this.logout()
-          await this.setOrganisation()
-        } catch {
-          console.error(`Tenant mis-match - "${urlTenantId}" and "${store.user.tenantId}" - logout`)
-        }
-      }
-    } else {
-      // no user - set the org according to the url
-      await this.setOrganisation(urlTenantId)
-    }
-  }
 }
 
 export const auth = new AuthStore()

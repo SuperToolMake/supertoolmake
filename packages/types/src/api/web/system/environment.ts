@@ -1,5 +1,4 @@
 export interface GetEnvironmentResponse {
-  multiTenancy: boolean
   offlineMode: boolean
   cloud: boolean
   baseUrl?: string

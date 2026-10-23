@@ -24,7 +24,7 @@ async function fetchGoogleCreds() {
 export async function preAuth(passport: Passport, ctx: UserCtx, next: Function) {
   // get the relevant config
   const googleConfig = await fetchGoogleCreds()
-  const platformUrl = await configs.getPlatformUrl({ tenantAware: false })
+  const platformUrl = await configs.getPlatformUrl()
 
   const callbackUrl = `${platformUrl}/api/global/auth/datasource/google/callback`
   const strategy = await google.strategyFactory(googleConfig, callbackUrl, ssoSaveUserNoOp)
@@ -43,7 +43,7 @@ export async function preAuth(passport: Passport, ctx: UserCtx, next: Function) 
 export async function postAuth(passport: Passport, ctx: UserCtx, next: Function) {
   // get the relevant config
   const config = await fetchGoogleCreds()
-  const platformUrl = await configs.getPlatformUrl({ tenantAware: false })
+  const platformUrl = await configs.getPlatformUrl()
 
   const callbackUrl = `${platformUrl}/api/global/auth/datasource/google/callback`
   const authStateCookie = utils.getCookie<{ appId: string }>(ctx, Cookie.DatasourceAuth)

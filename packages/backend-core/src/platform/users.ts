@@ -6,18 +6,12 @@ import type {
   User,
 } from "@supertoolmake/types"
 import { DEFAULT_TENANT_ID } from "../constants"
-import env from "../environment"
 import { getPlatformDB } from "./platformDb"
 
 // READ
 
-export async function lookupTenantId(userId: string) {
-  if (!env.MULTI_TENANCY) {
-    return DEFAULT_TENANT_ID
-  }
-
-  const user = await getUserDoc(userId)
-  return user.tenantId
+export async function lookupTenantId(_userId: string) {
+  return DEFAULT_TENANT_ID
 }
 
 export async function getUserDoc(emailOrId: string): Promise<PlatformUser> {

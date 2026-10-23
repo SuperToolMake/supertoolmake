@@ -1,16 +1,17 @@
-import { cache, context, sessions, utils } from "@supertoolmake/backend-core"
-import { generator, structures } from "@supertoolmake/backend-core/tests"
+import { cache, sessions, utils } from "@supertoolmake/backend-core"
+import { generator } from "@supertoolmake/backend-core/tests"
 import { TestConfiguration } from "../../../tests"
 import { loginUser, resetUpdate } from "../auth"
 
 describe("auth", () => {
   const config = new TestConfiguration()
 
+  beforeAll(() => config.beforeAll())
   afterAll(config.afterAll)
 
   describe("resetUpdate", () => {
     it("providing a valid code will update the password", async () => {
-      await context.doInTenant(structures.tenant.id(), async () => {
+      await config.doInTenant(async () => {
         const user = await config.createUser()
         const previousPassword = user.password
 
@@ -26,7 +27,7 @@ describe("auth", () => {
     })
 
     it("wrong code will not allow to reset the password", async () => {
-      await context.doInTenant(structures.tenant.id(), async () => {
+      await config.doInTenant(async () => {
         const code = generator.hash()
         const newPassword = generator.hash()
 
@@ -37,7 +38,7 @@ describe("auth", () => {
     })
 
     it("the same code cannot be used twice", async () => {
-      await context.doInTenant(structures.tenant.id(), async () => {
+      await config.doInTenant(async () => {
         const user = await config.createUser()
 
         const code = await cache.passwordReset.createCode(user._id!, {})
@@ -51,7 +52,7 @@ describe("auth", () => {
     })
 
     it("updating the password will invalidate all the sessions", async () => {
-      await context.doInTenant(structures.tenant.id(), async () => {
+      await config.doInTenant(async () => {
         const user = await config.createUser()
 
         await loginUser(user)
@@ -68,7 +69,7 @@ describe("auth", () => {
     })
 
     it("loginUser should return session invalidation count", async () => {
-      await context.doInTenant(structures.tenant.id(), async () => {
+      await config.doInTenant(async () => {
         const user = await config.createUser()
 
         const loginResult1 = await loginUser(user)

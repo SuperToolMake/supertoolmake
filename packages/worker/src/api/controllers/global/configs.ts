@@ -397,21 +397,15 @@ export async function destroy(ctx: UserCtx<void, DeleteConfigResponse>) {
 }
 
 export async function configChecklist(ctx: Ctx<void, ConfigChecklistResponse>) {
-  const tenantId = tenancy.getTenantId()
-
   try {
     ctx.body = await cache.withCache(
       cache.CacheKey.CHECKLIST,
       env.CHECKLIST_CACHE_TTL,
       async (): Promise<ConfigChecklistResponse> => {
-        let workspaces = []
-        if (!env.MULTI_TENANCY || tenantId) {
-          // Apps exist
-          workspaces = await dbCore.getAllWorkspaces({
-            idsOnly: true,
-            efficient: true,
-          })
-        }
+        // Apps exist
+        const workspaces = await dbCore.getAllWorkspaces({
+          idsOnly: true,
+        })
 
         // They have set up SMTP
         const smtpConfig = await configs.getSMTPConfig()

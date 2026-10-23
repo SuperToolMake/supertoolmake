@@ -1,11 +1,10 @@
-import { type Ctx, TenantResolutionStrategy, type Workspace } from "@supertoolmake/types"
+import type { Ctx, Workspace } from "@supertoolmake/types"
 import type { SetOption } from "cookies"
 import jwt, { type Secret } from "jsonwebtoken"
 import { DocumentType, Header, MAX_VALID_DATE, SEPARATOR } from "../constants"
 import * as context from "../context"
 import { getAllWorkspaces } from "../db"
 import env from "../environment"
-import * as tenancy from "../tenancy"
 
 const WORKSPACE_PREFIX = DocumentType.WORKSPACE + SEPARATOR
 const PROD_APP_PREFIX = "/app/"
@@ -14,15 +13,7 @@ async function resolveAppUrl(ctx: Ctx) {
   const workspaceUrl = ctx.path.split("/")[2]
   const possibleUrl = `/${workspaceUrl.toLowerCase()}`
 
-  let tenantId: string | undefined = context.getTenantId()
-  if (!env.isDev() && env.MULTI_TENANCY) {
-    // always use the tenant id from the subdomain in multi tenancy
-    // this ensures the logged-in user tenant id doesn't overwrite
-    // e.g. in the case of viewing a public app while already logged-in to another tenant
-    tenantId = tenancy.getTenantIDFromCtx(ctx, {
-      includeStrategies: [TenantResolutionStrategy.SUBDOMAIN],
-    })
-  }
+  const tenantId: string | undefined = context.getTenantId()
 
   // search prod apps for an url that matches
   const workspaces: Workspace[] = await context.doInTenant(tenantId, () =>

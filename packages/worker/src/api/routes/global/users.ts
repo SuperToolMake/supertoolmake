@@ -59,24 +59,9 @@ function buildInviteAcceptValidation() {
   )
 }
 
-function buildChangeTenantOwnerEmailValidation() {
-  return auth.zodValidator.body(
-    z.strictObject({
-      newAccountEmail: z.string(),
-      originalEmail: z.string(),
-      tenantIds: z.array(z.string()),
-    })
-  )
-}
-
 cloudRestrictedRoutes
   .post("/api/global/users/sso", users.buildAddSsoSupport(), controller.addSsoSupport)
   .post("/api/global/users/init", buildAdminInitValidation(), controller.adminUser)
-  .put(
-    "/api/global/users/tenant/owner",
-    buildChangeTenantOwnerEmailValidation(),
-    controller.changeTenantOwnerEmail
-  )
 
 adminRoutes
   .post("/api/global/users/bulk", users.buildUserBulkUserValidation(), controller.bulkUpdate)

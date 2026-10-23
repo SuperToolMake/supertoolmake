@@ -43,7 +43,7 @@ class TestConfiguration {
     // default to cloud hosting
     this.cloudHosted()
 
-    this.tenantId = structures.tenant.id()
+    this.tenantId = context.DEFAULT_TENANT_ID
 
     if (opts.openServer) {
       env.PORT = "0" // random port
@@ -53,12 +53,6 @@ class TestConfiguration {
     }
 
     this.api = new API(this)
-  }
-
-  async useNewTenant() {
-    this.tenantId = structures.tenant.id()
-
-    await this.beforeAll()
   }
 
   getRequest() {
@@ -131,37 +125,12 @@ class TestConfiguration {
     })
   }
 
-  createTenant = async (): Promise<User> => {
-    // create user / new tenant
-    const res = await this.api.users.createAdminUser()
-
-    // return the created user
-    const userRes = await this.api.users.getUser(res.userId, {
-      headers: {
-        ...this.internalAPIHeaders(),
-        [constants.Header.TENANT_ID]: res.tenantId,
-      },
-    })
-
-    // create a session for the new user
-    const user = userRes.body
-    await this.createSession(user)
-
-    return user
-  }
-
   getTenantId() {
     try {
       return context.getTenantId()
     } catch {
       return this.tenantId!
     }
-  }
-
-  async doInSpecificTenant<T>(tenantId: string, task: () => Promise<T>): Promise<T> {
-    return await context.doInTenant(tenantId, async () => {
-      return await task()
-    })
   }
 
   // AUTH

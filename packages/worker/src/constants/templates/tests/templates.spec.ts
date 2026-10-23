@@ -114,7 +114,9 @@ describe("Loading yaml email templates", () => {
 
     // Should notify that the two templates that didn't match were in actually persisted.
     expect(consoleSpy).toHaveBeenCalledTimes(2)
-    expect(consoleSpy).toHaveBeenCalledWith(`Email templates updated: welcome,custom`)
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringMatching(/^Email templates updated: (welcome,custom|custom,welcome)$/)
+    )
 
     consoleSpy.mockRestore()
   })

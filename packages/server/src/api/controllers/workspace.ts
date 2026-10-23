@@ -371,9 +371,7 @@ async function performWorkspaceCreate(
     }
   }
 
-  const tenantId = tenancy.getTenantId()
-  const opts = tenantId !== "default" ? { tenantId, random: true } : undefined
-  const workspaceId = getDevWorkspaceID(generateWorkspaceID(opts))
+  const workspaceId = getDevWorkspaceID(generateWorkspaceID({ random: true }))
 
   return await context.doInWorkspaceContext(workspaceId, async () => {
     const instance = await createInstance(workspaceId)

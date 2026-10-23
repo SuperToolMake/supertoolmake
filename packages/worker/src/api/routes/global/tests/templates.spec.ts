@@ -77,7 +77,7 @@ describe("/api/global/template", () => {
       }
       await config.api.templates.saveTemplate(updatedTemplate)
       const res = await config.api.templates.getTemplate()
-      const newTemplate = res.body.find((t: any) => (t.purpose = purpose))
+      const newTemplate = res.body.find((t: any) => t.purpose === purpose)
       expect(newTemplate.contents).toEqual(contents)
     })
   })

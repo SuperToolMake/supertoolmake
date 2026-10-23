@@ -1,8 +1,7 @@
-import { auth, constants, context, roles, tenancy, users, utils } from "@supertoolmake/backend-core"
+import { constants, context, roles, users, utils } from "@supertoolmake/backend-core"
 import type { ContextUser, UserCtx } from "@supertoolmake/types"
 import type { Middleware, Next } from "koa"
 import { generateUserMetadataID, isDevWorkspaceID } from "../db/utils"
-import env from "../environment"
 import { getCachedSelf } from "../utilities/global"
 import { isApiKey, isBrowser } from "./utils"
 
@@ -49,27 +48,6 @@ export const currentWorkspaceMiddleware = (async (ctx: UserCtx, next: Next) => {
   }
 
   const userId = ctx.user ? generateUserMetadataID(ctx.user._id!) : undefined
-
-  // if the user is not in the right tenant then make sure to wipe their cookie
-  // also cleanse any information about them that has been allocated
-  // this avoids apps making calls to say the worker which are cross tenant,
-  // we simply remove the authentication
-  if (
-    env.MULTI_TENANCY &&
-    userId &&
-    requestWorkspaceId &&
-    !tenancy.isUserInWorkspaceTenant(requestWorkspaceId, ctx.user)
-  ) {
-    // clear out the user
-    ctx.user = users.cleanseUserObject(ctx.user) as ContextUser
-    ctx.isAuthenticated = false
-    roleId = roles.BUILTIN_ROLE_IDS.PUBLIC
-    // remove the cookie, so future calls are public
-    await auth.platformLogout({
-      ctx,
-      userId,
-    })
-  }
 
   return context.doInWorkspaceContext(workspaceId, async () => {
     ctx.appId = workspaceId

@@ -27,7 +27,6 @@ describe("check BB_ADMIN environment variables", () => {
     await tenancy.doInTenant(tenancy.DEFAULT_TENANT_ID, async () => {
       await withEnv(
         {
-          MULTI_TENANCY: "0",
           SELF_HOSTED: "1",
         },
         () =>

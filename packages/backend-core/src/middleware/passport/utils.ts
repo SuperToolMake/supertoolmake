@@ -1,6 +1,5 @@
 import type { ConfigType, GoogleInnerConfig } from "@supertoolmake/types"
 import * as configs from "../../configs"
-import { getTenantId, isMultiTenant } from "../../context"
 
 /**
  * Utility to handle authentication errors.
@@ -26,9 +25,6 @@ export async function ssoCallbackUrl(type: ConfigType, config?: GoogleInnerConfi
   const settingsConfig = await configs.getSettingsConfig()
 
   let callbackUrl = `/api/global/auth`
-  if (isMultiTenant()) {
-    callbackUrl += `/${getTenantId()}`
-  }
   callbackUrl += `/${type}/callback`
 
   return `${settingsConfig.platformUrl}${callbackUrl}`

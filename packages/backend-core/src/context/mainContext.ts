@@ -49,17 +49,9 @@ export function getPlatformURL() {
   return env.PLATFORM_URL
 }
 
-export function isMultiTenant() {
-  return Boolean(env.MULTI_TENANCY)
-}
-
 export function isTenantIdSet() {
   const context = Context.get()
   return Boolean(context?.tenantId)
-}
-
-export function isTenancyEnabled() {
-  return env.MULTI_TENANCY
 }
 
 /**
@@ -70,19 +62,7 @@ export function getTenantIDFromWorkspaceID(workspaceId: string) {
   if (!workspaceId) {
     return
   }
-  if (!isMultiTenant()) {
-    return DEFAULT_TENANT_ID
-  }
-  const split = workspaceId.split(SEPARATOR)
-  const hasDev = split[1] === DocumentType.DEV
-  if ((hasDev && split.length === 3) || (!hasDev && split.length === 2)) {
-    return
-  }
-  if (hasDev) {
-    return split[2]
-  } else {
-    return split[1]
-  }
+  return DEFAULT_TENANT_ID
 }
 
 function updateContext(updates: ContextMap): ContextMap {
@@ -121,9 +101,7 @@ export async function doInContext(workspaceId: string, task: any): Promise<any> 
 
 export async function doInTenant<T>(tenantId: string | undefined, task: () => T): Promise<T> {
   // make sure default always selected in single tenancy
-  if (!env.MULTI_TENANCY) {
-    tenantId = tenantId || DEFAULT_TENANT_ID
-  }
+  tenantId = tenantId || DEFAULT_TENANT_ID
 
   const updates = tenantId ? { tenantId } : {}
   return newContext(updates, task)
@@ -207,15 +185,7 @@ export function getIdentity(): IdentityContext | undefined {
 }
 
 export function getTenantId(): string {
-  if (!isMultiTenant()) {
-    return DEFAULT_TENANT_ID
-  }
-  const context = Context.get()
-  const tenantId = context?.tenantId
-  if (!tenantId) {
-    throw new Error("Tenant id not found")
-  }
-  return tenantId
+  return DEFAULT_TENANT_ID
 }
 
 export function getAutomationId(): string | undefined {
@@ -302,7 +272,7 @@ export function getEnvironmentVariables() {
 
 export function getGlobalDB(): Database {
   const context = Context.get()
-  if (!context || (env.MULTI_TENANCY && !context.tenantId)) {
+  if (!context) {
     throw new Error("Global DB not found")
   }
   if (context.isSelfHostUsingCloud) {

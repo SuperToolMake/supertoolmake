@@ -92,7 +92,7 @@ describe("utils", () => {
         const app = structures.apps.app(appId)
 
         // set custom url
-        const appUrl = "preview"
+        const appUrl = `preview-${newid()}`
         app.url = `/${appUrl}`
         ctx.path = `/app/${appUrl}`
 

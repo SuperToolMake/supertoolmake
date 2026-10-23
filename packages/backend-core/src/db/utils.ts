@@ -5,43 +5,15 @@ import {
   WorkspaceState,
 } from "../cache/workspaceMetadata"
 import { DEFAULT_TENANT_ID, DocumentType, SEPARATOR } from "../constants"
-import { getGlobalDBName, getTenantId } from "../context"
-import { getStartEndKeyURL } from "../docIds"
+import { getTenantId } from "../context"
 import { getProdWorkspaceID, isDevWorkspace, isDevWorkspaceID } from "../docIds/conversions"
 import env from "../environment"
 import { directCouchAllDbs, doWithDB } from "./db"
 
 export * from "../docIds"
 
-/**
- * opts.efficient can be provided to make sure this call is always quick in a multi-tenant environment,
- * but it may not be 100% accurate in full efficiency mode (some tenantless workspaces may be missed).
- */
-export async function getAllDbs(opts = { efficient: false }) {
-  const efficient = opts?.efficient
-
-  let dbs: any[] = []
-  async function addDbs(queryString?: string) {
-    const json = await directCouchAllDbs(queryString)
-    dbs = dbs.concat(json)
-  }
-  const tenantId = getTenantId()
-  if (!env.MULTI_TENANCY || (!efficient && tenantId === DEFAULT_TENANT_ID)) {
-    // just get all DBs when:
-    // - single tenancy
-    // - default tenant
-    //    - workspaces dbs don't contain tenant id
-    //    - non-default tenant dbs are filtered out workspace side in getAllWorkspaces
-    await addDbs()
-  } else {
-    // get prod workspaces
-    await addDbs(getStartEndKeyURL(DocumentType.WORKSPACE, tenantId))
-    // get dev workspaces
-    await addDbs(getStartEndKeyURL(DocumentType.WORKSPACE_DEV, tenantId))
-    // add global db name
-    dbs.push(getGlobalDBName(tenantId))
-  }
-  return dbs
+export async function getAllDbs() {
+  return await directCouchAllDbs()
 }
 
 /**
@@ -54,30 +26,23 @@ export async function getAllWorkspaces(opts: {
   dev?: boolean
   all?: boolean
   idsOnly: true
-  efficient?: boolean
 }): Promise<string[]>
 export async function getAllWorkspaces(opts?: {
   dev?: boolean
   all?: boolean
   idsOnly?: false
-  efficient?: boolean
 }): Promise<Workspace[]>
 export async function getAllWorkspaces({
   dev,
   all,
   idsOnly,
-  efficient,
 }: {
   dev?: boolean
   all?: boolean
   idsOnly?: boolean
-  efficient?: boolean
 } = {}): Promise<Workspace[] | string[]> {
-  let tenantId = getTenantId()
-  if (!(env.MULTI_TENANCY || tenantId)) {
-    tenantId = DEFAULT_TENANT_ID
-  }
-  const dbs = await getAllDbs({ efficient: efficient ?? false })
+  const tenantId = getTenantId()
+  const dbs = await getAllDbs()
   const workspaceDbNames = dbs.filter((dbName: any) => {
     if (env.isTest() && !dbName) {
       return false
@@ -96,9 +61,11 @@ export async function getAllWorkspaces({
     return false
   })
   if (idsOnly) {
-    const devWorkspaceIds = workspaceDbNames.filter((workspaceId) => isDevWorkspaceID(workspaceId))
+    const devWorkspaceIds = workspaceDbNames.filter((workspaceId: string) =>
+      isDevWorkspaceID(workspaceId)
+    )
     const prodWorkspaceIds = workspaceDbNames.filter(
-      (workspaceId) => !isDevWorkspaceID(workspaceId)
+      (workspaceId: string) => !isDevWorkspaceID(workspaceId)
     )
     switch (dev) {
       case true:
@@ -109,7 +76,7 @@ export async function getAllWorkspaces({
         return workspaceDbNames
     }
   }
-  const workspacePromises = workspaceDbNames.map((workspace) =>
+  const workspacePromises = workspaceDbNames.map((workspace: string) =>
     // skip setup otherwise databases could be re-created
     getWorkspaceMetadata(workspace)
   )
