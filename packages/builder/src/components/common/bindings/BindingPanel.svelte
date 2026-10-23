@@ -108,14 +108,7 @@ const requestEval = (expression: string | null, context: any, snippets: Snippet[
 }
 
 const highlightJSON = (json: JSONValue) => {
-  return JsonFormatter.format(json, {
-    keyColor: "#e06c75",
-    numberColor: "#e5c07b",
-    stringColor: "#98c379",
-    trueColor: "#d19a66",
-    falseColor: "#d19a66",
-    nullColor: "#c678dd",
-  })
+  return JsonFormatter.format(json)
 }
 
 const enrichBindings = (
