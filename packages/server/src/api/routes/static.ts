@@ -29,7 +29,17 @@ router
   .get("/app/service-worker.js", controller.serveServiceWorker)
   .get("/app/:appUrl/:path*", controller.serveApp)
   .get(`/${devAppIdPath}/:path*`, controller.serveApp)
-  .post("/api/attachments/:datasourceId/url", controller.getSignedUploadURL)
-  .post("/api/attachments/:datasourceId/external/upload", controller.uploadExternalFile)
+  .post(
+    "/api/attachments/:datasourceId/url",
+    paramResource("datasourceId"),
+    authorized(PermissionType.TABLE, PermissionLevel.WRITE),
+    controller.getSignedUploadURL
+  )
+  .post(
+    "/api/attachments/:datasourceId/external/upload",
+    paramResource("datasourceId"),
+    authorized(PermissionType.TABLE, PermissionLevel.WRITE),
+    controller.uploadExternalFile
+  )
 
 export default router

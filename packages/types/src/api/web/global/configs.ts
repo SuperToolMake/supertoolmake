@@ -1,9 +1,31 @@
 import type { Config, ConfigType, SettingsConfig, SettingsInnerConfig } from "../../../documents"
 
 /**
- * Settings that aren't stored in the database - enriched at runtime.
+ * Settings returned to unauthenticated clients.
  */
-export interface PublicSettingsInnerConfig extends SettingsInnerConfig {
+export interface PublicSettingsInnerConfig
+  extends Pick<
+    SettingsInnerConfig,
+    | "platformUrl"
+    | "company"
+    | "logoUrl"
+    | "docsUrl"
+    | "logoUrlEtag"
+    | "uniqueTenantId"
+    | "isSSOEnforced"
+    | "createdVersion"
+    | "lockedBy"
+    | "active"
+    | "faviconUrl"
+    | "faviconUrlEtag"
+    | "emailBrandingEnabled"
+    | "platformTitle"
+    | "loginHeading"
+    | "loginButton"
+    | "metaDescription"
+    | "metaImageUrl"
+    | "metaTitle"
+  > {
   google: boolean
   googleDatasourceConfigured: boolean
   oidc: boolean

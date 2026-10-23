@@ -44,7 +44,7 @@ export abstract class OpenAPISource extends ImportSource {
     const document = await SwaggerParser.parse(parsedInput, baseOptions)
 
     try {
-      return await SwaggerParser.validate(document)
+      return await SwaggerParser.validate(document, baseOptions)
     } catch {
       console.log(`[OpenAPI Import] Schema validation failed, continuing without validation`)
       try {

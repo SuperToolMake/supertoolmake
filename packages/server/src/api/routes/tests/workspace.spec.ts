@@ -650,6 +650,21 @@ describe("/applications", () => {
   })
 
   describe("fetchAppDefinition", () => {
+    it("should reject users from another tenant", async () => {
+      await config.newTenant()
+
+      await config.withHeaders({ [Header.WORKSPACE_ID]: workspace.appId }, () =>
+        config.api.workspace.getDefinition(workspace.appId, {
+          status: 401,
+        })
+      )
+      await config
+        .getRequest()!
+        .get("/api/routing/client")
+        .set({ ...config.defaultHeaders(), [Header.WORKSPACE_ID]: workspace.appId })
+        .expect(401)
+    })
+
     it("should be able to get an apps definition", async () => {
       const res = await config.api.workspace.getDefinition(workspace.appId)
       expect(res.libraries.length).toEqual(1)
@@ -657,6 +672,36 @@ describe("/applications", () => {
   })
 
   describe("fetchAppPackage", () => {
+    it("should not expose snippets to public calls", async () => {
+      const snippets = [{ name: "PrivateSnippet", code: "return 'secret'" }]
+      await config.api.workspace.update(workspace.appId, {
+        snippets,
+      })
+
+      const builderPackage = await config.api.workspace.getAppPackage(workspace.appId)
+      expect(builderPackage.application.snippets).toEqual(snippets)
+
+      await config.publish()
+
+      const res = await config.withHeaders({ referer: "http://localhost:10000/app" }, () =>
+        config.api.workspace.getAppPackage(config.getProdWorkspaceId(), {
+          publicUser: true,
+        })
+      )
+
+      expect(res.application.snippets).toBeUndefined()
+    })
+
+    it("should reject users from another tenant", async () => {
+      await config.newTenant()
+
+      await config.withHeaders({ [Header.WORKSPACE_ID]: workspace.appId }, () =>
+        config.api.workspace.getAppPackage(workspace.appId, {
+          expectations: { status: 401 },
+        })
+      )
+    })
+
     it("should be able to fetch the app package", async () => {
       const res = await config.api.workspace.getAppPackage(workspace.appId)
       expect(res.application).toBeDefined()

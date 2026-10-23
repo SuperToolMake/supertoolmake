@@ -5286,17 +5286,20 @@
       {
         "type": "dataSource/store",
         "label": "Object store",
-        "key": "datasourceId"
+        "key": "datasourceId",
+        "supportsConditions": false
       },
       {
         "type": "text",
         "label": "Bucket",
-        "key": "bucket"
+        "key": "bucket",
+        "supportsConditions": false
       },
       {
         "type": "text",
         "label": "Folder",
-        "key": "folder"
+        "key": "folder",
+        "supportsConditions": false
       },
       {
         "type": "event",

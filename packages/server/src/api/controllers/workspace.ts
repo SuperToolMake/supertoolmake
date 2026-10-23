@@ -317,7 +317,7 @@ export async function fetchAppPackage(ctx: UserCtx<void, FetchAppPackageResponse
   const clientCacheKey = await objectStore.getClientCacheKey(application.version)
 
   ctx.body = {
-    application,
+    application: { ...application, snippets: isBuilder ? application.snippets : undefined },
     screens,
     layouts,
     clientLibPath,

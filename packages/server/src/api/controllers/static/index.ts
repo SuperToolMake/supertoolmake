@@ -17,6 +17,7 @@ import {
   type ServeAppResponse,
   type ServeBuilderPreviewResponse,
   type ServeClientLibraryResponse,
+  SourceName,
   type UserCtx,
   type Workspace,
 } from "@supertoolmake/types"
@@ -33,6 +34,7 @@ import {
   NODE_MODULES_PATH,
   shouldServeLocally,
 } from "../../../utilities/fileSystem"
+import { authorizeS3Upload } from "./s3Upload"
 import AppComponent from "./templates/App.svelte"
 
 const getUploadFilename = (file: unknown) => {
@@ -305,7 +307,7 @@ export const serveServiceWorker = async (ctx: Ctx) => {
 }
 
 export const getSignedUploadURL = async (
-  ctx: Ctx<GetSignedUploadUrlRequest, GetSignedUploadUrlResponse>
+  ctx: UserCtx<GetSignedUploadUrlRequest, GetSignedUploadUrlResponse>
 ) => {
   // Ensure datasource is valid
   let datasource
@@ -318,6 +320,11 @@ export const getSignedUploadURL = async (
   } catch (_error) {
     ctx.throw(400, "The specified datasource could not be found")
   }
+
+  if (datasource.source !== SourceName.MINIO) {
+    ctx.throw(400, "The specified datasource must be an object store")
+  }
+  await authorizeS3Upload({ ...ctx.request.body, ctx, datasourceId: ctx.params.datasourceId })
 
   // Determine type of datasource and generate signed URL
   let signedUrl
@@ -351,7 +358,7 @@ export const getSignedUploadURL = async (
     const params = { Bucket: bucket, Key: key }
     signedUrl = await getSignedUrl(s3, new PutObjectCommand(params))
     if (endpoint) {
-      publicUrl = `${endpoint}/${bucket}/${key}`
+      publicUrl = `${endpoint.replace(/\/$/, "")}/${encodeURIComponent(bucket)}/${key.split("/").map(encodeURIComponent).join("/")}`
     } else {
       throw Error("You must provide an endpoint.")
     }
@@ -362,8 +369,9 @@ export const getSignedUploadURL = async (
   ctx.body = { signedUrl, publicUrl }
 }
 
-export const uploadExternalFile = async (ctx: Ctx) => {
+export const uploadExternalFile = async (ctx: UserCtx) => {
   const { datasourceId } = ctx.params
+  await authorizeS3Upload({ ...ctx.request.body, ctx, datasourceId })
   const file = ctx.request?.files?.file
   let { bucket, key, compress } = ctx.request?.body || {}
 
@@ -383,6 +391,9 @@ export const uploadExternalFile = async (ctx: Ctx) => {
     throw new BadRequestError("The specified datasource could not be found")
   }
 
+  if (datasource.source !== SourceName.MINIO) {
+    ctx.throw(400, "The specified datasource must be an object store")
+  }
   const awsRegion = (datasource?.config?.region || "eu-west-1") as string
   let endpoint = datasource?.config?.endpoint
   const port = datasource?.config?.port
@@ -428,6 +439,9 @@ export const uploadExternalFile = async (ctx: Ctx) => {
     uploadKey = key.replace(/\.[^.]+$/, ".avif")
   }
 
+  if (uploadKey !== key) {
+    await authorizeS3Upload({ ...ctx.request.body, ctx, datasourceId, key: uploadKey })
+  }
   await s3.send(
     new PutObjectCommand({
       Bucket: bucket,

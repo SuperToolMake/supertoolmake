@@ -302,16 +302,31 @@ export async function publicSettings(ctx: Ctx<void, GetPublicSettingsResponse>) 
 
     const oidc = Boolean(oidcConfig?.activated)
     const googleDatasourceConfigured = Boolean(googleDatasource)
-    if (logoUrl) {
-      config.logoUrl = logoUrl
-    }
 
     ctx.body = {
       type: ConfigType.SETTINGS,
       _id: configDoc._id,
       _rev: configDoc._rev,
       config: {
-        ...config,
+        platformUrl: config.platformUrl,
+        company: config.company,
+        logoUrl: logoUrl || config.logoUrl,
+        docsUrl: config.docsUrl,
+        logoUrlEtag: config.logoUrlEtag,
+        uniqueTenantId: config.uniqueTenantId,
+        isSSOEnforced: config.isSSOEnforced,
+        createdVersion: config.createdVersion,
+        lockedBy: config.lockedBy,
+        active: config.active,
+        faviconUrl: config.faviconUrl,
+        faviconUrlEtag: config.faviconUrlEtag,
+        emailBrandingEnabled: config.emailBrandingEnabled,
+        platformTitle: config.platformTitle,
+        loginHeading: config.loginHeading,
+        loginButton: config.loginButton,
+        metaDescription: config.metaDescription,
+        metaImageUrl: config.metaImageUrl,
+        metaTitle: config.metaTitle,
         google,
         googleDatasourceConfigured,
         oidc,
