@@ -34,7 +34,7 @@
     "dayjs": "1.10.8",
     "downloadjs": "1.4.7",
     "exifreader": "4.41.1",
-    "nanoid": "6.0.1",
+    "nanoid": "6.0.2",
     "svelte-legacy": "npm:svelte@4.2.20",
     "svelte-spa-router": "4.0.1"
   },

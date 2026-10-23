@@ -1,5 +1,6 @@
 const fs = require("node:fs")
 const path = require("node:path")
+const { pathToFileURL } = require("node:url")
 const SwaggerParser = require("@apidevtools/swagger-parser")
 const { BodyType } = require("@supertoolmake/types")
 
@@ -56,8 +57,22 @@ describe("OpenAPI3 Import", () => {
     expect(openapi3.document).toBe(dereferenced)
 
     expect(parseSpy).toHaveBeenCalled()
-    expect(validateSpy).toHaveBeenCalled()
+    expect(validateSpy).toHaveBeenCalledWith(document, { resolve: { external: false } })
     expect(dereferenceSpy).toHaveBeenCalled()
+  })
+
+  it("does not resolve external file references during validation", async () => {
+    const externalRef = `${pathToFileURL(path.join(__dirname, "data/petstore/petstore.json")).href}#/components/schemas/Pet`
+    const readFileSpy = jest.spyOn(fs.promises, "readFile")
+    const spec = JSON.stringify({
+      openapi: "3.0.0",
+      info: { title: "External reference", version: "1.0.0" },
+      paths: {},
+      components: { schemas: { External: { $ref: externalRef } } },
+    })
+    expect(await openapi3.isSupported(spec)).toBe(true)
+    expect(readFileSpy).not.toHaveBeenCalled()
+    expect(openapi3.document.components.schemas.External).toEqual({ $ref: externalRef })
   })
 
   it("creates bindings for server variables", async () => {

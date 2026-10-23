@@ -6,43 +6,36 @@ import type {
 } from "@supertoolmake/types"
 import type { BaseAPIClient } from "./types"
 
+interface SignedDatasourceUpload extends GetSignedUploadUrlRequest {
+  datasourceId: string
+}
+interface ExternalUpload extends SignedDatasourceUpload {
+  data: Blob
+  compress?: { maxWidth?: number; quality?: number }
+}
+
 export interface AttachmentEndpoints {
   downloadAttachment: (
     datasourceId: string,
     rowId: string,
     columnName: string
   ) => Promise<DownloadAttachmentResponse>
-  getSignedDatasourceURL: (
-    datasourceId: string,
-    bucket: string,
-    key: string
-  ) => Promise<GetSignedUploadUrlResponse>
+  getSignedDatasourceURL: (upload: SignedDatasourceUpload) => Promise<GetSignedUploadUrlResponse>
   uploadAttachment: (tableId: string, data: any) => Promise<ProcessAttachmentResponse>
   uploadBuilderAttachment: (data: any) => Promise<ProcessAttachmentResponse>
-  externalUpload: (
-    datasourceId: string,
-    bucket: string,
-    key: string,
-    data: any,
-    compress?: {
-      maxWidth?: number
-      quality?: number
-    }
-  ) => Promise<{ publicUrl: string | undefined }>
+  externalUpload: (upload: ExternalUpload) => Promise<{ publicUrl: string | undefined }>
 }
 
 export const buildAttachmentEndpoints = (API: BaseAPIClient): AttachmentEndpoints => {
   const endpoints: Pick<AttachmentEndpoints, "getSignedDatasourceURL"> = {
     /**
      * Generates a signed URL to upload a file to an external datasource.
-     * @param datasourceId the ID of the datasource to upload to
-     * @param bucket the name of the bucket to upload to
-     * @param key the name of the file to upload to
+     * @param upload the configured upload destination
      */
-    getSignedDatasourceURL: async (datasourceId, bucket, key) => {
+    getSignedDatasourceURL: async ({ datasourceId, ...upload }) => {
       return await API.post<GetSignedUploadUrlRequest, GetSignedUploadUrlResponse>({
         url: `/api/attachments/${datasourceId}/url`,
-        body: { bucket, key },
+        body: upload,
       })
     },
   }
@@ -90,14 +83,13 @@ export const buildAttachmentEndpoints = (API: BaseAPIClient): AttachmentEndpoint
 
     /**
      * Uploads a file to an external datasource.
-     * @param datasourceId the ID of the datasource to upload to
-     * @param bucket the name of the bucket to upload to
-     * @param key the name of the file to upload to
+     * @param upload the configured upload destination
      * @param data the file to upload
      * @param compress optional compression options
      */
-    externalUpload: async (datasourceId, bucket, key, data, compress) => {
-      const { publicUrl } = await endpoints.getSignedDatasourceURL(datasourceId, bucket, key)
+    externalUpload: async ({ data, compress, ...upload }) => {
+      const { datasourceId, bucket, key, componentId, screenId } = upload
+      const { publicUrl } = await endpoints.getSignedDatasourceURL(upload)
       if (!publicUrl) {
         return { publicUrl: undefined }
       }
@@ -106,6 +98,8 @@ export const buildAttachmentEndpoints = (API: BaseAPIClient): AttachmentEndpoint
       formData.append("file", data)
       formData.append("bucket", bucket)
       formData.append("key", key)
+      formData.append("componentId", componentId)
+      formData.append("screenId", screenId)
       if (compress) {
         formData.append("compress", JSON.stringify(compress))
       }

@@ -23,7 +23,6 @@ export const globalRoutes = (user: GetGlobalSelfResponse) => {
 
 export const orgRoutes = (user: GetGlobalSelfResponse, admin: AdminState): Route[] => {
   const isAdmin = user != null && sdk.users.isAdmin(user)
-  const isGlobalBuilder = user != null && sdk.users.isGlobalBuilder(user)
   const cloud = admin?.cloud
 
   const emailRoutes: Route[] = [
@@ -68,7 +67,7 @@ export const orgRoutes = (user: GetGlobalSelfResponse, admin: AdminState): Route
     },
     {
       section: "People",
-      access: () => isGlobalBuilder,
+      access: () => isAdmin,
       path: "people",
       icon: "users",
       routes: [

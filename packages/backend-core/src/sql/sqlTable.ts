@@ -17,6 +17,18 @@ import { breakExternalTableId, getNativeSql } from "./utils"
 import SchemaBuilder = Knex.SchemaBuilder
 import CreateTableBuilder = Knex.CreateTableBuilder
 
+const quoteMySqlIdentifier = (identifier: string) => {
+  return `\`${identifier.replace(/`/g, "``")}\``
+}
+
+const quoteSqlServerIdentifier = (identifier: string) => {
+  return `[${identifier.replace(/]/g, "]]")}]`
+}
+
+const quoteSqlServerUnicodeString = (value: string) => {
+  return `N'${value.replace(/'/g, "''")}'`
+}
+
 function isIgnoredType(type: FieldType) {
   const ignored = [FieldType.LINK]
   return ignored.indexOf(type) !== -1
@@ -246,10 +258,12 @@ class SqlTableQueryBuilder {
         if (this.sqlClient === SqlClient.MY_SQL && json.meta?.renamed) {
           const updatedColumn = json.meta.renamed.updated
           const tableName = json?.schema
-            ? `\`${json.schema}\`.\`${json.table.name}\``
-            : `\`${json.table.name}\``
+            ? `${quoteMySqlIdentifier(json.schema)}.${quoteMySqlIdentifier(json.table.name)}`
+            : quoteMySqlIdentifier(json.table.name)
           return {
-            sql: `alter table ${tableName} rename column \`${json.meta.renamed.old}\` to \`${updatedColumn}\`;`,
+            sql: `alter table ${tableName} rename column ${quoteMySqlIdentifier(
+              json.meta.renamed.old
+            )} to ${quoteMySqlIdentifier(updatedColumn)};`,
             bindings: [],
           }
         }
@@ -267,14 +281,18 @@ class SqlTableQueryBuilder {
         if (this.sqlClient === SqlClient.MS_SQL && json.meta?.renamed) {
           const oldColumn = json.meta.renamed.old
           const updatedColumn = json.meta.renamed.updated
-          const tableName = json?.schema
-            ? `${json.schema}.${json.table.name}`
-            : `${json.table.name}`
+          const oldColumnName = [...(json.schema ? [json.schema] : []), json.table.name, oldColumn]
+            .map(quoteSqlServerIdentifier)
+            .join(".")
           const sql = getNativeSql(query)
           if (Array.isArray(sql)) {
             for (const query of sql) {
               if (query.sql.startsWith("exec sp_rename")) {
-                query.sql = `exec sp_rename '${tableName}.${oldColumn}', '${updatedColumn}', 'COLUMN'`
+                query.sql = `exec sp_rename ${quoteSqlServerUnicodeString(
+                  oldColumnName
+                )}, ${quoteSqlServerUnicodeString(
+                  updatedColumn
+                )}, ${quoteSqlServerUnicodeString("COLUMN")}`
                 query.bindings = []
               }
             }

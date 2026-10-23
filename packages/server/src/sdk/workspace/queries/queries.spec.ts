@@ -6,6 +6,15 @@ jest.mock("../../utils", () => ({
 
 describe("queries SDK", () => {
   describe("enrichContext", () => {
+    it.each(["delete", "row", "rows"])("escapes JSON parameters in %s", async (field) => {
+      const injected = 'value","extra":"injected'
+      const result = await enrichContext(
+        { [field]: '{"value":"{{ value }}"}' },
+        { value: injected }
+      )
+      expect(result[field]).toEqual({ value: injected })
+    })
+
     it.each([
       ["false", false],
       ["0", 0],

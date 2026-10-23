@@ -1,6 +1,7 @@
 import {
   utils as backendCoreUtils,
   cache,
+  constants,
   context,
   db,
   locks,
@@ -180,6 +181,13 @@ const parseBooleanParam = (param: any) => {
 
 export const adminUser = async (ctx: Ctx<CreateAdminUserRequest, CreateAdminUserResponse>) => {
   const { email, password, tenantId, ssoId, givenName, familyName } = ctx.request.body
+
+  if (context.isMultiTenant() || (tenantId && tenantId !== constants.DEFAULT_TENANT_ID)) {
+    const apiKey = ctx.request.headers[constants.Header.API_KEY]
+    if (typeof apiKey !== "string" || !backendCoreUtils.isValidInternalAPIKey(apiKey)) {
+      ctx.throw(403, "Unauthorized")
+    }
+  }
 
   await tenancy.doInTenant(tenantId, async () => {
     const hashPassword = parseBooleanParam(ctx.request.query.hashPassword)

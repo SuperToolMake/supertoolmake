@@ -2,6 +2,7 @@
 import { CoreDropzone, Helpers, ProgressCircle } from "@supertoolmake/bbui"
 import { getContext, onDestroy, onMount } from "svelte"
 import { builderStore } from "@/stores/builder"
+import { screenStore } from "@/stores/screens"
 import Field from "./Field.svelte"
 import ExifReader from "exifreader"
 
@@ -123,13 +124,17 @@ const upload = async () => {
         const uploadKey = folder
           ? `${folder}/${processedFile.key}.${ext}`
           : `${processedFile.key}.${ext}`
-        return API.externalUpload(
+        return API.externalUpload({
           datasourceId,
           bucket,
-          uploadKey,
-          rawFile,
-          shouldCompress ? { maxWidth: imageWidth, quality: compressionQuality } : undefined
-        )
+          key: uploadKey,
+          data: rawFile,
+          componentId: $component.id,
+          screenId: $screenStore.activeScreen._id,
+          compress: shouldCompress
+            ? { maxWidth: imageWidth, quality: compressionQuality }
+            : undefined,
+        })
       })
     )
     notificationStore.actions.success("File uploaded successfully")

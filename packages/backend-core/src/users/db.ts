@@ -18,7 +18,7 @@ import { EmailUnavailableError, HTTPError } from "../errors"
 import * as platform from "../platform"
 import { validatePassword } from "../security"
 import * as sessions from "../security/sessions"
-import { hash } from "../utils"
+import { compare, hash } from "../utils"
 import { getFirstPlatformUser, getPlatformUsers, searchExistingEmails } from "./lookup"
 import * as usersCore from "./users"
 import { creatorsInList, isAdmin, isCreatorAsync, validateUniqueUser } from "./utils"
@@ -72,8 +72,19 @@ export class UserDB {
       opts.requirePassword = false
     }
 
+    const passwordChanged = !!password && password !== dbUser?.password
+    if (dbUser?.forceResetPassword && user.forceResetPassword === false) {
+      const isCurrentPassword =
+        passwordChanged && password && dbUser.password
+          ? await compare(password, dbUser.password)
+          : false
+      if (!passwordChanged || isCurrentPassword) {
+        throw new HTTPError("A new password must be supplied when completing a forced reset.", 400)
+      }
+    }
+
     let hashedPassword
-    if (password && password !== dbUser?.password) {
+    if (passwordChanged) {
       if (await UserDB.isPreventPasswordActions(user)) {
         throw new HTTPError("Password change is disabled for this user", 400)
       }

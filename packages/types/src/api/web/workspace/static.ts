@@ -17,6 +17,8 @@ export type ServeBuilderPreviewResponse = BuilderPreview | string
 export type ServeClientLibraryResponse = stream.Readable
 
 export interface GetSignedUploadUrlRequest {
+  componentId: string
+  screenId: string
   bucket: string
   key: string
 }

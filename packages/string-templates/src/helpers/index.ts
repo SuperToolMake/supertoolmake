@@ -20,13 +20,15 @@ function isObject(value: string | any[]) {
   )
 }
 
+const javascriptHelper = new Helper(HelperFunctionNames.JS, processJS, false)
+
 export const HELPERS = [
   // external helpers
   new Helper(HelperFunctionNames.OBJECT, (value: any) => {
     return new Handlebars.SafeString(JSON.stringify(value))
   }),
   // javascript helper
-  new Helper(HelperFunctionNames.JS, processJS, false),
+  javascriptHelper,
   new Helper(HelperFunctionNames.DECODE_ID, (_id: string | { _id: string }) => {
     if (!_id) {
       return []
@@ -90,8 +92,18 @@ export function HelperNames() {
   )
 }
 
-export function registerMinimum(handlebars: typeof Handlebars) {
+interface RegisterMinimumOptions {
+  includeJS?: boolean
+}
+
+export function registerMinimum(
+  handlebars: typeof Handlebars,
+  { includeJS = true }: RegisterMinimumOptions = {}
+) {
   for (const helper of HELPERS) {
+    if (!includeJS && helper === javascriptHelper) {
+      continue
+    }
     helper.register(handlebars)
   }
 }

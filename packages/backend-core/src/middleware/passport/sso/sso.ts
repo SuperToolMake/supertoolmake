@@ -5,7 +5,7 @@ import type {
   SSOUser,
   User,
 } from "@supertoolmake/types"
-import { isSSOUser, LockName, LockType, UserStatus } from "@supertoolmake/types"
+import { LockName, LockType } from "@supertoolmake/types"
 import * as cache from "../../../cache"
 import * as context from "../../../context"
 import { generateGlobalUserID } from "../../../db"
@@ -77,11 +77,6 @@ export async function authenticate(
     return authError(done, "Email verification is required to accept this invite.")
   }
 
-  const emailLookupWasSkipped = !details.emailVerified && !allowUnverifiedEmailLinking
-  if (!dbUser && !pendingInvite && emailLookupWasSkipped) {
-    dbUser = await findLinkableAccountByEmail(details)
-  }
-
   // exit early if there is still no user/invite and auto creation is disabled
   if (!dbUser && !pendingInvite && requireLocalAccount) {
     return authError(done, "Email does not yet exist. You must set up your local account first.")
@@ -125,28 +120,6 @@ async function syncAndSaveUser(
     hashPassword: false,
     requirePassword: false,
   })) as SSOUser
-}
-
-// only linkable while no one else could plausibly own it: never claimed
-// with a password, not disabled, no account-portal ssoId, not a global
-// admin, and if already an SSO user, only from the same identity provider
-// that linked it
-function isAccountLinkable(user: User, details: SSOAuthDetails): boolean {
-  if (user.password || user.status === UserStatus.INACTIVE || user.admin?.global || user.ssoId) {
-    return false
-  }
-  if (isSSOUser(user)) {
-    return user.provider === details.provider && user.providerType === details.providerType
-  }
-  return true
-}
-
-async function findLinkableAccountByEmail(details: SSOAuthDetails): Promise<User | undefined> {
-  const user = await users.getGlobalUserByEmail(details.email!)
-  if (user && isAccountLinkable(user, details)) {
-    return user
-  }
-  return undefined
 }
 
 async function claimInviteAndSaveUser(

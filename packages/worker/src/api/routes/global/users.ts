@@ -81,11 +81,11 @@ cloudRestrictedRoutes
 adminRoutes
   .post("/api/global/users/bulk", users.buildUserBulkUserValidation(), controller.bulkUpdate)
   .delete("/api/global/users/:id", controller.destroy)
+  .get("/api/global/users/invites", controller.getUserInvites)
 
 builderOrAdminRoutes
   .get("/api/global/users", controller.fetch)
   .get("/api/global/users/count/:appId", controller.countByApp)
-  .get("/api/global/users/invites", controller.getUserInvites)
   .get("/api/global/users/:id", controller.find)
   .post("/api/global/users/invite/:code/:role", controller.addWorkspaceIdToInvite)
   .delete("/api/global/users/invite/:code", controller.removeWorkspaceIdFromInvite)
