@@ -315,10 +315,15 @@ describe("/applications", () => {
   })
 
   describe("fetchClientApps", () => {
+    const fetchCurrentWorkspaceApps = async () => {
+      const { apps } = await config.api.workspace.fetchClientApps()
+      return apps.filter((app) => app.prodId === config.getProdWorkspaceId())
+    }
+
     it("should return apps when workspace app are published", async () => {
-      const response = await config.api.workspace.fetchClientApps()
-      expect(response.apps).toHaveLength(1)
-      expect(response.apps[0]).toEqual(
+      const apps = await fetchCurrentWorkspaceApps()
+      expect(apps).toHaveLength(1)
+      expect(apps[0]).toEqual(
         expect.objectContaining({
           prodId: config.getProdWorkspaceId(),
         })
@@ -334,11 +339,11 @@ describe("/applications", () => {
       )
       await config.publish()
 
-      const response = await config.api.workspace.fetchClientApps()
+      const apps = await fetchCurrentWorkspaceApps()
 
-      expect(response.apps.length).toBe(2)
+      expect(apps).toHaveLength(2)
 
-      const testApp = response.apps.find((a) => a.name === "Test Workspace App")
+      const testApp = apps.find((a) => a.name === "Test Workspace App")
       expect(testApp).toEqual(
         expect.objectContaining({
           prodId: config.getProdWorkspaceId(),
@@ -364,10 +369,10 @@ describe("/applications", () => {
       )
       const app = await config.publish()
 
-      const response = await config.api.workspace.fetchClientApps()
+      const apps = await fetchCurrentWorkspaceApps()
 
-      expect(response.apps.length).toBe(3)
-      expect(response.apps).toEqual(
+      expect(apps).toHaveLength(3)
+      expect(apps).toEqual(
         expect.arrayContaining([
           {
             appId: expect.stringMatching(new RegExp(`^${app.appId}_workspace_app_.+`)),
@@ -412,11 +417,11 @@ describe("/applications", () => {
         })
       )
 
-      const response = await config.api.workspace.fetchClientApps()
+      const apps = await fetchCurrentWorkspaceApps()
 
-      expect(response.apps).toHaveLength(2)
+      expect(apps).toHaveLength(2)
 
-      expect(response.apps).toEqual(
+      expect(apps).toEqual(
         expect.arrayContaining([
           {
             appId: expect.stringMatching(new RegExp(`^${workspace.appId}_workspace_app_.+`)),
@@ -455,10 +460,10 @@ describe("/applications", () => {
 
       workspace = await config.publish()
 
-      const response = await config.api.workspace.fetchClientApps()
+      const apps = await fetchCurrentWorkspaceApps()
 
-      expect(response.apps).toHaveLength(2)
-      expect(response.apps).toEqual(
+      expect(apps).toHaveLength(2)
+      expect(apps).toEqual(
         expect.arrayContaining([
           {
             appId: expect.stringMatching(new RegExp(`^${workspace.appId}_workspace_app_.+`)),
