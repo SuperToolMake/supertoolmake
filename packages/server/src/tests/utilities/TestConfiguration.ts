@@ -47,6 +47,7 @@ import {
   layout as layoutController,
   query as queryController,
   role as roleController,
+  workspaceApp as workspaceAppController,
   workspace as workspaceController,
 } from "./controllers"
 import {
@@ -331,13 +332,13 @@ export default class TestConfiguration {
     prodApp,
   }: {
     roleId?: string
-    userId: string
+    userId?: string
     builder: boolean
     prodApp: boolean
   }) {
     const appId = prodApp ? this.getProdWorkspaceId() : this.getDevWorkspaceId()
     return context.doInWorkspaceContext(appId, async () => {
-      userId = !userId ? `us_uuid1` : userId
+      userId = userId || `us_${newid()}`
       if (!this.request) {
         throw "Server has not been opened, cannot login."
       }
@@ -522,7 +523,8 @@ export default class TestConfiguration {
   }
 
   async createDefaultWorkspaceApp(appName: string, mode: "dev" | "prod" = "dev") {
-    const { workspaceApp } = await this.api.workspaceApp.create(
+    const { workspaceApp } = await this._req(
+      workspaceAppController.create,
       structures.workspaceApps.createRequest({
         name: appName,
         url: "/",
@@ -565,7 +567,7 @@ export default class TestConfiguration {
     this.devWorkspace = await context.doInTenant(
       this.tenantId!,
       async () =>
-        (await this._req(workspaceController.create, {
+        (await this._req(workspaceController.createWorkspace, {
           name,
           url,
         })) as Workspace
@@ -588,10 +590,14 @@ export default class TestConfiguration {
 
   async createWorkspaceWithOnboarding(_name = "Workspace", url?: string): Promise<Workspace> {
     this.devWorkspaceId = undefined
-    this.devWorkspace = await this.api.workspace.create({
-      isOnboarding: "true",
-      url,
-    })
+    this.devWorkspace = await context.doInTenant(
+      this.tenantId!,
+      async () =>
+        (await this._req(workspaceController.createWorkspace, {
+          isOnboarding: "true",
+          url,
+        })) as Workspace
+    )
     this.devWorkspaceId = this.devWorkspace.appId
 
     const { workspaceApps } = await this.api.workspaceApp.fetch()

@@ -27,16 +27,6 @@ export interface OnboardingWorkspaceRequest {
 
 export interface CreateWorkspaceResponse extends Workspace {}
 
-export interface DuplicateWorkspaceRequest {
-  name: string
-  url?: string
-}
-
-export interface DuplicateWorkspaceResponse {
-  duplicateAppId: string
-  sourceAppId: string
-}
-
 export interface FetchAppDefinitionResponse {
   layouts: Layout[]
   screens: Screen[]

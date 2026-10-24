@@ -1,3 +1,10 @@
+// Startup refreshes every workspace's client files. Keep that background work out of
+// integration tests; client library uploads are covered in their own test suite.
+jest.mock("../utilities/fileSystem", () => ({
+  ...jest.requireActual("../utilities/fileSystem"),
+  updateClientLibrary: jest.fn(),
+}))
+
 import { env as coreEnv, timers } from "@supertoolmake/backend-core"
 import { testContainerUtils } from "@supertoolmake/backend-core/tests"
 import * as matchers from "jest-extended"
