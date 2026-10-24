@@ -1,5 +1,5 @@
 import path from "node:path"
-import { db, Header, roles } from "@supertoolmake/backend-core"
+import { cache, context, db, Header, objectStore, roles } from "@supertoolmake/backend-core"
 import { structures } from "@supertoolmake/backend-core/tests"
 import {
   BuiltinPermissionID,
@@ -25,6 +25,7 @@ const generateAppName = () => {
 
 describe("/applications", () => {
   const config = setup.getConfig()
+  let existingWorkspaceIds: Set<string>
   let workspace: Workspace
 
   afterAll(() => {
@@ -32,7 +33,33 @@ describe("/applications", () => {
   })
 
   beforeAll(async () => {
+    existingWorkspaceIds = new Set(
+      await context.doInTenant(context.DEFAULT_TENANT_ID, () =>
+        db.getAllWorkspaces({ idsOnly: true })
+      )
+    )
     await config.init()
+  })
+
+  afterEach(async () => {
+    const currentWorkspaceIds = await config.doInTenant(() =>
+      db.getAllWorkspaces({ idsOnly: true })
+    )
+    const createdWorkspaceIds = currentWorkspaceIds.filter((id) => !existingWorkspaceIds.has(id))
+
+    await Promise.all(
+      createdWorkspaceIds.map(async (id) => {
+        await cache.workspace.invalidateWorkspaceMetadata(id)
+
+        const files = await objectStore.getAllFiles(objectStore.ObjectStoreBuckets.APPS, id)
+        const filepaths = Object.keys(files)
+        if (filepaths.length) {
+          await objectStore.deleteFiles(objectStore.ObjectStoreBuckets.APPS, filepaths)
+        }
+
+        await db.getDB(id).destroy()
+      })
+    )
   })
 
   async function createNewApp() {
