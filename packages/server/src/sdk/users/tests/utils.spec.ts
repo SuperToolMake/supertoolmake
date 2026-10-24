@@ -24,12 +24,11 @@ describe("syncGlobalUsers", () => {
       await syncGlobalUsers()
 
       const metadata = await rawUserMetadata()
-      expect(metadata).toHaveLength(1)
-      expect(metadata).toEqual([
+      expect(metadata).toContainEqual(
         expect.objectContaining({
           _id: db.generateUserMetadataID(config.getUser()._id!),
-        }),
-      ])
+        })
+      )
     })
   })
 

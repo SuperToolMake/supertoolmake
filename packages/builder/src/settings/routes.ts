@@ -2,7 +2,6 @@ import { UserAvatar } from "@supertoolmake/frontend-core"
 import { sdk } from "@supertoolmake/shared-core"
 import type { GetGlobalSelfResponse } from "@supertoolmake/types"
 import type { AppMetaState } from "@/stores/builder/app"
-import type { AdminState } from "@/stores/portal/admin"
 import type { PortalAppsStore } from "@/stores/portal/apps"
 import type { Route } from "@/types/routing"
 import { Pages } from "./pages"
@@ -21,9 +20,8 @@ export const globalRoutes = (user: GetGlobalSelfResponse) => {
   ]
 }
 
-export const orgRoutes = (user: GetGlobalSelfResponse, admin: AdminState): Route[] => {
+export const orgRoutes = (user: GetGlobalSelfResponse): Route[] => {
   const isAdmin = user != null && sdk.users.isAdmin(user)
-  const cloud = admin?.cloud
 
   const emailRoutes: Route[] = [
     {
@@ -99,7 +97,7 @@ export const orgRoutes = (user: GetGlobalSelfResponse, admin: AdminState): Route
     },
     {
       section: "Self host",
-      access: () => !cloud && isAdmin,
+      access: () => isAdmin,
       path: "self",
       icon: "computer-tower",
       routes: [
@@ -122,7 +120,7 @@ export const orgRoutes = (user: GetGlobalSelfResponse, admin: AdminState): Route
     },
     {
       section: "Open source license",
-      access: () => !cloud && isAdmin,
+      access: () => isAdmin,
       path: "legal",
       icon: "gavel",
       routes: [

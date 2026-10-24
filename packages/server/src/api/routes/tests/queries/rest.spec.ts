@@ -247,7 +247,6 @@ describe("rest", () => {
   it("should allow localhost requests in self-hosted when blacklist override is empty", async () => {
     const resetBlacklistEnv = setCoreEnv({
       BLACKLIST_IPS: "",
-      SELF_HOSTED: true,
     })
     await blacklist.refreshBlacklist()
 

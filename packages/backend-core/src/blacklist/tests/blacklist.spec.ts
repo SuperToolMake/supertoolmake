@@ -114,7 +114,7 @@ describe("blacklist", () => {
     })
   })
 
-  describe("self-hosted blacklist override", () => {
+  describe("blacklist override", () => {
     let restoreEnv: (() => void) | undefined
 
     afterEach(async () => {
@@ -123,9 +123,8 @@ describe("blacklist", () => {
       await refreshBlacklist()
     })
 
-    it("should allow private IPs when self-hosted override is empty", async () => {
+    it("should allow private IPs when override is empty", async () => {
       restoreEnv = setEnv({
-        SELF_HOSTED: true,
         BLACKLIST_IPS: "",
       })
       await refreshBlacklist()
@@ -135,9 +134,8 @@ describe("blacklist", () => {
       expect(await isBlacklisted("172.16.0.1")).toBe(false)
     })
 
-    it("should fail open on DNS lookup errors when self-hosted override is empty", async () => {
+    it("should fail open on DNS lookup errors when override is empty", async () => {
       restoreEnv = setEnv({
-        SELF_HOSTED: true,
         BLACKLIST_IPS: "",
       })
       await refreshBlacklist()
@@ -145,26 +143,14 @@ describe("blacklist", () => {
       expect(await isBlacklisted("https://budibase-ssrf.invalid")).toBe(false)
     })
 
-    it("should use only configured entries when self-hosted override is set", async () => {
+    it("should use only configured entries when override is set", async () => {
       restoreEnv = setEnv({
-        SELF_HOSTED: true,
         BLACKLIST_IPS: "1.1.1.1",
       })
       await refreshBlacklist()
 
       expect(await isBlacklisted("1.1.1.1")).toBe(true)
       expect(await isBlacklisted("192.168.1.1")).toBe(false)
-    })
-
-    it("should not allow an override outside self-hosted deployments", async () => {
-      restoreEnv = setEnv({
-        SELF_HOSTED: false,
-        BLACKLIST_IPS: "",
-      })
-      await refreshBlacklist()
-
-      expect(await isBlacklisted("192.168.1.1")).toBe(true)
-      expect(await isBlacklisted("https://budibase-ssrf.invalid")).toBe(true)
     })
   })
 

@@ -212,7 +212,7 @@ $: {
         : emailsInput
   }
 }
-$: smtpConfigured = $admin.loaded && ($admin.cloud || Boolean($admin.checklist?.smtp?.checked))
+$: smtpConfigured = $admin.loaded && Boolean($admin.checklist?.smtp?.checked)
 $: emailInviteDisabled = $admin.loaded ? !smtpConfigured : false
 $: passwordInviteDisabled = $organisation.isSSOEnforced
 $: onboardingOptions = [

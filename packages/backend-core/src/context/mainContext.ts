@@ -107,22 +107,6 @@ export async function doInTenant<T>(tenantId: string | undefined, task: () => T)
   return newContext(updates, task)
 }
 
-// We allow self-host licensed users to make use of some Budicloud services.
-// When they do this, they use their license key as an API
-// key. We use that license key to identify the tenant ID, and we set the
-// context to be self-host using cloud. This affects things like where their
-// quota documents get stored (because we want to avoid creating a new global
-// DB for each self-host tenant).
-export async function doInSelfHostTenantUsingCloud<T>(tenantId: string, task: () => T): Promise<T> {
-  const updates = { tenantId, isSelfHostUsingCloud: true }
-  return newContext(updates, task)
-}
-
-export function isSelfHostUsingCloud() {
-  const context = Context.get()
-  return Boolean(context?.isSelfHostUsingCloud)
-}
-
 export async function doInWorkspaceContext<T>(workspaceId: string, task: () => T): Promise<T> {
   return _doInWorkspaceContext(workspaceId, task)
 }
@@ -275,9 +259,6 @@ export function getGlobalDB(): Database {
   if (!context) {
     throw new Error("Global DB not found")
   }
-  if (context.isSelfHostUsingCloud) {
-    throw new Error("Global DB not found - self-host users using cloud don't have a global DB")
-  }
   return getDB(baseGlobalDBName(context?.tenantId))
 }
 
@@ -296,9 +277,6 @@ export function getWorkspaceDB(opts?: any): Database {
   const workspaceId = getWorkspaceId()
   if (!workspaceId) {
     throw new Error("Unable to retrieve workspace DB - no workspace ID.")
-  }
-  if (isSelfHostUsingCloud()) {
-    throw new Error("Workspace DB not found - self-host users using cloud don't have workspace DBs")
   }
   return getDB(workspaceId, opts)
 }

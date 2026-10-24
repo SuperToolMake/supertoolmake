@@ -1,19 +1,10 @@
 <script>
 import { Dropzone, notifications } from "@supertoolmake/bbui"
 import { API } from "@/api"
-import { admin } from "@/stores/portal"
 
 export let value = []
 export let label
 export let fileSizeLimit = undefined
-
-const BYTES_IN_MB = 1000000
-
-function handleFileTooLarge(fileSizeLimit) {
-  notifications.error(
-    `Files cannot exceed ${fileSizeLimit / BYTES_IN_MB}MB. Please try again with smaller files.`
-  )
-}
 
 async function processFiles(fileList) {
   let data = new FormData()
@@ -34,7 +25,6 @@ async function processFiles(fileList) {
   {label}
   {...$$restProps}
   {processFiles}
-  handleFileTooLarge={$admin.cloud ? handleFileTooLarge : null}
   {fileSizeLimit}
   on:change
 />

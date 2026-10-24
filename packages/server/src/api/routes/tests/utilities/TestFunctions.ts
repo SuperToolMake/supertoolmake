@@ -54,7 +54,6 @@ export const checkBuilderEndpoint = async ({
   body?: any
 }) => {
   const headers = await config.login({
-    userId: "us_fail",
     builder: false,
     prodApp: true,
   })

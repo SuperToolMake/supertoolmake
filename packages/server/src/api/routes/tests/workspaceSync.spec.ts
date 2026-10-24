@@ -1,19 +1,20 @@
 import { db as dbCore, roles } from "@supertoolmake/backend-core"
+import type { User } from "@supertoolmake/types"
 import * as setup from "./utilities"
 
 describe("/api/applications/:appId/sync", () => {
   const config = setup.getConfig()
-  let app
+  let user: User
 
   afterAll(setup.afterAll)
 
   beforeAll(async () => {
-    app = await config.init()
+    await config.init()
     // create some users which we will use throughout the tests
-    await config.createUser({
-      email: "sync1@example.com",
+    user = await config.createUser({
+      builder: { global: false },
       roles: {
-        [app._id!]: roles.BUILTIN_ROLE_IDS.BASIC,
+        [config.getProdWorkspaceId()]: roles.BUILTIN_ROLE_IDS.BASIC,
       },
     })
   })
@@ -25,8 +26,19 @@ describe("/api/applications/:appId/sync", () => {
 
   it("make sure that user metadata is correctly sync'd", async () => {
     const rows = await getUserMetadata()
-    // A default user is created with the newTenant call via `await config.init()`
-    // therefore two users are expected in this case
-    expect(rows.length).toBe(2)
+    // Other suites share the single tenant, so check this suite's users rather
+    // than the total number of synced users.
+    expect(rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          _id: dbCore.generateUserMetadataID(config.getUser()._id),
+        }),
+        expect.objectContaining({
+          _id: dbCore.generateUserMetadataID(user._id!),
+          email: user.email,
+          roleId: roles.BUILTIN_ROLE_IDS.BASIC,
+        }),
+      ])
+    )
   })
 })

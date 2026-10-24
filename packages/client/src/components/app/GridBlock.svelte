@@ -30,7 +30,6 @@ export let autoRefresh = null
 
 const context = getContext("context")
 const component = getContext("component")
-const { environmentStore } = getContext("sdk")
 const {
   styleable,
   API,
@@ -282,7 +281,6 @@ onDestroy(() => {
     buttons={enrichedButtons}
     {buttonsCollapsed}
     {buttonsCollapsedText}
-    isCloud={$environmentStore.cloud}
     on:rowclick={e => onRowClick?.({ row: e.detail })}
   />
 </div>

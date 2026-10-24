@@ -84,7 +84,7 @@ export async function startup(opts: { app?: Koa; server?: Server; force?: boolea
   // the app user sync
   const bbAdminEmail = coreEnv.BB_ADMIN_USER_EMAIL,
     bbAdminPassword = coreEnv.BB_ADMIN_USER_PASSWORD
-  if (env.SELF_HOSTED && bbAdminEmail && bbAdminPassword) {
+  if (bbAdminEmail && bbAdminPassword) {
     console.log("Initialising admin user")
     const tenantId = tenancy.getTenantId()
     await tenancy.doInTenant(tenantId, async () => {
@@ -112,16 +112,14 @@ export async function startup(opts: { app?: Koa; server?: Server; force?: boolea
     })
   }
 
-  if (env.SELF_HOSTED) {
-    console.log("Updating client library")
-    const tenantId = tenancy.getTenantId()
-    await tenancy.doInTenant(tenantId, async () => {
-      const workspaces = await dbCore.getAllWorkspaces({})
-      for (const workspace of workspaces) {
-        await fileSystem.updateClientLibrary(workspace.appId)
-      }
-    })
-  }
+  console.log("Updating client library")
+  const tenantId = tenancy.getTenantId()
+  await tenancy.doInTenant(tenantId, async () => {
+    const workspaces = await dbCore.getAllWorkspaces({})
+    for (const workspace of workspaces) {
+      await fileSystem.updateClientLibrary(workspace.appId)
+    }
+  })
 
   console.log("Initialising JS runner")
   jsRunner.init()

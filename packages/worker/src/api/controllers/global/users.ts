@@ -49,11 +49,8 @@ import {
   type UserIdentifier,
 } from "@supertoolmake/types"
 import emailValidator from "email-validator"
-import env from "../../../environment"
 import * as userSdk from "../../../sdk/users"
 import { checkAnyUserExists } from "../../../utilities/users"
-
-const MAX_USERS_UPLOAD_LIMIT = 1000
 
 const stripUsers = (users: (User | StrippedUser)[]): StrippedUser[] => {
   return users.map((user) => ({
@@ -111,9 +108,6 @@ const bulkDelete = async (users: Array<UserIdentifier>, currentUserId: string) =
 }
 
 const bulkCreate = async (users: User[]) => {
-  if (!env.SELF_HOSTED && users.length > MAX_USERS_UPLOAD_LIMIT) {
-    throw new Error("Max limit for upload is 1000 users. Please reduce file size and try again.")
-  }
   return await userSdk.db.bulkCreate(users)
 }
 

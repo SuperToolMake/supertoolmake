@@ -35,7 +35,7 @@ import {
   tables,
   workspaceDeploymentStore,
 } from "@/stores/builder"
-import { admin, themeStore } from "@/stores/portal"
+import { themeStore } from "@/stores/portal"
 import { publishTableToProduction } from "@/utils/publishTableToProduction"
 
 let generateButton: GridGenerateButton
@@ -291,7 +291,6 @@ onDestroy(() => {
         canSaveSchema={!isProductionMode}
         schemaOverrides={isUsersTable ? userSchemaOverrides : null}
         showAvatars={false}
-        isCloud={$admin.cloud}
         buttonsCollapsed
         canHideColumns={false}
         externalClipboard={externalClipboardData}

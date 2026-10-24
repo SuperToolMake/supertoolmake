@@ -1,4 +1,3 @@
-import { withEnv } from "../../../environment"
 import { afterAll as _afterAll, getConfig, getRequest } from "./utilities"
 import { checkBuilderEndpoint } from "./utilities/TestFunctions"
 
@@ -14,14 +13,12 @@ describe("/api/keys", () => {
 
   describe("fetch", () => {
     it("should allow fetching", async () => {
-      await withEnv({ SELF_HOSTED: "true" }, async () => {
-        const res = await request
-          .get(`/api/keys`)
-          .set(config.defaultHeaders())
-          .expect("Content-Type", /json/)
-          .expect(200)
-        expect(res.body).toBeDefined()
-      })
+      const res = await request
+        .get(`/api/keys`)
+        .set(config.defaultHeaders())
+        .expect("Content-Type", /json/)
+        .expect(200)
+      expect(res.body).toBeDefined()
     })
 
     it("should check authorization for builder", async () => {
@@ -35,18 +32,16 @@ describe("/api/keys", () => {
 
   describe("update", () => {
     it("should allow updating a value", async () => {
-      await withEnv({ SELF_HOSTED: "true" }, async () => {
-        const res = await request
-          .put(`/api/keys/TEST`)
-          .send({
-            value: "test",
-          })
-          .set(config.defaultHeaders())
-          .expect("Content-Type", /json/)
-          .expect(200)
-        expect(res.body._id).toBeDefined()
-        expect(res.body._rev).toBeDefined()
-      })
+      const res = await request
+        .put(`/api/keys/TEST`)
+        .send({
+          value: "test",
+        })
+        .set(config.defaultHeaders())
+        .expect("Content-Type", /json/)
+        .expect(200)
+      expect(res.body._id).toBeDefined()
+      expect(res.body._rev).toBeDefined()
     })
 
     it("should check authorization for builder", async () => {

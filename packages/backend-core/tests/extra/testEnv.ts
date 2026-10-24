@@ -11,14 +11,6 @@ export async function withTenant(task: (tenantId: string) => any) {
   })
 }
 
-export function selfHosted() {
-  env._set("SELF_HOSTED", 1)
-}
-
-export function cloudHosted() {
-  env._set("SELF_HOSTED", 0)
-}
-
 // NODE
 
 export function nodeDev() {

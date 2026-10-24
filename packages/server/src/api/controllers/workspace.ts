@@ -5,6 +5,7 @@ import {
   db as dbCore,
   docIds,
   env as envCore,
+  locks,
   objectStore,
   roles,
   tenancy,
@@ -17,8 +18,6 @@ import {
   type CreateWorkspaceRequest,
   type CreateWorkspaceResponse,
   type Database,
-  type DuplicateWorkspaceRequest,
-  type DuplicateWorkspaceResponse,
   type FetchAppDefinitionResponse,
   type FetchAppPackageResponse,
   type FetchPublishedAppsResponse,
@@ -27,10 +26,13 @@ import {
   type ImportToUpdateWorkspaceRequest,
   type ImportToUpdateWorkspaceResponse,
   type Layout,
+  LockName,
+  LockType,
   type OnboardingWorkspaceRequest,
   type RevertAppClientResponse,
   type Row,
   type Screen,
+  SEPARATOR,
   type SyncWorkspaceResponse,
   type UnpublishWorkspaceResponse,
   type UpdateAppClientResponse,
@@ -371,7 +373,7 @@ async function performWorkspaceCreate(
     }
   }
 
-  const workspaceId = getDevWorkspaceID(generateWorkspaceID({ random: true }))
+  const workspaceId = getDevWorkspaceID(generateWorkspaceID())
 
   return await context.doInWorkspaceContext(workspaceId, async () => {
     const instance = await createInstance(workspaceId)
@@ -556,7 +558,7 @@ async function updateUserColumns(appId: string, db: Database, toUserId: string) 
 }
 
 async function workspacePostCreate(
-  ctx: UserCtx<CreateWorkspaceRequest, Workspace>,
+  ctx: UserCtx<CreateWorkspaceRequest | OnboardingWorkspaceRequest, Workspace>,
   workspace: Workspace
 ) {
   // If the user is a creator, we need to give them access to the new app
@@ -567,11 +569,36 @@ async function workspacePostCreate(
   }
 }
 
-export async function create(ctx: UserCtx<CreateWorkspaceRequest, CreateWorkspaceResponse>) {
+export async function createWorkspace(
+  ctx: UserCtx<CreateWorkspaceRequest | OnboardingWorkspaceRequest, CreateWorkspaceResponse>
+): Promise<void> {
   const newApplication = await performWorkspaceCreate(ctx)
   await workspacePostCreate(ctx, newApplication)
   await cache.bustCache(cache.CacheKey.CHECKLIST)
   ctx.body = newApplication
+}
+
+export async function create(
+  ctx: UserCtx<CreateWorkspaceRequest | OnboardingWorkspaceRequest, CreateWorkspaceResponse>
+) {
+  await locks.doWithLock(
+    {
+      name: LockName.WORKSPACE_CREATION,
+      type: LockType.AUTO_EXTEND,
+      systemLock: true,
+    },
+    async () => {
+      const workspacePrefix = `${DocumentType.WORKSPACE}${SEPARATOR}`
+      const existingWorkspaceIds = (await dbCore.getAllDbs()).filter((databaseName: string) =>
+        databaseName.startsWith(workspacePrefix)
+      )
+      if (existingWorkspaceIds.length) {
+        ctx.throw(409, "Only one workspace is supported")
+      }
+
+      await createWorkspace(ctx)
+    }
+  )
 }
 
 export async function find(ctx: UserCtx) {
@@ -736,61 +763,6 @@ export async function importToWorkspace(
     ctx.throw(500, `Unable to perform update, please retry - ${err?.message || err}`)
   }
   ctx.body = { message: "workspace updated" }
-}
-
-/**
- * Create a copy of the latest dev application.
- * Performs an export of the app, then imports from the export dir path
- */
-export async function duplicateWorkspace(
-  ctx: UserCtx<DuplicateWorkspaceRequest, DuplicateWorkspaceResponse>
-) {
-  const { name: appName, url: possibleUrl } = ctx.request.body
-  const { appId: sourceAppId } = ctx.params
-  const [workspace] = await dbCore.getWorkspacesByIDs([sourceAppId])
-
-  if (!workspace) {
-    ctx.throw(404, "Source app not found")
-  }
-
-  const workspaces = await dbCore.getAllWorkspaces({
-    dev: true,
-  })
-
-  checkWorkspaceName(ctx, workspaces, appName)
-  const url = sdk.workspaces.getAppUrl({ name: appName, url: possibleUrl })
-  checkWorkspaceUrl(ctx, workspaces, url)
-
-  const createRequestBody: CreateWorkspaceRequest = {
-    name: appName,
-    url: possibleUrl,
-    useTemplate: "true",
-  }
-
-  // Build a new request
-  const createRequest = {
-    roleId: ctx.roleId,
-    user: {
-      ...ctx.user,
-      _id: dbCore.getGlobalIDFromUserMetadataID(ctx.user._id || ""),
-    },
-    request: {
-      body: createRequestBody,
-    },
-  } as UserCtx<CreateWorkspaceRequest, Workspace>
-
-  // Build the new application
-  await create(createRequest)
-  const { body: newApplication } = createRequest
-
-  if (!newApplication) {
-    ctx.throw(500, "There was a problem duplicating the application")
-  }
-
-  ctx.body = {
-    duplicateAppId: newApplication?.appId,
-    sourceAppId,
-  }
 }
 
 export async function updateWorkspacePackage(

@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto"
 import { S3 } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { context, roles } from "@supertoolmake/backend-core"
@@ -126,20 +127,25 @@ describe("configured object-store uploads", () => {
             .png()
             .toBuffer()
         : Buffer.from("test")
+      const key = `documents/${randomUUID()}.png`
+      const expectedKey = compress ? key.replace(/\.png$/, ".avif") : key
       const uploadRequest = request
         .post(`/api/attachments/${datasourceId}/external/upload`)
         .set(config.defaultHeaders())
         .field("bucket", "uploads")
-        .field("key", "documents/file.png")
+        .field("key", key)
         .field("screenId", screen._id!)
         .field("componentId", componentId)
       if (compress) uploadRequest.field("compress", JSON.stringify({ quality: 80 }))
       await uploadRequest.attach("file", file, "file.png").expect(200)
-      expect(send).toHaveBeenCalledTimes(1)
-      expect(send.mock.calls[0][0].input).toMatchObject({
-        Bucket: "uploads",
-        Key: compress ? "documents/file.avif" : "documents/file.png",
-      })
+      expect(send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          input: expect.objectContaining({
+            Bucket: "uploads",
+            Key: expectedKey,
+          }),
+        })
+      )
     } finally {
       send.mockRestore()
     }

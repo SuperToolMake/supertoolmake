@@ -2,11 +2,9 @@
 import { Body, ModalContent, notifications, Select } from "@supertoolmake/bbui"
 import { Constants, emailValidator } from "@supertoolmake/frontend-core"
 import { parseUserEmailsFromCSV } from "@/helpers"
-import { admin } from "@/stores/portal/admin"
 
 const BYTES_IN_MB = 1000000
 const FILE_SIZE_LIMIT = BYTES_IN_MB * 5
-const MAX_USERS_UPLOAD_LIMIT = 1000
 
 export let createUsersFromCsv: (_data: { userEmails: string[]; usersRole: string }) => void
 
@@ -18,12 +16,6 @@ let invalidEmails: string[] = []
 
 const validEmails = (userEmails: string[]): boolean => {
   invalidEmails = [] // Reset invalid emails
-  if ($admin.cloud && userEmails.length > MAX_USERS_UPLOAD_LIMIT) {
-    notifications.error(
-      `Max limit for upload is 1000 users. Please reduce file size and try again.`
-    )
-    return false
-  }
   for (const email of userEmails) {
     if (emailValidator(email) !== true) invalidEmails.push(email)
   }
