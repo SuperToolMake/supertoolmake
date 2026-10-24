@@ -373,7 +373,7 @@ async function performWorkspaceCreate(
     }
   }
 
-  const workspaceId = getDevWorkspaceID(generateWorkspaceID({ random: true }))
+  const workspaceId = getDevWorkspaceID(generateWorkspaceID())
 
   return await context.doInWorkspaceContext(workspaceId, async () => {
     const instance = await createInstance(workspaceId)

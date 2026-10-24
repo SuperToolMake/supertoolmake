@@ -16,11 +16,13 @@ import {
 import { generator, structures } from "@supertoolmake/backend-core/tests"
 import {
   type AuthToken,
+  type CreateWorkspaceRequest,
   type Datasource,
   type DevInfo,
   FieldType,
   INTERNAL_TABLE_SOURCE_ID,
   type Layout,
+  type OnboardingWorkspaceRequest,
   type Query,
   type RelationshipFieldMetadata,
   RelationshipType,
@@ -37,7 +39,7 @@ import {
 } from "@supertoolmake/types"
 import jwt, { type Secret } from "jsonwebtoken"
 import supertest from "supertest"
-import { generateUserMetadataID } from "../../db/utils"
+import { generateUserMetadataID, generateWorkspaceID } from "../../db/utils"
 import env from "../../environment"
 import { startup } from "../../startup"
 import { cleanup } from "../../utilities/fileSystem"
@@ -562,15 +564,21 @@ export default class TestConfiguration {
   }
 
   // WORKSPACE
+  private async createWorkspaceFixture(body: CreateWorkspaceRequest | OnboardingWorkspaceRequest) {
+    let workspace!: Workspace
+    await jest.mocked(generateWorkspaceID).withImplementation(
+      () => dbCore.generateWorkspaceID({ random: true }),
+      async () => {
+        workspace = await this._req(workspaceController.createWorkspace, body)
+      }
+    )
+    return workspace
+  }
+
   async createWorkspace(name: string = generator.guid(), url?: string): Promise<Workspace> {
     this.devWorkspaceId = undefined
-    this.devWorkspace = await context.doInTenant(
-      this.tenantId!,
-      async () =>
-        (await this._req(workspaceController.createWorkspace, {
-          name,
-          url,
-        })) as Workspace
+    this.devWorkspace = await context.doInTenant(this.tenantId!, () =>
+      this.createWorkspaceFixture({ name, url })
     )
     this.devWorkspaceId = this.devWorkspace.appId
 
@@ -590,13 +598,8 @@ export default class TestConfiguration {
 
   async createWorkspaceWithOnboarding(_name = "Workspace", url?: string): Promise<Workspace> {
     this.devWorkspaceId = undefined
-    this.devWorkspace = await context.doInTenant(
-      this.tenantId!,
-      async () =>
-        (await this._req(workspaceController.createWorkspace, {
-          isOnboarding: "true",
-          url,
-        })) as Workspace
+    this.devWorkspace = await context.doInTenant(this.tenantId!, () =>
+      this.createWorkspaceFixture({ isOnboarding: "true", url })
     )
     this.devWorkspaceId = this.devWorkspace.appId
 
