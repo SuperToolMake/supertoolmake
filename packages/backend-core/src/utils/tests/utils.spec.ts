@@ -1,4 +1,4 @@
-import type { Ctx } from "@supertoolmake/types"
+import type { Ctx, Workspace } from "@supertoolmake/types"
 import { structures } from "../../../tests"
 import { DBTestConfiguration } from "../../../tests/extra"
 import { Header } from "../../constants"
@@ -6,6 +6,14 @@ import * as db from "../../db"
 import env from "../../environment"
 import * as utils from "../../utils"
 import { newid } from "../../utils"
+
+jest.mock("../../db", () => {
+  const actual = jest.requireActual("../../db")
+  return {
+    ...actual,
+    getAllWorkspaces: jest.fn(actual.getAllWorkspaces),
+  }
+})
 
 describe("utils", () => {
   const config = new DBTestConfiguration()
@@ -70,6 +78,30 @@ describe("utils", () => {
 
         const actual = await utils.getWorkspaceIdFromCtx(ctx)
         expect(actual).toBe(expected)
+      })
+    })
+
+    it("uses the only published workspace for a live app URL", async () => {
+      await config.doInTenant(async () => {
+        const expected = db.generateWorkspaceID({
+          tenantId: config.tenantId,
+          random: true,
+        })
+        jest.mocked(db.getAllWorkspaces).mockResolvedValueOnce([{ appId: expected } as Workspace])
+        const ctx = structures.koa.newContext()
+        ctx.path = "/app/live-app"
+
+        expect(await utils.getWorkspaceIdFromCtx(ctx)).toBe(expected)
+      })
+    })
+
+    it("does not resolve a live app when there is no published workspace", async () => {
+      await config.doInTenant(async () => {
+        jest.mocked(db.getAllWorkspaces).mockResolvedValueOnce([])
+        const ctx = structures.koa.newContext()
+        ctx.path = "/app/live-app"
+
+        expect(await utils.getWorkspaceIdFromCtx(ctx)).toBeUndefined()
       })
     })
 

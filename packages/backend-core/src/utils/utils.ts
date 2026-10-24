@@ -9,20 +9,14 @@ import env from "../environment"
 const WORKSPACE_PREFIX = DocumentType.WORKSPACE + SEPARATOR
 const PROD_APP_PREFIX = "/app/"
 
-async function resolveAppUrl(ctx: Ctx) {
-  const workspaceUrl = ctx.path.split("/")[2]
-  const possibleUrl = `/${workspaceUrl.toLowerCase()}`
-
+async function resolveDefaultWorkspaceId() {
   const tenantId: string | undefined = context.getTenantId()
 
-  // search prod apps for an url that matches
   const workspaces: Workspace[] = await context.doInTenant(tenantId, () =>
     getAllWorkspaces({ dev: false })
   )
-  const workspace = workspaces.filter((a) => a.url && a.url.toLowerCase() === possibleUrl)[0]
-
-  // Multi-workspace functionality has been removed, so assume a default
-  return workspace?.appId ? workspace.appId : "app_workspace"
+  const [defaultWorkspace] = workspaces
+  return defaultWorkspace?.appId
 }
 
 export function isServingApp(ctx: Ctx) {
@@ -107,7 +101,7 @@ export async function getWorkspaceIdFromCtx(ctx: Ctx) {
   const isBuilderPreview = isBuilderPreviewUrl(ctx.path)
   const isViewingProdApp = ctx.path.startsWith(PROD_APP_PREFIX) && !isBuilderPreview
   if (isViewingProdApp) {
-    setWorkspaceIdIfValid(await resolveAppUrl(ctx))
+    setWorkspaceIdIfValid(await resolveDefaultWorkspaceId())
   }
 
   return workspaceId
