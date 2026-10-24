@@ -52,11 +52,7 @@ describe("admin store", () => {
     beforeEach(async (ctx) => {
       let getMockIndex = 0
 
-      ctx.getMockValues = [
-        { tenantId: "tenantId" },
-        { cloud: true },
-        { status: { health: { passing: false } } },
-      ]
+      ctx.getMockValues = [{ tenantId: "tenantId" }]
 
       get.mockImplementation(() => {
         const value = ctx.getMockValues[getMockIndex]
@@ -68,7 +64,6 @@ describe("admin store", () => {
       API.getChecklist.mockReturnValue("checklist")
 
       API.getEnvironment.mockReturnValue({
-        cloud: true,
         isDev: true,
         serveDevClientFromStorage: false,
       })
@@ -102,59 +97,14 @@ describe("admin store", () => {
         expect(API.getEnvironment).toHaveBeenCalledWith()
         expect(ctx.writableReturn.update.mock.calls[1][0]({ foo: "foo" })).toEqual({
           foo: "foo",
-          cloud: true,
           isDev: true,
         })
       })
     })
 
-    describe("system status", () => {
-      describe("non cloud", () => {
-        beforeEach(async (ctx) => {
-          ctx.getMockValues[1].cloud = false
-          await ctx.returnedStore.init()
-        })
-
-        it("getSystemStatus", () => {
-          expect(API.getSystemStatus).toHaveBeenCalledTimes(0)
-        })
-      })
-
-      describe("cloud with healthy admin status", () => {
-        beforeEach(async (ctx) => {
-          ctx.getMockValues[1].cloud = true
-          ctx.getMockValues[2].status.health.passing = true
-          await ctx.returnedStore.init()
-        })
-
-        it("getSystemStatus", (ctx) => {
-          expect(get).toHaveBeenNthCalledWith(2, ctx.writableReturn)
-          expect(API.getSystemStatus).toHaveBeenCalledTimes(1)
-          expect(API.getEnvironment).toHaveBeenCalledWith()
-          expect(ctx.writableReturn.update.mock.calls[2][0]({ foo: "foo" })).toEqual({
-            foo: "foo",
-            status: "status",
-          })
-        })
-      })
-
-      describe("cloud with unhealthy admin status", () => {
-        beforeEach(async (ctx) => {
-          ctx.getMockValues[1].cloud = true
-          ctx.getMockValues[2].status.health.passing = false
-          await ctx.returnedStore.init()
-        })
-
-        it("getSystemStatus", (ctx) => {
-          expect(get).toHaveBeenNthCalledWith(2, ctx.writableReturn)
-          expect(API.getSystemStatus).toHaveBeenCalledTimes(1)
-          expect(API.getEnvironment).toHaveBeenCalledWith()
-          expect(ctx.writableReturn.update.mock.calls[2][0]({ foo: "foo" })).toEqual({
-            foo: "foo",
-            status: "status",
-          })
-        })
-      })
+    it("does not prefetch system status during initialization", async (ctx) => {
+      await ctx.returnedStore.init()
+      expect(API.getSystemStatus).not.toHaveBeenCalled()
     })
 
     describe("getEnvironment", () => {
@@ -163,7 +113,7 @@ describe("admin store", () => {
       })
 
       it("marks the store as loaded", (ctx) => {
-        expect(ctx.writableReturn.update.mock.calls[3][0]({ foo: "foo" })).toEqual({
+        expect(ctx.writableReturn.update.mock.calls[2][0]({ foo: "foo" })).toEqual({
           foo: "foo",
           loaded: true,
         })

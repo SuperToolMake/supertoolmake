@@ -45,8 +45,6 @@ const DefaultBucketName = {
   TEMP: "tmp-file-attachments",
 }
 
-const selfHosted = Boolean(parseInt(process.env.SELF_HOSTED || ""))
-
 function getAPIEncryptionKey() {
   return process.env.API_ENCRYPTION_KEY ? process.env.API_ENCRYPTION_KEY : process.env.JWT_SECRET // fallback to the JWT_SECRET used historically
 }
@@ -161,8 +159,6 @@ const environment = {
   S3_IGNORE_SELF_SIGNED: process.env.S3_IGNORE_SELF_SIGNED,
   INTERNAL_API_KEY: process.env.INTERNAL_API_KEY,
   INTERNAL_API_KEY_FALLBACK: process.env.INTERNAL_API_KEY_FALLBACK,
-  DISABLE_ACCOUNT_PORTAL: process.env.DISABLE_ACCOUNT_PORTAL,
-  SELF_HOSTED: selfHosted,
   COOKIE_DOMAIN: process.env.COOKIE_DOMAIN,
   PLATFORM_URL: process.env.PLATFORM_URL || "",
   ENABLE_ANALYTICS: process.env.ENABLE_ANALYTICS,
@@ -204,7 +200,7 @@ const environment = {
    * This can be useful to prevent lockout when configuring SSO.
    * However, this should be turned OFF by default for security purposes.
    */
-  ENABLE_SSO_MAINTENANCE_MODE: selfHosted ? process.env.ENABLE_SSO_MAINTENANCE_MODE : false,
+  ENABLE_SSO_MAINTENANCE_MODE: process.env.ENABLE_SSO_MAINTENANCE_MODE,
   ...getPackageJsonFields(),
   OFFLINE_MODE: process.env.OFFLINE_MODE,
   SESSION_EXPIRY_SECONDS: process.env.SESSION_EXPIRY_SECONDS,

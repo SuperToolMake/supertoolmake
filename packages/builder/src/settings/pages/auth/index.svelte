@@ -24,7 +24,6 @@ import OneLoginLogo from "assets/onelogin-logo.png"
 import { cloneDeep, isEqual } from "lodash/fp"
 import { onMount } from "svelte"
 import { API } from "@/api"
-import { admin } from "@/stores/portal/admin"
 import { organisation } from "@/stores/portal/organisation"
 import OidcLogo from "./_logos/OIDC.svelte"
 import Google from "./google.svelte"
@@ -107,7 +106,7 @@ $: OIDCConfigFields = {
     {
       name: "callbackURL",
       readonly: true,
-      tooltip: $admin.cloud ? null : "Vist the organisation page to update the platform URL",
+      tooltip: "Visit the organisation page to update the platform URL",
       label: "Callback URL",
       placeholder: $organisation.oidcCallbackUrl,
       copyButton: true,

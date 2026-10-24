@@ -2,7 +2,6 @@ import type { IdentityContext, Snippet, Table, VM } from "@supertoolmake/types"
 
 export type ContextMap = {
   tenantId?: string
-  isSelfHostUsingCloud?: boolean
   appId?: string
   identity?: IdentityContext
   environmentVariables?: Record<string, string>

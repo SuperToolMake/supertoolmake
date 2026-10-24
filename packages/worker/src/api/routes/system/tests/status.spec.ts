@@ -17,7 +17,6 @@ describe("/api/system/status", () => {
 
   describe("GET /api/system/status", () => {
     it("returns status in self host", async () => {
-      config.selfHosted()
       const res = await config.api.status.getStatus()
       expect(res.body).toEqual({
         health: {
@@ -25,7 +24,6 @@ describe("/api/system/status", () => {
         },
         version: expect.any(String),
       })
-      config.cloudHosted()
     })
   })
 })

@@ -10,18 +10,13 @@ describe("security boundaries", () => {
     undefined,
     "invalid-internal-key",
   ])("rejects tenant initialization with key %s before creating a database", async (key) => {
-    config.selfHosted()
     const tenantId = structures.tenant.id()
-    try {
-      const request = config.request.post("/api/global/users/init")
-      if (key) request.set(constants.Header.API_KEY, key)
-      await request
-        .send({ tenantId, email: structures.email(), password: "password123!" })
-        .expect(403)
-      expect(await context.doInTenant(tenantId, () => context.getGlobalDB().exists())).toBe(false)
-    } finally {
-      config.cloudHosted()
-    }
+    const request = config.request.post("/api/global/users/init")
+    if (key) request.set(constants.Header.API_KEY, key)
+    await request
+      .send({ tenantId, email: structures.email(), password: "password123!" })
+      .expect(403)
+    expect(await context.doInTenant(tenantId, () => context.getGlobalDB().exists())).toBe(false)
   })
 
   it("preserves public single-tenant bootstrap and rejects repeated initialization", async () => {
@@ -29,13 +24,11 @@ describe("security boundaries", () => {
     const database = db.getDB(name)
     const replacement = jest.replaceProperty(constants.StaticDatabases.GLOBAL, "name", name)
     try {
-      config.selfHosted()
       const input = { tenantId: "default", email: structures.email(), password: "password123!" }
       await config.request.post("/api/global/users/init").send(input).expect(200)
       await config.request.post("/api/global/users/init").send(input).expect(403)
     } finally {
       replacement.restore()
-      config.cloudHosted()
       if (await database.exists()) await database.destroy()
     }
   })

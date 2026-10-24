@@ -1,7 +1,6 @@
 <script>
 import { Button, Input, Label, Layout, notifications, ProgressCircle } from "@supertoolmake/bbui"
 import { writable } from "svelte/store"
-import { admin } from "@/stores/portal/admin"
 import { organisation } from "@/stores/portal/organisation"
 
 const values = writable({
@@ -38,17 +37,15 @@ async function saveConfig() {
       <Input thin bind:value={$values.company} />
     </div>
 
-    {#if !$admin.cloud}
-      <div class="field">
-        <Label
-          size="L"
-          tooltip={"Update the Platform URL to match your SuperToolMake web URL. This keeps email templates and authentication configs up to date."}
-        >
-          Platform URL
-        </Label>
-        <Input thin bind:value={$values.platformUrl} />
-      </div>
-    {/if}
+    <div class="field">
+      <Label
+        size="L"
+        tooltip={"Update the Platform URL to match your SuperToolMake web URL. This keeps email templates and authentication configs up to date."}
+      >
+        Platform URL
+      </Label>
+      <Input thin bind:value={$values.platformUrl} />
+    </div>
   </div>
   <div>
     <Button disabled={loading} on:click={saveConfig} cta>

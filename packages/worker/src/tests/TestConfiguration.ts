@@ -40,9 +40,6 @@ class TestConfiguration {
   appId?: string
 
   constructor(opts: { openServer: boolean } = { openServer: true }) {
-    // default to cloud hosting
-    this.cloudHosted()
-
     this.tenantId = context.DEFAULT_TENANT_ID
 
     if (opts.openServer) {
@@ -57,21 +54,6 @@ class TestConfiguration {
 
   getRequest() {
     return this.request
-  }
-
-  // HOSTING
-
-  setSelfHosted = (value: boolean) => {
-    env._set("SELF_HOSTED", value)
-    coreEnv._set("SELF_HOSTED", value)
-  }
-
-  cloudHosted = () => {
-    this.setSelfHosted(false)
-  }
-
-  selfHosted = () => {
-    this.setSelfHosted(true)
   }
 
   // UTILS

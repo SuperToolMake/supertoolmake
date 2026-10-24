@@ -11,7 +11,6 @@ builderRoutes
   .post("/api/applications/:appId/client/revert", controller.revertClient)
   .post("/api/applications/:appId/publish", deploymentController.publishWorkspace)
   .post("/api/applications/:appId/unpublish", controller.unpublish)
-  .post("/api/applications/:appId/duplicate", controller.duplicateWorkspace)
   .post("/api/applications/:appId/import", controller.importToWorkspace)
 
 creatorRoutes.post("/api/applications", applicationValidator(), controller.create)

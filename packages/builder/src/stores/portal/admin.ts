@@ -1,8 +1,4 @@
-import type {
-  ConfigChecklistResponse,
-  GetEnvironmentResponse,
-  SystemStatusResponse,
-} from "@supertoolmake/types"
+import type { ConfigChecklistResponse, GetEnvironmentResponse } from "@supertoolmake/types"
 import { get } from "svelte/store"
 import { API } from "@/api"
 import { BudiStore } from "../BudiStore"
@@ -11,7 +7,6 @@ import { auth } from "./auth"
 export interface AdminState extends GetEnvironmentResponse {
   loaded: boolean
   checklist?: ConfigChecklistResponse
-  status?: SystemStatusResponse
 }
 
 export class AdminStore extends BudiStore<AdminState> {
@@ -19,7 +14,6 @@ export class AdminStore extends BudiStore<AdminState> {
     super({
       loaded: false,
       isDev: false,
-      cloud: false,
       offlineMode: false,
       maintenance: [],
     })
@@ -28,11 +22,6 @@ export class AdminStore extends BudiStore<AdminState> {
   async init() {
     await this.getChecklist()
     await this.getEnvironment()
-    // enable system status checks in the cloud
-    if (get(this.store).cloud) {
-      // in cloud allow this
-      await this.getSystemStatus()
-    }
     this.update((store) => {
       store.loaded = true
       return store
@@ -43,20 +32,11 @@ export class AdminStore extends BudiStore<AdminState> {
     const environment = await API.getEnvironment()
     this.update((store) => {
       store.isDev = environment.isDev
-      store.cloud = environment.cloud
       store.baseUrl = environment.baseUrl
       store.offlineMode = environment.offlineMode
       store.maintenance = environment.maintenance
       store.passwordMinLength = environment.passwordMinLength
 
-      return store
-    })
-  }
-
-  async getSystemStatus() {
-    const status = await API.getSystemStatus()
-    this.update((store) => {
-      store.status = status
       return store
     })
   }

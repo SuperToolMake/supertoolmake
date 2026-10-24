@@ -1,7 +1,6 @@
 import { tmpdir } from "node:os"
 import { Agent, MockAgent, setGlobalDispatcher, fetch as undiciFetch } from "undici"
 
-process.env.SELF_HOSTED = "1"
 process.env.NODE_ENV = "jest"
 process.env.APP_PORT = "0"
 process.env.WORKER_PORT = "0"

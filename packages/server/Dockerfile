@@ -11,7 +11,6 @@ ENV PORT=4001
 ENV COUCH_DB_URL=https://couchdb.budi.live:5984
 ENV BUDIBASE_ENVIRONMENT=PRODUCTION
 ENV SERVICE=app-service
-ENV ACCOUNT_PORTAL_URL=https://account.budibase.app
 ENV TOP_LEVEL_PATH=/
 
 RUN yarn global add pm2

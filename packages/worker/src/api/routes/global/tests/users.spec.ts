@@ -702,7 +702,7 @@ describe("/api/global/users", () => {
         await config.api.users.saveUser(user)
       })
 
-      it("sso support couldn't be used by admin. It is cloud restricted and needs internal key", async () => {
+      it("requires the internal API key to add SSO support", async () => {
         const user = await config.createUser()
         const ssoId = "fake-ssoId"
         await config.api.users

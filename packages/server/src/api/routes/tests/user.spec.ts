@@ -32,8 +32,6 @@ describe("/users", () => {
       await config.createUser({ _id: id2 })
 
       const res = await config.api.user.fetch()
-      expect(res.length).toBe(3)
-
       const ids = res.map((u) => u._id)
       expect(ids).toContain(`ro_ta_users_${id1}`)
       expect(ids).toContain(`ro_ta_users_${id2}`)

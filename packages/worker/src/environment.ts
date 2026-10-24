@@ -37,9 +37,6 @@ const environment = {
   MINIO_URL: process.env.MINIO_URL,
   COUCH_DB_URL: process.env.COUCH_DB_URL,
   REDIS_URL: process.env.REDIS_URL,
-  ACCOUNT_PORTAL_URL: process.env.ACCOUNT_PORTAL_URL,
-  INTERNAL_ACCOUNT_PORTAL_URL:
-    process.env.INTERNAL_ACCOUNT_PORTAL_URL || process.env.ACCOUNT_PORTAL_URL,
   PLATFORM_URL: process.env.PLATFORM_URL,
   APPS_URL: process.env.APPS_URL,
   // ports
@@ -49,8 +46,6 @@ const environment = {
   WORKER_SERVICE: process.env.WORKER_SERVICE,
   // flags
   NODE_ENV: process.env.NODE_ENV,
-  SELF_HOSTED: Boolean(parseInt(process.env.SELF_HOSTED || "")),
-  DISABLE_ACCOUNT_PORTAL: process.env.DISABLE_ACCOUNT_PORTAL,
   SMTP_FALLBACK_ENABLED: process.env.SMTP_FALLBACK_ENABLED,
   DISABLE_DEVELOPER_LICENSE: process.env.DISABLE_DEVELOPER_LICENSE,
   BUDIBASE_ENVIRONMENT: process.env.BUDIBASE_ENVIRONMENT,

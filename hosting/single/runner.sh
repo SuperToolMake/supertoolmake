@@ -20,7 +20,6 @@ fi
 
 export NODE_ENV="${NODE_ENV:-production}"
 export REDIS_URL="${REDIS_URL:-127.0.0.1:6379}"
-export SELF_HOSTED="${SELF_HOSTED:-1}"
 export WORKER_PORT="${WORKER_PORT:-4002}"
 export WORKER_URL="${WORKER_URL:-http://127.0.0.1:4002}"
 export APPS_URL="${APPS_URL:-http://127.0.0.1:4001}"

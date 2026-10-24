@@ -16,11 +16,13 @@ import {
 import { generator, structures } from "@supertoolmake/backend-core/tests"
 import {
   type AuthToken,
+  type CreateWorkspaceRequest,
   type Datasource,
   type DevInfo,
   FieldType,
   INTERNAL_TABLE_SOURCE_ID,
   type Layout,
+  type OnboardingWorkspaceRequest,
   type Query,
   type RelationshipFieldMetadata,
   RelationshipType,
@@ -37,7 +39,7 @@ import {
 } from "@supertoolmake/types"
 import jwt, { type Secret } from "jsonwebtoken"
 import supertest from "supertest"
-import { generateUserMetadataID } from "../../db/utils"
+import { generateUserMetadataID, generateWorkspaceID } from "../../db/utils"
 import env from "../../environment"
 import { startup } from "../../startup"
 import { cleanup } from "../../utilities/fileSystem"
@@ -47,6 +49,7 @@ import {
   layout as layoutController,
   query as queryController,
   role as roleController,
+  workspaceApp as workspaceAppController,
   workspace as workspaceController,
 } from "./controllers"
 import {
@@ -331,13 +334,13 @@ export default class TestConfiguration {
     prodApp,
   }: {
     roleId?: string
-    userId: string
+    userId?: string
     builder: boolean
     prodApp: boolean
   }) {
     const appId = prodApp ? this.getProdWorkspaceId() : this.getDevWorkspaceId()
     return context.doInWorkspaceContext(appId, async () => {
-      userId = !userId ? `us_uuid1` : userId
+      userId = userId || `us_${newid()}`
       if (!this.request) {
         throw "Server has not been opened, cannot login."
       }
@@ -522,7 +525,8 @@ export default class TestConfiguration {
   }
 
   async createDefaultWorkspaceApp(appName: string, mode: "dev" | "prod" = "dev") {
-    const { workspaceApp } = await this.api.workspaceApp.create(
+    const { workspaceApp } = await this._req(
+      workspaceAppController.create,
       structures.workspaceApps.createRequest({
         name: appName,
         url: "/",
@@ -560,15 +564,21 @@ export default class TestConfiguration {
   }
 
   // WORKSPACE
+  private async createWorkspaceFixture(body: CreateWorkspaceRequest | OnboardingWorkspaceRequest) {
+    let workspace!: Workspace
+    await jest.mocked(generateWorkspaceID).withImplementation(
+      () => dbCore.generateWorkspaceID({ random: true }),
+      async () => {
+        workspace = await this._req(workspaceController.createWorkspace, body)
+      }
+    )
+    return workspace
+  }
+
   async createWorkspace(name: string = generator.guid(), url?: string): Promise<Workspace> {
     this.devWorkspaceId = undefined
-    this.devWorkspace = await context.doInTenant(
-      this.tenantId!,
-      async () =>
-        (await this._req(workspaceController.create, {
-          name,
-          url,
-        })) as Workspace
+    this.devWorkspace = await context.doInTenant(this.tenantId!, () =>
+      this.createWorkspaceFixture({ name, url })
     )
     this.devWorkspaceId = this.devWorkspace.appId
 
@@ -588,10 +598,9 @@ export default class TestConfiguration {
 
   async createWorkspaceWithOnboarding(_name = "Workspace", url?: string): Promise<Workspace> {
     this.devWorkspaceId = undefined
-    this.devWorkspace = await this.api.workspace.create({
-      isOnboarding: "true",
-      url,
-    })
+    this.devWorkspace = await context.doInTenant(this.tenantId!, () =>
+      this.createWorkspaceFixture({ isOnboarding: "true", url })
+    )
     this.devWorkspaceId = this.devWorkspace.appId
 
     const { workspaceApps } = await this.api.workspaceApp.fetch()

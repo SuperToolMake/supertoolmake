@@ -60,7 +60,6 @@ const {
     groupsStore: createStore([] as any[]),
     adminStore: createStore({
       loaded: true,
-      cloud: true,
       checklist: { smtp: { checked: true } },
     }),
     organisationStore: createStore({ isSSOEnforced: false }),
@@ -204,7 +203,6 @@ describe("InviteUsersModal", () => {
     groupsStore.set([])
     adminStore.set({
       loaded: true,
-      cloud: true,
       checklist: { smtp: { checked: true } },
     })
     organisationStore.set({ isSSOEnforced: false })

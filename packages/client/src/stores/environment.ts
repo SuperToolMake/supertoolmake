@@ -8,7 +8,6 @@ interface EnvironmentState extends GetEnvironmentResponse {
 
 const initialState: EnvironmentState = {
   offlineMode: false,
-  cloud: false,
   isDev: false,
   maintenance: [],
   loaded: false,

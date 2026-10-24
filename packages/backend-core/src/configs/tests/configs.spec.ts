@@ -1,6 +1,6 @@
 import { ConfigType } from "@supertoolmake/types"
 import { generator, structures } from "../../../tests"
-import { DBTestConfiguration, testEnv } from "../../../tests/extra"
+import { DBTestConfiguration } from "../../../tests/extra"
 import { getGlobalDB } from "../../context"
 import env from "../../environment"
 import * as configs from "../configs"
@@ -40,10 +40,6 @@ describe("configs", () => {
   }
 
   describe("getPlatformUrl", () => {
-    beforeEach(async () => {
-      testEnv.selfHosted()
-    })
-
     it("gets the default url", async () => {
       await config.doInTenant(async () => {
         await clearDbPlatformUrl()
@@ -73,7 +69,6 @@ describe("configs", () => {
 
   describe("getSettingsConfig", () => {
     beforeAll(async () => {
-      testEnv.selfHosted()
       env._set("PLATFORM_URL", "")
     })
 
@@ -105,10 +100,6 @@ describe("configs", () => {
       env.GOOGLE_CLIENT_SECRET = undefined
       env.GOOGLE_CLIENT_ID = undefined
     }
-
-    beforeEach(() => {
-      testEnv.selfHosted()
-    })
 
     it("returns from config", async () => {
       await config.doInTenant(async () => {

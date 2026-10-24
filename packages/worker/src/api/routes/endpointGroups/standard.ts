@@ -1,5 +1,4 @@
 import { auth, EndpointGroupList, middleware } from "@supertoolmake/backend-core"
-import cloudRestricted from "../../../middleware/cloudRestricted"
 
 export const endpointGroupList = new EndpointGroupList()
 
@@ -11,9 +10,6 @@ builderRoutes.lockMiddleware()
 
 export const adminRoutes = endpointGroupList.group(auth.adminOnly)
 adminRoutes.lockMiddleware()
-
-export const cloudRestrictedRoutes = endpointGroupList.group(cloudRestricted)
-cloudRestrictedRoutes.lockMiddleware()
 
 export const internalRoutes = endpointGroupList.group(middleware.internalApi)
 internalRoutes.lockMiddleware()

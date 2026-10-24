@@ -3,8 +3,6 @@ import type {
   ClearDevLockResponse,
   CreateWorkspaceRequest,
   CreateWorkspaceResponse,
-  DuplicateWorkspaceRequest,
-  DuplicateWorkspaceResponse,
   FetchAppPackageResponse,
   FetchComponentDefinitionResponse,
   FetchDeploymentResponse,
@@ -41,10 +39,6 @@ export interface AppEndpoints {
   releaseAppLock: (appId: string) => Promise<ClearDevLockResponse>
   getAppDeployments: () => Promise<FetchDeploymentResponse>
   createApp: (app: CreateWorkspaceRequest | FormData) => Promise<CreateWorkspaceResponse>
-  duplicateApp: (
-    appId: string,
-    app: DuplicateWorkspaceRequest
-  ) => Promise<DuplicateWorkspaceResponse>
   updateAppFromExport: (
     appId: string,
     body: ImportToUpdateWorkspaceRequest,
@@ -143,17 +137,6 @@ export const buildAppEndpoints = (API: BaseAPIClient): AppEndpoints => ({
 
     return await API.post({
       url: "/api/applications",
-      body: app,
-    })
-  },
-
-  /**
-   * Duplicate an existing app
-   * @param app the app to dupe
-   */
-  duplicateApp: async (appId, app) => {
-    return await API.post({
-      url: `/api/applications/${appId}/duplicate`,
       body: app,
     })
   },
