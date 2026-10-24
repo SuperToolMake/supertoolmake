@@ -18,7 +18,6 @@ import Deployment from "./Deployment"
 
 // the max time we can wait for an invalidation to complete before considering it failed
 const MAX_PENDING_TIME_MS = 30 * 60000
-const MAX_DEPLOYMENT_HISTORY_WRITE_ATTEMPTS = 5
 
 // checks that deployments are in a good state, any pending will be updated
 async function checkAllDeployments(
@@ -43,38 +42,29 @@ async function checkAllDeployments(
 async function storeDeploymentHistory(deployment: Deployment) {
   const deploymentJSON = deployment.getJSON()
   const db = context.getWorkspaceDB()
-  const deploymentId = deploymentJSON._id
 
-  for (let attempt = 0; attempt < MAX_DEPLOYMENT_HISTORY_WRITE_ATTEMPTS; attempt++) {
-    const deploymentDoc = (await db.tryGet<DeploymentDoc>(DocumentType.DEPLOYMENTS)) ?? {
-      _id: DocumentType.DEPLOYMENTS,
-      verification: undefined,
-      history: {},
-    }
-    const history = deploymentDoc.history ?? {}
-    history[deploymentId] = {
-      ...history[deploymentId],
-      ...deploymentJSON,
-      updatedAt: Date.now(),
-    }
-    deploymentDoc.history = history
-
-    try {
-      await db.put(deploymentDoc)
-      deployment.fromJSON(history[deploymentId])
-      return deployment
-    } catch (error) {
-      if (
-        !dbCore.isDocumentConflictError(error) ||
-        attempt === MAX_DEPLOYMENT_HISTORY_WRITE_ATTEMPTS - 1
-      ) {
-        throw error
-      }
-      await new Promise((resolve) => setTimeout(resolve, 10 * 2 ** attempt))
-    }
+  let deploymentDoc
+  try {
+    // theres only one deployment doc per app database
+    deploymentDoc = await db.get<any>(DocumentType.DEPLOYMENTS)
+  } catch {
+    deploymentDoc = { _id: DocumentType.DEPLOYMENTS, history: {} }
   }
 
-  throw new Error("Unable to store deployment history")
+  const deploymentId = deploymentJSON._id
+
+  // first time deployment
+  if (!deploymentDoc.history[deploymentId]) deploymentDoc.history[deploymentId] = {}
+
+  deploymentDoc.history[deploymentId] = {
+    ...deploymentDoc.history[deploymentId],
+    ...deploymentJSON,
+    updatedAt: Date.now(),
+  }
+
+  await db.put(deploymentDoc)
+  deployment.fromJSON(deploymentDoc.history[deploymentId])
+  return deployment
 }
 
 export async function fetchDeployments(ctx: UserCtx<void, FetchDeploymentResponse>) {

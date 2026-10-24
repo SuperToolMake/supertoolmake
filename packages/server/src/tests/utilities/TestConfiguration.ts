@@ -565,7 +565,7 @@ export default class TestConfiguration {
     this.devWorkspace = await context.doInTenant(
       this.tenantId!,
       async () =>
-        (await this._req(workspaceController.create, {
+        (await this._req(workspaceController.createWorkspace, {
           name,
           url,
         })) as Workspace
@@ -588,10 +588,14 @@ export default class TestConfiguration {
 
   async createWorkspaceWithOnboarding(_name = "Workspace", url?: string): Promise<Workspace> {
     this.devWorkspaceId = undefined
-    this.devWorkspace = await this.api.workspace.create({
-      isOnboarding: "true",
-      url,
-    })
+    this.devWorkspace = await context.doInTenant(
+      this.tenantId!,
+      async () =>
+        (await this._req(workspaceController.createWorkspace, {
+          isOnboarding: "true",
+          url,
+        })) as Workspace
+    )
     this.devWorkspaceId = this.devWorkspace.appId
 
     const { workspaceApps } = await this.api.workspaceApp.fetch()

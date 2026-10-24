@@ -1,5 +1,5 @@
 import path from "node:path"
-import { cache, context, db, Header, objectStore, roles } from "@supertoolmake/backend-core"
+import { cache, db, Header, objectStore, roles } from "@supertoolmake/backend-core"
 import { structures } from "@supertoolmake/backend-core/tests"
 import {
   BuiltinPermissionID,
@@ -19,13 +19,8 @@ import { basicScreen, basicTable, customScreen } from "../../../tests/utilities/
 import * as setup from "./utilities"
 import { checkBuilderEndpoint } from "./utilities/TestFunctions"
 
-const generateAppName = () => {
-  return structures.generator.word({ length: 10 })
-}
-
 describe("/applications", () => {
   const config = setup.getConfig()
-  let existingWorkspaceIds: Set<string>
   let workspace: Workspace
 
   afterAll(() => {
@@ -33,22 +28,19 @@ describe("/applications", () => {
   })
 
   beforeAll(async () => {
-    existingWorkspaceIds = new Set(
-      await context.doInTenant(context.DEFAULT_TENANT_ID, () =>
-        db.getAllWorkspaces({ idsOnly: true })
-      )
-    )
     await config.init()
   })
 
   afterEach(async () => {
-    const currentWorkspaceIds = await config.doInTenant(() =>
-      db.getAllWorkspaces({ idsOnly: true })
+    const workspacesToClean = new Set(
+      config.allWorkspaces
+        .map((workspace) => workspace.appId)
+        .filter((workspaceId): workspaceId is string => !!workspaceId)
     )
-    const createdWorkspaceIds = currentWorkspaceIds.filter((id) => !existingWorkspaceIds.has(id))
+    config.allWorkspaces = []
 
     await Promise.all(
-      createdWorkspaceIds.map(async (id) => {
+      Array.from(workspacesToClean).map(async (id) => {
         await cache.workspace.invalidateWorkspaceMetadata(id)
 
         const files = await objectStore.getAllFiles(objectStore.ObjectStoreBuckets.APPS, id)
@@ -131,7 +123,7 @@ describe("/applications", () => {
     })
   })
 
-  describe("create", () => {
+  describe("workspace initialization", () => {
     const checkScreenCount = async (expectedCount: number) => {
       const res = await config.api.workspace.getDefinition(config.getDevWorkspaceId())
       expect(res.screens.length).toEqual(expectedCount)
@@ -142,26 +134,21 @@ describe("/applications", () => {
       expect(tables.length).toEqual(expectedCount)
     }
 
-    it("creates empty app without sample data", async () => {
-      const name = generateAppName()
-      const newWorkspace = await config.api.workspace.create({
-        name,
-      })
-      expect(newWorkspace.name).toBe(name)
-      expect(newWorkspace._id).toBeDefined()
+    it("has no sample data by default", async () => {
+      expect(workspace.name).toBeDefined()
+      expect(workspace._id).toBeDefined()
 
       // Ensure we created a blank app without sample data
-      await checkScreenCount(0)
-      await checkTableCount(1) // users table
+      await config.withApp(workspace, async () => {
+        await checkScreenCount(0)
+        await checkTableCount(1) // users table
+      })
     })
 
     it("adds the workspace creator to the dev users table", async () => {
       const creator = config.getUser()
-      const newWorkspace = await config.api.workspace.create({
-        name: generateAppName(),
-      })
 
-      await config.withApp(newWorkspace, async () => {
+      await config.withApp(workspace, async () => {
         const rows = await config.api.row.fetch(USERS_TABLE_SCHEMA._id!)
         const userRow = rows.find((row) => row.email === creator.email)
         expect(userRow).toBeDefined()
@@ -169,81 +156,14 @@ describe("/applications", () => {
       })
     })
 
-    it("creates default workspace without sample data when onboarding", async () => {
-      const newWorkspace = await config.api.workspace.create({
-        isOnboarding: "true",
-      })
-      expect(newWorkspace._id).toBeDefined()
-      expect(newWorkspace.name).toBe("Workspace")
-
-      // Check sample resources in the newly created app context
-      await config.withApp(newWorkspace, async () => {
-        const workspaceAppsFetchResult = await config.api.workspaceApp.fetch()
-        const {
-          workspaceApps: [app],
-        } = workspaceAppsFetchResult
-        expect(app.name).toBe("Welcome app")
-
-        const res = await config.api.workspace.getDefinition(newWorkspace.appId)
-        expect(res.screens.length).toEqual(1)
-
-        const tables = await config.api.table.fetch()
-        expect(tables.length).toEqual(1)
-      })
-    })
-
-    it("creates a uniquely named default workspace when onboarding workspace already exists", async () => {
-      await config.api.workspace.create({
-        isOnboarding: "true",
-      })
-
-      const secondWorkspace = await config.api.workspace.create({
-        isOnboarding: "true",
-      })
-
-      expect(secondWorkspace.name).toBe("Workspace 2")
-      expect(secondWorkspace.navigation?.title).toBe("Workspace 2")
-    })
-
-    it("creates app from template", async () => {
-      nock("https://prod-budi-templates.s3-eu-west-1.amazonaws.com")
-        .get(`/templates/app/expense-approval.tar.gz`)
-        .replyWithFile(200, path.resolve(__dirname, "data", "expense-approval.tar.gz"))
-
-      const newApp = await config.api.workspace.create({
-        name: generateAppName(),
-        useTemplate: "true",
-        templateKey: "app/expense-approval",
-      })
-      expect(newApp._id).toBeDefined()
-
-      // Check resources from template in the newly created app context
-      await config.withApp(newApp, async () => {
-        const screens = await config.api.screen.list()
-        expect(screens.length).toBeGreaterThan(0)
-
-        const tables = await config.api.table.fetch()
-        expect(tables.length).toBeGreaterThan(1)
-      })
-    })
-
-    it("creates app from file", async () => {
-      const fileToImport = path.join(__dirname, "data", "export-change-request.tar.gz")
-      const newApp = await config.api.workspace.create({
-        name: generateAppName(),
-        useTemplate: "true",
-        fileToImport,
-      })
-      expect(newApp._id).toBeDefined()
-
-      // Check resources from import file in the newly created app context
-      await config.withApp(newApp, async () => {
-        const screens = await config.api.screen.list()
-        expect(screens.length).toBeGreaterThan(0)
-
-        const tables = await config.api.table.fetch()
-        expect(tables.length).toBeGreaterThan(0)
-      })
+    it("rejects creating a second workspace during onboarding", async () => {
+      await config.api.workspace.create(
+        { isOnboarding: "true" },
+        {
+          status: 409,
+          body: { message: "Only one workspace is supported" },
+        }
+      )
     })
 
     it("should apply authorization to endpoint", async () => {
@@ -255,35 +175,16 @@ describe("/applications", () => {
       })
     })
 
-    it("should reject with a known name", async () => {
-      await config.api.workspace.create(
-        { name: workspace.name },
-        { body: { message: "Workspace name is already in use." }, status: 400 }
-      )
-    })
-
-    it("should reject with a known url", async () => {
-      await config.api.workspace.create(
-        { name: "made up", url: workspace!.url! },
-        { body: { message: "App URL is already in use." }, status: 400 }
-      )
-    })
-
-    it("creates app from a new import", async () => {
+    it("imports an export into the existing workspace", async () => {
       const filePath = path.join(__dirname, "data", "export-change-request.tar.gz")
-      const newApp = await config.api.workspace.create({
-        name: generateAppName(),
-      })
-      expect(newApp._id).toBeDefined()
 
-      await config.withApp(newApp, async () => {
-        await config.api.workspace.importToWorkspace(newApp.appId, {
+      await config.withApp(workspace, async () => {
+        await config.api.workspace.importToWorkspace(workspace.appId, {
           fileToImport: filePath,
         })
       })
 
-      // Check resources from import file in the newly created app context
-      await config.withApp(newApp, async () => {
+      await config.withApp(workspace, async () => {
         const screens = await config.api.screen.list()
         expect(screens.length).toEqual(6)
 
@@ -292,7 +193,7 @@ describe("/applications", () => {
         expect(tables.length).toEqual(1)
       })
 
-      const fileEtags = await getAppObjectStorageEtags(newApp.appId)
+      const fileEtags = await getAppObjectStorageEtags(workspace.appId)
       expect(fileEtags).toEqual({
         // These etags match the ones from the export file
         "budibase-client.js": "e5cc573e15b6f763059fb39c7023563b",
@@ -493,69 +394,7 @@ describe("/applications", () => {
       )
     })
 
-    it("should return apps from multiple published workspaces", async () => {
-      const { workspaceApp: app1Workspace1 } = await config.api.workspaceApp.create(
-        structures.workspaceApps.createRequest({
-          name: "App One",
-          url: "/appone",
-        })
-      )
-      workspace = await config.publish()
-
-      const secondWorkspace = await tk.withFreeze(new Date(), async () => {
-        // Create second workspace
-        const secondWorkspace = await config.api.workspace.create({
-          name: "Second workspace",
-          url: "workspace2",
-        })
-
-        await config.withApp(secondWorkspace, async () => {
-          await config.api.workspaceApp.create(
-            structures.workspaceApps.createRequest({
-              name: "App Two",
-              url: "/apptwo",
-              disabled: false,
-            })
-          )
-          await config.api.workspace.publish(secondWorkspace.appId)
-        })
-        return secondWorkspace
-      })
-
-      const response = await config.api.workspace.fetchClientApps()
-
-      expect(response.apps).toHaveLength(3)
-
-      expect(response.apps).toEqual(
-        expect.arrayContaining([
-          {
-            appId: expect.stringMatching(new RegExp(`^${workspace.appId}_workspace_app_.+`)),
-            name: workspace.name,
-            prodId: workspace.appId,
-            updatedAt: workspace.updatedAt,
-            url: "",
-          },
-          {
-            appId: `${workspace.appId}_${app1Workspace1._id}`,
-            name: "App One",
-            prodId: config.getProdWorkspaceId(),
-            updatedAt: workspace.updatedAt,
-            url: `/appone`,
-          },
-          {
-            appId: expect.stringMatching(
-              new RegExp(`^${db.getProdWorkspaceID(secondWorkspace.appId)}_workspace_app_.+`)
-            ),
-            name: "App Two",
-            prodId: db.getProdWorkspaceID(secondWorkspace.appId),
-            updatedAt: secondWorkspace.updatedAt,
-            url: `/apptwo`,
-          },
-        ])
-      )
-    })
-
-    it("should not return unpublished workspaces", async () => {
+    it("should not return workspace apps added after publishing", async () => {
       const { workspaceApp: app1Workspace1 } = await config.api.workspaceApp.create(
         structures.workspaceApps.createRequest({
           name: "App One",
@@ -565,44 +404,17 @@ describe("/applications", () => {
       )
       workspace = await config.publish()
 
-      // Non published workspace
       await config.api.workspaceApp.create(
         structures.workspaceApps.createRequest({
-          name: "Another workspace",
+          name: "Unpublished app",
           url: "/other",
           disabled: false,
         })
       )
 
-      // Create second app
-      const secondWorkspace = await tk.withFreeze(new Date(), async () => {
-        const secondWorkspace = await config.api.workspace.create({
-          name: "Second workspace",
-        })
-
-        await config.withApp(secondWorkspace, () =>
-          config.api.workspaceApp.create(
-            structures.workspaceApps.createRequest({
-              name: "Default",
-              url: "/",
-            })
-          )
-        )
-        await config.api.workspace.publish(secondWorkspace.appId)
-        return secondWorkspace
-      })
-
-      // Unpublished workspace
-      const thirdWorkspace = await config.api.workspace.create({
-        name: "Third App",
-      })
-      await config.withApp(thirdWorkspace, () =>
-        config.api.workspaceApp.create(structures.workspaceApps.createRequest())
-      )
-
       const response = await config.api.workspace.fetchClientApps()
 
-      expect(response.apps).toHaveLength(3)
+      expect(response.apps).toHaveLength(2)
 
       expect(response.apps).toEqual(
         expect.arrayContaining([
@@ -619,15 +431,6 @@ describe("/applications", () => {
             prodId: config.getProdWorkspaceId(),
             updatedAt: workspace.updatedAt,
             url: `/appone`,
-          },
-          {
-            appId: expect.stringMatching(
-              new RegExp(`^${db.getProdWorkspaceID(secondWorkspace.appId)}_workspace_app_.+`)
-            ),
-            name: "Default",
-            prodId: db.getProdWorkspaceID(secondWorkspace.appId),
-            updatedAt: secondWorkspace.updatedAt,
-            url: "",
           },
         ])
       )
@@ -967,17 +770,11 @@ describe("/applications", () => {
 
   describe("edited at", () => {
     it("middleware should set updatedAt", async () => {
-      const app = await tk.withFreeze(
-        "2021-01-01",
-        async () => await config.api.workspace.create({ name: generateAppName() })
-      )
-      expect(app.updatedAt).toEqual("2021-01-01T00:00:00.000Z")
-
       const updatedApp = await tk.withFreeze(
         "2021-02-01",
         async () =>
-          await config.withApp(app, () =>
-            config.api.workspace.update(app.appId, {
+          await config.withApp(workspace, () =>
+            config.api.workspace.update(workspace.appId, {
               name: "UPDATED_NAME",
             })
           )
@@ -985,7 +782,7 @@ describe("/applications", () => {
       expect(updatedApp._rev).toBeDefined()
       expect(updatedApp.updatedAt).toEqual("2021-02-01T00:00:00.000Z")
 
-      const fetchedApp = await config.api.workspace.get(app.appId)
+      const fetchedApp = await config.api.workspace.get(workspace.appId)
       expect(fetchedApp.updatedAt).toEqual("2021-02-01T00:00:00.000Z")
     })
   })
@@ -1024,60 +821,6 @@ describe("/applications", () => {
     it("should unpublish app with prod app ID", async () => {
       await config.withProdApp(() =>
         config.api.workspace.unpublish(workspace.appId.replace("_dev", ""))
-      )
-    })
-  })
-
-  describe("POST /api/applications/:appId/duplicate", () => {
-    it("should duplicate an existing app", async () => {
-      const resp = await config.api.workspace.duplicateWorkspace(
-        workspace.appId,
-        {
-          name: "to-dupe copy",
-          url: "/to-dupe-copy",
-        },
-        {
-          status: 200,
-        }
-      )
-
-      expect(resp.duplicateAppId).toBeDefined()
-      expect(resp.sourceAppId).toEqual(workspace.appId)
-      expect(resp.duplicateAppId).not.toEqual(workspace.appId)
-    })
-
-    it("should reject an unknown app id with a 404", async () => {
-      await config.api.workspace.duplicateWorkspace(
-        structures.db.id(),
-        {
-          name: "to-dupe 123",
-          url: "/to-dupe-123",
-        },
-        {
-          status: 404,
-        }
-      )
-    })
-
-    it("should reject with a known name", async () => {
-      await config.api.workspace.duplicateWorkspace(
-        workspace.appId,
-        {
-          name: workspace.name,
-          url: "/known-name",
-        },
-        { body: { message: "Workspace name is already in use." }, status: 400 }
-      )
-    })
-
-    it("should reject with a known url", async () => {
-      await config.api.workspace.duplicateWorkspace(
-        workspace.appId,
-        {
-          name: "this is fine",
-          url: workspace.url,
-        },
-        { body: { message: "App URL is already in use." }, status: 400 }
       )
     })
   })

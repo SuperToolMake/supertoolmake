@@ -1,7 +1,6 @@
 import { constants, db as dbCore } from "@supertoolmake/backend-core"
 import type {
   CreateWorkspaceRequest,
-  DuplicateWorkspaceResponse,
   FetchAppDefinitionResponse,
   FetchAppPackageResponse,
   FetchPublishedAppsResponse,
@@ -118,22 +117,6 @@ export class WorkspaceAPI extends TestAPI {
       res.field("encryptionPassword", opts.encryptionPassword)
     }
     return this._checkResponse(await res, expectations).body
-  }
-
-  duplicateWorkspace = async (
-    workspaceId: string,
-    fields: object,
-    expectations?: Expectations
-  ): Promise<DuplicateWorkspaceResponse> => {
-    const headers = {
-      ...this.config.defaultHeaders(),
-      [constants.Header.WORKSPACE_ID]: workspaceId,
-    }
-    return this._post(`/api/applications/${workspaceId}/duplicate`, {
-      headers,
-      fields,
-      expectations,
-    })
   }
 
   getDefinition = async (

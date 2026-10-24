@@ -42,7 +42,6 @@ const openContextMenu = (e) => {
 
   const items = getAppContextMenuItems({
     app,
-    onDuplicate: appContextMenuModals?.showDuplicateModal,
     onExportDev: appContextMenuModals?.showExportDevModal,
     onExportProd: appContextMenuModals?.showExportProdModal,
     onDelete: appContextMenuModals?.showDeleteModal,
