@@ -9,7 +9,7 @@
   "author": "Budibase",
   "license": "GPL-3.0",
   "dependencies": {
-    "zod": "^4.1.12"
+    "zod": "4.6.6"
   },
   "scripts": {
     "prebuild": "rimraf dist/",
