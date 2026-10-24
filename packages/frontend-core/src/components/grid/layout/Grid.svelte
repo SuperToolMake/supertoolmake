@@ -55,7 +55,6 @@ export let buttons: { text: string; onClick: any }[] | null | undefined = null
 export let buttonsCollapsed = false
 export let buttonsCollapsedText = null
 export let darkMode = false
-export let isCloud: boolean | null | undefined = null
 export let canHideColumns = true
 export let externalClipboard: ExternalClipboardData | undefined = undefined
 
@@ -117,7 +116,6 @@ $: props.set({
   buttonsCollapsed,
   buttonsCollapsedText,
   darkMode,
-  isCloud,
   canHideColumns,
   externalClipboard,
 })

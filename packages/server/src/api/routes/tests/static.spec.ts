@@ -1,19 +1,15 @@
 import { constants } from "@supertoolmake/backend-core"
-import { setEnv } from "../../../environment"
 import { afterAll as _afterAll, getConfig, getRequest } from "./utilities"
 
 describe("/static", () => {
   const request = getRequest()
   const config = getConfig()
-  let cleanupEnv: () => void
 
   afterAll(() => {
     _afterAll()
-    cleanupEnv()
   })
 
   beforeAll(async () => {
-    cleanupEnv = setEnv({ SELF_HOSTED: "true" })
     await config.init()
   })
 

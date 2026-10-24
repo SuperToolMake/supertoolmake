@@ -1,7 +1,6 @@
 import { tenancy, users, utils, withEnv as withCoreEnv } from "@supertoolmake/backend-core"
 import { structures } from "@supertoolmake/backend-core/tests"
 import nock from "nock"
-import { withEnv } from "../../environment"
 import TestConfiguration from "../../tests/utilities/TestConfiguration"
 import { startup } from "../index"
 
@@ -25,26 +24,15 @@ describe("check BB_ADMIN environment variables", () => {
     const EMAIL = `${structures.generator.guid()}@budibase.com`
     const PASSWORD = "budibase"
     await tenancy.doInTenant(tenancy.DEFAULT_TENANT_ID, async () => {
-      await withEnv(
-        {
-          SELF_HOSTED: "1",
-        },
-        () =>
-          withCoreEnv(
-            {
-              BB_ADMIN_USER_EMAIL: EMAIL,
-              BB_ADMIN_USER_PASSWORD: PASSWORD,
-            },
-            async () => {
-              await startup({ force: true })
-              const user = await users.getGlobalUserByEmail(EMAIL, {
-                cleanup: false,
-              })
-              expect(user).toBeDefined()
-              expect(user?.password).toBeDefined()
-              expect(await utils.compare(PASSWORD, user!.password!)).toEqual(true)
-            }
-          )
+      await withCoreEnv(
+        { BB_ADMIN_USER_EMAIL: EMAIL, BB_ADMIN_USER_PASSWORD: PASSWORD },
+        async () => {
+          await startup({ force: true })
+          const user = await users.getGlobalUserByEmail(EMAIL, { cleanup: false })
+          expect(user).toBeDefined()
+          expect(user?.password).toBeDefined()
+          expect(await utils.compare(PASSWORD, user!.password!)).toEqual(true)
+        }
       )
     })
   })

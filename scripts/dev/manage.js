@@ -4,7 +4,6 @@ const updateDotEnv = require("update-dotenv")
 
 async function init() {
   let config = {
-    SELF_HOSTED: "1",
     APPS_PORT: "4001",
     WORKER_PORT: "4002",
     CLUSTER_PORT: "10000",
@@ -19,9 +18,6 @@ async function init() {
     COUCH_DB_URL: "http://budibase:budibase@localhost:4005",
     COUCH_DB_USERNAME: "budibase",
     COUCH_DB_PASSWORD: "budibase",
-    DISABLE_ACCOUNT_PORTAL: "1",
-    ACCOUNT_PORTAL_URL: "http://localhost:10001",
-    ACCOUNT_PORTAL_API_KEY: "budibase",
     PLATFORM_URL: "http://localhost:10000",
     APPS_URL: "http://localhost:4001",
     WORKER_URL: "http://localhost:4002",
@@ -31,7 +27,6 @@ async function init() {
     ENABLE_EMAIL_TEST_MODE: "1",
     VERSION: "0.0.0+local",
     PASSWORD_MIN_LENGTH: "1",
-    BUDICLOUD_URL: "https://budibaseqa.app",
   }
 
   config = { ...config, ...existingConfig }

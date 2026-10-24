@@ -588,7 +588,7 @@ export async function downloadTarball(url: string, bucketName: string, path: str
 
   const tmpPath = join(budibaseTempDir(), path)
   await pipeline(response.body, zlib.createUnzip(), tar.extract(tmpPath))
-  if (!env.isTest() && env.SELF_HOSTED) {
+  if (!env.isTest()) {
     await uploadDirectory(bucketName, tmpPath, path)
   }
   // return the temporary path incase there is a use for it

@@ -122,9 +122,7 @@ export const convertRowId = sql.utils.convertRowId
 export const breakRowIdField = sql.utils.breakRowIdField
 export const isValidFilter = sql.utils.isValidFilter
 
-const isCloud = env.isProd() && !env.SELF_HOSTED
-const isSelfHost = env.isProd() && env.SELF_HOSTED
-export const HOST_ADDRESS = isSelfHost ? "host.docker.internal" : isCloud ? "" : "localhost"
+export const HOST_ADDRESS = env.isProd() ? "host.docker.internal" : "localhost"
 
 export function generateColumnDefinition(config: {
   externalType: string

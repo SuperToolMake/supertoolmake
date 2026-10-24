@@ -73,10 +73,6 @@
     "build:docker:dependencies": "docker build -f hosting/dependencies/Dockerfile -t budibase/dependencies:latest ./hosting",
     "publish:docker:couch": "docker buildx build --platform linux/arm64,linux/amd64 -f hosting/couchdb/Dockerfile -t apache/couchdb:3.5.1 --push ./hosting/couchdb",
     "publish:docker:dependencies": "docker buildx build --platform linux/arm64,linux/amd64 -f hosting/dependencies/Dockerfile -t budibase/dependencies:latest -t budibase/dependencies:v3.2.1 --push ./hosting",
-    "env:selfhost:enable": "node scripts/dev/selfhost.js enable",
-    "env:selfhost:disable": "node scripts/dev/selfhost.js disable",
-    "mode:self": "yarn env:selfhost:enable && yarn env:account:disable",
-    "mode:cloud": "yarn env:selfhost:disable && yarn env:account:disable",
     "security:audit": "yarn audit-ci --critical --config .audit-ci.json",
     "postinstall": "husky install",
     "add-app-migration": "node scripts/add-app-migration.js --title"

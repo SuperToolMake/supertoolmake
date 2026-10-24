@@ -16,7 +16,6 @@ import {
 import { cloneDeep, isEqual } from "lodash/fp"
 import { onMount } from "svelte"
 import { API } from "@/api"
-import { admin } from "@/stores/portal/admin"
 import { organisation } from "@/stores/portal/organisation"
 import GoogleLogo from "./_logos/Google.svelte"
 
@@ -25,7 +24,7 @@ const ConfigTypes = {
 }
 
 // Some older google configs contain a manually specified value - retain the functionality to edit the field
-// When there is no value or we are in the cloud - prohibit editing the field, must use platform url to change
+// When there is no value, use the platform URL to change the callback.
 async function saveConfig(config) {
   // Delete unsupported fields
   delete config.createdAt
@@ -61,15 +60,13 @@ const copyToClipboard = async (value) => {
 }
 
 $: googleCallbackUrl = undefined
-$: googleCallbackReadonly = $admin.cloud || !googleCallbackUrl
+$: googleCallbackReadonly = !googleCallbackUrl
 
 // Indicate to user that callback is based on platform url
 // If there is an existing value, indicate that it may be removed to return to default behaviour
-$: googleCallbackTooltip = $admin.cloud
-  ? null
-  : googleCallbackReadonly
-    ? "Visit the organisation page to update the platform URL"
-    : "Leave blank to use the default callback URL"
+$: googleCallbackTooltip = googleCallbackReadonly
+  ? "Visit the organisation page to update the platform URL"
+  : "Leave blank to use the default callback URL"
 
 $: GoogleConfigFields = {
   Google: [

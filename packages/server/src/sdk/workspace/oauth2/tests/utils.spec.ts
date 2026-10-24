@@ -23,7 +23,6 @@ describe("oauth2 utils", () => {
   beforeAll(async () => {
     restoreEnv = setCoreEnv({
       BLACKLIST_IPS: "",
-      SELF_HOSTED: true,
     })
     await blacklist.refreshBlacklist()
     await config.init()
@@ -54,7 +53,6 @@ describe("oauth2 utils", () => {
   it("rejects a real Keycloak token endpoint when localhost is blacklisted", async () => {
     const restoreBlacklistEnv = setCoreEnv({
       BLACKLIST_IPS: undefined,
-      SELF_HOSTED: false,
     })
     await blacklist.refreshBlacklist()
 

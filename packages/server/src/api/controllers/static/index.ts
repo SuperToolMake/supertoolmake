@@ -4,7 +4,6 @@ import path from "node:path"
 import { PutObjectCommand, S3 } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { BadRequestError, configs, context, objectStore, utils } from "@supertoolmake/backend-core"
-import { InvalidFileExtensions } from "@supertoolmake/shared-core"
 import { processString } from "@supertoolmake/string-templates"
 import {
   type AppProps,
@@ -90,10 +89,6 @@ export const uploadFile = async (ctx: Ctx<void, ProcessAttachmentResponse>) => {
         throw new BadRequestError(
           `File "${fileName}" has no extension, an extension is required to upload a file`
         )
-      }
-
-      if (!env.SELF_HOSTED && InvalidFileExtensions.includes(extension.toLowerCase())) {
-        throw new BadRequestError(`File "${fileName}" has an invalid extension: "${extension}"`)
       }
 
       // filenames converted to UUIDs so they are unique

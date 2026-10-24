@@ -25,8 +25,8 @@ const ipv4CompatiblePrefix = new Address6("::/96")
 const nat64Prefix = new Address6("64:ff9b::/96")
 
 function shouldApplyDefaultBlacklist() {
-  // Self-hosted BLACKLIST_IPS explicitly replaces the defaults; an empty value disables them.
-  return !(env.SELF_HOSTED && env.BLACKLIST_IPS !== undefined)
+  // BLACKLIST_IPS explicitly replaces the defaults; an empty value disables them.
+  return env.BLACKLIST_IPS === undefined
 }
 
 function getIpVersion(address: string): "ipv4" | "ipv6" {

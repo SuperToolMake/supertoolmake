@@ -4,7 +4,7 @@ import * as controller from "../../controllers/global/users"
 import {
   adminRoutes,
   builderOrAdminRoutes,
-  cloudRestrictedRoutes,
+  internalRoutes,
   loggedInRoutes,
 } from "../endpointGroups"
 import { users } from "../validation"
@@ -59,9 +59,8 @@ function buildInviteAcceptValidation() {
   )
 }
 
-cloudRestrictedRoutes
-  .post("/api/global/users/sso", users.buildAddSsoSupport(), controller.addSsoSupport)
-  .post("/api/global/users/init", buildAdminInitValidation(), controller.adminUser)
+internalRoutes.post("/api/global/users/sso", users.buildAddSsoSupport(), controller.addSsoSupport)
+loggedInRoutes.post("/api/global/users/init", buildAdminInitValidation(), controller.adminUser)
 
 adminRoutes
   .post("/api/global/users/bulk", users.buildUserBulkUserValidation(), controller.bulkUpdate)
