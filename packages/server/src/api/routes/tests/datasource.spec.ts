@@ -179,7 +179,6 @@ describe("/datasources", () => {
     it("should not persist datasource updates from production users without builder access", async () => {
       const before = await config.api.datasource.get(datasource._id!)
       const headers = await config.login({
-        userId: "us_fail",
         builder: false,
         prodApp: true,
       })

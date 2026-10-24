@@ -12,10 +12,6 @@ describe("/applications/:appId/import", () => {
     await config.init()
   })
 
-  beforeEach(async () => {
-    await config.newTenant()
-  })
-
   it("imports an export over the existing workspace", async () => {
     const appId = config.getDevWorkspaceId()
     await request
@@ -44,7 +40,9 @@ describe("/applications/:appId/import", () => {
     expect(apps[0].name).toBe("Change request management")
 
     const fileEtags = await getAppObjectStorageEtags(appId!)
-    expect(fileEtags["budibase-client.js"]).toBeDefined()
-    expect(fileEtags["manifest.json"]).toBeDefined()
+    expect(fileEtags).toMatchObject({
+      "budibase-client.js": "e5cc573e15b6f763059fb39c7023563b",
+      "manifest.json": "93bcfcf77d7c3fa555642816f42214fa",
+    })
   })
 })

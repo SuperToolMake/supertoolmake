@@ -332,13 +332,13 @@ export default class TestConfiguration {
     prodApp,
   }: {
     roleId?: string
-    userId: string
+    userId?: string
     builder: boolean
     prodApp: boolean
   }) {
     const appId = prodApp ? this.getProdWorkspaceId() : this.getDevWorkspaceId()
     return context.doInWorkspaceContext(appId, async () => {
-      userId = !userId ? `us_uuid1` : userId
+      userId = userId || `us_${newid()}`
       if (!this.request) {
         throw "Server has not been opened, cannot login."
       }

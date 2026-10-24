@@ -19,7 +19,7 @@ describe("BuilderSocket - SelectApp authorization", () => {
     workspaceAProdId = config.getProdWorkspaceId()
     workspaceADevId = config.getDevWorkspaceId()
 
-    await config.createWorkspace("Workspace B")
+    await config.createWorkspace(`Workspace B ${generator.guid()}`)
     workspaceBDevId = config.getDevWorkspaceId()
 
     // A user who is a builder of Workspace A only - not a global builder,
