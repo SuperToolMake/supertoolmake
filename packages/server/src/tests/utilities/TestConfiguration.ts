@@ -47,6 +47,7 @@ import {
   layout as layoutController,
   query as queryController,
   role as roleController,
+  workspaceApp as workspaceAppController,
   workspace as workspaceController,
 } from "./controllers"
 import {
@@ -522,7 +523,8 @@ export default class TestConfiguration {
   }
 
   async createDefaultWorkspaceApp(appName: string, mode: "dev" | "prod" = "dev") {
-    const { workspaceApp } = await this.api.workspaceApp.create(
+    const { workspaceApp } = await this._req(
+      workspaceAppController.create,
       structures.workspaceApps.createRequest({
         name: appName,
         url: "/",
