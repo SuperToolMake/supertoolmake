@@ -27,10 +27,10 @@ vi.mock("@/stores/builder", () => ({
 }))
 
 vi.mock("@/components/common/bindings/ClientBindingPanel.svelte", async () => {
-  const { default: MockDrawer } = await import("../tests/MockDrawer.svelte")
+  const { default: MockBindingPanel } = await import("../tests/MockBindingPanel.svelte")
 
   return {
-    default: MockDrawer,
+    default: MockBindingPanel,
   }
 })
 
@@ -50,5 +50,16 @@ describe("DrawerBindableInput", () => {
     expect(input).toHaveAttribute("type", "text")
     expect(input).toHaveValue("(JavaScript function)")
     expect(input).toHaveAttribute("readonly")
+  })
+
+  it("only offers Handlebars bindings when JavaScript is disabled", () => {
+    render(DrawerBindableInput, {
+      props: {
+        value: "uploads",
+        allowJS: false,
+      },
+    })
+
+    expect(screen.getByTestId("binding-panel-allow-js")).toHaveTextContent("false")
   })
 })

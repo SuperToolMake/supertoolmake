@@ -84,7 +84,7 @@ describe("S3 upload key authorization", () => {
       configuredFileName: `uploads/${encodeJSBinding('return "report.pdf"')}`,
       requestedKey: "uploads/report.pdf",
     },
-  ])("allows browser-selected keys for JavaScript filename bindings (case %#)", ({
+  ])("rejects browser-selected keys for JavaScript filename bindings (case %#)", ({
     configuredFileName,
     requestedKey,
   }) => {
@@ -94,7 +94,7 @@ describe("S3 upload key authorization", () => {
         key: requestedKey,
         user,
       })
-    ).toBe(true)
+    ).toBe(false)
   })
 
   it.each([
@@ -254,5 +254,16 @@ describe("S3 upload bucket authorization", () => {
     "{{ lowercase tenant }}-{{ region }}-uploads",
   ])("keeps complex expression %s flexible", (template) => {
     expect(matchesConfiguredBucket({ template, bucket: "selected-bucket" })).toBe(true)
+  })
+
+  it.each([
+    { template: encodeJSBinding('return "uploads"'), bucket: "uploads" },
+    { template: `uploads-${encodeJSBinding('return "eu"')}`, bucket: "uploads-eu" },
+    {
+      template: encodeJSBinding('return "uploads"'),
+      bucket: "other-bucket",
+    },
+  ])("rejects JavaScript bucket bindings (case %#)", ({ template, bucket }) => {
+    expect(matchesConfiguredBucket({ template, bucket })).toBe(false)
   })
 })

@@ -67,9 +67,13 @@ export const matchesConfiguredBucket = ({
   template: string
   bucket: string
 }): boolean => {
+  const blocks = findHBSBlocks(template)
+  if (blocks.some(isJSBinding)) {
+    return false
+  }
   const parts: string[] = []
   let cursor = 0
-  for (const block of findHBSBlocks(template)) {
+  for (const block of blocks) {
     const expression = block.replace(/^\{\{\{?|\}\}\}?$/g, "").trim()
     // Complex expressions retain client-selected buckets for compatibility.
     if (!bindingPath.test(expression)) {
@@ -105,9 +109,8 @@ export const matchesConfiguredKey = ({
   }
 
   const blocks = findHBSBlocks(template)
-  // JavaScript bindings retain browser-selected keys for compatibility.
   if (blocks.some(isJSBinding)) {
-    return true
+    return false
   }
   const parts: string[] = []
   const userValues = new Map(Object.entries(user))

@@ -142,6 +142,7 @@ $: sections = getSections(componentInstance, componentDefinition, isScreen, tag,
                 // Field select settings
                 explanation: setting.explanation,
                 allowHTML: setting.allowHTML,
+                allowJS: setting.allowJS ?? true,
 
                 // Component configuration
                 componentType: setting.componentType,

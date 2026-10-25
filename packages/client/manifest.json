@@ -5293,13 +5293,15 @@
         "type": "text",
         "label": "Bucket",
         "key": "bucket",
-        "supportsConditions": false
+        "supportsConditions": false,
+        "allowJS": false
       },
       {
         "type": "text",
         "label": "Folder",
         "key": "folder",
-        "supportsConditions": false
+        "supportsConditions": false,
+        "allowJS": false
       },
       {
         "type": "event",

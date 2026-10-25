@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto"
 import { S3 } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { context, roles } from "@supertoolmake/backend-core"
+import { encodeJSBinding } from "@supertoolmake/string-templates"
 import { type Screen, SourceName } from "@supertoolmake/types"
 import sharp from "sharp"
 import sdk from "../../../sdk"
@@ -179,6 +180,32 @@ describe("configured object-store uploads", () => {
       .send(upload())
       .expect(403)
     expect(getSignedUrl).toHaveBeenCalledTimes(1)
+  })
+
+  it.each([
+    "bucket",
+    "folder",
+  ])("rejects a destination configured with a JavaScript %s binding", async (setting) => {
+    const original = await config.doInContext(undefined, async () => {
+      const db = context.getWorkspaceDB()
+      const saved = await db.get<Screen>(screen._id!)
+      const component = saved.props._children![0]
+      const previous = component[setting]
+      component[setting] = encodeJSBinding(`return "${previous}"`)
+      await db.put(saved)
+      return previous
+    })
+    try {
+      await request.post(url()).set(config.defaultHeaders()).send(upload()).expect(403)
+      expect(getSignedUrl).not.toHaveBeenCalled()
+    } finally {
+      await config.doInContext(undefined, async () => {
+        const db = context.getWorkspaceDB()
+        const saved = await db.get<Screen>(screen._id!)
+        saved.props._children![0][setting] = original
+        await db.put(saved)
+      })
+    }
   })
 
   it("rejects destinations controlled by UI conditions", async () => {
