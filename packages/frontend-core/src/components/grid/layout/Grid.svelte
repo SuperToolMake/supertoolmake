@@ -211,7 +211,10 @@ onMount(() => {
   {/if}
   {#if $loading && !$error}
     <div in:fade|local={{ duration: 130 }} class="grid-loading">
-      <ProgressCircle />
+      <div class="grid-loading-content">
+        <ProgressCircle />
+        <div class="grid-loading-text">Loading...</div>
+      </div>
     </div>
   {/if}
   {#if $config.canAddRows}
@@ -344,6 +347,17 @@ onMount(() => {
     height: 100%;
     background: var(--grid-background-alt);
     opacity: 0.3;
+  }
+  .grid-loading-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .grid-loading-text {
+    font-size: var(--font-size-s);
+    color: var(--grey-7);
   }
 
   /* Error */

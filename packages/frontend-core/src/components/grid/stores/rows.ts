@@ -1,5 +1,5 @@
 import { Helpers } from "@supertoolmake/bbui"
-import { FieldType, type Row, type UIRow } from "@supertoolmake/types"
+import { FieldType, type Row, type UIDatasource, type UIRow } from "@supertoolmake/types"
 import { tick } from "svelte"
 import { derived, get, type Readable, type Writable, writable } from "svelte/store"
 import { type DataFetch, type DataFetchDefinition, fetchData } from "../../../fetch"
@@ -200,7 +200,9 @@ export const createActions = (context: StoreContext): RowActionStore => {
   // Reset everything when datasource changes
   let unsubscribe: (() => void) | null = null
   let lastResetKey: string | null = null
+  let currentDatasource: UIDatasource | null = null
   datasource.subscribe(async ($datasource) => {
+    currentDatasource = $datasource
     // Unsub from previous fetch if one exists
     unsubscribe?.()
     unsubscribe = null
@@ -211,6 +213,18 @@ export const createActions = (context: StoreContext): RowActionStore => {
 
     // Abandon if we don't have a valid datasource
     if (!datasource.actions.isDatasourceValid($datasource)) {
+      // The datasource prop isn't available until after the component body
+      // runs, so an invalid value on the very first pass is usually just the
+      // initial mount resolving. Wait a tick to let a valid datasource arrive
+      // before treating this as a real error.
+      await tick()
+      // A newer datasource took over while we waited - let that run decide.
+      if (currentDatasource !== $datasource) {
+        return
+      }
+      if (datasource.actions.isDatasourceValid($datasource)) {
+        return
+      }
       error.set("Datasource is invalid")
       return
     }
