@@ -1,4 +1,4 @@
-import { context } from "@supertoolmake/backend-core"
+import { context, users } from "@supertoolmake/backend-core"
 import { dataFilters } from "@supertoolmake/shared-core"
 import {
   type Ctx,
@@ -189,9 +189,11 @@ export async function search(ctx: Ctx<SearchRowRequest, SearchRowResponse>) {
     query = replaceTableNamesInFilters(tableId, query, allTables)
   }
 
-  const enrichedQuery: SearchFilters = await utils.enrichSearchContext(query, {
-    user: sdk.users.getUserContextBindings(ctx.user),
-  })
+  const userBindings = sdk.users.getUserContextBindings(ctx.user)
+  const enrichedQuery: SearchFilters =
+    ctx.user && users.isBuilder(ctx.user, context.getWorkspaceId())
+      ? await utils.enrichSearchContext(query, { user: userBindings })
+      : utils.resolveReaderSearchBindings({ query, user: userBindings })
 
   const searchParams: RequiredKeys<RowSearchParams> = {
     query: enrichedQuery,

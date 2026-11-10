@@ -92,3 +92,6 @@ export function findDuplicateInternalColumns(table: Table): string[] {
   }
   return duplicates
 }
+
+export const hasSinglePrimaryKey = ({ table }: { table: Table }): boolean =>
+  table.primary?.length === 1

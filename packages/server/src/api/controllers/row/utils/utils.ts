@@ -1,12 +1,14 @@
-import { sql } from "@supertoolmake/backend-core"
-import { processStringSync } from "@supertoolmake/string-templates"
+import { BadRequestError, sql } from "@supertoolmake/backend-core"
+import { findHBSBlocks, processStringSync } from "@supertoolmake/string-templates"
 import {
   type Ctx,
   type DatasourcePlusQueryResponse,
   FieldType,
   type RelationshipsJson,
   type Row,
+  type SearchFilters,
   type Table,
+  type UserBindings,
 } from "@supertoolmake/types"
 import * as utils from "../../../../db/utils"
 import sdk from "../../../../sdk"
@@ -121,6 +123,54 @@ export async function sqlOutputProcessing(
 
 export function isUserMetadataTable(tableId: string) {
   return tableId === utils.InternalTables.USER_METADATA
+}
+
+export function resolveReaderSearchBindings({
+  query,
+  user,
+}: {
+  query: SearchFilters | undefined
+  user: UserBindings
+}): SearchFilters {
+  const bindings: Record<string, string | undefined> = {
+    "user._id": user._id,
+    "user.firstName": user.firstName,
+    "user.lastName": user.lastName,
+    "user.email": user.email,
+    "user.status": user.status,
+    "user.roleId": user.roleId ?? undefined,
+    "user.globalId": user.globalId,
+    "user.userId": user.userId,
+    now: new Date().toISOString(),
+  }
+
+  const resolve = (value: unknown): unknown => {
+    if (typeof value === "string") {
+      return findHBSBlocks(value).reduce((result, block) => {
+        const binding = block
+          .slice(2, -2)
+          .trim()
+          .replace(/^\[user\]\./, "user.")
+          .replace(/^user\.\[([a-zA-Z_][a-zA-Z0-9_]*)\]$/, "user.$1")
+          .replace(/^\[now\]$/, "now")
+        if (!Object.hasOwn(bindings, binding)) {
+          throw new BadRequestError("Unsupported search query binding")
+        }
+        return result.replace(block, bindings[binding] ?? "")
+      }, value)
+    }
+    if (Array.isArray(value)) {
+      return value.map(resolve)
+    }
+    if (value && typeof value === "object") {
+      return Object.fromEntries(
+        Object.entries(value).map(([key, nested]) => [key, resolve(nested)])
+      )
+    }
+    return value
+  }
+
+  return resolve(query ?? {}) as SearchFilters
 }
 
 export async function enrichArrayContext(

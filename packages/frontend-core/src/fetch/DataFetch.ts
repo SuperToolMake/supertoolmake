@@ -83,6 +83,7 @@ export default abstract class BaseDataFetch<
   }
   store: Writable<DataFetchStore<TDefinition, TQuery, TRow>>
   derivedStore: Readable<DataFetchDerivedStore<TDefinition, TQuery, TRow>>
+  private lastLoadId = 0
 
   /**
    * Constructs a new DataFetch instance.
@@ -204,12 +205,16 @@ export default abstract class BaseDataFetch<
    */
   async getInitialData() {
     const { filter, paginate } = this.options
+    const thisLoadId = ++this.lastLoadId
 
     // Fetch datasource definition and extract sort properties if configured
     const definition = await this.getDefinition()
 
     // Determine feature flags
     const features = await this.determineFeatureFlags()
+    if (thisLoadId !== this.lastLoadId) {
+      return
+    }
     this.features = {
       supportsSearch: Boolean(features?.supportsSearch),
       supportsSort: Boolean(features?.supportsSort),
@@ -275,6 +280,9 @@ export default abstract class BaseDataFetch<
 
     // Actually fetch data
     const page = await this.getPage()
+    if (thisLoadId !== this.lastLoadId) {
+      return
+    }
     this.store.update(($store) => {
       // For scroll pagination, cap initial rows at maxItems
       let rows = page.rows

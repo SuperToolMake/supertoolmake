@@ -125,7 +125,17 @@ export class CouchDatabase implements Database {
       method: "HEAD",
       cookie: this.couchInfo.cookie,
     })
-    return response.status === 200
+    if (response.status === 200) {
+      return true
+    }
+    if (response.status === 404) {
+      return false
+    }
+    throw new CouchDBError("Unable to check database existence", {
+      status: response.status,
+      name: "CouchDBError",
+      reason: response.statusText,
+    })
   }
 
   private async docExists(id: string): Promise<boolean> {

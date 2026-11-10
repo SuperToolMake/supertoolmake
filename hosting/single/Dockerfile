@@ -1,5 +1,5 @@
 ARG BASEIMG=apache/couchdb:3.5.1
-FROM node:22-slim AS build
+FROM node:22.23.4-slim AS build
 
 # Install node-gyp dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends g++ make python3 jq
@@ -48,7 +48,8 @@ RUN apt-get update && \
 
 # Install Node.js 22
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
-    apt-get install -y nodejs
+    apt-get install -y nodejs && \
+    node -e 'const [major, minor, patch] = process.versions.node.split(".").map(Number); if (major !== 22 || minor < 23 || (minor === 23 && patch < 4)) process.exit(1)'
 
 # We use pm2 in order to run multiple node processes in a single container
 RUN npm install --global pm2

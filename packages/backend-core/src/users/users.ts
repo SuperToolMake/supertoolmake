@@ -43,7 +43,9 @@ export async function bulkGetGlobalUsersById(userIds: string[], opts?: GetOpts) 
       keys: userIds,
       include_docs: true,
     })
-  ).rows.map((row) => row.doc) as User[]
+  ).rows
+    .filter((row) => row.doc)
+    .map((row) => row.doc) as User[]
   if (opts?.cleanup) {
     users = removeUserPassword(users) as User[]
   }
@@ -248,7 +250,7 @@ export async function paginatedUsers({ bookmark, query, appId, limit }: SearchUs
   } else if (appId) {
     userList = await searchGlobalUsersByApp(appId, opts)
     getKey = (doc: any) => getGlobalUserByAppPage(appId, doc)
-  } else if (query?.string?.email) {
+  } else if (query?.string?.email !== undefined) {
     userList = await searchGlobalUsersByEmail(query?.string?.email, opts)
     property = "email"
   } else if (query?.oneOf?._id) {

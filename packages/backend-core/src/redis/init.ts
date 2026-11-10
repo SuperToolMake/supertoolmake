@@ -1,3 +1,4 @@
+import env from "../environment"
 import Client from "./redis"
 import * as utils from "./utils"
 
@@ -14,7 +15,10 @@ let userClient: Client,
 
 export async function init() {
   userClient = await Client.init(utils.Databases.USER_CACHE)
-  sessionClient = await Client.init(utils.Databases.SESSIONS)
+  sessionClient = await Client.init(
+    utils.Databases.SESSIONS,
+    env.REDIS_CLUSTERED ? undefined : utils.SelectableDatabase.SESSIONS
+  )
   workspaceClient = await Client.init(utils.Databases.WORKSPACE_METADATA)
   cacheClient = await Client.init(utils.Databases.GENERIC_CACHE)
   lockClient = await Client.init(utils.Databases.LOCKS)

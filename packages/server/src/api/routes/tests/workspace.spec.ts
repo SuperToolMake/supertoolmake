@@ -1,5 +1,5 @@
 import { cache, db, Header, objectStore, roles } from "@supertoolmake/backend-core"
-import { structures } from "@supertoolmake/backend-core/tests"
+import { generator, structures } from "@supertoolmake/backend-core/tests"
 import {
   BuiltinPermissionID,
   PermissionLevel,
@@ -10,10 +10,12 @@ import {
 import nock from "nock"
 import tk from "timekeeper"
 import { USERS_TABLE_SCHEMA } from "../../../constants"
-import { WorkspaceStatus } from "../../../db/utils"
+import { generateWorkspaceID, WorkspaceStatus } from "../../../db/utils"
 import env from "../../../environment"
 import { type DatabaseName, getDatasource } from "../../../integrations/tests/utils"
+import sdk from "../../../sdk"
 import { basicScreen, basicTable, customScreen } from "../../../tests/utilities/structures"
+import { createWorkspace } from "../../controllers/workspace"
 import * as setup from "./utilities"
 import { checkBuilderEndpoint } from "./utilities/TestFunctions"
 
@@ -67,6 +69,23 @@ describe("/applications", () => {
     await createNewApp()
     jest.clearAllMocks()
     nock.cleanAll()
+  })
+
+  it("ignores a server file path supplied in a workspace creation body", async () => {
+    const importWorkspace = jest.spyOn(sdk.backups, "importWorkspace")
+    let created!: Workspace
+    await jest.mocked(generateWorkspaceID).withImplementation(
+      () => db.generateWorkspaceID({ random: true }),
+      async () => {
+        created = await config._req(createWorkspace, {
+          name: generator.guid(),
+          file: { path: "/etc/passwd" },
+        })
+      }
+    )
+    config.allWorkspaces.push(created)
+    expect(importWorkspace).not.toHaveBeenCalled()
+    importWorkspace.mockRestore()
   })
 
   // These need to go first for the app totals to make sense

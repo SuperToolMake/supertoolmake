@@ -20,12 +20,9 @@ async function populateFromDB(userId: string, tenantId: string) {
 async function populateUsersFromDB(
   userIds: string[]
 ): Promise<{ users: User[]; notFoundIds?: string[] }> {
-  const getUsersResponse = await UserDB.bulkGet(userIds)
-
-  // Handle missed user ids
-  const notFoundIds = userIds.filter((_uid, i) => !getUsersResponse[i])
-
-  const users = getUsersResponse.filter((x) => x)
+  const users = await UserDB.bulkGet(userIds)
+  const foundIds = new Set(users.map((user) => user._id))
+  const notFoundIds = userIds.filter((id) => !foundIds.has(id))
 
   await Promise.all(
     users.map(async (user: any) => {

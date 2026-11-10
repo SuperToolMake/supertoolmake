@@ -122,6 +122,24 @@ describe("rest", () => {
     })
   }
 
+  it.each([
+    { foo: ["{{ 1 }}"] },
+    { foo: { nested: "{{ user.oauth2.accessToken }}" } },
+    { foo: [{ "{{ user.email }}": "value" }] },
+  ])("rejects nested template parameters: %j", async (parameters) => {
+    const query = await createQuery({ path: "https://example.com" })
+    await config.api.query.execute(
+      query._id!,
+      { parameters: JSON.parse(JSON.stringify(parameters)) },
+      {
+        status: 400,
+        body: {
+          message: "Parameter 'foo' input contains a handlebars binding - this is not allowed.",
+        },
+      }
+    )
+  })
+
   beforeAll(async () => {
     restoreEnv = setServerEnv({ REST_REJECT_UNAUTHORIZED: false })
     config = setup.getConfig()

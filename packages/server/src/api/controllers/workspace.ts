@@ -367,10 +367,6 @@ async function performWorkspaceCreate(
       path: filePath,
       password: encryptionPassword,
     }
-  } else if (typeof body.file?.path === "string") {
-    instanceConfig.file = {
-      path: body.file?.path,
-    }
   }
 
   const workspaceId = getDevWorkspaceID(generateWorkspaceID())

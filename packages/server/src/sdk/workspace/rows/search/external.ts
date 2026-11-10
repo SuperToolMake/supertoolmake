@@ -197,7 +197,8 @@ export async function exportRows(options: ExportRowsParams): Promise<ExportRowsR
     rows = result.rows
   }
 
-  const schema = datasource.entities[tableName].schema
+  const tableSchema = datasource.entities[tableName].schema
+  const schema = columns?.length ? pick(tableSchema, columns) : tableSchema
   const exportRows = sdk.rows.utils.cleanExportRows(rows, schema, format, columns, customHeaders)
 
   let content: string

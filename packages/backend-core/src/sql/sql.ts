@@ -1,4 +1,4 @@
-import { dataFilters, helpers } from "@supertoolmake/shared-core"
+import { dataFilters, hasSinglePrimaryKey, helpers } from "@supertoolmake/shared-core"
 import {
   type AnySearchFilter,
   type ArrayFilter,
@@ -31,6 +31,7 @@ import * as dbCore from "../db"
 import environment from "../environment"
 import SqlTableQueryBuilder from "./sqlTable"
 import {
+  breakRowIdField,
   extractDate,
   getNativeSql,
   isExternalTable,
@@ -108,6 +109,20 @@ function isJsonColumn(field: FieldSchema): field is JsonFieldMetadata | BBRefere
   return JsonTypes.includes(field.type) && !helpers.schema.isDeprecatedSingleUserColumn(field)
 }
 
+const decodeRelatedRowId = (value: unknown): unknown => {
+  if (typeof value !== "string" || value === "") {
+    return value ?? null
+  }
+  try {
+    return breakRowIdField(value)[0] ?? null
+  } catch (err) {
+    if (err instanceof URIError) {
+      return value
+    }
+    throw err
+  }
+}
+
 const allowEmptyRelationships: Record<SearchFilterKey, boolean> = {
   [BasicOperator.EQUAL]: false,
   [BasicOperator.NOT_EQUAL]: true,
@@ -157,6 +172,9 @@ class InternalBuilder {
         field?.type === FieldType.OPTIONS
       )
     },
+    POSTGRES_UUID: (field: FieldSchema | undefined) => {
+      return this.client === SqlClient.POSTGRES && field?.externalType?.toLowerCase() === "uuid"
+    },
     MSSQL_DATES: (field: FieldSchema | undefined) => {
       return (
         this.client === SqlClient.MS_SQL && field?.type === FieldType.DATETIME && field.timeOnly
@@ -175,6 +193,25 @@ class InternalBuilder {
   getFieldSchema(key: string): FieldSchema | undefined {
     const { column } = this.splitter.run(key)
     return this.table.schema[column]
+  }
+
+  private getPostgresTextFilterSchema(key: string): FieldSchema | undefined {
+    if (this.client !== SqlClient.POSTGRES) {
+      return undefined
+    }
+
+    const { tableName, column } = this.splitter.run(key)
+    if (tableName) {
+      return this.query.tables[tableName]?.schema[column]
+    }
+
+    const table = Object.values(this.query.tables).find((table) => key.startsWith(`${table.name}.`))
+    if (table) {
+      const { column } = this.splitter.run(key.slice(table.name.length + 1))
+      return table.schema[column]
+    }
+
+    return this.getFieldSchema(key)
   }
 
   private requiresJsonAsStringClient(): boolean {
@@ -541,8 +578,17 @@ class InternalBuilder {
     ) {
       const handleRelationship = (q: Knex.QueryBuilder, key: string, value: any) => {
         const [filterTableName, ...otherProperties] = key.split(".")
-        const property = otherProperties.join(".")
+        let property = otherProperties.join(".")
         const alias = getTableAlias(filterTableName)
+        const { tableName } = builder.splitter.run(key)
+        const relatedTable = builder.query.tables[tableName || filterTableName]
+        if (property === "_id" && relatedTable && isExternalTable(relatedTable)) {
+          if (!hasSinglePrimaryKey({ table: relatedTable })) {
+            throw new Error("Filtering by a related row ID requires a single-column primary key")
+          }
+          property = relatedTable.primary![0]
+          value = Array.isArray(value) ? value.map(decodeRelatedRowId) : decodeRelatedRowId(value)
+        }
         return q.andWhere((subquery) =>
           fn(subquery, alias ? `${alias}.${property}` : property, value)
         )
@@ -589,6 +635,9 @@ class InternalBuilder {
     const like = (q: Knex.QueryBuilder, key: string, value: any) => {
       if (filters?.fuzzyOr || shouldOr) {
         q = q.or
+      }
+      if (this.SPECIAL_SELECT_CASES.POSTGRES_UUID(this.getPostgresTextFilterSchema(key))) {
+        return q.whereRaw(`??::text ilike ?`, [this.rawQuotedIdentifier(key), `%${value}%`])
       }
       return q.whereILike(
         // @ts-expect-error knex types are wrong, raw is fine here
@@ -753,12 +802,12 @@ class InternalBuilder {
         if (shouldOr) {
           q = q.or
         }
-        const schema = this.getFieldSchema(key)
-        if (this.SPECIAL_SELECT_CASES.POSTGRES_ENUM(schema)) {
-          return q.whereRaw(`??::text ilike ?`, [
-            this.knex.raw(this.quote(schema!.name)),
-            `${value}%`,
-          ])
+        const schema = this.getPostgresTextFilterSchema(key)
+        if (
+          this.SPECIAL_SELECT_CASES.POSTGRES_ENUM(schema) ||
+          this.SPECIAL_SELECT_CASES.POSTGRES_UUID(schema)
+        ) {
+          return q.whereRaw(`??::text ilike ?`, [this.rawQuotedIdentifier(key), `${value}%`])
         } else {
           return q.whereILike(key, `${value}%`)
         }
@@ -1317,7 +1366,7 @@ class InternalBuilder {
     query = this.addFilters(query, filters, { relationship: true })
 
     // handle relationships with a CTE for all others
-    if (relationships?.length) {
+    if (operation !== Operation.COUNT && relationships?.length) {
       const mainTable = this.query.tableAliases?.[table.name] || table.name
       const cte = this.addSorting(
         this.knex
