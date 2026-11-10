@@ -115,11 +115,13 @@ export async function doWithLock<T>(
 ): Promise<RedlockExecution<T>> {
   const redlock = await getClient(opts.type, opts.customOptions)
   let lock: Redlock.Lock | undefined
-  let timeout
+  let timeout: ReturnType<typeof setTimeout> | undefined
+  let stopped = false
+  let inflightExtend: Promise<void> | undefined
   try {
     const name = getLockName(opts)
 
-    const ttl = opts.type === LockType.AUTO_EXTEND ? AUTO_EXTEND_POLLING_MS : opts.ttl
+    const ttl = opts.type === LockType.AUTO_EXTEND ? (opts.ttl ?? AUTO_EXTEND_POLLING_MS) : opts.ttl
 
     // create the lock
     lock = await redlock.lock(name, ttl)
@@ -128,9 +130,21 @@ export async function doWithLock<T>(
       // We keep extending the lock while the task is running
       const extendInIntervals = (): void => {
         timeout = setTimeout(async () => {
-          lock = await lock!.extend(ttl, () => opts.onExtend?.())
-
-          extendInIntervals()
+          if (stopped) {
+            return
+          }
+          inflightExtend = (async () => {
+            try {
+              lock = await lock!.extend(ttl, () => opts.onExtend?.())
+            } catch {
+              // Retry transient extension failures; unlock reports a lost lock.
+            }
+          })()
+          await inflightExtend
+          inflightExtend = undefined
+          if (!stopped) {
+            extendInIntervals()
+          }
         }, ttl / 2)
       }
 
@@ -155,7 +169,9 @@ export async function doWithLock<T>(
       throw e
     }
   } finally {
+    stopped = true
     clearTimeout(timeout)
+    await inflightExtend
     await lock?.unlock()
   }
 }

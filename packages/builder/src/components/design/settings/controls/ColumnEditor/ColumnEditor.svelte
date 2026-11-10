@@ -28,7 +28,7 @@ let boundValue
 
 const getText = (value) => {
   if (!value?.length) {
-    return placeholder
+    return placeholder || "All columns"
   }
   let text = `${value.length} column`
   if (value.length !== 1) {
@@ -80,7 +80,7 @@ const save = () => {
   drawer.hide()
 }
 
-$: text = getText(value)
+$: text = getText(sanitisedValue)
 $: datasource = getDatasourceForProvider($selectedScreen, componentInstance)
 $: schema = getSchema($selectedScreen, datasource)
 $: options = allowCellEditing
@@ -89,10 +89,6 @@ $: options = allowCellEditing
 $: sanitisedValue = getValidColumns(value, options)
 $: updateBoundValue(sanitisedValue)
 $: enrichedSchemaFields = getSchemaFields(schema, $tables.list)
-
-$: {
-  value = (value || []).filter((column) => schema?.[column.name || column] !== undefined)
-}
 </script>
 
 <div class="column-editor">

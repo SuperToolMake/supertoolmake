@@ -2,6 +2,7 @@
 import type EasyMDE from "easymde"
 import "easymde/dist/easymde.min.css"
 import { onDestroy, onMount } from "svelte"
+import { getCustomToolbarIconNames, useLocalToolbarIcons } from "./toolbarIcons"
 
 export let height: string | null = null
 export let scroll: boolean = true
@@ -24,7 +25,9 @@ onMount(async () => {
     maxHeight: scroll ? height : undefined,
     minHeight: scroll ? undefined : height,
     ...easyMDEOptions,
+    autoDownloadFontAwesome: false,
   })
+  useLocalToolbarIcons(mde, getCustomToolbarIconNames(easyMDEOptions))
 })
 
 onDestroy(() => {

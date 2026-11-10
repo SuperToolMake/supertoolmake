@@ -1,7 +1,14 @@
 import { Readable, Writable } from "node:stream"
+import { Response } from "node-fetch"
 import tk from "timekeeper"
 import { generator, structures } from "../../../../tests"
 import { CouchDatabase } from ".."
+import * as couchUtils from "../utils"
+
+jest.mock("../utils", () => {
+  const actual = jest.requireActual("../utils")
+  return { ...actual, directCouchUrlCall: jest.fn(actual.directCouchUrlCall) }
+})
 
 const initialTime = new Date()
 tk.freeze(initialTime)
@@ -11,6 +18,22 @@ describe("DatabaseImpl", () => {
 
   beforeEach(() => {
     tk.freeze(initialTime)
+  })
+
+  describe("database existence", () => {
+    it.each([200, 404])("handles HTTP %s", async (status) => {
+      jest
+        .mocked(couchUtils.directCouchUrlCall)
+        .mockResolvedValueOnce(new Response(undefined, { status }))
+      expect(await db.exists()).toBe(status === 200)
+    })
+
+    it.each([401, 403, 500, 503])("propagates HTTP %s failures", async (status) => {
+      jest
+        .mocked(couchUtils.directCouchUrlCall)
+        .mockResolvedValueOnce(new Response(undefined, { status }))
+      await expect(db.exists()).rejects.toMatchObject({ status })
+    })
   })
 
   describe("put", () => {

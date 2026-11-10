@@ -17,6 +17,7 @@ jest.mock("@supertoolmake/backend-core", () => {
 
 import { cache, constants, db, utils } from "@supertoolmake/backend-core"
 import type { Workspace, WorkspaceAppResponse } from "@supertoolmake/types"
+import nock from "nock"
 import { basicScreen } from "../../../tests/utilities/structures"
 import * as setup from "./utilities"
 
@@ -50,7 +51,12 @@ describe("published apps in the single workspace", () => {
     const headers = config.defaultHeaders()
     delete headers[constants.Header.WORKSPACE_ID]
     const livePath = `/app${app.url}`
+    // Other suites publish random workspace IDs into the shared CouchDB.
+    const workspaceLookup = nock(db.getCouchInfo().url, { allowUnmocked: true })
+      .get("/_all_dbs")
+      .reply(200, ["app_workspace"])
     const response = await request.get(livePath).set(headers).expect(200)
+    workspaceLookup.done()
     expect(response.body.appId).toBe("app_workspace")
 
     const appPackage = await config.api.workspace.getAppPackage("app_workspace", {

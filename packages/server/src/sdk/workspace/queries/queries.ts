@@ -9,6 +9,10 @@ export interface EnrichContextOpts {
   escapeNewlines?: boolean
 }
 
+interface EnrichJsonOptions extends Required<EnrichContextOpts> {
+  preserveNullValues: boolean
+}
+
 const DEFAULT_ENRICH_CONTEXT_OPTS: Required<EnrichContextOpts> = {
   escapeNewlines: true,
 }
@@ -28,11 +32,7 @@ const processTemplateString = (
   })
 }
 
-const enrichJsonTemplate = (
-  template: string,
-  parameters: object,
-  options: Required<EnrichContextOpts>
-) =>
+const enrichJsonTemplate = (template: string, parameters: object, options: EnrichJsonOptions) =>
   enrichJsonValue(
     processJsonStringSync(template, parameters, {
       noEscaping: true,
@@ -46,7 +46,7 @@ const enrichJsonTemplate = (
 const enrichJsonValue = (
   value: JSONValue,
   parameters: object,
-  options: Required<EnrichContextOpts>
+  options: EnrichJsonOptions
 ): JSONValue => {
   if (Array.isArray(value)) {
     return value.map((item) => enrichJsonValue(item, parameters, options))
@@ -59,7 +59,7 @@ const enrichJsonValue = (
   const enrichedQuery: Record<string, JSONValue> = {}
   for (const key of Object.keys(value)) {
     const fieldValue = value[key]
-    if (fieldValue == null) {
+    if (fieldValue === undefined || (fieldValue === null && !options.preserveNullValues)) {
       continue
     }
     const enrichedKey = processTemplateString(key, parameters, options)
@@ -80,12 +80,14 @@ const enrichContextObject = async (
       continue
     }
     const enrichedKey = processTemplateString(key, parameters, options)
+    const isJsonField = JSON_TEMPLATE_FIELDS.has(enrichedKey)
+    const jsonOptions: EnrichJsonOptions = { ...options, preserveNullValues: isJsonField }
     if (typeof fieldValue === "string") {
-      enrichedQuery[enrichedKey] = JSON_TEMPLATE_FIELDS.has(enrichedKey)
-        ? enrichJsonTemplate(fieldValue, parameters, options)
+      enrichedQuery[enrichedKey] = isJsonField
+        ? enrichJsonTemplate(fieldValue, parameters, jsonOptions)
         : processTemplateString(fieldValue, parameters, options)
     } else {
-      enrichedQuery[enrichedKey] = enrichJsonValue(fieldValue, parameters, options)
+      enrichedQuery[enrichedKey] = enrichJsonValue(fieldValue, parameters, jsonOptions)
     }
   }
   return enrichedQuery

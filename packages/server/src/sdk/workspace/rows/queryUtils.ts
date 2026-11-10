@@ -1,4 +1,5 @@
 import { db, HTTPError } from "@supertoolmake/backend-core"
+import { hasSinglePrimaryKey } from "@supertoolmake/shared-core"
 import {
   FieldType,
   isArraySearchOperator,
@@ -72,7 +73,7 @@ export const getQueryableFields = async (table: Table, fields?: string[]): Promi
     opts?: { noRelationships?: boolean }
   ): Promise<string[]> => {
     const result = []
-    if (isInternal({ table })) {
+    if (isInternal({ table }) || hasSinglePrimaryKey({ table })) {
       result.push("_id")
     }
 

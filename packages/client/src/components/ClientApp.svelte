@@ -340,7 +340,8 @@ $: {
     flex-direction: row;
     justify-content: flex-start;
     align-items: stretch;
-    overflow: hidden;
+    overflow: clip;
+    min-height: 0;
     position: relative;
   }
 
