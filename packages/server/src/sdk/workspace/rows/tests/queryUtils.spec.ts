@@ -1,7 +1,14 @@
-import { FieldType, RelationshipType, type SearchFilters, type Table } from "@supertoolmake/types"
+import {
+  FieldType,
+  RelationshipType,
+  type SearchFilters,
+  type Table,
+  TableSourceType,
+} from "@supertoolmake/types"
 import { structures } from "../../../../api/routes/tests/utilities"
 import { type DatabaseName, getDatasource } from "../../../../integrations/tests/utils"
 import TestConfiguration from "../../../../tests/utilities/TestConfiguration"
+import sdk from "../../.."
 import { getQueryableFields, validateFilters } from "../queryUtils"
 
 describe("query utils", () => {
@@ -113,6 +120,63 @@ describe("query utils", () => {
     })
   })
 
+  describe("relationship primary keys", () => {
+    it.each([
+      { primary: ["person_id"], relatedIds: ["person._id", "persons._id"] },
+      { primary: ["person_id", "tenant_id"], relatedIds: [] },
+      { primary: undefined, relatedIds: [] },
+      { primary: [], relatedIds: [] },
+    ])("includes only supported related IDs with primary key %j", async ({
+      primary,
+      relatedIds,
+    }) => {
+      const relatedTable: Table = {
+        ...structures.basicTable(),
+        _id: "datasource_plus_persons",
+        name: "persons",
+        sourceType: TableSourceType.EXTERNAL,
+        primary,
+        schema: {
+          person_id: { name: "person_id", type: FieldType.STRING },
+          tenant_id: { name: "tenant_id", type: FieldType.STRING },
+        },
+      }
+      const table: Table = {
+        ...structures.basicTable(),
+        schema: {
+          person: {
+            name: "person",
+            type: FieldType.LINK,
+            tableId: relatedTable._id!,
+            relationshipType: RelationshipType.MANY_TO_ONE,
+            fieldName: "profiles",
+          },
+        },
+      }
+      const getTable = jest.spyOn(sdk.tables, "getTable").mockResolvedValue(relatedTable)
+      try {
+        const fields = await getQueryableFields(table)
+        expect(fields).toEqual([
+          "_id",
+          ...relatedIds,
+          "person.person_id",
+          "persons.person_id",
+          "person.tenant_id",
+          "persons.tenant_id",
+        ])
+        if (relatedIds.length) {
+          expect(() => validateFilters({ equal: { "person._id": "row-id" } }, fields)).not.toThrow()
+        } else {
+          expect(() => validateFilters({ equal: { "person._id": "row-id" } }, fields)).toThrow(
+            "Invalid filter field: person._id"
+          )
+        }
+      } finally {
+        getTable.mockRestore()
+      }
+    })
+  })
+
   describe("getQueryableFields", () => {
     const config = new TestConfiguration()
     let datasource: any
@@ -188,6 +252,8 @@ describe("query utils", () => {
         "_id",
         "name",
         "description",
+        "aux._id",
+        "auxTable_relationship._id",
         "aux.name",
         "auxTable_relationship.name",
         "aux.description",
@@ -235,6 +301,8 @@ describe("query utils", () => {
         "_id",
         "name",
         "description",
+        "aux._id",
+        "auxTable_hidden_rel._id",
         "aux.name",
         "auxTable_hidden_rel.name",
         "aux.description",
@@ -353,12 +421,16 @@ describe("query utils", () => {
             "_id",
             "name",
             "description",
+            "aux1._id",
+            "aux1Table_one_to_many._id",
             "aux1.name",
             "aux1Table_one_to_many.name",
             "aux1.description",
             "aux1Table_one_to_many.description",
             "aux1.id",
             "aux1Table_one_to_many.id",
+            "aux2._id",
+            "aux2Table_one_to_many._id",
             "aux2.name",
             "aux2Table_one_to_many.name",
             "aux2.description",
@@ -386,6 +458,8 @@ describe("query utils", () => {
             "name",
             "description",
             "id",
+            "aux2_1._id",
+            "aux2Table_one_to_many._id",
             "aux2_1.name",
             "aux2Table_one_to_many.name",
             "aux2_1.description",
@@ -398,12 +472,15 @@ describe("query utils", () => {
             "aux2Table_one_to_many.fk_aux1Table_one_to_many_aux2_1",
             "aux2_1.fk_aux1Table_one_to_many_aux2_2",
             "aux2Table_one_to_many.fk_aux1Table_one_to_many_aux2_2",
+            "aux2_2._id",
             "aux2_2.name",
             "aux2_2.description",
             "aux2_2.title",
             "aux2_2.id",
             "aux2_2.fk_aux1Table_one_to_many_aux2_1",
             "aux2_2.fk_aux1Table_one_to_many_aux2_2",
+            "table._id",
+            "TestTable_one_to_many._id",
             "table.name",
             "TestTable_one_to_many.name",
             "table.description",
@@ -426,18 +503,23 @@ describe("query utils", () => {
             "name",
             "description",
             "title",
+            "aux1_1._id",
+            "aux1Table_one_to_many._id",
             "aux1_1.name",
             "aux1Table_one_to_many.name",
             "aux1_1.description",
             "aux1Table_one_to_many.description",
             "aux1_1.id",
             "aux1Table_one_to_many.id",
+            "aux1_2._id",
             "aux1_2.name",
             "aux1_2.description",
             "aux1_2.id",
             "id",
             "fk_aux1Table_one_to_many_aux2_1",
             "fk_aux1Table_one_to_many_aux2_2",
+            "table._id",
+            "TestTable_one_to_many._id",
             "table.name",
             "TestTable_one_to_many.name",
             "table.description",
@@ -494,6 +576,8 @@ describe("query utils", () => {
             "_id",
             "name",
             "description",
+            "aux._id",
+            "amm._id",
             "aux.name",
             "amm.name",
             "aux.description",
@@ -516,6 +600,8 @@ describe("query utils", () => {
             "description",
             "title",
             "id",
+            "table._id",
+            "tmm._id",
             "table.name",
             "tmm.name",
             "table.description",

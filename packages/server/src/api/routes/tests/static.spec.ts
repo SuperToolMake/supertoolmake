@@ -1,4 +1,5 @@
-import { constants } from "@supertoolmake/backend-core"
+import { constants, db } from "@supertoolmake/backend-core"
+import nock from "nock"
 import { afterAll as _afterAll, getConfig, getRequest } from "./utilities"
 
 describe("/static", () => {
@@ -22,9 +23,14 @@ describe("/static", () => {
       const headers = config.defaultHeaders()
       delete headers[constants.Header.WORKSPACE_ID]
       const workspaceId = config.getProdWorkspaceId()
+      // Default-workspace discovery must see only this suite's fixture.
+      const workspaceLookup = nock(db.getCouchInfo().url, { allowUnmocked: true })
+        .get("/_all_dbs")
+        .reply(200, [workspaceId])
 
       const res = await request.get(`/app${config.getProdWorkspace().url}`).set(headers).expect(200)
 
+      workspaceLookup.done()
       expect(res.body.appId).toBe(workspaceId)
       expect(res.body.clientLibPath).toContain(`/api/assets/${workspaceId}/client?`)
     })
