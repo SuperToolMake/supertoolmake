@@ -1,5 +1,5 @@
 <script>
-import { Label, Select } from "@supertoolmake/bbui"
+import { Checkbox, Label, Select } from "@supertoolmake/bbui"
 import { findAllMatchingComponents } from "@/helpers/components"
 import { selectedScreen } from "@/stores/builder"
 
@@ -8,6 +8,12 @@ export let parameters
 $: components = findAllMatchingComponents($selectedScreen?.props, (component) =>
   component._component.endsWith("fileupload")
 )
+
+// Stop on error is enabled by default, including for actions which were
+// created before this option existed
+$: if (parameters && parameters.stopOnError === undefined) {
+  parameters.stopOnError = true
+}
 </script>
 
 <div class="root">
@@ -18,6 +24,9 @@ $: components = findAllMatchingComponents($selectedScreen?.props, (component) =>
     getOptionLabel={x => x._instanceName}
     getOptionValue={x => x._id}
   />
+
+  <Label size="S" />
+  <Checkbox text="Stop on error" bind:value={parameters.stopOnError} />
 </div>
 
 <style>

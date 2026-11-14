@@ -320,11 +320,14 @@ const updateStateHandler = (action) => {
 }
 
 const s3UploadHandler = async (action) => {
-  const { componentId } = action.parameters
+  const { componentId, stopOnError = true } = action.parameters
   if (!componentId) {
     return
   }
   const res = await uploadStore.actions.processFileUpload(componentId)
+  if (!res && stopOnError) {
+    return false
+  }
   return {
     publicUrl: res?.publicUrl,
   }
