@@ -35,15 +35,6 @@ export const getThemeVariables = (theme: Theme | undefined) => {
   --spectrum-alias-background-color-primary: var(--spectrum-global-color-gray-100);
     `
   }
-  if (theme === Theme.NORD) {
-    return `
-    --spectrum-global-color-gray-100: #3b4252;
-
-  --spectrum-global-color-gray-200: #424a5c;
-  --spectrum-global-color-gray-300: #4c566a;
-  --spectrum-alias-background-color-primary: var(--spectrum-global-color-gray-100);
-    `
-  }
   if (theme === Theme.MIDNIGHT) {
     return `
     --hue: 220;

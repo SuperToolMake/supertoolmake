@@ -16,11 +16,6 @@ export const ThemeOptions: ThemeMeta[] = [
     name: "Dark",
   },
   {
-    id: Theme.NORD,
-    name: "Nord",
-    base: Theme.DARKEST,
-  },
-  {
     id: Theme.MIDNIGHT,
     name: "Midnight",
     base: Theme.DARKEST,

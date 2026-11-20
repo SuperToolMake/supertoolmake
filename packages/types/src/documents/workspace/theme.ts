@@ -3,7 +3,6 @@ export enum Theme {
   LIGHT = "light",
   DARK = "dark",
   DARKEST = "darkest",
-  NORD = "nord",
   MIDNIGHT = "midnight",
 }
 

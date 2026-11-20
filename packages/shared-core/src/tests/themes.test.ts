@@ -6,7 +6,7 @@ describe("theme class names", () => {
     expect(getThemeClassNames(Theme.LIGHT)).toStrictEqual("spectrum--light")
   })
   it("generates class names for a theme with base theme", () => {
-    expect(getThemeClassNames(Theme.NORD)).toStrictEqual("spectrum--darkest spectrum--nord")
+    expect(getThemeClassNames(Theme.MIDNIGHT)).toStrictEqual("spectrum--darkest spectrum--midnight")
   })
 })
 
@@ -15,7 +15,7 @@ describe("theme validity checking", () => {
     expect(ensureValidTheme(undefined)).toStrictEqual(Theme.DARKEST)
   })
   it("allows specifiying a fallback", () => {
-    expect(ensureValidTheme(undefined, Theme.NORD)).toStrictEqual(Theme.NORD)
+    expect(ensureValidTheme(undefined, Theme.LIGHT)).toStrictEqual(Theme.LIGHT)
   })
   it("migrates lightest to light", () => {
     expect(ensureValidTheme(Theme.LIGHTEST)).toStrictEqual(Theme.LIGHT)
