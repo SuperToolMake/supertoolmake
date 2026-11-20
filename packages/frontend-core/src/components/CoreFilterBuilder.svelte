@@ -18,7 +18,6 @@ export let behaviourFilters = false
 export let allowBindings = false
 export let allowOnEmpty = true
 export let builderType = "filter"
-export let docsURL = "https://docs.budibase.com/docs/searchfilter-data"
 
 export let bindings
 export let panel
@@ -457,14 +456,6 @@ $: fieldOptions = (schemaFields || [])
             >
               Add {builderType} group
             </Button>
-            {#if docsURL}
-              <a href={docsURL} target="_blank">
-                <Icon
-                  name="question"
-                  color="var(--spectrum-global-color-gray-600)"
-                />
-              </a>
-            {/if}
           </div>
         </Layout>
       </div>

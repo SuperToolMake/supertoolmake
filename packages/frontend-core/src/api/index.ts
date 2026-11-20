@@ -10,7 +10,6 @@ import { buildDatasourceEndpoints } from "./datasources"
 import { buildDeploymentEndpoints } from "./deploy"
 import { buildLayoutEndpoints } from "./layouts"
 import { buildLogsEndpoints } from "./logs"
-import { buildMigrationEndpoints } from "./migrations"
 import { buildNavigationEndpoints } from "./navigation"
 import { buildOAuth2Endpoints } from "./oauth2"
 import { buildOtherEndpoints } from "./other"
@@ -160,7 +159,6 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
 
     // Handle response
     if (response.status >= 200 && response.status < 400) {
-      handleMigrations(response)
       try {
         if (response.status === 204) {
           return undefined as ResponseT
@@ -176,17 +174,6 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
     } else {
       delete cache[url]
       throw await makeErrorFromResponse(response, method, suppressErrors)
-    }
-  }
-
-  const handleMigrations = (response: Response) => {
-    if (!config.onMigrationDetected) {
-      return
-    }
-    const migration = response.headers.get(Header.MIGRATING_APP)
-
-    if (migration) {
-      config.onMigrationDetected(migration)
     }
   }
 
@@ -278,7 +265,6 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
     ...buildSelfEndpoints(API),
     ...buildBackupEndpoints(API),
     ...buildLogsEndpoints(API),
-    ...buildMigrationEndpoints(API),
     deployment: buildDeploymentEndpoints(API),
     oauth2: buildOAuth2Endpoints(API),
     navigation: buildNavigationEndpoints(API),

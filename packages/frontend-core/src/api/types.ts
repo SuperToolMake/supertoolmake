@@ -6,7 +6,6 @@ import type { DatasourceEndpoints } from "./datasources"
 import type { DeploymentEndpoints } from "./deploy"
 import type { LayoutEndpoints } from "./layouts"
 import type { LogEndpoints } from "./logs"
-import type { MigrationEndpoints } from "./migrations"
 import type { NavigationEndpoints } from "./navigation"
 import type { OAuth2Endpoints } from "./oauth2"
 import type { OtherEndpoints } from "./other"
@@ -39,7 +38,6 @@ export type APIClientConfig = {
   enableCaching?: boolean
   attachHeaders?: (headers: Headers) => void
   onError?: (error: APIError) => void
-  onMigrationDetected?: (migration: string) => void
 }
 
 export type APICallConfig<RequestT, ResponseT> = {
@@ -94,7 +92,6 @@ export type APIClient = BaseAPIClient &
   DatasourceEndpoints &
   LayoutEndpoints &
   LogEndpoints &
-  MigrationEndpoints &
   OtherEndpoints &
   PermissionEndpoints &
   QueryEndpoints &

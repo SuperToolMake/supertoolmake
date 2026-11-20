@@ -12,7 +12,6 @@ export let allowBindings = true
 export let allowOnEmpty = undefined
 export let datasource = undefined
 export let builderType = undefined
-export let docsURL = undefined
 export let evaluationContext = {}
 </script>
 
@@ -29,7 +28,6 @@ export let evaluationContext = {}
   {bindings}
   {allowOnEmpty}
   {builderType}
-  {docsURL}
   {evaluationContext}
   on:change
 />

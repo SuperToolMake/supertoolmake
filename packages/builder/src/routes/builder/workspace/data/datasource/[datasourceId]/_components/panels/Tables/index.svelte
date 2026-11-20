@@ -21,7 +21,7 @@ let tableSchema = {
   <Tooltip
     slot="tooltip"
     title="Using data in your app"
-    href="https://docs.budibase.com/docs/data"
+    href="https://supertoolmake.com/docs/data/overview"
   />
   <Table
     on:click={({ detail: table }) => $goto(`../../table/${table._id}`)}

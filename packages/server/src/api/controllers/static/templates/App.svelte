@@ -132,11 +132,6 @@ export let props
   <script type="application/javascript" nonce={props.nonce}>
     window.INIT_TIME = Date.now()
   </script>
-  {#if props.appMigrating}
-    <script type="application/javascript" nonce={props.nonce}>
-      window.MIGRATING_APP = true
-    </script>
-  {/if}
   <script
     id="budibase-client-script"
     type="module"

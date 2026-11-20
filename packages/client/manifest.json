@@ -1940,7 +1940,6 @@
     ]
   },
   "bar": {
-    "documentationLink": "https://docs.budibase.com/docs/bar-chart",
     "name": "Bar Chart",
     "description": "Bar chart",
     "icon": "chart-bar",
@@ -2124,7 +2123,6 @@
     ]
   },
   "line": {
-    "documentationLink": "https://docs.budibase.com/docs/line-chart",
     "name": "Line Chart",
     "description": "Line chart",
     "icon": "chart-line",
@@ -2303,7 +2301,6 @@
     ]
   },
   "area": {
-    "documentationLink": "https://docs.budibase.com/docs/area-chart",
     "name": "Area Chart",
     "description": "Line chart",
     "icon": "chart-line-up",
@@ -2494,7 +2491,6 @@
     ]
   },
   "pie": {
-    "documentationLink": "https://docs.budibase.com/docs/pie-donut-chart",
     "name": "Pie Chart",
     "description": "Pie chart",
     "icon": "chart-pie",
@@ -2663,7 +2659,6 @@
     ]
   },
   "donut": {
-    "documentationLink": "https://docs.budibase.com/docs/pie-donut-chart",
     "name": "Donut Chart",
     "description": "Donut chart",
     "icon": "chart-donut",
@@ -2826,7 +2821,6 @@
     ]
   },
   "candlestick": {
-    "documentationLink": "https://docs.budibase.com/docs/candlestick-chart",
     "name": "Candlestick Chart",
     "description": "Candlestick chart",
     "icon": "chart-bar",
@@ -2958,7 +2952,6 @@
     ]
   },
   "histogram": {
-    "documentationLink": "https://docs.budibase.com/docs/histogram-chart",
     "name": "Histogram Chart",
     "description": "Histogram chart",
     "icon": "chart-bar",
@@ -5865,7 +5858,6 @@
     ]
   },
   "chartblock": {
-    "documentationLink": "https://docs.budibase.com/docs/chart",
     "block": true,
     "name": "Chart Block",
     "icon": "chart-pie",
@@ -7498,7 +7490,7 @@
           "invert": true
         },
         "name": "Row ID",
-        "info": "<a href='https://docs.budibase.com/docs/form-block' target='_blank'>How to pass a row ID using bindings</a>",
+        "info": "<a href='https://supertoolmake.com/docs/apps/forms' target='_blank'>How to pass a row ID using bindings</a>",
         "settings": [
           {
             "type": "text",
@@ -7708,7 +7700,7 @@
           "invert": true
         },
         "name": "Row ID",
-        "info": "<a href='https://docs.budibase.com/docs/form-block' target='_blank'>How to pass a row ID using bindings</a>",
+        "info": "<a href='https://supertoolmake.com/docs/apps/forms' target='_blank'>How to pass a row ID using bindings</a>",
         "settings": [
           {
             "type": "text",

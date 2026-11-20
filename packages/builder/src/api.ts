@@ -2,7 +2,7 @@ import { Constants, CookieUtils, createAPIClient } from "@supertoolmake/frontend
 import { ClientHeader, Header, sdk } from "@supertoolmake/shared-core"
 import { get } from "svelte/store"
 import { appStore } from "@/stores/builder"
-import { auth, navigation } from "./stores/portal"
+import { auth } from "./stores/portal"
 
 const newClient = (opts?: { production?: boolean }) =>
   createAPIClient({
@@ -55,19 +55,6 @@ const newClient = (opts?: { production?: boolean }) =>
           location.reload()
         }
       }
-    },
-    onMigrationDetected: (appId) => {
-      const updatingUrl = "/builder/workspace/updating"
-
-      appStore.update((state) => ({ ...state, appId }))
-
-      if (window.location.pathname === updatingUrl) {
-        return
-      }
-
-      get(navigation)?.goto(
-        `${updatingUrl}?returnUrl=${encodeURIComponent(window.location.pathname)}`
-      )
     },
   })
 

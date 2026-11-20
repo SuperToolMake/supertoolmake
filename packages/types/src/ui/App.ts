@@ -6,7 +6,6 @@ export interface AppProps {
   metaDescription: string
   clientCacheKey?: string
   workspaceId: string
-  appMigrating?: boolean
   showSkeletonLoader?: boolean
   hideDevTools?: boolean
   sideNav?: boolean

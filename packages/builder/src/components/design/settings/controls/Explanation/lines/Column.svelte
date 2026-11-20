@@ -32,63 +32,7 @@ const getTypeIcon = (schema) => {
   return fieldDefinition?.icon || "Circle"
 }
 
-const getDocLink = (columnType) => {
-  if (columnType === FieldType.NUMBER) {
-    return "https://docs.budibase.com/docs/number"
-  }
-  if (columnType === FieldType.STRING) {
-    return "https://docs.budibase.com/docs/text"
-  }
-  if (columnType === FieldType.LONGFORM) {
-    return "https://docs.budibase.com/docs/text"
-  }
-  if (columnType === FieldType.ATTACHMENT_SINGLE) {
-    return "https://docs.budibase.com/docs/attachments"
-  }
-  if (columnType === FieldType.ATTACHMENTS) {
-    // No distinct multi attachment docs, link to attachment instead
-    return "https://docs.budibase.com/docs/attachments"
-  }
-  if (columnType === FieldType.ARRAY) {
-    return "https://docs.budibase.com/docs/multi-select"
-  }
-  if (columnType === FieldType.JSON) {
-    return "https://docs.budibase.com/docs/json"
-  }
-  if (columnType === "jsonarray") {
-    return "https://docs.budibase.com/docs/json"
-  }
-  if (columnType === FieldType.DATETIME) {
-    return "https://docs.budibase.com/docs/datetime"
-  }
-  if (columnType === FieldType.BB_REFERENCE_SINGLE) {
-    return "https://docs.budibase.com/docs/users-1"
-  }
-  if (columnType === FieldType.BB_REFERENCE) {
-    return "https://docs.budibase.com/docs/users-1"
-  }
-  if (columnType === FieldType.BARCODEQR) {
-    return "https://docs.budibase.com/docs/barcodeqr"
-  }
-  if (columnType === FieldType.LINK) {
-    return "https://docs.budibase.com/docs/relationships"
-  }
-  if (columnType === FieldType.FORMULA) {
-    return "https://docs.budibase.com/docs/formula"
-  }
-  if (columnType === FieldType.OPTIONS) {
-    return "https://docs.budibase.com/docs/options"
-  }
-  if (columnType === FieldType.BOOLEAN) {
-    return "https://docs.budibase.com/docs/boolean-truefalse"
-  }
-  if (columnType === FieldType.BIGINT) {
-    // No BigInt docs
-    return null
-  }
-
-  return null
-}
+const getDocLink = () => "https://supertoolmake.com/docs/data/tables-and-columns"
 
 // NOTE The correct indefinite article is based on the pronounciation of the word it precedes, not the spelling. So simply checking if the word begins with a vowel is not sufficient.
 
@@ -109,7 +53,7 @@ const getIndefiniteArticle = (schema) => {
 
 $: columnTypeName = getTypeName(schema)
 $: columnIcon = getTypeIcon(schema)
-$: docLink = getDocLink(schema?.type)
+$: docLink = getDocLink()
 $: indefiniteArticle = getIndefiniteArticle(schema)
 </script>
 
@@ -122,7 +66,6 @@ $: indefiniteArticle = getIndefiniteArticle(schema)
   />
   <Text value={` is ${indefiniteArticle} `} />
   <DocumentationLink
-    disabled={docLink === null}
     href={docLink}
     icon={columnIcon}
     text={columnTypeName}

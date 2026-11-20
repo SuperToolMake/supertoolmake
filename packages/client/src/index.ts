@@ -31,7 +31,6 @@ import { initWebsocket } from "@/websocket"
 import type Block from "./components/Block.svelte"
 import type BlockComponent from "./components/BlockComponent.svelte"
 import ClientApp from "./components/ClientApp.svelte"
-import UpdatingApp from "./components/UpdatingApp.svelte"
 
 // Set up global PWA install prompt handler
 if (typeof window !== "undefined") {
@@ -80,7 +79,6 @@ declare global {
     "##SUPER_COMPONENT_ERRORS##"?: Record<string, UIComponentError[]>
 
     // Other flags
-    MIGRATING_APP: boolean
 
     // PWA install prompt
     deferredPwaPrompt: any
@@ -140,15 +138,6 @@ const loadBudibase = async () => {
 
   // Set the flag used to determine if the app is being loaded via an iframe
   appStore.actions.setAppEmbedded(window["##SUPER_APP_EMBEDDED##"] === "true")
-
-  if (window.MIGRATING_APP) {
-    if (!app) {
-      app = mount(UpdatingApp, {
-        target: window.document.body,
-      })
-    }
-    return
-  }
 
   // Fetch environment info
   if (!get(environmentStore)?.loaded) {

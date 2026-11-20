@@ -121,7 +121,7 @@ $: supportsRelationships = datasource.source === "POSTGRES"
   <Tooltip
     slot="tooltip"
     title="Relationships"
-    href="https://docs.budibase.com/docs/relationships"
+    href="https://supertoolmake.com/docs/data/relationships"
   />
   <Table
     on:click={handleRowClick}

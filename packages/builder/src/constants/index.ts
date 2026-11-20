@@ -52,7 +52,7 @@ export const PlanModel = {
 }
 
 export const CHANGELOG_URL = "https://github.com/SuperToolMake/supertoolmake"
-export const DOCUMENTATION_URL = "https://docs.budibase.com/docs"
+export const DOCUMENTATION_URL = "https://supertoolmake.com/docs/"
 export const GITHUB_DISCUSSIONS_URL = "https://github.com/SuperToolMake/supertoolmake/discussions"
 
 export enum AutoScreenTypes {

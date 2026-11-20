@@ -19,6 +19,5 @@ export enum Header {
   TOKEN = "x-budibase-token",
   CSRF_TOKEN = "x-csrf-token",
   AUTHORIZATION = "authorization",
-  MIGRATING_APP = "x-budibase-migrating-app",
   COOKIE = "cookie",
 }

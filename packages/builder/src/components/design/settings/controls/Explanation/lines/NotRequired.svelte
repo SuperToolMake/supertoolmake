@@ -15,7 +15,7 @@ export let setExplanationSubject
   <Space />
   <DocumentationLink
     icon="database-slash"
-    href="https://docs.budibase.com/docs/budibasedb#constraints"
+    href="https://supertoolmake.com/docs/data/tables-and-columns"
     text="Constraint"
   />
   <Text value=", so values may be missing." />

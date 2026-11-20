@@ -31,7 +31,7 @@ const REST_PANEL_SECTIONS = [
     component: RestVariablesPanel,
     tooltip: {
       title: "REST variables",
-      href: "https://docs.budibase.com/docs/rest-variables",
+      href: "https://supertoolmake.com/docs/apis/rest",
     },
   },
 ]

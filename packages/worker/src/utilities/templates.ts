@@ -15,7 +15,7 @@ export async function getSettingsTemplateContext(
     [InternalTemplateBinding.LOGO_URL]: checkSlashesInUrl(`${URL}/${settings.logoUrl}`) || LOGO_URL,
     [InternalTemplateBinding.PLATFORM_URL]: URL,
     [InternalTemplateBinding.COMPANY]: settings.company || BASE_COMPANY,
-    [InternalTemplateBinding.DOCS_URL]: "https://docs.budibase.com/",
+    [InternalTemplateBinding.DOCS_URL]: "https://supertoolmake.com/docs/",
     [InternalTemplateBinding.LOGIN_URL]: checkSlashesInUrl(tenancy.addTenantToUrl(`${URL}/login`)),
     [InternalTemplateBinding.CURRENT_DATE]: new Date().toISOString(),
     [InternalTemplateBinding.CURRENT_YEAR]: new Date().getFullYear(),

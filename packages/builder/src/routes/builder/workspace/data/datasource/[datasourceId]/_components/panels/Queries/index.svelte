@@ -68,7 +68,7 @@ $: createQueryLabel = isRestDatasource ? "Add action" : "Create new query"
     {#if !isRestDatasource}
       <Tooltip
         title="Custom queries"
-        href="https://docs.budibase.com/docs/data-sources#custom-queries "
+        href="https://supertoolmake.com/docs/data/sql-queries"
       />
     {/if}
   </svelte:fragment>
