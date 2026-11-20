@@ -1,4 +1,4 @@
-import { context, db as dbCore } from "@supertoolmake/backend-core"
+import { context, db as dbCore, HTTPError } from "@supertoolmake/backend-core"
 import { helpers } from "@supertoolmake/shared-core"
 import { findHBSBlocks, processObjectSync } from "@supertoolmake/string-templates"
 import {
@@ -20,6 +20,7 @@ import {
   SourceName,
 } from "@supertoolmake/types"
 import { cloneDeep } from "lodash/fp"
+import isEqual from "lodash/isEqual"
 import merge from "lodash/merge"
 import {
   DocumentType,
@@ -248,7 +249,7 @@ export async function removeSecretSingle(datasource: Datasource) {
   return (await removeSecrets([datasource]))[0]
 }
 
-export function mergeConfigs(update: Datasource, old: Datasource) {
+export async function mergeConfigs(update: Datasource, old: Datasource) {
   if (!(update.config && old.config)) {
     return update
   }
@@ -274,20 +275,84 @@ export function mergeConfigs(update: Datasource, old: Datasource) {
     }
   }
 
-  if (old.config?.auth) {
-    update.config = merge(old.config, update.config)
+  const submittedConfig = update.config
+  if (
+    !old.config.auth &&
+    !Object.values(submittedConfig).some(
+      (value) => value === PASSWORD_REPLACEMENT || useEnvVars(value)
+    )
+  ) {
+    return update
   }
 
-  // update back to actual passwords for everything else
-  for (const [key, value] of Object.entries(update.config)) {
-    if (value !== PASSWORD_REPLACEMENT) {
-      continue
+  const definition = await getDefinition(old.source)
+  const credentialFields = Object.entries(definition?.datasource || {})
+    .filter(
+      ([, field]) =>
+        field.type === DatasourceFieldType.PASSWORD ||
+        field.type === DatasourceFieldType.SENSITIVE_LONGFORM
+    )
+    .map(([key]) => key)
+
+  if (old.config.auth) {
+    for (const key of credentialFields) {
+      if (Object.hasOwn(old.config, key) && update.config[key] === undefined) {
+        update.config[key] = PASSWORD_REPLACEMENT
+      }
     }
-    if (update.config && old.config?.[key]) {
-      update.config[key] = old.config?.[key]
-    } else if (update.config) {
-      delete update.config[key]
+    update.config = merge({}, old.config, update.config)
+  }
+
+  const usesBoundCredential = credentialFields.some((key) => useEnvVars(submittedConfig[key]))
+  if (usesBoundCredential || Object.values(update.config).includes(PASSWORD_REPLACEMENT)) {
+    const restoredConfig = { ...update.config }
+    for (const [key, value] of Object.entries(restoredConfig)) {
+      if (value !== PASSWORD_REPLACEMENT) {
+        continue
+      }
+      if (Object.hasOwn(old.config, key)) {
+        restoredConfig[key] = old.config[key]
+      } else {
+        delete restoredConfig[key]
+      }
     }
+
+    const storedSettings = { ...old.config }
+    const updatedSettings = { ...restoredConfig }
+    for (const [key, field] of Object.entries(definition?.datasource || {})) {
+      if (field.type === DatasourceFieldType.NUMBER) {
+        for (const settings of [storedSettings, updatedSettings]) {
+          if (Number.isFinite(settings[key])) {
+            settings[key] = String(settings[key])
+          }
+        }
+      }
+    }
+    for (const key of credentialFields) {
+      if (Object.hasOwn(update.config, key) && update.config[key] !== PASSWORD_REPLACEMENT) {
+        delete storedSettings[key]
+        delete updatedSettings[key]
+      }
+    }
+    if (helpers.isSQL(old)) {
+      delete storedSettings.staticVariables
+      delete storedSettings.dynamicVariables
+      delete updatedSettings.staticVariables
+      delete updatedSettings.dynamicVariables
+    }
+    if ([SourceName.POSTGRES, SourceName.SQL_SERVER].includes(old.source)) {
+      delete storedSettings.schema
+      delete updatedSettings.schema
+    }
+
+    if (
+      (update.source && update.source !== old.source) ||
+      !isEqual(updatedSettings, storedSettings)
+    ) {
+      throw new HTTPError("Datasource settings cannot change while using stored credentials.", 400)
+    }
+
+    update.config = restoredConfig
   }
 
   return update

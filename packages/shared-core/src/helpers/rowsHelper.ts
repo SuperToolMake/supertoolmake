@@ -5,8 +5,13 @@ import type { Row } from "@supertoolmake/types"
  * - Uses the provided columns to determine column order
  * - Escapes values appropriately for CSV format
  */
-export function convertRowsToCsv(rows: Row[], columns: string[], delimiter = ","): string {
-  const headerLine = columns.join(delimiter)
+export function convertRowsToCsv(
+  rows: Row[],
+  columns: string[],
+  delimiter = ",",
+  headers = columns
+): string {
+  const headerLine = headers.map((header) => escapeCsvValue(header, delimiter)).join(delimiter)
   const dataLines = rows.map((row) =>
     columns.map((h) => escapeCsvValue(row[h], delimiter)).join(delimiter)
   )
@@ -57,7 +62,8 @@ export function convertDataToExportFormat(
   rows: Row[],
   format: "csv" | "json",
   columns?: { name: string }[],
-  delimiter = ","
+  delimiter = ",",
+  customHeaders: Record<string, string> = {}
 ): string {
   const schemaKeys = columns?.length
     ? columns.map((c) => c.name)
@@ -71,11 +77,42 @@ export function convertDataToExportFormat(
     }, {})
   )
 
+  const getHeader = (key: string) => {
+    const customHeader = Object.hasOwn(customHeaders, key) ? customHeaders[key] : undefined
+    return customHeader || key
+  }
+
+  const exportHeaders = new Map<string, string>()
+  const usedHeaders = new Set<string>()
+  for (const key of schemaKeys) {
+    const header = getHeader(key)
+    let uniqueHeader = header
+    let suffix = 2
+    while (usedHeaders.has(uniqueHeader)) {
+      uniqueHeader = `${header} (${suffix})`
+      suffix++
+    }
+    exportHeaders.set(key, uniqueHeader)
+    usedHeaders.add(uniqueHeader)
+  }
+
   switch (format) {
     case "csv":
-      return convertRowsToCsv(filteredRows, schemaKeys, delimiter)
+      return convertRowsToCsv(filteredRows, schemaKeys, delimiter, schemaKeys.map(getHeader))
     case "json":
-      return convertRowsToJson(filteredRows)
+      return convertRowsToJson(
+        filteredRows.map((row) =>
+          Object.entries(row).reduce((renamedRow: Row, [key, value]) => {
+            Object.defineProperty(renamedRow, exportHeaders.get(key)!, {
+              value,
+              enumerable: true,
+              writable: true,
+              configurable: true,
+            })
+            return renamedRow
+          }, {})
+        )
+      )
     default:
       throw new Error(`Unsupported format: ${format}`)
   }

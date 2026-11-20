@@ -5,6 +5,7 @@ import type { Datasource, Role, Screen, Table, UIUser, WorkspaceApp } from "@sup
 import { get } from "svelte/store"
 import { appsStore, auth } from "@/stores/portal"
 import { appStore } from "./app"
+import { builderStore } from "./builder"
 import { datasources } from "./datasources"
 import { deploymentStore } from "./deployment"
 import { navigationStore } from "./navigation"
@@ -91,6 +92,9 @@ export const createBuilderWebsocket = (appId: string) => {
     BuilderSocketEvent.AppPublishChange,
     async ({ user, published }: { user: UIUser; published: boolean }) => {
       await appsStore.load()
+      if (builderStore.websocket !== socket) {
+        return
+      }
       if (published) {
         await Promise.all([deploymentStore.load(), workspaceDeploymentStore.fetch()])
       }

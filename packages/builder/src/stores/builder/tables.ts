@@ -71,7 +71,16 @@ export class TableStore extends DerivedBudiStore<BuilderTableStore, DerivedTable
   }
 
   private async singleFetch(tableId: string) {
-    const table = await API.getTable(tableId)
+    let table: Table
+    try {
+      table = await API.getTable(tableId)
+    } catch (error) {
+      if (error && typeof error === "object" && "status" in error && error.status === 404) {
+        this.replaceTable(tableId, null)
+        return
+      }
+      throw error
+    }
     this.store.update((state) => {
       const list = []
       // update the list, keep order accurate
@@ -157,6 +166,7 @@ export class TableStore extends DerivedBudiStore<BuilderTableStore, DerivedTable
   async delete(table: { _id: string; _rev: string }) {
     await API.deleteTable(table._id, table._rev)
     this.replaceTable(table._id, null)
+    await this.fetch()
   }
 
   async duplicate(tableId: string) {

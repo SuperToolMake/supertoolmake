@@ -363,7 +363,7 @@ const exportDataHandler = async (action) => {
   // If still no tableId, fallback to raw rows export
   if (!tableId) {
     try {
-      const cleanedRows = convertDataToExportFormat(rows, type, columns, delimiter)
+      const cleanedRows = convertDataToExportFormat(rows, type, columns, delimiter, customHeaders)
       download(new Blob([cleanedRows], { type: "text/plain" }), `${tableComponentId}.${type}`)
     } catch (error) {
       notificationStore.actions.error(`Error exporting data: ${error.message || error}`)
