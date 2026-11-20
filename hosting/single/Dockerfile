@@ -1,5 +1,5 @@
 ARG BASEIMG=apache/couchdb:3.5.1
-FROM node:22.23.4-slim AS build
+FROM node:22.23.5-slim AS build
 
 # Install node-gyp dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends g++ make python3 jq
