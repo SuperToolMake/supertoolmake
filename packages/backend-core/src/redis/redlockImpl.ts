@@ -136,8 +136,9 @@ export async function doWithLock<T>(
           inflightExtend = (async () => {
             try {
               lock = await lock!.extend(ttl, () => opts.onExtend?.())
-            } catch {
+            } catch (err) {
               // Retry transient extension failures; unlock reports a lost lock.
+              console.warn(`Failed to extend lock "${name}"`, err)
             }
           })()
           await inflightExtend

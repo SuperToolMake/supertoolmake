@@ -135,6 +135,7 @@ const changePermission = async (role) => {
       error
       icon="warning"
       body="Your previous configuration is shown above.<br/> Please choose a single role for read and write access."
+      allowHtml
     />
   {/if}
 

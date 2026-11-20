@@ -9,5 +9,6 @@ export let componentDefinition
   <InfoDisplay
     title={componentDefinition.name}
     body={componentDefinition.info}
+    allowHtml
   />
 </DetailSummary>

@@ -179,7 +179,7 @@ export async function update(ctx: UserCtx<UpdateDatasourceRequest, UpdateDatasou
 
   const datasource: Datasource = {
     ...baseDatasource,
-    ...sdk.datasources.mergeConfigs(dataSourceBody, baseDatasource),
+    ...(await sdk.datasources.mergeConfigs(dataSourceBody, baseDatasource)),
   }
 
   // this block is specific to GSheets, if no auth set, set it back

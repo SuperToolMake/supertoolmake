@@ -7,6 +7,7 @@ export let icon = "question"
 export let quiet = false
 export let warning = false
 export let error = false
+export let allowHtml = false
 </script>
 
 <div class="info" class:noTitle={!title} class:warning class:error class:quiet>
@@ -15,14 +16,22 @@ export let error = false
       <Icon name={icon} />
       {title || ""}
     </div>
-    <!-- biome-ignore lint: svelte/no-at-html-tags -->
-    {@html body}
+    {#if allowHtml}
+      <!-- biome-ignore lint: svelte/no-at-html-tags -->
+      {@html body}
+    {:else}
+      {body || ""}
+    {/if}
   {:else}
     <span class="icon">
       <Icon size="S" name={icon} />
     </span>
-    <!-- biome-ignore lint: svelte/no-at-html-tags -->
-    {@html body}
+    {#if allowHtml}
+      <!-- biome-ignore lint: svelte/no-at-html-tags -->
+      {@html body}
+    {:else}
+      {body || ""}
+    {/if}
   {/if}
 </div>
 

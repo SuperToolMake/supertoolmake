@@ -8,6 +8,7 @@ import {
   Layout,
   notifications,
 } from "@supertoolmake/bbui"
+import { Constants, CookieUtils } from "@supertoolmake/frontend-core"
 import { goto as gotoStore } from "@roxi/routify"
 import Logo from "assets/supertoolmake-emblem.svg"
 import { API } from "@/api"
@@ -27,6 +28,7 @@ async function save() {
     await API.createAdminUser(adminUser)
     notifications.success("Admin user created")
     await admin.init()
+    CookieUtils.removeCookie(Constants.Cookies.ReturnUrl)
     await auth.login(formData?.email.trim(), formData?.password)
     goto("/builder")
   } catch (error) {
