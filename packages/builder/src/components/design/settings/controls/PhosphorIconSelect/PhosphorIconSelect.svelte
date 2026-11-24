@@ -18,37 +18,8 @@ let currentPage: number = 1
 let buttonAnchor: HTMLDivElement
 let dropdown: Popover
 let loading: boolean = false
-let loadedWeights: Set<string> = new Set()
-let isLoadingWeight: boolean = false
 
-// Load phosphor icon weights dynamically when dropdown is opened
-async function loadRegularWeight(): Promise<void> {
-  if (loadedWeights.has("regular") || isLoadingWeight) return
-
-  isLoadingWeight = true
-  try {
-    // Load from CDN instead of bundled package
-    const link = document.createElement("link")
-    link.rel = "stylesheet"
-    link.href = "https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css"
-
-    await new Promise<void>((resolve, reject) => {
-      link.onload = () => resolve()
-      link.onerror = () => reject()
-      document.head.appendChild(link)
-    })
-
-    loadedWeights.add("regular")
-  } catch (error) {
-    console.error("Failed to load phosphor regular icons", error)
-  } finally {
-    isLoadingWeight = false
-  }
-}
-
-// Load regular weight when dropdown opens
-async function onDropdownShow(): Promise<void> {
-  await loadRegularWeight()
+function onDropdownShow(): void {
   dropdown.show()
 }
 
