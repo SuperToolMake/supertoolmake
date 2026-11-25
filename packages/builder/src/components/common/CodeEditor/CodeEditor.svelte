@@ -67,6 +67,7 @@ export const DropdownPosition = {
   import { validateJsTemplate } from "./validator/js"
   import { hbsTagPlugin, stripHbsDelimiters } from "./hbsTags"
   import { markdownDecorationPlugin } from "./markdownDecorations"
+  import { isInsideStringLiteral } from "./stringContext"
 
   export let label: string | undefined = undefined
   export let completions: BindingCompletion[] = []
@@ -269,12 +270,17 @@ const getCompletionIcon = (completion: Completion) => {
       complete.push(
         EditorView.inputHandler.of((view, from, to, insert) => {
           if (jsBindingWrapping && insert === "$") {
-            let { text } = view.state.doc.lineAt(from)
-            const left = from ? text.substring(0, from) : ""
-            const right = to ? text.substring(to) : ""
+            const line = view.state.doc.lineAt(from)
+            const left = line.text.substring(0, from - line.from)
+            const right = line.text.substring(to - line.from)
+            const alreadyWrapped =
+              left.includes('$("') && right.includes('")')
+            // Only wrap outside of strings - within a template literal the
+            // user is likely typing ${} interpolation, but inside ${} itself
+            // we are back in code so bindings should wrap as normal
             const wrap =
-              (!left.includes('$("') || !right.includes('")')) &&
-              !(left.includes("`") && right.includes("`"))
+              !alreadyWrapped &&
+              !isInsideStringLiteral(view.state.doc.sliceString(0, from))
             const anchor = from + (wrap ? 3 : 1)
             const tr = view.state.update(
               {
